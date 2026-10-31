@@ -308,8 +308,8 @@ def test_12_lean_formalization_module_verified():
     assert ver["contains_admit"] is False
     assert ver["actual_defs"] == CANONICAL_THETA_CORRELATION_LEAN_DEFS
     assert ver["actual_theorems"] == CANONICAL_THETA_CORRELATION_LEAN_THEOREMS
-    assert len(ver["actual_defs"]) == 28
-    assert len(ver["actual_theorems"]) == 47
+    assert len(ver["actual_defs"]) == 30
+    assert len(ver["actual_theorems"]) == 49
 
     lean_text = LEAN_MODULE_PATH.read_text(encoding="utf-8")
     # Ensure the vacuous universal quantification over res_sq is absent
@@ -1848,6 +1848,96 @@ def test_31_task_tc047_common_referent_prime_theta_bridge(artifact_payload):
         rt16["compared_against_live_original_arb_count"]
         == enum16_recheck["total_certified_arb_balls_checked"]
     )
+
+
+def test_32_task_tc048_single_observable_common_referent_audit(artifact_payload):
+    """Verify TASK-TC-048 coupled-cutoff piecewise continuity and right-hand jump formula,
+    Candidate 1 and Candidate 2 single-observable collision contract audit,
+    Covariance-Invariance-Discreteness Trilemma, and section_17 round-trip.
+    """
+    from tc.canonical_theta_correlation_bound import (
+        SINGLE_OBSERVABLE_COMMON_REFERENT_AUDIT_STATUS,
+        STARTING_HEAD_TC_048,
+        TASK_TC_048_ID,
+        verify_all_serialized_arb_in_tree,
+    )
+
+    assert (
+        artifact_payload["single_observable_common_referent_audit_task_id"]
+        == TASK_TC_048_ID
+    )
+    assert (
+        artifact_payload["status_dimensions"][
+            "single_observable_common_referent_audit_status"
+        ]
+        == SINGLE_OBSERVABLE_COMMON_REFERENT_AUDIT_STATUS
+    )
+    sec17 = artifact_payload[
+        "section_17_single_prime_theta_observable_and_coupled_cutoff_jump_audit"
+    ]
+    assert sec17["task_id"] == TASK_TC_048_ID
+    assert sec17["inspected_baseline"] == STARTING_HEAD_TC_048
+
+    s2_jump = sec17["section_2_coupled_cutoff_piecewise_continuity_and_jump_audit"]
+    assert s2_jump["all_prime_jump_identities_enclose_zero"] is True
+    assert s2_jump["all_prime_jumps_certified_nonzero"] is True
+    assert s2_jump["all_small_prime_jumps_certified_strictly_negative"] is True
+    assert len(s2_jump["certified_prime_threshold_jump_table"]) == 8
+    tail_1901 = s2_jump["asymptotic_tail_prime_1901_jump_check"]
+    assert tail_1901["in_strict_negative_h0_tail_alpha_ge_9"] is True
+    assert tail_1901["W_p_minus_at_u_p_certified_strictly_negative"] is True
+    assert tail_1901["jump_certified_nonzero"] is True
+    assert tail_1901["jump_certified_strictly_positive"] is True
+    assert (
+        s2_jump["composite_threshold_continuity_check"][
+            "jump_encloses_zero_at_composite_step"
+        ]
+        is True
+    )
+    assert (
+        s2_jump["lean_theorem"]
+        == "coupled_cutoff_prime_step_jump_and_dense_comparison_extension"
+    )
+
+    s3_cand = sec17["section_3_single_observable_common_referent_candidate_audit"]
+    c1_bench = s3_cand["candidate_1_grade_K_prime_euler_integer_layer_observable"][
+        "subcase_1A_unmodulated_carrier_c_K_eq_1"
+    ]["certified_benchmark_at_rho_1_K0_vs_J1"]
+    assert c1_bench["raw_CR1_difference_strictly_positive"] is True
+    assert c1_bench["coboundary_encloses_zero"] is True
+    assert c1_bench["raw_scale_CR1_difference_D_1_minus_D_0_strictly_positive"] is True
+
+    c2_audit = s3_cand[
+        "candidate_2_canonical_theta_and_stieltjes_zero_defect_observables"
+    ]
+    assert c2_audit["all_cand2a_cr1_enclose_zero"] is True
+    assert c2_audit["all_cand2a_off_line_strictly_positive"] is True
+    assert c2_audit["all_cand2a_on_line_enclose_zero"] is True
+    assert c2_audit["all_cand2a_strictly_below_one"] is True
+    assert c2_audit["all_cand2b_cr1_enclose_zero"] is True
+    assert len(c2_audit["certified_candidate_2_evaluation_table"]) == 4
+
+    tri = s3_cand["covariance_invariance_discreteness_trilemma"]
+    assert (
+        tri["lean_theorem"]
+        == "single_observable_common_referent_candidate_audit_and_trilemma"
+    )
+    rem17 = s3_cand["remaining_open_obligation"]
+    assert rem17["subgate_id"] == "SUBGATE-TC-043A"
+    assert rem17["status"] == "OPEN"
+    assert rem17["common_referent_bridge_complete"] is False
+
+    rt17 = sec17["full_section_17_tree_roundtrip_verification"]
+    assert rt17["all_enclose_original_256bit_arb_ball"] is True
+    assert rt17["live_original_count_matches_enumerated_total"] is True
+    enum17_recheck = verify_all_serialized_arb_in_tree(
+        sec17, path_prefix="section_17"
+    )
+    assert (
+        rt17["compared_against_live_original_arb_count"]
+        == enum17_recheck["total_certified_arb_balls_checked"]
+    )
+
 
 
 

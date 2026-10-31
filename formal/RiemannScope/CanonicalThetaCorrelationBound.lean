@@ -1284,16 +1284,20 @@ def finitePrimeMultiplicativeFactorCases (omega_le_y : ℕ) (n p : ℤ) : ℤ :=
 def gradeLayerRealizedObservable (N_ref : ℤ) (tau_K : ℝ) : ℝ :=
   (N_ref : ℝ) * tau_K
 
-/-- Theorem 46: Prime-Euler Multiplicative Integrality, Grade-Layer Membership (`CR2`), and Intrinsic Size Recovery (`CR1`).
+/-- Theorem 46: Prime-Euler Multiplicative Integrality, Grade-Layer Membership (`CR2`), and Intrinsic Coordinate Recovery.
+    Scope Note: This theorem proves the algebraic step consequences for supplied integer inputs
+    `n, p, N_prev, m_step : ℤ` and scales `tau_K, tau_J : ℝ`; the full alternating factorial-product
+    divisor cancellation `N_y(x) = prod_{d | P_y, d <= x} (floor(x/d)!)^{mu(d)} = prod_{n <= x} m_y(n) in Z_{>=1}`
+    is established in the paper derivation and certified computationally in `tc/common_referent_prime_theta_bridge.py`.
     (1) Whenever `1 <= p <= n` in `ℤ`, all three cases of `finitePrimeMultiplicativeFactorCases omega_le_y n p`
         (`omega_le_y = 0, 1, 2`) are positive integers in `[1, n]`.
     (2) For any positive integer prefix product `N_prev >= 1` and step factor `m_step >= 1` (`N_next = N_prev * m_step`),
         `N_next >= N_prev >= 1` (`N_next != 0`), and at any positive scale `tau_K > 0`, the grade-`K` realized observable
         `A_{K,next} = gradeLayerRealizedObservable N_next tau_K` belongs to the nonzero integer layer
         `L_K^x = { (m : ℝ) * tau_K | m : ℤ, m ≠ 0 }` (`CR2`) with `A_{K,next} >= tau_K > 0`.
-    (3) For any two nonzero grade scales `tau_K, tau_J != 0`, the intrinsic normalized size recovers the common
-        integer referent across grades (`CR1` on fiber size):
-        `A_{K,next} / tau_K = (N_next : ℝ) = A_{J,next} / tau_J`,
+    (3) For any two nonzero grade scales `tau_K, tau_J != 0`, dividing by the grade units recovers the intrinsic
+        integer coordinate (`A_{K,next} / tau_K = (N_next : ℝ) = A_{J,next} / tau_J`; note this unit-converted
+        recovery is NOT raw external `CR1` equality, since `A_{K,next} ≠ A_{J,next}` whenever `tau_K ≠ tau_J`),
         and the consecutive grade-`K` step ratio cancels `tau_K` identically:
         `A_{K,next} = (m_step : ℝ) * A_{K,prev}`. -/
 theorem prime_euler_multiplicative_integrality_and_grade_layer_membership
@@ -1338,13 +1342,17 @@ theorem prime_euler_multiplicative_integrality_and_grade_layer_membership
   push_cast
   ring
 
-/-- Theorem 47: Common-Referent Integer-Layer Bridge (`CR1`-`CR2`-`CR3`), Cross-Grade Station Ratio Identity,
-    and Stieltjes Jump Reconstruction.
+/-- Theorem 47: Common-Referent Integer-Layer Bridge (`CR1`-`CR2`-`CR3` Conditional Schema),
+    Cross-Grade Station Ratio Identity, and Stieltjes Jump Reconstruction.
+    Scope Note: Proves the algebraic station-ratio identity, the scale-coboundary law, the conditional
+    reductio implication under supplied `CR1 + CR2 + CR3` hypotheses (without deriving those collision
+    hypotheses from prime/theta data), and the two-step Stieltjes jump sum under the lower-endpoint
+    convention `L_1 = 0` (extending `A_{K,y}(x) = tau^K` constantly below `1` so no atom appears at `x = 1`).
     (1) Cross-grade station ratio identity: for any station integer `n : ℤ` and nonzero grade scales `tau_K, tau_J != 0`
         with relative scale `X_{K,J} = tau_K / tau_J`, the theta-wavelet kernel argument `(n : ℝ) / X_{K,J}` equals
         the ratio of the grade-`J` realized station `Phi_J(n) = gradeLayerRealizedObservable n tau_J` to the grade-`K`
         unit `Phi_K(1) = gradeLayerRealizedObservable 1 tau_K`.
-    (2) Scale-coboundary transfer vs. Common-Referent collision (`CR1 + CR2 + CR3`):
+    (2) Scale-coboundary transfer vs. Conditional Common-Referent collision (`CR1 + CR2 + CR3`):
         `gradeLayerRealizedObservable N_ref tau_K = (tau_K / tau_J) * gradeLayerRealizedObservable N_ref tau_J`,
         while if two integer-layer defect observables `D_K = gradeLayerRealizedObservable m_K tau_K` and
         `D_J = gradeLayerRealizedObservable m_J tau_J` (`CR2`) satisfy `D_K = D_J` (`CR1`), rational-grade
@@ -1381,5 +1389,166 @@ theorem common_referent_integer_layer_bridge_and_station_ratio_identity
   · rintro ⟨h_CR1, h_noncoll, h_CR3⟩
     by_contra h_delta_ne
     exact (h_CR3 h_delta_ne) (h_noncoll h_CR1).1
+
+/-- Exact right-hand jump `F(X_0^+) - F(X_0) = -p^{-1/2} * W_{p^-}(X_0 / p)` of the coupled
+    profile `F(X) = W_{M(X)}(X)` across a prime cutoff threshold `X_0 = (p - 1)^{4/5}`. -/
+def coupledCutoffPrimeStepJump (inv_sqrt_p W_prev_X0_over_p : ℝ) : ℝ :=
+  -inv_sqrt_p * W_prev_X0_over_p
+
+/-- Candidate 2A normalized pullback theta-zero radial defect observable
+    `D_K^{(2A)}(rho_K) = |H_0(tau^{-K} rho_K - 1/2)|^2 * (tau^delta + tau^{-delta} - 2)`. -/
+def thetaZeroRadialDefectObservable (abs_H0_sq tau_delta inv_tau_delta : ℝ) : ℝ :=
+  abs_H0_sq * (tau_delta + inv_tau_delta - 2)
+
+/-- Theorem 48: Coupled-Cutoff Prime-Step Right-Hand Jump Formula and Dense-to-All-`X`
+    Comparison Extension Without Continuity of `F(X) = W_{M(X)}(X)` (`TASK-TC-048`).
+    (1) At `X_0 = (p - 1)^{4/5}` for a prime `p >= 3`, where `F(X_0) = W_{p^-}(X_0)` and
+        `F(X_0^+) = W_p(X_0) = finitePrimeEulerRecursionStep W_{p^-}(X_0) (p^{-1/2}) W_{p^-}(X_0 / p)`,
+        the right-hand jump `F(X_0^+) - F(X_0)` equals
+        `coupledCutoffPrimeStepJump inv_sqrt_p W_prev_X0_over_p = -inv_sqrt_p * W_prev_X0_over_p`.
+    (2) For `inv_sqrt_p > 0`, `F(X_0^+) - F(X_0) ≠ 0 ↔ W_prev_X0_over_p ≠ 0`, and whenever
+        `W_prev_X0_over_p < 0` (as holds when `u_p = X_0 / p ≤ 2/9` so all stations lie in `[9, ∞)`
+        where `h_0 < 0`), the right-hand jump is strictly positive (`0 < F(X_0^+) - F(X_0)`).
+    (3) Dense-grade-to-all-`X` extension via continuity of `W` and uniform comparison (without continuity of `F`):
+        if `|F_X - W_X| ≤ half_C`, `|F_Xd - W_Xd| ≤ half_C`, `|F_Xd| ≤ M_dense`, and `|W_X - W_Xd| ≤ eps`,
+        then `|W_X| ≤ M_dense + half_C + eps` and `|F_X| ≤ M_dense + 2 * half_C + eps`. -/
+theorem coupled_cutoff_prime_step_jump_and_dense_comparison_extension
+    (W_prev_X0 inv_sqrt_p W_prev_X0_over_p F_X W_X F_Xd W_Xd half_C M_dense eps : ℝ)
+    (h_inv_sqrt_p_pos : 0 < inv_sqrt_p)
+    (h_comp_X : |F_X - W_X| ≤ half_C)
+    (h_comp_Xd : |F_Xd - W_Xd| ≤ half_C)
+    (h_dense_bound : |F_Xd| ≤ M_dense)
+    (h_W_cont : |W_X - W_Xd| ≤ eps) :
+    let F_X0 := W_prev_X0
+    let F_X0_plus := finitePrimeEulerRecursionStep W_prev_X0 inv_sqrt_p W_prev_X0_over_p
+    let jump := F_X0_plus - F_X0
+    (jump = coupledCutoffPrimeStepJump inv_sqrt_p W_prev_X0_over_p) ∧
+      (jump ≠ 0 ↔ W_prev_X0_over_p ≠ 0) ∧
+      (W_prev_X0_over_p < 0 → 0 < jump) ∧
+      (|W_X| ≤ M_dense + half_C + eps ∧ |F_X| ≤ M_dense + 2 * half_C + eps) := by
+  intro F_X0 F_X0_plus jump
+  have h_jump_eq :
+      jump = -inv_sqrt_p * W_prev_X0_over_p := by
+    dsimp [jump, F_X0, F_X0_plus, finitePrimeEulerRecursionStep]
+    ring
+  have h_neg_inv_ne : -inv_sqrt_p ≠ 0 := by linarith
+  refine ⟨h_jump_eq, ?_, ?_, ?_⟩
+  · constructor
+    · intro h_j_ne h_w_zero
+      apply h_j_ne
+      rw [h_jump_eq, h_w_zero, mul_zero]
+    · intro h_w_ne h_j_zero
+      rw [h_jump_eq] at h_j_zero
+      rcases mul_eq_zero.mp h_j_zero with h_inv0 | h_w0
+      · exact h_neg_inv_ne h_inv0
+      · exact h_w_ne h_w0
+  · intro h_W_neg
+    rw [h_jump_eq]
+    nlinarith
+  · have h1 := abs_le.mp h_comp_X
+    have h2 := abs_le.mp h_comp_Xd
+    have h3 := abs_le.mp h_dense_bound
+    have h4 := abs_le.mp h_W_cont
+    exact ⟨abs_le.mpr ⟨by linarith, by linarith⟩, abs_le.mpr ⟨by linarith, by linarith⟩⟩
+
+/-- Theorem 49: Single-Observable Common-Referent Candidate Audit (`CR1` + `CR2` + `CR3`)
+    and the Covariance-Invariance-Discreteness Trilemma (`TASK-TC-048`).
+    (1) Candidate 1 (`D_K^{(1A)} = gradeLayerRealizedObservable N_ref tau_K` with `N_ref >= 1`):
+        satisfies `CR2` (`∃ m : ℤ, m ≠ 0 ∧ D_K^{(1A)} = (m : ℝ) * tau_K`), obeys the weight-1
+        scale coboundary `D_K^{(1A)} = (tau_K / tau_J) * D_J^{(1A)}`, and for any `tau_K ≠ tau_J`,
+        fails raw `CR1` equality (`D_K^{(1A)} ≠ D_J^{(1A)}`).
+    (2) Candidate 2A (`D_K^{(2A)} = thetaZeroRadialDefectObservable abs_H0_sq (r^2) (inv_r^2)`
+        where `r = tau^{delta/2} > 0`, `r * inv_r = 1`, and pullback coordinates satisfy
+        `tau_K⁻¹ * (tau_K * rho) = rho = tau_J⁻¹ * (tau_J * rho)`):
+        - satisfies raw `CR1` unconditionally (`tau_K⁻¹ * (tau_K * rho) = tau_J⁻¹ * (tau_J * rho)`),
+        - factors as `abs_H0_sq * (r - inv_r)^2`,
+        - satisfies one-way `CR3`: if `abs_H0_sq > 0` and `r > 0` with `r ≠ 1` (`delta ≠ 0`), then `0 < D^{(2A)}` (`D^{(2A)} ≠ 0`),
+        - at `K = 0` (`L_0 = ℤ`), whenever `0 ≤ D^{(2A)} < 1`, integer membership `(∃ m : ℤ, D^{(2A)} = (m : ℝ))` holds iff `D^{(2A)} = 0`.
+    (3) Covariance-Invariance-Discreteness Trilemma: for any single observable with values `D_K, D_J : ℝ` at scales
+        `tau_K, tau_J` satisfying rational-grade layer disjointness
+        (`∀ m_K m_J : ℤ, (m_K : ℝ) * tau_K = (m_J : ℝ) * tau_J → m_K = 0 ∧ m_J = 0`),
+        simultaneous raw equality `D_K = D_J` (`CR1`) and integer-layer membership
+        `(∃ m_K : ℤ, D_K = (m_K : ℝ) * tau_K) ∧ (∃ m_J : ℤ, D_J = (m_J : ℝ) * tau_J)` (`CR2`)
+        holds if and only if `D_K = 0 ∧ D_J = 0`. -/
+theorem single_observable_common_referent_candidate_audit_and_trilemma
+    (N_ref : ℤ) (tau_K tau_J rho abs_H0_sq r inv_r D_K D_J : ℝ)
+    (h_N_pos : 1 ≤ N_ref)
+    (h_tau_K_ne : tau_K ≠ 0)
+    (h_tau_J_ne : tau_J ≠ 0)
+    (h_tau_diff : tau_K ≠ tau_J)
+    (h_H0_pos : 0 < abs_H0_sq)
+    (h_r_pos : 0 < r)
+    (h_r_inv : r * inv_r = 1)
+    (h_disjoint : ∀ m_K m_J : ℤ, (m_K : ℝ) * tau_K = (m_J : ℝ) * tau_J → m_K = 0 ∧ m_J = 0) :
+    let D1_K := gradeLayerRealizedObservable N_ref tau_K
+    let D1_J := gradeLayerRealizedObservable N_ref tau_J
+    let D2A := thetaZeroRadialDefectObservable abs_H0_sq (r ^ 2) (inv_r ^ 2)
+    ((∃ m : ℤ, m ≠ 0 ∧ D1_K = (m : ℝ) * tau_K) ∧
+      D1_K = (tau_K / tau_J) * D1_J ∧
+      D1_K ≠ D1_J) ∧
+    (tau_K⁻¹ * (tau_K * rho) = tau_J⁻¹ * (tau_J * rho) ∧
+      D2A = abs_H0_sq * (r - inv_r) ^ 2 ∧
+      (r ≠ 1 → 0 < D2A) ∧
+      ((0 ≤ D2A ∧ D2A < 1) → ((∃ m : ℤ, D2A = (m : ℝ)) ↔ D2A = 0))) ∧
+    ((D_K = D_J ∧ (∃ m_K : ℤ, D_K = (m_K : ℝ) * tau_K) ∧ (∃ m_J : ℤ, D_J = (m_J : ℝ) * tau_J)) ↔
+      (D_K = 0 ∧ D_J = 0)) := by
+  intro D1_K D1_J D2A
+  have h_N_ne : N_ref ≠ 0 := by linarith
+  have h_N_real_pos : (0 : ℝ) < (N_ref : ℝ) := by exact_mod_cast (by linarith : (0 : ℤ) < N_ref)
+  have h_N_real_ne : (N_ref : ℝ) ≠ 0 := ne_of_gt h_N_real_pos
+  have h_sq_id : D2A = abs_H0_sq * (r - inv_r) ^ 2 := by
+    dsimp [D2A, thetaZeroRadialDefectObservable]
+    calc abs_H0_sq * (r ^ 2 + inv_r ^ 2 - 2)
+      _ = abs_H0_sq * (r ^ 2 + inv_r ^ 2 - 2 * 1) := by ring
+      _ = abs_H0_sq * (r ^ 2 + inv_r ^ 2 - 2 * (r * inv_r)) := by rw [← h_r_inv]
+      _ = abs_H0_sq * (r - inv_r) ^ 2 := by ring
+  refine ⟨⟨⟨N_ref, h_N_ne, rfl⟩, ?_, ?_⟩, ⟨?_, h_sq_id, ?_, ?_⟩, ?_⟩
+  · dsimp [D1_K, D1_J, gradeLayerRealizedObservable]
+    calc (N_ref : ℝ) * tau_K
+      _ = (N_ref : ℝ) * ((tau_K / tau_J) * tau_J) := by rw [div_mul_cancel₀ tau_K h_tau_J_ne]
+      _ = (tau_K / tau_J) * ((N_ref : ℝ) * tau_J) := by ring
+  · dsimp [D1_K, D1_J, gradeLayerRealizedObservable]
+    intro h_eq
+    have h_sub : (N_ref : ℝ) * (tau_K - tau_J) = 0 := by linarith
+    rcases mul_eq_zero.mp h_sub with hN0 | h_tdiff
+    · exact h_N_real_ne hN0
+    · exact h_tau_diff (sub_eq_zero.mp h_tdiff)
+  · have hK : tau_K⁻¹ * (tau_K * rho) = rho := inv_mul_cancel_left₀ h_tau_K_ne rho
+    have hJ : tau_J⁻¹ * (tau_J * rho) = rho := inv_mul_cancel_left₀ h_tau_J_ne rho
+    rw [hK, hJ]
+  · intro h_r_ne_one
+    rw [h_sq_id]
+    have h_diff_ne : r - inv_r ≠ 0 := by
+      intro h_zero
+      have h_r_eq_inv : inv_r = r := by linarith
+      have h_r_sq : r * r = 1 := by
+        calc r * r = r * inv_r := by rw [h_r_eq_inv]
+        _ = 1 := h_r_inv
+      have h_prod_id : (r - 1) * (r + 1) = r * r - 1 := by ring
+      have h_r_m1_p1 : (r - 1) * (r + 1) = 0 := by linarith [h_r_sq, h_prod_id]
+      rcases mul_eq_zero.mp h_r_m1_p1 with hr1 | hr_neg1
+      · exact h_r_ne_one (by linarith)
+      · linarith
+    have h_sq_pos : 0 < (r - inv_r) ^ 2 := sq_pos_of_ne_zero h_diff_ne
+    exact mul_pos h_H0_pos h_sq_pos
+  · rintro ⟨h_nonneg, h_lt_one⟩
+    constructor
+    · rintro ⟨m, hm_eq⟩
+      have hm_ge_zero : (0 : ℝ) ≤ (m : ℝ) := by linarith
+      have hm_lt_one : (m : ℝ) < (1 : ℝ) := by linarith
+      have hm_int_ge : (0 : ℤ) ≤ m := by exact_mod_cast hm_ge_zero
+      have hm_int_lt : m < (1 : ℤ) := by exact_mod_cast hm_lt_one
+      have hm_zero : m = 0 := by omega
+      rw [hm_eq, hm_zero]
+      simp
+    · intro h_zero
+      exact ⟨0, by simp [h_zero]⟩
+  · constructor
+    · rintro ⟨h_eq, ⟨m_K, hmK⟩, ⟨m_J, hmJ⟩⟩
+      have h_layer_eq : (m_K : ℝ) * tau_K = (m_J : ℝ) * tau_J := by linarith
+      rcases h_disjoint m_K m_J h_layer_eq with ⟨rfl, rfl⟩
+      simp [hmK, hmJ]
+    · rintro ⟨rfl, rfl⟩
+      exact ⟨rfl, ⟨0, by simp⟩, ⟨0, by simp⟩⟩
 
 end RiemannScope

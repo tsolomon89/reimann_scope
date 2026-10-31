@@ -12,6 +12,7 @@
   "moebius_recovery_followup_repair_task_id": "TASK-TC-045R2",
   "prime_euler_moebius_recovery_task_id": "TASK-TC-046",
   "common_referent_prime_theta_bridge_task_id": "TASK-TC-047",
+  "single_observable_common_referent_audit_task_id": "TASK-TC-048",
   "title": "Canonical Theta Correlation Bound: Arithmetic Derivation, Certified Tests, and a Proof Attempt",
   "starting_head": "8fb8a7608212402659a9dee2d22481e3b91fc1c3",
   "repair_starting_head": "9b51ae68c08488a7191dc5fb04c740ba44012974",
@@ -25,6 +26,7 @@
   "moebius_recovery_followup_repair_starting_head": "71398c70c049b53d3546a7258ccda765481114f7",
   "prime_euler_moebius_recovery_starting_head": "1fc477927ccbb242dec10217744b1ad054877e12",
   "common_referent_prime_theta_bridge_starting_head": "c39eb27b31fc4eed98300be0118d8c670f92d32a",
+  "single_observable_common_referent_audit_starting_head": "39b4e3aec6d4357d283932ad296b6148477e00e4",
   "parent_work": [
     "TASK-TC-019",
     "TASK-TC-020",
@@ -44,7 +46,8 @@
     "TASK-TC-045",
     "TASK-TC-045R",
     "TASK-TC-045R2",
-    "TASK-TC-046"
+    "TASK-TC-046",
+    "TASK-TC-047"
   ],
   "status_dimensions": {
     "implementation_status": "IMPLEMENTED_AND_VERIFIED",
@@ -58,6 +61,7 @@
     "cross_grade_moebius_recovery_status": "MIXED_GRADE_PAIRING_POLARIZED_AND_EQUIVALENT_TO_MOEBIUS_RECOVERY_MERTENS_STIELTJES_CANCELLATION_OBLIGATION_ISOLATED",
     "prime_euler_moebius_recovery_status": "FINITE_PRIME_EULER_INVERSION_AND_COUPLED_CUTOFF_REDUCTION_PROVED_HORIZON_COLLAPSE_AND_LOW_FREQUENCY_EULER_SPIKE_OBSTRUCTIONS_QUANTIFIED",
     "common_referent_prime_theta_bridge_status": "COMMON_REFERENT_PRIME_THETA_INTEGER_LAYER_MEMBERSHIP_PROVED_AND_CERTIFIED_SUBGATE_OPEN",
+    "single_observable_common_referent_audit_status": "COUPLED_CUTOFF_JUMP_FORMULA_AND_SINGLE_OBSERVABLE_CANDIDATE_AUDIT_PROVED_COVARIANCE_INVARIANCE_DISCRETENESS_TRILEMMA_ISOLATED_SUBGATE_OPEN",
     "rh_equivalence_proof_status": "FIXED_SEED_RH_EQUIVALENCE_PROVED",
     "numerical_certification_status": "FINITE_GRID_CORRELATION_BOUND_CERTIFIED",
     "local_concavity_status": "LOCAL_ORIGIN_CONCAVITY_CERTIFIED",
@@ -2700,7 +2704,9 @@
       "finitePrimeEulerRecursionStep",
       "finitePrimeCoeffCases",
       "finitePrimeMultiplicativeFactorCases",
-      "gradeLayerRealizedObservable"
+      "gradeLayerRealizedObservable",
+      "coupledCutoffPrimeStepJump",
+      "thetaZeroRadialDefectObservable"
     ],
     "actual_defs": [
       "heatEulerPolyStep",
@@ -2730,7 +2736,9 @@
       "finitePrimeEulerRecursionStep",
       "finitePrimeCoeffCases",
       "finitePrimeMultiplicativeFactorCases",
-      "gradeLayerRealizedObservable"
+      "gradeLayerRealizedObservable",
+      "coupledCutoffPrimeStepJump",
+      "thetaZeroRadialDefectObservable"
     ],
     "expected_theorems": [
       "seed_first_order_spatial_polynomial",
@@ -2779,7 +2787,9 @@
       "finite_prime_euler_recursion_and_coefficient_cases",
       "coupled_prime_cutoff_comparison_and_boundedness_equivalence",
       "prime_euler_multiplicative_integrality_and_grade_layer_membership",
-      "common_referent_integer_layer_bridge_and_station_ratio_identity"
+      "common_referent_integer_layer_bridge_and_station_ratio_identity",
+      "coupled_cutoff_prime_step_jump_and_dense_comparison_extension",
+      "single_observable_common_referent_candidate_audit_and_trilemma"
     ],
     "actual_theorems": [
       "seed_first_order_spatial_polynomial",
@@ -2828,7 +2838,9 @@
       "finite_prime_euler_recursion_and_coefficient_cases",
       "coupled_prime_cutoff_comparison_and_boundedness_equivalence",
       "prime_euler_multiplicative_integrality_and_grade_layer_membership",
-      "common_referent_integer_layer_bridge_and_station_ratio_identity"
+      "common_referent_integer_layer_bridge_and_station_ratio_identity",
+      "coupled_cutoff_prime_step_jump_and_dense_comparison_extension",
+      "single_observable_common_referent_candidate_audit_and_trilemma"
     ]
   },
   "section_11_arithmetic_fourier_positive_factorization": {
@@ -6291,7 +6303,7 @@
       "ambient_space_vs_admissible_grades_bookkeeping": {
         "ambient_function_space": "F_{5/2} := {F in C((0, infty)) : |F(u)| = O(u^{5/2}) as u -> 0^+ and |F(X)| = O(X^theta) as X -> infty},  together with the unitary dilation representation (U_p f)(x) = f(x/p) on L^2(R_{>0}, d^*x)",
         "operator_action": "(D_p F)(X) = F(X / p) on X in (0, infty) (shifting kappa = log_tau X -> kappa - log_tau p on R)",
-        "restriction_to_admissible_grades": "Because log_tau(p) = log(p)/log(2*pi) cannot be assumed algebraic in A_R = Qbar intersect R, the commuting operators {I - p^{-1/2} D_p}_{p <= y} are defined and composed on the ambient continuous scale space (0, infty); the resulting continuous profile W_y(X) is then restricted to admissible grade scales X = tau^{|K - L|} (K, L in A_R), where density of A_R in R and continuity of W_y imply sup_{K in A_R} |W_y(tau^{|K|})| = sup_{X >= 1} |W_y(X)|.",
+        "restriction_to_admissible_grades": "Because log_tau(p) = log(p)/log(2*pi) cannot be assumed algebraic in A_R = Qbar intersect R, the commuting operators {I - p^{-1/2} D_p}_{p <= y} are defined and composed on the ambient continuous scale space (0, infty); for each fixed y, the resulting continuous profile W_y(X) is then restricted to admissible grade scales X = tau^{|K - L|} (K, L in A_R), where density of A_R in R and continuity of fixed-y W_y imply sup_{K in A_R} |W_y(tau^{|K|})| = sup_{X >= 1} |W_y(X)|. By contrast, for the coupled cutoff y = M(X) = ceil(max(2, X^{5/4})), F(X) = W_{M(X)}(X) is piecewise continuous with right-hand jumps F(X_0^+) - F(X_0) = -p^{-1/2} W_{p^-}(X_0/p) at prime thresholds X_0 = (p-1)^{4/5}, so extending boundedness from dense K in A_R to all X >= 1 uses continuity of W(X) (or R_mu(X)) together with the uniform comparison |F(X) - W(X)| <= (1/2) C_{log,0} < 0.278715, NEVER continuity of F(X).",
         "prime_log_tau_shifts": [
           {
             "prime_p": 2,
@@ -10127,7 +10139,7 @@
         "arb_ball_str": "[0.2787147935540087649401176325966251750389 +/- 3.72e-41]"
       },
       "smooth_and_rough_tail_partition": "R_mu(X) - R_{mu, M}(X) = T_{smooth, y}(X) + T_{rough, y}(X), where T_{smooth, y}(X) = W_y(X) - (W_log(X) + R_{mu, M}(X)) sums over y-smooth squarefree m > M (m | P_y) and T_{rough, y}(X) = W(X) - W_y(X) sums over y-rough squarefree m > M (m not dividing P_y), with |T_{smooth, y}(X)| + |T_{rough, y}(X)| <= C_{log,0} X^{5/2} / (2 M^2).",
-      "coupled_boundedness_equivalence": "sup_{X >= 1} |R_mu(X)| < infty  <==>  sup_{X >= 1} |W(X)| < infty  <==>  sup_{X >= 1} |W_{M(X)}(X)| < infty  <==>  sup_{X >= 1} |R_{mu, M(X)}(X)| < infty",
+      "coupled_boundedness_equivalence": "sup_{X >= 1} |R_mu(X)| < infty  <==>  sup_{X >= 1} |W(X)| < infty  <==>  sup_{X >= 1} |W_{M(X)}(X)| < infty  <==>  sup_{X >= 1} |R_{mu, M(X)}(X)| < infty (and for dense grade samples K in A_R = Qbar cap R, sup_{K in A_R} |W_{M(tau^{|K|})}(tau^{|K|})| < infty <==> sup_{X >= 1} |W_{M(X)}(X)| < infty by continuity of W(X) on [1, infty) together with the uniform comparison |W_{M(X)}(X) - W(X)| <= (1/2) C_{log,0} < 0.278715, NEVER by continuity of F(X) = W_{M(X)}(X), which is piecewise continuous with right-hand jump F(X_0^+) - F(X_0) = -p^{-1/2} W_{p^-}(X_0/p) at X_0 = (p-1)^{4/5})",
       "anti_circularity_diagnosis": "Because |W_{M(X)}(X) - W(X)| <= (1/2) C_{log,0} < 0.278715 and |W_{M(X)}(X) - (W_log(X) + R_{mu, M(X)}(X))| <= (1/2) C_{log,0} < 0.278715 for all X >= 1, bounding W_{M(X)}(X) by assuming boundedness of W(X), R_mu(X), R_{mu, M(X)}(X), or C_tau(K) is strictly circular. Furthermore, at y = M(X) >= X, lambda_{M(X)}(n) = Lambda(n) for all 2 <= n < 2 q_{>M(X)} and mu_{M(X)}(m) = mu(m) for all 1 <= m <= M(X), so the coupled finite-prime Euler construction is an exact quantitative reformulation of the Moebius/prime cancellation obligation within +/- 0.278715.",
       "certified_cutoff_ceiling_regression": [
         {
@@ -13163,33 +13175,39 @@
         "local_prime_euler_integer_factor": "m_y(n) := exp(lambda_y(n)) = prod_{d | gcd(n, P_y)} (n/d)^{mu(d)} = { 1 if n = 1 or omega_{<=y}(n) >= 2; n if omega_{<=y}(n) = 0; p if omega_{<=y}(n) = 1 } in Z_{>=1}",
         "cumulative_prime_euler_factorial_observable": "N_y(x) := exp(L_y(x)) = prod_{d | P_y, d <= x} (floor(x/d)!)^{mu(d)} = prod_{1 <= n <= floor(x)} m_y(n) in Z_{>=1}",
         "grade_K_integer_layer_realization": "A_{K,y}(x) := Phi_K(fromZ(K, N_y(x))) = N_y(x) * tau^K in L_K^x = tau^K (Z \\ {0}) subset L_K = tau^K Z",
-        "intrinsic_common_referent_projection": "N_K(A_{K,y}(x)) := tau^{-K} A_{K,y}(x) = N_y(x) = N_J(A_{J,y}(x)) in Z_{>=1}"
+        "stieltjes_lower_endpoint_convention": "Extend A_{K,y}(x) constantly as tau^K below 1 (so A_{K,y}(x) = tau^K on (0, 2)), or integrate over (1, infty), so that d(log A_{K,y})(x) has zero atom at x = 1 (no artificial K * log(tau) boundary term) and point masses log(A_{K,y}(n)/A_{K,y}(n-1)) = log m_y(n) = lambda_y(n) exclusively at integers n >= 2.",
+        "intrinsic_coordinate_recovery_vs_raw_CR1": "N_K(A_{K,y}(x)) := tau^{-K} A_{K,y}(x) = N_y(x) = N_J(A_{J,y}(x)) in Z_{>=1} recovers the intrinsic unit-converted integer coordinate, NOT the original raw external common-referent equality (`CR1`). Because A_{K,y}(x) = N_y(x) * tau^K > 0, the raw external values A_{K,y}(x) and A_{J,y}(x) satisfy A_{K,y}(x) = tau^{K-J} A_{J,y}(x) and are unequal whenever K != J."
       },
       "proved_integer_layer_membership_theorems": {
         "unconditional_factorial_ratio_integrality": "For every real x >= 1 and every prime cutoff y >= 2, all factorial denominators (floor(x/d)!)^{-1} with mu(d) = -1 in prod_{d | P_y, d <= x} (floor(x/d)!)^{mu(d)} divide the numerator identically, yielding the exact positive integer N_y(x) = prod_{2 <= n <= floor(x)} m_y(n) in Z_{>=1} with prime valuations E_{y,p}(x) = sum_{d | P_y, d <= x} mu(d) v_p(floor(x/d)!) >= 0.",
         "exact_chebyshev_lcm_agreement_window": "For all 1 <= x < 2 q_{>y} (in particular across the entire coupled-cutoff agreement window 1 <= x < 2 q_{>M(X)} where M(X) = ceil(max(2, X^{5/4}))), N_y(x) = lcm(1, 2, ..., floor(x)) = exp(psi(x)) in Z_{>=1}, and at the first discrepancy x = 2 q_{>y}, N_y(2 q_{>y}) = 2 * lcm(1, 2, ..., 2 q_{>y}) in Z_{>=1}.",
         "required_grade_layer_membership_CR2": "For every concurrent grade K in A_R = Qbar cap R, every y >= 2, and every x >= 1, A_{K,y}(x) = N_y(x) * tau^K belongs unconditionally to the discrete integer layer L_K^x = tau^K (Z \\ {0}) subset L_K = tau^K Z (`CR2`), and its consecutive step ratio A_{K,y}(n) / A_{K,y}(n-1) = m_y(n) in Z_{>=1} cancels tau^K identically.",
-        "mellin_stieltjes_and_station_ratio_bridge": "For any grades K >= J in A_R with relative scale X_{K,J} = tau^{K-J}, W_y(tau^{K-J}) = sum_{n>=2} log(A_{K,y}(n)/A_{K,y}(n-1)) * n^{-1/2} * h_0(Phi_J(n)/Phi_K(1)), where Phi_J(n)/Phi_K(1) = (n * tau^J)/tau^K = n / tau^{K-J}. For rational K - J != 0, Lindemann's theorem (tau = 2*pi not in Qbar) implies L_K cap L_J = {0}, so Phi_J(n) != Phi_K(m) for all nonzero integers n, m and no prime-power station ever collides with the self-dual peak alpha = 1."
+        "mellin_stieltjes_and_station_ratio_bridge": "With A_{K,y}(x) extended constantly as tau^K below 1 (or integrated over (1, infty)), for any grades K >= J in A_R with relative scale X_{K,J} = tau^{K-J}, W_y(tau^{K-J}) = int_{(1, infty)} x^{-1/2} h_0(x / tau^{K-J}) d(log A_{K,y})(x) = sum_{n>=2} log(A_{K,y}(n)/A_{K,y}(n-1)) * n^{-1/2} * h_0(Phi_J(n)/Phi_K(1)), where Phi_J(n)/Phi_K(1) = (n * tau^J)/tau^K = n / tau^{K-J}. For rational K - J != 0, Lindemann's theorem (tau = 2*pi not in Qbar) implies L_K cap L_J = {0}, so Phi_J(n) != Phi_K(m) for all nonzero integers n, m and no prime-power station ever collides with the self-dual peak alpha = 1."
       },
       "three_class_cr1_cr2_cr3_audit": {
         "class_I_intrinsic_fiber_referent": {
           "observable": "N_K(A_{K,y}(x)) = tau^{-K} A_{K,y}(x) = N_y(x) in Z_{>=1}",
-          "CR1_cross_grade_equality": "SATISFIED (N_K = N_J = N_y(x) for all K, J in A_R)",
+          "CR1_cross_grade_equality": "UNIT_CONVERTED_FIBER_COORDINATE_RECOVERY_NOT_RAW_CR1 (N_K = N_J = N_y(x) after dividing by tau^K and tau^J; raw A_{K,y}(x) != A_{J,y}(x) for K != J)",
           "CR2_distinct_scaled_layer_membership": "LIVES_IN_SINGLE_RING_Z_NOT_L_K_CAP_L_J",
           "CR3_off_critical_zero_sensitivity": "ARITHMETIC_CARRIER_INDEPENDENT_OF_ZERO_DEFECT_DELTA"
         },
         "class_II_ambient_integer_layer_observable": {
           "observable": "A_{K,y}(x) = N_y(x) * tau^K in L_K^x subset L_K = tau^K Z",
-          "CR1_cross_grade_equality": "OBEYS_SCALE_COBOUNDARY A_{K,y}(x) = tau^{K-J} A_{J,y}(x); ambient equality m_K * tau^K = m_J * tau^J for rational K - J != 0 forces m_K = m_J = 0 by Lindemann",
+          "CR1_cross_grade_equality": "FAILS_RAW_CR1_OBEYS_SCALE_COBOUNDARY A_{K,y}(x) = tau^{K-J} A_{J,y}(x) != A_{J,y}(x) for K != J; ambient equality m_K * tau^K = m_J * tau^J for rational K - J != 0 forces m_K = m_J = 0 by Lindemann",
           "CR2_distinct_scaled_layer_membership": "PROVED_UNCONDITIONALLY (A_{K,y}(x) in L_K = tau^K Z for all x >= 1, y >= 2)",
           "CR3_off_critical_zero_sensitivity": "CONDITIONAL_REDUCTIO_SCHEMA (`common_referent_integer_layer_bridge_and_station_ratio_identity`): if a zero-defect-modulated integer-layer observable D_K = m_K(delta) * tau^K in L_K satisfies D_K = D_J for rational K != J and delta != 0 => m_K(delta) != 0, then D_K in L_K cap L_J = {0} forces delta = 0"
         },
         "class_III_coupled_theta_wavelet_profile": {
           "observable": "W_{M(X)}(X) = sum_{n>=2} log(A_{K,M(X)}(n)/A_{K,M(X)}(n-1)) n^{-1/2} h_0(Phi_J(n)/Phi_K(1))  (X = tau^{K-J})",
           "CR1_cross_grade_equality": "SATISFIED_UNDER_SIMULTANEOUS_SHIFT (Q_tau(T_{K+A} psi_tau, T_{J+A} psi_tau) = C_tau(|K-J|))",
-          "CR2_distinct_scaled_layer_membership": "CONTINUOUS_MELLIN_STIELTJES_INTEGRAL_OVER_INTEGER_LAYER_JUMPS (arithmetic carrier A_{K,M(X)}(n) lies in L_K^x, while kernel values h_0(n/X) are continuous real numbers)",
-          "CR3_off_critical_zero_sensitivity": "PROVED_VIA_LAPLACE_CARLEMAN_AND_COUPLED_CUTOFF_EQUIVALENCE (sup_{X>=1} |W_{M(X)}(X)| < infty <=> sup_{X>=1} |R_mu(X)| < infty <=> sup_{K in A_R} |C_tau(K)| < infty <=> RH)"
+          "CR2_distinct_scaled_layer_membership": "PIECEWISE_CONTINUOUS_MELLIN_STIELTJES_INTEGRAL_OVER_INTEGER_LAYER_JUMPS (for fixed y, W_y(X) is continuous, while F(X) = W_{M(X)}(X) is piecewise continuous with right-hand jumps F(X_0^+) - F(X_0) = -p^{-1/2} W_{p^-}(X_0/p) at X_0 = (p-1)^{4/5}; arithmetic carrier A_{K,M(X)}(n) lies in L_K^x, while kernel values h_0(n/X) are continuous real numbers)",
+          "CR3_off_critical_zero_sensitivity": "PROVED_VIA_LAPLACE_CARLEMAN_AND_COUPLED_CUTOFF_EQUIVALENCE (sup_{X>=1} |W_{M(X)}(X)| < infty <=> sup_{X>=1} |R_mu(X)| < infty <=> sup_{K in A_R} |C_tau(K)| < infty <=> RH; extension from dense K in A_R to all X >= 1 uses continuity of W(X) and R_mu(X) together with |W_{M(X)}(X) - W(X)| <= (1/2) C_{log,0} < 0.278715, NEVER continuity of W_{M(X)}(X))"
         }
+      },
+      "lean_formalization_vs_derivation_and_computational_scope": {
+        "paper_mathematical_derivation": "Establishes unconditionally for all real x >= 1 and integer y >= 2 that m_y(n) = exp(lambda_y(n)) = prod_{d | gcd(n, P_y)} (n/d)^{mu(d)} in Z_{>=1}, N_y(x) = prod_{d | P_y, d <= x} (floor(x/d)!)^{mu(d)} = prod_{n <= x} m_y(n) in Z_{>=1}, N_y(x) = lcm(1, ..., floor(x)) for 1 <= x < 2 q_{>y} with first discrepancy N_y(2 q_{>y}) = 2 lcm(1, ..., 2 q_{>y}), and A_{K,y}(x) = N_y(x) * tau^K in L_K^x = tau^K (Z \\ {0}).",
+        "finite_computational_certification": "Exact integer/Fraction verification for y in {2, 3, 5, 7, 11, 13} and n <= max(45, 2 q_{>y} + 6) plus 256-bit Arb ball certification across 15 positive and negative admissible grades K in A_R.",
+        "lean_4_formalization_scope": "The Lean 4 theorems `prime_euler_multiplicative_integrality_and_grade_layer_membership` and `common_referent_integer_layer_bridge_and_station_ratio_identity` prove the algebraic consequences for supplied integer inputs (positivity of finitePrimeMultiplicativeFactorCases, step-ratio cancellation of tau^K, coboundary relation A_{K,y} = tau^{K-J} A_{J,y}, station-ratio identity Phi_J(n)/Phi_K(1) = n/tau^{K-J}, peak avoidance via Lindemann, and a conditional collision implication under supplied CR1+CR2+CR3 hypotheses); they do NOT internally formalize the full alternating factorial-product divisor cancellation over Finset.divisors or derive the missing CR1+CR2+CR3 collision hypotheses from actual prime/theta data."
       },
       "lean_theorems": [
         "prime_euler_multiplicative_integrality_and_grade_layer_membership",
@@ -13198,7 +13216,7 @@
       "remaining_open_obligation": {
         "subgate_id": "SUBGATE-TC-043A",
         "status": "OPEN",
-        "scope_note": "SUBGATE-TC-043A remains OPEN. Divergence of the unsplit critical-line Gram norm ||Psi_y||_{L^2(d^*x)} establishes failure of that Cauchy-Schwarz norm estimate as y -> infty; it does NOT establish divergence of the signed coupled profile W_{M(X)}(X) or failure of the concurrent-grade hypothesis. Passing from the proved integer-layer membership A_{K,M(X)}(x) = N_{M(X)}(x) * tau^K in L_K^x = tau^K (Z \\ {0}) to a uniform signed cancellation bound sup_{X >= 1} |W_{M(X)}(X)| < infty (or a zero-defect-modulated cross-grade equality D_K = D_J in L_K cap L_J = {0}) is the exact open obligation."
+        "scope_note": "SUBGATE-TC-043A remains OPEN. Divergence of the unsplit critical-line Gram norm ||Psi_y||_{L^2(d^*x)} establishes failure of that Cauchy-Schwarz norm estimate as y -> infty; it does NOT establish divergence of the signed coupled profile W_{M(X)}(X) or failure of the concurrent-grade hypothesis. Passing from the proved integer-layer membership A_{K,M(X)}(x) = N_{M(X)}(x) * tau^K in L_K^x = tau^K (Z \\ {0}) to a uniform signed cancellation bound sup_{X >= 1} |W_{M(X)}(X)| < infty (or deriving all three CR1+CR2+CR3 properties for one single prime/theta observable D_K(rho_K)) is the exact open obligation."
       }
     },
     "full_section_16_tree_roundtrip_verification": {
@@ -13352,6 +13370,1287 @@
         "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[14].W_M_X_K_direct_certified",
         "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[14].W_M_X_K_jump_vs_direct_diff_certified",
         "section_16.section_3_grade_layer_membership_and_station_ratio_bridge.certified_grade_layer_bridge_table[14].min_station_ratio_distance_to_peak_1_certified"
+      ]
+    }
+  },
+  "section_17_single_prime_theta_observable_and_coupled_cutoff_jump_audit": {
+    "task_id": "TASK-TC-048",
+    "reconciled_prior_task_id": "TASK-TC-047",
+    "parent_epic": "EPIC-TC-042",
+    "inspected_baseline": "39b4e3aec6d4357d283932ad296b6148477e00e4",
+    "reconciled_tc047_implementation_commit": "a2ae0f7057ee24a04031601316f40f96b7e3ef82",
+    "status": "COUPLED_CUTOFF_JUMP_FORMULA_AND_SINGLE_OBSERVABLE_CANDIDATE_AUDIT_PROVED_COVARIANCE_INVARIANCE_DISCRETENESS_TRILEMMA_ISOLATED_SUBGATE_OPEN",
+    "symbolic_identities_verification": {
+      "euler_prime_step_jump_identity_verified": true,
+      "candidate_1_coboundary_ratio_verified": true,
+      "candidate_2A_pullback_grade_invariance_verified": true,
+      "candidate_2A_radial_factor_square_identity_verified": true
+    },
+    "section_1_tc047_reconciliation_and_scope": {
+      "preserved_tc047_results": "N_y(x) = prod_{d | P_y, d <= x} (floor(x/d)!)^{mu(d)} = prod_{1 <= n <= floor(x)} m_y(n) in Z_{>=1}, its exact Chebyshev LCM agreement window N_y(x) = lcm(1, ..., floor(x)) on 1 <= x < 2 q_{>y} with first discrepancy N_y(2 q_{>y}) = 2 lcm(1, ..., 2 q_{>y}), its grade-K integer-layer membership A_{K,y}(x) = N_y(x) * tau^K in L_K^x = tau^K (Z \\ {0}) (`CR2`), and the logarithmic-jump reconstruction W_y(tau^{K-J}) = sum_{n>=2} log(A_{K,y}(n)/A_{K,y}(n-1)) n^{-1/2} h_0(Phi_J(n)/Phi_K(1)).",
+      "intrinsic_coordinate_recovery_vs_raw_CR1_correction": "The relation tau^{-K} A_{K,y}(x) = tau^{-J} A_{J,y}(x) = N_y(x) is unit-converted intrinsic fiber coordinate recovery, NOT the original raw external common-referent equality (`CR1`). Because A_{K,y}(x) = N_y(x) * tau^K > 0, the raw external values satisfy A_{K,y}(x) = tau^{K-J} A_{J,y}(x) and are strictly unequal whenever K != J.",
+      "stieltjes_lower_endpoint_convention": "Extend A_{K,y}(x) constantly as tau^K below 1 (so A_{K,y}(x) = tau^K on (0, 2)), or integrate over (1, infty), so that d(log A_{K,y})(x) has zero atom at x = 1 (no artificial K * log(tau) atom).",
+      "lean_vs_paper_vs_computational_scope": "The TC-047 Lean 4 theorems (`prime_euler_multiplicative_integrality_and_grade_layer_membership`, `common_referent_integer_layer_bridge_and_station_ratio_identity`) prove algebraic consequences for supplied integer inputs and a conditional collision implication; they do not internally establish the full alternating factorial-product construction or derive the missing CR1+CR2+CR3 collision hypotheses from actual prime/theta data."
+    },
+    "section_2_coupled_cutoff_piecewise_continuity_and_jump_audit": {
+      "fixed_y_vs_coupled_cutoff_regularity": "For any fixed y >= 2, W_y(X) = sum_{m | P_y} mu(m) m^{-1/2} W_log(X/m) is a finite linear combination of dilates of the continuous function W_log and is therefore continuous on (0, infty). By contrast, the coupled profile F(X) := W_{M(X)}(X) with M(X) = ceil(max(2, X^{5/4})) is constant-cutoff continuous on each half-open interval (m^{4/5}, (m+1)^{4/5}] (and [1, 2^{4/5}]), left-continuous at every X_m = m^{4/5}, continuous across composite thresholds m + 1 (since P_{m+1} = P_m), and has a jump discontinuity from the right at X_0 = (p - 1)^{4/5} for every prime p >= 3 where W_{p^-}(X_0/p) != 0.",
+      "exact_right_hand_jump_formula": "At X_0 = (p - 1)^{4/5} for a prime p >= 3, M(X_0) = p - 1 and lim_{X -> X_0^+} M(X) = p. By the one-prime Euler recursion W_p(X) = (I - p^{-1/2} D_p) W_{p^-}(X) = W_{p^-}(X) - p^{-1/2} W_{p^-}(X/p) and continuity of W_{p^-} and W_p at X_0, the exact right-hand jump is F(X_0^+) - F(X_0) = W_p(X_0) - W_{p^-}(X_0) = -p^{-1/2} W_{p^-}(X_0 / p).",
+      "analytic_nonvanishing_and_sign_criterion": "F(X_0^+) - F(X_0) != 0 if and only if W_{p^-}((p - 1)^{4/5} / p) != 0. Specifically: (1) for small primes p in {3, 5, 7, 11, 13, 17, 19, 23}, the leading station ratio 2 / u_p = 2p / (p - 1)^{4/5} in [3.2987, 3.8799] lies in the positive lobe (2.6941, 8.6213) of h_0(alpha) (where W = (alpha + 1/alpha)^2 in (9.3873, 76.3403)), so W_{p^-}(u_p) > 0 and F(X_0^+) - F(X_0) = -p^{-1/2} W_{p^-}(u_p) < 0 is certified strictly negative and nonzero in 256-bit Arb; (2) for all primes p >= 1901, u_p := (p - 1)^{4/5} / p <= 2/9 so every station n >= 2 satisfies n / u_p >= 2 / u_p >= 9 > 8.6213, where h_0(n / u_p) < 0 strictly while lambda_{p^-}(n) >= 0 and lambda_{p^-}(2) = log 2 > 0, proving unconditionally that W_{p^-}(u_p) < 0 and F(X_0^+) - F(X_0) > 0 strictly.",
+      "corrected_dense_grade_to_all_X_extension": "Because F(X) = W_{M(X)}(X) has right-hand jumps at prime thresholds X_0 = (p - 1)^{4/5}, one must NEVER invoke continuity of F(X) to pass from dense grade samples K in A_R = Qbar cap R to all real scales X >= 1. Instead, W(X) = W_log(X) + R_mu(X) IS continuous on [1, infty) by the Weierstrass M-test, and the uniform comparison |F(X) - W(X)| <= (1/2) C_{log,0} < 0.278715 holds for ALL real X >= 1. Hence: sup_{K in A_R} |F(tau^{|K|})| <= M_F  ==>  sup_{K in A_R} |W(tau^{|K|})| <= M_F + (1/2) C_{log,0} ==> (by continuity of W and density of {tau^{|K|} : K in A_R} in [1, infty)) sup_{X >= 1} |W(X)| <= M_F + (1/2) C_{log,0}  ==>  sup_{X >= 1} |F(X)| <= M_F + C_{log,0}.",
+      "all_prime_jump_identities_enclose_zero": true,
+      "all_prime_jumps_certified_nonzero": true,
+      "all_small_prime_jumps_certified_strictly_negative": true,
+      "certified_prime_threshold_jump_table": [
+        {
+          "prime_p": 3,
+          "m_prev": 2,
+          "X_0_equals_p_minus_1_pow_4_5_certified": {
+            "mid_float": 1.7411011265922482,
+            "rad_float_outward": 2.889189445995766e-17,
+            "lower_dec": "1.741101126592248278272540034959492197957e+0",
+            "upper_dec": "1.741101126592248278272540034959492197960e+0",
+            "arb_ball_str": "[1.741101126592248278272540034959492197958 +/- 2.51e-40]"
+          },
+          "u_p_equals_X_0_over_p_certified": {
+            "mid_float": 0.5803670421974161,
+            "rad_float_outward": 9.630631486652553e-18,
+            "lower_dec": "5.803670421974160927575133449864973993193e-1",
+            "upper_dec": "5.803670421974160927575133449864973993196e-1",
+            "arb_ball_str": "[0.5803670421974160927575133449864973993194 +/- 1.70e-41]"
+          },
+          "min_station_alpha_2_over_u_p_certified": {
+            "mid_float": 3.446095064991105,
+            "rad_float_outward": 5.209795688398961e-17,
+            "lower_dec": "3.446095064991105020395880840333782768330e+0",
+            "upper_dec": "3.446095064991105020395880840333782768333e+0",
+            "arb_ball_str": "[3.446095064991105020395880840333782768332 +/- 4.48e-40]"
+          },
+          "in_strict_negative_h0_tail_alpha_ge_9": false,
+          "F_at_X_0_equals_W_p_minus_certified": {
+            "mid_float": 0.03564643728499183,
+            "rad_float_outward": 4.803652636554779e-06,
+            "lower_dec": "3.564163363235527940359867999962370909028e-2",
+            "upper_dec": "3.565124093762838656202627236655753172214e-2",
+            "arb_ball_str": "[0.03565 +/- 8.37e-6]"
+          },
+          "F_at_X_0_plus_equals_W_p_certified": {
+            "mid_float": 0.017509494250976445,
+            "rad_float_outward": 5.228231827914009e-06,
+            "lower_dec": "1.750426601914853092593101451581066219890e-2",
+            "upper_dec": "1.751472248280435890036595652287548153487e-2",
+            "arb_ball_str": "[0.01751 +/- 5.74e-6]"
+          },
+          "W_p_minus_at_X_0_over_p_certified": {
+            "mid_float": 0.031413987983658444,
+            "rad_float_outward": 3.0815446061607983e-07,
+            "lower_dec": "3.141367982919782905936245324838387253190e-2",
+            "upper_dec": "3.141429613811905982755434334095048191456e-2",
+            "arb_ball_str": "[0.031414 +/- 3.21e-7]"
+          },
+          "direct_jump_F_X0_plus_minus_F_X0_certified": {
+            "mid_float": -0.018136943034015387,
+            "rad_float_outward": 1.0031884471574215e-05,
+            "lower_dec": "-1.814697491848696106345285885260558076590e-2",
+            "upper_dec": "-1.812691114954381507587512247488951631274e-2",
+            "arb_ball_str": "[-0.0181 +/- 4.70e-5]"
+          },
+          "euler_recursion_jump_formula_certified": {
+            "mid_float": -0.018136874418684872,
+            "rad_float_outward": 1.7791306183870153e-07,
+            "lower_dec": "-1.813705233174671044402536007015937777999e-2",
+            "upper_dec": "-1.813669650562303353844405445176148625851e-2",
+            "arb_ball_str": "[-0.018137 +/- 3.04e-7]"
+          },
+          "jump_identity_diff_certified": {
+            "mid_float": -6.861533051607842e-08,
+            "rad_float_outward": 1.0209797537186207e-05,
+            "lower_dec": "-1.027841286770228329252993308153485502990e-5",
+            "upper_dec": "1.014118220667012643396312750730181489200e-5",
+            "arb_ball_str": "[+/- 1.03e-5]"
+          },
+          "jump_identity_encloses_zero": true,
+          "jump_certified_nonzero": true,
+          "jump_certified_strictly_negative": true,
+          "jump_certified_strictly_positive": false,
+          "W_p_minus_at_u_p_certified_strictly_positive": true,
+          "W_p_minus_at_u_p_certified_strictly_negative": false
+        },
+        {
+          "prime_p": 5,
+          "m_prev": 4,
+          "X_0_equals_p_minus_1_pow_4_5_certified": {
+            "mid_float": 3.031433133020796,
+            "rad_float_outward": 1.866535685895135e-16,
+            "lower_dec": "3.031433133020796164694519602612890477361e+0",
+            "upper_dec": "3.031433133020796164694519602612890477364e+0",
+            "arb_ball_str": "[3.031433133020796164694519602612890477363 +/- 4.33e-40]"
+          },
+          "u_p_equals_X_0_over_p_certified": {
+            "mid_float": 0.6062866266041592,
+            "rad_float_outward": 1.512625322539957e-17,
+            "lower_dec": "6.062866266041592329389039205225780954724e-1",
+            "upper_dec": "6.062866266041592329389039205225780954727e-1",
+            "arb_ball_str": "[0.6062866266041592329389039205225780954725 +/- 1.35e-41]"
+          },
+          "min_station_alpha_2_over_u_p_certified": {
+            "mid_float": 3.2987697769322355,
+            "rad_float_outward": 1.505112205772142e-16,
+            "lower_dec": "3.298769776932235648435004928074100332582e+0",
+            "upper_dec": "3.298769776932235648435004928074100332585e+0",
+            "arb_ball_str": "[3.298769776932235648435004928074100332584 +/- 3.28e-40]"
+          },
+          "in_strict_negative_h0_tail_alpha_ge_9": false,
+          "F_at_X_0_equals_W_p_minus_certified": {
+            "mid_float": 0.05226227469292877,
+            "rad_float_outward": 2.091292731165874e-05,
+            "lower_dec": "5.224136176561711421186967791947305062296e-2",
+            "upper_dec": "5.228318762024042610960944594773232796674e-2",
+            "arb_ball_str": "[0.0523 +/- 5.87e-5]"
+          },
+          "F_at_X_0_plus_equals_W_p_certified": {
+            "mid_float": 0.03678134764078124,
+            "rad_float_outward": 2.1524933231378256e-05,
+            "lower_dec": "3.675982270754986567458870829120693254978e-2",
+            "upper_dec": "3.680287257401261778118821800724086809668e-2",
+            "arb_ball_str": "[0.0368 +/- 4.02e-5]"
+          },
+          "W_p_minus_at_X_0_over_p_certified": {
+            "mid_float": 0.034616169098329735,
+            "rad_float_outward": 3.7410181752588567e-07,
+            "lower_dec": "3.461579499651221318941351827837080075816e-2",
+            "upper_dec": "3.461654320014726131744864150553495004255e-2",
+            "arb_ball_str": "[0.034616 +/- 5.44e-7]"
+          },
+          "direct_jump_F_X0_plus_minus_F_X0_certified": {
+            "mid_float": -0.015480927052147528,
+            "rad_float_outward": 4.24378605430326e-05,
+            "lower_dec": "-1.552336491269056043502073765652539541695e-2",
+            "upper_dec": "-1.543848919160449643068145991223218252630e-2",
+            "arb_ball_str": "[-0.0155 +/- 6.16e-5]"
+          },
+          "euler_recursion_jump_formula_certified": {
+            "mid_float": -0.015480821444898579,
+            "rad_float_outward": 1.6730341978496037e-07,
+            "lower_dec": "-1.548098874831836351975800495819334830595e-2",
+            "upper_dec": "-1.548065414147879420173159884979163255046e-2",
+            "arb_ball_str": "[-0.015481 +/- 3.46e-7]"
+          },
+          "jump_identity_diff_certified": {
+            "mid_float": -1.0560724894957211e-07,
+            "rad_float_outward": 4.260516396925596e-05,
+            "lower_dec": "-4.271077121820552683196471466821993013679e-5",
+            "upper_dec": "4.249955672030638261937095389562284330074e-5",
+            "arb_ball_str": "[+/- 4.28e-5]"
+          },
+          "jump_identity_encloses_zero": true,
+          "jump_certified_nonzero": true,
+          "jump_certified_strictly_negative": true,
+          "jump_certified_strictly_positive": false,
+          "W_p_minus_at_u_p_certified_strictly_positive": true,
+          "W_p_minus_at_u_p_certified_strictly_negative": false
+        },
+        {
+          "prime_p": 7,
+          "m_prev": 6,
+          "X_0_equals_p_minus_1_pow_4_5_certified": {
+            "mid_float": 4.192962712629475,
+            "rad_float_outward": 4.0753432481845855e-16,
+            "lower_dec": "4.192962712629475471397862616628519061039e+0",
+            "upper_dec": "4.192962712629475471397862616628519061042e+0",
+            "arb_ball_str": "[4.192962712629475471397862616628519061041 +/- 2.47e-40]"
+          },
+          "u_p_equals_X_0_over_p_certified": {
+            "mid_float": 0.5989946732327822,
+            "rad_float_outward": 5.222126433086301e-18,
+            "lower_dec": "5.989946732327822101996946595183598658628e-1",
+            "upper_dec": "5.989946732327822101996946595183598658631e-1",
+            "arb_ball_str": "[0.5989946732327822101996946595183598658630 +/- 3.52e-41]"
+          },
+          "min_station_alpha_2_over_u_p_certified": {
+            "mid_float": 3.338927855912263,
+            "rad_float_outward": 1.4835614561647595e-17,
+            "lower_dec": "3.338927855912262835772190297333939444935e+0",
+            "upper_dec": "3.338927855912262835772190297333939444938e+0",
+            "arb_ball_str": "[3.338927855912262835772190297333939444936 +/- 1.84e-40]"
+          },
+          "in_strict_negative_h0_tail_alpha_ge_9": false,
+          "F_at_X_0_equals_W_p_minus_certified": {
+            "mid_float": -0.0009208039496421559,
+            "rad_float_outward": 4.8431099571644174e-05,
+            "lower_dec": "-9.692350492138000842891688305246185969448e-4",
+            "upper_dec": "-8.723728500705117764659280735360932063195e-4",
+            "arb_ball_str": "[-0.0009 +/- 6.93e-5]"
+          },
+          "F_at_X_0_plus_equals_W_p_certified": {
+            "mid_float": -0.01394852270182241,
+            "rad_float_outward": 4.9107718893992955e-05,
+            "lower_dec": "-1.399763042071640279446138051264170924396e-2",
+            "upper_dec": "-1.389941498292841765633193758242015162674e-2",
+            "arb_ball_str": "[-0.0139 +/- 9.77e-5]"
+          },
+          "W_p_minus_at_X_0_over_p_certified": {
+            "mid_float": 0.03446777942629854,
+            "rad_float_outward": 3.735762268427319e-07,
+            "lower_dec": "3.446740585007170085751300933830348695892e-2",
+            "upper_dec": "3.446815300252538480995741696156470026157e-2",
+            "arb_ball_str": "[0.034468 +/- 5.95e-7]"
+          },
+          "direct_jump_F_X0_plus_minus_F_X0_certified": {
+            "mid_float": -0.013027718752180254,
+            "rad_float_outward": 9.753881863616717e-05,
+            "lower_dec": "-1.312525757081642127457787648371468586186e-2",
+            "upper_dec": "-1.293017993354408731546034470728646320558e-2",
+            "arb_ball_str": "[-0.013 +/- 1.26e-4]"
+          },
+          "euler_recursion_jump_formula_certified": {
+            "mid_float": -0.013027596086659213,
+            "rad_float_outward": 1.4119854263617256e-07,
+            "lower_dec": "-1.302773728520184894936801596491882660156e-2",
+            "upper_dec": "-1.302745488811657728096588711201498367550e-2",
+            "arb_ball_str": "[-0.013028 +/- 5.46e-7]"
+          },
+          "jump_identity_diff_certified": {
+            "mid_float": -1.2266552104117986e-07,
+            "rad_float_outward": 9.768001723386989e-05,
+            "lower_dec": "-9.780268275491105563339713610471431706072e-5",
+            "upper_dec": "9.755735171282869592907902203737552668931e-5",
+            "arb_ball_str": "[+/- 9.79e-5]"
+          },
+          "jump_identity_encloses_zero": true,
+          "jump_certified_nonzero": true,
+          "jump_certified_strictly_negative": true,
+          "jump_certified_strictly_positive": false,
+          "W_p_minus_at_u_p_certified_strictly_positive": true,
+          "W_p_minus_at_u_p_certified_strictly_negative": false
+        },
+        {
+          "prime_p": 11,
+          "m_prev": 10,
+          "X_0_equals_p_minus_1_pow_4_5_certified": {
+            "mid_float": 6.3095734448019325,
+            "rad_float_outward": 1.4631941204912524e-18,
+            "lower_dec": "6.309573444801932494343601366223438646728e+0",
+            "upper_dec": "6.309573444801932494343601366223438646731e+0",
+            "arb_ball_str": "[6.309573444801932494343601366223438646729 +/- 4.53e-40]"
+          },
+          "u_p_equals_X_0_over_p_certified": {
+            "mid_float": 0.5735975858910848,
+            "rad_float_outward": 1.0225954234818811e-17,
+            "lower_dec": "5.735975858910847722130546696566762406116e-1",
+            "upper_dec": "5.735975858910847722130546696566762406119e-1",
+            "arb_ball_str": "[0.5735975858910847722130546696566762406118 +/- 3.16e-41]"
+          },
+          "min_station_alpha_2_over_u_p_certified": {
+            "mid_float": 3.4867650234144496,
+            "rad_float_outward": 6.280061764543064e-17,
+            "lower_dec": "3.486765023414449667444623021461315429191e+0",
+            "upper_dec": "3.486765023414449667444623021461315429194e+0",
+            "arb_ball_str": "[3.486765023414449667444623021461315429193 +/- 2.28e-40]"
+          },
+          "in_strict_negative_h0_tail_alpha_ge_9": false,
+          "F_at_X_0_equals_W_p_minus_certified": {
+            "mid_float": 0.003021845790048576,
+            "rad_float_outward": 0.00013641033092426374,
+            "lower_dec": "2.885435459124312389815247983423197561292e-3",
+            "upper_dec": "3.158256120972839769149220914331400686295e-3",
+            "arb_ball_str": "[0.003 +/- 1.59e-4]"
+          },
+          "F_at_X_0_plus_equals_W_p_certified": {
+            "mid_float": -0.006713604915651468,
+            "rad_float_outward": 0.00013710725738747028,
+            "lower_dec": "-6.850712173038937851465868501984215631005e-3",
+            "upper_dec": "-6.576497658263998107663917093597985162252e-3",
+            "arb_ball_str": "[-0.007 +/- 4.24e-4]"
+          },
+          "W_p_minus_at_X_0_over_p_certified": {
+            "mid_float": 0.032288385197158306,
+            "rad_float_outward": 3.3991125913981056e-07,
+            "lower_dec": "3.228804528589916653952949338366747324050e-2",
+            "upper_dec": "3.228872510841744567795084214543462221209e-2",
+            "arb_ball_str": "[0.032288 +/- 7.26e-7]"
+          },
+          "direct_jump_F_X0_plus_minus_F_X0_certified": {
+            "mid_float": -0.009735450705700043,
+            "rad_float_outward": 0.00027351758853910816,
+            "lower_dec": "-1.000896829423915129605832147579437608294e-2",
+            "upper_dec": "-9.461933117160936822035933017542422957921e-3",
+            "arb_ball_str": "[-0.01 +/- 5.39e-4]"
+          },
+          "euler_recursion_jump_formula_certified": {
+            "mid_float": -0.00973531443503996,
+            "rad_float_outward": 1.0248710136158728e-07,
+            "lower_dec": "-9.735416922141321327178266714027621513799e-3",
+            "upper_dec": "-9.735211947938599185892817971462853914690e-3",
+            "arb_ball_str": "[-0.009735 +/- 4.17e-7]"
+          },
+          "jump_identity_diff_certified": {
+            "mid_float": -1.362706600838025e-07,
+            "rad_float_outward": 0.0002736200758590713,
+            "lower_dec": "-2.737563465191550237141968271409352436775e-4",
+            "upper_dec": "2.734838051989874186910270192946116313228e-4",
+            "arb_ball_str": "[+/- 2.74e-4]"
+          },
+          "jump_identity_encloses_zero": true,
+          "jump_certified_nonzero": true,
+          "jump_certified_strictly_negative": true,
+          "jump_certified_strictly_positive": false,
+          "W_p_minus_at_u_p_certified_strictly_positive": true,
+          "W_p_minus_at_u_p_certified_strictly_negative": false
+        },
+        {
+          "prime_p": 13,
+          "m_prev": 12,
+          "X_0_equals_p_minus_1_pow_4_5_certified": {
+            "mid_float": 7.300372102718469,
+            "rad_float_outward": 4.0832512675153603e-16,
+            "lower_dec": "7.300372102718469111455965300067727731943e+0",
+            "upper_dec": "7.300372102718469111455965300067727731946e+0",
+            "arb_ball_str": "[7.300372102718469111455965300067727731944 +/- 1.19e-40]"
+          },
+          "u_p_equals_X_0_over_p_certified": {
+            "mid_float": 0.5615670848244976,
+            "rad_float_outward": 4.848997935973595e-17,
+            "lower_dec": "5.615670848244976239581511769282867486109e-1",
+            "upper_dec": "5.615670848244976239581511769282867486112e-1",
+            "arb_ball_str": "[0.5615670848244976239581511769282867486111 +/- 1.40e-41]"
+          },
+          "min_station_alpha_2_over_u_p_certified": {
+            "mid_float": 3.5614622972873224,
+            "rad_float_outward": 4.2316891787998313e-17,
+            "lower_dec": "3.561462297287322485001745528500455620996e+0",
+            "upper_dec": "3.561462297287322485001745528500455620999e+0",
+            "arb_ball_str": "[3.561462297287322485001745528500455620998 +/- 4.33e-40]"
+          },
+          "in_strict_negative_h0_tail_alpha_ge_9": false,
+          "F_at_X_0_equals_W_p_minus_certified": {
+            "mid_float": 0.004438809601272615,
+            "rad_float_outward": 0.0001974344452264634,
+            "lower_dec": "4.241375156046151810520624571995838530395e-3",
+            "upper_dec": "4.636244046499078090497588568883045561648e-3",
+            "arb_ball_str": "[0.004 +/- 6.37e-4]"
+          },
+          "F_at_X_0_plus_equals_W_p_certified": {
+            "mid_float": -0.004158186691874161,
+            "rad_float_outward": 0.00019812748428194046,
+            "lower_dec": "-4.356314176156101164620263676889628679325e-3",
+            "upper_dec": "-3.960059207592220626052363019235820085572e-3",
+            "arb_ball_str": "[-0.004 +/- 3.57e-4]"
+          },
+          "W_p_minus_at_X_0_over_p_certified": {
+            "mid_float": 0.030996411289247967,
+            "rad_float_outward": 3.2401457872349323e-07,
+            "lower_dec": "3.099608727466924385351002316993985904264e-2",
+            "upper_dec": "3.099673530382669007065113734525953067353e-2",
+            "arb_ball_str": "[0.030996 +/- 7.36e-7]"
+          },
+          "direct_jump_F_X0_plus_minus_F_X0_certified": {
+            "mid_float": -0.008596996293146775,
+            "rad_float_outward": 0.0003955619299631516,
+            "lower_dec": "-8.992558223109926606004316364730193772221e-3",
+            "upper_dec": "-8.201434363183625085686523472274139084718e-3",
+            "arb_ball_str": "[-0.009 +/- 7.99e-4]"
+          },
+          "euler_recursion_jump_formula_certified": {
+            "mid_float": -0.008596857712211877,
+            "rad_float_outward": 8.986547561671036e-08,
+            "lower_dec": "-8.596947577687493746356440764427473362473e-3",
+            "upper_dec": "-8.596767846736260720507917225402136858488e-3",
+            "arb_ball_str": "[-0.008597 +/- 2.33e-7]"
+          },
+          "jump_identity_diff_certified": {
+            "mid_float": -1.3858093489861242e-07,
+            "rad_float_outward": 0.00039565179577039094,
+            "lower_dec": "-3.957903767052895029519333979525956929890e-4",
+            "upper_dec": "3.955132148354922781254515507778730570113e-4",
+            "arb_ball_str": "[+/- 3.96e-4]"
+          },
+          "jump_identity_encloses_zero": true,
+          "jump_certified_nonzero": true,
+          "jump_certified_strictly_negative": true,
+          "jump_certified_strictly_positive": false,
+          "W_p_minus_at_u_p_certified_strictly_positive": true,
+          "W_p_minus_at_u_p_certified_strictly_negative": false
+        },
+        {
+          "prime_p": 17,
+          "m_prev": 16,
+          "X_0_equals_p_minus_1_pow_4_5_certified": {
+            "mid_float": 9.18958683997628,
+            "rad_float_outward": 7.310468314907225e-16,
+            "lower_dec": "9.189586839976280054389015574223420715549e+0",
+            "upper_dec": "9.189586839976280054389015574223420715552e+0",
+            "arb_ball_str": "[9.189586839976280054389015574223420715551 +/- 1.94e-40]"
+          },
+          "u_p_equals_X_0_over_p_certified": {
+            "mid_float": 0.5405639317633106,
+            "rad_float_outward": 4.300275479357191e-17,
+            "lower_dec": "5.405639317633105914346479749543188656205e-1",
+            "upper_dec": "5.405639317633105914346479749543188656208e-1",
+            "arb_ball_str": "[0.5405639317633105914346479749543188656206 +/- 3.58e-41]"
+          },
+          "min_station_alpha_2_over_u_p_certified": {
+            "mid_float": 3.6998398940085275,
+            "rad_float_outward": 6.139527572741003e-17,
+            "lower_dec": "3.699839894008527591329147574288920920660e+0",
+            "upper_dec": "3.699839894008527591329147574288920920663e+0",
+            "arb_ball_str": "[3.699839894008527591329147574288920920661 +/- 2.84e-40]"
+          },
+          "in_strict_negative_h0_tail_alpha_ge_9": false,
+          "F_at_X_0_equals_W_p_minus_certified": {
+            "mid_float": 0.006956300429173359,
+            "rad_float_outward": 0.0003522266442814727,
+            "lower_dec": "6.604073784891886009200981598803696974613e-3",
+            "upper_dec": "7.308527073454831099435261231372056349616e-3",
+            "arb_ball_str": "[0.007 +/- 3.96e-4]"
+          },
+          "F_at_X_0_plus_equals_W_p_certified": {
+            "mid_float": 6.31652212994119e-05,
+            "rad_float_outward": 0.0003529006376083999,
+            "lower_dec": "-2.897354163089879461641916625183206963981e-4",
+            "upper_dec": "4.160658589078117488805642731506246161022e-4",
+            "arb_ball_str": "[+/- 4.17e-4]"
+          },
+          "W_p_minus_at_X_0_over_p_certified": {
+            "mid_float": 0.028420547698477006,
+            "rad_float_outward": 2.9559692649212804e-07,
+            "lower_dec": "2.842025210155051413740909732960957787331e-2",
+            "upper_dec": "2.842084329540349758891568593763608238994e-2",
+            "arb_ball_str": "[0.028421 +/- 7.48e-7]"
+          },
+          "direct_jump_F_X0_plus_minus_F_X0_certified": {
+            "mid_float": -0.006893135207873946,
+            "rad_float_outward": 0.000705127283254115,
+            "lower_dec": "-7.598262491128061098258845250762935639764e-3",
+            "upper_dec": "-6.188007924619832207661024968780513764761e-3",
+            "arb_ball_str": "[-0.007 +/- 8.12e-4]"
+          },
+          "euler_recursion_jump_formula_certified": {
+            "mid_float": -0.006892995299925035,
+            "rad_float_outward": 7.169278570807392e-08,
+            "lower_dec": "-6.893066992710743238325729918911863732059e-3",
+            "upper_dec": "-6.892923607139327105818946449331749844270e-3",
+            "arb_ball_str": "[-0.0068930 +/- 7.64e-8]"
+          },
+          "jump_identity_diff_certified": {
+            "mid_float": -1.3990794891148089e-07,
+            "rad_float_outward": 0.0007051989769024659,
+            "lower_dec": "-7.053388848513772825736454333403476015979e-4",
+            "upper_dec": "7.050590689535543207984515820405117734024e-4",
+            "arb_ball_str": "[+/- 7.06e-4]"
+          },
+          "jump_identity_encloses_zero": true,
+          "jump_certified_nonzero": true,
+          "jump_certified_strictly_negative": true,
+          "jump_certified_strictly_positive": false,
+          "W_p_minus_at_u_p_certified_strictly_positive": true,
+          "W_p_minus_at_u_p_certified_strictly_negative": false
+        },
+        {
+          "prime_p": 19,
+          "m_prev": 18,
+          "X_0_equals_p_minus_1_pow_4_5_certified": {
+            "mid_float": 10.097596309015795,
+            "rad_float_outward": 4.0104347357335375e-17,
+            "lower_dec": "1.009759630901579537262914869301499642733e+1",
+            "upper_dec": "1.009759630901579537262914869301499642736e+1",
+            "arb_ball_str": "[10.09759630901579537262914869301499642734 +/- 1.04e-39]"
+          },
+          "u_p_equals_X_0_over_p_certified": {
+            "mid_float": 0.5314524373166208,
+            "rad_float_outward": 3.132715050894283e-17,
+            "lower_dec": "5.314524373166208090857446680534208645967e-1",
+            "upper_dec": "5.314524373166208090857446680534208645970e-1",
+            "arb_ball_str": "[0.5314524373166208090857446680534208645969 +/- 3.23e-42]"
+          },
+          "min_station_alpha_2_over_u_p_certified": {
+            "mid_float": 3.763271855706007,
+            "rad_float_outward": 1.0964877953708364e-16,
+            "lower_dec": "3.763271855706007083822540218962405066897e+0",
+            "upper_dec": "3.763271855706007083822540218962405066900e+0",
+            "arb_ball_str": "[3.763271855706007083822540218962405066898 +/- 2.04e-42]"
+          },
+          "in_strict_negative_h0_tail_alpha_ge_9": false,
+          "F_at_X_0_equals_W_p_minus_certified": {
+            "mid_float": 0.005090114698578662,
+            "rad_float_outward": 0.0004466398604563439,
+            "lower_dec": "4.643474838122318051403182201626564003291e-3",
+            "upper_dec": "5.536754559035005531852858715298439003294e-3",
+            "arb_ball_str": "[0.005 +/- 5.37e-4]"
+          },
+          "F_at_X_0_plus_equals_W_p_certified": {
+            "mid_float": -0.0011533535956518236,
+            "rad_float_outward": 0.00044730337367582257,
+            "lower_dec": "-1.600656969327646143066285796296692654497e-3",
+            "upper_dec": "-7.060502219760011167103039695144660919955e-4",
+            "arb_ball_str": "[-0.001 +/- 6.01e-4]"
+          },
+          "W_p_minus_at_X_0_over_p_certified": {
+            "mid_float": 0.027214039343280993,
+            "rad_float_outward": 2.8383995553940363e-07,
+            "lower_dec": "2.721375550332545345335116965632817878638e-2",
+            "upper_dec": "2.721432318323653220894581411901793613352e-2",
+            "arb_ball_str": "[0.027214 +/- 3.24e-7]"
+          },
+          "direct_jump_F_X0_plus_minus_F_X0_certified": {
+            "mid_float": -0.006243468294230486,
+            "rad_float_outward": 0.0008939432354964087,
+            "lower_dec": "-7.137411529726893727578536868467690251540e-3",
+            "upper_dec": "-5.349525058734077115454093814268471501537e-3",
+            "arb_ball_str": "[+/- 7.14e-3]"
+          },
+          "euler_recursion_jump_formula_certified": {
+            "mid_float": -0.00624332880752115,
+            "rad_float_outward": 6.511735217734535e-08,
+            "lower_dec": "-6.243393924873326812190917324067925928920e-3",
+            "upper_dec": "-6.243263690168972674770393994429981230583e-3",
+            "arb_ball_str": "[-0.0062433 +/- 9.40e-8]"
+          },
+          "jump_identity_diff_certified": {
+            "mid_float": -1.3948670933567803e-07,
+            "rad_float_outward": 0.000894008353498066,
+            "lower_dec": "-8.941478402074015222138594501855335467863e-4",
+            "upper_dec": "8.938688667887301661425400859472789532140e-4",
+            "arb_ball_str": "[+/- 8.95e-4]"
+          },
+          "jump_identity_encloses_zero": true,
+          "jump_certified_nonzero": true,
+          "jump_certified_strictly_negative": true,
+          "jump_certified_strictly_positive": false,
+          "W_p_minus_at_u_p_certified_strictly_positive": true,
+          "W_p_minus_at_u_p_certified_strictly_negative": false
+        },
+        {
+          "prime_p": 23,
+          "m_prev": 22,
+          "X_0_equals_p_minus_1_pow_4_5_certified": {
+            "mid_float": 11.855998744839985,
+            "rad_float_outward": 2.0725199149244723e-16,
+            "lower_dec": "1.185599874483998504479220584987918733014e+1",
+            "upper_dec": "1.185599874483998504479220584987918733017e+1",
+            "arb_ball_str": "[11.85599874483998504479220584987918733016 +/- 3.54e-39]"
+          },
+          "u_p_equals_X_0_over_p_certified": {
+            "mid_float": 0.5154782062973906,
+            "rad_float_outward": 4.762740918228576e-17,
+            "lower_dec": "5.154782062973906541214002543425733621806e-1",
+            "upper_dec": "5.154782062973906541214002543425733621809e-1",
+            "arb_ball_str": "[0.5154782062973906541214002543425733621807 +/- 1.60e-41]"
+          },
+          "min_station_alpha_2_over_u_p_certified": {
+            "mid_float": 3.8798924485396307,
+            "rad_float_outward": 2.1454368876608976e-16,
+            "lower_dec": "3.879892448539630881713974726399865479616e+0",
+            "upper_dec": "3.879892448539630881713974726399865479619e+0",
+            "arb_ball_str": "[3.879892448539630881713974726399865479617 +/- 1.17e-40]"
+          },
+          "in_strict_negative_h0_tail_alpha_ge_9": false,
+          "F_at_X_0_equals_W_p_minus_certified": {
+            "mid_float": 0.0058919326625009065,
+            "rad_float_outward": 0.0006681940330963701,
+            "lower_dec": "5.223738629404536376610367707804324801554e-3",
+            "upper_dec": "6.560126695597276019766896180704715426557e-3",
+            "arb_ball_str": "[0.006 +/- 7.77e-4]"
+          },
+          "F_at_X_0_plus_equals_W_p_certified": {
+            "mid_float": 0.0006804551653073593,
+            "rad_float_outward": 0.0006688350804324729,
+            "lower_dec": "1.162008487488657405095566377397855239253e-5",
+            "upper_dec": "1.349290245739832075140051733109916052394e-3",
+            "arb_ball_str": "[+/- 1.35e-3]"
+          },
+          "W_p_minus_at_X_0_over_p_certified": {
+            "mid_float": 0.024992706416452792,
+            "rad_float_outward": 2.6338016789767704e-07,
+            "lower_dec": "2.499244303628489499862439313388094312078e-2",
+            "upper_dec": "2.499296979662069001653321518047377473244e-2",
+            "arb_ball_str": "[0.024993 +/- 5.57e-7]"
+          },
+          "direct_jump_F_X0_plus_minus_F_X0_certified": {
+            "mid_float": -0.005211477497193547,
+            "rad_float_outward": 0.0013370291162573271,
+            "lower_dec": "-6.548506613450873551034725230675854061665e-3",
+            "upper_dec": "-3.874448380936220196151531260949291561662e-3",
+            "arb_ball_str": "[+/- 6.55e-3]"
+          },
+          "euler_recursion_jump_formula_certified": {
+            "mid_float": -0.005211339534127147,
+            "rad_float_outward": 5.491856164276905e-08,
+            "lower_dec": "-5.211394452688789523006277156178234836680e-3",
+            "upper_dec": "-5.211284615565504028563906465074374100783e-3",
+            "arb_ball_str": "[-0.0052113 +/- 9.45e-8]"
+          },
+          "jump_identity_diff_certified": {
+            "mid_float": -1.3796306640009782e-07,
+            "rad_float_outward": 0.0013370840351853988,
+            "lower_dec": "-1.337221998251798631748351681768299592933e-3",
+            "upper_dec": "1.336946072118998436132278811395762907070e-3",
+            "arb_ball_str": "[+/- 1.34e-3]"
+          },
+          "jump_identity_encloses_zero": true,
+          "jump_certified_nonzero": true,
+          "jump_certified_strictly_negative": true,
+          "jump_certified_strictly_positive": false,
+          "W_p_minus_at_u_p_certified_strictly_positive": true,
+          "W_p_minus_at_u_p_certified_strictly_negative": false
+        }
+      ],
+      "asymptotic_tail_prime_1901_jump_check": {
+        "prime_p": 1901,
+        "X_0_equals_1900_pow_4_5_certified": {
+          "mid_float": 419.761768345637,
+          "rad_float_outward": 3.707117283927426e-15,
+          "lower_dec": "4.197617683456369908744649735967077146599e+2",
+          "upper_dec": "4.197617683456369908744649735967077146602e+2",
+          "arb_ball_str": "[419.7617683456369908744649735967077146601 +/- 2.46e-38]"
+        },
+        "u_p_equals_X_0_over_1901_certified": {
+          "mid_float": 0.22081103016603734,
+          "rad_float_outward": 1.9482490296925278e-18,
+          "lower_dec": "2.208110301660373439634218693301986926143e-1",
+          "upper_dec": "2.208110301660373439634218693301986926146e-1",
+          "arb_ball_str": "[0.2208110301660373439634218693301986926145 +/- 4.69e-41]"
+        },
+        "min_station_alpha_2_over_u_p_certified": {
+          "mid_float": 9.057518541968278,
+          "rad_float_outward": 2.77891450178406e-16,
+          "lower_dec": "9.057518541968277936080193530240345251475e+0",
+          "upper_dec": "9.057518541968277936080193530240345251478e+0",
+          "arb_ball_str": "[9.057518541968277936080193530240345251477 +/- 3.57e-40]"
+        },
+        "in_strict_negative_h0_tail_alpha_ge_9": true,
+        "W_p_minus_at_u_p_certified": {
+          "mid_float": -0.001740123550541485,
+          "rad_float_outward": 6.527446771988682e-08,
+          "lower_dec": "-1.740188825009204786973343905082312249947e-3",
+          "upper_dec": "-1.740058276073765053191339281874117278859e-3",
+          "arb_ball_str": "[-0.0017401 +/- 8.89e-8]"
+        },
+        "W_p_minus_at_u_p_certified_strictly_negative": true,
+        "euler_recursion_jump_formula_certified": {
+          "mid_float": 3.991067071079533e-05,
+          "rad_float_outward": 1.4971050770642769e-09,
+          "lower_dec": "3.990917360571826536056838366221808757510e-5",
+          "upper_dec": "3.991216781587238785026605372423245500653e-5",
+          "arb_ball_str": "[3.991e-5 +/- 2.17e-9]"
+        },
+        "jump_certified_nonzero": true,
+        "jump_certified_strictly_positive": true
+      },
+      "composite_threshold_continuity_check": {
+        "composite_m_plus_1": 4,
+        "X_0_equals_3_pow_4_5_certified": {
+          "mid_float": 2.408224685280692,
+          "rad_float_outward": 1.5608648564996602e-16,
+          "lower_dec": "2.408224685280692046285508614191154329099e+0",
+          "upper_dec": "2.408224685280692046285508614191154329102e+0",
+          "arb_ball_str": "[2.408224685280692046285508614191154329100 +/- 3.58e-40]"
+        },
+        "F_at_X_0_equals_W_3_certified": {
+          "mid_float": 0.0934148036477441,
+          "rad_float_outward": 1.1763521627023074e-05,
+          "lower_dec": "9.340304012611707598545596891964122950431e-2",
+          "upper_dec": "9.342656716937111063736499244297191798091e-2",
+          "arb_ball_str": "[0.0934 +/- 2.66e-5]"
+        },
+        "F_at_X_0_plus_equals_W_4_certified": {
+          "mid_float": 0.0934148036477441,
+          "rad_float_outward": 1.1763521627023074e-05,
+          "lower_dec": "9.340304012611707598545596891964122950431e-2",
+          "upper_dec": "9.342656716937111063736499244297191798091e-2",
+          "arb_ball_str": "[0.0934 +/- 2.66e-5]"
+        },
+        "direct_jump_diff_certified": {
+          "mid_float": 0.0,
+          "rad_float_outward": 2.3527043254034655e-05,
+          "lower_dec": "-2.352704325403465190902352333068847656251e-5",
+          "upper_dec": "2.352704325403465190902352333068847656251e-5",
+          "arb_ball_str": "[+/- 2.36e-5]"
+        },
+        "jump_encloses_zero_at_composite_step": true
+      },
+      "lean_theorem": "coupled_cutoff_prime_step_jump_and_dense_comparison_extension"
+    },
+    "section_3_single_observable_common_referent_candidate_audit": {
+      "collision_contract_specification": {
+        "zero_setup": "For a nontrivial Riemann zeta zero rho = 1/2 + delta + i*gamma (delta = Re(rho) - 1/2 in (-1/2, 1/2)), its grade-K image is rho_K = tau^K * rho in C_K, considered across all concurrent grades K in A_R = Qbar cap R (both positive and negative), with contradiction witnesses taken at a justified nonzero rational difference K - J in Q \\ {0} (canonical benchmark pair: K = 0, J = 1).",
+        "CR1_raw_cross_grade_common_referent_equality": "D_K(rho_K) = D_J(rho_J) = D(rho) as the exact same external real value in R.",
+        "CR2_simultaneous_discrete_integer_layer_membership": "D_K(rho_K) = m_K * tau^K in L_K = tau^K Z and D_J(rho_J) = m_J * tau^J in L_J = tau^J Z with exact integers m_K, m_J in Z.",
+        "CR3_one_way_off_critical_sensitivity": "delta != 0  ==>  D(rho) != 0 (one-way implication required by the reductio; never strengthened to a biconditional).",
+        "same_expression_requirement": "All three properties CR1, CR2, CR3 must hold simultaneously for the SAME single expression D_K(rho_K)."
+      },
+      "candidate_1_grade_K_prime_euler_integer_layer_observable": {
+        "definition": "D_{K,y}^{(1)}(rho_K) := c_K(rho_K) * A_{K,y}(X_K(rho_K)) = c_K(rho_K) * N_y(X_K(rho_K)) * tau^K, where N_y(x) = prod_{d | P_y, d <= x} (floor(x/d)!)^{mu(d)} = prod_{n <= x} m_y(n) in Z_{>=1}.",
+        "domain_and_dependencies": "Defined for all K in A_R = Qbar cap R, y >= 2, and complex zero image rho_K = tau^K rho != 0, with invariant zero-height scale X_0(rho_K) = tau^{-K} |rho_K| = |rho| >= 14.13 > 1 (or raw scale X_K(rho_K) = |rho_K| for K >= 0).",
+        "subcase_1A_unmodulated_carrier_c_K_eq_1": {
+          "transformation_law": "At invariant scale X_0 = tau^{-K}|rho_K| = |rho|, D_{K,y}^{(1A)}(rho_K) = N_y(|rho|) * tau^K obeys the exact weight-1 scale-coboundary law D_{K,y}^{(1A)}(rho_K) = tau^{K-J} D_{J,y}^{(1A)}(rho_J).",
+          "CR1_status": "FAILS_RAW_EQUALITY: Since N_y(|rho|) >= 1 and tau = 2*pi > 1, D_{K,y}^{(1A)}(rho_K) - D_{J,y}^{(1A)}(rho_J) = N_y(|rho|) * (tau^K - tau^J) != 0 whenever K != J (and at raw scale |rho_K|, N_y(|rho_J|) * tau^J > N_y(|rho_K|) * tau^K for J > K >= 0).",
+          "CR2_status": "PROVED_UNCONDITIONALLY: By Theorem `unconditional_factorial_ratio_integrality`, N_y(X) in Z_{>=1}, so D_{K,y}^{(1A)}(rho_K) = N_y(X) * tau^K in L_K^x = tau^K (Z \\ {0}) subset L_K.",
+          "CR3_status": "VACUOUSLY_NONZERO_UNSENSITIVE_TO_DELTA: Since N_y(X) >= 1 and tau^K > 0, D_{K,y}^{(1A)}(rho_K) > 0 for ALL zeros (both delta != 0 and delta = 0).",
+          "certified_benchmark_at_rho_1_K0_vs_J1": {
+            "floor_abs_rho_1": 14,
+            "coupled_cutoff_y": 28,
+            "N_y_at_floor_abs_rho_1_exact": "360360",
+            "D_0_1A_invariant_scale_certified": {
+              "mid_float": 360360.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "3.603599999999999999999999999999999999999e+5",
+              "upper_dec": "3.603600000000000000000000000000000000001e+5",
+              "arb_ball_str": "360360.0000000000000000000000000000000000"
+            },
+            "D_1_1A_invariant_scale_certified": {
+              "mid_float": 2264208.657295236,
+              "rad_float_outward": 1.155209125078487e-10,
+              "lower_dec": "2.264208657295235782824796339197203318697e+6",
+              "upper_dec": "2.264208657295235782824796339197203318700e+6",
+              "arb_ball_str": "[2264208.657295235782824796339197203318699 +/- 4.17e-34]"
+            },
+            "D_sqrt2_half_1A_invariant_scale_certified": {
+              "mid_float": 1321706.347697263,
+              "rad_float_outward": 9.500800884591234e-11,
+              "lower_dec": "1.321706347697262980056994327174538447664e+6",
+              "upper_dec": "1.321706347697262980056994327174538447667e+6",
+              "arb_ball_str": "[1321706.347697262980056994327174538447666 +/- 2.93e-34]"
+            },
+            "raw_CR1_difference_D_1_minus_D_0_certified": {
+              "mid_float": 1903848.657295236,
+              "rad_float_outward": 1.155209125078487e-10,
+              "lower_dec": "1.903848657295235782824796339197203318697e+6",
+              "upper_dec": "1.903848657295235782824796339197203318700e+6",
+              "arb_ball_str": "[1903848.657295235782824796339197203318699 +/- 4.17e-34]"
+            },
+            "raw_CR1_difference_strictly_positive": true,
+            "coboundary_D_1_minus_tau_D_0_diff_certified": {
+              "mid_float": 0.0,
+              "rad_float_outward": 9.734247050460465e-71,
+              "lower_dec": "-9.734247050460463880840815492865584587357e-71",
+              "upper_dec": "9.734247050460463880840815492865584587357e-71",
+              "arb_ball_str": "[+/- 9.74e-71]"
+            },
+            "coboundary_encloses_zero": true,
+            "raw_scale_J1_floor_abs_tau_rho_1": 88,
+            "raw_scale_CR1_difference_D_1_minus_D_0_strictly_positive": true
+          }
+        },
+        "subcase_1B_zero_defect_modulated_carrier": {
+          "definition": "D_{K,y}^{(1B)}(rho_K) = m_K(rho_K) * N_y(X_0) * tau^K with integer multiplier m_K(rho_K) in Z",
+          "trilemma_obstruction": "To preserve CR2 (D_{K,y}^{(1B)} in L_K = tau^K Z), the multiplier c_K(rho_K) * N_y(X_0) must be an integer M_K in Z. At any rational grade difference K - J in Q \\ {0} (such as K = 0, J = 1), Lindemann's theorem gives L_K cap L_J = {0}, so raw equality CR1 (M_K * tau^K = M_J * tau^J) holds if and only if M_K = M_J = 0. Furthermore, by `invariant_covariant_observable_vanishing` in `formal/RiemannScope/Grade.lean`, any multiplier extending continuously to a real interval I subset R (necessary because A_R is totally disconnected) while taking integer values on I cap A_R must be a constant integer M_0 in Z: if M_0 != 0 then CR1 fails (M_0 * tau^K != M_0 * tau^J), and if M_0 = 0 then CR3 fails (D = 0 even for delta != 0). Conversely, if c_K(rho_K) = tau^{-K} Theta_0(delta) is chosen to cancel tau^K and enforce CR1, then CR2 at J = 1 requires Theta_0(delta) * N_y(X_0) in Z cap tau Z = {0}, reducing to Candidate 2."
+        }
+      },
+      "candidate_2_canonical_theta_and_stieltjes_zero_defect_observables": {
+        "subcase_2A_normalized_pullback_theta_zero_radial_defect": {
+          "definition": "D_K^{(2A)}(rho_K) := |H_0(tau^{-K} rho_K - 1/2)|^2 * (tau^{tau^{-K} Re(rho_K) - 1/2} + tau^{-(tau^{-K} Re(rho_K) - 1/2)} - 2) = |H_0(delta + i*gamma)|^2 * (tau^delta + tau^{-delta} - 2), where H_0(z) = F_tau(1/2 + z) * F_tau(1/2 - z) = ((z^2 - 1/4)^4 / (1024 sqrt(pi))) * Gamma((1 + 2z)/4) * Gamma((1 - 2z)/4).",
+          "domain_and_transformation_law": "Defined for all K in A_R = Qbar cap R and all rho_K = tau^K rho with Re(rho) in (0, 1). Because tau^{-K} rho_K = rho is invariant under the grade-K ray dilation Phi_K, D_K^{(2A)}(rho_K) has weight 0 (strict cross-grade invariance D_K^{(2A)}(rho_K) = D_J^{(2A)}(rho_J)).",
+          "CR1_status": "PROVED_UNCONDITIONALLY: For all K, J in A_R (both rational and irrational algebraic grades), tau^{-K} rho_K - 1/2 = delta + i*gamma = tau^{-J} rho_J - 1/2, so D_K^{(2A)}(rho_K) = D_J^{(2A)}(rho_J) = D^{(2A)}(rho) as the exact same external real number.",
+          "CR3_status": "PROVED_UNCONDITIONALLY_ONE_WAY (delta != 0 ==> D^{(2A)}(rho) > 0): (1) By the squared pole-annihilating normalization P(D)^2 = (D^2 - 1/16)^2 of psi_tau, H_0(z) = ((z^2 - 1/4)^4 / (1024 sqrt(pi))) * Gamma((1 + 2z)/4) * Gamma((1 - 2z)/4). Since 1/Gamma(w) is entire on C, Gamma((1 +/- 2z)/4) has no zeros anywhere in C; hence the ONLY zeros of H_0(z) in C are z = +/- 1/2 (corresponding to s = 0, 1). Every nontrivial zero rho = 1/2 + delta + i*gamma in the critical strip has |delta| < 1/2 (and gamma != 0), so z = delta + i*gamma != +/- 1/2 and |H_0(delta + i*gamma)|^2 > 0 unconditionally. (2) Since tau = 2*pi > 1, tau^delta + tau^{-delta} - 2 = (tau^{delta/2} - tau^{-delta/2})^2 > 0 for all delta != 0. Therefore delta != 0 ==> D^{(2A)}(rho) > 0 != 0 unconditionally.",
+          "CR2_status": "EQUIVALENT_TO_DELTA_EQ_0_NOT_UNCONDITIONALLY_PROVED: For every nontrivial zero rho = 1/2 + delta + i*gamma in the critical strip |delta| < 1/2 (with |gamma| >= 14.13), 0 <= D^{(2A)}(rho) < 1 (for instance at gamma = gamma_1 ~ 14.1347, |H_0(delta + i*gamma_1)|^2 < 3e-11 and 0 <= tau^delta + tau^{-delta} - 2 < 0.91). Consequently: (a) even at the single grade K = 0 (where L_0 = Z), D_0^{(2A)}(rho) in Z holds if and only if D_0^{(2A)}(rho) = 0 <=> delta = 0; (b) across K = 0 and J = 1 (rational difference K - J = -1 != 0), Lindemann's theorem gives L_0 cap L_1 = Z cap tau Z = {0}, so simultaneous layer membership D_0^{(2A)}(rho) in L_0 and D_1^{(2A)}(rho_1) in L_1 holds if and only if D^{(2A)}(rho) = 0 <=> delta = 0. Thus CR2 for Candidate 2A is logically equivalent to RH for rho and cannot be asserted unconditionally without circularity."
+        },
+        "subcase_2B_prime_euler_stieltjes_shift_difference": {
+          "definition": "D_{K,y}^{(2B)}(rho_K) := W_y(tau^{1 + |delta(rho_K)|}) - W_y(tau) = int_{(1, infty)} x^{-1/2} [h_0(x / tau^{1+|delta|}) - h_0(x / tau)] d(log A_{K,y})(x), where delta(rho_K) = tau^{-K} Re(rho_K) - 1/2 = delta.",
+          "CR1_status": "PROVED_UNCONDITIONALLY: Because d(log A_{K,y})(x) = d(log N_y)(x) cancels tau^K and delta(rho_K) = delta is grade-invariant, D_{K,y}^{(2B)}(rho_K) = D_{J,y}^{(2B)}(rho_J) for all K, J in A_R.",
+          "CR2_status": "FAILS_FOR_NONZERO_VALUES: For delta != 0, D_{K,y}^{(2B)}(rho_K) is a continuous Mellin-Stieltjes sum of (log m_y(n)) n^{-1/2} [h_0(n / tau^{1+|delta|}) - h_0(n / tau)] in (-1, 1) \\ {0}, which does not lie in L_0 = Z or L_1 = tau Z.",
+          "CR3_status": "CERTIFIED_NONZERO_FOR_SAMPLED_OFF_LINE_SHIFTS: Vanishes at delta = 0 and is certified nonzero for delta in {1/20, 1/10, 1/4} at y = M(|rho_1|) = 28."
+        },
+        "all_cand2a_cr1_enclose_zero": true,
+        "all_cand2a_off_line_strictly_positive": true,
+        "all_cand2a_on_line_enclose_zero": true,
+        "all_cand2a_strictly_below_one": true,
+        "all_cand2b_cr1_enclose_zero": true,
+        "certified_candidate_2_evaluation_table": [
+          {
+            "delta_label": "0",
+            "delta_certified": {
+              "mid_float": 0.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "0",
+              "upper_dec": "0",
+              "arb_ball_str": "0"
+            },
+            "gamma_1_certified": {
+              "mid_float": 14.134725141734695,
+              "rad_float_outward": 8.407109157053215e-16,
+              "lower_dec": "1.413472514173469379045725198356247027077e+1",
+              "upper_dec": "1.413472514173469379045725198356247027080e+1",
+              "arb_ball_str": "[14.13472514173469379045725198356247027078 +/- 4.26e-39]"
+            },
+            "abs_H0_at_delta_plus_i_gamma1_sq_certified": {
+              "mid_float": 2.2567480269679515e-07,
+              "rad_float_outward": 7.193671008776191e-24,
+              "lower_dec": "2.256748026967951546108093440660440032519e-7",
+              "upper_dec": "2.256748026967951546108093440660440032522e-7",
+              "arb_ball_str": "[2.256748026967951546108093440660440032521e-7 +/- 6.14e-48]"
+            },
+            "abs_H0_sq_strictly_positive": true,
+            "radial_cosh_factor_tau_delta_certified": {
+              "mid_float": 0.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "0",
+              "upper_dec": "0",
+              "arb_ball_str": "0"
+            },
+            "D_0_2A_at_rho_0_certified": {
+              "mid_float": 0.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "0",
+              "upper_dec": "0",
+              "arb_ball_str": "0"
+            },
+            "D_1_2A_at_rho_1_certified": {
+              "mid_float": -3.8979312694544104e-84,
+              "rad_float_outward": 1.9616111823367567e-83,
+              "lower_dec": "-2.351404309282197368237365789161229330508e-83",
+              "upper_dec": "1.571818055391315253946936746036669563194e-83",
+              "arb_ball_str": "[+/- 2.36e-83]"
+            },
+            "D_sqrt2_half_2A_certified": {
+              "mid_float": -3.8979312694544104e-84,
+              "rad_float_outward": 6.469344860915748e-83,
+              "lower_dec": "-6.859137987861188652538399406730366517901e-83",
+              "upper_dec": "6.079551733970306538247970363605806750587e-83",
+              "arb_ball_str": "[+/- 6.86e-83]"
+            },
+            "D_0_minus_D_1_2A_CR1_diff_certified": {
+              "mid_float": 3.8979312694544104e-84,
+              "rad_float_outward": 1.9616111823367567e-83,
+              "lower_dec": "-1.571818055391315253946936746036669563194e-83",
+              "upper_dec": "2.351404309282197368237365789161229330508e-83",
+              "arb_ball_str": "[+/- 2.36e-83]"
+            },
+            "CR1_raw_equality_2A_encloses_zero": true,
+            "D_2A_strictly_positive_when_delta_nonzero": true,
+            "D_2A_ lies_in_open_interval_0_1_when_delta_nonzero": false,
+            "D_0_2B_stieltjes_shift_diff_certified": {
+              "mid_float": 0.0,
+              "rad_float_outward": 0.0031255108660843693,
+              "lower_dec": "-3.125510866084368899464607238769531250001e-3",
+              "upper_dec": "3.125510866084368899464607238769531250001e-3",
+              "arb_ball_str": "[+/- 3.13e-3]"
+            },
+            "D_1_2B_stieltjes_shift_diff_certified": {
+              "mid_float": 0.0,
+              "rad_float_outward": 0.0031255108660843693,
+              "lower_dec": "-3.125510866084368899464607238769531250001e-3",
+              "upper_dec": "3.125510866084368899464607238769531250001e-3",
+              "arb_ball_str": "[+/- 3.13e-3]"
+            },
+            "D_0_minus_D_1_2B_CR1_diff_certified": {
+              "mid_float": 0.0,
+              "rad_float_outward": 0.006251021732168739,
+              "lower_dec": "-6.251021732168737798929214477539062500001e-3",
+              "upper_dec": "6.251021732168737798929214477539062500001e-3",
+              "arb_ball_str": "[+/- 6.26e-3]"
+            },
+            "CR1_raw_equality_2B_encloses_zero": true
+          },
+          {
+            "delta_label": "1/20",
+            "delta_certified": {
+              "mid_float": 0.05,
+              "rad_float_outward": 2.775557561562892e-18,
+              "lower_dec": "4.999999999999999999999999999999999999998e-2",
+              "upper_dec": "5.000000000000000000000000000000000000002e-2",
+              "arb_ball_str": "[0.05000000000000000000000000000000000000000 +/- 3e-46]"
+            },
+            "gamma_1_certified": {
+              "mid_float": 14.134725141734695,
+              "rad_float_outward": 8.407109157053215e-16,
+              "lower_dec": "1.413472514173469379045725198356247027077e+1",
+              "upper_dec": "1.413472514173469379045725198356247027080e+1",
+              "arb_ball_str": "[14.13472514173469379045725198356247027078 +/- 4.26e-39]"
+            },
+            "abs_H0_at_delta_plus_i_gamma1_sq_certified": {
+              "mid_float": 2.2569589276835927e-07,
+              "rad_float_outward": 1.0846000887611103e-23,
+              "lower_dec": "2.256958927683592840903832575925438232217e-7",
+              "upper_dec": "2.256958927683592840903832575925438232220e-7",
+              "arb_ball_str": "[2.256958927683592840903832575925438232218e-7 +/- 8.74e-48]"
+            },
+            "abs_H0_sq_strictly_positive": true,
+            "radial_cosh_factor_tau_delta_certified": {
+              "mid_float": 0.008450424388292865,
+              "rad_float_outward": 3.2798640447540077e-19,
+              "lower_dec": "8.450424388292864986054075732813903999581e-3",
+              "upper_dec": "8.450424388292864986054075732813903999584e-3",
+              "arb_ball_str": "[0.008450424388292864986054075732813903999583 +/- 7.41e-44]"
+            },
+            "D_0_2A_at_rho_0_certified": {
+              "mid_float": 1.9072260765872746e-09,
+              "rad_float_outward": 7.939868402062066e-26,
+              "lower_dec": "1.907226076587274553511662789999555930720e-9",
+              "upper_dec": "1.907226076587274553511662789999555930723e-9",
+              "arb_ball_str": "[1.907226076587274553511662789999555930722e-9 +/- 4.02e-49]"
+            },
+            "D_1_2A_at_rho_1_certified": {
+              "mid_float": 1.9072260765872746e-09,
+              "rad_float_outward": 7.939868402062066e-26,
+              "lower_dec": "1.907226076587274553511662789999555930720e-9",
+              "upper_dec": "1.907226076587274553511662789999555930723e-9",
+              "arb_ball_str": "[1.907226076587274553511662789999555930722e-9 +/- 4.02e-49]"
+            },
+            "D_sqrt2_half_2A_certified": {
+              "mid_float": 1.9072260765872746e-09,
+              "rad_float_outward": 7.939868402062066e-26,
+              "lower_dec": "1.907226076587274553511662789999555930720e-9",
+              "upper_dec": "1.907226076587274553511662789999555930723e-9",
+              "arb_ball_str": "[1.907226076587274553511662789999555930722e-9 +/- 4.02e-49]"
+            },
+            "D_0_minus_D_1_2A_CR1_diff_certified": {
+              "mid_float": -1.0938559877619561e-84,
+              "rad_float_outward": 3.492885538920732e-81,
+              "lower_dec": "-3.493979394908493509441320723103505702659e-81",
+              "upper_dec": "3.491791682932969597151111668429780234847e-81",
+              "arb_ball_str": "[+/- 3.50e-81]"
+            },
+            "CR1_raw_equality_2A_encloses_zero": true,
+            "D_2A_strictly_positive_when_delta_nonzero": true,
+            "D_2A_ lies_in_open_interval_0_1_when_delta_nonzero": true,
+            "D_0_2B_stieltjes_shift_diff_certified": {
+              "mid_float": 0.0034575834021969413,
+              "rad_float_outward": 0.0035291175627207854,
+              "lower_dec": "-7.153416052384366711737771672063691047274e-5",
+              "upper_dec": "6.986700964917726167830208342849675589529e-3",
+              "arb_ball_str": "[+/- 6.99e-3]"
+            },
+            "D_1_2B_stieltjes_shift_diff_certified": {
+              "mid_float": 0.0034575834021969413,
+              "rad_float_outward": 0.0035291175627207854,
+              "lower_dec": "-7.153416052384366711737771672063691047274e-5",
+              "upper_dec": "6.986700964917726167830208342849675589529e-3",
+              "arb_ball_str": "[+/- 6.99e-3]"
+            },
+            "D_0_minus_D_1_2B_CR1_diff_certified": {
+              "mid_float": 1.3305097180192379e-76,
+              "rad_float_outward": 0.007058235125441571,
+              "lower_dec": "-7.058235125441569834947586059570312500001e-3",
+              "upper_dec": "7.058235125441569834947586059570312500002e-3",
+              "arb_ball_str": "[+/- 7.06e-3]"
+            },
+            "CR1_raw_equality_2B_encloses_zero": true
+          },
+          {
+            "delta_label": "1/10",
+            "delta_certified": {
+              "mid_float": 0.1,
+              "rad_float_outward": 5.551115123125784e-18,
+              "lower_dec": "9.999999999999999999999999999999999999998e-2",
+              "upper_dec": "1.000000000000000000000000000000000000002e-1",
+              "arb_ball_str": "[0.1000000000000000000000000000000000000000 +/- 3e-45]"
+            },
+            "gamma_1_certified": {
+              "mid_float": 14.134725141734695,
+              "rad_float_outward": 8.407109157053215e-16,
+              "lower_dec": "1.413472514173469379045725198356247027077e+1",
+              "upper_dec": "1.413472514173469379045725198356247027080e+1",
+              "arb_ball_str": "[14.13472514173469379045725198356247027078 +/- 4.26e-39]"
+            },
+            "abs_H0_at_delta_plus_i_gamma1_sq_certified": {
+              "mid_float": 2.2575917324127818e-07,
+              "rad_float_outward": 1.0462019694002403e-23,
+              "lower_dec": "2.257591732412781673087576385062770482495e-7",
+              "upper_dec": "2.257591732412781673087576385062770482498e-7",
+              "arb_ball_str": "[2.257591732412781673087576385062770482497e-7 +/- 2.01e-47]"
+            },
+            "abs_H0_sq_strictly_positive": true,
+            "radial_cosh_factor_tau_delta_certified": {
+              "mid_float": 0.03387310722551371,
+              "rad_float_outward": 3.392051775570012e-18,
+              "lower_dec": "3.387310722551371478560147398407441162474e-2",
+              "upper_dec": "3.387310722551371478560147398407441162477e-2",
+              "arb_ball_str": "[0.03387310722551371478560147398407441162475 +/- 2.31e-42]"
+            },
+            "D_0_2A_at_rho_0_certified": {
+              "mid_float": 7.647164682345142e-09,
+              "rad_float_outward": 1.071315685261197e-25,
+              "lower_dec": "7.647164682345141982580246406875900629226e-9",
+              "upper_dec": "7.647164682345141982580246406875900629229e-9",
+              "arb_ball_str": "[7.647164682345141982580246406875900629227e-9 +/- 3.07e-49]"
+            },
+            "D_1_2A_at_rho_1_certified": {
+              "mid_float": 7.647164682345142e-09,
+              "rad_float_outward": 1.071315685261197e-25,
+              "lower_dec": "7.647164682345141982580246406875900629226e-9",
+              "upper_dec": "7.647164682345141982580246406875900629229e-9",
+              "arb_ball_str": "[7.647164682345141982580246406875900629227e-9 +/- 3.07e-49]"
+            },
+            "D_sqrt2_half_2A_certified": {
+              "mid_float": 7.647164682345142e-09,
+              "rad_float_outward": 1.071315685261197e-25,
+              "lower_dec": "7.647164682345141982580246406875900629226e-9",
+              "upper_dec": "7.647164682345141982580246406875900629229e-9",
+              "arb_ball_str": "[7.647164682345141982580246406875900629227e-9 +/- 3.07e-49]"
+            },
+            "D_0_minus_D_1_2A_CR1_diff_certified": {
+              "mid_float": -4.504112890784525e-84,
+              "rad_float_outward": 1.49730690131865e-80,
+              "lower_dec": "-1.497757312607728346927288631760462955333e-80",
+              "upper_dec": "1.496856490029571441866614315130105409763e-80",
+              "arb_ball_str": "[+/- 1.50e-80]"
+            },
+            "CR1_raw_equality_2A_encloses_zero": true,
+            "D_2A_strictly_positive_when_delta_nonzero": true,
+            "D_2A_ lies_in_open_interval_0_1_when_delta_nonzero": true,
+            "D_0_2B_stieltjes_shift_diff_certified": {
+              "mid_float": 0.005978427360566792,
+              "rad_float_outward": 0.00403696217108518,
+              "lower_dec": "1.941465189481613283712566303418718951895e-3",
+              "upper_dec": "1.001538953165197098787516395966871895191e-2",
+              "arb_ball_str": "[+/- 0.0101]"
+            },
+            "D_1_2B_stieltjes_shift_diff_certified": {
+              "mid_float": 0.005978427360566792,
+              "rad_float_outward": 0.00403696217108518,
+              "lower_dec": "1.941465189481613283712566303418718951895e-3",
+              "upper_dec": "1.001538953165197098787516395966871895191e-2",
+              "arb_ball_str": "[+/- 0.0101]"
+            },
+            "D_0_minus_D_1_2B_CR1_diff_certified": {
+              "mid_float": 1.6975468816107518e-76,
+              "rad_float_outward": 0.00807392434217036,
+              "lower_dec": "-8.073924342170357704162597656250000000001e-3",
+              "upper_dec": "8.073924342170357704162597656250000000002e-3",
+              "arb_ball_str": "[+/- 8.08e-3]"
+            },
+            "CR1_raw_equality_2B_encloses_zero": true
+          },
+          {
+            "delta_label": "1/4",
+            "delta_certified": {
+              "mid_float": 0.25,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "2.499999999999999999999999999999999999999e-1",
+              "upper_dec": "2.500000000000000000000000000000000000001e-1",
+              "arb_ball_str": "0.2500000000000000000000000000000000000000"
+            },
+            "gamma_1_certified": {
+              "mid_float": 14.134725141734695,
+              "rad_float_outward": 8.407109157053215e-16,
+              "lower_dec": "1.413472514173469379045725198356247027077e+1",
+              "upper_dec": "1.413472514173469379045725198356247027080e+1",
+              "arb_ball_str": "[14.13472514173469379045725198356247027078 +/- 4.26e-39]"
+            },
+            "abs_H0_at_delta_plus_i_gamma1_sq_certified": {
+              "mid_float": 2.26202567643778e-07,
+              "rad_float_outward": 3.954755568045167e-24,
+              "lower_dec": "2.262025676437779937212945714627113356113e-7",
+              "upper_dec": "2.262025676437779937212945714627113356116e-7",
+              "arb_ball_str": "[2.262025676437779937212945714627113356115e-7 +/- 4.00e-47]"
+            },
+            "abs_H0_sq_strictly_positive": true,
+            "radial_cosh_factor_tau_delta_certified": {
+              "mid_float": 0.21485226483222425,
+              "rad_float_outward": 9.110538785652684e-18,
+              "lower_dec": "2.148522648322242398699135445628015315080e-1",
+              "upper_dec": "2.148522648322242398699135445628015315083e-1",
+              "arb_ball_str": "[0.2148522648322242398699135445628015315081 +/- 4.30e-41]"
+            },
+            "D_0_2A_at_rho_0_certified": {
+              "mid_float": 4.860013396913011e-08,
+              "rad_float_outward": 3.2987943099580153e-24,
+              "lower_dec": "4.860013396913010737836376500753027043325e-8",
+              "upper_dec": "4.860013396913010737836376500753027043328e-8",
+              "arb_ball_str": "[4.860013396913010737836376500753027043327e-8 +/- 4.25e-48]"
+            },
+            "D_1_2A_at_rho_1_certified": {
+              "mid_float": 4.860013396913011e-08,
+              "rad_float_outward": 3.2987943099580153e-24,
+              "lower_dec": "4.860013396913010737836376500753027043325e-8",
+              "upper_dec": "4.860013396913010737836376500753027043328e-8",
+              "arb_ball_str": "[4.860013396913010737836376500753027043327e-8 +/- 4.25e-48]"
+            },
+            "D_sqrt2_half_2A_certified": {
+              "mid_float": 4.860013396913011e-08,
+              "rad_float_outward": 3.2987943099580153e-24,
+              "lower_dec": "4.860013396913010737836376500753027043325e-8",
+              "upper_dec": "4.860013396913010737836376500753027043328e-8",
+              "arb_ball_str": "[4.860013396913010737836376500753027043327e-8 +/- 4.25e-48]"
+            },
+            "D_0_minus_D_1_2A_CR1_diff_certified": {
+              "mid_float": -1.6986940045244495e-83,
+              "rad_float_outward": 1.3600094927852646e-79,
+              "lower_dec": "-1.360179362185716708480650283730350105653e-79",
+              "upper_dec": "1.359839623384811818572053112886900974181e-79",
+              "arb_ball_str": "[+/- 1.37e-79]"
+            },
+            "CR1_raw_equality_2A_encloses_zero": true,
+            "D_2A_strictly_positive_when_delta_nonzero": true,
+            "D_2A_ lies_in_open_interval_0_1_when_delta_nonzero": true,
+            "D_0_2B_stieltjes_shift_diff_certified": {
+              "mid_float": 0.00998242719011436,
+              "rad_float_outward": 0.006491694344731514,
+              "lower_dec": "3.490732845382847277367337293090029349187e-3",
+              "upper_dec": "1.647412153484587409898064906066815434920e-2",
+              "arb_ball_str": "[+/- 0.0165]"
+            },
+            "D_1_2B_stieltjes_shift_diff_certified": {
+              "mid_float": 0.00998242719011436,
+              "rad_float_outward": 0.006491694352007472,
+              "lower_dec": "3.490732838106889663183911389769716849187e-3",
+              "upper_dec": "1.647412154212183171316407496398846684920e-2",
+              "arb_ball_str": "[+/- 0.0165]"
+            },
+            "D_0_minus_D_1_2B_CR1_diff_certified": {
+              "mid_float": 1.9174992994983134e-76,
+              "rad_float_outward": 0.012983388704014944,
+              "lower_dec": "-1.298338870401494204998016357421875000001e-2",
+              "upper_dec": "1.298338870401494204998016357421875000002e-2",
+              "arb_ball_str": "[+/- 0.0130]"
+            },
+            "CR1_raw_equality_2B_encloses_zero": true
+          }
+        ]
+      },
+      "role_of_theta_normalization_tau_transcendence_and_regularity": {
+        "theta_normalization_role": "The squared pole-annihilating operator P(D)^2 = (D^2 - 1/16)^2 produces the exact factor (s^2 (s - 1)^2 / 32)^2 in H_0(s - 1/2), which (1) kills the simple poles of xi(s) at s = 0, 1 (z = +/- 1/2) in the explicit formula and (2) ensures by Euler's Gamma nonvanishing theorem that H_0(z) has NO zeros in the critical strip |Re(z)| < 1/2, making CR3 for Candidate 2A unconditional.",
+        "tau_transcendence_and_rational_vs_irrational_grade_differences": "By Lindemann-Weierstrass, tau = 2*pi is transcendental over Q, so for any nonzero RATIONAL grade difference K - J = p/q in Q \\ {0} (in particular K = 0, J = 1), (tau^{K-J})^q = tau^p not in Q, which implies tau^{K-J} not in Q and L_K cap L_J = tau^K Z cap tau^J Z = {0} (`layer_disjointness` in `formal/RiemannScope/Grade.lean`). For general irrational algebraic grade differences K - J in (Qbar cap R) \\ Q (such as K - J = sqrt(2)), rationality of tau^{K-J} is an open problem in transcendental number theory (beyond Lindemann-Weierstrass and Gelfond-Schneider) and is NEVER assumed; a single rational-difference pair (K = 0, J = 1) suffices for the collision step while retaining the full concurrent grade family K in Qbar cap R.",
+        "regularity_and_connectedness_scope": "Because A_R = Qbar cap R is totally disconnected in the Euclidean topology (every point can be separated by irrational real cuts), continuity on A_R alone never forces a Z-valued function to be constant. Constant-integer rigidity (`invariant_covariant_observable_vanishing` in `Grade.lean`) requires a continuous extension to a connected real interval I subset R."
+      },
+      "covariance_invariance_discreteness_trilemma": {
+        "statement": "For any single observable D_K(rho_K) evaluated at rational-difference grades K != J (e.g. K = 0, J = 1) where L_K cap L_J = {0}: (CR1: D_K(rho_K) = D_J(rho_J) = D) and (CR2: D_K(rho_K) in L_K and D_J(rho_J) in L_J) hold simultaneously if and only if D_K(rho_K) = D_J(rho_J) = 0. Consequently: (i) Weight-1 covariant prime-Euler integer-layer carriers D_K^{(1A)} = N_y(X_0) * tau^K satisfy CR2 unconditionally with N_y(X_0) >= 1, so D_K^{(1A)} = tau^{K-J} D_J^{(1A)} != D_J^{(1A)} and raw CR1 fails. (ii) Weight-0 pullback zero-defect observables D_K^{(2A)}(rho_K) = |H_0(delta+i*gamma)|^2 (tau^delta + tau^{-delta} - 2) satisfy raw CR1 and one-way CR3 (delta != 0 ==> D^{(2A)} > 0) unconditionally, so CR2 (D_K^{(2A)} in L_K) holds if and only if D^{(2A)}(rho) = 0 <=> delta = 0, which is equivalent to RH for rho rather than an independent consequence of prime/theta algebra.",
+        "lean_theorem": "single_observable_common_referent_candidate_audit_and_trilemma"
+      },
+      "remaining_open_obligation": {
+        "subgate_id": "SUBGATE-TC-043A",
+        "status": "OPEN",
+        "common_referent_bridge_complete": false,
+        "exact_open_gap": "SUBGATE-TC-043A remains OPEN and the common-referent bridge is NOT complete: Candidate 1 (A_{K,y}(x) = N_y(x) * tau^K) satisfies CR2 unconditionally on the arithmetic side but transforms with weight 1 (failing raw CR1), whereas Candidate 2A (D_K^{(2A)}(rho_K) = |H_0(delta+i*gamma)|^2 (tau^delta + tau^{-delta} - 2)) satisfies raw CR1 and one-way CR3 unconditionally on the spectral/theta side but satisfies CR2 if and only if delta = 0. Closing SUBGATE-TC-043A requires either (a) proving the uniform signed Moebius cancellation bound sup_{X >= 1} |R_mu(X)| < infty (equivalently sup_{X >= 1} |W_{M(X)}(X)| < infty), or (b) establishing an independent arithmetic-spectral identity that forces a genuine raw-invariant, off-line-sensitive observable D_K(rho_K) to lie in L_K = tau^K Z without assuming delta = 0."
+      }
+    },
+    "full_section_17_tree_roundtrip_verification": {
+      "total_certified_arb_balls_checked": 130,
+      "compared_against_live_original_arb_count": 130,
+      "live_original_count_matches_enumerated_total": true,
+      "all_enclose_original_256bit_arb_ball": true,
+      "failed_paths": [],
+      "checked_paths": [
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[0].X_0_equals_p_minus_1_pow_4_5_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[0].u_p_equals_X_0_over_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[0].min_station_alpha_2_over_u_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[0].F_at_X_0_equals_W_p_minus_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[0].F_at_X_0_plus_equals_W_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[0].W_p_minus_at_X_0_over_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[0].direct_jump_F_X0_plus_minus_F_X0_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[0].euler_recursion_jump_formula_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[0].jump_identity_diff_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[1].X_0_equals_p_minus_1_pow_4_5_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[1].u_p_equals_X_0_over_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[1].min_station_alpha_2_over_u_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[1].F_at_X_0_equals_W_p_minus_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[1].F_at_X_0_plus_equals_W_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[1].W_p_minus_at_X_0_over_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[1].direct_jump_F_X0_plus_minus_F_X0_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[1].euler_recursion_jump_formula_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[1].jump_identity_diff_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[2].X_0_equals_p_minus_1_pow_4_5_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[2].u_p_equals_X_0_over_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[2].min_station_alpha_2_over_u_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[2].F_at_X_0_equals_W_p_minus_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[2].F_at_X_0_plus_equals_W_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[2].W_p_minus_at_X_0_over_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[2].direct_jump_F_X0_plus_minus_F_X0_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[2].euler_recursion_jump_formula_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[2].jump_identity_diff_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[3].X_0_equals_p_minus_1_pow_4_5_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[3].u_p_equals_X_0_over_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[3].min_station_alpha_2_over_u_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[3].F_at_X_0_equals_W_p_minus_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[3].F_at_X_0_plus_equals_W_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[3].W_p_minus_at_X_0_over_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[3].direct_jump_F_X0_plus_minus_F_X0_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[3].euler_recursion_jump_formula_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[3].jump_identity_diff_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[4].X_0_equals_p_minus_1_pow_4_5_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[4].u_p_equals_X_0_over_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[4].min_station_alpha_2_over_u_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[4].F_at_X_0_equals_W_p_minus_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[4].F_at_X_0_plus_equals_W_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[4].W_p_minus_at_X_0_over_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[4].direct_jump_F_X0_plus_minus_F_X0_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[4].euler_recursion_jump_formula_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[4].jump_identity_diff_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[5].X_0_equals_p_minus_1_pow_4_5_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[5].u_p_equals_X_0_over_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[5].min_station_alpha_2_over_u_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[5].F_at_X_0_equals_W_p_minus_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[5].F_at_X_0_plus_equals_W_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[5].W_p_minus_at_X_0_over_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[5].direct_jump_F_X0_plus_minus_F_X0_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[5].euler_recursion_jump_formula_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[5].jump_identity_diff_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[6].X_0_equals_p_minus_1_pow_4_5_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[6].u_p_equals_X_0_over_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[6].min_station_alpha_2_over_u_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[6].F_at_X_0_equals_W_p_minus_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[6].F_at_X_0_plus_equals_W_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[6].W_p_minus_at_X_0_over_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[6].direct_jump_F_X0_plus_minus_F_X0_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[6].euler_recursion_jump_formula_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[6].jump_identity_diff_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[7].X_0_equals_p_minus_1_pow_4_5_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[7].u_p_equals_X_0_over_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[7].min_station_alpha_2_over_u_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[7].F_at_X_0_equals_W_p_minus_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[7].F_at_X_0_plus_equals_W_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[7].W_p_minus_at_X_0_over_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[7].direct_jump_F_X0_plus_minus_F_X0_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[7].euler_recursion_jump_formula_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.certified_prime_threshold_jump_table[7].jump_identity_diff_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.asymptotic_tail_prime_1901_jump_check.X_0_equals_1900_pow_4_5_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.asymptotic_tail_prime_1901_jump_check.u_p_equals_X_0_over_1901_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.asymptotic_tail_prime_1901_jump_check.min_station_alpha_2_over_u_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.asymptotic_tail_prime_1901_jump_check.W_p_minus_at_u_p_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.asymptotic_tail_prime_1901_jump_check.euler_recursion_jump_formula_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.composite_threshold_continuity_check.X_0_equals_3_pow_4_5_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.composite_threshold_continuity_check.F_at_X_0_equals_W_3_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.composite_threshold_continuity_check.F_at_X_0_plus_equals_W_4_certified",
+        "section_17.section_2_coupled_cutoff_piecewise_continuity_and_jump_audit.composite_threshold_continuity_check.direct_jump_diff_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_1_grade_K_prime_euler_integer_layer_observable.subcase_1A_unmodulated_carrier_c_K_eq_1.certified_benchmark_at_rho_1_K0_vs_J1.D_0_1A_invariant_scale_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_1_grade_K_prime_euler_integer_layer_observable.subcase_1A_unmodulated_carrier_c_K_eq_1.certified_benchmark_at_rho_1_K0_vs_J1.D_1_1A_invariant_scale_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_1_grade_K_prime_euler_integer_layer_observable.subcase_1A_unmodulated_carrier_c_K_eq_1.certified_benchmark_at_rho_1_K0_vs_J1.D_sqrt2_half_1A_invariant_scale_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_1_grade_K_prime_euler_integer_layer_observable.subcase_1A_unmodulated_carrier_c_K_eq_1.certified_benchmark_at_rho_1_K0_vs_J1.raw_CR1_difference_D_1_minus_D_0_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_1_grade_K_prime_euler_integer_layer_observable.subcase_1A_unmodulated_carrier_c_K_eq_1.certified_benchmark_at_rho_1_K0_vs_J1.coboundary_D_1_minus_tau_D_0_diff_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[0].delta_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[0].gamma_1_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[0].abs_H0_at_delta_plus_i_gamma1_sq_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[0].radial_cosh_factor_tau_delta_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[0].D_0_2A_at_rho_0_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[0].D_1_2A_at_rho_1_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[0].D_sqrt2_half_2A_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[0].D_0_minus_D_1_2A_CR1_diff_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[0].D_0_2B_stieltjes_shift_diff_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[0].D_1_2B_stieltjes_shift_diff_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[0].D_0_minus_D_1_2B_CR1_diff_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[1].delta_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[1].gamma_1_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[1].abs_H0_at_delta_plus_i_gamma1_sq_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[1].radial_cosh_factor_tau_delta_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[1].D_0_2A_at_rho_0_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[1].D_1_2A_at_rho_1_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[1].D_sqrt2_half_2A_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[1].D_0_minus_D_1_2A_CR1_diff_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[1].D_0_2B_stieltjes_shift_diff_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[1].D_1_2B_stieltjes_shift_diff_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[1].D_0_minus_D_1_2B_CR1_diff_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[2].delta_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[2].gamma_1_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[2].abs_H0_at_delta_plus_i_gamma1_sq_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[2].radial_cosh_factor_tau_delta_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[2].D_0_2A_at_rho_0_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[2].D_1_2A_at_rho_1_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[2].D_sqrt2_half_2A_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[2].D_0_minus_D_1_2A_CR1_diff_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[2].D_0_2B_stieltjes_shift_diff_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[2].D_1_2B_stieltjes_shift_diff_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[2].D_0_minus_D_1_2B_CR1_diff_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[3].delta_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[3].gamma_1_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[3].abs_H0_at_delta_plus_i_gamma1_sq_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[3].radial_cosh_factor_tau_delta_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[3].D_0_2A_at_rho_0_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[3].D_1_2A_at_rho_1_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[3].D_sqrt2_half_2A_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[3].D_0_minus_D_1_2A_CR1_diff_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[3].D_0_2B_stieltjes_shift_diff_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[3].D_1_2B_stieltjes_shift_diff_certified",
+        "section_17.section_3_single_observable_common_referent_candidate_audit.candidate_2_canonical_theta_and_stieltjes_zero_defect_observables.certified_candidate_2_evaluation_table[3].D_0_minus_D_1_2B_CR1_diff_certified"
       ]
     }
   },

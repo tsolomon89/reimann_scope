@@ -44,10 +44,13 @@ from tc.canonical_theta_correlation_bound import (
     CANONICAL_THETA_CORRELATION_LEAN_THEOREMS,
     COMMON_REFERENT_PRIME_THETA_BRIDGE_STATUS,
     PRIME_EULER_MOEBIUS_RECOVERY_STATUS,
+    SINGLE_OBSERVABLE_COMMON_REFERENT_AUDIT_STATUS,
     STARTING_HEAD_TC_046,
     STARTING_HEAD_TC_047,
+    STARTING_HEAD_TC_048,
     TASK_TC_046_ID,
     TASK_TC_047_ID,
+    TASK_TC_048_ID,
     verify_all_serialized_arb_in_tree,
     verify_canonical_theta_correlation_lean_module,
 )
@@ -55,12 +58,15 @@ from tc.common_referent_prime_theta_bridge import (
     alternating_factorial_prime_valuation_exact,
     cumulative_N_y_alternating_factorial_fraction,
     cumulative_N_y_from_local_factors_exact,
+    evaluate_coupled_cutoff_jump_at_prime_threshold_arb,
     evaluate_grade_layer_observable_A_K_y_arb,
+    evaluate_theta_zero_radial_defect_observable_arb,
     evaluate_w_y_from_grade_layer_jumps_arb,
     lcm_prefix_exact,
     local_prime_euler_factor_divisor_product_fraction,
     local_prime_euler_factor_m_y_exact,
     verify_symbolic_common_referent_identities,
+    verify_symbolic_tc048_jump_and_single_observable_identities,
 )
 from tc.prime_euler_moebius_recovery import (
     certified_coupled_cutoff_M_X_arb,
@@ -411,8 +417,8 @@ def test_07_lean_module_and_artifact_section_15():
     assert lean_audit["contains_sorry"] is False
     assert lean_audit["contains_admit"] is False
     assert lean_audit["matches_exact"] is True
-    assert len(CANONICAL_THETA_CORRELATION_LEAN_DEFS) == 28
-    assert len(CANONICAL_THETA_CORRELATION_LEAN_THEOREMS) == 47
+    assert len(CANONICAL_THETA_CORRELATION_LEAN_DEFS) == 30
+    assert len(CANONICAL_THETA_CORRELATION_LEAN_THEOREMS) == 49
     assert "finitePrimeEulerRecursionStep" in CANONICAL_THETA_CORRELATION_LEAN_DEFS
     assert "finitePrimeCoeffCases" in CANONICAL_THETA_CORRELATION_LEAN_DEFS
     assert "finitePrimeMultiplicativeFactorCases" in CANONICAL_THETA_CORRELATION_LEAN_DEFS
@@ -664,3 +670,158 @@ def test_08_task_tc047_common_referent_prime_theta_integer_layer_bridge():
         rt16["compared_against_live_original_arb_count"]
         == enum16["total_certified_arb_balls_checked"]
     )
+
+
+def test_09_task_tc048_coupled_cutoff_jump_and_single_observable_audit():
+    """Verify TASK-TC-048 coupled-cutoff piecewise continuity and right-hand jump formula
+    F(X_0^+) - F(X_0) = -p^{-1/2} W_{p^-}(X_0 / p) at X_0 = (p - 1)^{4/5},
+    Candidate 1 vs Candidate 2 single-observable collision contract audit,
+    Covariance-Invariance-Discreteness Trilemma, and section_17 round-trip.
+    """
+    sym48 = verify_symbolic_tc048_jump_and_single_observable_identities()
+    assert sym48["euler_prime_step_jump_identity_verified"] is True
+    assert sym48["candidate_1_coboundary_ratio_verified"] is True
+    assert sym48["candidate_2A_pullback_grade_invariance_verified"] is True
+    assert sym48["candidate_2A_radial_factor_square_identity_verified"] is True
+
+    assert "coupledCutoffPrimeStepJump" in CANONICAL_THETA_CORRELATION_LEAN_DEFS
+    assert "thetaZeroRadialDefectObservable" in CANONICAL_THETA_CORRELATION_LEAN_DEFS
+    assert (
+        "coupled_cutoff_prime_step_jump_and_dense_comparison_extension"
+        in CANONICAL_THETA_CORRELATION_LEAN_THEOREMS
+    )
+    assert (
+        "single_observable_common_referent_candidate_audit_and_trilemma"
+        in CANONICAL_THETA_CORRELATION_LEAN_THEOREMS
+    )
+
+    # 1. Live 256-bit Arb verification of right-hand jumps at prime thresholds p in {3, 5, 7, 11, 13}
+    #    (where 2/u_p in (2.6941, 8.6213) lies in the positive lobe of h_0, so W_{p^-}(u_p) > 0
+    #    and F(X_0^+) - F(X_0) < 0) and continuity (jump == 0) at composite step m + 1 = 4:
+    for p_val in (3, 5, 7, 11, 13):
+        j_res = evaluate_coupled_cutoff_jump_at_prime_threshold_arb(
+            p_val, k_max=2000, prec_bits=256
+        )
+        assert j_res["is_prime_threshold"] is True
+        assert j_res["jump_identity_encloses_zero"] is True
+        assert j_res["jump_certified_nonzero"] is True
+        assert j_res["jump_certified_strictly_negative"] is True
+        assert j_res["W_p_minus_at_u_p_certified_strictly_positive"] is True
+
+    comp_res = evaluate_coupled_cutoff_jump_at_prime_threshold_arb(
+        4, k_max=2000, prec_bits=256
+    )
+    assert comp_res["is_prime_threshold"] is False
+    assert bool(comp_res["direct_jump_F_X0_plus_minus_F_X0_arb"].contains(0))
+
+    # 2. Live 256-bit Arb verification of Candidate 2A across grades K = 0, J = 1, K = -1, K = sqrt(2)/2:
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = 256
+        gamma_test = arb("14.1347251417346937904572519835625")
+        # On critical line delta = 0: D_K^{(2A)} == 0 across all grades
+        c2a_0_k0 = evaluate_theta_zero_radial_defect_observable_arb(
+            arb(0), gamma_test, arb(0), prec_bits=256
+        )
+        c2a_0_j1 = evaluate_theta_zero_radial_defect_observable_arb(
+            arb(0), gamma_test, arb(1), prec_bits=256
+        )
+        assert c2a_0_k0["abs_H0_at_z_sq_strictly_positive"] is True
+        assert bool(c2a_0_k0["D_K_2A_arb"].contains(0))
+        assert bool((c2a_0_k0["D_K_2A_arb"] - c2a_0_j1["D_K_2A_arb"]).contains(0))
+
+        # Off critical line delta = 1/10 != 0: D_K^{(2A)} > 0 and D_K^{(2A)} == D_J^{(2A)} in (0, 1)
+        delta_off = arb(1) / arb(10)
+        c2a_off_k0 = evaluate_theta_zero_radial_defect_observable_arb(
+            delta_off, gamma_test, arb(0), prec_bits=256
+        )
+        c2a_off_j1 = evaluate_theta_zero_radial_defect_observable_arb(
+            delta_off, gamma_test, arb(1), prec_bits=256
+        )
+        c2a_off_kn1 = evaluate_theta_zero_radial_defect_observable_arb(
+            delta_off, gamma_test, -arb(1), prec_bits=256
+        )
+        c2a_off_ksqrt2 = evaluate_theta_zero_radial_defect_observable_arb(
+            delta_off, gamma_test, arb(2).sqrt() / arb(2), prec_bits=256
+        )
+        assert c2a_off_k0["abs_H0_at_z_sq_strictly_positive"] is True
+        assert bool(c2a_off_k0["D_K_2A_arb"].lower() > arb(0))
+        assert bool(c2a_off_k0["D_K_2A_arb"].upper() < arb(1))
+        assert bool((c2a_off_k0["D_K_2A_arb"] - c2a_off_j1["D_K_2A_arb"]).contains(0))
+        assert bool((c2a_off_k0["D_K_2A_arb"] - c2a_off_kn1["D_K_2A_arb"]).contains(0))
+        assert bool(
+            (c2a_off_k0["D_K_2A_arb"] - c2a_off_ksqrt2["D_K_2A_arb"]).contains(0)
+        )
+    finally:
+        flint_ctx.prec = saved_prec
+
+    # 3. Artifact section_17 verification:
+    artifact_path = (
+        Path(__file__).resolve().parent.parent
+        / "data"
+        / "tc_canonical_theta_correlation_bound.json"
+    )
+    payload = json.loads(artifact_path.read_text(encoding="utf-8"))
+    assert payload["single_observable_common_referent_audit_task_id"] == TASK_TC_048_ID
+    assert (
+        payload["status_dimensions"]["single_observable_common_referent_audit_status"]
+        == SINGLE_OBSERVABLE_COMMON_REFERENT_AUDIT_STATUS
+    )
+    sec17 = payload[
+        "section_17_single_prime_theta_observable_and_coupled_cutoff_jump_audit"
+    ]
+    assert sec17["task_id"] == TASK_TC_048_ID
+    assert sec17["inspected_baseline"] == STARTING_HEAD_TC_048
+
+    s2_jump = sec17["section_2_coupled_cutoff_piecewise_continuity_and_jump_audit"]
+    assert s2_jump["all_prime_jump_identities_enclose_zero"] is True
+    assert s2_jump["all_prime_jumps_certified_nonzero"] is True
+    assert s2_jump["all_small_prime_jumps_certified_strictly_negative"] is True
+    assert len(s2_jump["certified_prime_threshold_jump_table"]) == 8
+    tail_1901 = s2_jump["asymptotic_tail_prime_1901_jump_check"]
+    assert tail_1901["in_strict_negative_h0_tail_alpha_ge_9"] is True
+    assert tail_1901["W_p_minus_at_u_p_certified_strictly_negative"] is True
+    assert tail_1901["jump_certified_nonzero"] is True
+    assert tail_1901["jump_certified_strictly_positive"] is True
+    assert (
+        s2_jump["composite_threshold_continuity_check"][
+            "jump_encloses_zero_at_composite_step"
+        ]
+        is True
+    )
+    assert (
+        "NEVER invoke continuity of F(X)"
+        in s2_jump["corrected_dense_grade_to_all_X_extension"]
+    )
+
+    s3_cand = sec17["section_3_single_observable_common_referent_candidate_audit"]
+    c1_bench = s3_cand["candidate_1_grade_K_prime_euler_integer_layer_observable"][
+        "subcase_1A_unmodulated_carrier_c_K_eq_1"
+    ]["certified_benchmark_at_rho_1_K0_vs_J1"]
+    assert c1_bench["raw_CR1_difference_strictly_positive"] is True
+    assert c1_bench["coboundary_encloses_zero"] is True
+    assert c1_bench["raw_scale_CR1_difference_D_1_minus_D_0_strictly_positive"] is True
+
+    c2_audit = s3_cand[
+        "candidate_2_canonical_theta_and_stieltjes_zero_defect_observables"
+    ]
+    assert c2_audit["all_cand2a_cr1_enclose_zero"] is True
+    assert c2_audit["all_cand2a_off_line_strictly_positive"] is True
+    assert c2_audit["all_cand2a_on_line_enclose_zero"] is True
+    assert c2_audit["all_cand2a_strictly_below_one"] is True
+    assert c2_audit["all_cand2b_cr1_enclose_zero"] is True
+
+    rem17 = s3_cand["remaining_open_obligation"]
+    assert rem17["subgate_id"] == "SUBGATE-TC-043A"
+    assert rem17["status"] == "OPEN"
+    assert rem17["common_referent_bridge_complete"] is False
+
+    rt17 = sec17["full_section_17_tree_roundtrip_verification"]
+    assert rt17["all_enclose_original_256bit_arb_ball"] is True
+    assert rt17["live_original_count_matches_enumerated_total"] is True
+    enum17 = verify_all_serialized_arb_in_tree(sec17, path_prefix="section_17")
+    assert (
+        rt17["compared_against_live_original_arb_count"]
+        == enum17["total_certified_arb_balls_checked"]
+    )
+

@@ -1142,9 +1142,13 @@ def execute_task_tc046_prime_euler_moebius_recovery(
                 "restriction_to_admissible_grades": (
                     "Because log_tau(p) = log(p)/log(2*pi) cannot be assumed algebraic in A_R = Qbar intersect R, "
                     "the commuting operators {I - p^{-1/2} D_p}_{p <= y} are defined and composed on the ambient continuous "
-                    "scale space (0, infty); the resulting continuous profile W_y(X) is then restricted to admissible grade "
-                    "scales X = tau^{|K - L|} (K, L in A_R), where density of A_R in R and continuity of W_y imply "
-                    "sup_{K in A_R} |W_y(tau^{|K|})| = sup_{X >= 1} |W_y(X)|."
+                    "scale space (0, infty); for each fixed y, the resulting continuous profile W_y(X) is then restricted to "
+                    "admissible grade scales X = tau^{|K - L|} (K, L in A_R), where density of A_R in R and continuity of "
+                    "fixed-y W_y imply sup_{K in A_R} |W_y(tau^{|K|})| = sup_{X >= 1} |W_y(X)|. By contrast, for the coupled "
+                    "cutoff y = M(X) = ceil(max(2, X^{5/4})), F(X) = W_{M(X)}(X) is piecewise continuous with right-hand "
+                    "jumps F(X_0^+) - F(X_0) = -p^{-1/2} W_{p^-}(X_0/p) at prime thresholds X_0 = (p-1)^{4/5}, so extending "
+                    "boundedness from dense K in A_R to all X >= 1 uses continuity of W(X) (or R_mu(X)) together with the "
+                    "uniform comparison |F(X) - W(X)| <= (1/2) C_{log,0} < 0.278715, NEVER continuity of F(X)."
                 ),
                 "prime_log_tau_shifts": prime_log_tau_shifts,
             },
@@ -2045,7 +2049,11 @@ def execute_task_tc046_prime_euler_moebius_recovery(
             ),
             "coupled_boundedness_equivalence": (
                 "sup_{X >= 1} |R_mu(X)| < infty  <==>  sup_{X >= 1} |W(X)| < infty  "
-                "<==>  sup_{X >= 1} |W_{M(X)}(X)| < infty  <==>  sup_{X >= 1} |R_{mu, M(X)}(X)| < infty"
+                "<==>  sup_{X >= 1} |W_{M(X)}(X)| < infty  <==>  sup_{X >= 1} |R_{mu, M(X)}(X)| < infty "
+                "(and for dense grade samples K in A_R = Qbar cap R, sup_{K in A_R} |W_{M(tau^{|K|})}(tau^{|K|})| < infty "
+                "<==> sup_{X >= 1} |W_{M(X)}(X)| < infty by continuity of W(X) on [1, infty) together with the uniform "
+                "comparison |W_{M(X)}(X) - W(X)| <= (1/2) C_{log,0} < 0.278715, NEVER by continuity of F(X) = W_{M(X)}(X), "
+                "which is piecewise continuous with right-hand jump F(X_0^+) - F(X_0) = -p^{-1/2} W_{p^-}(X_0/p) at X_0 = (p-1)^{4/5})"
             ),
             "anti_circularity_diagnosis": (
                 "Because |W_{M(X)}(X) - W(X)| <= (1/2) C_{log,0} < 0.278715 and "
