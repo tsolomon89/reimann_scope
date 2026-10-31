@@ -566,12 +566,15 @@ def evaluate_b_log_boundary_term_arb(u: arb, prec_bits: int = 256) -> arb:
 
 def certified_coupled_cutoff_M_X_arb(X: arb, prec_bits: int = 256) -> int:
     """
-    Compute the certified coupled prime cutoff M(X) = ceil(max(2, X^{5/4}))
-    directly from the Arb ball enclosure of X^{5/4} = (X^5)^{1/4} without
-    passing through binary64 float conversion.
+    Compute a certified safe integer cutoff M(X) >= max(2, X^{5/4}) directly from
+    the Arb ball enclosure of X^{5/4} = (X^5)^{1/4} without passing through
+    binary64 float conversion.
 
-    Certifies in Arb ball arithmetic that arb(M_X) >= X^{5/4} and
-    arb(M_X)^2 >= X^{5/2}.
+    For a general input interval ball crossing an integer boundary, taking the
+    ceiling of the upper endpoint u_arb.upper().ceil() may exceed the minimal
+    pointwise ceiling while guaranteeing M_X >= X^{5/4} and M_X^2 >= X^{5/2}
+    across the entire input ball. Certifies in Arb ball arithmetic that
+    arb(M_X) >= X^{5/4} and arb(M_X)^2 >= X^{5/2}.
     """
     saved_prec = flint_ctx.prec
     try:
@@ -599,26 +602,256 @@ def certified_coupled_cutoff_M_X_arb(X: arb, prec_bits: int = 256) -> int:
         flint_ctx.prec = saved_prec
 
 
+def certify_subproduct_counterexample_at_y210_arb(
+    y: int = 210, prec_bits: int = 256
+) -> Dict[str, Any]:
+    """
+    Reproduce and certify in 256-bit Arb the counterexample at y = 210 refuting
+    the false subproduct inequality
+        |E_y(i t_{y,-})|^2 >= prod_{y^{16/21} <= p <= y} (1 + p^{-1/2} + p^{-1})
+    at t_{y,-} = 7*tau / (16*log y) = 7*pi / (8*log y).
+
+    Discarding lower-prime factors p < y^{16/21} is invalid because small primes
+    satisfy cos(t_{y,-} log p) > (1/2) p^{-1/2}, making their Euler factors
+    g_p(t_{y,-}) = 1 + p^{-1} - 2*p^{-1/2}*cos(t_{y,-} log p) < 1.
+    At y = 210:
+        |E_{210}(i t_{210,-})|^2 ~ 3.3605057481 < 18.2536118944 ~ subproduct.
+    """
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = max(prec_bits, 256)
+        ps = primes_up_to(y)
+        y_arb = arb(y)
+        log_y_arb = y_arb.log()
+        t_y_minus_arb = (arb(7) * arb.pi()) / (arb(8) * log_y_arb)
+        threshold_arb = (y_arb**16).root(21)
+
+        full_e_sq_arb = arb(1)
+        lower_prime_prod_arb = arb(1)
+        upper_prime_actual_prod_arb = arb(1)
+        claimed_false_subproduct_arb = arb(1)
+        factors_less_than_one_count = 0
+        upper_prime_count = 0
+
+        for p in ps:
+            p_arb = arb(p)
+            inv_p = arb(1) / p_arb
+            inv_sqrt_p = arb(1) / p_arb.sqrt()
+            cos_minus = (t_y_minus_arb * p_arb.log()).cos()
+            factor_actual = arb(1) + inv_p - arb(2) * inv_sqrt_p * cos_minus
+            full_e_sq_arb *= factor_actual
+            if bool(factor_actual < arb(1)):
+                factors_less_than_one_count += 1
+            if bool(p_arb >= threshold_arb):
+                upper_prime_count += 1
+                upper_prime_actual_prod_arb *= factor_actual
+                claimed_false_subproduct_arb *= arb(1) + inv_sqrt_p + inv_p
+            else:
+                lower_prime_prod_arb *= factor_actual
+
+        return {
+            "y": y,
+            "pi_y": len(ps),
+            "threshold_y_pow_16_21_arb": threshold_arb,
+            "upper_prime_count": upper_prime_count,
+            "factors_less_than_one_count": factors_less_than_one_count,
+            "t_y_minus_arb": t_y_minus_arb,
+            "actual_E_y_abs_sq_at_t_y_minus_arb": full_e_sq_arb,
+            "omitted_lower_prime_product_arb": lower_prime_prod_arb,
+            "upper_prime_actual_product_arb": upper_prime_actual_prod_arb,
+            "claimed_false_subproduct_arb": claimed_false_subproduct_arb,
+            "omitted_lower_prime_product_strictly_less_than_one": bool(
+                lower_prime_prod_arb < arb(1)
+            ),
+            "enclosures_disjoint_and_false_subproduct_exceeds_actual": bool(
+                full_e_sq_arb < claimed_false_subproduct_arb
+            ),
+        }
+    finally:
+        flint_ctx.prec = saved_prec
+
+
+def certify_H0_local_monotonicity_and_global_decay_arb(
+    prec_bits: int = 256,
+) -> Dict[str, Any]:
+    """
+    Certify in 256-bit Arb:
+      1. The left-endpoint exponential coefficient 4*cos(tau/16) = 2*sqrt(2 + sqrt(2))
+         ~ 3.695518130045147 (strictly less than the right-endpoint coefficient 4).
+      2. The canonical Weierstrass product identity (v = 4*t^2):
+           H_0(it) / H_0(0) = (1 + v)^3 * prod_{n=1}^infty (1 + v / (4n + 1)^2)^{-1}.
+      3. The local logarithmic derivative lower bound on 0 <= t <= 1 (0 <= v <= 4):
+           (d/dv) log(H_0(it) / H_0(0)) = 3/(1 + v) - sum_{n=1}^infty 1/((4n + 1)^2 + v)
+                                        >= 3/5 - tau^2 / 384 > 0,
+         together with I_y subset [0, 1] for all integer y >= 24 (since exp(pi) ~ 23.1407).
+      4. The 64-subinterval Arb certificate on [0, v_{2,+}] (v_{2,+} = 4*t_{2,+}^2,
+         t_{2,+} = pi / log 2 ~ 4.53236) proving (d/dv) log(H_0(it)/H_0(0)) > 0 across
+         all [0, t_{2,+}], covering the finite-table rows y in {2, 5, 11}.
+      5. Explicit counterexample points (t = 5, 10, 20) refuting global monotonicity
+         of H_0(it) on [0, infty) and confirming decay toward 0 as t -> infty.
+    """
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = max(prec_bits, 256)
+        tau_arb = arb(2) * arb.pi()
+        left_coeff_arb = arb(4) * (tau_arb / arb(16)).cos()
+        left_coeff_algebraic_arb = arb(2) * (arb(2) + arb(2).sqrt()).sqrt()
+        coeff_diff_arb = left_coeff_arb - left_coeff_algebraic_arb
+
+        # Analytic lower bound on [0, 1] (0 <= v <= 4): 3/5 - tau^2 / 384
+        dlog_dv_unit_interval_lb_arb = (arb(3) / arb(5)) - (tau_arb**2) / arb(384)
+        # Analytic lower bound on [0, 2] (0 <= v <= 16, covering y = 5, 11): 3/17 - tau^2 / 384
+        dlog_dv_t_le_2_lb_arb = (arb(3) / arb(17)) - (tau_arb**2) / arb(384)
+
+        # Verify I_y subset [0, 1] iff y >= 24 for integer y (exp(pi) ~ 23.14069)
+        exp_pi_arb = arb.pi().exp()
+        t_plus_y23_arb = arb.pi() / arb(23).log()
+        t_plus_y24_arb = arb.pi() / arb(24).log()
+
+        # Verify canonical Weierstrass product identity at t in {1/4, 1/2, 1, 2}
+        H0_0_arb = evaluate_H0_critical_line_arb(arb(0))
+        product_identity_checks: List[Dict[str, Any]] = []
+        n_trunc = 2000
+        for t_label, t_arb in (
+            ("1/4", arb(1) / arb(4)),
+            ("1/2", arb(1) / arb(2)),
+            ("1", arb(1)),
+            ("2", arb(2)),
+        ):
+            v_arb = arb(4) * (t_arb**2)
+            ratio_direct = evaluate_H0_critical_line_arb(t_arb) / H0_0_arb
+            log_partial = arb(3) * (arb(1) + v_arb).log() - sum(
+                (
+                    (arb(1) + v_arb / arb((4 * n + 1) ** 2)).log()
+                    for n in range(1, n_trunc + 1)
+                ),
+                arb(0),
+            )
+            tail_rad = (v_arb / arb(16 * n_trunc)).upper()
+            ratio_product_enclosure = (log_partial + arb(0, tail_rad)).exp()
+            residual_arb = ratio_direct - ratio_product_enclosure
+            product_identity_checks.append(
+                {
+                    "t_label": t_label,
+                    "v_eq_4_t_sq": float(v_arb.mid()),
+                    "direct_ratio_H0_it_over_H0_0_arb": ratio_direct,
+                    "weierstrass_product_enclosure_arb": ratio_product_enclosure,
+                    "enclosures_intersect": bool(residual_arb.contains(0)),
+                }
+            )
+
+        # 64-subinterval Arb certificate of d/dv log(H_0(it)/H_0(0)) > 0 across [0, v_{2,+}]
+        t_plus_y2_arb = arb.pi() / arb(2).log()
+        v_max_y2_arb = arb(4) * (t_plus_y2_arb**2)
+        num_sub = 64
+        dv_arb = v_max_y2_arb / arb(num_sub)
+        min_dlog_dv_on_0_t2plus_arb: Optional[arb] = None
+        all_subintervals_positive = True
+        for j in range(1, num_sub + 1):
+            v_lo = arb(j - 1) * dv_arb
+            v_hi = arb(j) * dv_arb
+            sum_hi = (
+                sum(
+                    (
+                        arb(1) / (arb((4 * n + 1) ** 2) + v_lo)
+                        for n in range(1, 201)
+                    ),
+                    arb(0),
+                )
+                + arb(1) / arb(3200)
+            )
+            sub_lb = arb(3) / (arb(1) + v_hi) - sum_hi
+            if not bool(sub_lb > arb(0)):
+                all_subintervals_positive = False
+            if min_dlog_dv_on_0_t2plus_arb is None or bool(
+                sub_lb.lower() < min_dlog_dv_on_0_t2plus_arb.lower()
+            ):
+                min_dlog_dv_on_0_t2plus_arb = sub_lb
+
+        assert min_dlog_dv_on_0_t2plus_arb is not None
+
+        # Global non-monotonicity and high-frequency decay checks
+        H0_t2plus_arb = evaluate_H0_critical_line_arb(t_plus_y2_arb)
+        H0_t5_arb = evaluate_H0_critical_line_arb(arb(5))
+        H0_t10_arb = evaluate_H0_critical_line_arb(arb(10))
+        H0_t20_arb = evaluate_H0_critical_line_arb(arb(20))
+
+        return {
+            "left_endpoint_coeff_4_cos_tau_over_16_arb": left_coeff_arb,
+            "left_endpoint_coeff_exact_2_sqrt_2_plus_sqrt2_arb": left_coeff_algebraic_arb,
+            "left_endpoint_coeff_algebraic_identity_contains_zero": bool(
+                coeff_diff_arb.contains(0)
+            ),
+            "left_endpoint_coeff_strictly_between_3_6955_and_4": bool(
+                left_coeff_arb > arb("3.6955") and left_coeff_arb < arb(4)
+            ),
+            "dlog_dv_unit_interval_lb_3_5_minus_tau_sq_over_384_arb": dlog_dv_unit_interval_lb_arb,
+            "dlog_dv_unit_interval_lb_strictly_positive": bool(
+                dlog_dv_unit_interval_lb_arb > arb(0)
+            ),
+            "dlog_dv_t_le_2_lb_3_17_minus_tau_sq_over_384_arb": dlog_dv_t_le_2_lb_arb,
+            "dlog_dv_t_le_2_lb_strictly_positive": bool(
+                dlog_dv_t_le_2_lb_arb > arb(0)
+            ),
+            "exp_pi_threshold_arb": exp_pi_arb,
+            "t_plus_at_y23_arb": t_plus_y23_arb,
+            "t_plus_at_y24_arb": t_plus_y24_arb,
+            "y23_exceeds_unit_interval_and_y24_inside_unit_interval": bool(
+                t_plus_y23_arb > arb(1) and t_plus_y24_arb < arb(1)
+            ),
+            "weierstrass_product_identity_checks": product_identity_checks,
+            "all_weierstrass_product_checks_intersect": all(
+                row["enclosures_intersect"] for row in product_identity_checks
+            ),
+            "subdivision_64_on_0_to_t2plus_all_dlog_dv_positive": all_subintervals_positive,
+            "subdivision_64_min_dlog_dv_on_0_to_t2plus_arb": min_dlog_dv_on_0_t2plus_arb,
+            "H0_at_0_arb": H0_0_arb,
+            "H0_at_t2plus_arb": H0_t2plus_arb,
+            "H0_at_t5_arb": H0_t5_arb,
+            "H0_at_t10_arb": H0_t10_arb,
+            "H0_at_t20_arb": H0_t20_arb,
+            "global_monotonicity_falsified_H0_t5_lt_H0_t2plus": bool(
+                H0_t5_arb < H0_t2plus_arb
+            ),
+            "high_frequency_decay_verified_H0_t20_lt_H0_0": bool(
+                H0_t20_arb < H0_0_arb
+                and H0_t20_arb < H0_t10_arb
+                and H0_t10_arb < H0_t5_arb
+            ),
+        }
+    finally:
+        flint_ctx.prec = saved_prec
+
+
 def evaluate_euler_spike_interval_gram_lower_bound_arb(
     y: int, prec_bits: int = 256
 ) -> Dict[str, Any]:
     """
     Certify the controlled-width frequency interval lower bound on the Euler-sieved
     seed Gram norm squared ||Psi_y||_{L^2(d^*x)}^2 across
-      I_y := [t_{y,-}, t_{y,+}] = [7*pi / (8*log y), pi / log y],
-      |I_y| = pi / (8*log y) > 0.
+      I_y := [t_{y,-}, t_{y,+}] = [7*tau / (16*log y), tau / (2*log y)]
+                                = [7*pi / (8*log y), pi / log y],
+      |I_y| = tau / (16*log y) = pi / (8*log y) > 0.
 
-    Because for every prime p <= y and every t in [0, pi / log y] the phase
-    t*log(p) lies in [0, pi] where sin(t*log p) >= 0, each factor
-    g_p(t) = 1 + p^{-1} - 2*p^{-1/2}*cos(t*log p) is monotonically non-decreasing
-    in t on I_y, so inf_{t in I_y} |E_y(it)|^2 = |E_y(i t_{y,-})|^2 exactly.
-    Likewise H_0(it) is strictly increasing in |t| on [0, infty), so
-    inf_{t in I_y} H_0(it) = H_0(i t_{y,-}) >= H_0(0) > 0.
-    By Plancherel's identity and evenness of |E_y(it)|^2 H_0(it) on (-I_y) union I_y:
-      ||Psi_y||_{L^2}^2 >= (2 / tau) int_{t_{y,-}}^{t_{y,+}} |E_y(it)|^2 H_0(it) dt
-                        >= (2 |I_y| / tau) |E_y(i t_{y,-})|^2 H_0(i t_{y,-})
-                        = (H_0(i t_{y,-}) / (8 log y)) |E_y(i t_{y,-})|^2
-                        >= (H_0(0) / (8 log y)) |E_y(i t_{y,-})|^2.
+    1. Euler-factor monotonicity on I_y:
+       For every prime p <= y and every t in [0, tau / (2*log y)], the phase
+       t*log(p) lies in [0, pi] where sin(t*log p) >= 0, so each factor
+       g_p(t) = |1 - p^{-1/2 - it}|^2 = 1 + p^{-1} - 2*p^{-1/2}*cos(t*log p)
+       has derivative g_p'(t) = 2*p^{-1/2}*(log p)*sin(t*log p) >= 0.
+       Consequently, inf_{t in I_y} |E_y(it)|^2 = |E_y(i t_{y,-})|^2, with
+       asymptotic log|E_y(i t_{y,-})|^2 = (4*cos(tau/16) + o(1)) * sqrt(y) / log y.
+    2. Local kernel monotonicity and finite-table interval certification:
+       With v = 4*t^2, H_0(it)/H_0(0) = (1 + v)^3 * prod_{n>=1} (1 + v/(4n+1)^2)^{-1}.
+       For 0 <= t <= 1 (0 <= v <= 4), which contains I_y for all integer y >= 24,
+       (d/dv) log(H_0(it)/H_0(0)) >= 3/5 - tau^2/384 > 0.
+       For finite-table rows with y < 24 (and as an independent check for all y),
+       we certify both (d/dv) log(H_0(it)/H_0(0)) > 0 across v in [4*t_{y,-}^2, 4*t_{y,+}^2]
+       by 16-subinterval Arb bounding and direct 64-subinterval Arb ball evaluation of
+       H_0(it) across I_y.
+    3. Integrated Gram-norm lower-bound expressions:
+       ||Psi_y||_{L^2}^2 >= (2 / tau) int_{t_{y,-}}^{t_{y,+}} |E_y(it)|^2 H_0(it) dt
+                         >= (H_0(i t_{y,-}) / (8 log y)) |E_y(i t_{y,-})|^2
+                         >= (H_0(0) / (8 log y)) |E_y(i t_{y,-})|^2.
     """
     saved_prec = flint_ctx.prec
     try:
@@ -626,6 +859,7 @@ def evaluate_euler_spike_interval_gram_lower_bound_arb(
         ps = primes_up_to(y)
         y_arb = arb(y)
         log_y_arb = y_arb.log()
+        tau_arb = arb(2) * arb.pi()
         t_y_plus_arb = arb.pi() / log_y_arb
         t_y_minus_arb = (arb(7) * arb.pi()) / (arb(8) * log_y_arb)
         interval_width_arb = arb.pi() / (arb(8) * log_y_arb)
@@ -654,9 +888,59 @@ def evaluate_euler_spike_interval_gram_lower_bound_arb(
         H0_at_minus_arb = evaluate_H0_critical_line_arb(t_y_minus_arb)
         H0_at_plus_arb = evaluate_H0_critical_line_arb(t_y_plus_arb)
 
+        # Certify d/dv log(H_0(it)/H_0(0)) > 0 on v in [4*t_{y,-}^2, 4*t_{y,+}^2]:
+        in_unit_interval = bool(t_y_plus_arb <= arb(1))
+        if in_unit_interval:
+            dlog_dv_min_arb = (arb(3) / arb(5)) - (tau_arb**2) / arb(384)
+        else:
+            v_min_arb = arb(4) * (t_y_minus_arb**2)
+            v_max_arb = arb(4) * (t_y_plus_arb**2)
+            k_sub_v = 16
+            dv_sub = (v_max_arb - v_min_arb) / arb(k_sub_v)
+            dlog_dv_min_arb = None
+            for j in range(1, k_sub_v + 1):
+                v_lo = v_min_arb + arb(j - 1) * dv_sub
+                v_hi = v_min_arb + arb(j) * dv_sub
+                s_hi = (
+                    sum(
+                        (
+                            arb(1) / (arb((4 * n + 1) ** 2) + v_lo)
+                            for n in range(1, 201)
+                        ),
+                        arb(0),
+                    )
+                    + arb(1) / arb(3200)
+                )
+                sub_lb = arb(3) / (arb(1) + v_hi) - s_hi
+                if dlog_dv_min_arb is None or bool(
+                    sub_lb.lower() < dlog_dv_min_arb.lower()
+                ):
+                    dlog_dv_min_arb = sub_lb
+            assert dlog_dv_min_arb is not None
+
+        # Also compute a direct 64-subinterval Arb ball cover of I_y = [t_{y,-}, t_{y,+}]
+        k_sub_t = 64
+        dt_sub = (t_y_plus_arb - t_y_minus_arb) / arb(k_sub_t)
+        H0_subdiv_min_arb: Optional[arb] = None
+        for j in range(k_sub_t):
+            a_t = t_y_minus_arb + arb(j) * dt_sub
+            b_t = t_y_minus_arb + arb(j + 1) * dt_sub
+            mid_t = (a_t + b_t) / arb(2)
+            rad_t = (b_t - a_t) / arb(2)
+            t_ball = arb(mid_t.mid(), mid_t.rad() + rad_t.upper())
+            h_ball = evaluate_H0_critical_line_arb(t_ball)
+            if H0_subdiv_min_arb is None or bool(
+                h_ball.lower() < H0_subdiv_min_arb.lower()
+            ):
+                H0_subdiv_min_arb = h_ball
+        assert H0_subdiv_min_arb is not None
+
         # Since 2 * |I_y| / tau = 2 * (pi / (8 log y)) / (2 pi) = 1 / (8 log y):
         gram_sq_lb_H0_0_arb = (
             H0_at_0_arb / (arb(8) * log_y_arb)
+        ) * e_sq_at_minus_arb
+        gram_sq_lb_H0_subdiv_arb = (
+            H0_subdiv_min_arb / (arb(8) * log_y_arb)
         ) * e_sq_at_minus_arb
         gram_sq_lb_H0_minus_arb = (
             H0_at_minus_arb / (arb(8) * log_y_arb)
@@ -675,11 +959,36 @@ def evaluate_euler_spike_interval_gram_lower_bound_arb(
             "H0_at_0_arb": H0_at_0_arb,
             "H0_at_minus_arb": H0_at_minus_arb,
             "H0_at_plus_arb": H0_at_plus_arb,
+            "H0_subdiv_min_arb": H0_subdiv_min_arb,
+            "H0_dlog_dv_min_on_I_y_arb": dlog_dv_min_arb,
             "gram_sq_lb_H0_0_arb": gram_sq_lb_H0_0_arb,
+            "gram_sq_lb_H0_subdiv_arb": gram_sq_lb_H0_subdiv_arb,
             "gram_sq_lb_H0_minus_arb": gram_sq_lb_H0_minus_arb,
+            "I_y_subset_of_analytic_unit_interval_0_1": in_unit_interval,
+            "E_y_sq_interval_monotonicity_by_phase_in_0_pi": bool(
+                (t_y_plus_arb * log_y_arb - arb.pi()).contains(0)
+                and all(
+                    bool(t_y_plus_arb * arb(p).log() < arb.pi())
+                    for p in ps
+                    if p < y
+                )
+            ),
+            "H0_interval_monotonicity_certified_on_I_y": bool(
+                dlog_dv_min_arb > arb(0)
+            ),
+            "H0_interval_subdivision_exceeds_H0_0": bool(
+                H0_subdiv_min_arb > H0_at_0_arb
+            ),
+            "endpoint_ordering_E_y_sq_minus_le_plus": bool(
+                e_sq_at_minus_arb <= e_sq_at_plus_arb
+            ),
+            "endpoint_ordering_H0_0_le_minus_le_plus": bool(
+                H0_at_0_arb <= H0_at_minus_arb and H0_at_minus_arb <= H0_at_plus_arb
+            ),
+            # Preserve backwards-compatible aliases for caller convenience
             "monotonicity_verified": bool(e_sq_at_minus_arb <= e_sq_at_plus_arb),
             "H0_monotonicity_verified": bool(
-                H0_at_0_arb <= H0_at_minus_arb and H0_at_minus_arb <= H0_at_plus_arb
+                dlog_dv_min_arb > arb(0) and H0_subdiv_min_arb > H0_at_0_arb
             ),
         }
     finally:
@@ -690,7 +999,7 @@ def compute_coupled_cutoff_comparison_bound_arb(
     X: arb, prec_bits: int = 256
 ) -> Dict[str, Any]:
     """
-    Compute the coupled prime cutoff M(X) = ceil(max(2, X^{5/4})) directly in Arb
+    Compute the certified safe integer cutoff M(X) >= ceil(max(2, X^{5/4})) directly in Arb
     (without float conversion) and the certified comparison bound
     C_{log,0} X^{5/2} / (2 M(X)^2) <= (1/2) C_{log,0}.
     """
@@ -1139,10 +1448,150 @@ def execute_task_tc046_prime_euler_moebius_recovery(
             )
 
         # 4B. Certify the low-frequency coherent arch spike of |E_y(it)|^2 across the
-        #     controlled-width frequency interval I_y = [t_{y,-}, t_{y,+}] = [7*pi / (8*log y), pi / log y]
-        #     of width |I_y| = pi / (8*log y) in 256-bit Arb across y in {2, 5, 11, 31, 97, 199, 499, 997, 1999, 4999, 9973}
+        #     controlled-width frequency interval I_y = [t_{y,-}, t_{y,+}] = [7*tau / (16*log y), tau / (2*log y)]
+        #     of width |I_y| = tau / (16*log y) = pi / (8*log y) in 256-bit Arb across
+        #     y in {2, 5, 11, 31, 97, 199, 499, 997, 1999, 4999, 9973}, together with:
+        #     - the certified y = 210 counterexample refuting the false subproduct inequality, and
+        #     - the local Weierstrass product monotonicity certificate on [0, 1] (covering y >= 24)
+        #       and 64-subinterval certificate on [0, t_{2,+}] (covering y in {2, 5, 11}) plus
+        #       counterexample points t = 5, 10, 20 refuting global monotonicity of H_0(it).
         f_half_acb = evaluate_f_tau_acb(acb(arb(1) / arb(2)))
         H0_at_0_arb = (f_half_acb * f_half_acb).real
+
+        subprod_cex_raw = certify_subproduct_counterexample_at_y210_arb(
+            y=210, prec_bits=prec_bits
+        )
+        subproduct_counterexample_y210 = {
+            "y": subprod_cex_raw["y"],
+            "pi_y": subprod_cex_raw["pi_y"],
+            "threshold_y_pow_16_21_certified": serialize_arb_certified(
+                subprod_cex_raw["threshold_y_pow_16_21_arb"]
+            ),
+            "upper_prime_count": subprod_cex_raw["upper_prime_count"],
+            "factors_less_than_one_count": subprod_cex_raw[
+                "factors_less_than_one_count"
+            ],
+            "t_210_minus_certified": serialize_arb_certified(
+                subprod_cex_raw["t_y_minus_arb"]
+            ),
+            "actual_E_210_abs_sq_at_t_210_minus_certified": serialize_arb_certified(
+                subprod_cex_raw["actual_E_y_abs_sq_at_t_y_minus_arb"]
+            ),
+            "omitted_lower_prime_product_certified": serialize_arb_certified(
+                subprod_cex_raw["omitted_lower_prime_product_arb"]
+            ),
+            "upper_prime_actual_product_certified": serialize_arb_certified(
+                subprod_cex_raw["upper_prime_actual_product_arb"]
+            ),
+            "claimed_false_subproduct_certified": serialize_arb_certified(
+                subprod_cex_raw["claimed_false_subproduct_arb"]
+            ),
+            "omitted_lower_prime_product_strictly_less_than_one": subprod_cex_raw[
+                "omitted_lower_prime_product_strictly_less_than_one"
+            ],
+            "enclosures_disjoint_and_false_subproduct_exceeds_actual": subprod_cex_raw[
+                "enclosures_disjoint_and_false_subproduct_exceeds_actual"
+            ],
+        }
+
+        h0_local_raw = certify_H0_local_monotonicity_and_global_decay_arb(
+            prec_bits=prec_bits
+        )
+        weierstrass_checks_serialized: List[Dict[str, Any]] = []
+        for w_row in h0_local_raw["weierstrass_product_identity_checks"]:
+            weierstrass_checks_serialized.append(
+                {
+                    "t_label": w_row["t_label"],
+                    "v_eq_4_t_sq": w_row["v_eq_4_t_sq"],
+                    "direct_ratio_H0_it_over_H0_0_certified": serialize_arb_certified(
+                        w_row["direct_ratio_H0_it_over_H0_0_arb"]
+                    ),
+                    "weierstrass_product_enclosure_certified": serialize_arb_certified(
+                        w_row["weierstrass_product_enclosure_arb"]
+                    ),
+                    "enclosures_intersect": w_row["enclosures_intersect"],
+                }
+            )
+        h0_local_monotonicity_and_decay_certificate = {
+            "weierstrass_product_identity": (
+                "H_0(it) / H_0(0) = (1 + v)^3 * prod_{n=1}^infty (1 + v / (4n + 1)^2)^{-1},   v = 4*t^2"
+            ),
+            "compact_differentiation_justification": (
+                "On any compact interval v in [0, V], |(d/dv) log(1 + v/(4n+1)^2)| = 1/((4n+1)^2 + v) <= 1/(16 n^2) "
+                "with sum_{n>=1} 1/(16 n^2) = tau^2 / 384 < infty, so term-by-term differentiation holds by the Weierstrass M-test."
+            ),
+            "unit_interval_monotonicity_bound_formula": (
+                "For 0 <= t <= 1 (0 <= v <= 4): (d/dv) log(H_0(it)/H_0(0)) = 3/(1+v) - sum_{n=1}^infty 1/((4n+1)^2 + v) "
+                ">= 3/5 - tau^2 / 384 > 0, proving strict monotonicity of H_0(it) on t in [0, 1] (covering I_y for all integer y >= 24)."
+            ),
+            "left_endpoint_coeff_4_cos_tau_over_16_certified": serialize_arb_certified(
+                h0_local_raw["left_endpoint_coeff_4_cos_tau_over_16_arb"]
+            ),
+            "left_endpoint_coeff_exact_2_sqrt_2_plus_sqrt2_certified": serialize_arb_certified(
+                h0_local_raw["left_endpoint_coeff_exact_2_sqrt_2_plus_sqrt2_arb"]
+            ),
+            "left_endpoint_coeff_algebraic_identity_contains_zero": h0_local_raw[
+                "left_endpoint_coeff_algebraic_identity_contains_zero"
+            ],
+            "left_endpoint_coeff_strictly_between_3_6955_and_4": h0_local_raw[
+                "left_endpoint_coeff_strictly_between_3_6955_and_4"
+            ],
+            "dlog_dv_unit_interval_lb_3_5_minus_tau_sq_over_384_certified": serialize_arb_certified(
+                h0_local_raw[
+                    "dlog_dv_unit_interval_lb_3_5_minus_tau_sq_over_384_arb"
+                ]
+            ),
+            "dlog_dv_unit_interval_lb_strictly_positive": h0_local_raw[
+                "dlog_dv_unit_interval_lb_strictly_positive"
+            ],
+            "dlog_dv_t_le_2_lb_3_17_minus_tau_sq_over_384_certified": serialize_arb_certified(
+                h0_local_raw["dlog_dv_t_le_2_lb_3_17_minus_tau_sq_over_384_arb"]
+            ),
+            "dlog_dv_t_le_2_lb_strictly_positive": h0_local_raw[
+                "dlog_dv_t_le_2_lb_strictly_positive"
+            ],
+            "exp_pi_threshold_certified": serialize_arb_certified(
+                h0_local_raw["exp_pi_threshold_arb"]
+            ),
+            "t_plus_at_y23_certified": serialize_arb_certified(
+                h0_local_raw["t_plus_at_y23_arb"]
+            ),
+            "t_plus_at_y24_certified": serialize_arb_certified(
+                h0_local_raw["t_plus_at_y24_arb"]
+            ),
+            "y23_exceeds_unit_interval_and_y24_inside_unit_interval": h0_local_raw[
+                "y23_exceeds_unit_interval_and_y24_inside_unit_interval"
+            ],
+            "weierstrass_product_identity_checks": weierstrass_checks_serialized,
+            "all_weierstrass_product_checks_intersect": h0_local_raw[
+                "all_weierstrass_product_checks_intersect"
+            ],
+            "subdivision_64_on_0_to_t2plus_all_dlog_dv_positive": h0_local_raw[
+                "subdivision_64_on_0_to_t2plus_all_dlog_dv_positive"
+            ],
+            "subdivision_64_min_dlog_dv_on_0_to_t2plus_certified": serialize_arb_certified(
+                h0_local_raw["subdivision_64_min_dlog_dv_on_0_to_t2plus_arb"]
+            ),
+            "H0_at_t2plus_certified": serialize_arb_certified(
+                h0_local_raw["H0_at_t2plus_arb"]
+            ),
+            "H0_at_t5_certified": serialize_arb_certified(
+                h0_local_raw["H0_at_t5_arb"]
+            ),
+            "H0_at_t10_certified": serialize_arb_certified(
+                h0_local_raw["H0_at_t10_arb"]
+            ),
+            "H0_at_t20_certified": serialize_arb_certified(
+                h0_local_raw["H0_at_t20_arb"]
+            ),
+            "global_monotonicity_falsified_H0_t5_lt_H0_t2plus": h0_local_raw[
+                "global_monotonicity_falsified_H0_t5_lt_H0_t2plus"
+            ],
+            "high_frequency_decay_verified_H0_t20_lt_H0_0": h0_local_raw[
+                "high_frequency_decay_verified_H0_t20_lt_H0_0"
+            ],
+        }
+
         low_freq_spike_table: List[Dict[str, Any]] = []
         for y in (2, 5, 11, 31, 97, 199, 499, 997, 1999, 4999, 9973):
             spike_info = evaluate_euler_spike_interval_gram_lower_bound_arb(
@@ -1155,7 +1604,10 @@ def execute_task_tc046_prime_euler_moebius_recovery(
             e_sq_plus_arb = spike_info["e_sq_at_plus_arb"]
             H0_minus_arb = spike_info["H0_at_minus_arb"]
             H0_plus_arb = spike_info["H0_at_plus_arb"]
+            H0_subdiv_min_arb = spike_info["H0_subdiv_min_arb"]
+            dlog_dv_min_arb = spike_info["H0_dlog_dv_min_on_I_y_arb"]
             gram_lb_0_arb = spike_info["gram_sq_lb_H0_0_arb"]
+            gram_lb_subdiv_arb = spike_info["gram_sq_lb_H0_subdiv_arb"]
             gram_lb_minus_arb = spike_info["gram_sq_lb_H0_minus_arb"]
             low_freq_spike_table.append(
                 {
@@ -1188,16 +1640,39 @@ def execute_task_tc046_prime_euler_moebius_recovery(
                     "interval_min_H0_at_i_t_y_minus_certified": serialize_arb_certified(
                         H0_minus_arb
                     ),
+                    "H0_interval_subdivision_min_certified": serialize_arb_certified(
+                        H0_subdiv_min_arb
+                    ),
+                    "H0_dlog_dv_min_on_I_y_certified": serialize_arb_certified(
+                        dlog_dv_min_arb
+                    ),
                     "H0_at_i_t_y_certified": serialize_arb_certified(H0_plus_arb),
                     "H0_at_i_t_y_exceeds_H0_at_0": bool(H0_plus_arb >= H0_at_0_arb),
-                    "interval_monotonicity_E_y_sq_and_H0_verified": bool(
-                        spike_info["monotonicity_verified"]
-                        and spike_info["H0_monotonicity_verified"]
-                    ),
-                    "integrated_gram_norm_sq_lower_bound_via_H0_0_certified": serialize_arb_certified(
+                    "I_y_subset_of_analytic_unit_interval_0_1": spike_info[
+                        "I_y_subset_of_analytic_unit_interval_0_1"
+                    ],
+                    "E_y_sq_interval_monotonicity_by_phase_in_0_pi": spike_info[
+                        "E_y_sq_interval_monotonicity_by_phase_in_0_pi"
+                    ],
+                    "H0_interval_monotonicity_certified_on_I_y": spike_info[
+                        "H0_interval_monotonicity_certified_on_I_y"
+                    ],
+                    "H0_interval_subdivision_exceeds_H0_0": spike_info[
+                        "H0_interval_subdivision_exceeds_H0_0"
+                    ],
+                    "endpoint_ordering_E_y_sq_minus_le_plus": spike_info[
+                        "endpoint_ordering_E_y_sq_minus_le_plus"
+                    ],
+                    "endpoint_ordering_H0_0_le_minus_le_plus": spike_info[
+                        "endpoint_ordering_H0_0_le_minus_le_plus"
+                    ],
+                    "gram_norm_sq_lower_bound_expr_via_H0_0_certified": serialize_arb_certified(
                         gram_lb_0_arb
                     ),
-                    "integrated_gram_norm_sq_lower_bound_via_H0_minus_certified": serialize_arb_certified(
+                    "gram_norm_sq_lower_bound_expr_via_H0_subdiv_min_certified": serialize_arb_certified(
+                        gram_lb_subdiv_arb
+                    ),
+                    "gram_norm_sq_lower_bound_expr_via_H0_minus_certified": serialize_arb_certified(
                         gram_lb_minus_arb
                     ),
                 }
@@ -1313,23 +1788,34 @@ def execute_task_tc046_prime_euler_moebius_recovery(
                 "H0_at_0_certified": serialize_arb_certified(H0_at_0_arb),
                 "euler_sieved_seed_gram_norm_table": euler_gram_norm_table,
                 "low_frequency_coherent_arch_obstruction": (
-                    "On the controlled-width frequency interval I_y := [t_{y,-}, t_{y,+}] = [7*pi / (8*log y), pi / log y] "
-                    "of width |I_y| = pi / (8*log y) > 0, every prime p <= y and every t in [0, pi / log y] has phase "
-                    "t*log(p) in [0, pi] where (d/dt)(1 + p^{-1} - 2*p^{-1/2}*cos(t*log p)) = 2*p^{-1/2}*(log p)*sin(t*log p) >= 0. "
+                    "On the controlled-width frequency interval I_y := [t_{y,-}, t_{y,+}] = [7*tau / (16*log y), tau / (2*log y)] "
+                    "= [7*pi / (8*log y), pi / log y] of width |I_y| = tau / (16*log y) = pi / (8*log y) > 0, every prime p <= y "
+                    "and every t in [0, tau / (2*log y)] has phase t*log(p) in [0, pi] where "
+                    "(d/dt)|1 - p^{-1/2 - it}|^2 = 2*p^{-1/2}*(log p)*sin(t*log p) >= 0. "
                     "Thus |E_y(it)|^2 is monotonically non-decreasing in t on I_y, with exact interval minimum at the left endpoint: "
-                    "inf_{t in I_y} |E_y(it)|^2 = |E_y(i t_{y,-})|^2 >= exp((4 + o(1)) sqrt(y) / log y) "
-                    "(since every prime p in [y^{16/21}, y] has t*log(p) in [2*pi/3, pi] with -cos(t*log p) >= 1/2 throughout I_y), "
-                    "while inf_{t in I_y} H_0(it) = H_0(i t_{y,-}) >= H_0(0) = F_tau(1/2)^2 = 2.82909344e-5 > 0. "
-                    "Integrating over (-I_y) union I_y gives the rigorous integrated Gram-norm lower bound "
+                    "inf_{t in I_y} |E_y(it)|^2 = |E_y(i t_{y,-})|^2. "
+                    "Retaining every prime factor p <= y, log|E_y(it)|^2 = -2*sum_{p<=y} p^{-1/2}*cos(t*log p) + O(sum_{p<=y} p^{-1}); "
+                    "by the Prime Number Theorem with partial summation (and Mertens' bound sum_{p<=y} p^{-1} = O(log log y)), "
+                    "sum_{p<=y} p^{-1/2}*cos(a*log p / log y) = (2*cos a + o(1))*sqrt(y)/log y, giving at a = 7*tau/16 "
+                    "the exact left-endpoint asymptotic log|E_y(i t_{y,-})|^2 = (4*cos(tau/16) + o(1))*sqrt(y)/log y "
+                    "(where 4*cos(tau/16) = 2*sqrt(2 + sqrt(2)) ~ 3.695518130045147, whereas the right endpoint t_{y,+} = tau/(2*log y) "
+                    "has coefficient 4; the earlier subproduct claim |E_y(i t_{y,-})|^2 >= prod_{y^{16/21}<=p<=y}(1 + p^{-1/2} + p^{-1}) "
+                    "is refuted at y = 210 in 256-bit Arb: 3.3605057481 < 18.2536118944). "
+                    "For the kernel weight H_0(it) (which decays to 0 as t -> infty and is NOT globally increasing on [0, infty)), "
+                    "the canonical Weierstrass product H_0(it)/H_0(0) = (1 + v)^3 * prod_{n>=1} (1 + v/(4n+1)^2)^{-1} (v = 4*t^2) "
+                    "gives on 0 <= t <= 1 (0 <= v <= 4): (d/dv) log(H_0(it)/H_0(0)) = 3/(1+v) - sum_{n>=1} 1/((4n+1)^2 + v) "
+                    ">= 3/5 - tau^2/384 > 0, proving strict monotonicity on [0, 1] and hence on I_y subset [0, 1] for all integer y >= 24 "
+                    "(while for y in {2, 5, 11}, both a 64-subinterval Arb logarithmic-derivative certificate on [0, t_{2,+}] and direct "
+                    "64-subinterval Arb ball enclosures on I_y certify inf_{t in I_y} H_0(it) = H_0(i t_{y,-}) > H_0(0) > 0). "
+                    "Integrating over (-I_y) union I_y gives for y >= 24 (and all certified table rows): "
                     "||Psi_y||_{L^2(d^*x)}^2 >= (2/tau) int_{t_{y,-}}^{t_{y,+}} |E_y(it)|^2 H_0(it) dt "
-                    ">= (2 |I_y| / tau) |E_y(i t_{y,-})|^2 H_0(i t_{y,-}) "
-                    ">= (H_0(0) / (8 log y)) |E_y(i t_{y,-})|^2 = exp((4 + o(1)) sqrt(y) / log y) -> +infty as y -> infty "
-                    "(reaching >= 153.39 at y = 9973). "
-                    "Scope: this establishes divergence of the unsplit critical-line Cauchy-Schwarz / Gram-norm bound as y -> infty "
-                    "(because keeping E_y(it) factored on Re(z) = 0 retains all 2^{pi(y)} divisors m | P_y up to P_y ~ e^y "
-                    "without the right-shift spatial decay O((X/m)^{5/2}) that suppresses m > X); it does NOT establish failure "
-                    "of the coupled profile W_{M(X)}(X) or of the broader concurrent-grade hypothesis."
+                    ">= (H_0(0) / (8 log y)) |E_y(i t_{y,-})|^2 = (H_0(0) / (8 log y)) exp[(4*cos(tau/16) + o(1)) sqrt(y) / log y] -> +infty as y -> infty "
+                    "(with lower-bound expression (H_0(0)/(8 log y))|E_y(i t_{y,-})|^2 reaching 153.39246 at y = 9973). "
+                    "Scope: this establishes divergence of the unsplit critical-line Cauchy-Schwarz / Gram-norm estimate as y -> infty; "
+                    "it does NOT establish divergence of W_{M(X)}(X), failure of the concurrent-grade hypothesis, or closure of the arithmetic cancellation obligation."
                 ),
+                "subproduct_counterexample_y210": subproduct_counterexample_y210,
+                "h0_local_monotonicity_and_decay_certificate": h0_local_monotonicity_and_decay_certificate,
                 "low_frequency_spike_table": low_freq_spike_table,
             },
             "mechanism_B_prime_by_prime_recursion_and_horizon_collapse": {
@@ -1532,7 +2018,12 @@ def execute_task_tc046_prime_euler_moebius_recovery(
                 "Using |W_log(X/m)| <= C_{log,0} (X/m)^{5/2} yields "
                 "|W(X) - W_y(X)| = |R_mu(X) - R_{mu, y}(X)| <= C_{log,0} X^{5/2} sum_{m > M} m^{-3} <= C_{log,0} X^{5/2} / (2 M^2)."
             ),
-            "coupled_cutoff_schedule": "y = M(X) := ceil(max(2, X^{5/4})) for X >= 1 (computed directly from Arb ball enclosure of (X^5)^{1/4} without float conversion)",
+            "coupled_cutoff_schedule": (
+                "y = M(X) := ceil(max(2, X^{5/4})) for X >= 1 (computed as a certified safe integer cutoff directly from the "
+                "upper endpoint of the Arb ball enclosure of (X^5)^{1/4} without float conversion; for an input interval ball "
+                "crossing an integer boundary it may exceed the minimal pointwise ceiling while guaranteeing M(X) >= X^{5/4} "
+                "and M(X)^2 >= X^{5/2} across the entire input ball)"
+            ),
             "scale_horizon_vs_coupled_cutoff_tail_comparison": (
                 "At the bare scale horizon N = floor(X), the small-scale tail bound is "
                 "C_{log,0} X^{5/2} / (2 floor(X)^2) = O(sqrt(X)), which diverges as X -> infty and does NOT establish uniform "
@@ -1572,7 +2063,7 @@ def execute_task_tc046_prime_euler_moebius_recovery(
             "strongest_new_mathematical_results": [
                 "Exact Finite-Prime Euler Inversion & Agreement Horizon (`finite_prime_euler_recursion_and_coefficient_cases`): W_y(X) = [prod_{p <= y}(I - p^{-1/2} D_p)] W_log(X) = sum_{n>=2} lambda_y(n) n^{-1/2} h_0(n/X) with lambda_y = mu_y * log >= Lambda >= 0, exact agreement lambda_y(n) = Lambda(n) for all 2 <= n < 2 q_{>y} (first discrepancy at 2 q_{>y} of value log 2), and summatory identity L_y(x) = sum_{d | P_y, d <= x} mu(d) log(floor(x/d)!).",
                 "Coupled-Cutoff Quantitative Reduction & Smooth/Rough Tail Partition (`coupled_prime_cutoff_comparison_and_boundedness_equivalence`): For y >= M >= max(2, X), |W(X) - W_y(X)| <= C_{log,0} X^{5/2} / (2 M^2), and at y = M(X) = ceil(max(2, X^{5/4})), sup_{X >= 1} |W(X) - W_{M(X)}(X)| <= (1/2) C_{log,0} = 0.2787147936 < 0.278715 (and |W_{M(X)}(X) - (W_log(X) + R_{mu, M(X)}(X))| <= (1/2) C_{log,0} < 0.278715), reducing uniform boundedness of R_mu(X) to uniform boundedness of W_{M(X)}(X) or R_{mu, M(X)}(X) (whereas at N = floor(X) the available small-scale tail estimate grows as O(sqrt(X))).",
-                "Quantified Dual Obstruction (Controlled-Width Coherent Euler Spike vs. Coupled-Cutoff Horizon Collapse): (1) On the critical line Re(z) = 0, holomorphy of M_X[W_y](z) = -E_y(z) H_0(z) zeta'(z+1/2) yields sup_{X > 0} |W_y(X)| <= ||Psi_y||_{L^2} N_{zeta',tau}, but on the controlled-width frequency interval I_y = [7*pi / (8*log y), pi / log y] of width |I_y| = pi / (8*log y), monotonicity of each prime factor proves inf_{t in I_y} |E_y(it)|^2 = |E_y(i t_{y,-})|^2 >= exp((4+o(1)) sqrt(y)/log y) and ||Psi_y||_{L^2}^2 >= (H_0(0)/(8 log y)) |E_y(i t_{y,-})|^2 -> +infty, establishing divergence of the unsplit Cauchy-Schwarz/Gram-norm bound (without refuting boundedness of the coupled profile W_{M(X)}(X) or the broader concurrent-grade hypothesis); (2) splitting at the coupled cutoff M(X) = ceil(max(2, X^{5/4})) bounds the m > M(X) tail by (1/2) C_{log,0} < 0.278715, but for y >= M(X) every squarefree m <= M(X) divides P_y, collapsing the m <= M(X) sum identically to W_log(X) + R_{mu, M(X)}(X).",
+                "Quantified Dual Obstruction (Controlled-Width Coherent Euler Spike vs. Coupled-Cutoff Horizon Collapse): (1) On the critical line Re(z) = 0, holomorphy of M_X[W_y](z) = -E_y(z) H_0(z) zeta'(z+1/2) yields sup_{X > 0} |W_y(X)| <= ||Psi_y||_{L^2} N_{zeta',tau}; on the controlled-width frequency interval I_y = [7*tau/(16*log y), tau/(2*log y)] of width |I_y| = tau/(16*log y), prime-factor monotonicity proves inf_{t in I_y} |E_y(it)|^2 = |E_y(i t_{y,-})|^2 with PNT + partial summation asymptotic log|E_y(i t_{y,-})|^2 = (4*cos(tau/16) + o(1))*sqrt(y)/log y (4*cos(tau/16) = 2*sqrt(2+sqrt(2)) ~ 3.695518130045147, while the right endpoint has coefficient 4 and the false subproduct inequality is refuted at y = 210), and local Weierstrass-product monotonicity of H_0(it) on [0, 1] (covering I_y for all integer y >= 24, with 64-subinterval Arb certification for y in {2, 5, 11}) proves ||Psi_y||_{L^2}^2 >= (H_0(0)/(8 log y)) |E_y(i t_{y,-})|^2 = (H_0(0)/(8 log y)) exp[(4*cos(tau/16) + o(1))*sqrt(y)/log y] -> +infty, establishing divergence of the unsplit Cauchy-Schwarz/Gram-norm bound (without refuting boundedness of the coupled profile W_{M(X)}(X) or the broader concurrent-grade hypothesis); (2) splitting at the coupled cutoff M(X) = ceil(max(2, X^{5/4})) bounds the m > M(X) tail by (1/2) C_{log,0} < 0.278715, but for y >= M(X) every squarefree m <= M(X) divides P_y, collapsing the m <= M(X) sum identically to W_log(X) + R_{mu, M(X)}(X).",
             ],
             "advances_uniform_cancellation_estimate": False,
             "why_reformulation_not_closure": (
@@ -1640,6 +2131,8 @@ __all__ = [
     "evaluate_H0_critical_line_arb",
     "evaluate_b_log_boundary_term_arb",
     "certified_coupled_cutoff_M_X_arb",
+    "certify_subproduct_counterexample_at_y210_arb",
+    "certify_H0_local_monotonicity_and_global_decay_arb",
     "evaluate_euler_spike_interval_gram_lower_bound_arb",
     "compute_coupled_cutoff_comparison_bound_arb",
     "verify_symbolic_finite_prime_identities",

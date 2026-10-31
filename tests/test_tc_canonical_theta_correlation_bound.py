@@ -1750,10 +1750,22 @@ def test_30_task_tc046_prime_euler_moebius_recovery(artifact_payload):
     )
     s3 = sec15["section_3_quantitative_compatibility_and_obstruction_analysis"]
     mech_a = s3["mechanism_A_critical_line_mellin_fourier_and_gram_bound"]
+    assert (
+        mech_a["subproduct_counterexample_y210"][
+            "enclosures_disjoint_and_false_subproduct_exceeds_actual"
+        ]
+        is True
+    )
+    assert (
+        mech_a["h0_local_monotonicity_and_decay_certificate"][
+            "global_monotonicity_falsified_H0_t5_lt_H0_t2plus"
+        ]
+        is True
+    )
     assert len(mech_a["low_frequency_spike_table"]) == 11
     assert (
         mech_a["low_frequency_spike_table"][-1][
-            "integrated_gram_norm_sq_lower_bound_via_H0_0_certified"
+            "gram_norm_sq_lower_bound_expr_via_H0_0_certified"
         ]["mid_float"]
         > 153.0
     )

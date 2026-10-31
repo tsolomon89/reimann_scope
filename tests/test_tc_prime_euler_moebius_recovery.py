@@ -50,6 +50,8 @@ from tc.canonical_theta_correlation_bound import (
 )
 from tc.prime_euler_moebius_recovery import (
     certified_coupled_cutoff_M_X_arb,
+    certify_H0_local_monotonicity_and_global_decay_arb,
+    certify_subproduct_counterexample_at_y210_arb,
     compute_coupled_cutoff_comparison_bound_arb,
     divisors_of_primorial,
     evaluate_H0_critical_line_arb,
@@ -241,14 +243,77 @@ def test_05_stieltjes_boundary_envelope_and_critical_line_spike():
         prev_gram_lb = arb(0)
         for y in (97, 199, 499, 997, 1999, 4999, 9973):
             iv = evaluate_euler_spike_interval_gram_lower_bound_arb(y, prec_bits=256)
-            assert iv["monotonicity_verified"] is True
-            assert iv["H0_monotonicity_verified"] is True
+            assert iv["I_y_subset_of_analytic_unit_interval_0_1"] is True
+            assert iv["E_y_sq_interval_monotonicity_by_phase_in_0_pi"] is True
+            assert iv["H0_interval_monotonicity_certified_on_I_y"] is True
+            assert iv["H0_interval_subdivision_exceeds_H0_0"] is True
+            assert iv["endpoint_ordering_E_y_sq_minus_le_plus"] is True
+            assert iv["endpoint_ordering_H0_0_le_minus_le_plus"] is True
             assert bool(iv["interval_width_arb"] > arb(0))
             assert bool(iv["e_sq_at_minus_arb"] <= iv["e_sq_at_plus_arb"])
+            assert bool(iv["gram_sq_lb_H0_0_arb"] <= iv["gram_sq_lb_H0_subdiv_arb"])
+            assert bool(
+                iv["gram_sq_lb_H0_subdiv_arb"].lower()
+                <= iv["gram_sq_lb_H0_minus_arb"].lower()
+            )
             assert bool(iv["gram_sq_lb_H0_0_arb"] <= iv["gram_sq_lb_H0_minus_arb"])
             assert bool(iv["gram_sq_lb_H0_0_arb"] > prev_gram_lb)
             prev_gram_lb = iv["gram_sq_lb_H0_0_arb"]
         assert bool(prev_gram_lb > arb(153))
+
+        # 4. Also verify finite-table rows with y < 24 (y in {2, 5, 11}) where I_y is not a subset of [0, 1]
+        for y_small in (2, 5, 11):
+            iv_s = evaluate_euler_spike_interval_gram_lower_bound_arb(y_small, prec_bits=256)
+            assert iv_s["I_y_subset_of_analytic_unit_interval_0_1"] is False
+            assert iv_s["E_y_sq_interval_monotonicity_by_phase_in_0_pi"] is True
+            assert iv_s["H0_interval_monotonicity_certified_on_I_y"] is True
+            assert iv_s["H0_interval_subdivision_exceeds_H0_0"] is True
+            assert bool(iv_s["H0_dlog_dv_min_on_I_y_arb"] > arb(0))
+            assert bool(iv_s["H0_subdiv_min_arb"] > iv_s["H0_at_0_arb"])
+
+        # 5. Regression: Counterexample at y = 210 refuting the false subproduct inequality
+        #    |E_y(i t_{y,-})|^2 >= prod_{y^{16/21} <= p <= y} (1 + p^{-1/2} + p^{-1})
+        ce_210 = certify_subproduct_counterexample_at_y210_arb(210, prec_bits=256)
+        assert ce_210["enclosures_disjoint_and_false_subproduct_exceeds_actual"] is True
+        assert ce_210["omitted_lower_prime_product_strictly_less_than_one"] is True
+        assert bool(
+            ce_210["actual_E_y_abs_sq_at_t_y_minus_arb"]
+            < ce_210["claimed_false_subproduct_arb"]
+        )
+        assert math.isclose(
+            float(ce_210["actual_E_y_abs_sq_at_t_y_minus_arb"].mid()),
+            3.360505748107592,
+            rel_tol=1e-13,
+        )
+        assert math.isclose(
+            float(ce_210["claimed_false_subproduct_arb"].mid()),
+            18.253611894431243,
+            rel_tol=1e-13,
+        )
+        assert math.isclose(
+            float(ce_210["omitted_lower_prime_product_arb"].mid()),
+            0.05585403137068536,
+            rel_tol=1e-13,
+        )
+
+        # 6. Regression: Local monotonicity of H_0(it) on [0, 1] (and [0, t_{2,+}]),
+        #    left-endpoint coefficient 4*cos(tau/16) = 2*sqrt(2+sqrt(2)), and global non-monotonicity
+        h0_cert = certify_H0_local_monotonicity_and_global_decay_arb(prec_bits=256)
+        assert h0_cert["left_endpoint_coeff_algebraic_identity_contains_zero"] is True
+        assert h0_cert["left_endpoint_coeff_strictly_between_3_6955_and_4"] is True
+        assert math.isclose(
+            float(h0_cert["left_endpoint_coeff_4_cos_tau_over_16_arb"].mid()),
+            3.695518130045147,
+            rel_tol=1e-14,
+        )
+        assert h0_cert["dlog_dv_unit_interval_lb_strictly_positive"] is True
+        assert h0_cert["dlog_dv_t_le_2_lb_strictly_positive"] is True
+        assert h0_cert["y23_exceeds_unit_interval_and_y24_inside_unit_interval"] is True
+        assert h0_cert["all_weierstrass_product_checks_intersect"] is True
+        assert h0_cert["subdivision_64_on_0_to_t2plus_all_dlog_dv_positive"] is True
+        assert bool(h0_cert["subdivision_64_min_dlog_dv_on_0_to_t2plus_arb"] > arb(0))
+        assert h0_cert["global_monotonicity_falsified_H0_t5_lt_H0_t2plus"] is True
+        assert h0_cert["high_frequency_decay_verified_H0_t20_lt_H0_0"] is True
     finally:
         flint_ctx.prec = saved_prec
 
@@ -384,15 +449,36 @@ def test_07_lean_module_and_artifact_section_15():
     )
     s3 = sec15["section_3_quantitative_compatibility_and_obstruction_analysis"]
     mech_a = s3["mechanism_A_critical_line_mellin_fourier_and_gram_bound"]
-    assert "does NOT establish failure" in mech_a["low_frequency_coherent_arch_obstruction"]
+    assert (
+        "does NOT establish divergence of W_{M(X)}(X), failure of the concurrent-grade hypothesis"
+        in mech_a["low_frequency_coherent_arch_obstruction"]
+    )
+    assert (
+        "4*cos(tau/16)"
+        in mech_a["low_frequency_coherent_arch_obstruction"]
+    )
+    ce_art = mech_a["subproduct_counterexample_y210"]
+    assert ce_art["enclosures_disjoint_and_false_subproduct_exceeds_actual"] is True
+    assert ce_art["omitted_lower_prime_product_strictly_less_than_one"] is True
+    h0_art = mech_a["h0_local_monotonicity_and_decay_certificate"]
+    assert h0_art["left_endpoint_coeff_algebraic_identity_contains_zero"] is True
+    assert h0_art["dlog_dv_unit_interval_lb_strictly_positive"] is True
+    assert h0_art["all_weierstrass_product_checks_intersect"] is True
+    assert h0_art["subdivision_64_on_0_to_t2plus_all_dlog_dv_positive"] is True
+    assert h0_art["global_monotonicity_falsified_H0_t5_lt_H0_t2plus"] is True
+    assert h0_art["high_frequency_decay_verified_H0_t20_lt_H0_0"] is True
     spike_rows = mech_a["low_frequency_spike_table"]
     assert len(spike_rows) == 11
     assert all(
-        row["interval_monotonicity_E_y_sq_and_H0_verified"] is True
+        row["E_y_sq_interval_monotonicity_by_phase_in_0_pi"] is True
+        and row["H0_interval_monotonicity_certified_on_I_y"] is True
+        and row["H0_interval_subdivision_exceeds_H0_0"] is True
+        and row["endpoint_ordering_E_y_sq_minus_le_plus"] is True
+        and row["endpoint_ordering_H0_0_le_minus_le_plus"] is True
         for row in spike_rows
     )
     assert (
-        spike_rows[-1]["integrated_gram_norm_sq_lower_bound_via_H0_0_certified"][
+        spike_rows[-1]["gram_norm_sq_lower_bound_expr_via_H0_0_certified"][
             "mid_float"
         ]
         > 153.0
