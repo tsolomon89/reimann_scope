@@ -2057,11 +2057,15 @@ def test_33_task_tc049_arithmetic_cancellation_in_canonical_theta_correlation(
         "section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation"
     ]["cancellation_mechanism_1_subcritical_vs_supercritical_resummation"]
     assert (
-        "making super-linear cutoff growth y / X -> infty necessary"
+        "Fixed linear cutoffs y = floor(A X) with A >= 5 fail"
         in s2_meta["theorem_statement"]
     )
     assert (
-        "establishes sufficiency for cutoffs growing at least as fast as X^{5/4}"
+        "Cutoffs y >= M(X) = ceil(max(2, X^{5/4})) suffice"
+        in s2_meta["theorem_statement"]
+    )
+    assert (
+        "W_2(X) = W_log(X) - 2^{-1/2} W_log(X/2) = O(X^{-5/2})"
         in s2_meta["theorem_statement"]
     )
 
