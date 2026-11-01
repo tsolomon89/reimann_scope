@@ -2053,6 +2053,27 @@ def test_33_task_tc049_arithmetic_cancellation_in_canonical_theta_correlation(
         for row in s2_18["subcritical_compensation_table"]
     )
 
+    s2_meta = sec18[
+        "section_2_supercritical_dyadic_block_obstruction_and_subcritical_compensation"
+    ]["cancellation_mechanism_1_subcritical_vs_supercritical_resummation"]
+    assert (
+        "making super-linear cutoff growth y / X -> infty necessary"
+        in s2_meta["theorem_statement"]
+    )
+    assert (
+        "establishes sufficiency for cutoffs growing at least as fast as X^{5/4}"
+        in s2_meta["theorem_statement"]
+    )
+
+    s3_meta = sec18[
+        "section_3_w_log_large_scale_decay_and_resonant_band_reduction"
+    ]["cancellation_mechanism_2_higher_order_stirling_and_mellin_cancellation"]
+    assert (
+        "- (1/12) g_X'(1) - (1/24) int_1^infty {x}^2 (1 - {x})^2 g_X^{(4)}(x) dx"
+        in s3_meta["exact_asymptotic_and_global_bound_theorem"]
+    )
+    assert "external_analytic_bounds_vs_lean_deductive_verification" in s3_meta
+
     s3_18 = sec18[
         "section_3_w_log_large_scale_decay_and_resonant_band_reduction"
     ]["certified_audit_data"]
@@ -2071,6 +2092,30 @@ def test_33_task_tc049_arithmetic_cancellation_in_canonical_theta_correlation(
         row["satisfies_euler_maclaurin_bound"]
         for row in s3_18["w_log_asymptotic_table"]
     )
+    assert len(s3_18["w_log_asymptotic_table"]) == 12
+    for row in s3_18["w_log_asymptotic_table"][:6]:
+        assert row["em_vs_direct_series_encloses_zero"] is True
+    by_label = {r["X_label"]: r for r in s3_18["w_log_asymptotic_table"]}
+    assert math.isclose(
+        by_label["128"]["X_pow_5_2_times_W_log_X_certified"]["mid_float"],
+        -0.03859347492468833,
+        rel_tol=1e-12,
+    )
+    assert math.isclose(
+        by_label["128"]["X_pow_9_2_times_remainder_certified"]["mid_float"],
+        -0.9362876032507326,
+        rel_tol=1e-12,
+    )
+    assert math.isclose(
+        by_label["512"]["X_pow_5_2_times_W_log_X_certified"]["mid_float"],
+        -0.038539897676042614,
+        rel_tol=1e-12,
+    )
+    assert math.isclose(
+        by_label["512"]["X_pow_9_2_times_remainder_certified"]["mid_float"],
+        -0.9356473830296043,
+        rel_tol=1e-12,
+    )
     assert all(
         row["head_satisfies_global_bound"]
         and row["tail_satisfies_half_C_log_0_bound"]
@@ -2081,6 +2126,22 @@ def test_33_task_tc049_arithmetic_cancellation_in_canonical_theta_correlation(
 
     s4_18 = sec18["section_4_outcome_and_remaining_obligation"]
     assert s4_18["symbolic_identities_verification"]["all_verified"] is True
+    assert (
+        s4_18["symbolic_identities_verification"][
+            "peano_kernel_boundary_and_signs_verified"
+        ]
+        is True
+    )
+    assert (
+        s4_18["symbolic_identities_verification"]["em_leading_pieces_verified"]
+        is True
+    )
+    assert (
+        s4_18["symbolic_identities_verification"][
+            "tail_domination_alpha_ge_20_verified"
+        ]
+        is True
+    )
     assert (
         s4_18["lean_theorem"]
         == "prime_increment_telescoping_and_resonant_band_reduction"
@@ -2097,6 +2158,7 @@ def test_33_task_tc049_arithmetic_cancellation_in_canonical_theta_correlation(
     enum18_recheck = verify_all_serialized_arb_in_tree(
         sec18, path_prefix="section_18"
     )
+    assert enum18_recheck["total_certified_arb_balls_checked"] == 246
     assert (
         rt18["compared_against_live_original_arb_count"]
         == enum18_recheck["total_certified_arb_balls_checked"]

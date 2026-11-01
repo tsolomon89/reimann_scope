@@ -15502,7 +15502,7 @@
         "scoped_obstruction_conclusion": "Any proof strategy that attempts to bound the coupled prime-increment sum sum_{p <= M(X)} J_p(X) by bounding dyadic prime blocks A X < p <= 2 A X separately in absolute value (or summing |J_p(X)| over p <= M(X)) is unconditionally obstructed: every supercritical prime p > (9/2) X has the same negative sign J_p(X) < 0, and a single dyadic block (A X, 2 A X] inside [1, M(X)] already grows as Theta_A(sqrt(X) / log X)."
       },
       "cancellation_mechanism_1_subcritical_vs_supercritical_resummation": {
-        "theorem_statement": "For any prime cutoffs y_2 > y_1 >= floor(A X) with A >= 9/2 (e.g. A = 5, y_1 = floor(5 X), y_2 = max(floor(10 X), M(X))): every unsieved composite n >= 2 q_{> y_1} > 2 A X >= 9 X lies in the negative tail h_0(n/X) < 0, so both sieve defects D_{y_1}(X) := W_{y_1}(X) - W(X) = sum_{n >= 2 q_{> y_1}} (Delta_{y_1}(n)/sqrt(n)) h_0(n/X) < 0 and D_{y_2}(X) := W_{y_2}(X) - W(X) < 0 are strictly negative, while every prime p in (y_1, y_2] satisfies J_p(X) < 0 so T_{(y_1, y_2]}(X) := -sum_{y_1 < p <= y_2} J_p(X) > 0 is strictly positive. The exact coefficient identity Delta_{y_1}(n) - sum_{y_1 < p <= y_2, p | n} lambda_{p^-}(n/p) = Delta_{y_2}(n) annihilates every composite multiple n = m p < 2 q_{> y_2} identically, proving: D_{y_1}(X) + T_{(y_1, y_2]}(X) = D_{y_2}(X) < 0, and at y_2 = M(X) (for X >= (2A)^4) 0 < -D_{M(X)}(X) = -D_{y_1}(X) - T_{(y_1, M(X)]}(X) <= C_{log,0} X^{5/2} / (2 M(X)^2) <= (1/2) C_{log,0} < 0.278715. Corollary (Unconditional Linear-Cutoff Divergence): For any fixed A >= 5 and all X >= 59/A, taking y_1 = floor(A X) and y_2 = floor(2 A X) gives W(X) - W_{floor(A X)}(X) = -D_{floor(A X)}(X) = T_{(floor(A X), floor(2 A X)]}(X) + (-D_{floor(2 A X)}(X)) > T_{(floor(A X), floor(2 A X)]}(X) >= (3 c_0(A) / (32 A^2)) * sqrt(X) / log(2 A X) -> +infty, proving unconditionally that linear prime cutoffs y = floor(A X) diverge from W(X) at rate Theta_A(sqrt(X)/log X) and that super-linear sieving (such as y = M(X) = ceil(X^{5/4})) is necessary and sufficient for O(1) comparison."
+        "theorem_statement": "For any prime cutoffs y_2 > y_1 >= floor(A X) with A >= 9/2 (e.g. A = 5, y_1 = floor(5 X), y_2 = max(floor(10 X), M(X))): every unsieved composite n >= 2 q_{> y_1} > 2 A X >= 9 X lies in the negative tail h_0(n/X) < 0, so both sieve defects D_{y_1}(X) := W_{y_1}(X) - W(X) = sum_{n >= 2 q_{> y_1}} (Delta_{y_1}(n)/sqrt(n)) h_0(n/X) < 0 and D_{y_2}(X) := W_{y_2}(X) - W(X) < 0 are strictly negative, while every prime p in (y_1, y_2] satisfies J_p(X) < 0 so T_{(y_1, y_2]}(X) := -sum_{y_1 < p <= y_2} J_p(X) > 0 is strictly positive. The exact coefficient identity Delta_{y_1}(n) - sum_{y_1 < p <= y_2, p | n} lambda_{p^-}(n/p) = Delta_{y_2}(n) annihilates every composite multiple n = m p < 2 q_{> y_2} identically, proving: D_{y_1}(X) + T_{(y_1, y_2]}(X) = D_{y_2}(X) < 0, and at y_2 = M(X) (for X >= (2A)^4) 0 < -D_{M(X)}(X) = -D_{y_1}(X) - T_{(y_1, M(X)]}(X) <= C_{log,0} X^{5/2} / (2 M(X)^2) <= (1/2) C_{log,0} < 0.278715. Corollary (Unconditional Linear-Cutoff Divergence & Established Growth Conditions): For any fixed A >= 5 and all X >= 59/A, taking y_1 = floor(A X) and y_2 = floor(2 A X) gives W(X) - W_{floor(A X)}(X) = -D_{floor(A X)}(X) = T_{(floor(A X), floor(2 A X)]}(X) + (-D_{floor(2 A X)}(X)) > T_{(floor(A X), floor(2 A X)]}(X) >= (3 c_0(A) / (32 A^2)) * sqrt(X) / log(2 A X) -> +infty. Thus: (i) any linear prime cutoff y = floor(A X) (A >= 5) diverges from W(X) at rate Omega_A(sqrt(X)/log X), making super-linear cutoff growth y / X -> infty necessary for O(1) comparison; (ii) the proved small-scale divisor tail estimate |W(X) - W_y(X)| <= C_{log,0} X^{5/2} / (2 M^2) (y >= M >= max(2, X)) establishes sufficiency for cutoffs growing at least as fast as X^{5/4}, specifically y >= M(X) = ceil(max(2, X^{5/4})) (where |W(X) - W_{M(X)}(X)| <= (1/2) C_{log,0} < 0.278715), whereas intermediate super-linear growth rates X << y << X^{5/4} are not settled by the O(X^{5/2} / y^2) tail estimate."
       },
       "certified_audit_data": {
         "kappa_10_certified": {
@@ -16242,8 +16242,12 @@
     "section_3_w_log_large_scale_decay_and_resonant_band_reduction": {
       "cancellation_mechanism_2_higher_order_stirling_and_mellin_cancellation": {
         "why_tc044_lost_two_powers_of_X": "In TC-044, Stieltjes integration by parts of T(x) = log(floor(x)!) = (x log x - x + 1) + E_log(x) used H_0(1/2) = H_0'(1/2) = 0 to cancel x log x - x + 1, but bounded the remainder E_log(x) = (1/2) log(2*pi*x) - B_1({x}) log x + O(1/x) in absolute value |E_log(x)| <= (1/2) log x + 1. Because H_0(z) = F_tau(1/2+z) F_tau(1/2-z) is EVEN in z, it ALSO has a triple zero at z = -1/2 (H_0(-1/2) = H_0'(-1/2) = H_0''(-1/2) = 0), which cancels the entire smooth Stirling (1/2) log(2*pi*x) moment int_0^infty x^{-1/2} (log x) h_0(x/X) dx = 0 identically! Retaining the signed Bernoulli oscillation via 4th-order Euler-Maclaurin on g_X(x) = x^{-1/2} (log x) h_0(x/X) = X^{-1/2} (log x) psi_0(x/X) recovers two full powers of X, improving O(X^{-1/2} log X) to O(X^{-5/2}).",
-        "exact_asymptotic_and_global_bound_theorem": "Theorem: For all X > 0, the Mellin transform M_X[W_log](z) = -H_0(z) zeta'(z + 1/2) is holomorphic across the entire open strip -5/2 < Re(z) < 5/2, with its first left-half-plane simple pole at z = -5/2 (s = -2, the first trivial zero of zeta(s)), where Res_{z=-5/2}(-H_0(z) zeta'(z+1/2) X^z) = (-81/64)(-zeta'(-2)) X^{-5/2} = -(81 zeta(3) / (256 pi^2)) X^{-5/2} (~ -0.0385363285 X^{-5/2}) and second simple pole at z = -9/2 (s = -4) with residue -(5625 zeta(5) / (64 pi^4)) X^{-9/2} (~ -0.93556235 X^{-9/2}). In the spatial domain, 4th-order Euler-Maclaurin integration by parts on [1, infty) using int_0^infty g_X(x) dx = 0 gives W_log(X) = -int_0^1 g_X(x) dx + (1/12) g_X'(1) + (1/24) int_1^infty {x}^2 (1 - {x})^2 g_X^{(4)}(x) dx, proving unconditionally for all X >= 1: |W_log(X)| <= (217709/393216 + (I_{d4,0}/384)*(log X / X) + ((I_{d4,log} + I_{R_L})/384)*(1/X)) X^{-5/2} <= C_{log,EM} X^{-5/2} with C_{log,EM} = 13.468515 < 13.47.",
-        "unconditional_small_divisor_head_bound_and_resonant_band_reduction": "Theorem (`prime_increment_telescoping_and_resonant_band_reduction`): Combining the small-scale bound |W_log(u)| <= C_{log,0} u^{5/2} (u > 0) with the new large-scale bound |W_log(u)| <= C_{log,EM} u^{-5/2} (u >= 1) gives the two-sided localization envelope |W_log(u)| <= C_{log,*} min(u^{5/2}, u^{-5/2}) for all u > 0. Splitting R_mu(X) = sum_{m=2}^infty (mu(m)/sqrt(m)) W_log(X/m) at the lower divisor cutoff M_-(X) := floor(X^{5/6}) and upper divisor cutoff M_+(X) := M(X) = ceil(max(2, X^{5/4})) yields: (1) Small-divisor head (2 <= m <= floor(X^{5/6})): |R_{mu,head}(X)| <= C_{log,EM} X^{-5/2} sum_{2 <= m <= M_-(X)} m^2 <= (5/6) C_{log,EM} < 11.224 unconditionally for all X >= 1 (even with |mu(m)| <= 1); (2) Large-divisor tail (m > M(X)): |R_{mu,tail}(X)| <= (1/2) C_{log,0} < 0.278715 unconditionally for all X >= 1; (3) Localized Resonant-Band Equivalence: |R_mu(X) - R_{mu,band}(X)| <= (5/6) C_{log,EM} + (1/2) C_{log,0} < 11.503 for all X >= 1, where R_{mu,band}(X) := sum_{X^{5/6} < m <= M(X)} (mu(m)/sqrt(m)) W_log(X/m)."
+        "exact_asymptotic_and_global_bound_theorem": "Theorem: For all X > 0, the Mellin transform M_X[W_log](z) = -H_0(z) zeta'(z + 1/2) is holomorphic across the entire open strip -5/2 < Re(z) < 5/2, with its first left-half-plane simple pole at z = -5/2 (s = -2, the first trivial zero of zeta(s)), where Res_{z=-5/2}(-H_0(z) zeta'(z+1/2) X^z) = (-81/64)(-zeta'(-2)) X^{-5/2} = -(81 zeta(3) / (256 pi^2)) X^{-5/2} (~ -0.0385363285 X^{-5/2}) and second simple pole at z = -9/2 (s = -4) with residue -(5625 zeta(5) / (64 pi^4)) X^{-9/2} (~ -0.93560290 X^{-9/2}). In the spatial domain, 4th-order Euler-Maclaurin integration by parts on [1, infty) with Peano kernel P_4(t) = (1/24) t^2 (1-t)^2 and int_0^infty g_X(x) dx = 0 gives W_log(X) = -int_0^1 g_X(x) dx - (1/12) g_X'(1) - (1/24) int_1^infty {x}^2 (1 - {x})^2 g_X^{(4)}(x) dx, proving unconditionally for all X >= 1: |W_log(X)| <= (217709/393216 + (I_{d4,0}/384)*(log X / X) + ((I_{d4,log} + I_{R_L})/384)*(1/X)) X^{-5/2} <= C_{log,EM} X^{-5/2} with C_{log,EM} = 13.468515 < 13.47.",
+        "unconditional_small_divisor_head_bound_and_resonant_band_reduction": "Theorem (`prime_increment_telescoping_and_resonant_band_reduction`): Combining the small-scale bound |W_log(u)| <= C_{log,0} u^{5/2} (u > 0) with the new large-scale bound |W_log(u)| <= C_{log,EM} u^{-5/2} (u >= 1) gives the two-sided localization envelope |W_log(u)| <= C_{log,*} min(u^{5/2}, u^{-5/2}) for all u > 0. Splitting R_mu(X) = sum_{m=2}^infty (mu(m)/sqrt(m)) W_log(X/m) at the lower divisor cutoff M_-(X) := floor(X^{5/6}) and upper divisor cutoff M_+(X) := M(X) = ceil(max(2, X^{5/4})) yields: (1) Small-divisor head (2 <= m <= floor(X^{5/6})): |R_{mu,head}(X)| <= C_{log,EM} X^{-5/2} sum_{2 <= m <= M_-(X)} m^2 <= (5/6) C_{log,EM} < 11.224 unconditionally for all X >= 1 (even with |mu(m)| <= 1); (2) Large-divisor tail (m > M(X)): |R_{mu,tail}(X)| <= (1/2) C_{log,0} < 0.278715 unconditionally for all X >= 1; (3) Localized Resonant-Band Equivalence: |R_mu(X) - R_{mu,band}(X)| <= (5/6) C_{log,EM} + (1/2) C_{log,0} < 11.503 for all X >= 1, where R_{mu,band}(X) := sum_{X^{5/6} < m <= M(X)} (mu(m)/sqrt(m)) W_log(X/m).",
+        "external_analytic_bounds_vs_lean_deductive_verification": {
+          "proved_externally_analytic_and_arb": "Paper derivation + SymPy exact polynomial/series identities + 256-bit Arb ball arithmetic establish: (a) evenness H_0(-z) = H_0(z) and triple zero H_0(-1/2) = H_0'(-1/2) = H_0''(-1/2) = 0 => int_0^infty g_X(x) dx = 0; (b) 4th-order Euler-Maclaurin identity on [1, infty) and [N_0, infty) with signs - (1/12) g_X' - (1/24) int {x}^2(1-{x})^2 g_X^{(4)}(x) dx, polynomial tail domination for alpha >= 20, Interval Newton root certification of P_{d4}(alpha^2) and Q_L(alpha^2), and 256-bit Arb enclosures of I_{d4,0}, I_{d4,log}, I_{R_L}, yielding |W_log(u)| <= C_{log,EM} u^{-5/2} (C_{log,EM} < 13.47) for all u >= 1; (c) small-divisor head bound |R_{mu,head}(X)| <= (5/6) C_{log,EM} < 11.224 (via sum_{m=2}^N m^2 <= (5/6) N^3) and large-divisor tail bound |R_{mu,tail}(X)| <= (1/2) C_{log,0} < 0.278715.",
+          "verified_in_lean_4": "In `formal/RiemannScope/CanonicalThetaCorrelationBound.lean` (0 sorry), Lean 4 verifies: (a) the exact prime-increment telescoping identity `primeIncrementTelescopingIdentity` (W_log - W_y = sum_{p <= y} J_p); (b) the exact three-zone additive decomposition `localizedResonantBandDecomp` (R_mu = R_{mu,head} + R_{mu,band} + R_{mu,tail}); (c) the deductive implication `resonantBandComparison_of_head_and_tail_bounds` and master theorem `prime_increment_telescoping_and_resonant_band_reduction`: taking the externally proved head bound |R_{mu,head}(X)| <= (5/6) C_{log,EM} and tail bound |R_{mu,tail}(X)| <= (1/2) C_{log,0} as hypotheses, Lean 4 deductively proves |R_mu(X) - R_{mu,band}(X)| <= (5/6) C_{log,EM} + (1/2) C_{log,0} and sup_{X >= 1} |R_mu(X)| < infty <==> sup_{X >= 1} |R_{mu,band}(X)| < infty."
+        }
       },
       "certified_audit_data": {
         "leading_pole_coeff_neg_81_zeta3_over_256_pi2_certified": {
@@ -16327,11 +16331,11 @@
               "arb_ball_str": "1.000000000000000000000000000000000000000"
             },
             "W_log_X_certified": {
-              "mid_float": -0.044061156600391414,
-              "rad_float_outward": 5.07398739027782e-07,
-              "lower_dec": "-4.406166399913044207716743513922733286770e-2",
-              "upper_dec": "-4.406064920165239263207772565986556033044e-2",
-              "arb_ball_str": "[-0.044061 +/- 6.64e-7]"
+              "mid_float": -0.0440613848045717,
+              "rad_float_outward": 6.8276445428368785e-15,
+              "lower_dec": "-4.406138480457852915464589668859826885921e-2",
+              "upper_dec": "-4.406138480456487533322841568515004310771e-2",
+              "arb_ball_str": "[-0.04406138480457 +/- 8.53e-15]"
             },
             "leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified": {
               "mid_float": -0.038536328464528986,
@@ -16341,25 +16345,32 @@
               "arb_ball_str": "[-0.03853632846452898333125584325255526419386 +/- 1.33e-44]"
             },
             "remainder_after_leading_pole_certified": {
-              "mid_float": -0.005524828135862434,
-              "rad_float_outward": 5.073987399129171e-07,
-              "lower_dec": "-5.525335534602346924331292011904407579163e-3",
-              "upper_dec": "-5.524320737122521122402182282077957231259e-3",
-              "arb_ball_str": "[-0.005525 +/- 6.80e-7]"
+              "mid_float": -0.005525056340042719,
+              "rad_float_outward": 6.8272184185822505e-15,
+              "lower_dec": "-5.525056340049545823396670880943428886735e-3",
+              "upper_dec": "-5.525056340035892001965954987694354692460e-3",
+              "arb_ball_str": "[-0.00552505634004 +/- 9.55e-15]"
             },
             "X_pow_5_2_times_W_log_X_certified": {
-              "mid_float": -0.044061156600391414,
-              "rad_float_outward": 5.073987416923173e-07,
-              "lower_dec": "-4.406166399913310661242653551492434958371e-2",
-              "upper_dec": "-4.406064920164972809681862528416854361444e-2",
-              "arb_ball_str": "[-0.044061 +/- 6.64e-7]"
+              "mid_float": -0.0440613848045717,
+              "rad_float_outward": 6.827644556071768e-15,
+              "lower_dec": "-4.406138480457852915465913157839911730201e-2",
+              "upper_dec": "-4.406138480456487533321518079534919466491e-2",
+              "arb_ball_str": "[-0.04406138480457 +/- 8.53e-15]"
             },
             "X_pow_9_2_times_remainder_certified": {
-              "mid_float": -0.005524828135862434,
-              "rad_float_outward": 5.073987416892739e-07,
-              "lower_dec": "-5.525335534604123281170692262369085389832e-3",
-              "upper_dec": "-5.524320737120744765562782031613279420590e-3",
-              "arb_ball_str": "[-0.005525 +/- 6.80e-7]"
+              "mid_float": -0.005525056340042719,
+              "rad_float_outward": 6.827218438434585e-15,
+              "lower_dec": "-5.525056340049545823416523215644701550932e-3",
+              "upper_dec": "-5.525056340035892001946102652993082028264e-3",
+              "arb_ball_str": "[-0.00552505634004 +/- 9.55e-15]"
+            },
+            "X_pow_13_2_times_second_remainder_certified": {
+              "mid_float": 0.9300778479883117,
+              "rad_float_outward": 6.861277719963535e-15,
+              "lower_dec": "9.300778479883048620707113511276760014012e-1",
+              "upper_dec": "9.300778479883185158922082414699293178097e-1",
+              "arb_ball_str": "[0.93007784798831 +/- 8.52e-15]"
             },
             "euler_maclaurin_X_neg_5_2_bound_certified": {
               "mid_float": 11.387701965440117,
@@ -16368,7 +16379,8 @@
               "upper_dec": "1.138770348268081856519725075625917836603e+1",
               "arb_ball_str": "[11.38770 +/- 3.49e-6]"
             },
-            "satisfies_euler_maclaurin_bound": true
+            "satisfies_euler_maclaurin_bound": true,
+            "em_vs_direct_series_encloses_zero": true
           },
           {
             "X_label": "2",
@@ -16380,11 +16392,11 @@
               "arb_ball_str": "2.000000000000000000000000000000000000000"
             },
             "W_log_X_certified": {
-              "mid_float": 0.07050966167095038,
-              "rad_float_outward": 2.8702807100040784e-06,
-              "lower_dec": "7.050679139024038601693756553902103205767e-2",
-              "upper_dec": "7.051253195166038391964103702082111140340e-2",
-              "arb_ball_str": "[0.07051 +/- 3.21e-6]"
+              "mid_float": 0.07050837076013518,
+              "rad_float_outward": 3.862540262203084e-14,
+              "lower_dec": "7.050837076009656551539293431396262323694e-2",
+              "upper_dec": "7.050837076017380319311725088750424739049e-2",
+              "arb_ball_str": "[0.0705083707601 +/- 7.39e-14]"
             },
             "leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified": {
               "mid_float": -0.006812324794825154,
@@ -16394,25 +16406,32 @@
               "arb_ball_str": "[-0.006812324794825154689780662419416257307254 +/- 4.53e-43]"
             },
             "remainder_after_leading_pole_certified": {
-              "mid_float": 0.07732198646577554,
-              "rad_float_outward": 2.870280717105571e-06,
-              "lower_dec": "7.731911618505843527936062695657857812225e-2",
-              "upper_dec": "7.732485674649264403677930044209607995333e-2",
-              "arb_ball_str": "[0.07732 +/- 4.86e-6]"
+              "mid_float": 0.07732069555496034,
+              "rad_float_outward": 3.862146771937594e-14,
+              "lower_dec": "7.732069555492172020506771761497209300181e-2",
+              "upper_dec": "7.732069555499895788300379242532729224013e-2",
+              "arb_ball_str": "[0.0773206955550 +/- 7.83e-14]"
             },
             "X_pow_5_2_times_W_log_X_certified": {
-              "mid_float": 0.3988628792535857,
-              "rad_float_outward": 1.623675973408169e-05,
-              "lower_dec": "3.988466424938516298038312947253966078334e-1",
-              "upper_dec": "3.988791160133197423032844221095823988494e-1",
-              "arb_ball_str": "[0.3989 +/- 5.34e-5]"
+              "mid_float": 0.398855576759255,
+              "rad_float_outward": 2.1848226438868968e-13,
+              "lower_dec": "3.988555767590365416434016075537864735860e-1",
+              "upper_dec": "3.988555767594734639313020985058925986506e-1",
+              "arb_ball_str": "[0.398855576759 +/- 4.74e-13]"
             },
             "X_pow_9_2_times_remainder_certified": {
-              "mid_float": 1.7495968308724588,
-              "rad_float_outward": 6.494703904999796e-05,
-              "lower_dec": "1.749531883833408765702626935882068108225e+0",
-              "upper_dec": "1.749661777911508589375882677478290032057e+0",
-              "arb_ball_str": "[1.7496 +/- 6.82e-5]"
+              "mid_float": 1.7495676208951358,
+              "rad_float_outward": 8.739447019600961e-13,
+              "lower_dec": "1.749567620894262099896935737330858350440e+0",
+              "upper_dec": "1.749567620896009789051925832928300052057e+0",
+              "arb_ball_str": "[1.74956762090 +/- 5.74e-12]"
+            },
+            "X_pow_13_2_times_second_remainder_certified": {
+              "mid_float": 10.740682100893961,
+              "rad_float_outward": 3.495539501956071e-12,
+              "lower_dec": "1.074068210089046603115753112267788520462e+1",
+              "upper_dec": "1.074068210089745678779104403222372081653e+1",
+              "arb_ball_str": "[10.74068210089 +/- 7.46e-12]"
             },
             "euler_maclaurin_X_neg_5_2_bound_certified": {
               "mid_float": 1.4020129145402176,
@@ -16421,7 +16440,8 @@
               "upper_dec": "1.402013048646616369046723532774634159588e+0",
               "arb_ball_str": "[1.402013 +/- 2.20e-7]"
             },
-            "satisfies_euler_maclaurin_bound": true
+            "satisfies_euler_maclaurin_bound": true,
+            "em_vs_direct_series_encloses_zero": true
           },
           {
             "X_label": "4",
@@ -16433,11 +16453,11 @@
               "arb_ball_str": "4.000000000000000000000000000000000000000"
             },
             "W_log_X_certified": {
-              "mid_float": -0.005965332371094642,
-              "rad_float_outward": 1.623675964879119e-05,
-              "lower_dec": "-5.981569130743433325046640225367826444087e-3",
-              "upper_dec": "-5.949095611445851082175936885791105252678e-3",
-              "arb_ball_str": "[-0.0060 +/- 5.10e-5]"
+              "mid_float": -0.005972634707672667,
+              "rad_float_outward": 2.1846155430129814e-13,
+              "lower_dec": "-5.972634707891127827825332348747104280590e-3",
+              "upper_dec": "-5.972634707454205542465940238403880233445e-3",
+              "arb_ball_str": "[-0.005972634708 +/- 5.46e-13]"
             },
             "leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified": {
               "mid_float": -0.0012042602645165308,
@@ -16447,25 +16467,32 @@
               "arb_ball_str": "[-0.001204260264516530729101745101642352006058 +/- 1.25e-43]"
             },
             "remainder_after_leading_pole_certified": {
-              "mid_float": -0.004761072106578112,
-              "rad_float_outward": 1.623675970563473e-05,
-              "lower_dec": "-4.777308866283746014805703138595164379435e-3",
-              "upper_dec": "-4.744835346872476934213383769279063305214e-3",
-              "arb_ball_str": "[-0.0048 +/- 5.52e-5]"
+              "mid_float": -0.004768374443156136,
+              "rad_float_outward": 2.184614766346667e-13,
+              "lower_dec": "-4.768374443374597099147103720731902444066e-3",
+              "upper_dec": "-4.768374442937674812940678663134378057852e-3",
+              "arb_ball_str": "[-0.004768374443 +/- 3.75e-13]"
             },
             "X_pow_5_2_times_W_log_X_certified": {
-              "mid_float": -0.19089063587502855,
-              "rad_float_outward": 0.0005195763114898022,
-              "lower_dec": "-1.914102121865183505068112719255155633984e-1",
-              "upper_dec": "-1.903710595635387505243111956315702508981e-1",
-              "arb_ball_str": "[-0.191 +/- 6.29e-4]"
+              "mid_float": -0.19112431064552535,
+              "rad_float_outward": 6.9907697511940675e-12,
+              "lower_dec": "-1.911243106525160905039631623159761424041e-1",
+              "upper_dec": "-1.911243106385345773453575604728553620450e-1",
+              "arb_ball_str": "[-0.1911243106 +/- 5.26e-11]"
             },
             "X_pow_9_2_times_remainder_certified": {
-              "mid_float": -2.437668918567993,
-              "rad_float_outward": 0.008313221012940727,
-              "lower_dec": "-2.445982139580933705265620562380646037272e+0",
-              "upper_dec": "-2.429355697555052444632151934450958537269e+0",
-              "arb_ball_str": "[-2.4 +/- 0.0460]"
+              "mid_float": -2.4414077148959414,
+              "rad_float_outward": 1.1185227625378978e-10,
+              "lower_dec": "-2.441407715007793714980157539511834938164e+0",
+              "upper_dec": "-2.441407714784089504008787041027700678818e+0",
+              "arb_ball_str": "[-2.441407715 +/- 2.16e-10]"
+            },
+            "X_pow_13_2_times_second_remainder_certified": {
+              "mid_float": -24.092876969081395,
+              "rad_float_outward": 1.7896338280670469e-09,
+              "lower_dec": "-2.409287697087102891684570983641302837712e+1",
+              "upper_dec": "-2.409287696729176153436488795675965184995e+1",
+              "arb_ball_str": "[-24.09287697 +/- 2.71e-9]"
             },
             "euler_maclaurin_X_neg_5_2_bound_certified": {
               "mid_float": 0.1632022773937601,
@@ -16474,7 +16501,8 @@
               "upper_dec": "1.632022892472030632746398901310645790776e-1",
               "arb_ball_str": "[0.1632023 +/- 3.45e-8]"
             },
-            "satisfies_euler_maclaurin_bound": true
+            "satisfies_euler_maclaurin_bound": true,
+            "em_vs_direct_series_encloses_zero": true
           },
           {
             "X_label": "tau",
@@ -16486,11 +16514,11 @@
               "arb_ball_str": "[6.283185307179586476925286766559005768394 +/- 3.39e-40]"
             },
             "W_log_X_certified": {
-              "mid_float": -0.0007069580561142823,
-              "rad_float_outward": 5.021102117552803e-05,
-              "lower_dec": "-7.571690772898103030772886391129468670211e-4",
-              "upper_dec": "-6.567470349387542963402352447953199138958e-4",
-              "arb_ball_str": "[-0.0007 +/- 5.72e-5]"
+              "mid_float": -0.0007295390567310754,
+              "rad_float_outward": 6.755755322400869e-13,
+              "lower_dec": "-7.295390574066509589925177215775140471998e-4",
+              "upper_dec": "-7.295390560554999513048051877107167318589e-4",
+              "arb_ball_str": "[-0.000729539057 +/- 9.45e-13]"
             },
             "leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified": {
               "mid_float": -0.0003894221625093948,
@@ -16500,25 +16528,32 @@
               "arb_ball_str": "[-0.0003894221625093947968513140386634864829850 +/- 2.77e-44]"
             },
             "remainder_after_leading_pole_certified": {
-              "mid_float": -0.0003175358936048875,
-              "rad_float_outward": 5.021102123237144e-05,
-              "lower_dec": "-3.677469148372589250867826153191503254424e-4",
-              "upper_dec": "-2.673248723725160806281131912621434895046e-4",
-              "arb_ball_str": "[-0.0003 +/- 6.78e-5]"
+              "mid_float": -0.00034011689422168065,
+              "rad_float_outward": 6.755755113841695e-13,
+              "lower_dec": "-3.401168948972561629882366301683279032831e-4",
+              "upper_dec": "-3.401168935461051536064582017929299098056e-4",
+              "arb_ball_str": "[-0.000340116894 +/- 8.98e-13]"
             },
             "X_pow_5_2_times_W_log_X_certified": {
-              "mid_float": -0.06995895581676774,
-              "rad_float_outward": 0.004968768094840931,
-              "lower_dec": "-7.492772391160866005597111169398426038631e-2",
-              "upper_dec": "-6.499018772192680968222614709437488538628e-2",
-              "arb_ball_str": "[-0.07 +/- 5.01e-3]"
+              "mid_float": -0.07219352010355375,
+              "rad_float_outward": 6.685341224844888e-11,
+              "lower_dec": "-7.219352017040715829633523014061629714788e-2",
+              "upper_dec": "-7.219352003670033729071330706981107346007e-2",
+              "arb_ball_str": "[-0.0721935201 +/- 7.05e-11]"
             },
             "X_pow_9_2_times_remainder_certified": {
-              "mid_float": -1.2405156048377857,
-              "rad_float_outward": 0.19615910178981735,
-              "lower_dec": "-1.436674706627602981856088531737148014869e+0",
-              "upper_dec": "-1.044356503047968553831796539549648014866e+0",
-              "arb_ball_str": "[-1e+0 +/- 0.437]"
+              "mid_float": -1.3287326669153072,
+              "rad_float_outward": 2.639266967380191e-09,
+              "lower_dec": "-1.328732669554573972520231861003932501420e+0",
+              "upper_dec": "-1.328732664276040258227799184019542373944e+0",
+              "arb_ball_str": "[-1.32873267 +/- 5.73e-9]"
+            },
+            "X_pow_13_2_times_second_remainder_certified": {
+              "mid_float": -15.520140940109613,
+              "rad_float_outward": 1.041940797567436e-07,
+              "lower_dec": "-1.552014104430369184258028729682089436022e+1",
+              "upper_dec": "-1.552014083591553311365759730842662650312e+1",
+              "arb_ball_str": "[-15.520141 +/- 1.65e-7]"
             },
             "euler_maclaurin_X_neg_5_2_bound_certified": {
               "mid_float": 0.03973860898715582,
@@ -16527,7 +16562,8 @@
               "upper_dec": "3.973861142739039121754890030651496007631e-2",
               "arb_ball_str": "[0.03973861 +/- 3.46e-9]"
             },
-            "satisfies_euler_maclaurin_bound": true
+            "satisfies_euler_maclaurin_bound": true,
+            "em_vs_direct_series_encloses_zero": true
           },
           {
             "X_label": "10",
@@ -16539,11 +16575,11 @@
               "arb_ball_str": "10.00000000000000000000000000000000000000"
             },
             "W_log_X_certified": {
-              "mid_float": -0.0001547899118758113,
-              "rad_float_outward": 4.884285880280005e-05,
-              "lower_dec": "-2.036327706786113409635208311151556667845e-4",
-              "upper_dec": "-1.059470530730112656329355897974066433467e-4",
-              "arb_ball_str": "[-0.0002 +/- 9.41e-5]"
+              "mid_float": -0.0001554179217406234,
+              "rad_float_outward": 2.1588587375075682e-12,
+              "lower_dec": "-1.554179238994821061205031701746497552143e-4",
+              "upper_dec": "-1.554179195817646578953322193150859098441e-4",
+              "arb_ball_str": "[-0.00015541792 +/- 3.90e-12]"
             },
             "leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified": {
               "mid_float": -0.00012186257060829082,
@@ -16553,25 +16589,32 @@
               "arb_ball_str": "[-0.0001218625706082908276554900700348010781509 +/- 2.87e-44]"
             },
             "remainder_after_leading_pole_certified": {
-              "mid_float": -3.2927341267520473e-05,
-              "rad_float_outward": 4.884285885964346e-05,
-              "lower_dec": "-8.177020012716393216883877595004453003967e-5",
-              "upper_dec": "1.591551759212298088336249510708437621036e-5",
-              "arb_ball_str": "[+/- 8.18e-5]"
+              "mid_float": -3.3555351132332554e-05,
+              "rad_float_outward": 2.158858728275217e-12,
+              "lower_dec": "-3.355535329119128185314488915705003333648e-5",
+              "upper_dec": "-3.355534897347382685171036026308347542003e-5",
+              "arb_ball_str": "[-3.355535e-5 +/- 3.30e-12]"
             },
             "X_pow_5_2_times_W_log_X_certified": {
-              "mid_float": -0.04894886803443102,
-              "rad_float_outward": 0.015445468190591784,
-              "lower_dec": "-6.439433622502280240719548416022023672333e-2",
-              "upper_dec": "-3.350339984383923774426213455084523672330e-2",
-              "arb_ball_str": "[+/- 0.0644]"
+              "mid_float": -0.04914746219101708,
+              "rad_float_outward": 6.826910756456209e-10,
+              "lower_dec": "-4.914746287370815566992304784355146565441e-2",
+              "upper_dec": "-4.914746150832600457820226185878927807287e-2",
+              "arb_ball_str": "[-0.049147462 +/- 8.74e-10]"
             },
             "X_pow_9_2_times_remainder_certified": {
-              "mid_float": -1.0412539569902037,
-              "rad_float_outward": 1.5445468220859768,
-              "lower_dec": "-2.585800779076180275094269266547747252947e+0",
-              "upper_dec": "5.032928650957729261996760459522527470546e-1",
-              "arb_ball_str": "[+/- 2.59]"
+              "mid_float": -1.0611133726488098,
+              "rad_float_outward": 6.826910780383881e-08,
+              "lower_dec": "-1.061113440917917379583492441151416076656e+0",
+              "upper_dec": "-1.061113304379701978977869878571605457299e+0",
+              "arb_ball_str": "[-1.0611134 +/- 9.57e-8]"
+            },
+            "X_pow_13_2_times_second_remainder_certified": {
+              "mid_float": -12.551046832045527,
+              "rad_float_outward": 6.826910777205819e-06,
+              "lower_dec": "-1.255105365895630427436249079283131123722e+1",
+              "upper_dec": "-1.255104000513475000294551933284653187928e+1",
+              "arb_ball_str": "[-12.5510 +/- 5.37e-5]"
             },
             "euler_maclaurin_X_neg_5_2_bound_certified": {
               "mid_float": 0.009295394894791574,
@@ -16580,7 +16623,8 @@
               "upper_dec": "9.295395374585216205465694930263721739017e-3",
               "arb_ball_str": "[0.009295395 +/- 5.86e-10]"
             },
-            "satisfies_euler_maclaurin_bound": true
+            "satisfies_euler_maclaurin_bound": true,
+            "em_vs_direct_series_encloses_zero": true
           },
           {
             "X_label": "16",
@@ -16592,11 +16636,11 @@
               "arb_ball_str": "16.00000000000000000000000000000000000000"
             },
             "W_log_X_certified": {
-              "mid_float": -4.103429241242486e-05,
-              "rad_float_outward": 1.0060989311000417e-05,
-              "lower_dec": "-5.109528172342527588091099800187791268538e-5",
-              "upper_dec": "-3.097330310142445133726352991182053963847e-5",
-              "arb_ball_str": "[+/- 5.11e-5]"
+              "mid_float": -4.137640839424623e-05,
+              "rad_float_outward": 1.2984592538043212e-12,
+              "lower_dec": "-4.137640969270547685827796290774745844600e-5",
+              "upper_dec": "-4.137640709578697413593836839490155230802e-5",
+              "arb_ball_str": "[-4.137641e-5 +/- 2.91e-12]"
             },
             "leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified": {
               "mid_float": -3.763313326614159e-05,
@@ -16606,25 +16650,32 @@
               "arb_ball_str": "[-3.763313326614158528442953442632350018932e-5 +/- 3.61e-45]"
             },
             "remainder_after_leading_pole_certified": {
-              "mid_float": -3.4011591462832783e-06,
-              "rad_float_outward": 1.0060989325211269e-05,
-              "lower_dec": "-1.346214847149454531168346729297689784762e-5",
-              "upper_dec": "6.659830178927988662368008231925445902394e-6",
-              "arb_ball_str": "[+/- 1.35e-5]"
+              "mid_float": -3.74327512810464e-06,
+              "rad_float_outward": 1.2984592531458106e-12,
+              "lower_dec": "-3.743276426563893267914322990024636393320e-6",
+              "upper_dec": "-3.743273829645387157442939459977373982072e-6",
+              "arb_ball_str": "[-3.74328e-6 +/- 6.18e-12]"
             },
             "X_pow_5_2_times_W_log_X_certified": {
-              "mid_float": -0.04201911543032306,
-              "rad_float_outward": 0.010302453098120173,
-              "lower_dec": "-5.232156852844322818715341737384485758983e-2",
-              "upper_dec": "-3.171666233220289248425729920978235758980e-2",
-              "arb_ball_str": "[+/- 0.0524]"
+              "mid_float": -0.04236944219570814,
+              "rad_float_outward": 1.329622279365072e-09,
+              "lower_dec": "-4.236944352533041177232358597114758627256e-2",
+              "upper_dec": "-4.236944086608585804575393728276500073956e-2",
+              "arb_ball_str": "[-0.04236944 +/- 3.53e-9]"
             },
             "X_pow_9_2_times_remainder_certified": {
-              "mid_float": -0.8915934632432837,
-              "rad_float_outward": 2.6374279931187634,
-              "lower_dec": "-3.529021456362046683109778975050135909365e+0",
-              "upper_dec": "1.745834529875479256831627274949864090638e+0",
-              "arb_ball_str": "[+/- 3.53]"
+              "mid_float": -0.9812771151818628,
+              "rad_float_outward": 3.40383303788923e-07,
+              "lower_dec": "-9.812774555651665690917618360848667910481e-1",
+              "upper_dec": "-9.812767747985590387330923716084602167986e-1",
+              "arb_ball_str": "[-0.981277 +/- 4.56e-7]"
+            },
+            "X_pow_13_2_times_second_remainder_certified": {
+              "mid_float": -11.69259797849815,
+              "rad_float_outward": 8.713812576396401e-05,
+              "lower_dec": "-1.169268511662391326659090607404678135117e+1",
+              "upper_dec": "-1.169251084037238549477152316808669834333e+1",
+              "arb_ball_str": "[-11.6926 +/- 8.92e-5]"
             },
             "euler_maclaurin_X_neg_5_2_bound_certified": {
               "mid_float": 0.0021591213750838736,
@@ -16633,7 +16684,8 @@
               "upper_dec": "2.159121467688896751898837958819174431020e-3",
               "arb_ball_str": "[0.002159121 +/- 4.68e-10]"
             },
-            "satisfies_euler_maclaurin_bound": true
+            "satisfies_euler_maclaurin_bound": true,
+            "em_vs_direct_series_encloses_zero": true
           },
           {
             "X_label": "25",
@@ -16645,11 +16697,11 @@
               "arb_ball_str": "25.00000000000000000000000000000000000000"
             },
             "W_log_X_certified": {
-              "mid_float": -1.2629362599759733e-05,
-              "rad_float_outward": 2.2361575418017323e-06,
-              "lower_dec": "-1.486552014156146445617223361827581170810e-5",
-              "upper_dec": "-1.039320505795800248466575721599309686432e-5",
-              "arb_ball_str": "[-1e-5 +/- 4.87e-6]"
+              "mid_float": -1.2819992242054383e-05,
+              "rad_float_outward": 2.8995764534522297e-13,
+              "lower_dec": "-1.281999253201202799508456448785978825364e-5",
+              "upper_dec": "-1.281999195209673807970957987946150940223e-5",
+              "arb_ball_str": "[-1.2819992e-5 +/- 5.33e-13]"
             },
             "leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified": {
               "mid_float": -1.2331625108649274e-05,
@@ -16659,25 +16711,32 @@
               "arb_ball_str": "[-1.233162510864927466600186984081768454204e-5 +/- 4.81e-45]"
             },
             "remainder_after_leading_pole_certified": {
-              "mid_float": -2.977374911104588e-07,
-              "rad_float_outward": 2.236157545354445e-06,
-              "lower_dec": "-2.533895036464903468970864706813748503941e-6",
-              "upper_dec": "1.938420054243985860136613554180209015593e-6",
-              "arb_ball_str": "[+/- 2.54e-6]"
+              "mid_float": -4.883671334051084e-07,
+              "rad_float_outward": 2.899576453937514e-13,
+              "lower_dec": "-4.883674233627537525991682741922732457526e-7",
+              "upper_dec": "-4.883668434474629901912364114936553260476e-7",
+              "arb_ball_str": "[-4.88367e-7 +/- 4.24e-13]"
             },
             "X_pow_5_2_times_W_log_X_certified": {
-              "mid_float": -0.039466758124249164,
-              "rad_float_outward": 0.006987992346694231,
-              "lower_dec": "-4.645475047094339440309425752913110714442e-2",
-              "upper_dec": "-3.247876577755493978702446382795923214439e-2",
-              "arb_ball_str": "[-0.04 +/- 7.53e-3]"
+              "mid_float": -0.04006247575641995,
+              "rad_float_outward": 9.061176442804959e-10,
+              "lower_dec": "-4.006247666253759058308578508079247860452e-2",
+              "upper_dec": "-4.006247485030230340064591606708657657007e-2",
+              "arb_ball_str": "[-0.04006248 +/- 5.15e-9]"
             },
             "X_pow_9_2_times_remainder_certified": {
-              "mid_float": -0.5815185373251148,
-              "rad_float_outward": 4.367495223879815,
-              "lower_dec": "-4.949013761204929000326417141243690906592e+0",
-              "upper_dec": "3.785976686554699295572020358756309093411e+0",
-              "arb_ball_str": "[+/- 4.95]"
+              "mid_float": -0.9538420574318522,
+              "rad_float_outward": 5.663235276750571e-07,
+              "lower_dec": "-9.538426237553799166349635715110304188952e-1",
+              "upper_dec": "-9.538414911083246591275455802192988229019e-1",
+              "arb_ball_str": "[-0.953842 +/- 6.24e-7]"
+            },
+            "X_pow_13_2_times_second_remainder_certified": {
+              "mid_float": -11.399470689686176,
+              "rad_float_outward": 0.0003539522053877568,
+              "lower_dec": "-1.139982464189156202337256991097998240455e+1",
+              "upper_dec": "-1.139911673748078796051926337907385447483e+1",
+              "arb_ball_str": "[-11.399 +/- 8.25e-4]"
             },
             "euler_maclaurin_X_neg_5_2_bound_certified": {
               "mid_float": 0.000548893584538824,
@@ -16698,11 +16757,11 @@
               "arb_ball_str": "[39.47841760435743447533796399950460454125 +/- 4.80e-39]"
             },
             "W_log_X_certified": {
-              "mid_float": -3.8928106558083545e-06,
-              "rad_float_outward": 4.789349627998264e-07,
-              "lower_dec": "-4.371745618608180790448109404127354371711e-6",
-              "upper_dec": "-3.413875693008528229671078518907780397099e-6",
-              "arb_ball_str": "[-4e-6 +/- 5.87e-7]"
+              "mid_float": -3.997013946585275e-06,
+              "rad_float_outward": 6.204786229698994e-14,
+              "lower_dec": "-3.997014008633136332958562214730110820186e-6",
+              "upper_dec": "-3.997013884537412478021894953035405886721e-6",
+              "arb_ball_str": "[-3.997014e-6 +/- 1.16e-13]"
             },
             "leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified": {
               "mid_float": -3.935237909160972e-06,
@@ -16712,25 +16771,32 @@
               "arb_ball_str": "[-3.935237909160972092439600592533740033350e-6 +/- 1.55e-46]"
             },
             "remainder_after_leading_pole_certified": {
-              "mid_float": 4.2427253352617584e-08,
-              "rad_float_outward": 4.789349636880048e-07,
-              "lower_dec": "-4.365077103353871177086340439325196728327e-7",
-              "upper_dec": "5.213622170406222824686473059648649707223e-7",
-              "arb_ball_str": "[+/- 5.22e-7]"
+              "mid_float": -6.177603742430231e-08,
+              "rad_float_outward": 6.2047862039309e-14,
+              "lower_dec": "-6.177609947216434639808002898391317037462e-8",
+              "upper_dec": "-6.177597537644027970317595371412346983272e-8",
+              "arb_ball_str": "[-6.1776e-8 +/- 9.95e-14]"
             },
             "X_pow_5_2_times_W_log_X_certified": {
-              "mid_float": -0.03812085407421624,
-              "rad_float_outward": 0.0046900328743504395,
-              "lower_dec": "-4.281088694856667349736339648229805968099e-2",
-              "upper_dec": "-3.343082119986580143372661669714180968096e-2",
-              "arb_ball_str": "[-0.04 +/- 6.57e-3]"
+              "mid_float": -0.03914127833652478,
+              "rad_float_outward": 6.076117538912144e-10,
+              "lower_dec": "-3.914127894413653572467526356462031831475e-2",
+              "upper_dec": "-3.914127772891303056699430254496975099175e-2",
+              "arb_ball_str": "[-0.03914128 +/- 2.28e-9]"
             },
             "X_pow_9_2_times_remainder_certified": {
-              "mid_float": 0.6475357233323348,
-              "rad_float_outward": 7.309629425406457,
-              "lower_dec": "-6.662093702074121235686613784539381329548e+0",
-              "upper_dec": "7.957165148738790751618073715460618670455e+0",
-              "arb_ball_str": "[+/- 7.96]"
+              "mid_float": -0.9428418744359518,
+              "rad_float_outward": 9.469905357921269e-07,
+              "lower_dec": "-9.428428214264875391474039184379403923883e-1",
+              "upper_dec": "-9.428409274454160067672479322629993294608e-1",
+              "arb_ball_str": "[-0.94284 +/- 2.83e-6]"
+            },
+            "X_pow_13_2_times_second_remainder_certified": {
+              "mid_float": -11.282263971253986,
+              "rad_float_outward": 0.0014759278055866203,
+              "lower_dec": "-1.128373989905957267700213811374342971761e+1",
+              "upper_dec": "-1.128078804344840017227906606174147659258e+1",
+              "arb_ball_str": "[-11.28 +/- 3.74e-3]"
             },
             "euler_maclaurin_X_neg_5_2_bound_certified": {
               "mid_float": 0.000138342008754341,
@@ -16751,11 +16817,11 @@
               "arb_ball_str": "64.00000000000000000000000000000000000000"
             },
             "W_log_X_certified": {
-              "mid_float": -1.12853295145654e-06,
-              "rad_float_outward": 9.320685523395165e-08,
-              "lower_dec": "-1.221739806690491507148533884076846376004e-6",
-              "upper_dec": "-1.035326096222588391762099519012940660058e-6",
-              "arb_ball_str": "[-1e-6 +/- 2.22e-7]"
+              "mid_float": -1.1830266355011186e-06,
+              "rad_float_outward": 1.218675328296586e-14,
+              "lower_dec": "-1.183026647687871840320884365649097279421e-6",
+              "upper_dec": "-1.183026623314365348919419954957828465682e-6",
+              "arb_ball_str": "[-1.1830266e-6 +/- 4.77e-14]"
             },
             "leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified": {
               "mid_float": -1.1760354145669246e-06,
@@ -16765,25 +16831,32 @@
               "arb_ball_str": "[-1.176035414566924540138422950822609380916e-6 +/- 1.38e-46]"
             },
             "remainder_after_leading_pole_certified": {
-              "mid_float": 4.750246311038459e-08,
-              "rad_float_outward": 9.320685534497387e-08,
-              "lower_dec": "-4.570439223458926947262658729660016189502e-8",
-              "upper_dec": "1.407093184553584508388390858520318876657e-7",
-              "arb_ball_str": "[+/- 1.41e-7]"
+              "mid_float": -6.991220934194055e-09,
+              "rad_float_outward": 1.2186753259124032e-14,
+              "lower_dec": "-6.991233120947313417351215674930696445753e-9",
+              "upper_dec": "-6.991208747440795546107203286776286825040e-9",
+              "arb_ball_str": "[-6.9912e-9 +/- 3.32e-14]"
             },
             "X_pow_5_2_times_W_log_X_certified": {
-              "mid_float": -0.036979767753327904,
-              "rad_float_outward": 0.003054202243220064,
-              "lower_dec": "-4.003396999654796212751829716841057079885e-2",
-              "upper_dec": "-3.392556551010783999998533818403557079882e-2",
-              "arb_ball_str": "[-0.04 +/- 6.08e-3]"
+              "mid_float": -0.03876541679210065,
+              "rad_float_outward": 3.993355328772679e-10,
+              "lower_dec": "-3.876541719143618576467734587619494046097e-2",
+              "upper_dec": "-3.876541639276512245234894610145280235457e-2",
+              "arb_ball_str": "[-0.038765417 +/- 6.08e-10]"
             },
             "X_pow_9_2_times_remainder_certified": {
-              "mid_float": 6.375672673079633,
-              "rad_float_outward": 12.510012388229372,
-              "lower_dec": "-6.134339715149737149491011239343335853981e+0",
-              "upper_dec": "1.888568506130900308488398876065666414604e+1",
-              "arb_ball_str": "[+/- 18.9]"
+              "mid_float": -0.9383457897335635,
+              "rad_float_outward": 1.6356783376889365e-06,
+              "lower_dec": "-9.383474254119011672944747464281139900280e-1",
+              "upper_dec": "-9.383441540552258399973492690843163063119e-1",
+              "arb_ball_str": "[-0.93835 +/- 5.85e-6]"
+            },
+            "X_pow_13_2_times_second_remainder_certified": {
+              "mid_float": -11.234858619736457,
+              "rad_float_outward": 0.006699738485622852,
+              "lower_dec": "-1.124155835822207841899494480249566926489e+1",
+              "upper_dec": "-1.122815888125083397951225589868707551486e+1",
+              "arb_ball_str": "[-11.2 +/- 0.0416]"
             },
             "euler_maclaurin_X_neg_5_2_bound_certified": {
               "mid_float": 3.327944372195909e-05,
@@ -16791,6 +16864,186 @@
               "lower_dec": "3.327944299848234630290713101184497038342e-5",
               "upper_dec": "3.327944444543583472588883223429224092184e-5",
               "arb_ball_str": "[3.327944e-5 +/- 4.45e-12]"
+            },
+            "satisfies_euler_maclaurin_bound": true
+          },
+          {
+            "X_label": "128",
+            "X_certified": {
+              "mid_float": 128.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "1.279999999999999999999999999999999999999e+2",
+              "upper_dec": "1.280000000000000000000000000000000000001e+2",
+              "arb_ball_str": "128.0000000000000000000000000000000000000"
+            },
+            "W_log_X_certified": {
+              "mid_float": -2.0820394766845778e-07,
+              "rad_float_outward": 1.167435379816404e-15,
+              "lower_dec": "-2.082039488358931576000114782417487032772e-7",
+              "upper_dec": "-2.082039465010224234305724784350662256545e-7",
+              "arb_ball_str": "[-2.0820395e-7 +/- 3.50e-15]"
+            },
+            "leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified": {
+              "mid_float": -2.0789565413895124e-07,
+              "rad_float_outward": 1.2261967649041804e-23,
+              "lower_dec": "-2.078956541389512539605915044987871492694e-7",
+              "upper_dec": "-2.078956541389512539605915044987871492691e-7",
+              "arb_ball_str": "[-2.078956541389512539605915044987871492692e-7 +/- 3.99e-47]"
+            },
+            "remainder_after_leading_pole_certified": {
+              "mid_float": -3.0829352950653655e-10,
+              "rad_float_outward": 1.1674353687435084e-15,
+              "lower_dec": "-3.082946969419052937811988490169037505932e-10",
+              "upper_dec": "-3.082923620711678156197488302237266425699e-10",
+              "arb_ball_str": "[-3.0829e-10 +/- 4.70e-15]"
+            },
+            "X_pow_5_2_times_W_log_X_certified": {
+              "mid_float": -0.03859347492468833,
+              "rad_float_outward": 2.1640025836867515e-10,
+              "lower_dec": "-3.859347514108858688875887989896839044628e-2",
+              "upper_dec": "-3.859347470828807271138057612833037765334e-2",
+              "arb_ball_str": "[-0.038593475 +/- 2.92e-10]"
+            },
+            "X_pow_9_2_times_remainder_certified": {
+              "mid_float": -0.9362876032507326,
+              "rad_float_outward": 3.545501819271113e-06,
+              "lower_dec": "-9.362911487525517915571100158345192306655e-1",
+              "upper_dec": "-9.362840577489132985362658356976002090587e-1",
+              "arb_ball_str": "[-0.93629 +/- 5.95e-6]"
+            },
+            "X_pow_13_2_times_second_remainder_certified": {
+              "mid_float": -11.2181071442434,
+              "rad_float_outward": 0.058089501806535,
+              "lower_dec": "-1.127619664604993393408256575729957716407e+1",
+              "upper_dec": "-1.116001764243686428057151839401832716404e+1",
+              "arb_ball_str": "[-11.2 +/- 0.0762]"
+            },
+            "euler_maclaurin_X_neg_5_2_bound_certified": {
+              "mid_float": 4.600204618231882e-06,
+              "rad_float_outward": 6.394691465390587e-14,
+              "lower_dec": "4.600204554284967433159233548661089017308e-6",
+              "upper_dec": "4.600204682178795917430129700891712261206e-6",
+              "arb_ball_str": "[4.6002046e-6 +/- 8.22e-14]"
+            },
+            "satisfies_euler_maclaurin_bound": true
+          },
+          {
+            "X_label": "256",
+            "X_certified": {
+              "mid_float": 256.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "2.559999999999999999999999999999999999999e+2",
+              "upper_dec": "2.560000000000000000000000000000000000001e+2",
+              "arb_ball_str": "256.0000000000000000000000000000000000000"
+            },
+            "W_log_X_certified": {
+              "mid_float": -3.6764724019260566e-08,
+              "rad_float_outward": 1.1116635865111649e-16,
+              "lower_dec": "-3.676472413042692051524517912520841592582e-8",
+              "upper_dec": "-3.676472390809420775568103894829669578877e-8",
+              "arb_ball_str": "[-3.6764724e-8 +/- 1.31e-16]"
+            },
+            "leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified": {
+              "mid_float": -3.6751106705216395e-08,
+              "rad_float_outward": 2.8879319057826675e-24,
+              "lower_dec": "-3.675110670521639187932571721320654315364e-8",
+              "upper_dec": "-3.675110670521639187932571721320654315361e-8",
+              "arb_ball_str": "[-3.675110670521639187932571721320654315363e-8 +/- 7.10e-49]"
+            },
+            "remainder_after_leading_pole_certified": {
+              "mid_float": -1.3617314044172257e-11,
+              "rad_float_outward": 1.11166356587134e-16,
+              "lower_dec": "-1.361742521052884271461505025879149002767e-11",
+              "upper_dec": "-1.361720287781566956016859683323391730257e-11",
+              "arb_ball_str": "[-1.3617e-11 +/- 4.26e-16]"
+            },
+            "X_pow_5_2_times_W_log_X_certified": {
+              "mid_float": -0.03855060725322017,
+              "rad_float_outward": 1.16566376122634e-10,
+              "lower_dec": "-3.855060736978653903987459794059631354081e-2",
+              "upper_dec": "-3.855060713665379155794013210204738248042e-2",
+              "arb_ball_str": "[-0.038550607 +/- 3.70e-10]"
+            },
+            "X_pow_9_2_times_remainder_certified": {
+              "mid_float": -0.9357746956653015,
+              "rad_float_outward": 7.639293897948e-06,
+              "lower_dec": "-9.357823349591993417481376394656448458861e-1",
+              "upper_dec": "-9.357670563714035222721236363080291842647e-1",
+              "arb_ball_str": "[-0.9358 +/- 3.30e-5]"
+            },
+            "X_pow_13_2_times_second_remainder_certified": {
+              "mid_float": -11.258517058160173,
+              "rad_float_outward": 0.5006487648934133,
+              "lower_dec": "-1.175916582305358505551660531864662775484e+1",
+              "upper_dec": "-1.075786829326675987546289438114662775481e+1",
+              "arb_ball_str": "[-1.1e+1 +/- 0.760]"
+            },
+            "euler_maclaurin_X_neg_5_2_bound_certified": {
+              "mid_float": 6.852167707070753e-07,
+              "rad_float_outward": 5.652162090870625e-15,
+              "lower_dec": "6.852167650549133002675732627372063364290e-7",
+              "upper_dec": "6.852167763592374285721178035375756375105e-7",
+              "arb_ball_str": "[6.8521677e-7 +/- 6.36e-15]"
+            },
+            "satisfies_euler_maclaurin_bound": true
+          },
+          {
+            "X_label": "512",
+            "X_certified": {
+              "mid_float": 512.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "5.119999999999999999999999999999999999999e+2",
+              "upper_dec": "5.120000000000000000000000000000000000001e+2",
+              "arb_ball_str": "512.0000000000000000000000000000000000000"
+            },
+            "W_log_X_certified": {
+              "mid_float": -6.4973409159101e-09,
+              "rad_float_outward": 1.0531032673273463e-17,
+              "lower_dec": "-6.497340926441132625460441334873147137612e-9",
+              "upper_dec": "-6.497340905379067914271871253590024171061e-9",
+              "arb_ball_str": "[-6.4973409e-9 +/- 2.65e-17]"
+            },
+            "leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified": {
+              "mid_float": -6.496739191842226e-09,
+              "rad_float_outward": 3.831864890325564e-25,
+              "lower_dec": "-6.496739191842226686268484515587098414665e-9",
+              "upper_dec": "-6.496739191842226686268484515587098414662e-9",
+              "arb_ball_str": "[-6.496739191842226686268484515587098414664e-9 +/- 2.54e-49]"
+            },
+            "remainder_after_leading_pole_certified": {
+              "mid_float": -6.017240678735836e-13,
+              "rad_float_outward": 1.0531032368543924e-17,
+              "lower_dec": "-6.017345989059521166538904271061428124404e-13",
+              "upper_dec": "-6.017135368412150786896668618683365330913e-13",
+              "arb_ball_str": "[-6.017e-13 +/- 3.46e-17]"
+            },
+            "X_pow_5_2_times_W_log_X_certified": {
+              "mid_float": -0.038539897676042614,
+              "rad_float_outward": 6.246631126659005e-11,
+              "lower_dec": "-3.853989773850892556060194478834877323304e-2",
+              "upper_dec": "-3.853989761357630553880988240695491136343e-2",
+              "arb_ball_str": "[-0.0385398977 +/- 8.65e-11]"
+            },
+            "X_pow_9_2_times_remainder_certified": {
+              "mid_float": -0.9356473830296043,
+              "rad_float_outward": 1.637516839992878e-05,
+              "lower_dec": "-9.356637581980041914138714030610684081059e-1",
+              "upper_dec": "-9.356310078612043553366096869336727782228e-1",
+              "arb_ball_str": "[-0.9356 +/- 6.38e-5]"
+            },
+            "X_pow_13_2_times_second_remainder_certified": {
+              "mid_float": -11.659824660444738,
+              "rad_float_outward": 4.292652145028116,
+              "lower_dec": "-1.595247680547285099617814523330080558005e+1",
+              "upper_dec": "-7.367172515416622358482832733300805580031e+0",
+              "arb_ball_str": "[-1e+1 +/- 5.96]"
+            },
+            "euler_maclaurin_X_neg_5_2_bound_certified": {
+              "mid_float": 1.0852639219453945e-07,
+              "rad_float_outward": 4.995852692636184e-16,
+              "lower_dec": "1.085263916949541885419903351102009036929e-7",
+              "upper_dec": "1.085263926941247235753567112995026477861e-7",
+              "arb_ball_str": "[1.08526392e-7 +/- 6.95e-16]"
             },
             "satisfies_euler_maclaurin_bound": true
           }
@@ -17216,6 +17469,9 @@
         "psi0_series_verified": true,
         "poly_coeffs_verified": true,
         "antideriv_L_verified": true,
+        "peano_kernel_boundary_and_signs_verified": true,
+        "em_leading_pieces_verified": true,
+        "tail_domination_alpha_ge_20_verified": true,
         "subcritical_supercritical_coeff_cancellation_verified_n_2_to_400": true,
         "head_sum_bound_identity_verified": true,
         "all_verified": true
@@ -17230,8 +17486,8 @@
       }
     },
     "full_section_18_tree_roundtrip_verification": {
-      "total_certified_arb_balls_checked": 213,
-      "compared_against_live_original_arb_count": 213,
+      "total_certified_arb_balls_checked": 246,
+      "compared_against_live_original_arb_count": 246,
       "live_original_count_matches_enumerated_total": true,
       "all_enclose_original_256bit_arb_ball": true,
       "failed_paths": [],
@@ -17344,6 +17600,7 @@
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[0].remainder_after_leading_pole_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[0].X_pow_5_2_times_W_log_X_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[0].X_pow_9_2_times_remainder_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[0].X_pow_13_2_times_second_remainder_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[0].euler_maclaurin_X_neg_5_2_bound_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[1].X_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[1].W_log_X_certified",
@@ -17351,6 +17608,7 @@
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[1].remainder_after_leading_pole_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[1].X_pow_5_2_times_W_log_X_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[1].X_pow_9_2_times_remainder_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[1].X_pow_13_2_times_second_remainder_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[1].euler_maclaurin_X_neg_5_2_bound_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[2].X_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[2].W_log_X_certified",
@@ -17358,6 +17616,7 @@
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[2].remainder_after_leading_pole_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[2].X_pow_5_2_times_W_log_X_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[2].X_pow_9_2_times_remainder_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[2].X_pow_13_2_times_second_remainder_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[2].euler_maclaurin_X_neg_5_2_bound_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[3].X_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[3].W_log_X_certified",
@@ -17365,6 +17624,7 @@
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[3].remainder_after_leading_pole_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[3].X_pow_5_2_times_W_log_X_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[3].X_pow_9_2_times_remainder_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[3].X_pow_13_2_times_second_remainder_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[3].euler_maclaurin_X_neg_5_2_bound_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[4].X_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[4].W_log_X_certified",
@@ -17372,6 +17632,7 @@
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[4].remainder_after_leading_pole_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[4].X_pow_5_2_times_W_log_X_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[4].X_pow_9_2_times_remainder_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[4].X_pow_13_2_times_second_remainder_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[4].euler_maclaurin_X_neg_5_2_bound_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[5].X_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[5].W_log_X_certified",
@@ -17379,6 +17640,7 @@
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[5].remainder_after_leading_pole_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[5].X_pow_5_2_times_W_log_X_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[5].X_pow_9_2_times_remainder_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[5].X_pow_13_2_times_second_remainder_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[5].euler_maclaurin_X_neg_5_2_bound_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[6].X_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[6].W_log_X_certified",
@@ -17386,6 +17648,7 @@
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[6].remainder_after_leading_pole_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[6].X_pow_5_2_times_W_log_X_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[6].X_pow_9_2_times_remainder_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[6].X_pow_13_2_times_second_remainder_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[6].euler_maclaurin_X_neg_5_2_bound_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[7].X_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[7].W_log_X_certified",
@@ -17393,6 +17656,7 @@
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[7].remainder_after_leading_pole_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[7].X_pow_5_2_times_W_log_X_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[7].X_pow_9_2_times_remainder_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[7].X_pow_13_2_times_second_remainder_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[7].euler_maclaurin_X_neg_5_2_bound_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[8].X_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[8].W_log_X_certified",
@@ -17400,7 +17664,32 @@
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[8].remainder_after_leading_pole_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[8].X_pow_5_2_times_W_log_X_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[8].X_pow_9_2_times_remainder_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[8].X_pow_13_2_times_second_remainder_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[8].euler_maclaurin_X_neg_5_2_bound_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[9].X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[9].W_log_X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[9].leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[9].remainder_after_leading_pole_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[9].X_pow_5_2_times_W_log_X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[9].X_pow_9_2_times_remainder_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[9].X_pow_13_2_times_second_remainder_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[9].euler_maclaurin_X_neg_5_2_bound_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[10].X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[10].W_log_X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[10].leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[10].remainder_after_leading_pole_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[10].X_pow_5_2_times_W_log_X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[10].X_pow_9_2_times_remainder_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[10].X_pow_13_2_times_second_remainder_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[10].euler_maclaurin_X_neg_5_2_bound_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[11].X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[11].W_log_X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[11].leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[11].remainder_after_leading_pole_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[11].X_pow_5_2_times_W_log_X_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[11].X_pow_9_2_times_remainder_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[11].X_pow_13_2_times_second_remainder_certified",
+        "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.w_log_asymptotic_table[11].euler_maclaurin_X_neg_5_2_bound_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[0].X_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[0].R_mu_total_certified",
         "section_18.section_3_w_log_large_scale_decay_and_resonant_band_reduction.certified_audit_data.resonant_band_table[0].R_mu_head_2_to_M_minus_certified",

@@ -896,6 +896,9 @@ def test_10_task_tc049_arithmetic_cancellation_and_resonant_band_reduction():
     assert sym49["psi0_series_verified"] is True
     assert sym49["poly_coeffs_verified"] is True
     assert sym49["antideriv_L_verified"] is True
+    assert sym49["peano_kernel_boundary_and_signs_verified"] is True
+    assert sym49["em_leading_pieces_verified"] is True
+    assert sym49["tail_domination_alpha_ge_20_verified"] is True
     assert sym49["subcritical_supercritical_coeff_cancellation_verified_n_2_to_400"] is True
     assert sym49["head_sum_bound_identity_verified"] is True
     assert sym49["all_verified"] is True
@@ -993,6 +996,46 @@ def test_10_task_tc049_arithmetic_cancellation_and_resonant_band_reduction():
         row["satisfies_euler_maclaurin_bound"]
         for row in s3_18["w_log_asymptotic_table"]
     )
+    assert len(s3_18["w_log_asymptotic_table"]) == 12
+    for row in s3_18["w_log_asymptotic_table"][:6]:
+        assert row["em_vs_direct_series_encloses_zero"] is True
+
+    # Regression checks at X = 128 and larger scales (X in {64, 128, 256, 512}):
+    c_lead = s3_18["leading_pole_coeff_neg_81_zeta3_over_256_pi2_certified"]["mid_float"]
+    c_sub = s3_18["subleading_pole_coeff_neg_5625_zeta5_over_64_pi4_certified"]["mid_float"]
+    by_label = {r["X_label"]: r for r in s3_18["w_log_asymptotic_table"]}
+    assert math.isclose(
+        by_label["128"]["X_pow_5_2_times_W_log_X_certified"]["mid_float"],
+        -0.03859347492468833,
+        rel_tol=1e-12,
+    )
+    assert math.isclose(
+        by_label["128"]["X_pow_9_2_times_remainder_certified"]["mid_float"],
+        -0.9362876032507326,
+        rel_tol=1e-12,
+    )
+    assert math.isclose(
+        by_label["512"]["X_pow_5_2_times_W_log_X_certified"]["mid_float"],
+        -0.038539897676042614,
+        rel_tol=1e-12,
+    )
+    assert math.isclose(
+        by_label["512"]["X_pow_9_2_times_remainder_certified"]["mid_float"],
+        -0.9356473830296043,
+        rel_tol=1e-12,
+    )
+    high_scale_labels = ("16", "25", "tau^2", "64", "128", "256", "512")
+    lead_gaps = [
+        abs(by_label[lbl]["X_pow_5_2_times_W_log_X_certified"]["mid_float"] - c_lead)
+        for lbl in high_scale_labels
+    ]
+    sub_gaps = [
+        abs(by_label[lbl]["X_pow_9_2_times_remainder_certified"]["mid_float"] - c_sub)
+        for lbl in high_scale_labels
+    ]
+    assert all(lead_gaps[i + 1] < lead_gaps[i] for i in range(len(lead_gaps) - 1))
+    assert all(sub_gaps[i + 1] < sub_gaps[i] for i in range(len(sub_gaps) - 1))
+
     assert all(
         row["head_satisfies_global_bound"]
         and row["tail_satisfies_half_C_log_0_bound"]
@@ -1000,6 +1043,11 @@ def test_10_task_tc049_arithmetic_cancellation_and_resonant_band_reduction():
         and row["three_zone_decomposition_encloses_zero"]
         for row in s3_18["resonant_band_table"]
     )
+
+    s3_meta = sec18[
+        "section_3_w_log_large_scale_decay_and_resonant_band_reduction"
+    ]["cancellation_mechanism_2_higher_order_stirling_and_mellin_cancellation"]
+    assert "external_analytic_bounds_vs_lean_deductive_verification" in s3_meta
 
     s4_18 = sec18["section_4_outcome_and_remaining_obligation"]
     assert s4_18["symbolic_identities_verification"]["all_verified"] is True
@@ -1013,6 +1061,7 @@ def test_10_task_tc049_arithmetic_cancellation_and_resonant_band_reduction():
     assert rt18["all_enclose_original_256bit_arb_ball"] is True
     assert rt18["live_original_count_matches_enumerated_total"] is True
     enum18 = verify_all_serialized_arb_in_tree(sec18, path_prefix="section_18")
+    assert enum18["total_certified_arb_balls_checked"] == 246
     assert (
         rt18["compared_against_live_original_arb_count"]
         == enum18["total_certified_arb_balls_checked"]

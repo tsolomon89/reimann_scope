@@ -2293,6 +2293,80 @@ def verify_symbolic_tc049_prime_increment_and_w_log_asymptotic_identities() -> D
         sp.simplify(sp.diff(F3_al, al) + psi0_d3 / al - L_al) == 0
     )
 
+    # Verify 4th-order Euler-Maclaurin Peano kernel identity and signs on [k, k+1]:
+    #   With P_4(t) = (1/24) t^2 (1 - t)^2:
+    #     P_4(0) = P_4(1) = P_4'(0) = P_4'(1) = 0,
+    #     P_4''(0) = P_4''(1) = +1/12,
+    #     P_4'''(0) = -1/2,   P_4'''(1) = +1/2,   P_4^{(4)}(t) = 1.
+    #   Hence on [N_0, infty):
+    #     sum_{k=N_0+1}^infty g_X(k) = int_{N_0}^infty g_X(x) dx - (1/2) g_X(N_0) - (1/12) g_X'(N_0)
+    #                                  - (1/24) int_{N_0}^infty {x}^2 (1 - {x})^2 g_X^{(4)}(x) dx.
+    t_sym = sp.Symbol("t", real=True)
+    P4_t = sp.Rational(1, 24) * t_sym**2 * (1 - t_sym) ** 2
+    P4_d1 = sp.diff(P4_t, t_sym)
+    P4_d2 = sp.diff(P4_d1, t_sym)
+    P4_d3 = sp.diff(P4_d2, t_sym)
+    P4_d4 = sp.diff(P4_d3, t_sym)
+    peano_kernel_boundary_and_signs_verified = bool(
+        P4_t.subs(t_sym, 0) == 0
+        and P4_t.subs(t_sym, 1) == 0
+        and P4_d1.subs(t_sym, 0) == 0
+        and P4_d1.subs(t_sym, 1) == 0
+        and P4_d2.subs(t_sym, 0) == sp.Rational(1, 12)
+        and P4_d2.subs(t_sym, 1) == sp.Rational(1, 12)
+        and P4_d3.subs(t_sym, 0) == -sp.Rational(1, 2)
+        and P4_d3.subs(t_sym, 1) == sp.Rational(1, 2)
+        and sp.simplify(P4_d4 - 1) == 0
+    )
+
+    # Verify leading X^{-5/2} Euler-Maclaurin decomposition pieces on [1, infty) for f(x) = x^2 log x:
+    #   -int_0^1 x^2 log x dx = +1/9,   -(1/12) f'(1) = -1/12,   f^{(4)}(x) = -2/x^2,
+    #   so (-81/64) * [ -int_0^1 f(x) dx - (1/12) f'(1) - (1/24) int_1^infty {x}^2(1-{x})^2 f^{(4)}(x) dx ]
+    #    = (-81/64) * [ 1/9 - 1/12 + (1/12) int_1^infty {x}^2(1-{x})^2 x^{-2} dx ]
+    #    = -9/64 + 27/256 - (27/256) int_1^infty {x}^2(1-{x})^2 x^{-2} dx = -(81 * zeta(3)) / (256 * pi^2).
+    x_sym = sp.Symbol("x", positive=True)
+    f_lead = x_sym**2 * sp.log(x_sym)
+    em_leading_pieces_verified = bool(
+        -sp.integrate(f_lead, (x_sym, 0, 1)) == sp.Rational(1, 9)
+        and -sp.Rational(1, 12) * sp.diff(f_lead, x_sym).subs(x_sym, 1)
+        == -sp.Rational(1, 12)
+        and sp.simplify(sp.diff(f_lead, x_sym, 4) + 2 / x_sym**2) == 0
+    )
+
+    # Verify exact polynomial tail domination for alpha >= 20 (u = alpha^2 = 400 + w, w >= 0):
+    #   0 < -psi_0^{(4)}(alpha) <= (3645/8) alpha^{-7}   and   0 < L(alpha) <= (13851/32) alpha^{-7}
+    #   by checking that -P_{d4}(400+w), 233280*(400+w)^9 - (-P_{d4}(400+w)),
+    #   p_L(400+w), and 221616*(400+w)^9 - p_L(400+w) all have strictly positive coefficients in w >= 0,
+    #   and that integrating (1/384)*((3645/8)*log(x) + 13851/32)*alpha^{-7} over x >= N_0 = alpha_0 * X
+    #   equals ((14580*log(N_0) + 16281) / (73728 * alpha_0^6)) * X^{-7/2}.
+    w_sym = sp.Symbol("w", nonnegative=True)
+    p4_expr = p_d4_u.as_expr()
+    pL_expr = p_L_u.as_expr()
+    tail_domination_alpha_ge_20_verified = bool(
+        all(c > 0 for c in sp.Poly((-p4_expr).subs(u, w_sym + 400), w_sym).all_coeffs())
+        and all(
+            c > 0
+            for c in sp.Poly(
+                (233280 * u**9 - (-p4_expr)).subs(u, w_sym + 400), w_sym
+            ).all_coeffs()
+        )
+        and all(c > 0 for c in sp.Poly(pL_expr.subs(u, w_sym + 400), w_sym).all_coeffs())
+        and all(
+            c > 0
+            for c in sp.Poly(
+                (221616 * u**9 - pL_expr).subs(u, w_sym + 400), w_sym
+            ).all_coeffs()
+        )
+        and sp.Rational(1, 384)
+        * (
+            sp.Rational(3645, 8)
+            * (N_sym + sp.Rational(1, 6))
+            + sp.Rational(13851, 32)
+        )
+        / 6
+        == (14580 * N_sym + 16281) / 73728
+    )
+
     # 3. Subcritical sieve-defect vs. supercritical prime-increment coefficient cancellation identity:
     #    Delta_{y_1}(n) - sum_{y_1 < p <= y_2, p | n} lambda_{p^-}(n / p) == Delta_{y_2}(n)
     y1_test, y2_test = 10, 40
@@ -2334,6 +2408,9 @@ def verify_symbolic_tc049_prime_increment_and_w_log_asymptotic_identities() -> D
         "psi0_series_verified": psi0_series_verified,
         "poly_coeffs_verified": poly_coeffs_verified,
         "antideriv_L_verified": antideriv_L_verified,
+        "peano_kernel_boundary_and_signs_verified": peano_kernel_boundary_and_signs_verified,
+        "em_leading_pieces_verified": em_leading_pieces_verified,
+        "tail_domination_alpha_ge_20_verified": tail_domination_alpha_ge_20_verified,
         "subcritical_supercritical_coeff_cancellation_verified_n_2_to_400": coeff_cancellation_all_zero,
         "head_sum_bound_identity_verified": head_sum_bound_identity_verified,
         "all_verified": bool(
@@ -2343,6 +2420,9 @@ def verify_symbolic_tc049_prime_increment_and_w_log_asymptotic_identities() -> D
             and psi0_series_verified
             and poly_coeffs_verified
             and antideriv_L_verified
+            and peano_kernel_boundary_and_signs_verified
+            and em_leading_pieces_verified
+            and tail_domination_alpha_ge_20_verified
             and coeff_cancellation_all_zero
             and head_sum_bound_identity_verified
         ),
@@ -2890,22 +2970,32 @@ def certify_w_log_large_scale_decay_and_resonant_band_reduction_arb(
             small_divisor_head_bound_em_arb + half_c_log_0_arb
         )
 
-        # Helper to evaluate W_log(X) to high accuracy at any X >= 1 via zero-moment Euler-Maclaurin:
+        # Helper to evaluate W_log(X) to high accuracy at any X >= 1 via zero-moment 4th-order Euler-Maclaurin:
+        #   W_log(X) = sum_{k=2}^{N_0} g_X(k) - int_0^{N_0} g_X(x) dx - (1/2) g_X(N_0) - (1/12) g_X'(N_0)
+        #              - (1/24) int_{N_0}^infty {x}^2 (1 - {x})^2 g_X^{(4)}(x) dx,
+        # where for N_0 >= 20 X (alpha_{N_0} = N_0 / X >= 20), the exact polynomial tail domination
+        #   0 < -psi_0^{(4)}(alpha) <= (3645/8) alpha^{-7},   0 < L(alpha) <= (13851/32) alpha^{-7}
+        # proves unconditionally:
+        #   |(1/24) int_{N_0}^infty {x}^2 (1 - {x})^2 g_X^{(4)}(x) dx|
+        #     <= ((14580 * log(N_0) + 16281) / (73728 * alpha_{N_0}^6)) * X^{-7/2}.
         from tc.canonical_theta_correlation_bound import evaluate_h0_acb
 
         def _eval_w_log_em_sharp_arb(X_a: arb) -> arb:
             x_mid = float(X_a.mid())
-            if x_mid <= 8.0:
-                return evaluate_w_log_divisor_aggregated_certified_arb(
-                    X_a, k_max=5000, prec_bits=prec_bits
-                )["enclosure_arb"]
-            N0 = max(160, int(16 * x_mid))
+            ceil_20x = (arb(20) * X_a).upper().ceil().unique_fmpz()
+            if ceil_20x is None:
+                raise RuntimeError(f"Non-unique integer ceiling for 20*X: {X_a}")
+            N0 = max(240, int(ceil_20x))
+            N0_a = arb(N0)
+            al_N0 = N0_a / X_a
+            if not bool(al_N0 >= arb(20)):
+                raise RuntimeError(f"Euler-Maclaurin cutoff N0={N0} failed al_N0 >= 20 for X={X_a}")
             s_part = arb(0)
             for k in range(2, N0 + 1):
                 k_a = arb(k)
                 s_part += (k_a.log() / k_a.sqrt()) * evaluate_h0_arb(k_a / X_a)
-            eps_b = arb("1e-8")
-            tol_i = 2**(-80)
+            eps_b = arb("1e-10")
+            tol_i = 2**(-90)
 
             def _f_g(x_c: acb, analytic: bool = False, xc: acb = acb(X_a)) -> acb:
                 return (
@@ -2914,6 +3004,8 @@ def certify_w_log_large_scale_decay_and_resonant_band_reduction_arb(
                     * evaluate_h0_acb(x_c / xc, analytic=analytic)
                 )
 
+            mid_1 = max(2.0, x_mid)
+            mid_2 = max(8.0, 4.0 * x_mid)
             int_0_N0 = (
                 acb.integral(
                     _f_g, acb(eps_b), acb("0.25"), rel_tol=tol_i, abs_tol=tol_i
@@ -2922,18 +3014,18 @@ def certify_w_log_large_scale_decay_and_resonant_band_reduction_arb(
                     _f_g, acb("0.25"), acb(1), rel_tol=tol_i, abs_tol=tol_i
                 ).real
                 + acb.integral(
-                    _f_g, acb(1), acb(X_a.mid()), rel_tol=tol_i, abs_tol=tol_i
+                    _f_g, acb(1), acb(mid_1), rel_tol=tol_i, abs_tol=tol_i
                 ).real
                 + acb.integral(
                     _f_g,
-                    acb(X_a.mid()),
-                    acb((arb(4) * X_a).mid()),
+                    acb(mid_1),
+                    acb(mid_2),
                     rel_tol=tol_i,
                     abs_tol=tol_i,
                 ).real
                 + acb.integral(
                     _f_g,
-                    acb((arb(4) * X_a).mid()),
+                    acb(mid_2),
                     acb(N0),
                     rel_tol=tol_i,
                     abs_tol=tol_i,
@@ -2946,8 +3038,6 @@ def certify_w_log_large_scale_decay_and_resonant_band_reduction_arb(
                 * (arb(3) * (arb(1) / eps_b).log() + arb(1))
                 / arb(9)
             )
-            N0_a = arb(N0)
-            al_N0 = N0_a / X_a
             u_N0 = al_N0 * al_N0
             op_N0 = arb(1) + u_N0
             psi0_N0 = (al_N0 ** arb("-0.5")) * evaluate_h0_arb(al_N0)
@@ -2960,21 +3050,21 @@ def certify_w_log_large_scale_decay_and_resonant_band_reduction_arb(
             gp_N0 = (X_a ** arb("-1.5")) * (
                 N0_a.log() * psi0_d1_N0 + psi0_N0 / al_N0
             )
-            # Remainder on [N0, infty) where al >= N0/X >= 16:
+            # Proved analytic remainder bound on [N0, infty) where al >= N0/X >= 20:
             rem_N0_bound = (
                 (X_a ** arb("-3.5"))
-                * (c_em_log_coeff_arb * N0_a.log() + c_em_const_coeff_arb)
-                / (al_N0**2)
+                * (arb(14580) * N0_a.log() + arb(16281))
+                / (arb(73728) * (al_N0**6))
             )
             return (
                 s_part
                 - int_0_N0
                 - arb("0.5") * g_N0
-                + gp_N0 / arb(12)
+                - gp_N0 / arb(12)
                 + arb(0, (eps_0_err + rem_N0_bound).upper())
             )
 
-        # Certify W_log(X) large-scale decay across sample scales X in {1, 2, 4, tau, 10, 16, 25, tau^2, 64}:
+        # Certify W_log(X) large-scale decay across sample scales X in {1, 2, 4, tau, 10, 16, 25, tau^2, 64, 128, 256, 512}:
         w_log_asymptotic_table: List[Dict[str, Any]] = []
         for x_label, x_arb in (
             ("1", arb(1)),
@@ -2986,42 +3076,57 @@ def certify_w_log_large_scale_decay_and_resonant_band_reduction_arb(
             ("25", arb(25)),
             ("tau^2", tau_arb**2),
             ("64", arb(64)),
+            ("128", arb(128)),
+            ("256", arb(256)),
+            ("512", arb(512)),
         ):
             w_log_val = _eval_w_log_em_sharp_arb(x_arb)
             lead_term = c_lead_z_neg_5_2_arb * (x_arb ** arb("-2.5"))
+            sublead_term = c_sublead_z_neg_9_2_arb * (x_arb ** arb("-4.5"))
             rem_after_lead = w_log_val - lead_term
+            rem_after_sublead = rem_after_lead - sublead_term
             scaled_x52_w_log = w_log_val * (x_arb ** arb("2.5"))
             scaled_x92_rem = rem_after_lead * (x_arb ** arb("4.5"))
+            scaled_x13_2_rem2 = rem_after_sublead * (x_arb ** arb("6.5"))
             em_upper_bound = (
                 c_bdry_and_singular_arb
                 + c_em_log_coeff_arb * (x_arb.log() / x_arb)
                 + c_em_const_coeff_arb / x_arb
             ) * (x_arb ** arb("-2.5"))
-            w_log_asymptotic_table.append(
-                {
-                    "X_label": x_label,
-                    "X_certified": serialize_arb_certified(x_arb),
-                    "W_log_X_certified": serialize_arb_certified(w_log_val),
-                    "leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified": serialize_arb_certified(
-                        lead_term
-                    ),
-                    "remainder_after_leading_pole_certified": serialize_arb_certified(
-                        rem_after_lead
-                    ),
-                    "X_pow_5_2_times_W_log_X_certified": serialize_arb_certified(
-                        scaled_x52_w_log
-                    ),
-                    "X_pow_9_2_times_remainder_certified": serialize_arb_certified(
-                        scaled_x92_rem
-                    ),
-                    "euler_maclaurin_X_neg_5_2_bound_certified": serialize_arb_certified(
-                        em_upper_bound
-                    ),
-                    "satisfies_euler_maclaurin_bound": bool(
-                        abs(w_log_val) <= em_upper_bound
-                    ),
-                }
-            )
+            row_entry: Dict[str, Any] = {
+                "X_label": x_label,
+                "X_certified": serialize_arb_certified(x_arb),
+                "W_log_X_certified": serialize_arb_certified(w_log_val),
+                "leading_pole_term_neg_81_zeta3_over_256_pi2_X_neg_5_2_certified": serialize_arb_certified(
+                    lead_term
+                ),
+                "remainder_after_leading_pole_certified": serialize_arb_certified(
+                    rem_after_lead
+                ),
+                "X_pow_5_2_times_W_log_X_certified": serialize_arb_certified(
+                    scaled_x52_w_log
+                ),
+                "X_pow_9_2_times_remainder_certified": serialize_arb_certified(
+                    scaled_x92_rem
+                ),
+                "X_pow_13_2_times_second_remainder_certified": serialize_arb_certified(
+                    scaled_x13_2_rem2
+                ),
+                "euler_maclaurin_X_neg_5_2_bound_certified": serialize_arb_certified(
+                    em_upper_bound
+                ),
+                "satisfies_euler_maclaurin_bound": bool(
+                    abs(w_log_val) <= em_upper_bound
+                ),
+            }
+            if float(x_arb.mid()) <= 16.0:
+                w_dir_check = evaluate_w_log_divisor_aggregated_certified_arb(
+                    x_arb, k_max=5000, prec_bits=prec_bits
+                )["enclosure_arb"]
+                row_entry["em_vs_direct_series_encloses_zero"] = bool(
+                    (w_log_val - w_dir_check).contains(0)
+                )
+            w_log_asymptotic_table.append(row_entry)
 
         # Certify the three-zone localized resonant-band decomposition of R_mu(X):
         #   R_mu(X) = R_{mu,head}(X) + R_{mu,band}(X) + R_{mu,tail}(X),
@@ -3274,11 +3379,16 @@ def execute_task_tc049_arithmetic_cancellation_audit(
                     "annihilates every composite multiple n = m p < 2 q_{> y_2} identically, proving: "
                     "D_{y_1}(X) + T_{(y_1, y_2]}(X) = D_{y_2}(X) < 0, and at y_2 = M(X) (for X >= (2A)^4) "
                     "0 < -D_{M(X)}(X) = -D_{y_1}(X) - T_{(y_1, M(X)]}(X) <= C_{log,0} X^{5/2} / (2 M(X)^2) <= (1/2) C_{log,0} < 0.278715. "
-                    "Corollary (Unconditional Linear-Cutoff Divergence): For any fixed A >= 5 and all X >= 59/A, taking y_1 = floor(A X) and y_2 = floor(2 A X) gives "
+                    "Corollary (Unconditional Linear-Cutoff Divergence & Established Growth Conditions): For any fixed A >= 5 and all X >= 59/A, "
+                    "taking y_1 = floor(A X) and y_2 = floor(2 A X) gives "
                     "W(X) - W_{floor(A X)}(X) = -D_{floor(A X)}(X) = T_{(floor(A X), floor(2 A X)]}(X) + (-D_{floor(2 A X)}(X)) "
-                    "> T_{(floor(A X), floor(2 A X)]}(X) >= (3 c_0(A) / (32 A^2)) * sqrt(X) / log(2 A X) -> +infty, "
-                    "proving unconditionally that linear prime cutoffs y = floor(A X) diverge from W(X) at rate Theta_A(sqrt(X)/log X) and that "
-                    "super-linear sieving (such as y = M(X) = ceil(X^{5/4})) is necessary and sufficient for O(1) comparison."
+                    "> T_{(floor(A X), floor(2 A X)]}(X) >= (3 c_0(A) / (32 A^2)) * sqrt(X) / log(2 A X) -> +infty. "
+                    "Thus: (i) any linear prime cutoff y = floor(A X) (A >= 5) diverges from W(X) at rate Omega_A(sqrt(X)/log X), "
+                    "making super-linear cutoff growth y / X -> infty necessary for O(1) comparison; "
+                    "(ii) the proved small-scale divisor tail estimate |W(X) - W_y(X)| <= C_{log,0} X^{5/2} / (2 M^2) (y >= M >= max(2, X)) "
+                    "establishes sufficiency for cutoffs growing at least as fast as X^{5/4}, specifically y >= M(X) = ceil(max(2, X^{5/4})) "
+                    "(where |W(X) - W_{M(X)}(X)| <= (1/2) C_{log,0} < 0.278715), whereas intermediate super-linear growth rates "
+                    "X << y << X^{5/4} are not settled by the O(X^{5/2} / y^2) tail estimate."
                 ),
             },
             "certified_audit_data": dyadic_and_subcritical,
@@ -3300,9 +3410,10 @@ def execute_task_tc049_arithmetic_cancellation_audit(
                     "entire open strip -5/2 < Re(z) < 5/2, with its first left-half-plane simple pole at z = -5/2 (s = -2, the first "
                     "trivial zero of zeta(s)), where Res_{z=-5/2}(-H_0(z) zeta'(z+1/2) X^z) = (-81/64)(-zeta'(-2)) X^{-5/2} "
                     "= -(81 zeta(3) / (256 pi^2)) X^{-5/2} (~ -0.0385363285 X^{-5/2}) and second simple pole at z = -9/2 (s = -4) "
-                    "with residue -(5625 zeta(5) / (64 pi^4)) X^{-9/2} (~ -0.93556235 X^{-9/2}). "
-                    "In the spatial domain, 4th-order Euler-Maclaurin integration by parts on [1, infty) using int_0^infty g_X(x) dx = 0 gives "
-                    "W_log(X) = -int_0^1 g_X(x) dx + (1/12) g_X'(1) + (1/24) int_1^infty {x}^2 (1 - {x})^2 g_X^{(4)}(x) dx, "
+                    "with residue -(5625 zeta(5) / (64 pi^4)) X^{-9/2} (~ -0.93560290 X^{-9/2}). "
+                    "In the spatial domain, 4th-order Euler-Maclaurin integration by parts on [1, infty) with Peano kernel P_4(t) = (1/24) t^2 (1-t)^2 "
+                    "and int_0^infty g_X(x) dx = 0 gives "
+                    "W_log(X) = -int_0^1 g_X(x) dx - (1/12) g_X'(1) - (1/24) int_1^infty {x}^2 (1 - {x})^2 g_X^{(4)}(x) dx, "
                     "proving unconditionally for all X >= 1: "
                     "|W_log(X)| <= (217709/393216 + (I_{d4,0}/384)*(log X / X) + ((I_{d4,log} + I_{R_L})/384)*(1/X)) X^{-5/2} <= C_{log,EM} X^{-5/2} "
                     "with C_{log,EM} = 13.468515 < 13.47."
@@ -3319,6 +3430,27 @@ def execute_task_tc049_arithmetic_cancellation_audit(
                     "(3) Localized Resonant-Band Equivalence: |R_mu(X) - R_{mu,band}(X)| <= (5/6) C_{log,EM} + (1/2) C_{log,0} < 11.503 "
                     "for all X >= 1, where R_{mu,band}(X) := sum_{X^{5/6} < m <= M(X)} (mu(m)/sqrt(m)) W_log(X/m)."
                 ),
+                "external_analytic_bounds_vs_lean_deductive_verification": {
+                    "proved_externally_analytic_and_arb": (
+                        "Paper derivation + SymPy exact polynomial/series identities + 256-bit Arb ball arithmetic establish: "
+                        "(a) evenness H_0(-z) = H_0(z) and triple zero H_0(-1/2) = H_0'(-1/2) = H_0''(-1/2) = 0 => int_0^infty g_X(x) dx = 0; "
+                        "(b) 4th-order Euler-Maclaurin identity on [1, infty) and [N_0, infty) with signs - (1/12) g_X' - (1/24) int {x}^2(1-{x})^2 g_X^{(4)}(x) dx, "
+                        "polynomial tail domination for alpha >= 20, Interval Newton root certification of P_{d4}(alpha^2) and Q_L(alpha^2), "
+                        "and 256-bit Arb enclosures of I_{d4,0}, I_{d4,log}, I_{R_L}, yielding |W_log(u)| <= C_{log,EM} u^{-5/2} (C_{log,EM} < 13.47) for all u >= 1; "
+                        "(c) small-divisor head bound |R_{mu,head}(X)| <= (5/6) C_{log,EM} < 11.224 (via sum_{m=2}^N m^2 <= (5/6) N^3) and "
+                        "large-divisor tail bound |R_{mu,tail}(X)| <= (1/2) C_{log,0} < 0.278715."
+                    ),
+                    "verified_in_lean_4": (
+                        "In `formal/RiemannScope/CanonicalThetaCorrelationBound.lean` (0 sorry), Lean 4 verifies: "
+                        "(a) the exact prime-increment telescoping identity `primeIncrementTelescopingIdentity` (W_log - W_y = sum_{p <= y} J_p); "
+                        "(b) the exact three-zone additive decomposition `localizedResonantBandDecomp` (R_mu = R_{mu,head} + R_{mu,band} + R_{mu,tail}); "
+                        "(c) the deductive implication `resonantBandComparison_of_head_and_tail_bounds` and master theorem "
+                        "`prime_increment_telescoping_and_resonant_band_reduction`: taking the externally proved head bound "
+                        "|R_{mu,head}(X)| <= (5/6) C_{log,EM} and tail bound |R_{mu,tail}(X)| <= (1/2) C_{log,0} as hypotheses, "
+                        "Lean 4 deductively proves |R_mu(X) - R_{mu,band}(X)| <= (5/6) C_{log,EM} + (1/2) C_{log,0} and "
+                        "sup_{X >= 1} |R_mu(X)| < infty <==> sup_{X >= 1} |R_{mu,band}(X)| < infty."
+                    ),
+                },
             },
             "certified_audit_data": w_log_and_resonant_band,
         }
