@@ -2188,6 +2188,39 @@ def verify_canonical_hilbert_schmidt_orbit_decomposition(
             ),
         }
 
+        observable_radius_summary: Dict[str, Any] = {
+            "sample_grade_set": [r["K_label"] for r in orbit_rows],
+            "sample_grade_count": len(orbit_rows),
+            "per_observable_max_radius": {
+                obs_key: max(
+                    float(r[obs_key]["enclosure_arb"].rad())
+                    for r in orbit_rows
+                )
+                for obs_key in (
+                    "P_tau_K_HS_orbit_certified",
+                    "pole_plus_transfer_term_neg_c_tau_A_h0_certified",
+                    "small_scale_prime_W_inv_XK_certified",
+                    "divisor_aggregated_W_log_XK_certified",
+                    "head_divisor_R_mu_head_XK_certified",
+                    "resonant_band_R_mu_band_XK_direct_sum_certified",
+                    "super_scale_tail_R_mu_tail_XK_direct_certified",
+                    "E_tau_controlled_K_certified",
+                    "E_tau_K_total_remainder_certified",
+                    "C_tau_K_certified",
+                )
+            },
+            "precision_scope_note": (
+                "Each observable's radius reflects its specific analytical truncation and quadrature budget: "
+                "W_log(X_K), R_{mu,head}(X_K), and R_{mu,band}(X_K) (evaluated by 4th-order Euler-Maclaurin "
+                "on [N0, infty)) have radii <= 6.59e-11 (6.58e-11, 5.64e-11, and 5.64e-11), P_tau(K) has radius "
+                "<= 3.22e-22, -(c_tau^B+2)h_0(X_K) has radius <= 6.34e-75, and W(X_K^{-1}) has radius <= 7.01e-9, "
+                "whereas R_{mu,tail}(X_K) and E_{tau,controlled}(K) include the direct super-scale tail remainder "
+                "C_{log,0} X_K^{5/2} / (2 m_tail_cut^2) (radii 1.89e-5 at K=0 up to 5.42e-4 at |K|=2), "
+                "and C_tau(K) and E_tau(K) include the prime-power Rosser-Schoenfeld tail on n > 16500 "
+                "in W(X_K) (radii 1.40e-8 at K=0 up to 6.87e-5 at |K|=2)."
+            ),
+        }
+
         return {
             "positive_hilbert_space_and_unitary_orbit": {
                 "hilbert_space_H_tau_pos": "H_tau^pos := H_tau^B (+) L^2(R_{>0}, dy/y)",
@@ -2288,7 +2321,7 @@ def verify_canonical_hilbert_schmidt_orbit_decomposition(
                 ),
                 "unconditional_component_bounds_over_all_K_in_A_R": {
                     "abs_P_tau_K_bound_certified": serialize_arb_certified(
-                         p_tau_0
+                        p_tau_0
                     ),
                     "abs_pole_plus_transfer_h0_bound_certified": serialize_arb_certified(
                         B_h0_arb
@@ -2401,6 +2434,7 @@ def verify_canonical_hilbert_schmidt_orbit_decomposition(
                     "(establishing o(1) decay of R_{mu,head} would require cancellation or a strictly smaller exponent < 5/6, "
                     "and o(1) decay of R_{mu,tail} requires a cutoff growing faster than X_K^{5/4})."
                 ),
+                "observable_radius_summary_across_13_sample_grades": observable_radius_summary,
                 "all_orbit_reconstructions_enclose_zero": all_orbit_identities_enclose_zero,
                 "all_independent_tail_bounds_verified": all_independent_tail_bounds_verified,
                 "all_component_bounds_verified": all_component_bounds_verified,
@@ -2591,6 +2625,7 @@ def verify_prime_separation_identity_and_canonical_band_boundary_arb(
         all_canonical_band_sep_enclose_zero = True
         all_boundary_bounds_certified = True
         all_p_squared_obstructions_detected = True
+        both_upper_cutoff_orderings_certified = True
 
         for x_label, x_a in sample_scales:
             H_x = certified_head_cutoff_H_X_arb(x_a, prec_bits=prec_bits)
@@ -2654,6 +2689,16 @@ def verify_prime_separation_identity_and_canonical_band_boundary_arb(
                         x_over_p, B_over_p, arb(M_xp), p, prec_bits=prec_bits
                     )
                     B_p_val = delta_low + delta_high
+                    if M_x >= p * M_xp:
+                        upper_ordering = "M(X)/p >= M(X/p)"
+                    else:
+                        upper_ordering = (
+                            "M(X)/p < M(X/p) (small-Y single-endpoint regime)"
+                        )
+                    high_cert = certify_abs_le_bound_arb(delta_high, B_tail_arb)
+                    if not high_cert["certified"]:
+                        both_upper_cutoff_orderings_certified = False
+                        all_boundary_bounds_certified = False
                 else:
                     H_xp = 0
                     M_xp = 0
@@ -2661,6 +2706,7 @@ def verify_prime_separation_identity_and_canonical_band_boundary_arb(
                     delta_low = S_p_rescaled
                     delta_high = arb(0)
                     B_p_val = S_p_rescaled
+                    upper_ordering = "X/p < 1 (sub-unit regime)"
 
                 canon_rhs = (
                     S_p_band_X
@@ -2698,6 +2744,7 @@ def verify_prime_separation_identity_and_canonical_band_boundary_arb(
                             "X_over_p_ge_1": x_ge_p,
                             "H_X_over_p": H_xp,
                             "M_X_over_p": M_xp,
+                            "upper_cutoff_ordering": upper_ordering,
                             "R_mu_band_X_certified": serialize_arb_certified(
                                 R_band
                             ),
@@ -2733,7 +2780,23 @@ def verify_prime_separation_identity_and_canonical_band_boundary_arb(
                         }
                     )
 
-        # 2. Verify iterated single-prime tower telescoping for p = 2 and p = 3 at X = tau^2:
+        # Explicit small-Y single-endpoint upper-cutoff ordering check at X = 2, p = 2:
+        # Here Y = X/p = 1, M(2) = 3, M(2)/2 = 3/2 < 2 = M(1), so (M(2)/2, M(1)] = (3/2, 2]
+        # contains only the single integer endpoint d = M(1) = 2. For p = 2, 2 | d so Delta_{2,high}(2) = 0;
+        # even without coprime filtering, the single endpoint term 2^{-1/2} |W_log(1/2)| is <= (1/2) C_{log,0} = B_tail.
+        single_ep_d2_term = (arb(1) / arb(2).sqrt()) * abs(
+            evaluate_W_log_em4_certified_arb(arb("0.5"), prec_bits=prec_bits)
+        )
+        single_ep_d2_cert = certify_abs_le_bound_arb(
+            single_ep_d2_term, B_tail_arb
+        )
+        if not single_ep_d2_cert["certified"]:
+            both_upper_cutoff_orderings_certified = False
+
+        # 2. Verify iterated single-prime tower telescoping (both arbitrary-interval rescaled tower
+        #    S_0 = sum_{j=0}^{L-1} q^j R_j + q^L S_L and canonical-band tower
+        #    S_{p,band}(X) = sum_{j=0}^{L-1} q^j (R_{mu,band}(X/p^j) + q B_p(X/p^j)) + q^L S_{p,band}(X/p^L))
+        #    at L = 1, L = 2, and terminal L for p = 2 and p = 3 at X = tau^2:
         tower_checks: List[Dict[str, Any]] = []
         all_tower_telescoping_enclose_zero = True
         x_tower = tau_arb * tau_arb
@@ -2742,10 +2805,61 @@ def verify_prime_separation_identity_and_canonical_band_boundary_arb(
             q_a = arb(1) / p_a.sqrt()
             H_top = certified_head_cutoff_H_X_arb(x_tower, prec_bits=prec_bits)
             M_top = certified_coupled_cutoff_M_X_arb(x_tower, prec_bits=prec_bits)
+            A_top = arb(H_top)
+            B_top = arb(M_top)
             S_p_top = evaluate_S_p_interval_arb(
-                x_tower, arb(H_top), arb(M_top), p, prec_bits=prec_bits
+                x_tower, A_top, B_top, p, prec_bits=prec_bits
             )
+
+            # (2a) Simultaneously rescaled arbitrary-interval tower:
+            #      R_j := R(X/p^j; A/p^j, B/p^j), S_j := S_p(X/p^j; A/p^j, B/p^j),
+            #      R_j = S_j - q S_{j+1}, S_0 = sum_{j=0}^{L-1} q^j R_j + q^L S_L.
+            R_rescaled_list: List[arb] = []
+            S_rescaled_list: List[arb] = []
+            j_res = 0
+            while True:
+                p_pow = p_a ** arb(j_res)
+                Sj = evaluate_S_p_interval_arb(
+                    x_tower / p_pow,
+                    A_top / p_pow,
+                    B_top / p_pow,
+                    p,
+                    prec_bits=prec_bits,
+                )
+                Rj = evaluate_R_interval_arb(
+                    x_tower / p_pow,
+                    A_top / p_pow,
+                    B_top / p_pow,
+                    prec_bits=prec_bits,
+                )
+                S_rescaled_list.append(Sj)
+                R_rescaled_list.append(Rj)
+                if bool(((B_top / p_pow) - arb(1)).upper() < arb(0)):
+                    break
+                j_res += 1
+
+            L_res_terminal = len(R_rescaled_list) - 1
+            rescaled_L1_rhs = R_rescaled_list[0] + q_a * S_rescaled_list[1]
+            rescaled_L2_rhs = (
+                R_rescaled_list[0]
+                + q_a * R_rescaled_list[1]
+                + (q_a ** arb(2)) * S_rescaled_list[2]
+            )
+            rescaled_term_rhs = arb(0)
+            for j_idx in range(L_res_terminal):
+                rescaled_term_rhs += (q_a ** arb(j_idx)) * R_rescaled_list[j_idx]
+            rescaled_L1_ok = bool((S_p_top - rescaled_L1_rhs).contains(0))
+            rescaled_L2_ok = bool((S_p_top - rescaled_L2_rhs).contains(0))
+            rescaled_term_ok = bool((S_p_top - rescaled_term_rhs).contains(0)) and bool(
+                S_rescaled_list[L_res_terminal].contains(0)
+            )
+
+            # (2b) Canonical-band tower:
+            #      S_{p,band}(X) = sum_{j=0}^{L-1} q^j (R_{mu,band}(X/p^j) + q B_p(X/p^j)) + q^L S_{p,band}(X/p^L),
+            #      terminating at L = floor(log_p X) + 1 where X/p^L < 1 => S_{p,band}(X/p^L) = 0 by definition.
             telescoped_sum = arb(0)
+            canon_step_terms: List[arb] = []
+            canon_S_bands: List[arb] = [S_p_top]
             y_cur = x_tower
             j_step = 0
             while bool((y_cur - arb(1)).lower() >= arb(0)):
@@ -2771,31 +2885,82 @@ def verify_prime_separation_identity_and_canonical_band_boundary_arb(
                 else:
                     S_band_yn = arb(0)
                 B_y = S_res_y - S_band_yn
-                telescoped_sum += (q_a ** arb(j_step)) * (R_y + q_a * B_y)
+                step_term = R_y + q_a * B_y
+                canon_step_terms.append(step_term)
+                canon_S_bands.append(S_band_yn)
+                telescoped_sum += (q_a ** arb(j_step)) * step_term
                 y_cur = y_next
                 j_step += 1
 
+            canon_L1_rhs = canon_step_terms[0] + q_a * canon_S_bands[1]
+            canon_L2_rhs = (
+                canon_step_terms[0]
+                + q_a * canon_step_terms[1]
+                + (q_a ** arb(2)) * canon_S_bands[2]
+            )
+            canon_L1_ok = bool((S_p_top - canon_L1_rhs).contains(0))
+            canon_L2_ok = bool((S_p_top - canon_L2_rhs).contains(0))
             tower_diff = S_p_top - telescoped_sum
-            tower_ok = bool(tower_diff.contains(0))
+            tower_ok = (
+                bool(tower_diff.contains(0))
+                and rescaled_L1_ok
+                and rescaled_L2_ok
+                and rescaled_term_ok
+                and canon_L1_ok
+                and canon_L2_ok
+            )
             if not tower_ok:
                 all_tower_telescoping_enclose_zero = False
             tower_checks.append(
                 {
                     "X_label": "tau^2",
                     "prime_p": p,
-                    "steps_J_p_plus_1": j_step,
+                    "canonical_band_steps_J_p_plus_1": j_step,
+                    "rescaled_interval_terminal_L": L_res_terminal,
                     "S_p_band_X_certified": serialize_arb_certified(S_p_top),
                     "telescoped_tower_sum_certified": serialize_arb_certified(
                         telescoped_sum
                     ),
+                    "rescaled_interval_L1_encloses_zero": rescaled_L1_ok,
+                    "rescaled_interval_L2_encloses_zero": rescaled_L2_ok,
+                    "rescaled_interval_terminal_encloses_zero": rescaled_term_ok,
+                    "canonical_band_L1_encloses_zero": canon_L1_ok,
+                    "canonical_band_L2_encloses_zero": canon_L2_ok,
                     "tower_diff_encloses_zero": tower_ok,
                 }
             )
 
-        # 3. Verify multi-prime inclusion-exclusion and tautological sieve collapse:
-        # At X = 16, H(16) = 10, M(16) = 32:
-        #   (a) For P = {2, 3, 5}, R(16; 10, 32) = sum_{d | 30} (mu(d)/sqrt(d)) S_{2,3,5}(16/d; 10/d, 32/d).
-        #   (b) For P = {p <= 32} (all 11 primes <= M(16)), every integer k in (10/d, 32/d] coprime to P_P
+        # 3. Verify multi-prime inclusion-exclusion, P = 2 orientation regression, and tautological sieve collapse:
+        #   (a) Orientation regression at P = 2, X = 1, (A, B] = (1, 2]:
+        #       R(1; 1, 2) = -2^{-1/2} W_log(1/2), S_2(1; 1, 2) = 0, S_2(1/2; 1/2, 1) = W_log(1/2).
+        #       Rightly oriented formula: sum_{d | 2} (mu(d)/sqrt(d)) S_2(1/d; 1/d, 2/d) = -2^{-1/2} W_log(1/2) = R(1; 1, 2).
+        #       Reversed formula: sum_{d | 2} (mu(d)/sqrt(d)) R(1/d; 1/d, 2/d) = -sqrt(2) W_log(1/2) != 0 = S_2(1; 1, 2).
+        R_1_1_2 = evaluate_R_interval_arb(
+            arb(1), arb(1), arb(2), prec_bits=prec_bits
+        )
+        S2_1_1_2 = evaluate_S_p_interval_arb(
+            arb(1), arb(1), arb(2), 2, prec_bits=prec_bits
+        )
+        S2_half_half_1 = evaluate_S_p_interval_arb(
+            arb("0.5"), arb("0.5"), arb(1), 2, prec_bits=prec_bits
+        )
+        R_half_half_1 = evaluate_R_interval_arb(
+            arb("0.5"), arb("0.5"), arb(1), prec_bits=prec_bits
+        )
+        inv_sqrt2 = arb(1) / arb(2).sqrt()
+        correct_mp_p2_rhs = S2_1_1_2 - inv_sqrt2 * S2_half_half_1
+        reversed_mp_p2_rhs = R_1_1_2 - inv_sqrt2 * R_half_half_1
+        p2_correct_orientation_encloses_zero = bool(
+            (R_1_1_2 - correct_mp_p2_rhs).contains(0)
+        )
+        p2_reversed_formula_discrepancy = S2_1_1_2 - reversed_mp_p2_rhs
+        p2_reversed_formula_detected_nonzero = not bool(
+            p2_reversed_formula_discrepancy.contains(0)
+        )
+
+        #   (b) At X = 16, H(16) = 10, M(16) = 32:
+        #       For P = {2, 3, 5}, R(16; 10, 32) = sum_{d | 30} (mu(d)/sqrt(d)) S_{2,3,5}(16/d; 10/d, 32/d).
+        #   (c) For P = {p <= 32} (all 11 primes <= M(16)), every integer k in (10/d, 32/d] coprime to P_P
         #       has k = 1 (which lies in (10/d, 32/d] iff 10 < d <= 32), so
         #       S_P(16/d; 10/d, 32/d) = 1_{10 < d <= 32} W_log(16/d), collapsing tautologically back to R_{mu,band}(16)!
         X_mp = arb(16)
@@ -2845,7 +3010,7 @@ def verify_prime_separation_identity_and_canonical_band_boundary_arb(
             if not bool((s_full_sieve - expected_single).contains(0)):
                 tautological_collapse_all_match = False
 
-        # Euler product norm blow-up prod_{p <= y} (1 + p^{-1/2}) across y in {5, 13, 31, 100, 1000}:
+        # Euler product norm blow-up prod_{p <= y} (1 + p^{-1/2}) across y in {5, 13, 31, 97, 997}:
         euler_factor_growth: List[Dict[str, Any]] = []
         for y_cut in (5, 13, 31, 97, 997):
             prod_val = arb(1)
@@ -2866,9 +3031,16 @@ def verify_prime_separation_identity_and_canonical_band_boundary_arb(
                 "R(X; A, B) = S_p(X; A, B) - p^{-1/2} S_p(X / p; A / p, B / p)   "
                 "(for all X > 0, 0 <= A < B, and prime p in P, using mu(p d) = 0 for p | d and mu(p d) = -mu(d) for p nmid d)"
             ),
+            "rescaled_interval_inverse_tower_identity": (
+                "For R_j := R(X/p^j; A/p^j, B/p^j) and S_j := S_p(X/p^j; A/p^j, B/p^j) with q = p^{-1/2}, "
+                "R_j = S_j - q S_{j+1} and S_0 = sum_{j=0}^{L-1} q^j R_j + q^L S_L for every L >= 1, "
+                "terminating when B/p^L < 1 so S_L = 0."
+            ),
             "canonical_rescaled_band_identity": (
                 "R_{mu,band}(X) = S_{p,band}(X) - p^{-1/2} S_{p,band}(X / p) - p^{-1/2} B_p(X),   "
-                "where B_p(X) = Delta_{p,low}(X) + Delta_{p,high}(X) is the rescaled cutoff boundary sum"
+                "where B_p(X) = Delta_{p,low}(X) + Delta_{p,high}(X) is the rescaled cutoff boundary sum, "
+                "and S_{p,band}(X) = sum_{j=0}^{L-1} q^j (R_{mu,band}(X/p^j) + q B_p(X/p^j)) + q^L S_{p,band}(X/p^L) "
+                "terminates at L = floor(log_p X) + 1 where X/p^L < 1 so S_{p,band}(X/p^L) = 0 by definition."
             ),
             "unconditional_rescaled_boundary_bounds": {
                 "B_rescaled_global_all_X_ge_1_and_all_p_certified": serialize_arb_certified(
@@ -2882,6 +3054,22 @@ def verify_prime_separation_identity_and_canonical_band_boundary_arb(
                 "B_subunit_when_X_lt_p_coeff_zeta3_C_log_0_certified": serialize_arb_certified(
                     B_subunit_arb
                 ),
+                "both_upper_cutoff_orderings_certified": both_upper_cutoff_orderings_certified,
+                "small_Y_single_endpoint_regime_X2_p2": {
+                    "X": 2,
+                    "p": 2,
+                    "Y_equals_X_over_p": 1,
+                    "M_X": 3,
+                    "M_X_over_p_ratio": "3/2 = 1.5",
+                    "M_Y": 2,
+                    "interval_M_X_over_p_to_M_Y": "(3/2, 2] containing only integer d = M(1) = 2",
+                    "single_endpoint_unfiltered_term_2_neg_half_abs_W_log_half_certified": serialize_arb_certified(
+                        single_ep_d2_term
+                    ),
+                    "single_endpoint_le_B_tail_certified": single_ep_d2_cert[
+                        "certified"
+                    ],
+                },
             },
             "two_way_coprime_band_equivalence_theorem": (
                 "For every fixed prime p in P (in particular p = 2, odd squarefree integers 2 nmid m), "
@@ -2893,6 +3081,21 @@ def verify_prime_separation_identity_and_canonical_band_boundary_arb(
                 "multi_prime_inclusion_exclusion_formula": (
                     "R(X; A, B) = sum_{d | P_P} (mu(d) / sqrt(d)) S_P(X / d; A / d, B / d)"
                 ),
+                "p2_x1_interval_1_2_orientation_regression": {
+                    "R_1_1_2_certified": serialize_arb_certified(R_1_1_2),
+                    "S2_1_1_2_certified": serialize_arb_certified(S2_1_1_2),
+                    "S2_half_half_1_certified": serialize_arb_certified(
+                        S2_half_half_1
+                    ),
+                    "correct_formula_rhs_certified": serialize_arb_certified(
+                        correct_mp_p2_rhs
+                    ),
+                    "reversed_formula_rhs_certified": serialize_arb_certified(
+                        reversed_mp_p2_rhs
+                    ),
+                    "correct_orientation_encloses_zero": p2_correct_orientation_encloses_zero,
+                    "reversed_formula_detected_nonzero": p2_reversed_formula_detected_nonzero,
+                },
                 "three_prime_P_2_3_5_at_X_16_encloses_zero": mp_3_encloses_zero,
                 "full_sieve_P_le_M_X_tautological_collapse_verified": tautological_collapse_all_match,
                 "tautological_collapse_explanation": (
@@ -2902,15 +3105,20 @@ def verify_prime_separation_identity_and_canonical_band_boundary_arb(
                     "tautologically back to sum_{H(X) < d <= M(X)} (mu(d)/sqrt(d)) W_log(X/d) = R_{mu,band}(X)."
                 ),
                 "multiplicative_coset_shift_note": (
-                    "Prime dilation X_K |-> X_K / p = tau^{|K| - log_tau p} shifts out of the algebraic "
-                    "grade locus tau^{A_R} into the multiplicative coset p^{-1} tau^{A_R} because log_tau p = log p / log(2*pi) "
-                    "is not assumed algebraic; all rescaled boundary bounds hold on all of R_{>0} without assuming log_tau p in A_R."
+                    "Whether log_tau p = log p / log(2*pi) lies in A_R is not assumed; if log_tau p notin A_R, "
+                    "then prime dilation X_K |-> X_K / p = tau^{|K| - log_tau p} leaves the algebraic grade locus "
+                    "tau^{A_R} for the multiplicative coset p^{-1} tau^{A_R}, whereas all rescaled boundary bounds "
+                    "are proved on all of R_{>0} without assuming log_tau p in A_R."
+                ),
+                "euler_product_log_expansion": (
+                    "sum_{p <= y} log(1 + p^{-1/2}) = sum_{p <= y} p^{-1/2} - (1/2) sum_{p <= y} p^{-1} + O(1)"
                 ),
                 "euler_product_factor_growth": euler_factor_growth,
             },
             "all_prime_separation_identities_enclose_zero": all_prime_sep_enclose_zero,
             "all_canonical_band_separations_enclose_zero": all_canonical_band_sep_enclose_zero,
             "all_boundary_bounds_certified": all_boundary_bounds_certified,
+            "both_upper_cutoff_orderings_certified": both_upper_cutoff_orderings_certified,
             "all_p_squared_obstructions_detected": all_p_squared_obstructions_detected,
             "all_tower_telescoping_enclose_zero": all_tower_telescoping_enclose_zero,
             "sample_band_prime_table": band_prime_rows,
@@ -2922,6 +3130,7 @@ def verify_prime_separation_identity_and_canonical_band_boundary_arb(
 
 def verify_summation_by_parts_and_tilde_W_log_identity_arb(
     prec_bits: int = 256,
+    max_quadrature_M: int = 32,
 ) -> Dict[str, Any]:
     """Certify in SymPy and 256-bit Arb (Requirement 4):
       1. Exact Derivative Identity for F_X(t) = t^{-1/2} W_log(X / t):
@@ -2932,8 +3141,10 @@ def verify_summation_by_parts_and_tilde_W_log_identity_arb(
       2. Exact Summation by Parts with Right-Continuous Relative Mertens Function M_A(t) := sum_{A < m <= t} mu(m):
              R(X; A, B) = M_A(B) F_X(B) - int_A^B M_A(t) F_X'(t) dt
                         = M_A(B) F_X(B) + int_A^B M_A(t) t^{-3/2} tilde{W}_log(X / t) dt,
-         verified both by piecewise-constant step summation and by direct complex-analytic quadrature
-         (`acb.integral`) of F_X'(t) = -t^{-3/2} tilde{W}_log(X / t) on each unit step interval [n, n+1].
+         verified by piecewise-constant step summation across all sample scales and by independent
+         complex-analytic quadrature (`acb.integral`) of F_X'(t) = -t^{-3/2} tilde{W}_log(X / t) on each
+         unit step interval [n, n+1] for scales with M(X) <= max_quadrature_M (recording `"NOT_RUN"` and
+         `None` for quadrature fields when M(X) > max_quadrature_M).
       3. Unconditional Upper-Endpoint Bound at (A, B) = (H(X), M(X)):
          Using ONLY the trivial counting inequality |M_{H(X)}(M(X))| <= M(X) - H(X) <= M(X) (with zero
          unproved Mertens hypotheses) and |W_log(X / M(X))| <= C_{log,0} (X / M(X))^{5/2} with X^{5/2} / M(X)^2 <= 1:
@@ -3046,7 +3257,10 @@ def verify_summation_by_parts_and_tilde_W_log_identity_arb(
         #    and unconditional endpoint bound |M_{H(X)}(M(X)) F_X(M(X))| <= C_{log,0} across sample scales:
         sbp_rows: List[Dict[str, Any]] = []
         all_sbp_ftc_enclose_zero = True
-        all_sbp_quadrature_enclose_zero = True
+        all_performed_sbp_quadrature_enclose_zero = True
+        quadrature_checks_performed_count = 0
+        quadrature_checks_passed_count = 0
+        quadrature_checks_not_run_count = 0
         all_endpoint_bounds_certified = True
         all_smooth_mertens_transfer_certified = True
 
@@ -3126,8 +3340,9 @@ def verify_summation_by_parts_and_tilde_W_log_identity_arb(
                 all_sbp_ftc_enclose_zero = False
 
             # Direct complex-analytic quadrature of int_n^{n+1} t^{-3/2} tilde{W}_log(X/t) dt on each unit interval
-            # for scales with M(X) <= 32 (verifying the derivative formula under the integral sign):
-            if M_x <= 32:
+            # for scales with M(X) <= max_quadrature_M (verifying the derivative formula under the integral sign):
+            if M_x <= max_quadrature_M:
+                quadrature_checks_performed_count += 1
                 I_mertens_quad = arb(0)
                 k_cut_q = 300
                 k_cut_qa = arb(k_cut_q)
@@ -3172,11 +3387,18 @@ def verify_summation_by_parts_and_tilde_W_log_identity_arb(
                 quad_recon = endpoint_term + I_mertens_quad
                 quad_diff = R_band - quad_recon
                 quad_ok = bool(quad_diff.contains(0))
-                if not quad_ok:
-                    all_sbp_quadrature_enclose_zero = False
+                if quad_ok:
+                    quadrature_checks_passed_count += 1
+                else:
+                    all_performed_sbp_quadrature_enclose_zero = False
+                quad_status = "CERTIFIED_QUADRATURE"
+                quad_cert_entry: Any = serialize_arb_certified(I_mertens_quad)
+                quad_encloses_zero_entry: Any = quad_ok
             else:
-                I_mertens_quad = I_mertens_ftc
-                quad_ok = True
+                quadrature_checks_not_run_count += 1
+                quad_status = "NOT_RUN"
+                quad_cert_entry = None
+                quad_encloses_zero_entry = None
 
             # Certify unconditional upper-endpoint bound |M_{H(X)}(M(X)) F_X(M(X))| <= C_{log,0} X^{5/2} / M(X)^2 <= C_{log,0}:
             sharp_ep_bound = (
@@ -3213,14 +3435,13 @@ def verify_summation_by_parts_and_tilde_W_log_identity_arb(
                     "smooth_mertens_integral_I_M_band_ftc_certified": serialize_arb_certified(
                         I_mertens_ftc
                     ),
-                    "smooth_mertens_integral_I_M_band_quadrature_certified": serialize_arb_certified(
-                        I_mertens_quad
-                    ),
+                    "independent_quadrature_status": quad_status,
+                    "smooth_mertens_integral_I_M_band_quadrature_certified": quad_cert_entry,
                     "sharp_endpoint_bound_C_log_0_X_5_2_over_M_sq_certified": serialize_arb_certified(
                         sharp_ep_bound
                     ),
                     "sbp_ftc_identity_encloses_zero": ftc_ok,
-                    "sbp_quadrature_identity_encloses_zero": quad_ok,
+                    "sbp_quadrature_identity_encloses_zero": quad_encloses_zero_entry,
                     "abs_endpoint_le_sharp_bound_certified": ep_sharp_cert[
                         "certified"
                     ],
@@ -3261,7 +3482,12 @@ def verify_summation_by_parts_and_tilde_W_log_identity_arb(
             "termwise_euler_symbolic_verified": termwise_euler_symbolic_verified,
             "all_jet_identities_enclose_zero": all_jet_identities_enclose_zero,
             "all_sbp_ftc_enclose_zero": all_sbp_ftc_enclose_zero,
-            "all_sbp_quadrature_enclose_zero": all_sbp_quadrature_enclose_zero,
+            "all_performed_sbp_quadrature_enclose_zero": all_performed_sbp_quadrature_enclose_zero,
+            "all_sbp_quadrature_enclose_zero": all_performed_sbp_quadrature_enclose_zero,
+            "independent_quadrature_max_M_cutoff": max_quadrature_M,
+            "independent_quadrature_performed_count": quadrature_checks_performed_count,
+            "independent_quadrature_passed_count": quadrature_checks_passed_count,
+            "independent_quadrature_not_run_count": quadrature_checks_not_run_count,
             "all_endpoint_bounds_certified": all_endpoint_bounds_certified,
             "all_smooth_mertens_transfer_certified": all_smooth_mertens_transfer_certified,
             "jet_derivative_checks": jet_checks,
@@ -3276,15 +3502,18 @@ def verify_sign_sequence_cancellation_discrimination_arb(
 ) -> Dict[str, Any]:
     """Compare across scales X in {1, 2, 4, tau, 10, 16, 25, tau^2, 64} the resonant-band sum
         R_sigma(X) := sum_{H(X) < m <= M(X)} (sigma_m / sqrt(m)) W_log(X / m)
-    for four bounded arithmetic sequences sigma_m in [-1, 1]:
-      1. Actual Moebius sequence sigma_m = mu(m) (signed squarefree cancellation);
-      2. Constant sequence sigma_m = +1 (unsigned all-divisor sum, where Sigma_A(t) = floor(t) - H(X) ~ t);
-      3. Squarefree indicator sigma_m = |mu(m)| = mu(m)^2 (unsigned squarefree sum);
-      4. Worst-case adversarial sign sequence sigma_m^{wc}(X) = |mu(m)| sgn(W_log(X / m))
-         (triangle-inequality majorant sum_{H(X) < m <= M(X)} (|mu(m)| / sqrt(m)) |W_log(X / m)|).
-    Certifies that the worst-case non-cancelling sum grows like O(X^{1/2}) (exceeding 0.549 at X = 64,
-    more than 54x larger than |R_{mu,band}(64)| = 0.00856), proving that any proof closing SUBGATE-TC-043A
-    must use signed Moebius cancellation rather than absolute-value majorants."""
+    for the four evaluated bounded arithmetic sequences sigma_m in [-1, 1]:
+      1. Actual Moebius sequence sigma_m = mu(m) (signed squarefree sum R_{mu,band}(X));
+      2. Constant sequence sigma_m = +1 (signed kernel-weighted all-integer sum R_{1,band}(X));
+      3. Squarefree indicator sigma_m = |mu(m)| = mu(m)^2 (signed kernel-weighted squarefree sum R_{|mu|,band}(X));
+      4. Worst-case adversarial sign sequence sigma_m^{wc}(X) = |mu(m)| sgn(W_log(X / m)),
+         giving the triangle-inequality majorant sum_{H(X) < m <= M(X)} (|mu(m)| / sqrt(m)) |W_log(X / m)|.
+    Distinguishes signed sums |sum_m a_m m^{-1/2} W_log(X/m)| from absolute-value sums
+    sum_m |a_m m^{-1/2} W_log(X/m)|: at X = 64 ((H, M) = (32, 182)), R_{mu,band}(64) = 0.03059141547...,
+    R_{1,band}(64) = -0.01583365880..., R_{|mu|,band}(64) = 0.01904894182..., and the triangle-inequality
+    majorant reaches 0.29032671364... (ratio 9.49046356... over |R_{mu,band}(64)|). Note that finite-grid
+    observations do not determine the asymptotic behavior of R_{1,band}(X) or R_{|mu|,band}(X), and O(X^{1/2})
+    is an upper bound for the triangle-inequality majorant unless a matching lower bound is proved."""
     saved_prec = flint_ctx.prec
     try:
         flint_ctx.prec = max(prec_bits, 256)
@@ -3351,12 +3580,16 @@ def verify_sign_sequence_cancellation_discrimination_arb(
             )
         return {
             "discrimination_summary": (
-                "Across X in [1, 64], |R_{mu,band}(X)| remains <= 0.03052 whereas the worst-case "
-                "non-cancelling sign sequence sigma_m^{wc}(X) = |mu(m)| sgn(W_log(X/m)) grows as "
-                "O(X^{1/2}), reaching 0.5494 at X = 64 (over 64x larger than |R_{mu,band}(64)| = 0.00856). "
-                "For the non-cancelling sequences sigma_m = 1 and sigma_m = |mu(m)|, the smooth kernel "
-                "W_log(X/t) supplies zero-moment oscillation across t ~ X, but only actual mu(m) "
-                "combines kernel oscillation with arithmetic Mertens sign cancellation."
+                "Across the 9 tested grid points X in {1, 2, 4, tau, 10, 16, 25, tau^2, 64}, "
+                "max |R_{mu,band}(X)| = |R_{mu,band}(64)| = 0.03059141547..., whereas at X = 64 "
+                "((H, M) = (32, 182)) the signed sums are R_{1,band}(64) = -0.01583365880... and "
+                "R_{|mu|,band}(64) = 0.01904894182..., and the triangle-inequality majorant "
+                "sum_{32 < m <= 182} (|mu(m)| / sqrt(m)) |W_log(64/m)| = 0.29032671364... "
+                "(ratio 9.49046356... over |R_{mu,band}(64)|). This distinguishes signed sums "
+                "|sum_m a_m m^{-1/2} W_log(X/m)| from absolute-value sums sum_m |a_m m^{-1/2} W_log(X/m)|; "
+                "finite-grid evaluations do not determine the asymptotic behavior of R_{1,band}(X) or "
+                "R_{|mu|,band}(X), and O(X^{1/2}) is an upper bound for the triangle-inequality majorant "
+                "unless a matching lower bound is proved."
             ),
             "max_abs_R_mu_band_on_tested_grid_certified": serialize_arb_certified(
                 max_abs_mu_band
@@ -3370,7 +3603,7 @@ def verify_sign_sequence_cancellation_discrimination_arb(
 def execute_task_tc051_prime_arithmetic_resonant_band_audit(
     prec_bits: int = 256,
 ) -> Dict[str, Any]:
-    """Execute the complete TASK-TC-051 audit of the prime-separation identity,
+    """Execute the complete TASK-TC-051 / TASK-TC-051R audit of the prime-separation identity,
     rescaled canonical-band boundary bounds, summation by parts, and sign-sequence
     cancellation discrimination."""
     prime_sep_audit = (
@@ -3386,7 +3619,11 @@ def execute_task_tc051_prime_arithmetic_resonant_band_audit(
     )
     return {
         "task_id": TASK_TC_051_ID,
+        "repair_task_id": "TASK-TC-051R",
         "starting_head": STARTING_HEAD_TC_051,
+        "tc051_merged_main_baseline": "b6f22dfee0dd6177ee855189304e7930f9ba3e20",
+        "tc051_implementation_commit": "333661eecd69738e8a67143e635b6db4f40170ce",
+        "tc051_branch_tip": "7ac0546b1177970ff0d87824f61643da2405c4c0",
         "subgate_tc043a_status": "OPEN",
         "rh_proved": False,
         "closure_target_formula": (
@@ -3404,11 +3641,14 @@ def execute_task_tc051_prime_arithmetic_resonant_band_audit(
             ),
             "compatibility_identities_proved": [
                 "R(X; A, B) = S_p(X; A, B) - p^{-1/2} S_p(X/p; A/p, B/p)   (exact single-prime separation)",
+                "R_j = S_j - q S_{j+1}, S_0 = sum_{j=0}^{L-1} q^j R_j + q^L S_L   (simultaneously rescaled arbitrary-interval tower)",
                 "R_{mu,band}(X) = S_{p,band}(X) - p^{-1/2} S_{p,band}(X/p) - p^{-1/2} B_p(X)   (canonical rescaled-band separation)",
+                "S_{p,band}(X) = sum_{j=0}^{L-1} q^j (R_{mu,band}(X/p^j) + q B_p(X/p^j)) + q^L S_{p,band}(X/p^L)   (canonical-band inverse tower)",
+                "R(X; A, B) = sum_{d | P} (mu(d)/sqrt(d)) S_P(X/d; A/d, B/d)   (multi-prime inclusion-exclusion)",
                 "R(X; A, B) = M_A(B) F_X(B) + int_A^B M_A(t) t^{-3/2} tilde{W}_log(X/t) dt   (exact summation by parts)",
             ],
             "unconditional_estimates_proved": [
-                "|B_p(X)| <= B_rescaled := B_log + (5/6) C_{log,EM} + (1/2) C_{log,0} < 14.851486   (all X >= 1, all primes p)",
+                "|B_p(X)| <= B_rescaled := B_log + (5/6) C_{log,EM} + (1/2) C_{log,0} < 14.851486   (all X >= 1, all primes p, across both M(X)/p >= M(X/p) and M(X)/p < M(X/p))",
                 "|M_{H(X)}(M(X)) F_X(M(X))| <= C_{log,0} (X^{5/2} / M(X)^2) <= C_{log,0} < 0.557430   (all X >= 1)",
                 "|R_{mu,band}(X) - I_{M,band}(X)| <= C_{log,0} < 0.557430   (all X >= 1)",
             ],
@@ -3435,14 +3675,14 @@ def execute_task_tc051_prime_arithmetic_resonant_band_audit(
 
 
 # ---------------------------------------------------------------------------
-# 6. Master Execution Function for TASK-TC-050 / TASK-TC-051
+# 6. Master Execution Function for TASK-TC-050 / TASK-TC-051 / TASK-TC-051R
 # ---------------------------------------------------------------------------
 
 
 def execute_task_tc050_faithful_spectral_realization_audit(
     prec_bits: int = 256,
 ) -> Dict[str, Any]:
-    """Execute the complete TASK-TC-050 audit and return the certified report dictionary."""
+    """Execute the complete TASK-TC-050 / TASK-TC-051R audit and return the certified report dictionary."""
     sec1_roles = verify_tau_joint_arithmetic_fourier_roles_and_transforms(
         prec_bits=prec_bits
     )
@@ -3465,11 +3705,14 @@ def execute_task_tc050_faithful_spectral_realization_audit(
     report: Dict[str, Any] = {
         "task_id": TASK_TC_050_ID,
         "continuation_task_id": TASK_TC_051_ID,
-        "repair_task_id": "TASK-TC-050R2",
-        "preceding_repair_task_id": "TASK-TC-050R",
+        "repair_task_id": "TASK-TC-051R",
+        "preceding_repair_task_ids": ["TASK-TC-050R", "TASK-TC-050R2"],
         "parent_epic": EPIC_TC_042_ID,
         "starting_head": STARTING_HEAD_TC_050,
         "tc051_starting_head": STARTING_HEAD_TC_051,
+        "tc051_merged_main_baseline": "b6f22dfee0dd6177ee855189304e7930f9ba3e20",
+        "tc051_implementation_commit": "333661eecd69738e8a67143e635b6db4f40170ce",
+        "tc051_branch_tip": "7ac0546b1177970ff0d87824f61643da2405c4c0",
         "reviewed_baseline": REVIEWED_BASELINE_TC_050,
         "tc050r_reviewed_baseline": "2f7871fff666091c4152ecc8657f2345aacdd4fa",
         "tc050r2_reviewed_head": "0e6ae36ce995ef3037652b3dfb67645325f990b1",
@@ -3578,8 +3821,10 @@ def execute_task_tc050_faithful_spectral_realization_audit(
                     "external_analytic_scope_note": (
                         "Theorem 54 proves the algebraic consequences of the single-prime separation and rescaled-band "
                         "boundary decomposition from explicit hypotheses h_sep, h_rescaled, h_low, h_high; the squarefree "
-                        "divisibility partition m = p d (mu(p d) = 0 for p | d, mu(p d) = -mu(d) for p nmid d) and the "
-                        "interval cutoff comparisons H(X)/p <= H(X/p) and M(X/p) <= M(X)/p are proved analytically outside Lean."
+                        "divisibility partition m = p d (mu(p d) = 0 for p | d, mu(p d) = -mu(d) for p nmid d), the lower "
+                        "cutoff comparison H(X)/p <= H(X/p), and the upper boundary bound |Delta_{p,high}(X)| <= B_tail across "
+                        "both cutoff orderings (M(X)/p >= M(X/p) and the small-Y single-endpoint regime M(X)/p < M(X/p) when "
+                        "1 <= X/p < 2^{4/5}) are proved analytically outside Lean."
                     ),
                 },
                 "theorem_55_summation_by_parts_endpoint_bound_and_smooth_mertens_reduction": {
