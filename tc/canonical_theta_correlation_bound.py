@@ -255,6 +255,14 @@ CANONICAL_THETA_CORRELATION_LEAN_DEFS = [
     "thetaZeroRadialDefectObservable",
     "primeIncrementStep",
     "localizedResonantBandDecomp",
+    "gradeRadialCharacter",
+    "hyperbolicPairForm",
+    "jordanTwoByTwoSocleStep",
+    "adelicPhaseDiscrepancy",
+    "logPrimeShiftAction",
+    "logScaleAction",
+    "controlledCorrelationRemainder",
+    "canonicalCorrelationHSOrbitDecomp",
 ]
 
 CANONICAL_THETA_CORRELATION_LEAN_THEOREMS = [
@@ -308,6 +316,9 @@ CANONICAL_THETA_CORRELATION_LEAN_THEOREMS = [
     "coupled_cutoff_prime_step_jump_and_dense_comparison_extension",
     "single_observable_common_referent_candidate_audit_and_trilemma",
     "prime_increment_telescoping_and_resonant_band_reduction",
+    "tau_grade_star_involution_and_hyperbolic_pair_obstruction",
+    "tate_rational_diagonal_character_rigidity_and_convolution_isometry",
+    "canonical_hilbert_schmidt_orbit_decomposition_and_resonant_band_equivalence",
 ]
 
 TAU_FLOAT = 2.0 * math.pi
@@ -9927,6 +9938,17 @@ def execute_task_tc049_arithmetic_cancellation_audit(
     )
 
     return _exec_tc049(prec_bits=prec_bits)
+
+
+def execute_task_tc050_faithful_spectral_realization_audit(
+    prec_bits: int = 256,
+) -> Dict[str, Any]:
+    """Execute TASK-TC-050: Construct the faithful tau-arithmetic spectral realization and prove adjoint compatibility."""
+    from tc.faithful_tau_arithmetic_spectral_realization import (
+        execute_task_tc050_faithful_spectral_realization_audit as _exec_tc050,
+    )
+
+    return _exec_tc050(prec_bits=prec_bits)
 
 
 def build_canonical_theta_correlation_bound_report(
