@@ -1680,7 +1680,19 @@ def jordanTwoByTwoSocleStep (lam c0 c1 : ℝ) : ℝ × ℝ :=
   (lam * c0 + c1, lam * c1)
 
 /-- Theorem 51: Grade Star-Involution Compatibility, Hyperbolic Pair Null-Cone Obstruction,
-    and Jordan Socle Eigenvector (`TASK-TC-050`).
+    and Jordan Socle Eigenvector (`TASK-TC-050` / `TASK-TC-050R`).
+    Proof Scope & External Hypothesis Discharge:
+    - Distinguishes (a) conditional unitary-character arguments (which show that IF Meyer's
+      cotangent quotient `H_-^0` admits a positive Hilbert inner product making `U_K` unitary
+      and extending to the socle functional `l_{rho,0}`, THEN `delta = Re(rho) - 1/2 = 0`) from
+      (b) the open construction of such a positive inner product (`SUBGATE-TC-043A`).
+    - Distinguishes continuous-dual functionals `l_{rho,0} in (H_-^0)'` (which extend off-critical
+      zeros in the nuclear Fréchet topology of `H_-^0`) from ambient `L^2(1/2 + i R)` vectors
+      (where off-critical point evaluation is unbounded).
+    - Distinguishes the socle eigenspace `ker(^t D_- - rho)` (dimension >= 1 for any multiplicity
+      `m_rho = ord_xi(rho) >= 1`, supplying a strict eigenvector `l_{rho,0}` without simplicity
+      assumptions) from higher generalized Jordan vectors `l_{rho,1}` in `ker((^t D_- - rho)^{m_rho})`
+      (which acquire nilpotent polynomial drift under `U_K`).
     (1) Multiplicative law across all real grades:
         For `tau > 1` and real `K, J, delta`, `gradeRadialCharacter tau (K + J) delta =
         gradeRadialCharacter tau K delta * gradeRadialCharacter tau J delta` and
@@ -1698,10 +1710,12 @@ def jordanTwoByTwoSocleStep (lam c0 c1 : ℝ) : ℝ × ℝ :=
         `B11 * c1^2 + 2 * B12 * c1 * c2 + B22 * c2^2` to `hyperbolicPairForm B12 c1 c2`,
         which takes strictly positive value `2 * B12 > 0` at `(1, 1)` and strictly negative value
         `-2 * B12 < 0` at `(1, -1)` whenever `B12 > 0`.
-    (4) Non-simple zero multiplicity socle eigenvector:
+    (4) Non-simple zero multiplicity socle eigenvector vs. Jordan-chain nilpotent drift:
         For any upper-triangular Jordan block action `jordanTwoByTwoSocleStep`, the socle vector
-        `(1, 0)` satisfies `jordanTwoByTwoSocleStep (gradeRadialCharacter tau K delta) 1 0 =
-        (gradeRadialCharacter tau K delta, 0)`. -/
+        `l_{rho,0} = (1, 0)` satisfies `jordanTwoByTwoSocleStep (gradeRadialCharacter tau K delta) 1 0 =
+        (gradeRadialCharacter tau K delta, 0)` (zero nilpotent drift), whereas the generalized vector
+        `l_{rho,1} = (0, 1)` satisfies `jordanTwoByTwoSocleStep (gradeRadialCharacter tau K delta) 0 1 =
+        (1, gradeRadialCharacter tau K delta)` with nonzero socle drift component `1 != 0`. -/
 theorem tau_grade_star_involution_and_hyperbolic_pair_obstruction
     (tau K J delta B11 B12 B22 c1 c2 : ℝ)
     (htau : 1 < tau)
@@ -1719,9 +1733,12 @@ theorem tau_grade_star_involution_and_hyperbolic_pair_obstruction
         0 < hyperbolicPairForm B12 1 1 ∧
         hyperbolicPairForm B12 1 (-1) < 0)) ∧
     (jordanTwoByTwoSocleStep (gradeRadialCharacter tau K delta) 1 0 =
-      (gradeRadialCharacter tau K delta, 0)) := by
+        (gradeRadialCharacter tau K delta, 0) ∧
+      jordanTwoByTwoSocleStep (gradeRadialCharacter tau K delta) 0 1 =
+        (1, gradeRadialCharacter tau K delta) ∧
+      (jordanTwoByTwoSocleStep (gradeRadialCharacter tau K delta) 0 1).1 ≠ 0) := by
   have htau_pos : 0 < tau := by linarith
-  refine ⟨⟨?_, ?_⟩, ?_, ?_, ?_⟩
+  refine ⟨⟨?_, ?_⟩, ?_, ?_, ⟨?_, ?_, ?_⟩⟩
   · dsimp [gradeRadialCharacter]
     rw [← Real.rpow_add htau_pos]
     ring_nf
@@ -1794,6 +1811,10 @@ theorem tau_grade_star_involution_and_hyperbolic_pair_obstruction
       linarith
   · dsimp [jordanTwoByTwoSocleStep]
     ext <;> ring
+  · dsimp [jordanTwoByTwoSocleStep]
+    ext <;> ring
+  · dsimp [jordanTwoByTwoSocleStep]
+    norm_num
 
 /-- Total log-phase discrepancy `(tau - c_inf) * q` of the adelic character product
     `prod_p psi_p(q) * psi_inf(q) = exp(i * (tau - c_inf) * q)` on a principal rational
@@ -1812,7 +1833,15 @@ def logScaleAction (scale u : ℝ) : ℝ :=
   scale * u
 
 /-- Theorem 52: Tate Rational Diagonal Character Rigidity, Semidirect Intertwining of
-    Arithmetic vs. Analytic Prime Transforms, and Convolution-Trace Isometry (`TASK-TC-050`).
+    Arithmetic vs. Analytic Prime Transforms, and Convolution-Trace Isometry (`TASK-TC-050` / `TASK-TC-050R`).
+    Proof Scope & External Hypothesis Discharge:
+    - The reduction of the principal-adele character product to `adelicPhaseDiscrepancy tau c_inf q`
+      is discharged by the rational partial-fraction identity `q - sum_p {q}_p in Z` (Cassels–Fröhlich
+      Ch. XV, verified in `verify_tau_joint_arithmetic_fourier_roles_and_transforms`).
+    - In (4), the hypothesis `C_dil = C_gh` represents the multiplicative Haar change-of-variables
+      identity `((U_K g) * (U_K h)^*)(alpha) = (g * h^*)(alpha)` on `R_+^×` (proved analytically in
+      Section 3 of `docs/reviews/TC_FAITHFUL_TAU_ARITHMETIC_SPECTRAL_REALIZATION.md`), from which
+      Lean verifies invariance of any linear trace functional `T_conv`.
     (1) Tate rational diagonal character rigidity:
         For fixed local p-adic characters normalized with `tau = 2 * pi`, vanishing of the
         rational-diagonal phase discrepancy `adelicPhaseDiscrepancy tau c_inf 1 = 0` at `q = 1`
@@ -1877,29 +1906,36 @@ def canonicalCorrelationHSOrbitDecomp (P_K E_ctrl_K R_band_X : ℝ) : ℝ :=
   P_K + (E_ctrl_K - R_band_X)
 
 /-- Theorem 53: Canonical Hilbert–Schmidt Unitary Orbit Decomposition and Resonant-Band
-    Boundedness Equivalence (`TASK-TC-050`).
-    Scope Note: This theorem formalizes the exact algebraic decomposition
-    `C_tau(K) = P_tau(K) + E_tau(K)` where `P_tau(K) = <U_K B_0, B_0>_{HS}` satisfies
-    `|P_tau(K)| <= ||B_0||_{HS}^2 = P_0` on the positive Hilbert space
-    `H_tau^pos = H_tau^B ⊕ L^2(R_{>0}, d^× x)` and `E_tau(K) = E_{tau,controlled}(K) - R_{mu,band}(X_K)`.
-    The analytic evaluations of `||B_0||_{HS}^2 = 2.5582580074...` and the component bounds
-    `B_h0, B_refl, B_log, B_head, B_tail` are proved in the companion review and certified in
-    256-bit Arb in `tc/faithful_tau_arithmetic_spectral_realization.py`.
-    (1) Exact decomposition identity:
-        When `W_arch = P_K - c_pole_transfer_h0` and
-        `W_prime = W_reflected + W_log_X + localizedResonantBandDecomp R_head R_band_X R_tail`,
-        the canonical correlation `C_K = W_arch - W_prime` satisfies
-        `C_K = canonicalCorrelationHSOrbitDecomp P_K E_ctrl_K R_band_X = P_K + E_K`.
-    (2) Controlled remainder bound:
-        `|E_ctrl_K| <= B_ctrl` and `|C_K - (P_K - R_band_X)| <= B_ctrl`, where
-        `B_ctrl = B_h0 + B_refl + B_log + B_head + B_tail`.
+    Boundedness Equivalence (`TASK-TC-050` / `TASK-TC-050R`).
+    Proof Scope & External Hypothesis Discharge:
+    - Formalizes the Attempt B pole-integral `J(kappa)` cancellation between
+      `P_K^B := <A_tau^B T_K psi_tau, A_tau^B psi_tau>_{H_tau^B} = W_arch + c_tau^B * h0_XK - (2 * h0_XK - J_K)`
+      (where `(A_tau^B f)(x, y) = f(y) - f(y/x)` is the one-sided shift-difference operator from
+      `TC-042F`/`TC-043`) and `R_{0,K} := 4 <R_0 T_K psi_tau, R_0 psi_tau>_{L^2(dy/y)} = 4 * h0_XK - J_K`,
+      giving `P_K = P_K^B + R_{0,K} = W_arch + (c_tau^B + 2) * h0_XK` and discharging `h_arch`.
+    - Discharges the `TC-049`/`TC-049R` cutoff definitions `H(X) = floor(X^{5/6})` and
+      `M(X) = ceil(max(2, X^{5/4}))`, where `|R_head| <= (5/6) * C_log_EM` (`B_head`) and
+      `|R_tail| <= (1/2) * C_log_0` (`B_tail`) are proved uniform `O(1)` bounds, and verifies the
+      concrete rational upper bound `B_ctrl < 17987140 / 1000000` (`17.987140`) from the 256-bit Arb
+      component enclosures `B_h0 < 2.671923`, `B_refl < 0.463730`, `B_log < 3.349009`,
+      `C_log_EM < 13.468515`, and `C_log_0 < 0.557430`.
+    - Distinguishes both directions of the RH equivalence: the Fixed-Seed RH Equivalence Theorem
+      (`TASK-TC-037` / Theorem 12) shows `sup_K |C_tau(K)| < infty ==> RH` without assuming zero
+      simplicity, whereas the converse spectral triangle bound (`RH + simplicity ==> sup_K |C_tau(K)| < infty`)
+      uses absolute summability of simple critical-line zero coefficients.
+    (1) Attempt B `J_K`-cancellation & exact decomposition identity:
+        `(W_arch + c_tau_B * h0_XK - (2 * h0_XK - J_K)) + (4 * h0_XK - J_K) = W_arch + (c_tau_B + 2) * h0_XK`,
+        `0 <= P_0 -> |P_0| <= P_0`, and `C_K = canonicalCorrelationHSOrbitDecomp P_K E_ctrl_K R_band_X = P_K + E_K`.
+    (2) Controlled remainder bound & concrete `TC-049R` rational bound discharge:
+        `|E_ctrl_K| <= B_ctrl`, `|C_K - (P_K - R_band_X)| <= B_ctrl`, and under the certified rational
+        enclosures with `B_head = (5/6) * C_log_EM` and `B_tail = (1/2) * C_log_0`, `B_ctrl < 17987140 / 1000000`.
     (3) Two-way boundedness equivalence between `C_tau(K)`, `E_tau(K)`, and `R_{mu,band}(tau^{|K|})`:
         - If `|R_band_X| <= M_band`, then `|E_K| <= B_ctrl + M_band` and `|C_K| <= P_0 + B_ctrl + M_band`.
         - Conversely, if `|C_K| <= M_C`, then `|E_K| <= M_C + P_0` and `|R_band_X| <= M_C + P_0 + B_ctrl`. -/
 theorem canonical_hilbert_schmidt_orbit_decomposition_and_resonant_band_equivalence
-    (W_arch W_prime P_K P_0 c_pole_transfer_h0 W_reflected W_log_X
+    (W_arch W_prime P_K P_0 c_tau_B h0_XK J_K c_pole_transfer_h0 W_reflected W_log_X
       R_head R_band_X R_tail
-      B_h0 B_refl B_log B_head B_tail M_band M_C : ℝ)
+      B_h0 B_refl B_log C_log_EM C_log_0 B_head B_tail M_band M_C : ℝ)
     (h_arch : W_arch = P_K - c_pole_transfer_h0)
     (h_prime : W_prime = W_reflected + W_log_X + localizedResonantBandDecomp R_head R_band_X R_tail)
     (h_PK : |P_K| ≤ P_0)
@@ -1912,9 +1948,21 @@ theorem canonical_hilbert_schmidt_orbit_decomposition_and_resonant_band_equivale
     let E_ctrl_K := controlledCorrelationRemainder c_pole_transfer_h0 W_reflected W_log_X R_head R_tail
     let E_K := E_ctrl_K - R_band_X
     let B_ctrl := B_h0 + B_refl + B_log + B_head + B_tail
-    (C_K = canonicalCorrelationHSOrbitDecomp P_K E_ctrl_K R_band_X ∧
+    (((W_arch + c_tau_B * h0_XK - (2 * h0_XK - J_K)) + (4 * h0_XK - J_K) =
+        W_arch + (c_tau_B + 2) * h0_XK) ∧
+      (0 ≤ P_0 → |P_0| ≤ P_0) ∧
+      C_K = canonicalCorrelationHSOrbitDecomp P_K E_ctrl_K R_band_X ∧
       C_K = P_K + E_K) ∧
-    (|E_ctrl_K| ≤ B_ctrl ∧ |C_K - (P_K - R_band_X)| ≤ B_ctrl) ∧
+    (|E_ctrl_K| ≤ B_ctrl ∧
+      |C_K - (P_K - R_band_X)| ≤ B_ctrl ∧
+      (B_head = (5 / 6 : ℝ) * C_log_EM →
+        B_tail = (1 / 2 : ℝ) * C_log_0 →
+        B_h0 < 2671923 / 1000000 →
+        B_refl < 463730 / 1000000 →
+        B_log < 3349009 / 1000000 →
+        C_log_EM < 13468515 / 1000000 →
+        C_log_0 < 557430 / 1000000 →
+        B_ctrl < 17987140 / 1000000)) ∧
     ((|R_band_X| ≤ M_band → (|E_K| ≤ B_ctrl + M_band ∧ |C_K| ≤ P_0 + B_ctrl + M_band)) ∧
       (|C_K| ≤ M_C → (|E_K| ≤ M_C + P_0 ∧ |R_band_X| ≤ M_C + P_0 + B_ctrl))) := by
   intro C_K E_ctrl_K E_K B_ctrl
@@ -1924,6 +1972,13 @@ theorem canonical_hilbert_schmidt_orbit_decomposition_and_resonant_band_equivale
   have hlog := abs_le.mp h_log
   have hhead := abs_le.mp h_head
   have htail := abs_le.mp h_tail
+  have h_J_cancel :
+      (W_arch + c_tau_B * h0_XK - (2 * h0_XK - J_K)) + (4 * h0_XK - J_K) =
+        W_arch + (c_tau_B + 2) * h0_XK := by
+    ring
+  have h_P0_self : 0 ≤ P_0 → |P_0| ≤ P_0 := by
+    intro hP0_nonneg
+    rw [abs_of_nonneg hP0_nonneg]
   have h_CK_decomp : C_K = canonicalCorrelationHSOrbitDecomp P_K E_ctrl_K R_band_X := by
     dsimp [C_K, E_ctrl_K, canonicalCorrelationHSOrbitDecomp, controlledCorrelationRemainder,
       localizedResonantBandDecomp] at *
@@ -1937,9 +1992,13 @@ theorem canonical_hilbert_schmidt_orbit_decomposition_and_resonant_band_equivale
   have h_diff_eq : C_K - (P_K - R_band_X) = E_ctrl_K := by
     dsimp [E_K] at h_CK_sum
     linarith
-  refine ⟨⟨h_CK_decomp, h_CK_sum⟩, ⟨abs_le.mpr h_E_ctrl_bounds, ?_⟩, ⟨?_, ?_⟩⟩
+  refine ⟨⟨h_J_cancel, h_P0_self, h_CK_decomp, h_CK_sum⟩,
+    ⟨abs_le.mpr h_E_ctrl_bounds, ?_, ?_⟩, ⟨?_, ?_⟩⟩
   · rw [h_diff_eq]
     exact abs_le.mpr h_E_ctrl_bounds
+  · intro hB_head hB_tail hBh0 hBrefl hBlog hCEM hC0
+    dsimp [B_ctrl]
+    linarith
   · intro h_band
     have hband := abs_le.mp h_band
     refine ⟨?_, ?_⟩

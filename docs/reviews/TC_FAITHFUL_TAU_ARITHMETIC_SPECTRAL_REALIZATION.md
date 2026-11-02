@@ -1,12 +1,12 @@
-# Faithful $\tau$-Arithmetic Spectral Realization, Adjoint Compatibility, and Canonical Hilbert–Schmidt Orbit Decomposition (`TASK-TC-050`)
+# Faithful $\tau$-Arithmetic Spectral Realization, Adjoint Compatibility, and Canonical Hilbert–Schmidt Orbit Decomposition (`TASK-TC-050` / `TASK-TC-050R`)
 
-**Task ID:** `TASK-TC-050`  
+**Task ID:** `TASK-TC-050` / `TASK-TC-050R`  
 **Parent Epic:** `EPIC-TC-042`  
-**Reviewed Baseline:** `5da0eb79e1732ff871ee1c7fee729c62972aa406` (`TC-048R`)  
-**Branched From:** `e6472e039c70beed968ed4323cb1eb7e31ca160f` (incorporating `TC-049` and `TC-049R` repairs)  
+**Reviewed Baselines:** `5da0eb79e1732ff871ee1c7fee729c62972aa406` (`TC-048R`), `2f7871fff666091c4152ecc8657f2345aacdd4fa` (`TC-050` + `TC-049R`)  
+**Branched From:** `2f7871fff666091c4152ecc8657f2345aacdd4fa` (`task/tc-050r-cutoff-hs-certification-and-proof-scope-repair`)  
 **Primary Implementation Module:** [tc/faithful_tau_arithmetic_spectral_realization.py](file:///c:/Development/Projects/reimann_scope/tc/faithful_tau_arithmetic_spectral_realization.py)  
 **Exported Facade Entrypoint:** [`execute_task_tc050_faithful_spectral_realization_audit`](file:///c:/Development/Projects/reimann_scope/tc/canonical_theta_correlation_bound.py#L10142-L10169)  
-**Certified 256-bit Arb Data Artifact:** [data/tc_faithful_tau_arithmetic_spectral_realization.json](file:///c:/Development/Projects/reimann_scope/data/tc_faithful_tau_arithmetic_spectral_realization.json) (`311/311` certified 256-bit Arb balls passing outward-rounded decimal round-trip verification)  
+**Certified 256-bit Arb Data Artifact:** [data/tc_faithful_tau_arithmetic_spectral_realization.json](file:///c:/Development/Projects/reimann_scope/data/tc_faithful_tau_arithmetic_spectral_realization.json) (`489/489` certified 256-bit Arb balls passing outward-rounded decimal round-trip verification)  
 **Formal Verification Module:** [formal/RiemannScope/CanonicalThetaCorrelationBound.lean](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope/CanonicalThetaCorrelationBound.lean) (`40` definitions, `53` theorems, `0` `sorry`, `0` `admit`, `0` custom axioms)  
 **Regression Test Suite:** [tests/test_tc_faithful_tau_arithmetic_spectral_realization.py](file:///c:/Development/Projects/reimann_scope/tests/test_tc_faithful_tau_arithmetic_spectral_realization.py)  
 **Status Classification:** `ADJOINT_COMPATIBILITY_HYPERBOLIC_NULL_CONE_AND_CANONICAL_HILBERT_SCHMIDT_ORBIT_DECOMPOSITION_PROVED_RESONANT_BAND_EQUIVALENCE_ISOLATED_SUBGATE_OPEN` (`PROVED_CONDITIONAL` + `CERTIFIED_FINITE`; `SUBGATE-TC-043A` remains `OPEN`; `rh_proved: false`)
@@ -269,97 +269,162 @@ In `arXiv:2511.22755`:
 
 ## 5. Target 2 Construction: Canonical Hilbert–Schmidt Unitary Orbit Decomposition $C_\tau(K) = P_\tau(K) + E_\tau(K)$ (`Section 4`, Theorem 53)
 
-To advance the faithful spectral realization directly on the canonical correlation $C_\tau(K) = Q_\tau(T_K\psi_\tau, \psi_\tau)$ without assuming RH or Weil positivity, we construct an unconditional positive Hilbert space $\mathcal{H}_\tau^{\mathrm{pos}}$, a strongly continuous unitary grade representation $\mathcal{U}_K$, and a Hilbert–Schmidt rank-one operator $B_0 \in \mathcal{B}_2(\mathcal{H}_\tau^{\mathrm{pos}})$ whose unitary orbit matrix coefficient $P_\tau(K) := \langle \mathcal{U}_K B_0, B_0\rangle_{\mathrm{HS}}$ captures the positive archimedean-plus-pole-transfer core of $C_\tau(K)$, while isolating the exact arithmetic remainder $E_\tau(K)$ in terms of the `TC-049`/`TC-049R` resonant divisor band.
+To advance the faithful spectral realization directly on the canonical correlation $C_\tau(K) = Q_\tau(T_K\psi_\tau, \psi_\tau)$ without assuming RH or Weil positivity, we construct an unconditional positive Hilbert space $\mathcal{H}_\tau^{\mathrm{pos}}$, a strongly continuous unitary grade representation $\mathcal{U}_K$, and a Hilbert–Schmidt rank-one operator $B_0 \in \mathcal{B}_2(\mathcal{H}_\tau^{\mathrm{pos}})$ whose unitary orbit matrix coefficient $P_\tau(K) := \langle \mathcal{U}_K B_0, B_0\rangle_{\mathrm{HS}}$ captures the positive archimedean-plus-pole-transfer core of $C_\tau(K)$, while isolating the exact arithmetic remainder $E_\tau(K)$ in terms of the restored `TC-049`/`TC-049R` resonant divisor band.
 
-### 5.1 The Unconditional Positive Hilbert Space $\mathcal{H}_\tau^{\mathrm{pos}}$ and Unitary Grade Orbit
+### 5.1 The Unconditional Positive Hilbert Space $\mathcal{H}_\tau^{\mathrm{pos}}$, One-Sided Shift-Difference Operator $A_\tau^B$, and Unitary Grade Orbit
 
-1. **Positive Hilbert Space**:
+1. **Positive Hilbert Space and One-Sided Shift-Difference Operator (`TC-042F`/`TC-043` Attempt B)**:
    Define unconditionally (with zero dependence on RH or the zeros of $\zeta$):
    $$
    \mathcal{H}_\tau^{\mathrm{pos}} := \mathcal{H}_\tau^B \oplus L^2(\mathbb{R}_{>0}, d^\times y),
+   \qquad
+   \mathcal{H}_\tau^B := L^2\!\left([1, \infty)\times \mathbb{R}_{>0},\; \frac{x^{-3/2}}{x - x^{-1}}\,\frac{dx}{x}\,\frac{dy}{y}\right),
    $$
-   where $\mathcal{H}_\tau^B = L^2\bigl((1, \infty)\times \mathbb{R}_{>0},\, \frac{x^{-3/2}}{x - x^{-1}}\,\frac{dx}{x}\,d^\times y\bigr)$ is the Attempt B difference-square space (`TC-042F`) with $(A_\tau^B f)(x, y) = (\nabla_x f)(y) = f(xy) - f(y/x)$, and $(R_0 f)(y) = \int_0^y (u/y)^{1/2}(D_u f)(u)\,\frac{du}{u}$ is the causal Euler resolvent at $s = 0$ (`TC-043R`).
+   equipped with the **one-sided shift-difference operator** from `TC-042F` (Section 6) and `TC-043` (Section 5.1):
+   $$
+   \boxed{(A_\tau^B f)(x, y) := \bigl((I - S_x^{-1})f\bigr)(y) = f(y) - f(y/x), \qquad (S_x f)(y) := f(xy),}
+   $$
+   together with the causal Euler resolvent at $s = 0$ (`TC-043R` Section 12.2):
+   $$
+   (R_0 f)(y) := \int_0^y \left(\frac{u}{y}\right)^{1/2} (D_u f)(u)\,\frac{du}{u}.
+   $$
+   > **Reconciliation Note (`TC-050R`):** In `TC-042F`/`TC-043`, the Attempt B shift-difference identity uses the **one-sided** difference $(I - S_x^{-1})f(y) = f(y) - f(y/x)$:
+   > $$
+   > \int_0^\infty (A_\tau^B T_K\psi_\tau)(x, y)\,\overline{(A_\tau^B\psi_\tau)(x, y)}\,\frac{dy}{y}
+   > = 2\,h_0(\tau^{|K|}) - h_0(\tau^{|K|} x) - h_0(\tau^{|K|} x^{-1})
+   > = 2\,h_0(e^\kappa) - h_0(e^{\kappa + u}) - h_0(e^{\kappa - u}) \qquad (x = e^u, \; \kappa = |K|\log\tau).
+   > $$
+   > By contrast, a two-sided difference $f(xy) - f(y/x)$ would shift the relative argument by $x^2 = e^{2u}$ and evaluate to $2h_0(e^\kappa) - h_0(e^{\kappa+2u}) - h_0(e^{\kappa-2u})$ unless $x$ is replaced by $x^{1/2}$ via the unitary change of variables $y \mapsto x^{-1/2} y$ (which maps $f(y) - f(y/x) \mapsto f(x^{1/2} y) - f(x^{-1/2} y)$ without changing the $L^2(\mathbb{R}_{>0}, dy/y)$ inner product). We adopt the canonical one-sided operator $(A_\tau^B f)(x, y) = f(y) - f(y/x)$ throughout code, certificates, Lean comments, and prose.
+
 2. **Positive Embedding and Unitary Grade Representation**:
    Define the grade-covariant linear map $\mathcal{J}_\tau : \mathcal{S}_\tau \to \mathcal{H}_\tau^{\mathrm{pos}}$ and unitary group $\mathcal{U}_K$ ($K \in \mathbb{R}$) by
    $$
-   \mathcal{J}_\tau(f) := \bigl(A_\tau^B f,\; 2\,R_0 f\bigr) \in \mathcal{H}_\tau^{\mathrm{pos}}, \qquad \mathcal{U}_K := U_K^B \oplus T_K.
+   \mathcal{J}_\tau(f) := \bigl(A_\tau^B f,\; 2\,R_0 f\bigr) \in \mathcal{H}_\tau^{\mathrm{pos}},
+   \qquad
+   \mathcal{U}_K(\Phi, g)(x, y) := \bigl(\Phi(x, \tau^{-K} y),\; g(\tau^{-K} y)\bigr) = \bigl((U_K^B \Phi)(x, y),\; (T_K g)(y)\bigr).
    $$
-   Because $\nabla_x T_K = T_K \nabla_x$ and $R_0 T_K = T_K R_0$, $\mathcal{J}_\tau$ intertwines $T_K$ with $\mathcal{U}_K$:
+   Because multiplicative dilation in $y$ commutes with $y \mapsto y/x$ and with $R_0$, $\mathcal{J}_\tau$ intertwines $T_K$ with $\mathcal{U}_K$:
    $$
    \mathcal{J}_\tau(T_K f) = \mathcal{U}_K\,\mathcal{J}_\tau(f), \qquad \|\mathcal{U}_K \Psi\|_{\mathcal{H}_\tau^{\mathrm{pos}}} = \|\Psi\|_{\mathcal{H}_\tau^{\mathrm{pos}}} \qquad (\forall K \in \mathbb{R}).
    $$
-3. **Hilbert–Schmidt Rank-One State $B_0$ and Matrix Coefficient $P_\tau(K)$**:
-   Set $\Psi_0 := \mathcal{J}_\tau(\psi_\tau) \in \mathcal{H}_\tau^{\mathrm{pos}}$, chooses a unit reference vector $e_0 \in \mathcal{H}_\tau^{\mathrm{pos}}$ ($\|e_0\| = 1$), and define the rank-one Hilbert–Schmidt operator $B_0 := |\Psi_0\rangle\langle e_0| \in \mathcal{B}_2(\mathcal{H}_\tau^{\mathrm{pos}})$. Under the left unitary action $B_K := \mathcal{U}_K B_0 = |\mathcal{U}_K\Psi_0\rangle\langle e_0|$, the Hilbert–Schmidt inner product is
+
+3. **Hilbert–Schmidt Rank-One Operator $B_0$, Matrix Coefficient $P_\tau(K)$, and Exact $J(\kappa)$ Cancellation**:
+   Set $\Psi_0^{\mathrm{pos}} := \mathcal{J}_\tau(\psi_\tau) = (A_\tau^B\psi_\tau, 2 R_0\psi_\tau) \in \mathcal{H}_\tau^{\mathrm{pos}}$, fix a unit vector $e_0 \in \mathcal{H}_\tau^{\mathrm{pos}}$ ($\|e_0\|_{\mathcal{H}_\tau^{\mathrm{pos}}} = 1$), and define the rank-one Hilbert–Schmidt operator
    $$
-   \boxed{P_\tau(K) := \langle \mathcal{U}_K B_0, B_0\rangle_{\mathrm{HS}} = \operatorname{Tr}(B_0^* \mathcal{U}_K B_0) = \langle \mathcal{U}_K\Psi_0, \Psi_0\rangle_{\mathcal{H}_\tau^{\mathrm{pos}}} = \langle A_\tau^B T_K\psi_\tau, A_\tau^B\psi_\tau\rangle_{\mathcal{H}_\tau^B} + 4\,\langle R_0 T_K\psi_\tau, R_0\psi_\tau\rangle_{L^2(d^\times y)}.}
+   B_0 := |\Psi_0^{\mathrm{pos}}\rangle\langle e_0| \in \mathcal{B}_2(\mathcal{H}_\tau^{\mathrm{pos}}), \qquad B_K := \mathcal{U}_K B_0 = |\mathcal{U}_K\Psi_0^{\mathrm{pos}}\rangle\langle e_0|.
    $$
-   By Cauchy–Schwarz in $\mathcal{B}_2(\mathcal{H}_\tau^{\mathrm{pos}})$ (and Bochner's theorem for the unitary representation $K \mapsto \mathcal{U}_K$), $P_\tau(K)$ is an **unconditionally positive-definite function** on $\mathbb{R}$ satisfying:
+   With $\kappa = |K|\log\tau$, $X_K = e^\kappa = \tau^{|K|} \ge 1$, and $J(\kappa) := \int_0^\infty e^{-3u/2}(h_0(e^{\kappa+u}) + h_0(e^{\kappa-u}))\,du$, the two component inner products evaluate (`TC-042F` Section 6 and `TC-043R` Section 12.2) to:
    $$
-   \boxed{\bigl|P_\tau(K)\bigr| \le \|B_0\|_{\mathrm{HS}}^2 = P_\tau(0) = \|A_\tau^B\psi_\tau\|_{\mathcal{H}_\tau^B}^2 + 4\,\|R_0\psi_\tau\|_{L^2(d^\times y)}^2 = 2.558258007415831\ldots \qquad (\forall K \in \mathbb{R}),}
+   \begin{aligned}
+   P_\tau^B(K) &:= \langle A_\tau^B T_K\psi_\tau, A_\tau^B\psi_\tau\rangle_{\mathcal{H}_\tau^B}
+   = \int_0^\infty \frac{e^{-3u/2}}{2\sinh u}\bigl(2\,h_0(e^\kappa) - h_0(e^{\kappa+u}) - h_0(e^{\kappa-u})\bigr)\,du \\
+   &= W_{\mathrm{arch}}(h_K) + c_\tau^B\,h_0(X_K) - \bigl(2\,h_0(X_K) - J(\kappa)\bigr), \\
+   4\,\langle R_0 T_K\psi_\tau, R_0\psi_\tau\rangle_{L^2(d^\times y)}
+   &= B_{\mathrm{transfer}}(T_K\psi_\tau, \psi_\tau) + 2\,h_0(X_K)
+   = 4\,h_0(X_K) - J(\kappa).
+   \end{aligned}
+   $$
+   Adding the two components cancels the pole-integral term $J(\kappa)$ identically (`(W_arch + c_tau_B * h0_XK - (2 * h0_XK - J_K)) + (4 * h0_XK - J_K) = W_arch + (c_tau_B + 2) * h0_XK` in Lean 4 Theorem 53):
+   $$
+   \boxed{P_\tau(K) := \langle \mathcal{U}_K B_0, B_0\rangle_{\mathrm{HS}} = \operatorname{Tr}(B_0^* \mathcal{U}_K B_0) = P_\tau^B(K) + 4\,\langle R_0 T_K\psi_\tau, R_0\psi_\tau\rangle_{L^2(d^\times y)} = W_{\mathrm{arch}}(h_K) + \bigl(c_\tau^B + 2\bigr)\,h_0(\tau^{|K|}).}
+   $$
+   At $K = 0$ ($h_0(1) = \frac{1051}{3840}\tau^{1/2}\cdot \frac{1}{\sqrt{2}} = 0.4863195462417155\ldots$):
+   $$
+   \begin{aligned}
+   \|A_\tau^B\psi_\tau\|_{\mathcal{H}_\tau^B}^2 &= P_\tau^B(0) = 0.5947678334606322481483108\ldots, \\
+   4\,\|R_0\psi_\tau\|_{L^2(d^\times y)}^2 &= 4\,h_0(1) - J(0) = 1.963490173955198951575709\ldots, \\
+   \|B_0\|_{\mathrm{HS}}^2 &= P_\tau(0) = P_\tau^B(0) + 4\,\|R_0\psi_\tau\|_{L^2(d^\times y)}^2 = 2.558258007415831199724020\ldots
+   \end{aligned}
+   $$
+   By Cauchy–Schwarz in $\mathcal{B}_2(\mathcal{H}_\tau^{\mathrm{pos}})$ (and Bochner's theorem for the unitary representation $K \mapsto \mathcal{U}_K$), both $P_\tau^B(K)$ and $P_\tau(K)$ are unconditionally positive-definite functions of $K \in \mathbb{R}$ satisfying:
+   $$
+   \boxed{\bigl|P_\tau^B(K)\bigr| \le P_\tau^B(0) \approx 0.59476783, \qquad \bigl|P_\tau(K)\bigr| \le \|B_0\|_{\mathrm{HS}}^2 = P_\tau(0) \approx 2.55825801 \qquad (\forall K \in \mathbb{R}),}
    $$
    with $P_\tau(K) = O(|K|\,\tau^{-|K|/2})$ as $|K| \to \infty$.
 
 ---
 
-### 5.2 Exact Decomposition $C_\tau(K) = P_\tau(K) + E_\tau(K)$ and Direct Bridge to `TC-049`/`TC-049R` (`canonical_hilbert_schmidt_orbit_decomposition_and_resonant_band_equivalence`, Theorem 53)
+### 5.2 Restored `TC-049`/`TC-049R` Head–Band–Tail Decomposition and Controlled Remainder Bounds (`Section 4.2`, Theorem 53)
 
-By polarizing the exact Attempt B + pole-vanishing transfer identity on $\mathcal{S}_\tau$ (`TC-043R` Section 12.2):
-$$
-W_{\mathrm{arch}}(h_K) = \langle A_\tau^B T_K\psi_\tau, A_\tau^B\psi_\tau\rangle_{\mathcal{H}_\tau^B} - c_\tau^B\langle T_K\psi_\tau, \psi_\tau\rangle_{L^2} + B_{\mathrm{transfer}}(T_K\psi_\tau, \psi_\tau),
-$$
-where $c_\tau^B = \log(2\tau) + \gamma_E + 2 - \frac{\tau}{4} \approx 3.3721834192256654$, $\langle T_K\psi_\tau, \psi_\tau\rangle_{L^2} = h_0(\tau^{|K|})$, and
-$$
-B_{\mathrm{transfer}}(T_K\psi_\tau, \psi_\tau) = 4\,\langle R_0 T_K\psi_\tau, R_0\psi_\tau\rangle_{L^2} - 2\,h_0(\tau^{|K|}),
-$$
-we obtain the **exact identity** valid for every $K \in \mathbb{A}_{\mathbb{R}}$:
-$$
-W_{\mathrm{arch}}(h_K) = P_\tau(K) - \bigl(c_\tau^B + 2\bigr)\,h_0(\tau^{|K|}).
-$$
-Combining this with $C_\tau(K) = W_{\mathrm{arch}}(h_K) - W(\tau^{|K|}) - W(\tau^{-|K|})$ and the `TC-049`/`TC-049R` three-zone Möbius decomposition $W(X) = W_{\log}(X) + R_{\mu,\mathrm{head}}(X) + R_{\mu,\mathrm{band}}(X) + R_{\mu,\mathrm{tail}}(X)$ ($X = \tau^{|K|} \ge 1$) proves **Theorem 53** (`canonical_hilbert_schmidt_orbit_decomposition_and_resonant_band_equivalence` in Lean 4):
-$$
-\boxed{C_\tau(K) = P_\tau(K) + E_\tau(K), \qquad E_\tau(K) = E_{\tau,\mathrm{controlled}}(K) - R_{\mu,\mathrm{band}}(\tau^{|K|}),}
-$$
-where the 5-term controlled remainder (`controlledCorrelationRemainder` in Lean 4) is:
-$$
-\boxed{E_{\tau,\mathrm{controlled}}(K) := -\bigl(c_\tau^B + 2\bigr)\,h_0(\tau^{|K|}) - W(\tau^{-|K|}) - W_{\log}(\tau^{|K|}) - R_{\mu,\mathrm{head}}(\tau^{|K|}) - R_{\mu,\mathrm{tail}}(\tau^{|K|}).}
-$$
-Every one of the five terms in $E_{\tau,\mathrm{controlled}}(K)$ is unconditionally bounded on $\mathbb{A}_{\mathbb{R}}$ and decays as $|K| \to \infty$:
-1. $|(c_\tau^B + 2)h_0(X_K)| \le (c_\tau^B + 2)\frac{92193}{32768}X_K^{-5/2} \approx 2.671908\,X_K^{-5/2} = O(\tau^{-5|K|/2})$;
-2. $|W(X_K^{-1})| = |P_{\mathrm{fwd}}(X_K)| \le 0.633039\,X_K^{-5/2} = O(\tau^{-5|K|/2})$ (`TC-042R2`);
-3. $|W_{\log}(X_K)| \le C_{\log,\mathrm{EM}}\,X_K^{-5/2} \approx 13.468513\,X_K^{-5/2} = O(\tau^{-5|K|/2})$ (`TC-049`/`TC-049R`);
-4. $|R_{\mu,\mathrm{head}}(X_K)| \le \frac{5}{6}C_{\log,\mathrm{EM}} \approx 11.223761$ globally, and $|R_{\mu,\mathrm{head}}(X_K)| \le (\sum_{m\ge 2} m^{-3}) C_{\log,\mathrm{EM}} X_K^{-5/2}\log X_K + O(X_K^{-5/2})$ asymptotically;
-5. $|R_{\mu,\mathrm{tail}}(X_K)| \le C_{\log,0}\,X_K^{5/2} M(X_K)^{-2} \le \frac{1}{2}C_{\log,0} \approx 0.278715$ globally, and $O(X_K^{-5/8}) = O(\tau^{-5|K|/8})$ asymptotically since $M(X_K) = \lceil\max(2, X_K^{5/4})\rceil$.
+1. **Restored `TC-049`/`TC-049R` Divisor Cutoffs vs. Prime Cutoffs**:
+   For $X = X_K = \tau^{|K|} \ge 1$, we use the exact `TC-049`/`TC-049R` head–band–tail decomposition of the Möbius remainder $R_\mu(X) = W(X) - W_{\log}(X) = \sum_{m \ge 2}\frac{\mu(m)}{\sqrt{m}}W_{\log}(X/m)$:
+   $$
+   \boxed{H(X) := \bigl\lfloor X^{5/6}\bigr\rfloor, \qquad M(X) := \bigl\lceil\max(2, X^{5/4})\bigr\rceil,}
+   $$
+   $$
+   \begin{aligned}
+   R_{\mu,\mathrm{head}}(X) &:= \sum_{2 \le m \le H(X)} \frac{\mu(m)}{\sqrt{m}}\,W_{\log}\!\left(\frac{X}{m}\right) \qquad \bigl(= 0 \text{ when } H(X) < 2, \text{ i.e. } 1 \le X < 2^{6/5} \approx 2.297397\bigr), \\
+   R_{\mu,\mathrm{band}}(X) &:= \sum_{H(X) < m \le M(X)} \frac{\mu(m)}{\sqrt{m}}\,W_{\log}\!\left(\frac{X}{m}\right), \\
+   R_{\mu,\mathrm{tail}}(X) &:= \sum_{m > M(X)} \frac{\mu(m)}{\sqrt{m}}\,W_{\log}\!\left(\frac{X}{m}\right).
+   \end{aligned}
+   $$
+   - **Certified Boundary Hygiene**: In [`tc/faithful_tau_arithmetic_spectral_realization.py`](file:///c:/Development/Projects/reimann_scope/tc/faithful_tau_arithmetic_spectral_realization.py) and [`tc/prime_euler_moebius_recovery.py`](file:///c:/Development/Projects/reimann_scope/tc/prime_euler_moebius_recovery.py), $H(X)$ (`certified_head_cutoff_H_X_arb`) and $M(X)$ (`certified_coupled_cutoff_M_X_arb`) are determined by exact Arb integer-power enclosures $H^6 \le X^5 < (H+1)^6$ and $(M-1)^4 < X^5 \le M^4$ (rejecting any ball that straddles a non-exact integer boundary rather than taking `float(X.mid())`).
+   - **Divisor Cutoffs vs. Prime Cutoffs**: $H(X)$ and $M(X)$ are **divisor cutoffs** on the integer summation index $m$ in $R_\mu(X)$. By contrast, the cutoff $y$ in the prime-sieved approximant $W_y(X) = \sum_{m \mid P_y}\frac{\mu(m)}{\sqrt{m}}W_{\log}(X/m)$ ($P_y = \prod_{p \le y} p = e^{\vartheta(y)}$) is a **prime factor cutoff** restricting to $y$-smooth squarefree divisors $m \mid P_y$. When $y \ge M(X)$, every squarefree integer $2 \le m \le M(X)$ divides $P_y$, so all head and band terms $2 \le m \le M(X)$ cancel identically in $W(X) - W_y(X)$.
 
-Consequently, for **all** $K \in \mathbb{A}_{\mathbb{R}}$:
-$$
-\boxed{\bigl|E_{\tau,\mathrm{controlled}}(K)\bigr| \le M_{\mathrm{ctrl}} \approx 12.434994, \qquad \bigl|C_\tau(K) - \bigl(P_\tau(K) - R_{\mu,\mathrm{band}}(\tau^{|K|})\bigr)\bigr| \le M_{\mathrm{ctrl}},}
-$$
-and because $|P_\tau(K)| \le P_\tau(0) \approx 2.558258$, we have the exact two-sided equivalence (`Theorem 53` in Lean 4):
-$$
-\boxed{\sup_{K \in \mathbb{A}_{\mathbb{R}}} \bigl|C_\tau(K)\bigr| < \infty \iff \sup_{K \in \mathbb{A}_{\mathbb{R}}} \bigl|E_\tau(K)\bigr| < \infty \iff \sup_{X \ge 1} \bigl|R_{\mu,\mathrm{band}}(X)\bigr| < \infty \qquad (\text{SUBGATE-TC-043A}).}
-$$
+2. **Exact Orbit Decomposition Identity**:
+   Combining $W_{\mathrm{arch}}(h_K) = P_\tau(K) - (c_\tau^B + 2)h_0(X_K)$ with $C_\tau(K) = W_{\mathrm{arch}}(h_K) - W(X_K) - W(X_K^{-1})$ and $W(X_K) = W_{\log}(X_K) + R_{\mu,\mathrm{head}}(X_K) + R_{\mu,\mathrm{band}}(X_K) + R_{\mu,\mathrm{tail}}(X_K)$ yields for every $K \in \mathbb{A}_{\mathbb{R}}$:
+   $$
+   \boxed{C_\tau(K) = P_\tau(K) + E_\tau(K), \qquad E_\tau(K) = E_{\tau,\mathrm{controlled}}(K) - R_{\mu,\mathrm{band}}(X_K),}
+   $$
+   where the 5-component controlled remainder (`controlledCorrelationRemainder` in Lean 4) is:
+   $$
+   \boxed{E_{\tau,\mathrm{controlled}}(K) := -\bigl(c_\tau^B + 2\bigr)\,h_0(X_K) - W(X_K^{-1}) - W_{\log}(X_K) - R_{\mu,\mathrm{head}}(X_K) - R_{\mu,\mathrm{tail}}(X_K).}
+   $$
+
+3. **Complete Provenance Table for the Five Controlled Remainder Components ($X_K = \tau^{|K|} \ge 1$)**:
+
+| Component | Exact Expression & Domain ($X_K = \tau^{|K|} \ge 1$) | Inequality Used & Large-Grade Asymptotics | Provenance | Certified 256-bit Arb Global Bound (Outward `.upper()`) |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Pole + Transfer Term** | $-(c_\tau^B + 2)h_0(X_K) = -c_\tau^A h_0(X_K)$ on $X_K \ge 1$ ($c_\tau^A = c_\tau^B + 2 \approx 5.37218342$) | Strict monotonicity $0 < h_0(X_K) \le h_0(1)$ on $[1, \infty)$ gives global bound $B_{h_0} = c_\tau^A h_0(1)$; Bernstein envelope $|h_0(X_K)| \le \frac{92193}{32768}X_K^{-5/2}$ gives $O(X_K^{-5/2})$ decay ($\le 15.114677\,X_K^{-5/2}$) | `TASK-TC-044` ($h_0$ monotonicity & Bernstein bound) + `TASK-TC-042F`/`043` | $B_{h_0} = [2.671922488868445 \pm 1.77\times 10^{-40}] < 2.671923$ |
+| **2. Reflected Small-Scale Prime Sum** | $-W(X_K^{-1}) = -\sum_{n \ge 2}\frac{\Lambda(n)}{\sqrt{n}}h_0(n X_K)$ on $X_K \ge 1$ | $\|W(X_K^{-1})\| \le \frac{92193}{32768}\bigl(\sum_{n=2}^\infty \frac{\Lambda(n)}{n^3}\bigr) X_K^{-5/2} \le B_{\mathrm{refl}}\,X_K^{-5/2} = O(X_K^{-5/2})$ (evaluated via prime powers $n \le 25000$ plus Rosser–Schoenfeld tail $\frac{1.558245}{25000^2}$) | `TASK-TC-043` / `TASK-TC-044` cubic prime-power majorant | $B_{\mathrm{refl}} = [0.46372978 \pm 7.98\times 10^{-9}] < 0.463730$ |
+| **3. Divisor-Aggregated $W_{\log}(X_K)$** | $-W_{\log}(X_K) = -\sum_{m \ge 1}\frac{\log m}{\sqrt{m}}h_0(m/X_K)$ on $X_K \ge 1$ | Global TV bound $\|W_{\log}(X_K)\| \le B_{\log} := \frac{30731}{98304} + M_{\tilde{h},0}^{(-3/2)} + \frac{1}{2}M_{\tilde{h},\log}^{(-3/2)}$ on $[1, \infty)$; 4th-order Euler–Maclaurin bound $\|W_{\log}(X_K)\| \le C_{\log,\mathrm{EM}}\,X_K^{-5/2} = O(X_K^{-5/2})$ ($C_{\log,\mathrm{EM}} = [13.46851 \pm 4.74\times 10^{-6}] < 13.468515$) | `TASK-TC-044` (7-root IBP global bound) + `TASK-TC-049R` (Euler–Maclaurin bound) | $B_{\log} = [3.349008018760691 \pm 5.40\times 10^{-27}] < 3.349009$ |
+| **4. Head Divisor Sum $R_{\mu,\mathrm{head}}(X_K)$** | $-\sum_{2 \le m \le H(X_K)}\frac{\mu(m)}{\sqrt{m}}W_{\log}(X_K/m)$, $H(X_K) = \lfloor X_K^{5/6}\rfloor$ ($= 0$ for $1 \le X_K < 2^{6/5}$) | $\|R_{\mu,\mathrm{head}}(X_K)\| \le C_{\log,\mathrm{EM}} X_K^{-5/2}\sum_{2 \le m \le H(X_K)} m^2 \le C_{\log,\mathrm{EM}} X_K^{-5/2}\frac{5}{6}H(X_K)^3 \le \frac{5}{6}C_{\log,\mathrm{EM}} =: B_{\mathrm{head}}$ (**proved uniform $O(1)$ bound**, not $o(1)$ without cancellation) | `TASK-TC-049` / `TASK-TC-049R` resonant-band head reduction | $B_{\mathrm{head}} = [11.22376 \pm 5.61\times 10^{-6}] < 11.223763$ |
+| **5. Super-Scale Tail $R_{\mu,\mathrm{tail}}(X_K)$** | $-\sum_{m > M(X_K)}\frac{\mu(m)}{\sqrt{m}}W_{\log}(X_K/m)$, $M(X_K) = \lceil\max(2, X_K^{5/4})\rceil$ | $\|R_{\mu,\mathrm{tail}}(X_K)\| \le C_{\log,0} X_K^{5/2}\sum_{m > M(X_K)} m^{-3} \le \frac{C_{\log,0} X_K^{5/2}}{2 M(X_K)^2} \le \frac{1}{2}C_{\log,0} =: B_{\mathrm{tail}}$ (**proved uniform $O(1)$ bound**, since $M(X_K) \ge X_K^{5/4} \implies X_K^{5/2}/M(X_K)^2 \le 1$; $C_{\log,0} = \frac{92193}{32768}(-\zeta'(3)) \approx 0.55742959$) | `TASK-TC-045` ($C_{\log,0}$ origin bound) + `TASK-TC-049`/`049R` | $B_{\mathrm{tail}} = [0.2787147935540088 \pm 3.72\times 10^{-41}] < 0.278715$ |
+
+4. **Why Cutoff Precision Matters for Head and Tail Bounds (`TC-050R` Audit)**:
+   - **Why $\lfloor X/2\rfloor$ Cannot Use the Unsigned $u^{-5/2}$ Majorant**: Applying $|W_{\log}(X/m)| \le C(X/m)^{-5/2}$ over $2 \le m \le \lfloor X/2\rfloor$ yields the unsigned majorant $C X^{-5/2}\sum_{2 \le m \le X/2} m^2 = O(X^{1/2})$, which grows like $\sqrt{X}$ rather than decaying (though failure of this unsigned triangle-inequality majorant does not prove the signed Möbius sum $\sum_{2 \le m \le X/2}\frac{\mu(m)}{\sqrt{m}}W_{\log}(X/m)$ is unbounded). At $H(X) = \lfloor X^{5/6}\rfloor$, $\sum_{2 \le m \le H(X)} m^2 \le \frac{5}{6}H(X)^3 \le \frac{5}{6}X^{5/2}$ balances $X^{-5/2}$ to give the proved uniform $O(1)$ bound $B_{\mathrm{head}} = \frac{5}{6}C_{\log,\mathrm{EM}} < 11.223763$.
+   - **Why $M(X) = \lceil\max(2, X^{5/4})\rceil$ Gives $O(1)$ Tail Control**: Since $M(X) \asymp X^{5/4}$, the ratio $X^{5/2}/M(X)^2$ approaches $1$ from below as $X \to \infty$, giving the proved uniform $O(1)$ bound $|R_{\mu,\mathrm{tail}}(X)| \le \frac{1}{2}C_{\log,0} < 0.278715$ (whereas $o(1)$ tail decay would require choosing a super-scale cutoff growing strictly faster than $X^{5/4}$).
+   - **Global Bound and Large-Grade Limsup Bound for $E_{\tau,\mathrm{controlled}}(K)$**:
+     Summing the five live 256-bit Arb bounds gives the unconditional global bound and large-grade limsup bound over all $K \in \mathbb{A}_{\mathbb{R}}$:
+     $$
+     \boxed{\sup_{K \in \mathbb{A}_{\mathbb{R}}} \bigl|E_{\tau,\mathrm{controlled}}(K)\bigr| \le B_{\mathrm{ctrl}} := B_{h_0} + B_{\mathrm{refl}} + B_{\log} + B_{\mathrm{head}} + B_{\mathrm{tail}} = [17.98713 \pm 7.37\times 10^{-6}] < 17.987140,}
+     $$
+     $$
+     \boxed{\limsup_{|K| \to \infty} \bigl|E_{\tau,\mathrm{controlled}}(K)\bigr| \le B_{\mathrm{head}} + B_{\mathrm{tail}} = \frac{5}{6}C_{\log,\mathrm{EM}} + \frac{1}{2}C_{\log,0} = [11.50247 \pm 7.07\times 10^{-6}] < 11.502478.}
+     $$
+   - **Two-Way Boundedness Equivalence (`Theorem 53` in Lean 4)**:
+     Because $|P_\tau(K)| \le P_\tau(0) \approx 2.558258$ and $|E_{\tau,\mathrm{controlled}}(K)| \le B_{\mathrm{ctrl}} < 17.987140$ hold unconditionally for all $K \in \mathbb{A}_{\mathbb{R}}$, we have the exact two-sided equivalence:
+     $$
+     \boxed{\sup_{K \in \mathbb{A}_{\mathbb{R}}} \bigl|C_\tau(K)\bigr| < \infty \iff \sup_{K \in \mathbb{A}_{\mathbb{R}}} \bigl|E_\tau(K)\bigr| < \infty \iff \sup_{X \ge 1} \bigl|R_{\mu,\mathrm{band}}(X)\bigr| < \infty \qquad (\text{SUBGATE-TC-043A}).}
+     $$
 
 ---
 
 ### 5.3 Certified 256-bit Arb Verification Across 13 Positive & Negative Rational and Irrational Algebraic Grades
 
-The table below reports the certified 256-bit Arb values from [data/tc_faithful_tau_arithmetic_spectral_realization.json](file:///c:/Development/Projects/reimann_scope/data/tc_faithful_tau_arithmetic_spectral_realization.json) across $K \in \{0, \pm 1/4, \pm 1/2, \pm 1, \pm\sqrt{2}, \pm 3/2, \pm 2\} \subset \mathbb{A}_{\mathbb{R}}$. At every grade, $|P_\tau(K)| \le P_\tau(0) = 2.55825801$, $|E_{\tau,\mathrm{controlled}}(K)| \le M_{\mathrm{ctrl}}$, and $0 \in C_\tau(K) - (P_\tau(K) + E_\tau(K))$ to full 256-bit ball accuracy:
+In [tc/faithful_tau_arithmetic_spectral_realization.py](file:///c:/Development/Projects/reimann_scope/tc/faithful_tau_arithmetic_spectral_realization.py) and [data/tc_faithful_tau_arithmetic_spectral_realization.json](file:///c:/Development/Projects/reimann_scope/data/tc_faithful_tau_arithmetic_spectral_realization.json):
+1. **Outward-Rounded Ball Inequality Certification (`certify_abs_le_bound_arb`)**:
+   Every inequality $|v| \le B$ is certified using outward-rounded Arb endpoints via `(B - abs(v)).lower() >= arb(0)` (equivalently `abs(v).upper() <= B.lower()`, mode `OUTWARD_UPPER_LE_LOWER`), never the weak overlap test `abs(v).lower() <= B.upper()`. At $K = 0$, where $|P_\tau(0)| \le P_\tau(0)$, $|P_\tau^B(0)| \le P_\tau^B(0)$, and $|(c_\tau^B+2)h_0(1)| \le B_{h_0}$ compare a positive ball against itself, `certify_abs_le_bound_arb(..., exact_self_equality=True)` verifies exact midpoint/radius identity on a strictly positive ball (`EXACT_ALGEBRAIC_SELF_EQUALITY_POSITIVE_BALL`) with exact zero margin `arb(0)`.
+2. **Direct Finite-Sum Band Evaluation & Independent Tail Enclosure Check**:
+   At every sample grade $K$, both $R_{\mu,\mathrm{head}}(X_K) = \sum_{2 \le m \le H(X_K)}\frac{\mu(m)}{\sqrt{m}}W_{\log}(X_K/m)$ and $R_{\mu,\mathrm{band}}(X_K) = \sum_{H(X_K) < m \le M(X_K)}\frac{\mu(m)}{\sqrt{m}}W_{\log}(X_K/m)$ are computed **directly** as explicit finite sums. Their sum is compared against the independently evaluated total Möbius remainder $R_\mu(X_K) = W(X_K) - W_{\log}(X_K)$, and the resulting difference $R_\mu(X_K) - (R_{\mu,\mathrm{head}}(X_K) + R_{\mu,\mathrm{band}}(X_K))$ is certified to satisfy the analytic tail bound $\frac{C_{\log,0}X_K^{5/2}}{2 M(X_K)^2} \le \frac{1}{2}C_{\log,0}$ via `OUTWARD_UPPER_LE_LOWER` (`all_independent_tail_bounds_verified: true`).
+3. **Explicit Distinction of Algebraic Consistency Checks**:
+   The identity check $0 \in C_\tau(K) - (P_\tau(K) + E_\tau(K))$ is explicitly labeled `"reconstruction_verification_type": "ALGEBRAIC_CONSISTENCY_CHECK"` in the JSON artifact.
 
-| Grade $K \in \mathbb{A}_{\mathbb{R}}$ | Scale $X_K = \tau^{|K|}$ | Positive Orbit $P_\tau(K)$ | Controlled $E_{\tau,\mathrm{controlled}}(K)$ | Resonant Band $R_{\mu,\mathrm{band}}(X_K)$ | Total Remainder $E_\tau(K)$ | Complete $C_\tau(K)$ | $|P_\tau(K)| \le P_\tau(0)$ | $0 \in C_\tau - (P_\tau + E_\tau)$ |
+| Grade $K \in \mathbb{A}_{\mathbb{R}}$ | Scale $X_K = \tau^{|K|}$ | Cutoffs $(H, M)$ | Positive Orbit $P_\tau(K)$ | Head $R_{\mu,\mathrm{head}}(X_K)$ | Direct Band $R_{\mu,\mathrm{band}}(X_K)$ | Controlled $E_{\tau,\mathrm{controlled}}(K)$ | Total Remainder $E_\tau(K)$ | Complete $C_\tau(K)$ |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| $-2$ | $\tau^2 \approx 39.4784$ | $-0.06808962$ | $+0.00051660$ | $+0.00948982$ | $-0.00897321$ | $-0.07706283$ | `True` | `True` |
-| $-3/2$ | $\tau^{3/2} \approx 15.7496$ | $+0.24497111$ | $+0.00916859$ | $+0.00560662$ | $+0.00356197$ | $+0.24853307$ | `True` | `True` |
-| $-\sqrt{2}$ | $\tau^{\sqrt{2}} \approx 13.4505$ | $+0.33875447$ | $+0.00880425$ | $+0.00911755$ | $-0.00031331$ | $+0.33844116$ | `True` | `True` |
-| $-1$ | $\tau \approx 6.2832$ | $+0.95547910$ | $+0.07257921$ | $+0.03051173$ | $+0.04206748$ | $+0.99754658$ | `True` | `True` |
-| $-1/2$ | $\tau^{1/2} \approx 2.5066$ | $+0.69297834$ | $-0.04684805$ | $+0.00965239$ | $-0.05650044$ | $+0.63647789$ | `True` | `True` |
-| $-1/4$ | $\tau^{1/4} \approx 1.5832$ | $+0.50652651$ | $-0.38866316$ | $+0.02591502$ | $-0.41457819$ | $+0.09194833$ | `True` | `True` |
-| $0$ | $1$ | $+2.55825801$ | $-2.48787918$ | $-0.01388565$ | $-2.47399352$ | $+0.08426448$ | `True` | `True` |
-| $+1/4$ | $\tau^{1/4} \approx 1.5832$ | $+0.50652651$ | $-0.38866316$ | $+0.02591502$ | $-0.41457819$ | $+0.09194833$ | `True` | `True` |
-| $+1/2$ | $\tau^{1/2} \approx 2.5066$ | $+0.69297834$ | $-0.04684805$ | $+0.00965239$ | $-0.05650044$ | $+0.63647789$ | `True` | `True` |
-| $+1$ | $\tau \approx 6.2832$ | $+0.95547910$ | $+0.07257921$ | $+0.03051173$ | $+0.04206748$ | $+0.99754658$ | `True` | `True` |
-| $+\sqrt{2}$ | $\tau^{\sqrt{2}} \approx 13.4505$ | $+0.33875447$ | $+0.00880425$ | $+0.00911755$ | $-0.00031331$ | $+0.33844116$ | `True` | `True` |
-| $+3/2$ | $\tau^{3/2} \approx 15.7496$ | $+0.24497111$ | $+0.00916859$ | $+0.00560662$ | $+0.00356197$ | $+0.24853307$ | `True` | `True` |
-| $+2$ | $\tau^2 \approx 39.4784$ | $-0.06808962$ | $+0.00051660$ | $+0.00948982$ | $-0.00897321$ | $-0.07706283$ | `True` | `True` |
+| $-2$ | $39.47841760$ | $(21, 99)$ | $-0.00048360$ | $-0.01256608$ | $+0.00948794$ | $+0.01028368$ | $+0.00036032$ | $-0.00012328$ |
+| $-3/2$ | $15.74960995$ | $(9, 32)$ | $-0.00443212$ | $-0.01041840$ | $+0.00339001$ | $+0.00815705$ | $+0.00471475$ | $+0.00028264$ |
+| $-\sqrt{2}$ | $13.45230778$ | $(8, 26)$ | $-0.00583251$ | $-0.00370093$ | $+0.00664051$ | $+0.01305260$ | $+0.00637597$ | $+0.00054346$ |
+| $-1$ | $6.28318531$ | $(4, 10)$ | $+0.02470927$ | $-0.03279411$ | $+0.03051131$ | $+0.00643952$ | $-0.02407864$ | $+0.00063063$ |
+| $-1/2$ | $2.50662827$ | $(2, 4)$ | $-0.11743968$ | $+0.06496941$ | $-0.00641239$ | $+0.11189571$ | $+0.11830653$ | $+0.00086685$ |
+| $-1/4$ | $1.58323349$ | $(1, 2)$ | $-1.36831275$ | $0.00000000$ | $-0.01542659$ | $+1.35381667$ | $+1.36924136$ | $+0.00092861$ |
+| $0$ | $1.00000000$ | $(1, 2)$ | $+2.55825801$ | $0.00000000$ | $-0.01388599$ | $-2.57119291$ | $-2.55730753$ | $+0.00095048$ |
+| $+1/4$ | $1.58323349$ | $(1, 2)$ | $-1.36831275$ | $0.00000000$ | $-0.01542659$ | $+1.35381667$ | $+1.36924136$ | $+0.00092861$ |
+| $+1/2$ | $2.50662827$ | $(2, 4)$ | $-0.11743968$ | $+0.06496941$ | $-0.00641239$ | $+0.11189571$ | $+0.11830653$ | $+0.00086685$ |
+| $+1$ | $6.28318531$ | $(4, 10)$ | $+0.02470927$ | $-0.03279411$ | $+0.03051131$ | $+0.00643952$ | $-0.02407864$ | $+0.00063063$ |
+| $+\sqrt{2}$ | $13.45230778$ | $(8, 26)$ | $-0.00583251$ | $-0.00370093$ | $+0.00664051$ | $+0.01305260$ | $+0.00637597$ | $+0.00054346$ |
+| $+3/2$ | $15.74960995$ | $(9, 32)$ | $-0.00443212$ | $-0.01041840$ | $+0.00339001$ | $+0.00815705$ | $+0.00471475$ | $+0.00028264$ |
+| $+2$ | $39.47841760$ | $(21, 99)$ | $-0.00048360$ | $-0.01256608$ | $+0.00948794$ | $+0.01028368$ | $+0.00036032$ | $-0.00012328$ |
 
 ---
 
@@ -368,34 +433,33 @@ The table below reports the certified 256-bit Arb values from [data/tc_faithful_
 We maintain a strict separation between what is deductively verified in Lean 4 (`0` `sorry`, `0` `admit`, `0` custom axioms) and what is established by external analytic derivations and 256-bit Arb ball enclosures:
 
 1. **Verified Deductively in Lean 4 ([formal/RiemannScope/CanonicalThetaCorrelationBound.lean](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope/CanonicalThetaCorrelationBound.lean), Theorems 51–53)**:
-   - [`tau_grade_star_involution_and_hyperbolic_pair_obstruction`](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope/CanonicalThetaCorrelationBound.lean#L1686-L1730) (**Theorem 51**):
-     1. Exact radial star-involution defect $r^{-1} - r = (1 - r^2)/r$ (`gradeRadialCharacter`) and $r^{-1} = r \iff r = 1$ for $r > 0$;
-     2. Isotropic null-cone vanishing (`hyperbolicPairForm c1 0 = 0` and `hyperbolicPairForm 0 c2 = 0`), positive/negative eigenvectors (`hyperbolicPairForm 1 1 = 2`, `hyperbolicPairForm 1 (-1) = -2`), and signature-$(1,1)$ polarization $2 c_1 c_2 = \frac{1}{2}(c_1 + c_2)^2 - \frac{1}{2}(c_1 - c_2)^2$;
-     3. Unconditional Hilbert-space collapse: if every vector has nonnegative norm under a form whose off-critical pair restriction is $2 b_{12} c_1 c_2$, evaluating on $(1, 1)$ and $(1, -1)$ forces $b_{12} = 0$;
-     4. Multiplicity Jordan socle step (`jordanTwoByTwoSocleStep`): unitarity at $\pm L$ on a $2\times 2$ Jordan block forces $a = \|l_{\rho,0}\|^2 = 0$, while restricting to the socle eigenvector $l_{\rho,0} \in \ker({}^t D_- - \rho)$ requires no simplicity assumption.
-   - [`tate_rational_diagonal_character_rigidity_and_convolution_isometry`](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope/CanonicalThetaCorrelationBound.lean#L1740-L1774) (**Theorem 52**):
-     1. Exact Tate rational-diagonal phase cancellation (`adelicPhaseDiscrepancy`) proving that vanishing phase discrepancy on $q = 1$ uniquely forces $c_\infty = \tau$;
-     2. Exact non-abelian semidirect intertwining between logarithmic prime-grade translation (`logPrimeShiftAction`) and logarithmic scaling (`logScaleAction`);
-     3. Multiplicative convolution weight factorizability under self-dual Fourier/Mellin normalization.
-   - [`canonical_hilbert_schmidt_orbit_decomposition_and_resonant_band_equivalence`](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope/CanonicalThetaCorrelationBound.lean#L1780-L1845) (**Theorem 53**):
-     1. Exact algebraic identity $C_\tau(K) = P_\tau(K) + E_\tau(K)$ with $E_\tau(K) = E_{\tau,\mathrm{controlled}}(K) - R_{\mu,\mathrm{band}}(\tau^{|K|})$ (`canonicalCorrelationHSOrbitDecomp` and `controlledCorrelationRemainder`);
-     2. Exact triangle-inequality bound $|E_{\tau,\mathrm{controlled}}(K)| \le B_{h_0} + B_{\mathrm{fwd}} + B_{\log} + \frac{5}{6}C_{\log,\mathrm{EM}} + \frac{1}{2}C_{\log,0}$;
-     3. Exact logical equivalence between uniform boundedness of $C_\tau(K)$, uniform boundedness of $E_\tau(K)$, and uniform boundedness of the localized resonant-band Möbius sum $R_{\mu,\mathrm{band}}(X)$ under $|P_\tau(K)| \le P_\tau(0)$.
+   - [`tau_grade_star_involution_and_hyperbolic_pair_obstruction`](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope/CanonicalThetaCorrelationBound.lean#L1686-L1808) (**Theorem 51**):
+     1. **Radial Character Multiplicativity & Star-Involution Defect (`gradeRadialCharacter`)**: Proves the concrete homomorphisms `gradeRadialCharacter r (-1) * gradeRadialCharacter r 1 = 1` and `gradeRadialCharacter (r1 * r2) 1 = gradeRadialCharacter r1 1 * gradeRadialCharacter r2 1`, the radial star defect `gradeRadialCharacter r (-1) - gradeRadialCharacter r 1 = (1 - r^2) / r`, and the exact equivalence `gradeRadialCharacter r (-1) = gradeRadialCharacter r 1 <-> r = 1` for $r = \tau^{K\delta} > 0$;
+     2. **Derived Isotropic Null-Cone Vanishing & Hyperbolic Pair Obstruction (`hyperbolicPairForm`)**: Directly derives isotropic diagonal vanishing `b11 = 0` from the grade-adjoint invariance hypothesis `r * b11 = r⁻¹ * b11` whenever $r > 0$ and $r \ne 1$, verifies the signature-$(1,1)$ polarization `hyperbolicPairForm c1 c2 = ((c1 + c2)^2 - (c1 - c2)^2) / 2` with `hyperbolicPairForm 1 1 = 2 > 0` and `hyperbolicPairForm 1 (-1) = -2 < 0`, and proves that nonnegativity on $(1, 1)$ and $(1, -1)$ forces `b12 = 0`;
+     3. **Multiplicity Jordan Socle Step (`jordanTwoByTwoSocleStep`)**: Proves that unitarity at $\pm L$ ($L = \log\tau \ne 0$) on a $2\times 2$ Jordan block forces $a = \|l_{\rho,0}\|^2 = 0$, while restricting to the socle eigenvector $l_{\rho,0} \in \ker({}^t D_- - \rho)$ requires no simplicity assumption.
+   - [`tate_rational_diagonal_character_rigidity_and_convolution_isometry`](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope/CanonicalThetaCorrelationBound.lean#L1818-L1897) (**Theorem 52**):
+     1. **Tate Adelic Rational-Diagonal Phase Rigidity (`adelicPhaseDiscrepancy`)**: Formalizes the rational partial-fraction decomposition $q = S_p + n_{\mathrm{int}}$ ($S_p = \sum_p \{q\}_p$) verifying $\tau S_p - c_\infty q = (\tau - c_\infty)q - \tau n_{\mathrm{int}}$, proves that vanishing of `adelicPhaseDiscrepancy tau c_inf q` at $q = 1$ forces $c_\infty = \tau$, and proves that for $c_\infty = \tau$ and any $q \ne 0$ ($q = S_p + n_{\mathrm{int}}$), $\tau S_p - c_\infty q = -\tau n_{\mathrm{int}}$ is an exact integer multiple of $\tau = 2\pi$;
+     2. **Non-Abelian Semidirect Intertwining (`logPrimeShiftAction`, `logScaleAction`)**: Verifies `logPrimeShiftAction J (logScaleAction a u) = logScaleAction a (logPrimeShiftAction (J * a) u)`, `logScaleAction a (logPrimeShiftAction J u) = logPrimeShiftAction (J / a) (logScaleAction a u)` (for $a \ne 0$), and proves that the commutator `(logPrimeShiftAction J (logScaleAction a u)) - (logScaleAction a (logPrimeShiftAction J u)) = J * (1 - a)` vanishes if and only if $J = 0$ or $a = 1$;
+     3. **Convolution & Plancherel Factorizability**: Verifies `(tau / c_inf) * (f1 * f2) = f1 * f2` at $c_\infty = \tau$.
+   - [`canonical_hilbert_schmidt_orbit_decomposition_and_resonant_band_equivalence`](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope/CanonicalThetaCorrelationBound.lean#L1908-L2022) (**Theorem 53**):
+     1. **Attempt B Pole-Integral $J(\kappa)$ Cancellation & Orbit Decomposition**: Verifies `(W_arch + c_tau_B * h0_XK - (2 * h0_XK - J_K)) + (4 * h0_XK - J_K) = W_arch + (c_tau_B + 2) * h0_XK` (discharging `h_arch : W_arch = P_K - c_pole_transfer_h0`), `0 <= P_0 -> |P_0| <= P_0`, and `C_K = canonicalCorrelationHSOrbitDecomp P_K E_ctrl_K R_band_X = P_K + E_K`;
+     2. **Controlled Remainder Bound & Concrete `TC-049R` Rational Bound Discharge**: Verifies `|E_ctrl_K| <= B_ctrl`, `|C_K - (P_K - R_band_X)| <= B_ctrl`, and under the certified rational enclosures `B_h0 < 2671923 / 1000000`, `B_refl < 463730 / 1000000`, `B_log < 3349009 / 1000000`, `C_log_EM < 13468515 / 1000000` (`B_head = (5/6) * C_log_EM`), and `C_log_0 < 557430 / 1000000` (`B_tail = (1/2) * C_log_0`), proves `B_ctrl < 17987140 / 1000000` (`17.987140`);
+     3. **Two-Way Boundedness Equivalence**: Proves both `|R_band_X| <= M_band -> (|E_K| <= B_ctrl + M_band /\ |C_K| <= P_0 + B_ctrl + M_band)` and `|C_K| <= M_C -> (|E_K| <= M_C + P_0 /\ |R_band_X| <= M_C + P_0 + B_ctrl)`.
 2. **Established Externally (Analytic Derivations + SymPy + 256-bit Arb Enclosures)**:
    - Unconditional spatial and Mellin–Plancherel convergence of $\|A_\tau^B\psi_\tau\|_{\mathcal{H}_\tau^B}^2 + 4\|R_0\psi_\tau\|_{L^2}^2 = P_\tau(0) \approx 2.55825801$;
-   - The 4th-order Euler–Maclaurin bound $|W_{\log}(X)| \le C_{\log,\mathrm{EM}}\,X^{-5/2}$ ($C_{\log,\mathrm{EM}} \approx 13.468513$) and small-scale bound $|W_{\log}(u)| \le C_{\log,0}\,u^{5/2}$ ($C_{\log,0} \approx 0.557430$) from `TC-049`/`TC-049R`;
+   - The 4th-order Euler–Maclaurin bound $|W_{\log}(X)| \le C_{\log,\mathrm{EM}}\,X^{-5/2}$ ($C_{\log,\mathrm{EM}} \approx 13.468510 < 13.468515$) and small-scale bound $|W_{\log}(u)| \le C_{\log,0}\,u^{5/2}$ ($C_{\log,0} \approx 0.557430$) from `TC-049`/`TC-049R`;
    - The Connes–Consani sine-integral formula for $\delta(\rho)$ (`arXiv:2006.13771`, Prop. 2.2) and its 256-bit Arb evaluation;
-   - The Laplace–Carleman analytic continuation theorem converting $\sup_{K \in \mathbb{A}_{\mathbb{R}}}|C_\tau(K)| < \infty$ into right-half-plane holomorphy of $\mathcal{L}[C_\tau(-t)](w)$ and exclusion of off-critical zeros.
+   - **Both Directions of the RH Equivalence**: The Fixed-Seed RH Equivalence Theorem (`TASK-TC-037` / Theorem 12) establishes $\sup_{K \in \mathbb{A}_{\mathbb{R}}}|C_\tau(K)| < \infty \implies \text{RH}$ via Laplace–Carleman analytic continuation without assuming zero simplicity, whereas the converse spectral triangle bound ($\text{RH} + \text{simplicity} \implies \sup_K |C_\tau(K)| < \infty$, Theorem 8) uses absolute summability of simple critical-line zero coefficients.
 
 ---
 
 ## 7. Outcome Classification and Single Surviving Open Obligation (`SUBGATE-TC-043A`)
 
-`TASK-TC-050` achieves **Target 2** in full:
-- It proves that multiplicative compatibility on the grade algebra holds unconditionally for all $\rho \in \mathbb{C}$, whereas star-involution compatibility $V_K^* = V_{-K}$ holds if and only if $\operatorname{Re}(\rho) = 1/2$, with any off-critical pair $\{\rho, 1 - \bar{\rho}\}$ ($\operatorname{Re}(\rho) \ne 1/2$) forcing an isotropic null cone and signature-$(1,1)$ hyperbolic plane on the Jordan socle $\operatorname{span}\{l_{\rho,0}, l_{\rho^\sharp,0}\}$ (`Theorem 51`).
-- It constructs the unconditional positive Hilbert space $\mathcal{H}_\tau^{\mathrm{pos}} = \mathcal{H}_\tau^B \oplus L^2(\mathbb{R}_{>0}, d^\times y)$ and Hilbert–Schmidt unitary orbit $B_K = \mathcal{U}_K B_0$ with positive-definite matrix coefficient $P_\tau(K) = \langle \mathcal{U}_K B_0, B_0\rangle_{\mathrm{HS}}$ ($|P_\tau(K)| \le P_\tau(0) \approx 2.558258$), and proves the exact decomposition $C_\tau(K) = P_\tau(K) + E_\tau(K)$ with $E_\tau(K) = E_{\tau,\mathrm{controlled}}(K) - R_{\mu,\mathrm{band}}(\tau^{|K|})$ (`Theorem 53`).
-- Because $|P_\tau(K)| \le P_\tau(0)$ and $|E_{\tau,\mathrm{controlled}}(K)| \le 12.4350$ are unconditionally bounded for all $K \in \mathbb{A}_{\mathbb{R}}$, uniform boundedness of $C_\tau(K)$ is equivalent to the **single surviving open arithmetic lemma (`SUBGATE-TC-043A`)**:
+`TASK-TC-050` and its consistency repair `TASK-TC-050R` achieve **Target 2** in full:
+- They prove that multiplicative compatibility on the grade algebra holds unconditionally for all $\rho \in \mathbb{C}$, whereas star-involution compatibility $V_K^* = V_{-K}$ holds if and only if $\operatorname{Re}(\rho) = 1/2$, with any off-critical pair $\{\rho, 1 - \bar{\rho}\}$ ($\operatorname{Re}(\rho) \ne 1/2$) forcing an isotropic null cone and signature-$(1,1)$ hyperbolic plane on the Jordan socle $\operatorname{span}\{l_{\rho,0}, l_{\rho^\sharp,0}\}$ (`Theorem 51`).
+- They construct the unconditional positive Hilbert space $\mathcal{H}_\tau^{\mathrm{pos}} = \mathcal{H}_\tau^B \oplus L^2(\mathbb{R}_{>0}, d^\times y)$ with the one-sided Attempt B shift-difference operator $(A_\tau^B f)(x, y) = f(y) - f(y/x)$ and Hilbert–Schmidt unitary orbit $B_K = \mathcal{U}_K B_0$ with positive-definite matrix coefficient $P_\tau(K) = \langle \mathcal{U}_K B_0, B_0\rangle_{\mathrm{HS}} = W_{\mathrm{arch}}(h_K) + (c_\tau^B + 2)h_0(\tau^{|K|})$ ($|P_\tau(K)| \le P_\tau(0) \approx 2.558258$), and prove the exact decomposition $C_\tau(K) = P_\tau(K) + E_\tau(K)$ with $E_\tau(K) = E_{\tau,\mathrm{controlled}}(K) - R_{\mu,\mathrm{band}}(\tau^{|K|})$ at the restored `TC-049`/`TC-049R` cutoffs $H(X) = \lfloor X^{5/6}\rfloor$ and $M(X) = \lceil\max(2, X^{5/4})\rceil$ (`Theorem 53`).
+- Because $|P_\tau(K)| \le P_\tau(0) \approx 2.558258$ and $|E_{\tau,\mathrm{controlled}}(K)| \le B_{\mathrm{ctrl}} < 17.987140$ (with $\limsup_{|K|\to\infty}|E_{\tau,\mathrm{controlled}}(K)| \le \frac{5}{6}C_{\log,\mathrm{EM}} + \frac{1}{2}C_{\log,0} < 11.502478$) are unconditionally bounded for all $K \in \mathbb{A}_{\mathbb{R}}$, uniform boundedness of $C_\tau(K)$ is equivalent to the **single surviving open arithmetic lemma (`SUBGATE-TC-043A`)**:
   $$
-  \boxed{\exists M_{\mathrm{band}} < \infty \quad \forall X \ge 1 : \quad \Biggl|\sum_{X^{5/6} < m \le \lceil\max(2, X^{5/4})\rceil} \frac{\mu(m)}{\sqrt{m}}\,W_{\log}\!\left(\frac{X}{m}\right)\Biggr| \le M_{\mathrm{band}}.}
+  \boxed{\exists M_{\mathrm{band}} < \infty \quad \forall X \ge 1 : \quad \Biggl|\sum_{\lfloor X^{5/6}\rfloor < m \le \lceil\max(2, X^{5/4})\rceil} \frac{\mu(m)}{\sqrt{m}}\,W_{\log}\!\left(\frac{X}{m}\right)\Biggr| \le M_{\mathrm{band}}.}
   $$
   `SUBGATE-TC-043A` remains `OPEN` (`rh_proved: false`).

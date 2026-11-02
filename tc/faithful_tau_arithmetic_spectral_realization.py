@@ -59,7 +59,7 @@ Key Mathematical Results Implemented & Certified
      (U_K g) * (U_K h)^* = g * h^* for all K in A_R.
    - Connes-Consani (arXiv:2006.13771 Appendix A, Thms. 1, 4.4, 6.11):
      Evaluates the exact Sine-Integral archimedean trace-remainder delta(rho) in 256-bit Arb on [1/2, 2],
-     verifying delta(1) = Si(4*pi)/(2*pi) + 2 = 2.2374848352..., inversion symmetry delta(1/rho) = delta(rho),
+     verifying delta(1) = Si(4*pi)/(2*pi) + 2 = 2.2374848349418275..., inversion symmetry delta(1/rho) = delta(rho),
      and derivative jump delta'(1^+) - delta'(1^-) = 2, and demonstrates how separated grades
      |K - L| > log(2)/log(tau) = 0.377146... move the relative scale tau^{|K-L|} outside (1/2, 2)
      to activate prime stations p >= 2.
@@ -69,24 +69,27 @@ Key Mathematical Results Implemented & Certified
      in Section 8 (irrationally aligned multi-prime visual zeros and inductive step from N to N+1).
 
 4. Canonical Hilbert-Schmidt Unitary Orbit Decomposition (Target 2):
-   - Constructs on H_tau^pos := H_tau^B (+) L^2(R_{>0}, d^x x) the Hilbert-Schmidt operator
-     B_0 := |Psi_0^pos><e_0| with Psi_0^pos = (A_tau^B psi_tau, 2 R_0 psi_tau) and unitary orbit
-     B_K := U_K B_0 (K in A_R), proving:
+   - Constructs on H_tau^pos := H_tau^B (+) L^2(R_{>0}, d^x y) (using the inherited TC-042F/TC-043 Attempt B
+     one-sided shift-difference operator (A_tau^B f)(x, y) := ((I - S_x^{-1}) f)(y) = f(y) - f(y/x))
+     the Hilbert-Schmidt operator B_0 := |Psi_0^pos><e_0| with Psi_0^pos = (A_tau^B psi_tau, 2 R_0 psi_tau)
+     and left unitary orbit B_K := U_K B_0 (K in A_R), proving:
          P_tau(K) := <B_K, B_0>_{HS} = <A_tau^B T_K psi_tau, A_tau^B psi_tau>_{H_tau^B}
-                                       + 4 <R_0 T_K psi_tau, R_0 psi_tau>_{L^2(d^x x)}
+                                       + 4 <R_0 T_K psi_tau, R_0 psi_tau>_{L^2(d^x y)}
                   = W_arch(h_K) + (c_tau^B + 2) h_0(tau^{|K|}),
-         |P_tau(K)| <= ||B_0||_{HS}^2 = P_tau(0) = 2.558258007419548... < 2.55826   for all K in A_R.
+         |P_tau(K)| <= ||B_0||_{HS}^2 = P_tau(0) = 2.558258007415831... < 2.55826   for all K in A_R.
    - Establishes the exact decomposition across all K in A_R (positive and negative, rational and
-     irrational algebraic):
+     irrational algebraic) using the rigorously supported TC-049/TC-049R divisor cutoffs
+     H(X) = floor(X^{5/6}) and M(X) = ceil(max(2, X^{5/4})):
          C_tau(K) = P_tau(K) + E_tau(K),
          E_tau(K) = E_{tau,controlled}(K) - R_{mu,band}(tau^{|K|}),
      where
          E_{tau,controlled}(K) = -(c_tau^B + 2) h_0(X_K) - W(X_K^{-1}) - W_log(X_K)
-                                 - R_{mu,head}(X_K) - R_{mu,tail}(X_K)    (X_K = tau^{|K|})
+                                 - R_{mu,head}(X_K) - R_{mu,tail}(X_K)    (X_K = tau^{|K|} >= 1)
      retains all pole, transfer, small-scale prime, divisor-aggregated log-prime, head-divisor
-     (2 <= m <= floor(X_K / 2)), and super-scale tail-divisor (m > M(X_K) = floor(81 X_K^{5/4}))
-     contributions, is unconditionally bounded over all K in A_R, and decays as O(|K| tau^{-|K|/2} + tau^{-5|K|/8})
-     as |K| -> infty.
+     (2 <= m <= H(X_K) = floor(X_K^{5/6})), and super-scale tail-divisor (m > M(X_K) = ceil(max(2, X_K^{5/4})))
+     contributions, and satisfies the unconditional uniform bound |E_{tau,controlled}(K)| <= B_ctrl < 17.987140
+     for all K in A_R (with the first three terms decaying as O(X_K^{-5/2}) = O(tau^{-5|K|/2}) and the
+     head and tail terms satisfying proved uniform O(1) bounds (5/6) C_{log,EM} and (1/2) C_{log,0}).
 """
 
 from __future__ import annotations
@@ -97,7 +100,7 @@ import math
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
-from flint import acb, arb, ctx as flint_ctx
+from flint import acb, acb_series, arb, ctx as flint_ctx
 import sympy as sp
 
 from tc.canonical_theta_correlation_bound import (
@@ -112,6 +115,8 @@ from tc.canonical_theta_correlation_bound import (
     verify_canonical_theta_correlation_lean_module,
 )
 from tc.prime_euler_moebius_recovery import (
+    certified_coupled_cutoff_M_X_arb,
+    certify_w_log_large_scale_decay_and_resonant_band_reduction_arb,
     moebius_mu_int,
     prime_factors_with_multiplicity,
 )
@@ -764,7 +769,7 @@ def verify_primary_literature_constructions_and_support_extension(
                     "Tr(theta(g * g^*) P P_hat) = int_{1/2}^2 (g * g^*)(rho) delta(rho) d^* rho "
                     "for supp(g) subset [2^{-1/2}, 2^{1/2}] (arXiv:2006.13771 Prop. 2.2 & Appendix A)."
                 ),
-                "delta_at_1_formula": "delta(1) = Si(4*pi)/(2*pi) + 2 = 2.2374848352...",
+                "delta_at_1_formula": "delta(1) = Si(4*pi)/(2*pi) + 2 = 2.2374848349418275...",
                 "delta_at_1_certified": serialize_arb_certified(delta_at_1),
                 "delta_derivative_jump_at_1": "delta'(1^+) - delta'(1^-) = 2",
                 "certified_delta_grid_on_half_to_two": cc_delta_rows,
@@ -826,16 +831,350 @@ def verify_primary_literature_constructions_and_support_extension(
 # ---------------------------------------------------------------------------
 
 
+def certified_head_cutoff_H_X_arb(X: arb, prec_bits: int = 256) -> int:
+    """Certify the integer head cutoff H(X) := floor(X^{5/6}) for X > 0 in Arb
+    by verifying the exact integer sixth-power inequality H^6 <= X^5 < (H + 1)^6
+    without deciding floors from float midpoints.
+
+    Raises ValueError if X <= 0 or if X is an inexact interval straddling an
+    integer sixth-power boundary k^6 (for X^5)."""
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = max(prec_bits, 256)
+        X_arb = arb(X)
+        if (X_arb - arb(0)).lower() <= arb(0):
+            raise ValueError(f"X must be certified strictly positive: {X_arb}")
+        x5_arb = X_arb ** arb(5)
+        # Integer binary search for H >= 0 with H^6 <= x5_arb.lower()
+        lo = 0
+        hi = 1
+        while (x5_arb - arb(hi ** 6)).lower() >= arb(0):
+            lo = hi
+            hi *= 2
+        while lo + 1 < hi:
+            mid = (lo + hi) // 2
+            if (x5_arb - arb(mid ** 6)).lower() >= arb(0):
+                lo = mid
+            else:
+                hi = mid
+        h_cand = lo
+        lower_ok = (x5_arb - arb(h_cand ** 6)).lower() >= arb(0)
+        upper_ok = (arb((h_cand + 1) ** 6) - x5_arb).lower() > arb(0)
+        if lower_ok and upper_ok:
+            return h_cand
+        raise ValueError(
+            f"Unable to certify unique integer floor(X^(5/6)) for X={X_arb} "
+            f"(X^5={x5_arb} straddles {(h_cand + 1) ** 6})."
+        )
+    finally:
+        flint_ctx.prec = saved_prec
+
+
+def certify_abs_le_bound_arb(
+    value_arb: arb,
+    bound_arb: arb,
+    *,
+    exact_self_equality: bool = False,
+) -> Dict[str, Any]:
+    """Certify the inequality |value| <= bound in Arb using outward-rounded endpoints.
+
+    - Standard mode (`exact_self_equality=False`):
+      Requires `(bound_arb - abs(value_arb)).lower() >= arb(0)` (equivalently
+      `abs(value_arb).upper() <= bound_arb.lower()`). Mere interval overlap
+      (`abs(value_arb).lower() <= bound_arb.upper()`) is explicitly rejected.
+    - Self-equality mode (`exact_self_equality=True`):
+      Used only when `value_arb` and `bound_arb` are the identical positive quantity
+      (e.g., |P_tau(0)| <= P_tau(0) at K = 0 where P_tau(0) > 0 is a single ball of
+      nonzero radius so interval subtraction B - |B| would double the radius).
+      Requires `value_arb.lower() > arb(0)` and `value_arb == bound_arb`.
+    """
+    abs_val = abs(value_arb)
+    margin = bound_arb - abs_val
+    outward_ok = bool(margin.lower() >= arb(0))
+    weak_overlap = bool(abs_val.lower() <= bound_arb.upper())
+    if exact_self_equality:
+        pos_self_ok = bool(
+            (abs_val.lower() > arb(0))
+            and (bound_arb.lower() > arb(0))
+            and (abs_val.mid() == bound_arb.mid())
+            and (abs_val.rad() == bound_arb.rad())
+        )
+        return {
+            "certified": pos_self_ok,
+            "certification_mode": "EXACT_ALGEBRAIC_SELF_EQUALITY_POSITIVE_BALL",
+            "outward_upper_le_lower": outward_ok,
+            "weak_overlap_lower_le_upper": weak_overlap,
+            "abs_value_upper_str": str(abs_val.upper()),
+            "bound_lower_str": str(bound_arb.lower()),
+            "margin_bound_minus_abs_certified": serialize_arb_certified(
+                arb(0) if pos_self_ok else margin
+            ),
+        }
+    return {
+        "certified": outward_ok,
+        "certification_mode": "OUTWARD_UPPER_LE_LOWER",
+        "outward_upper_le_lower": outward_ok,
+        "weak_overlap_lower_le_upper": weak_overlap,
+        "abs_value_upper_str": str(abs_val.upper()),
+        "bound_lower_str": str(bound_arb.lower()),
+        "margin_bound_minus_abs_certified": serialize_arb_certified(margin),
+    }
+
+
+def _compute_live_B_log_global_bound_arb(prec_bits: int = 256) -> Dict[str, Any]:
+    """Compute the TC-044 global bound B_log := 30731/98304 + M_{tilde{h},0}^{(-3/2)} + (1/2) M_{tilde{h},log}^{(-3/2)}
+    for sup_{X >= 1} |W_log(X)| live in 256-bit Arb from the 7 certified positive roots of
+    Q_0(u) = 648 u^7 - 93844 u^6 + 1345108 u^5 - 4462075 u^4 + 4306220 u^3 - 1202252 u^2 + 75896 u - 432
+    (where u = alpha^2)."""
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = max(prec_bits, 256)
+        tol_spec = 2 ** (-90)
+        u_poly_sym = sp.Symbol("u", real=True)
+        q0_poly_sym = (
+            648 * u_poly_sym**7
+            - 93844 * u_poly_sym**6
+            + 1345108 * u_poly_sym**5
+            - 4462075 * u_poly_sym**4
+            + 4306220 * u_poly_sym**3
+            - 1202252 * u_poly_sym**2
+            + 75896 * u_poly_sym
+            - 432
+        )
+        q0_deriv_sym = sp.diff(q0_poly_sym, u_poly_sym)
+        q0_coeffs_d = [
+            int(c) for c in sp.Poly(q0_poly_sym, u_poly_sym).all_coeffs()
+        ]
+        q0_deriv_coeffs_d = [
+            int(c) for c in sp.Poly(q0_deriv_sym, u_poly_sym).all_coeffs()
+        ]
+        q0_intervals = sp.Poly(q0_poly_sym, u_poly_sym).intervals(eps=1e-35)
+
+        def _horner_arb(coeffs_seq: List[int], u_a: arb) -> arb:
+            acc = arb(0)
+            for c_i in coeffs_seq:
+                acc = acc * u_a + arb(c_i)
+            return acc
+
+        alpha_roots_7: List[arb] = []
+        for (a_rat, b_rat), _ in q0_intervals:
+            u_mid = arb(
+                (
+                    (
+                        arb(int(a_rat.p)) / arb(int(a_rat.q))
+                        + arb(int(b_rat.p)) / arb(int(b_rat.q))
+                    )
+                    / arb(2)
+                ).mid()
+            )
+            for _ in range(12):
+                u_mid = arb(
+                    (
+                        u_mid
+                        - _horner_arb(q0_coeffs_d, u_mid)
+                        / _horner_arb(q0_deriv_coeffs_d, u_mid)
+                    ).mid()
+                )
+            u_pt = arb(u_mid.mid())
+            rad_u = arb("1e-55")
+            u_ball = arb(u_pt.mid(), rad_u.upper())
+            n_step = u_pt - _horner_arb(q0_coeffs_d, u_pt) / _horner_arb(
+                q0_deriv_coeffs_d, u_ball
+            )
+            if not bool(abs(n_step - u_pt) < rad_u):
+                raise RuntimeError("Newton root certification failed in TC-050R B_log")
+            alpha_roots_7.append(u_ball.sqrt())
+
+        g_extrema = [
+            (r_b ** arb("-0.5")) * evaluate_h0_arb(r_b) for r_b in alpha_roots_7
+        ]
+        m_th0_tv_arb = arb(2) * sum((abs(gv) for gv in g_extrema), arb(0))
+
+        def _h0_over_al32_acb(al: acb, analytic: bool = False) -> acb:
+            u2 = al * al
+            op = acb(1) + u2
+            op2 = op * op
+            op4 = op2 * op2
+            op6 = op4 * op2
+            num = (
+                -acb(648) * op6
+                + acb(58380) * u2 * op4
+                - acb(706860) * u2 * u2 * op2
+                + acb(2027025) * u2 * u2 * u2
+            )
+            return al * num / (acb(512) * (op**8) * op.sqrt(analytic=analytic))
+
+        def _h0_inv_u12_acb(u_c: acb, analytic: bool = False) -> acb:
+            u2 = u_c * u_c
+            op = acb(1) + u2
+            op2 = op * op
+            op4 = op2 * op2
+            op6 = op4 * op2
+            num = (
+                -acb(648) * op6
+                + acb(58380) * u2 * op4
+                - acb(706860) * u2 * u2 * op2
+                + acb(2027025) * u2 * u2 * u2
+            )
+            return u2 * num / (acb(512) * (op**8) * op.sqrt(analytic=analytic))
+
+        def _log_g_endpoint(a_ball: arb) -> arb:
+            m_f = float(a_ball.mid())
+            if m_f == 0.0 or m_f == 1.0:
+                return arb(0)
+            return a_ball.log() * (a_ball ** arb("-0.5")) * evaluate_h0_arb(a_ball)
+
+        nodes_log_ibp = [arb(0)] + alpha_roots_7[:4] + [arb(1)] + alpha_roots_7[4:]
+        m_th_log_ibp_arb = arb(0)
+        for idx_s in range(len(nodes_log_ibp) - 1):
+            a_b = nodes_log_ibp[idx_s]
+            b_b = nodes_log_ibp[idx_s + 1]
+            int_h0_seg = acb.integral(
+                _h0_over_al32_acb,
+                acb(a_b.mid()),
+                acb(b_b.mid()),
+                rel_tol=tol_spec,
+                abs_tol=tol_spec,
+            ).real
+            end_err = (
+                arb(2) * abs(_h0_over_al32_acb(acb(a_b))).real * arb(a_b.rad())
+                + arb(2) * abs(_h0_over_al32_acb(acb(b_b))).real * arb(b_b.rad())
+            )
+            seg_signed = (
+                -_log_g_endpoint(b_b)
+                + _log_g_endpoint(a_b)
+                + int_h0_seg
+                + arb(0, end_err.upper())
+            )
+            m_th_log_ibp_arb += abs(seg_signed)
+
+        u_top_r7 = arb(1) / alpha_roots_7[-1]
+        tail_h0_int = acb.integral(
+            _h0_inv_u12_acb,
+            acb(0),
+            acb(u_top_r7.mid()),
+            rel_tol=tol_spec,
+            abs_tol=tol_spec,
+        ).real
+        tail_end_err = (
+            arb(2) * abs(_h0_inv_u12_acb(acb(u_top_r7))).real * arb(u_top_r7.rad())
+        )
+        tail_seg_signed = (
+            _log_g_endpoint(alpha_roots_7[-1])
+            + tail_h0_int
+            + arb(0, tail_end_err.upper())
+        )
+        m_th_log_ibp_arb += abs(tail_seg_signed)
+
+        tail_constant = arb(30731) / arb(98304)
+        b_log_total = tail_constant + m_th0_tv_arb + arb("0.5") * m_th_log_ibp_arb
+        return {
+            "B_log_arb": b_log_total,
+            "M_tilde_h_0_arb": m_th0_tv_arb,
+            "M_tilde_h_log_arb": m_th_log_ibp_arb,
+            "tail_constant_30731_98304_arb": tail_constant,
+        }
+    finally:
+        flint_ctx.prec = saved_prec
+
+
+_LIVE_CONTROLLED_BOUNDS_CACHE: Dict[int, Dict[str, Any]] = {}
+
+
+def _compute_live_controlled_component_bounds_arb(
+    prec_bits: int = 256,
+) -> Dict[str, Any]:
+    """Compute all 5 component global bounds for E_{tau,controlled}(K) (X_K = tau^{|K|} >= 1)
+    live in 256-bit Arb from their proved analytic formulas."""
+    if prec_bits in _LIVE_CONTROLLED_BOUNDS_CACHE:
+        return _LIVE_CONTROLLED_BOUNDS_CACHE[prec_bits]
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = max(prec_bits, 256)
+        pi_arb = arb.pi()
+        tau_arb = arb(2) * pi_arb
+        gamma_e_arb = arb.const_euler()
+        c_tau_A_arb = (arb(4) * tau_arb).log() + gamma_e_arb + tau_arb / arb(4)
+        h0_1_arb = evaluate_h0_arb(arb(1))
+        c0_bernstein = arb(92193) / arb(32768)
+
+        # 1. Pole + transfer archimedean term -(c_tau^B + 2) h_0(X_K) = -c_tau^A h_0(X_K):
+        # Since h_0(u) > 0 is strictly decreasing on [1, infty) (TC-044), its global maximum on
+        # X_K >= 1 is attained at X_K = 1 (K = 0): B_{h_0} = c_tau^A h_0(1).
+        # For large X_K, |c_tau^A h_0(X_K)| <= c_tau^A * (92193/32768) * X_K^{-5/2} = O(X_K^{-5/2}).
+        B_h0_arb = c_tau_A_arb * h0_1_arb
+        C_h0_decay_arb = c_tau_A_arb * c0_bernstein
+
+        # 2. Reflected small-scale prime sum W(X_K^{-1}) for X_K >= 1:
+        # |W(X_K^{-1})| <= (92193/32768) * (sum_{n>=2} Lambda(n)/n^3) * X_K^{-5/2} <= B_refl.
+        n_max_pp = 25000
+        pp_all = get_prime_powers_up_to(n_max_pp)
+        s_prime_cube = arb(0)
+        for pk, p, _ in pp_all:
+            pk_a = arb(pk)
+            s_prime_cube += arb(p).log() / (pk_a ** arb(3))
+        rs_tail = arb("1.558245") / (arb(n_max_pp) ** arb(2))
+        # Enclose sum_{n>=2} Lambda(n)/n^3 in [s_prime_cube, s_prime_cube + rs_tail]:
+        half_rs = rs_tail / arb(2)
+        prime_cube_enclosure = s_prime_cube + arb(half_rs.mid(), abs(half_rs).upper())
+        B_refl_arb = c0_bernstein * prime_cube_enclosure
+
+        # 3. Divisor-aggregated log-prime profile W_log(X_K) for X_K >= 1:
+        # Global bound on [1, infty) from TC-044 total variation + IBP, and large-scale
+        # O(X_K^{-5/2}) decay constant C_{log,EM} from TC-049R Euler-Maclaurin theorem:
+        b_log_res = _compute_live_B_log_global_bound_arb(prec_bits=prec_bits)
+        B_log_arb = b_log_res["B_log_arb"]
+        tc049r_cert = certify_w_log_large_scale_decay_and_resonant_band_reduction_arb(
+            prec_bits=prec_bits
+        )
+        c_em_cert_dict = tc049r_cert[
+            "global_euler_maclaurin_constant_C_log_EM_certified"
+        ]
+        C_log_EM_arb = arb(c_em_cert_dict["arb_ball_str"])
+        zeta_prime_3_arb = acb_series([acb(3), acb(1)], 2).zeta()[1].real
+        C_log_0_arb = c0_bernstein * (-zeta_prime_3_arb)
+
+        # 4. Head Moebius sum R_{mu,head}(X_K) over 2 <= m <= H(X_K) = floor(X_K^{5/6}):
+        # |R_{mu,head}(X_K)| <= C_{log,EM} X_K^{-5/2} sum_{2 <= m <= H(X_K)} m^2 <= (5/6) C_{log,EM}.
+        B_head_arb = (arb(5) / arb(6)) * C_log_EM_arb
+
+        # 5. Super-scale tail Moebius sum R_{mu,tail}(X_K) over m > M(X_K) = ceil(max(2, X_K^{5/4})):
+        # |R_{mu,tail}(X_K)| <= C_{log,0} X_K^{5/2} / (2 M(X_K)^2) <= (1/2) C_{log,0}.
+        B_tail_arb = (arb(1) / arb(2)) * C_log_0_arb
+
+        # Total global bound B_ctrl and asymptotic limsup bound B_head + B_tail:
+        B_ctrl_arb = B_h0_arb + B_refl_arb + B_log_arb + B_head_arb + B_tail_arb
+        B_limsup_arb = B_head_arb + B_tail_arb
+
+        res = {
+            "B_h0_arb": B_h0_arb,
+            "C_h0_decay_arb": C_h0_decay_arb,
+            "B_refl_arb": B_refl_arb,
+            "B_log_arb": B_log_arb,
+            "C_log_EM_arb": C_log_EM_arb,
+            "C_log_0_arb": C_log_0_arb,
+            "B_head_arb": B_head_arb,
+            "B_tail_arb": B_tail_arb,
+            "B_ctrl_arb": B_ctrl_arb,
+            "B_limsup_arb": B_limsup_arb,
+        }
+        _LIVE_CONTROLLED_BOUNDS_CACHE[prec_bits] = res
+        return res
+    finally:
+        flint_ctx.prec = saved_prec
+
+
 def verify_canonical_hilbert_schmidt_orbit_decomposition(
     prec_bits: int = 256,
 ) -> Dict[str, Any]:
     """Certify in 256-bit Arb the exact Hilbert-Schmidt unitary orbit decomposition:
         C_tau(K) = P_tau(K) + E_tau(K),
         P_tau(K) = <U_K B_0, B_0>_{HS} = W_arch(h_K) + (c_tau^B + 2) h_0(tau^{|K|}),
-        |P_tau(K)| <= ||B_0||_{HS}^2 = P_tau(0) = 2.5582580074... < 2.55826,
+        |P_tau(K)| <= ||B_0||_{HS}^2 = P_tau(0) = 2.558258007415831... < 2.55826,
         E_tau(K) = E_{tau,controlled}(K) - R_{mu,band}(tau^{|K|}),
-    across positive and negative rational and irrational algebraic grades
-    K in {0, 1/4, -1/4, 1/2, -1/2, 1, -1, sqrt(2), -sqrt(2), 3/2, -3/2, 2, -2}."""
+    using the rigorously supported TC-049/TC-049R cutoffs H(X) = floor(X^{5/6}) and
+    M(X) = ceil(max(2, X^{5/4})) across positive and negative rational and irrational
+    algebraic grades K in {0, 1/4, -1/4, 1/2, -1/2, 1, -1, sqrt(2), -sqrt(2), 3/2, -3/2, 2, -2}."""
     saved_prec = flint_ctx.prec
     try:
         flint_ctx.prec = max(prec_bits, 256)
@@ -846,10 +1185,25 @@ def verify_canonical_hilbert_schmidt_orbit_decomposition(
         c_tau_A_arb = (arb(4) * tau_arb).log() + gamma_e_arb + tau_arb / arb(4)
         c_tau_B_arb = c_tau_A_arb - arb(2)
         h0_1_arb = evaluate_h0_arb(arb(1))
+        c0_bernstein = arb(92193) / arb(32768)
         tol_spec = 2 ** (-90)
 
         n_max_pp = 25000
         pp_all = get_prime_powers_up_to(n_max_pp)
+
+        live_bounds = _compute_live_controlled_component_bounds_arb(
+            prec_bits=prec_bits
+        )
+        B_h0_arb = live_bounds["B_h0_arb"]
+        C_h0_decay_arb = live_bounds["C_h0_decay_arb"]
+        B_refl_arb = live_bounds["B_refl_arb"]
+        B_log_arb = live_bounds["B_log_arb"]
+        C_log_EM_arb = live_bounds["C_log_EM_arb"]
+        C_log_0_arb = live_bounds["C_log_0_arb"]
+        B_head_arb = live_bounds["B_head_arb"]
+        B_tail_arb = live_bounds["B_tail_arb"]
+        B_ctrl_arb = live_bounds["B_ctrl_arb"]
+        B_limsup_arb = live_bounds["B_limsup_arb"]
 
         # Helper for J(kappa) = 4 ||f||^2 - 4 <R_0 T_K psi_tau, R_0 psi_tau>:
         def _eval_j_kap(kappa_a: arb) -> arb:
@@ -873,49 +1227,42 @@ def verify_canonical_hilbert_schmidt_orbit_decomposition(
             u_top_a = arb(u_top_J)
             j_tail = (
                 (arb(2) / arb(3))
-                * (arb(92193) / arb(32768))
+                * c0_bernstein
                 * ((arb("2.5") * abs(kappa_a)).exp())
                 * ((-arb(3) * u_top_a).exp())
             )
             return j_fin + arb(0, j_tail.upper())
 
-        # Helper for certified W_log(u) for any u > 0:
-        def _eval_W_log_arb(u_a: arb, min_cut: int = 800) -> arb:
+        # Helper for certified W_log(u) for any u > 0 with rigorous symmetric Bernstein tail:
+        def _eval_W_log_arb(u_a: arb, min_cut: int = 2400) -> arb:
             u_up = float(u_a.upper())
-            k_cut = max(min_cut, min(n_max_pp, int(math.ceil(24.0 * u_up))))
+            k_cut = max(min_cut, min(n_max_pp, int(math.ceil(40.0 * u_up))))
             s_fin = arb(0)
             for k_i in range(2, k_cut + 1):
                 k_a = arb(k_i)
                 s_fin += (k_a.log() / k_a.sqrt()) * evaluate_h0_arb(k_a / u_a)
             k_cut_a = arb(k_cut)
             tail_mag = (
-                (arb(81) / arb(64))
+                c0_bernstein
                 * (u_a ** arb("2.5"))
                 * (arb(2) * k_cut_a.log() + arb(1))
                 / (arb(4) * k_cut_a * k_cut_a)
             )
-            half_t = -tail_mag / arb(2)
-            return s_fin + arb(half_t.mid(), abs(half_t).upper())
+            return s_fin + arb(0, tail_mag.upper())
 
-        # Helper for certified W(u) for any u > 0:
-        def _eval_W_arb(u_a: arb, min_cut: int = 2000) -> arb:
-            u_up = float(u_a.upper())
-            n_cut = max(min_cut, min(n_max_pp, int(math.ceil(24.0 * u_up))))
+        # Helper for certified W(u) for any u > 0 using N_max = 25000 + Rosser-Schoenfeld tail:
+        def _eval_W_arb(u_a: arb) -> arb:
             s_fin = arb(0)
             for pk, p, _ in pp_all:
-                if pk > n_cut:
-                    break
                 pk_a = arb(pk)
                 s_fin += (arb(p).log() / pk_a.sqrt()) * evaluate_h0_arb(pk_a / u_a)
-            n_cut_a = arb(n_cut)
+            n_cut_a = arb(n_max_pp)
             tail_mag = (
-                (arb(81) / arb(64))
+                c0_bernstein
                 * (u_a ** arb("2.5"))
-                * (arb(2) * n_cut_a.log() + arb(1))
-                / (arb(4) * n_cut_a * n_cut_a)
+                * (arb("1.558245") / (n_cut_a * n_cut_a))
             )
-            half_t = -tail_mag / arb(2)
-            return s_fin + arb(half_t.mid(), abs(half_t).upper())
+            return s_fin + arb(0, tail_mag.upper())
 
         # Evaluate at K = 0 to obtain the Hilbert-Schmidt norm squared ||B_0||_{HS}^2 = P_tau(0):
         w_arch_0 = evaluate_archimedean_integral_certified_arb(
@@ -946,18 +1293,21 @@ def verify_canonical_hilbert_schmidt_orbit_decomposition(
         ]
 
         # Pre-cache by |K| while independently evaluating K = -1 to certify evenness W_arch(-1) = W_arch(1):
-        abs_k_cache: Dict[str, Tuple[arb, arb, arb, arb, arb, arb]] = {}
+        abs_k_cache: Dict[str, Dict[str, Any]] = {}
         w_arch_neg_1 = evaluate_archimedean_integral_certified_arb(
             arb(-1), prec_bits=prec_bits
         )["w_arch_total_arb"]
         orbit_rows: List[Dict[str, Any]] = []
         all_orbit_identities_enclose_zero = True
         all_hs_cauchy_schwarz_verified = True
+        all_independent_tail_bounds_verified = True
+        all_component_bounds_verified = True
+
         for k_label, abs_key, k_a in grade_samples:
             abs_k = abs(k_a)
             kap_a = abs_k * L_arb
-            X_k = kap_a.exp()
-            inv_X_k = (-kap_a).exp()
+            X_k = arb(1) if k_label == "0" else kap_a.exp()
+            inv_X_k = arb(1) if k_label == "0" else (-kap_a).exp()
             h0_X_k = h0_1_arb if k_label == "0" else evaluate_h0_arb(X_k)
 
             if abs_key not in abs_k_cache:
@@ -971,30 +1321,81 @@ def verify_canonical_hilbert_schmidt_orbit_decomposition(
                 j_abs = j_0 if abs_key == "0" else _eval_j_kap(kap_a)
                 w_XK_abs = _eval_W_arb(X_k)
                 w_inv_XK_abs = w_XK_abs if abs_key == "0" else _eval_W_arb(inv_X_k)
-                w_log_XK_abs = _eval_W_log_arb(X_k)
-                m_head_max = int(math.floor(float(X_k.mid()) / 2.0))
+                w_log_XK_abs = _eval_W_log_arb(X_k, min_cut=3200)
+
+                # Certified TC-049/TC-049R cutoffs H(X_K) = floor(X_K^{5/6}) and M(X_K) = ceil(max(2, X_K^{5/4})):
+                h_cut_int = certified_head_cutoff_H_X_arb(X_k, prec_bits=prec_bits)
+                m_cut_int = certified_coupled_cutoff_M_X_arb(X_k, prec_bits=prec_bits)
+
+                # Direct finite-sum evaluation of R_{mu,head}(X_K) over 2 <= m <= H(X_K) (0 if H(X_K) < 2):
                 r_mu_head_abs = arb(0)
-                for m_i in range(2, m_head_max + 1):
+                for m_i in range(2, h_cut_int + 1):
                     mu_m = moebius_mu_int(m_i)
                     if mu_m == 0:
                         continue
                     m_a = arb(m_i)
                     r_mu_head_abs += (
                         arb(mu_m) / m_a.sqrt()
-                    ) * _eval_W_log_arb(X_k / m_a, min_cut=400)
-                abs_k_cache[abs_key] = (
-                    w_arch_abs,
-                    j_abs,
-                    w_XK_abs,
-                    w_inv_XK_abs,
-                    w_log_XK_abs,
-                    r_mu_head_abs,
+                    ) * _eval_W_log_arb(X_k / m_a, min_cut=1200)
+
+                # Direct finite-sum evaluation of R_{mu,band}(X_K) over max(2, H(X_K)+1) <= m <= M(X_K):
+                r_mu_band_abs = arb(0)
+                band_start = max(2, h_cut_int + 1)
+                for m_i in range(band_start, m_cut_int + 1):
+                    mu_m = moebius_mu_int(m_i)
+                    if mu_m == 0:
+                        continue
+                    m_a = arb(m_i)
+                    r_mu_band_abs += (
+                        arb(mu_m) / m_a.sqrt()
+                    ) * _eval_W_log_arb(X_k / m_a, min_cut=1000)
+
+                # Direct certified enclosure of R_{mu,tail}(X_K) over m > M(X_K):
+                # Sum M(X_K) < m <= m_tail_cut directly + analytic remainder C_{log,0} X_K^{5/2} / (2 m_tail_cut^2):
+                m_tail_cut = max(240, 4 * m_cut_int)
+                r_mu_tail_partial = arb(0)
+                for m_i in range(m_cut_int + 1, m_tail_cut + 1):
+                    mu_m = moebius_mu_int(m_i)
+                    if mu_m == 0:
+                        continue
+                    m_a = arb(m_i)
+                    r_mu_tail_partial += (
+                        arb(mu_m) / m_a.sqrt()
+                    ) * _eval_W_log_arb(X_k / m_a, min_cut=600)
+                rem_after_tail_cut = (
+                    C_log_0_arb
+                    * (X_k ** arb("2.5"))
+                    / (arb(2) * (arb(m_tail_cut) ** arb(2)))
                 )
-            w_arch_k, j_k, w_XK, w_inv_XK, w_log_XK, r_mu_head_XK = abs_k_cache[
-                abs_key
-            ]
-            if k_label == "-1":
-                w_arch_k = w_arch_neg_1
+                r_mu_tail_direct_abs = r_mu_tail_partial + arb(
+                    0, rem_after_tail_cut.upper()
+                )
+
+                abs_k_cache[abs_key] = {
+                    "w_arch_abs": w_arch_abs,
+                    "j_abs": j_abs,
+                    "w_XK_abs": w_XK_abs,
+                    "w_inv_XK_abs": w_inv_XK_abs,
+                    "w_log_XK_abs": w_log_XK_abs,
+                    "h_cut_int": h_cut_int,
+                    "m_cut_int": m_cut_int,
+                    "r_mu_head_abs": r_mu_head_abs,
+                    "r_mu_band_abs": r_mu_band_abs,
+                    "r_mu_tail_direct_abs": r_mu_tail_direct_abs,
+                }
+
+            cached = abs_k_cache[abs_key]
+            w_arch_k = w_arch_neg_1 if k_label == "-1" else cached["w_arch_abs"]
+            j_k = cached["j_abs"]
+            w_XK = cached["w_XK_abs"]
+            w_inv_XK = cached["w_inv_XK_abs"]
+            w_log_XK = cached["w_log_XK_abs"]
+            h_cut_XK = cached["h_cut_int"]
+            m_cut_XK = cached["m_cut_int"]
+            r_mu_head_XK = cached["r_mu_head_abs"]
+            r_mu_band_XK = cached["r_mu_band_abs"]
+            r_mu_tail_direct_XK = cached["r_mu_tail_direct_abs"]
+
             w_prime_k = w_XK + w_inv_XK
             c_tau_k = w_arch_k - w_prime_k
 
@@ -1003,33 +1404,87 @@ def verify_canonical_hilbert_schmidt_orbit_decomposition(
             p_tau_B_k = w_arch_k + c_tau_B_arb * h0_X_k - b_transfer_k
             p_tau_k = p_tau_B_k + four_r0_inner_k  # = <U_K B_0, B_0>_{HS}
 
-            # Verify |P_tau(K)| <= ||B_0||_{HS}^2 = P_tau(0) and |P_tau^B(K)| <= P_tau^B(0):
-            hs_cs_ok = bool(abs(p_tau_k).lower() <= p_tau_0.upper())
-            hs_B_cs_ok = bool(abs(p_tau_B_k).lower() <= p_tau_B_0.upper())
+            # Outward-rounded Cauchy-Schwarz certification |P_tau(K)| <= P_tau(0) and |P_tau^B(K)| <= P_tau^B(0):
+            is_k_zero = k_label == "0"
+            hs_cs_cert = certify_abs_le_bound_arb(
+                p_tau_k, p_tau_0, exact_self_equality=is_k_zero
+            )
+            hs_B_cs_cert = certify_abs_le_bound_arb(
+                p_tau_B_k, p_tau_B_0, exact_self_equality=is_k_zero
+            )
+            hs_cs_ok = bool(hs_cs_cert["certified"])
+            hs_B_cs_ok = bool(hs_B_cs_cert["certified"])
             if not (hs_cs_ok and hs_B_cs_ok):
                 all_hs_cauchy_schwarz_verified = False
 
-            # Arithmetic terms at X_K = tau^{|K|}:
+            # Independent comparison between direct finite sums R_{mu,head}(X_K) + R_{mu,band}(X_K)
+            # and independently evaluated R_mu(X_K) = W(X_K) - W_log(X_K):
             r_mu_total_XK = w_XK - w_log_XK
-            r_mu_band_plus_tail_XK = r_mu_total_XK - r_mu_head_XK
+            r_mu_tail_from_diff_XK = r_mu_total_XK - (r_mu_head_XK + r_mu_band_XK)
 
-            # Analytical super-scale tail bound |R_{mu,tail}(X_K)| <= 0.008568 * X_K^{-5/8}
-            # for m > M(X_K) = floor(81 * X_K^{5/4}) (proved in TASK-TC-049/049R):
-            tail_bound_mag_XK = arb("0.008568") * (X_k ** arb("-0.625"))
+            # Proved TC-049/TC-049R tail bound at M(X_K) = ceil(max(2, X_K^{5/4})):
+            # |R_{mu,tail}(X_K)| <= C_{log,0} X_K^{5/2} / (2 M(X_K)^2) <= (1/2) C_{log,0}:
+            analytic_tail_bound_XK = (
+                C_log_0_arb
+                * (X_k ** arb("2.5"))
+                / (arb(2) * (arb(m_cut_XK) ** arb(2)))
+            )
+            tail_bound_cert_from_diff = certify_abs_le_bound_arb(
+                r_mu_tail_from_diff_XK, analytic_tail_bound_XK
+            )
+            tail_bound_cert_direct = certify_abs_le_bound_arb(
+                r_mu_tail_direct_XK, analytic_tail_bound_XK
+            )
+            tail_diff_consistency = r_mu_tail_from_diff_XK - r_mu_tail_direct_XK
+            tail_encloses_zero = bool(tail_diff_consistency.contains(0))
+            if not (
+                tail_bound_cert_from_diff["certified"]
+                and tail_bound_cert_direct["certified"]
+                and tail_encloses_zero
+            ):
+                all_independent_tail_bounds_verified = False
 
             # Pole + transfer archimedean term -(c_tau^B + 2) h_0(X_K) = -c_tau^A h_0(X_K):
             c_pole_transfer_h0_k = -c_tau_A_arb * h0_X_k
 
             # Total remainder E_tau(K) = C_tau(K) - P_tau(K):
             e_tau_k = c_tau_k - p_tau_k
-            # Controlled remainder (excluding R_{mu,band+tail}(X_K), or with R_{mu,tail} bounded by tail_bound_mag_XK):
+
+            # Full 5-term controlled remainder E_{tau,controlled}(K):
+            e_ctrl_k = (
+                c_pole_transfer_h0_k
+                - w_inv_XK
+                - w_log_XK
+                - r_mu_head_XK
+                - r_mu_tail_direct_XK
+            )
             e_ctrl_minus_tail_k = (
                 c_pole_transfer_h0_k - w_inv_XK - w_log_XK - r_mu_head_XK
             )
-            # Reconstruction C_tau(K) = P_tau(K) + e_ctrl_minus_tail_k - r_mu_band_plus_tail_XK:
-            c_tau_reconstructed = (
-                p_tau_k + e_ctrl_minus_tail_k - r_mu_band_plus_tail_XK
+
+            # Outward-rounded component bound checks at grade K:
+            cert_h0_k = certify_abs_le_bound_arb(
+                c_pole_transfer_h0_k, B_h0_arb, exact_self_equality=is_k_zero
             )
+            cert_refl_k = certify_abs_le_bound_arb(w_inv_XK, B_refl_arb)
+            cert_log_k = certify_abs_le_bound_arb(w_log_XK, B_log_arb)
+            cert_head_k = certify_abs_le_bound_arb(r_mu_head_XK, B_head_arb)
+            cert_tail_global_k = certify_abs_le_bound_arb(
+                r_mu_tail_direct_XK, B_tail_arb
+            )
+            cert_e_ctrl_k = certify_abs_le_bound_arb(e_ctrl_k, B_ctrl_arb)
+            if not (
+                cert_h0_k["certified"]
+                and cert_refl_k["certified"]
+                and cert_log_k["certified"]
+                and cert_head_k["certified"]
+                and cert_tail_global_k["certified"]
+                and cert_e_ctrl_k["certified"]
+            ):
+                all_component_bounds_verified = False
+
+            # Algebraic consistency check C_tau(K) = P_tau(K) + E_{tau,controlled}(K) - R_{mu,band}(X_K):
+            c_tau_reconstructed = p_tau_k + e_ctrl_k - r_mu_band_XK
             recon_diff = c_tau_k - c_tau_reconstructed
             encloses_zero = bool(recon_diff.contains(0))
             if not encloses_zero:
@@ -1040,6 +1495,9 @@ def verify_canonical_hilbert_schmidt_orbit_decomposition(
                     "K_label": k_label,
                     "K_float": float(k_a.mid()),
                     "X_K_eq_tau_abs_K_certified": serialize_arb_certified(X_k),
+                    "H_XK_eq_floor_XK_5_6": h_cut_XK,
+                    "M_XK_eq_ceil_max_2_XK_5_4": m_cut_XK,
+                    "head_sum_is_empty": bool(h_cut_XK < 2),
                     "C_tau_K_certified": serialize_arb_certified(c_tau_k),
                     "P_tau_K_HS_orbit_certified": serialize_arb_certified(p_tau_k),
                     "P_tau_B_K_conductor_inner_certified": serialize_arb_certified(
@@ -1049,9 +1507,12 @@ def verify_canonical_hilbert_schmidt_orbit_decomposition(
                         four_r0_inner_k
                     ),
                     "abs_P_tau_K_le_P_tau_0": hs_cs_ok,
+                    "abs_P_tau_K_le_P_tau_0_certification": hs_cs_cert,
+                    "abs_P_tau_B_K_le_P_tau_B_0_certification": hs_B_cs_cert,
                     "E_tau_K_total_remainder_certified": serialize_arb_certified(
                         e_tau_k
                     ),
+                    "E_tau_controlled_K_certified": serialize_arb_certified(e_ctrl_k),
                     "E_ctrl_K_minus_tail_certified": serialize_arb_certified(
                         e_ctrl_minus_tail_k
                     ),
@@ -1067,48 +1528,79 @@ def verify_canonical_hilbert_schmidt_orbit_decomposition(
                     "head_divisor_R_mu_head_XK_certified": serialize_arb_certified(
                         r_mu_head_XK
                     ),
-                    "resonant_band_plus_tail_R_mu_ge_half_XK_certified": serialize_arb_certified(
-                        r_mu_band_plus_tail_XK
+                    "resonant_band_R_mu_band_XK_direct_sum_certified": serialize_arb_certified(
+                        r_mu_band_XK
                     ),
-                    "super_scale_tail_bound_0_008568_XK_neg_5_8_certified": serialize_arb_certified(
-                        tail_bound_mag_XK
+                    "super_scale_tail_R_mu_tail_XK_direct_certified": serialize_arb_certified(
+                        r_mu_tail_direct_XK
                     ),
+                    "super_scale_tail_R_mu_tail_XK_from_W_minus_Wlog_minus_head_band_certified": serialize_arb_certified(
+                        r_mu_tail_from_diff_XK
+                    ),
+                    "super_scale_tail_analytic_bound_C_log_0_XK_5_2_over_2_M_sq_certified": serialize_arb_certified(
+                        analytic_tail_bound_XK
+                    ),
+                    "independent_tail_enclosure_verification": {
+                        "verification_type": "INDEPENDENT_HEAD_BAND_VS_TOTAL_MOEBIUS_TAIL_ENCLOSURE_CHECK",
+                        "tail_from_diff_le_analytic_bound": tail_bound_cert_from_diff,
+                        "tail_direct_le_analytic_bound": tail_bound_cert_direct,
+                        "tail_diff_minus_direct_encloses_zero": tail_encloses_zero,
+                    },
+                    "component_bound_certifications": {
+                        "abs_pole_transfer_le_B_h0": cert_h0_k,
+                        "abs_W_inv_XK_le_B_refl": cert_refl_k,
+                        "abs_W_log_XK_le_B_log": cert_log_k,
+                        "abs_R_mu_head_le_B_head": cert_head_k,
+                        "abs_R_mu_tail_le_B_tail": cert_tail_global_k,
+                        "abs_E_ctrl_le_B_ctrl": cert_e_ctrl_k,
+                    },
                     "reconstruction_diff_C_tau_minus_P_plus_E_certified": serialize_arb_certified(
                         recon_diff
                     ),
+                    "reconstruction_verification_type": "ALGEBRAIC_CONSISTENCY_CHECK",
                     "reconstruction_encloses_zero": encloses_zero,
                 }
             )
 
-        # Componentwise unconditional global bounds over all K in A_R (X_K = tau^{|K|} >= 1):
-        bound_P_tau_0 = p_tau_0  # <= 2.5582580075
-        bound_pole_transfer = c_tau_A_arb * (arb(92193) / arb(32768)) * (arb(2) ** arb("-2.5"))
-        bound_W_inv_XK = arb("0.45170319")
-        bound_W_log_XK = arb("3.34900802")
-        bound_R_mu_head_XK = arb("5.95379204")
-        bound_R_mu_tail_XK = arb("0.008568")
-        bound_E_ctrl_global = (
-            bound_pole_transfer
-            + bound_W_inv_XK
-            + bound_W_log_XK
-            + bound_R_mu_head_XK
-            + bound_R_mu_tail_XK
-        )
-
         return {
             "positive_hilbert_space_and_unitary_orbit": {
-                "hilbert_space_H_tau_pos": "H_tau^pos := H_tau^B (+) L^2(R_{>0}, d^x x)",
-                "unitary_representation": (
-                    "U_K (phi, psi) := (U_K^B phi, T_K psi) for all K in A_R, where "
-                    "U_K^B and T_K are unitary dilations by tau^{-K} with U_K^* = U_{-K}."
+                "hilbert_space_H_tau_pos": "H_tau^pos := H_tau^B (+) L^2(R_{>0}, dy/y)",
+                "conductor_space_H_tau_B": (
+                    "H_tau^B := L^2([1, infty) x R_{>0}, (x^{-3/2} / (x - x^{-1})) (dx/x) (dy/y))"
+                ),
+                "shift_difference_operator_A_tau_B": (
+                    "(A_tau^B f)(x, y) := ((I - S_x^{-1}) f)(y) = f(y) - f(y/x)   (x >= 1, y > 0)"
+                ),
+                "two_sided_vs_one_sided_shift_reconciliation": (
+                    "With (S_x f)(y) = f(xy) and (S_x^{-1} f)(y) = f(y/x), the inherited TC-042F/TC-043 "
+                    "Attempt B one-sided shift-difference (A_tau^B f)(x, y) = f(y) - f(y/x) satisfies "
+                    "int_0^infty ((A_tau^B T_K f)(x, y)) conj((A_tau^B f)(x, y)) dy/y = "
+                    "2 h_0(e^kappa) - h_0(e^{kappa + u}) - h_0(e^{kappa - u}) (kappa = |K| log tau, u = log x). "
+                    "By contrast, a two-sided difference f(xy) - f(y/x) would evaluate to "
+                    "2 h_0(e^kappa) - h_0(e^{kappa + 2u}) - h_0(e^{kappa - 2u}) (doubling the log-shift u -> 2u) "
+                    "unless x is replaced by x^{1/2} via the isometric change of variable y |-> x^{-1/2} y."
+                ),
+                "isometric_embedding_J_tau": (
+                    "J_tau(f) := (A_tau^B f, 2 R_0 f) in H_tau^pos = H_tau^B (+) L^2(R_{>0}, dy/y), "
+                    "where (R_0 f)(y) = y^{-1/2} int_0^y f(t) t^{1/2} dt/t is the s = 0 pole-resolvent."
+                ),
+                "unitary_representation_and_intertwining": (
+                    "U_K (phi, psi) := (U_K^B phi, T_K psi) for all K in A_R, where (U_K^B phi)(x, y) = phi(x, tau^{-K} y) "
+                    "and (T_K psi)(y) = psi(tau^{-K} y) are unitary dilations with U_K^* = U_{-K}, satisfying "
+                    "the exact intertwining identity J_tau(T_K f) = U_K J_tau(f)."
                 ),
                 "hilbert_schmidt_seed_operator_B_0": (
-                    "B_0 := |Psi_0^pos><e_0| in HS(H_tau^pos), where Psi_0^pos := (A_tau^B psi_tau, 2 R_0 psi_tau) "
-                    "and e_0 is a fixed unit vector, with unitary orbit B_K := U_K B_0."
+                    "B_0 := |Psi_0^pos><e_0| in HS(H_tau^pos), where Psi_0^pos := J_tau(psi_tau) = (A_tau^B psi_tau, 2 R_0 psi_tau) "
+                    "and e_0 in H_tau^pos is a fixed unit vector (||e_0|| = 1), with left unitary orbit B_K := U_K B_0 = |U_K Psi_0^pos><e_0|."
+                ),
+                "pole_integral_J_kappa_cancellation_identity": (
+                    "<A_tau^B T_K psi_tau, A_tau^B psi_tau>_{H_tau^B} = W_arch(h_K) + c_tau^B h_0(X_K) - (2 h_0(X_K) - J(kappa)) "
+                    "and 4 <R_0 T_K psi_tau, R_0 psi_tau>_{L^2(dy/y)} = 4 h_0(X_K) - J(kappa), so the pole-transfer "
+                    "integral J(kappa) cancels identically in their sum P_tau(K) = W_arch(h_K) + (c_tau^B + 2) h_0(X_K)."
                 ),
                 "matrix_coefficient_identity": (
                     "P_tau(K) := <B_K, B_0>_{HS} = <U_K Psi_0^pos, Psi_0^pos>_{H_tau^pos} "
-                    "= <A_tau^B T_K psi_tau, A_tau^B psi_tau>_{H_tau^B} + 4 <R_0 T_K psi_tau, R_0 psi_tau>_{L^2(d^x x)} "
+                    "= <A_tau^B T_K psi_tau, A_tau^B psi_tau>_{H_tau^B} + 4 <R_0 T_K psi_tau, R_0 psi_tau>_{L^2(dy/y)} "
                     "= W_arch(h_K) + (c_tau^B + 2) h_0(tau^{|K|}) = W_arch(h_K) + c_tau^A h_0(tau^{|K|})."
                 ),
                 "norm_B_0_HS_sq_eq_P_tau_0_certified": serialize_arb_certified(
@@ -1127,43 +1619,135 @@ def verify_canonical_hilbert_schmidt_orbit_decomposition(
                     "C_tau(K) = P_tau(K) + E_tau(K),   "
                     "E_tau(K) = E_{tau,controlled}(K) - R_{mu,band}(tau^{|K|})"
                 ),
+                "cutoff_definitions_tc049r": {
+                    "H_X_formula": "H(X) := floor(X^{5/6})",
+                    "M_X_formula": "M(X) := ceil(max(2, X^{5/4}))",
+                    "R_mu_head_formula": "R_{mu,head}(X) := sum_{2 <= m <= H(X)} (mu(m)/sqrt(m)) W_log(X/m)  (0 when H(X) < 2)",
+                    "R_mu_band_formula": "R_{mu,band}(X) := sum_{H(X) < m <= M(X)} (mu(m)/sqrt(m)) W_log(X/m)",
+                    "R_mu_tail_formula": "R_{mu,tail}(X) := sum_{m > M(X)} (mu(m)/sqrt(m)) W_log(X/m)",
+                    "divisor_vs_prime_cutoff_distinction": (
+                        "H(X) and M(X) are divisor cutoffs on the integer index m in the full Moebius sum "
+                        "R_mu(X) = sum_{m>=2} (mu(m)/sqrt(m)) W_log(X/m). By contrast, y in the prime-sieved "
+                        "approximant W_y(X) = sum_{m | P_y} (mu(m)/sqrt(m)) W_log(X/m) is a prime factor cutoff "
+                        "(restricting to squarefree m with P^+(m) <= y, where max divisor is P_y = exp(vartheta(y))). "
+                        "For y >= M(X), every squarefree m <= M(X) divides P_y, so the shared head+band terms "
+                        "2 <= m <= M(X) cancel in W(X) - W_y(X)."
+                    ),
+                },
                 "controlled_remainder_formula": (
                     "E_{tau,controlled}(K) = -(c_tau^B + 2) h_0(X_K) - W(X_K^{-1}) - W_log(X_K) "
                     "- R_{mu,head}(X_K) - R_{mu,tail}(X_K),   X_K = tau^{|K|} >= 1"
                 ),
                 "unconditional_component_bounds_over_all_K_in_A_R": {
                     "abs_P_tau_K_bound_certified": serialize_arb_certified(
-                        bound_P_tau_0
+                         p_tau_0
                     ),
                     "abs_pole_plus_transfer_h0_bound_certified": serialize_arb_certified(
-                        bound_pole_transfer
+                        B_h0_arb
                     ),
                     "abs_W_inv_XK_bound_certified": serialize_arb_certified(
-                        bound_W_inv_XK
+                        B_refl_arb
                     ),
                     "abs_W_log_XK_bound_certified": serialize_arb_certified(
-                        bound_W_log_XK
+                        B_log_arb
                     ),
                     "abs_R_mu_head_XK_bound_certified": serialize_arb_certified(
-                        bound_R_mu_head_XK
+                        B_head_arb
                     ),
                     "abs_R_mu_tail_XK_bound_certified": serialize_arb_certified(
-                        bound_R_mu_tail_XK
+                        B_tail_arb
                     ),
                     "abs_E_tau_controlled_global_bound_certified": serialize_arb_certified(
-                        bound_E_ctrl_global
+                        B_ctrl_arb
+                    ),
+                    "abs_E_tau_controlled_limsup_bound_certified": serialize_arb_certified(
+                        B_limsup_arb
                     ),
                 },
-                "large_grade_asymptotic_decay_of_E_tau_controlled": (
-                    "As |K| -> infty (X_K = tau^{|K|} -> infty): "
-                    "|(c_tau^B + 2) h_0(X_K)| = O(X_K^{-5/2}), "
-                    "|W(X_K^{-1})| = O(X_K^{-5/2}), "
-                    "|W_log(X_K)| = O(X_K^{-5/2}), "
-                    "|R_{mu,head}(X_K)| <= sum_{2<=m<=X_K/2} m^{-1/2} |W_log(X_K/m)| = O(X_K^{-1/2} log X_K), "
-                    "and |R_{mu,tail}(X_K)| <= 0.008568 X_K^{-5/8}; hence "
-                    "lim_{|K|->infty} E_{tau,controlled}(K) = 0 with rate O(|K| tau^{-|K|/2} + tau^{-5|K|/8})."
+                "component_bound_provenance_records": {
+                    "component_1_pole_plus_transfer_h0": {
+                        "expression": "-(c_tau^B + 2) h_0(X_K) = -c_tau^A h_0(X_K)",
+                        "domain": "X_K = tau^{|K|} >= 1 (all K in A_R)",
+                        "inequality_used": (
+                            "Strict monotonicity 0 < h_0(X_K) <= h_0(1) on [1, infty) (global bound B_{h_0} = c_tau^A h_0(1)), "
+                            "and Bernstein envelope |h_0(X_K)| <= (92193/32768) X_K^{-5/2} for O(X_K^{-5/2}) decay."
+                        ),
+                        "provenance": "TASK-TC-044 (h_0 monotonicity and Bernstein envelope) + TASK-TC-042F/043 (c_tau^A = c_tau^B + 2).",
+                        "rounding_direction": "Outward-rounded Arb ball enclosure (.upper() provides certified upper bound).",
+                        "bound_certified": serialize_arb_certified(B_h0_arb),
+                        "asymptotic_decay_constant_C_h0_certified": serialize_arb_certified(
+                            C_h0_decay_arb
+                        ),
+                    },
+                    "component_2_reflected_small_scale_prime_W_inv_XK": {
+                        "expression": "-W(X_K^{-1})",
+                        "domain": "X_K = tau^{|K|} >= 1 (u = X_K^{-1} in (0, 1])",
+                        "inequality_used": (
+                            "|W(X_K^{-1})| <= (92193/32768) (sum_{n=2}^infty Lambda(n)/n^3) X_K^{-5/2} <= B_refl "
+                            "(computed via prime powers n <= 25000 plus Rosser-Schoenfeld tail 1.558245 / 25000^2)."
+                        ),
+                        "provenance": "TASK-TC-043 / TASK-TC-044 prime-power cubic tail majorant.",
+                        "rounding_direction": "Outward-rounded Arb ball enclosure (.upper() provides certified upper bound).",
+                        "bound_certified": serialize_arb_certified(B_refl_arb),
+                    },
+                    "component_3_divisor_aggregated_W_log_XK": {
+                        "expression": "-W_log(X_K)",
+                        "domain": "X_K = tau^{|K|} >= 1",
+                        "inequality_used": (
+                            "Global bound |W_log(X_K)| <= B_log := 30731/98304 + M_{tilde{h},0}^{(-3/2)} + (1/2) M_{tilde{h},log}^{(-3/2)} "
+                            "for all X_K >= 1, and large-scale decay |W_log(X_K)| <= C_{log,EM} X_K^{-5/2} for X_K > 0."
+                        ),
+                        "provenance": "TASK-TC-044 (7-root total-variation global bound) and TASK-TC-049R (Euler-Maclaurin decay constant C_{log,EM}).",
+                        "rounding_direction": "Outward-rounded Arb ball enclosure (.upper() provides certified upper bound).",
+                        "bound_certified": serialize_arb_certified(B_log_arb),
+                        "large_scale_decay_constant_C_log_EM_certified": serialize_arb_certified(
+                            C_log_EM_arb
+                        ),
+                    },
+                    "component_4_head_divisor_R_mu_head_XK": {
+                        "expression": "-R_{mu,head}(X_K) = -sum_{2 <= m <= H(X_K)} (mu(m)/sqrt(m)) W_log(X_K/m), H(X_K) = floor(X_K^{5/6})",
+                        "domain": "X_K = tau^{|K|} >= 1 (empty sum = 0 for 1 <= X_K < 2^{6/5})",
+                        "inequality_used": (
+                            "|R_{mu,head}(X_K)| <= C_{log,EM} X_K^{-5/2} sum_{2 <= m <= H(X_K)} m^2 "
+                            "<= C_{log,EM} X_K^{-5/2} (5/6) H(X_K)^3 <= (5/6) C_{log,EM} =: B_head (proved uniform O(1) bound). "
+                            "Note: extending the head to floor(X/2) cannot use |W_log(u)| <= C u^{-5/2} to claim decay because "
+                            "X^{-5/2} sum_{2 <= m <= X/2} m^2 = O(X^{1/2}) grows like sqrt(X) (though failure of this unsigned "
+                            "majorant does not prove the signed Moebius head sum is unbounded)."
+                        ),
+                        "provenance": "TASK-TC-049 / TASK-TC-049R (resonant-band head reduction theorem).",
+                        "rounding_direction": "Outward-rounded Arb ball enclosure (.upper() provides certified upper bound).",
+                        "bound_certified": serialize_arb_certified(B_head_arb),
+                    },
+                    "component_5_super_scale_tail_R_mu_tail_XK": {
+                        "expression": "-R_{mu,tail}(X_K) = -sum_{m > M(X_K)} (mu(m)/sqrt(m)) W_log(X_K/m), M(X_K) = ceil(max(2, X_K^{5/4}))",
+                        "domain": "X_K = tau^{|K|} >= 1",
+                        "inequality_used": (
+                            "|R_{mu,tail}(X_K)| <= C_{log,0} X_K^{5/2} sum_{m > M(X_K)} m^{-3} "
+                            "<= C_{log,0} X_K^{5/2} / (2 M(X_K)^2) <= (1/2) C_{log,0} =: B_tail (proved uniform O(1) bound, "
+                            "since M(X_K) >= X_K^{5/4} implies X_K^{5/2} / M(X_K)^2 <= 1)."
+                        ),
+                        "provenance": "TASK-TC-045 (origin bound C_{log,0}) and TASK-TC-049 / TASK-TC-049R (super-scale tail bound).",
+                        "rounding_direction": "Outward-rounded Arb ball enclosure (.upper() provides certified upper bound).",
+                        "bound_certified": serialize_arb_certified(B_tail_arb),
+                        "small_argument_constant_C_log_0_certified": serialize_arb_certified(
+                            C_log_0_arb
+                        ),
+                    },
+                },
+                "large_grade_asymptotic_behavior_of_E_tau_controlled": (
+                    "As |K| -> infty (X_K = tau^{|K|} -> infty): the first three components decay rapidly as "
+                    "|(c_tau^B + 2) h_0(X_K)| = O(X_K^{-5/2}), |W(X_K^{-1})| = O(X_K^{-5/2}), and "
+                    "|W_log(X_K)| <= C_{log,EM} X_K^{-5/2} = O(X_K^{-5/2}), while at the TC-049/TC-049R cutoffs "
+                    "H(X_K) = floor(X_K^{5/6}) and M(X_K) = ceil(max(2, X_K^{5/4})) the head and tail satisfy the "
+                    "proved uniform O(1) bounds |R_{mu,head}(X_K)| <= (5/6) C_{log,EM} and "
+                    "|R_{mu,tail}(X_K)| <= (1/2) C_{log,0}. Consequently, sup_{K in A_R} |E_{tau,controlled}(K)| <= B_ctrl < 17.987140 "
+                    "and limsup_{|K|->infty} |E_{tau,controlled}(K)| <= (5/6) C_{log,EM} + (1/2) C_{log,0} < 11.502478 "
+                    "(establishing o(1) decay of R_{mu,head} would require cancellation or a strictly smaller exponent < 5/6, "
+                    "and o(1) decay of R_{mu,tail} requires a cutoff growing faster than X_K^{5/4})."
                 ),
                 "all_orbit_reconstructions_enclose_zero": all_orbit_identities_enclose_zero,
+                "all_independent_tail_bounds_verified": all_independent_tail_bounds_verified,
+                "all_component_bounds_verified": all_component_bounds_verified,
                 "certified_grade_orbit_table": orbit_rows,
             },
             "parallel_connes_consani_hilbert_schmidt_compressions": {
@@ -1210,9 +1794,11 @@ def execute_task_tc050_faithful_spectral_realization_audit(
 
     report: Dict[str, Any] = {
         "task_id": TASK_TC_050_ID,
+        "repair_task_id": "TASK-TC-050R",
         "parent_epic": EPIC_TC_042_ID,
         "starting_head": STARTING_HEAD_TC_050,
         "reviewed_baseline": REVIEWED_BASELINE_TC_050,
+        "tc050r_reviewed_baseline": "2f7871fff666091c4152ecc8657f2345aacdd4fa",
         "status": FAITHFUL_TAU_ARITHMETIC_SPECTRAL_REALIZATION_STATUS,
         "subgate_tc043a_status": "OPEN",
         "rh_proved": False,
@@ -1232,10 +1818,10 @@ def execute_task_tc050_faithful_spectral_realization_audit(
                 "status": "OPEN",
                 "exact_statement": (
                     "Prove uniform boundedness sup_{X >= 1} |R_{mu,band}(X)| < infty of the localized "
-                    "resonant-band Moebius sum R_{mu,band}(X) = sum_{floor(X/2) < m <= M(X)} (mu(m)/sqrt(m)) W_log(X/m) "
-                    "(M(X) = floor(81 X^{5/4})), or equivalently construct a positive Hilbert-space inner product "
-                    "on Meyer's cotangent quotient H_-^0 for which the grade-translation representation U_K is "
-                    "unitary and the zero functionals l_{rho,0} are bounded."
+                    "resonant-band Moebius sum R_{mu,band}(X) = sum_{H(X) < m <= M(X)} (mu(m)/sqrt(m)) W_log(X/m) "
+                    "with H(X) = floor(X^{5/6}) and M(X) = ceil(max(2, X^{5/4})), or equivalently construct a "
+                    "positive Hilbert-space inner product on Meyer's cotangent quotient H_-^0 for which the "
+                    "grade-translation representation U_K is unitary and the socle zero functionals l_{rho,0} are bounded."
                 ),
             },
         },
