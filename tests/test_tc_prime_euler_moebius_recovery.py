@@ -424,8 +424,8 @@ def test_07_lean_module_and_artifact_section_15():
     assert lean_audit["contains_sorry"] is False
     assert lean_audit["contains_admit"] is False
     assert lean_audit["matches_exact"] is True
-    assert len(CANONICAL_THETA_CORRELATION_LEAN_DEFS) == 40
-    assert len(CANONICAL_THETA_CORRELATION_LEAN_THEOREMS) == 53
+    assert len(CANONICAL_THETA_CORRELATION_LEAN_DEFS) == 44
+    assert len(CANONICAL_THETA_CORRELATION_LEAN_THEOREMS) == 56
     assert "finitePrimeEulerRecursionStep" in CANONICAL_THETA_CORRELATION_LEAN_DEFS
     assert "finitePrimeCoeffCases" in CANONICAL_THETA_CORRELATION_LEAN_DEFS
     assert "finitePrimeMultiplicativeFactorCases" in CANONICAL_THETA_CORRELATION_LEAN_DEFS

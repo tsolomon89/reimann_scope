@@ -19,6 +19,7 @@ from tc.canonical_theta_correlation_bound import (
     REPO_ROOT,
     evaluate_h0_arb,
     execute_task_tc050_faithful_spectral_realization_audit,
+    execute_task_tc051_prime_arithmetic_resonant_band_audit,
     verify_all_serialized_arb_in_tree,
     verify_canonical_theta_correlation_lean_module,
 )
@@ -27,17 +28,27 @@ from tc.faithful_tau_arithmetic_spectral_realization import (
     FAITHFUL_TAU_ARITHMETIC_SPECTRAL_REALIZATION_STATUS,
     REVIEWED_BASELINE_TC_050,
     STARTING_HEAD_TC_050,
+    STARTING_HEAD_TC_051,
     TASK_TC_050_ID,
+    TASK_TC_051_ID,
     certified_head_cutoff_H_X_arb,
     certify_abs_le_bound_arb,
     certify_clamped_exact_cutoff_M_X_arb,
     evaluate_connes_consani_delta_arb,
+    evaluate_R_interval_arb,
+    evaluate_S_p_interval_arb,
+    evaluate_S_prime_set_interval_arb,
+    evaluate_tilde_W_log_certified_arb,
+    evaluate_W_log_em4_certified_arb,
     p_adic_fractional_part_rational,
     verify_adjoint_compatibility_and_hyperbolic_pair_obstruction,
     verify_canonical_hilbert_schmidt_orbit_decomposition,
     verify_euler_resolvent_R0_spatial_and_mellin_identity_arb,
     verify_h0_autocorrelation_cauchy_schwarz_and_sign_change_arb,
+    verify_prime_separation_identity_and_canonical_band_boundary_arb,
     verify_primary_literature_constructions_and_support_extension,
+    verify_sign_sequence_cancellation_discrimination_arb,
+    verify_summation_by_parts_and_tilde_W_log_identity_arb,
     verify_tau_joint_arithmetic_fourier_roles_and_transforms,
 )
 from tc.prime_euler_moebius_recovery import certified_coupled_cutoff_M_X_arb
@@ -258,8 +269,8 @@ def test_06_lean_formalization_and_arb_roundtrip_verification(
         assert thm_name in lean_live["actual_theorems"]
 
     sec6 = tc050_artifact["section_6_certified_arb_roundtrip_verification"]
-    assert sec6["total_certified_arb_balls_checked"] == 522
-    assert sec6["compared_against_live_original_arb_count"] == 522
+    assert sec6["total_certified_arb_balls_checked"] == 703
+    assert sec6["compared_against_live_original_arb_count"] == 703
     assert sec6["live_original_count_matches_enumerated_total"] is True
     assert sec6["all_enclose_original_256bit_arb_ball"] is True
     assert sec6["failed_paths"] == []
@@ -268,7 +279,7 @@ def test_06_lean_formalization_and_arb_roundtrip_verification(
     rt_recheck = verify_all_serialized_arb_in_tree(
         tc050_artifact, path_prefix="task_tc050"
     )
-    assert rt_recheck["total_certified_arb_balls_checked"] == 522
+    assert rt_recheck["total_certified_arb_balls_checked"] == 703
     assert (
         sec6["compared_against_live_original_arb_count"]
         == rt_recheck["total_certified_arb_balls_checked"]
@@ -737,5 +748,177 @@ def test_13_tc050r2_committed_lean_theorems_and_multiplicity_scope_alignment(
         "B_ctrl < 17987140 / 1000000",
     ):
         assert clause in lean_text
+
+
+def test_14_tc051_prime_separation_identity_and_p_squared_support_falsification(
+    tc050_artifact: dict,
+) -> None:
+    """Verify the exact TASK-TC-051 prime-separation identity
+    R(X; A, B) = S_p(X; A, B) - p^{-1/2} S_p(X/p; A/p, B/p)
+    and falsification of unrestricted R(X/p; A/p, B/p) when p^2 lies in (A, B]."""
+    assert tc050_artifact["continuation_task_id"] == TASK_TC_051_ID == "TASK-TC-051"
+    assert tc050_artifact["tc051_starting_head"] == STARTING_HEAD_TC_051
+    assert tc050_artifact["subgate_tc043a_status"] == "OPEN"
+    assert tc050_artifact["rh_proved"] is False
+
+    sec7 = tc050_artifact[
+        "section_7_task_tc051_prime_separation_and_summation_by_parts"
+    ]
+    p_audit = sec7["prime_separation_and_rescaled_band_audit"]
+    assert p_audit["all_prime_separation_identities_enclose_zero"] is True
+    assert p_audit["all_p_squared_obstructions_detected"] is True
+    assert len(p_audit["sample_band_prime_table"]) == 10
+
+    for row in p_audit["sample_band_prime_table"]:
+        assert row["prime_sep_identity_encloses_zero"] is True
+        if row["has_p_squared_multiple_in_band"]:
+            assert row["omitted_p_squared_error_nonzero_certified"] is True
+
+    # Direct live spot check at X = 4, p = 2 where p^2 = 4 in (H(4)=3, M(4)=6]:
+    saved_prec = flint_ctx.prec
+    flint_ctx.prec = 256
+    try:
+        x_a = arb(4)
+        r_band = evaluate_R_interval_arb(x_a, 3, 6, prec_bits=256)
+        s_2 = evaluate_S_p_interval_arb(x_a, 3, 6, 2, prec_bits=256)
+        s_2_res = evaluate_S_p_interval_arb(
+            x_a / arb(2), 1.5, 3, 2, prec_bits=256
+        )
+        r_2_unrestricted = evaluate_R_interval_arb(
+            x_a / arb(2), 1.5, 3, prec_bits=256
+        )
+        inv_sqrt2 = arb(1) / arb(2).sqrt()
+        assert arb(0) in (r_band - (s_2 - inv_sqrt2 * s_2_res))
+        naive_err = r_band - (s_2 - inv_sqrt2 * r_2_unrestricted)
+        expected_p_sq_err = -(arb(1) / arb(2)) * evaluate_W_log_em4_certified_arb(
+            arb(1), min_N0=240, prec_bits=256
+        )
+        assert arb(0) in (naive_err - expected_p_sq_err)
+        assert bool((abs(naive_err) - arb(0)).lower() > arb(0))
+    finally:
+        flint_ctx.prec = saved_prec
+
+
+def test_15_tc051_canonical_rescaled_band_boundary_bounds_and_iterated_tower(
+    tc050_artifact: dict,
+) -> None:
+    """Verify the canonical rescaled-band boundary decomposition
+    R_{mu,band}(X) = S_{p,band}(X) - p^{-1/2} S_{p,band}(X/p) - p^{-1/2} B_p(X),
+    the uniform bound |B_p(X)| <= B_rescaled < 14.851487, and the two-step prime tower."""
+    sec7 = tc050_artifact[
+        "section_7_task_tc051_prime_separation_and_summation_by_parts"
+    ]
+    p_audit = sec7["prime_separation_and_rescaled_band_audit"]
+    assert p_audit["all_canonical_band_separations_enclose_zero"] is True
+    assert p_audit["all_boundary_bounds_certified"] is True
+    assert p_audit["all_tower_telescoping_enclose_zero"] is True
+
+    b_bounds = p_audit["unconditional_rescaled_boundary_bounds"]
+    assert (
+        b_bounds["B_rescaled_global_all_X_ge_1_and_all_p_certified"]["mid_float"]
+        < 14.851486
+        < 14.851487
+    )
+    assert (
+        b_bounds["B_rescaled_large_X_when_H_X_ge_p_certified"]["mid_float"]
+        < 11.502478
+    )
+
+    for row in p_audit["sample_band_prime_table"]:
+        assert row["canonical_band_sep_encloses_zero"] is True
+        assert row["abs_B_p_le_B_rescaled_certified"] is True
+
+
+def test_16_tc051_multi_prime_inclusion_exclusion_and_tautological_sieve_collapse(
+    tc050_artifact: dict,
+) -> None:
+    """Verify the multi-prime inclusion-exclusion identity and the tautological sieve collapse
+    when y >= B = M(X)."""
+    sec7 = tc050_artifact[
+        "section_7_task_tc051_prime_separation_and_summation_by_parts"
+    ]
+    p_audit = sec7["prime_separation_and_rescaled_band_audit"]
+    sieve = p_audit["multi_prime_sieve_collapse_and_coset_obstruction"]
+    assert sieve["three_prime_P_2_3_5_at_X_16_encloses_zero"] is True
+    assert sieve["full_sieve_P_le_M_X_tautological_collapse_verified"] is True
+    assert "k = 1" in sieve["tautological_collapse_explanation"]
+    assert len(sieve["euler_product_factor_growth"]) == 5
+    assert (
+        sieve["euler_product_factor_growth"][-1][
+            "prod_1_plus_p_neg_half_certified"
+        ]["mid_float"]
+        > 120000.0
+    )
+
+
+def test_17_tc051_summation_by_parts_tilde_W_log_and_unconditional_endpoint_bound(
+    tc050_artifact: dict,
+) -> None:
+    """Verify the derivative kernel identity -F_X'(t) = t^{-3/2} tilde{W}_log(X/t),
+    exact summation by parts, and unconditional upper-endpoint bound
+    |M_{H(X)}(M(X)) F_X(M(X))| <= C_{log,0} < 0.557430."""
+    sec7 = tc050_artifact[
+        "section_7_task_tc051_prime_separation_and_summation_by_parts"
+    ]
+    sbp = sec7["summation_by_parts_and_tilde_W_log_audit"]
+    assert sbp["chain_rule_symbolic_verified"] is True
+    assert sbp["termwise_euler_symbolic_verified"] is True
+    assert sbp["all_jet_identities_enclose_zero"] is True
+    assert sbp["all_sbp_ftc_enclose_zero"] is True
+    assert sbp["all_sbp_quadrature_enclose_zero"] is True
+    assert sbp["all_endpoint_bounds_certified"] is True
+    assert sbp["all_smooth_mertens_transfer_certified"] is True
+
+    for row in sbp["summation_by_parts_table"]:
+        assert row["sbp_ftc_identity_encloses_zero"] is True
+        assert row["sbp_quadrature_identity_encloses_zero"] is True
+        assert row["abs_endpoint_le_sharp_bound_certified"] is True
+        assert row["abs_endpoint_le_C_log_0_certified"] is True
+        assert row["abs_R_band_minus_I_M_band_le_C_log_0_certified"] is True
+
+
+def test_18_tc051_sign_sequence_discrimination_and_tc050r2_reporting_repairs(
+    tc050_artifact: dict,
+) -> None:
+    """Verify sign-sequence cancellation discrimination (actual mu(m) vs +1, |mu(m)|,
+    and worst-case |mu(m)| sgn(W_log(X/m))), Lean Theorems 54-56, and TC-050R2 reporting repairs."""
+    sec7 = tc050_artifact[
+        "section_7_task_tc051_prime_separation_and_summation_by_parts"
+    ]
+    disc = sec7["sign_sequence_cancellation_discrimination_audit"]
+    table = disc["sign_discrimination_table"]
+    assert len(table) == 9
+    for row in table:
+        assert (
+            row["R_worst_case_abs_band_certified"]["mid_float"]
+            >= abs(row["R_mu_band_actual_certified"]["mid_float"]) - 1e-12
+        )
+    # At X = 16 and X = tau^2, worst-case unsigned sum exceeds actual |R_{mu,band}| by > 25x:
+    row_tau2 = [r for r in table if r["X_label"] == "tau^2"][0]
+    assert row_tau2["worst_case_to_actual_abs_ratio_certified"]["mid_float"] > 25.0
+
+    # Verify Lean module declarations (44 defs + 56 theorems = 100 declarations):
+    lean_audit = verify_canonical_theta_correlation_lean_module()
+    assert len(lean_audit["actual_defs"]) == 44
+    assert len(lean_audit["actual_theorems"]) == 56
+    assert len(lean_audit["actual_defs"]) + len(lean_audit["actual_theorems"]) == 100
+    assert lean_audit["matches_exact"] is True
+    assert lean_audit["contains_sorry"] is False
+    assert lean_audit["contains_admit"] is False
+
+    # Verify TC-050R2 reporting repairs in docs/reviews/TC_FAITHFUL_TAU_ARITHMETIC_SPECTRAL_REALIZATION.md:
+    doc_text = (
+        REPO_ROOT
+        / "docs"
+        / "reviews"
+        / "TC_FAITHFUL_TAU_ARITHMETIC_SPECTRAL_REALIZATION.md"
+    ).read_text(encoding="utf-8")
+    assert "0.49736248380990124448" in doc_text
+    assert "0.4973624838099012420092607" not in doc_text
+    assert "0.10383893" not in doc_text
+    assert "13.468513" not in doc_text
+    assert "maximal positive real offset" not in doc_text
+    assert "\\operatorname*{Res}_{s=\\rho}\\bigl(-\\xi'(s)/\\xi(s)\\bigr) = -m_\\rho" in doc_text
+
 
 

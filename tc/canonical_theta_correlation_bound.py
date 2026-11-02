@@ -263,6 +263,10 @@ CANONICAL_THETA_CORRELATION_LEAN_DEFS = [
     "logScaleAction",
     "controlledCorrelationRemainder",
     "canonicalCorrelationHSOrbitDecomp",
+    "primeSeparationDecomp",
+    "rescaledBandBoundarySum",
+    "summationByPartsDecomp",
+    "twoStepPrimeTowerSum",
 ]
 
 CANONICAL_THETA_CORRELATION_LEAN_THEOREMS = [
@@ -319,6 +323,9 @@ CANONICAL_THETA_CORRELATION_LEAN_THEOREMS = [
     "tau_grade_star_involution_and_hyperbolic_pair_obstruction",
     "tate_rational_diagonal_character_rigidity_and_convolution_isometry",
     "canonical_hilbert_schmidt_orbit_decomposition_and_resonant_band_equivalence",
+    "prime_separation_and_canonical_band_boundary_equivalence",
+    "summation_by_parts_endpoint_bound_and_smooth_mertens_reduction",
+    "iterated_prime_tower_telescoping_and_coprime_band_transfer",
 ]
 
 TAU_FLOAT = 2.0 * math.pi
@@ -9949,6 +9956,18 @@ def execute_task_tc050_faithful_spectral_realization_audit(
     )
 
     return _exec_tc050(prec_bits=prec_bits)
+
+
+def execute_task_tc051_prime_arithmetic_resonant_band_audit(
+    prec_bits: int = 256,
+) -> Dict[str, Any]:
+    """Execute TASK-TC-051: Derive the prime-separation identity, canonical rescaled-band boundary bounds,
+    summation by parts, and sign-sequence cancellation discrimination for SUBGATE-TC-043A."""
+    from tc.faithful_tau_arithmetic_spectral_realization import (
+        execute_task_tc051_prime_arithmetic_resonant_band_audit as _exec_tc051,
+    )
+
+    return _exec_tc051(prec_bits=prec_bits)
 
 
 def build_canonical_theta_correlation_bound_report(
