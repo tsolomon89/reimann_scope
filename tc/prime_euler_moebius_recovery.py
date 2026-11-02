@@ -3387,9 +3387,9 @@ def execute_task_tc049_arithmetic_cancellation_audit(
                     "> T_{(floor(A X), floor(2 A X)]}(X) >= (3 c_0(A) / (32 A^2)) * sqrt(X) / log(2 A X) -> +infty. "
                     "Established cutoff statement: (i) Fixed linear cutoffs y = floor(A X) with A >= 5 fail (diverging from W(X) at rate Omega_A(sqrt(X)/log X)); "
                     "(ii) Cutoffs y >= M(X) = ceil(max(2, X^{5/4})) suffice (via |W(X) - W_y(X)| <= C_{log,0} X^{5/2} / (2 M^2) <= (1/2) C_{log,0} < 0.278715); "
-                    "(iii) Any broader necessity theorem requires an explicit restriction on the admissible cutoff regime (in particular, y / X -> infty is NOT "
-                    "necessary across arbitrary cutoffs: for the fixed cutoff y = 2, W_2(X) = W_log(X) - 2^{-1/2} W_log(X/2) = O(X^{-5/2}), "
-                    "so if W(X) is bounded on [1, infty) then W(X) - W_2(X) is bounded too)."
+                    "(iii) Any broader necessity theorem requires an explicit restriction on the admissible cutoff regime. "
+                    "Necessity of y / X -> infty has not been established across arbitrary cutoffs. If W is bounded, the fixed cutoff "
+                    "y = 2 already gives bounded comparison (since W_2(X) = W_log(X) - 2^{-1/2} W_log(X/2) = O(X^{-5/2}))."
                 ),
             },
             "certified_audit_data": dyadic_and_subcritical,

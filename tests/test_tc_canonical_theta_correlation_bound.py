@@ -2065,6 +2065,10 @@ def test_33_task_tc049_arithmetic_cancellation_in_canonical_theta_correlation(
         in s2_meta["theorem_statement"]
     )
     assert (
+        "Necessity of y / X -> infty has not been established across arbitrary cutoffs. If W is bounded, the fixed cutoff y = 2 already gives bounded comparison"
+        in s2_meta["theorem_statement"]
+    )
+    assert (
         "W_2(X) = W_log(X) - 2^{-1/2} W_log(X/2) = O(X^{-5/2})"
         in s2_meta["theorem_statement"]
     )
