@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0.0",
   "report_type": "formal_build_report",
-  "status": "failed",
+  "status": "passed",
   "command": "lake build",
-  "exit_code": -1,
-  "producing_git_commit": "e6472e03883e6ec88729fddaea47902b71be7c97",
-  "timestamp": "2026-11-02T10:32:48.627689+00:00",
+  "exit_code": 0,
+  "producing_git_commit": "16e5c55f0f8065b53723c6f79da1e2042afe022b",
+  "timestamp": "2026-11-02T11:17:07.601843+00:00",
   "lake_version": "Lake version 5.0.0-df668f0 (Lean version 4.8.0)",
   "lean_version": "Lean (version 4.8.0, x86_64-w64-windows-gnu, commit df668f00e6c0, Release)",
   "project_theorem_declarations_compiled": 754,
@@ -56,7 +56,7 @@
     "scripts/build_formal.py": "7ab2d3351039935793128e2ac5a940f282e5a3fcc79a41d9dbcc0ae119675d70",
     "certification.py": "f1a6671380078439a3d3609337a18ca01e2f4ab33e54e715bcd2fd0e470667c7"
   },
-  "build_stdout": "",
+  "build_stdout": "\u2139 [1558/2198] Replayed RiemannScope.ExtremalCorrelation\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:717:0: 'RiemannScope.full_finite_extremal_grade_correlation_theorem' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:718:0: 'RiemannScope.full_finite_correlation_transcendence_contradiction' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:719:0: 'RiemannScope.full_finite_extremal_grade_correlation_theorem_support' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:720:0: 'RiemannScope.tc_extremal_correlation_nonvanishing_corollary' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:721:0: 'RiemannScope.three_coefficient_legal_vanishing' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:722:0: 'RiemannScope.nonzero_legal_has_nonzero_selected_coefficient' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:723:0: 'RiemannScope.scalar_pairwise_sum_identity' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:724:0: 'RiemannScope.legal_unit_scalar_invariant' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:725:0: 'RiemannScope.scalar_bridge_L_invariant' depends on axioms: [propext, Classical.choice, Quot.sound]\n\u2139 [1567/2198] Replayed RiemannScope.UnitRescaling\ninfo: .\\.\\.\\.\\RiemannScope\\UnitRescaling.lean:139:2: Try this: ring_nf\n\u2714 [2197/2198] Built RiemannScope\nBuild completed successfully.",
   "build_stderr": "",
-  "report_hash": "a9a0da49d330f9a1de5664fad4ee9241459b5801c41b76204e00e50d3b9c5bf5"
+  "report_hash": "d00bcc523a556de9cf653416afed701fbcff622f7a3f27c8e1ef04f15cae757d"
 }
