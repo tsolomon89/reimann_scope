@@ -2029,4 +2029,247 @@ theorem canonical_hilbert_schmidt_orbit_decomposition_and_resonant_band_equivale
       rw [h_band_id]
       exact abs_le.mpr ⟨by linarith, by linarith⟩
 
+/-! ## Section 50: Prime-Separation Identity, Canonical Rescaled-Band Boundary Theorem,
+    and Summation-by-Parts Reduction (`TASK-TC-051`) -/
+
+/-- Exact single-prime separation decomposition (`TASK-TC-051`):
+    `R(X; A, B) = S_p(X; A, B) - p^{-1/2} S_p(X / p; A / p, B / p)`,
+    where `q = p^{-1/2}`. -/
+def primeSeparationDecomp (S_p_X q S_p_rescaled : ℝ) : ℝ :=
+  S_p_X - q * S_p_rescaled
+
+/-- Rescaled canonical-band boundary discrepancy (`TASK-TC-051`):
+    `B_p(X) = Delta_{p,low}(X) + Delta_{p,high}(X)`. -/
+def rescaledBandBoundarySum (B_p_low B_p_high : ℝ) : ℝ :=
+  B_p_low + B_p_high
+
+/-- **Theorem 54 (`TASK-TC-051`)**: Exact single-prime separation and canonical
+    rescaled-band boundary equivalence:
+    (1) Canonical band prime-separation identity:
+        `R_X = S_p_X - q * S_p_band_xp - q * (B_p_low + B_p_high)`.
+    (2) Unconditional rescaled boundary bound and rational ceiling discharge:
+        `|B_p_low + B_p_high| <= B_log + B_head + B_tail`, and under the proved
+        `TC-049R` rational upper bounds, `B_log + B_head + B_tail < 14851487 / 1000000`.
+    (3) Two-way step transfer between `R_X` and `S_p_X`:
+        - If `|S_p_X| <= M_S` and `|S_p_band_xp| <= M_S`, then
+          `|R_X| <= (1 + q) * M_S + q * (B_log + B_head + B_tail)`.
+        - Conversely, if `|R_X| <= M_R` and `|S_p_band_xp| <= M_S`, then
+          `|S_p_X| <= M_R + q * M_S + q * (B_log + B_head + B_tail)`. -/
+theorem prime_separation_and_canonical_band_boundary_equivalence
+    (R_X S_p_X S_p_rescaled S_p_band_xp B_p_low B_p_high q
+      B_log C_log_EM C_log_0 B_head B_tail M_S M_R : ℝ)
+    (hq_nonneg : 0 ≤ q)
+    (hq_le_one : q ≤ 1)
+    (h_sep : R_X = primeSeparationDecomp S_p_X q S_p_rescaled)
+    (h_rescaled : S_p_rescaled = S_p_band_xp + rescaledBandBoundarySum B_p_low B_p_high)
+    (h_low : |B_p_low| ≤ B_log + B_head)
+    (h_high : |B_p_high| ≤ B_tail) :
+    (R_X = S_p_X - q * S_p_band_xp - q * (B_p_low + B_p_high)) ∧
+    (|B_p_low + B_p_high| ≤ B_log + B_head + B_tail ∧
+      (B_head = (5 / 6 : ℝ) * C_log_EM →
+        B_tail = (1 / 2 : ℝ) * C_log_0 →
+        B_log < 3349009 / 1000000 →
+        C_log_EM < 13468515 / 1000000 →
+        C_log_0 < 557430 / 1000000 →
+        B_log + B_head + B_tail < 14851487 / 1000000)) ∧
+    ((|S_p_X| ≤ M_S ∧ |S_p_band_xp| ≤ M_S →
+        |R_X| ≤ (1 + q) * M_S + q * (B_log + B_head + B_tail)) ∧
+      (|R_X| ≤ M_R ∧ |S_p_band_xp| ≤ M_S →
+        |S_p_X| ≤ M_R + q * M_S + q * (B_log + B_head + B_tail))) := by
+  have _ := hq_le_one
+  have hlow := abs_le.mp h_low
+  have hhigh := abs_le.mp h_high
+  have h_id : R_X = S_p_X - q * S_p_band_xp - q * (B_p_low + B_p_high) := by
+    dsimp [primeSeparationDecomp, rescaledBandBoundarySum] at h_sep h_rescaled
+    rw [h_sep, h_rescaled]
+    ring
+  have h_bdry_bounds :
+      -(B_log + B_head + B_tail) ≤ B_p_low + B_p_high ∧
+        B_p_low + B_p_high ≤ B_log + B_head + B_tail := by
+    exact ⟨by linarith, by linarith⟩
+  have hq_bd_lo :
+      -(q * (B_log + B_head + B_tail)) ≤ q * (B_p_low + B_p_high) := by
+    have h_sum_nonneg : 0 ≤ (B_p_low + B_p_high) + (B_log + B_head + B_tail) := by linarith
+    have h_mul := mul_nonneg hq_nonneg h_sum_nonneg
+    linarith
+  have hq_bd_hi :
+      q * (B_p_low + B_p_high) ≤ q * (B_log + B_head + B_tail) := by
+    have h_diff_nonneg : 0 ≤ (B_log + B_head + B_tail) - (B_p_low + B_p_high) := by linarith
+    have h_mul := mul_nonneg hq_nonneg h_diff_nonneg
+    linarith
+  refine ⟨h_id, ⟨abs_le.mpr h_bdry_bounds, ?_⟩, ⟨?_, ?_⟩⟩
+  · intro hB_head hB_tail hBlog hCEM hC0
+    linarith
+  · rintro ⟨hSpX, hSpxp⟩
+    have h1 := abs_le.mp hSpX
+    have h2 := abs_le.mp hSpxp
+    have hq_xp_lo : -(q * M_S) ≤ q * S_p_band_xp := by
+      have h_mul := mul_nonneg hq_nonneg (by linarith : 0 ≤ S_p_band_xp + M_S)
+      linarith
+    have hq_xp_hi : q * S_p_band_xp ≤ q * M_S := by
+      have h_mul := mul_nonneg hq_nonneg (by linarith : 0 ≤ M_S - S_p_band_xp)
+      linarith
+    rw [h_id]
+    exact abs_le.mpr ⟨by linarith, by linarith⟩
+  · rintro ⟨hRX, hSpxp⟩
+    have h1 := abs_le.mp hRX
+    have h2 := abs_le.mp hSpxp
+    have h_Sp_id : S_p_X = R_X + q * S_p_band_xp + q * (B_p_low + B_p_high) := by
+      linarith
+    have hq_xp_lo : -(q * M_S) ≤ q * S_p_band_xp := by
+      have h_mul := mul_nonneg hq_nonneg (by linarith : 0 ≤ S_p_band_xp + M_S)
+      linarith
+    have hq_xp_hi : q * S_p_band_xp ≤ q * M_S := by
+      have h_mul := mul_nonneg hq_nonneg (by linarith : 0 ≤ M_S - S_p_band_xp)
+      linarith
+    rw [h_Sp_id]
+    exact abs_le.mpr ⟨by linarith, by linarith⟩
+
+/-- Summation-by-parts decomposition (`TASK-TC-051`):
+    `R(X; A, B) = M_A(B) F_X(B) + I_{M,band}(X)`, where
+    `I_{M,band}(X) = -int_A^B M_A(t) F_X'(t) dt`. -/
+def summationByPartsDecomp (M_B F_B I_mertens : ℝ) : ℝ :=
+  M_B * F_B + I_mertens
+
+/-- **Theorem 55 (`TASK-TC-051`)**: Summation-by-parts upper-endpoint bound and
+    two-way reduction to the smooth Mertens-weighted integral:
+    (1) From the trivial counting inequality `|M_B| <= M_cut`, the origin envelope
+        `|F_B| * M_cut^3 <= C_log_0 * X25` (`X25 = X^{5/2}`), and the super-scale
+        cutoff inequality `X25 <= M_cut^2`, proves unconditionally:
+        `|M_B * F_B| * (M_cut ^ 2) <= C_log_0 * X25` and `|M_B * F_B| <= C_log_0`.
+    (2) Proves `|R_X - I_mertens| <= C_log_0`, with `< 557430 / 1000000` when
+        `C_log_0 < 557430 / 1000000`.
+    (3) Proves the two-way boundedness equivalence between `R_X` and `I_mertens`. -/
+theorem summation_by_parts_endpoint_bound_and_smooth_mertens_reduction
+    (R_X M_B F_B I_mertens M_cut X25 C_log_0 M_I M_R : ℝ)
+    (h_sbp : R_X = summationByPartsDecomp M_B F_B I_mertens)
+    (h_M_pos : 0 < M_cut)
+    (h_X25_nonneg : 0 ≤ X25)
+    (h_C_nonneg : 0 ≤ C_log_0)
+    (h_mertens_triv : |M_B| ≤ M_cut)
+    (h_F_bound : |F_B| * (M_cut ^ 3) ≤ C_log_0 * X25)
+    (h_cutoff_dom : X25 ≤ M_cut ^ 2) :
+    (|M_B * F_B| * (M_cut ^ 2) ≤ C_log_0 * X25 ∧
+      |M_B * F_B| ≤ C_log_0) ∧
+    (|R_X - I_mertens| ≤ C_log_0 ∧
+      (C_log_0 < 557430 / 1000000 → |R_X - I_mertens| < 557430 / 1000000)) ∧
+    ((|I_mertens| ≤ M_I → |R_X| ≤ M_I + C_log_0) ∧
+      (|R_X| ≤ M_R → |I_mertens| ≤ M_R + C_log_0)) := by
+  have _ := h_X25_nonneg
+  have h_abs_F_nonneg : 0 ≤ |F_B| := abs_nonneg F_B
+  have h_M_sq_pos : 0 < M_cut ^ 2 := sq_pos_of_pos h_M_pos
+  have h_M_sq_nonneg : 0 ≤ M_cut ^ 2 := le_of_lt h_M_sq_pos
+  have h_step_mult :
+      0 ≤ (M_cut - |M_B|) * (|F_B| * (M_cut ^ 2)) := by
+    exact mul_nonneg (sub_nonneg.mpr h_mertens_triv) (mul_nonneg h_abs_F_nonneg h_M_sq_nonneg)
+  have h_prod_id :
+      |M_B * F_B| * (M_cut ^ 2) = |M_B| * (|F_B| * (M_cut ^ 2)) := by
+    rw [abs_mul]
+    ring
+  have h_cube_id :
+      M_cut * (|F_B| * (M_cut ^ 2)) = |F_B| * (M_cut ^ 3) := by
+    ring
+  have h_sharp_ep : |M_B * F_B| * (M_cut ^ 2) ≤ C_log_0 * X25 := by
+    linarith
+  have h_dom_mult : 0 ≤ C_log_0 * (M_cut ^ 2 - X25) := by
+    exact mul_nonneg h_C_nonneg (sub_nonneg.mpr h_cutoff_dom)
+  have h_ep_sq : |M_B * F_B| * (M_cut ^ 2) ≤ C_log_0 * (M_cut ^ 2) := by
+    linarith
+  have h_ep_global : |M_B * F_B| ≤ C_log_0 := by
+    nlinarith
+  have h_diff_id : R_X - I_mertens = M_B * F_B := by
+    dsimp [summationByPartsDecomp] at h_sbp
+    linarith
+  have h_ep_pair := abs_le.mp h_ep_global
+  refine ⟨⟨h_sharp_ep, h_ep_global⟩, ⟨?_, ?_⟩, ⟨?_, ?_⟩⟩
+  · rw [h_diff_id]
+    exact h_ep_global
+  · intro hC_rat
+    rw [h_diff_id]
+    linarith
+  · intro hI
+    have hI_pair := abs_le.mp hI
+    have hR_id : R_X = I_mertens + M_B * F_B := by linarith
+    rw [hR_id]
+    exact abs_le.mpr ⟨by linarith, by linarith⟩
+  · intro hR
+    have hR_pair := abs_le.mp hR
+    have hI_id : I_mertens = R_X - M_B * F_B := by linarith
+    rw [hI_id]
+    exact abs_le.mpr ⟨by linarith, by linarith⟩
+
+/-- Two-step iterated prime-power tower telescoping expression (`TASK-TC-051`):
+    `S_0 = (R_0 + q B_0) + q (R_1 + q B_1) + q^2 S_2`. -/
+def twoStepPrimeTowerSum (R_0 R_1 B_0 B_1 q S_2 : ℝ) : ℝ :=
+  (R_0 + q * B_0) + q * (R_1 + q * B_1) + (q ^ 2) * S_2
+
+/-- **Theorem 56 (`TASK-TC-051`)**: Iterated prime-power tower telescoping and
+    geometric coprime-band transfer bound:
+    (1) From `R_0 = S_0 - q S_1 - q B_0` and `R_1 = S_1 - q S_2 - q B_1`, proves
+        `S_0 = twoStepPrimeTowerSum R_0 R_1 B_0 B_1 q S_2`.
+    (2) Under `|R_j| <= M_R` and `|B_j| <= B_rescaled`, proves
+        `|S_0 - q^2 S_2| <= (1 + q) * (M_R + q * B_rescaled)`.
+    (3) When the sub-unit base term vanishes (`S_2 = 0`), proves the geometric
+        contraction inequality `(1 - q) * |S_0| <= M_R + q * B_rescaled`. -/
+theorem iterated_prime_tower_telescoping_and_coprime_band_transfer
+    (S_0 S_1 S_2 R_0 R_1 B_0 B_1 q M_R B_rescaled : ℝ)
+    (hq_nonneg : 0 ≤ q)
+    (hq_lt_one : q < 1)
+    (h_step0 : R_0 = S_0 - q * S_1 - q * B_0)
+    (h_step1 : R_1 = S_1 - q * S_2 - q * B_1)
+    (h_R0 : |R_0| ≤ M_R)
+    (h_R1 : |R_1| ≤ M_R)
+    (h_B0 : |B_0| ≤ B_rescaled)
+    (h_B1 : |B_1| ≤ B_rescaled) :
+    (S_0 = twoStepPrimeTowerSum R_0 R_1 B_0 B_1 q S_2) ∧
+    (|S_0 - (q ^ 2) * S_2| ≤ (1 + q) * (M_R + q * B_rescaled)) ∧
+    (S_2 = 0 → (1 - q) * |S_0| ≤ M_R + q * B_rescaled) := by
+  have hr0 := abs_le.mp h_R0
+  have hr1 := abs_le.mp h_R1
+  have hb0 := abs_le.mp h_B0
+  have hb1 := abs_le.mp h_B1
+  have h_tele : S_0 = twoStepPrimeTowerSum R_0 R_1 B_0 B_1 q S_2 := by
+    dsimp [twoStepPrimeTowerSum]
+    linear_combination -h_step0 - q * h_step1
+  have h_diff_tele :
+      S_0 - (q ^ 2) * S_2 = (R_0 + q * B_0) + q * (R_1 + q * B_1) := by
+    dsimp [twoStepPrimeTowerSum] at h_tele
+    linarith
+  have h_qB0_lo : -(q * B_rescaled) ≤ q * B_0 := by
+    have h_mul := mul_nonneg hq_nonneg (by linarith : 0 ≤ B_0 + B_rescaled)
+    linarith
+  have h_qB0_hi : q * B_0 ≤ q * B_rescaled := by
+    have h_mul := mul_nonneg hq_nonneg (by linarith : 0 ≤ B_rescaled - B_0)
+    linarith
+  have h_qB1_lo : -(q * B_rescaled) ≤ q * B_1 := by
+    have h_mul := mul_nonneg hq_nonneg (by linarith : 0 ≤ B_1 + B_rescaled)
+    linarith
+  have h_qB1_hi : q * B_1 ≤ q * B_rescaled := by
+    have h_mul := mul_nonneg hq_nonneg (by linarith : 0 ≤ B_rescaled - B_1)
+    linarith
+  have h_step1_lo : -(M_R + q * B_rescaled) ≤ R_1 + q * B_1 := by linarith
+  have h_step1_hi : R_1 + q * B_1 ≤ M_R + q * B_rescaled := by linarith
+  have h_qstep1_lo : -(q * (M_R + q * B_rescaled)) ≤ q * (R_1 + q * B_1) := by
+    have h_mul := mul_nonneg hq_nonneg (by linarith : 0 ≤ (R_1 + q * B_1) + (M_R + q * B_rescaled))
+    linarith
+  have h_qstep1_hi : q * (R_1 + q * B_1) ≤ q * (M_R + q * B_rescaled) := by
+    have h_mul := mul_nonneg hq_nonneg (by linarith : 0 ≤ (M_R + q * B_rescaled) - (R_1 + q * B_1))
+    linarith
+  have h_two_step_bound :
+      |S_0 - (q ^ 2) * S_2| ≤ (1 + q) * (M_R + q * B_rescaled) := by
+    rw [h_diff_tele]
+    exact abs_le.mpr ⟨by linarith, by linarith⟩
+  refine ⟨h_tele, h_two_step_bound, ?_⟩
+  · intro hS2
+    have hS0_bound : |S_0| ≤ (1 + q) * (M_R + q * B_rescaled) := by
+      simpa [hS2] using h_two_step_bound
+    have h_MR_nonneg : 0 ≤ M_R := le_trans (abs_nonneg R_0) h_R0
+    have h_B_nonneg : 0 ≤ B_rescaled := le_trans (abs_nonneg B_0) h_B0
+    have h_qB_nonneg : 0 ≤ q * B_rescaled := mul_nonneg hq_nonneg h_B_nonneg
+    have h_M_nonneg : 0 ≤ M_R + q * B_rescaled := by linarith
+    have h_one_minus_q_nonneg : 0 ≤ 1 - q := by linarith
+    have h_mul_diff := mul_nonneg h_one_minus_q_nonneg (by linarith : 0 ≤ (1 + q) * (M_R + q * B_rescaled) - |S_0|)
+    have h_q_sq_nonneg : 0 ≤ (q ^ 2) * (M_R + q * B_rescaled) := mul_nonneg (sq_nonneg q) h_M_nonneg
+    linarith
+
 end RiemannScope

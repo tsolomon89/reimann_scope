@@ -3148,10 +3148,12 @@ def certify_w_log_large_scale_decay_and_resonant_band_reduction_arb(
             w_actual = evaluate_w_prime_sum_certified_arb(
                 x_arb, n_max=n_max_c, prec_bits=prec_bits
             )["enclosure_arb"]
-            w_log_val = evaluate_w_log_divisor_aggregated_certified_arb(
-                x_arb, k_max=n_max_c, prec_bits=prec_bits
-            )["enclosure_arb"]
+            w_log_val = _eval_w_log_em_sharp_arb(x_arb)
             r_mu_total = w_actual - w_log_val
+
+            from tc.faithful_tau_arithmetic_spectral_realization import (
+                evaluate_W_log_em4_certified_arb,
+            )
 
             r_mu_head = arb(0)
             r_mu_band = arb(0)
@@ -3159,10 +3161,10 @@ def certify_w_log_large_scale_decay_and_resonant_band_reduction_arb(
                 mu_m = moebius_mu_int(m)
                 if mu_m != 0:
                     m_arb = arb(m)
-                    k_eff = max(250, int(2000 / math.sqrt(m)) + 150)
-                    w_log_xm = evaluate_w_log_divisor_aggregated_certified_arb(
-                        x_arb / m_arb, k_max=k_eff, prec_bits=prec_bits
-                    )["enclosure_arb"]
+                    u_xm = x_arb / m_arb
+                    w_log_xm = evaluate_W_log_em4_certified_arb(
+                        u_xm, min_N0=240, prec_bits=prec_bits
+                    )
                     term = (arb(mu_m) / m_arb.sqrt()) * w_log_xm
                     if m <= M_minus:
                         r_mu_head += term
