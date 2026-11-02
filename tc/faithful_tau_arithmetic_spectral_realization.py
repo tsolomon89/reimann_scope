@@ -98,10 +98,14 @@ from fractions import Fraction
 import json
 import math
 from pathlib import Path
+import sys
 from typing import Any, Dict, List, Tuple
 
 from flint import acb, acb_series, arb, ctx as flint_ctx
 import sympy as sp
+
+if str(Path(__file__).resolve().parent.parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from tc.canonical_theta_correlation_bound import (
     EPIC_TC_042_ID,
@@ -577,9 +581,34 @@ def verify_adjoint_compatibility_and_hyperbolic_pair_obstruction(
                     "a non-trivial nilpotent Jordan part N_rho on E_rho, the socle ker(^t D_- - rho) subset E_rho "
                     "has dimension >= 1, and any nonzero socle vector l_{rho,0} in ker(^t D_- - rho) \\ {0} is a "
                     "strict eigenvector satisfying U_K l_{rho,0} = tau^{K(rho - 1/2)} l_{rho,0}. Thus Target 1 "
-                    "requires only a positive inner product on the spectral realization (or on the socle) and "
-                    "never assumes simplicity of zeros."
+                    "requires only a positive inner product on the socle (or a semisimple multiplicity-weighted "
+                    "eigenspace) and never assumes simplicity of zeros."
                 ),
+                "scalar_correlation_vs_operator_jordan_scope_distinction": {
+                    "scalar_correlation_boundedness_equivalence": (
+                        "RH <==> sup_{K in A_R} |C_tau(K)| <= C_tau(0) <==> sup_{K in A_R} |C_tau(K)| < infty "
+                        "holds unconditionally in zero multiplicity m_rho >= 1 in BOTH directions: "
+                        "(i) Under RH (Re(rho) = 1/2), each distinct zero rho = 1/2 + i*gamma_rho of multiplicity "
+                        "m_rho = ord_xi(rho) >= 1 is a simple pole of -xi'(s)/xi(s) with residue m_rho, so "
+                        "-F_tau(s) F_tau(1-s) (xi'(s)/xi(s)) tau^{-K(s-1/2)} has residue m_rho |F_tau(rho)|^2 tau^{-i K gamma_rho} "
+                        "(with no polynomial drift in K), giving |C_tau(K)| <= sum_{rho distinct} m_rho |F_tau(rho)|^2 = C_tau(0) < infty; "
+                        "(ii) Conversely, by the Fixed-Seed RH Equivalence Theorem (TASK-TC-037 / Theorem 12), "
+                        "sup_{K in A_R} |C_tau(K)| < infty implies RH via Laplace-Carleman analytic continuation "
+                        "without assuming zero simplicity."
+                    ),
+                    "socle_operator_unitary_realization_equivalence": (
+                        "Realizing the socle eigenvectors l_{rho,0} in ker(^t D_- - rho) \\ {0} (or a semisimple "
+                        "multiplicity-weighted eigenspace) in a positive-definite inner-product space with "
+                        "V_K^* = V_{-K} is equivalent to Re(rho) = 1/2 for all zeros (RH alone, arbitrary m_rho >= 1)."
+                    ),
+                    "full_generalized_eigenspace_unitary_realization_equivalence": (
+                        "Realizing the full generalized-eigenvector operator action on Meyer's cotangent quotient "
+                        "H_-^0 = (+) E_rho as a unitary representation on a Hilbert space is equivalent to "
+                        "RH + Simplicity (Re(rho) = 1/2 and m_rho = 1 for all zeros), because for m_rho >= 2 the "
+                        "nilpotent Jordan chain V_K l_{rho,1} = tau^{K(rho-1/2)} (l_{rho,1} + (K log tau) l_{rho,0}) "
+                        "has norm growing linearly in |K|."
+                    ),
+                },
                 "jordan_socle_verifications": jordan_checks,
             },
         }
@@ -870,6 +899,399 @@ def certified_head_cutoff_H_X_arb(X: arb, prec_bits: int = 256) -> int:
         flint_ctx.prec = saved_prec
 
 
+def certify_clamped_exact_cutoff_M_X_arb(
+    X: arb, prec_bits: int = 256
+) -> Dict[str, Any]:
+    """Certify the clamped integer super-scale cutoff M(X) := ceil(max(2, X^{5/4})) for X >= 1
+    and distinguish the exact mathematical cutoff M(X) from the interval safe upper helper
+    `certified_coupled_cutoff_M_X_arb(X)` (defined in `tc/prime_euler_moebius_recovery.py`).
+
+    - Exact Clamped Characterization (for real X >= 1 and integer M):
+          M = ceil(max(2, X^{5/4}))
+            <==>  M >= 2  and  X^5 <= M^4  and  (M = 2  or  (M - 1)^4 < X^5).
+      Note that the unclamped strict lower inequality (M - 1)^4 < X^5 fails at X = 1, M = 2
+      because (2 - 1)^4 = 1 = 1^5.
+    - Helper Scope (`certified_coupled_cutoff_M_X_arb(X)` in `tc/prime_euler_moebius_recovery.py`):
+      Computes `M_safe(X_ball) = max(2, int(((X_ball^5)^{1/4}).upper().ceil()))` and verifies
+      `X_ball^5 <= M_safe^4`. This returns a certified safe upper cutoff across the entire input
+      ball `X_ball` (so `X^5 / M_safe^2 <= X^{-5/2} X^5 / M(X)^2 <= 1` holds on all of `X_ball`).
+      Whenever `u_ball = (X_ball^5)^{1/4}` does not straddle an integer >= 2, `M_safe(X_ball)`
+      additionally satisfies `(M_safe = 2 or (M_safe - 1)^4 < X_ball^5)` across the entire ball
+      and therefore equals the exact mathematical ceiling `M(X)` on every point of `X_ball`.
+      If `u_ball` straddles an integer boundary >= 2 (e.g., `X = 16 +/- 10^{-30}`, where
+      `16^{5/4} = 32`), `M_safe = 33` exceeds the midpoint ceiling `M(16) = 32` by 1 and
+      `exact_clamped_characterization_certified` is False.
+    """
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = max(prec_bits, 256)
+        X_arb = arb(X)
+        if (X_arb - arb(1)).lower() < arb(0):
+            raise ValueError(f"X must satisfy X >= 1 for M(X) clamped characterization: {X_arb}")
+        x5_arb = X_arb ** arb(5)
+        u_arb = x5_arb.root(4)
+        m_safe = certified_coupled_cutoff_M_X_arb(X_arb, prec_bits=prec_bits)
+        ceil_lower = u_arb.lower().ceil()
+        fmpz_lower = ceil_lower.unique_fmpz()
+        if fmpz_lower is None:
+            raise RuntimeError(
+                f"Non-unique integer ceiling for lower endpoint of X^(5/4): {ceil_lower}"
+            )
+        m_lower_ceil = max(2, int(fmpz_lower))
+        m_ge_2 = bool(m_safe >= 2)
+        upper_ok = bool((arb(m_safe ** 4) - x5_arb).lower() >= arb(0))
+        unclamped_lower_strict_ok = bool(
+            (x5_arb - arb((m_safe - 1) ** 4)).lower() > arb(0)
+        )
+        clamped_lower_ok = bool((m_safe == 2) or unclamped_lower_strict_ok)
+        exact_clamped_ok = bool(
+            m_ge_2 and upper_ok and clamped_lower_ok and (m_lower_ceil == m_safe)
+        )
+        return {
+            "M_safe_upper_int": m_safe,
+            "M_lower_ceil_int": m_lower_ceil,
+            "m_ge_2": m_ge_2,
+            "X5_le_M4_certified": upper_ok,
+            "clamped_lower_M_eq_2_or_M_minus_1_pow4_lt_X5_certified": clamped_lower_ok,
+            "unclamped_M_minus_1_pow4_lt_X5_holds": unclamped_lower_strict_ok,
+            "exact_clamped_characterization_certified": exact_clamped_ok,
+        }
+    finally:
+        flint_ctx.prec = saved_prec
+
+
+def verify_h0_autocorrelation_cauchy_schwarz_and_sign_change_arb(
+    prec_bits: int = 256,
+) -> Dict[str, Any]:
+    """Certify in SymPy and 256-bit Arb the exact properties of the multiplicative
+    autocorrelation profile h_0(X) := (psi_tau * psi_tau^*)(X) = <T_{log_tau X} psi_tau, psi_tau>_{L^2(dy/y)}:
+      1. Single consistent value at X = 1 (W_1 = (1 + 1)^2 = 4):
+             h_0(1) = P_sym(4) / (512 * 2^{17/2})
+                    = 92193 / (512 * 2^{17/2})
+                    = 92193 / (131072 * sqrt(2))
+                    = 0.4973624838099012416952988635325...
+         where P_sym(W) = -648 W^3 + 58380 W^2 - 706860 W + 2027025
+                        = 92193 - 270924 (W - 4) + 50604 (W - 4)^2 - 648 (W - 4)^3.
+      2. Explicit sign-change witness on [1, infty):
+         h_0(X) is NOT strictly positive or monotone decreasing on [1, infty); at X = 2
+         (W_2 = 25/4 = 6.25), P_sym(25/4) = -177558.75 < 0 and
+             h_0(2) = -0.21743062244679337... < 0.
+      3. Valid unconditional global bound |h_0(X)| <= h_0(1) for all X > 0:
+         Derived directly from the unitary dilation Cauchy-Schwarz inequality on L^2(R_{>0}, dy/y):
+             |h_0(X)| = |<T_{log_tau X} psi_tau, psi_tau>_{L^2(dy/y)}|
+                     <= ||T_{log_tau X} psi_tau||_{L^2(dy/y)} ||psi_tau||_{L^2(dy/y)}
+                      = ||psi_tau||_{L^2(dy/y)}^2 = h_0(1),
+         and independently from the symmetric Bernstein polynomial envelope (Lean Theorem 5)
+             |h_0(X)| <= (92193 / 32768) (X + X^{-1})^{-5/2} <= (92193 / 32768) 2^{-5/2} = h_0(1).
+         Consequently, |-(c_tau^B + 2) h_0(X_K)| = c_tau^A |h_0(X_K)| <= c_tau^A h_0(1) =: B_{h_0}.
+      4. Leading large-X asymptotic (X -> infty):
+         With W_X = (X + X^{-1})^2 ~ X^2, the numerator -648 W_X^3 + ... ~ -648 X^6 divided by
+         512 (X + X^{-1})^{17/2} ~ 512 X^{17/2} gives
+             h_0(X) ~ -(648 / 512) X^{6 - 17/2} = -(81 / 64) X^{-5/2} = O(X^{-5/2}).
+    """
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = max(prec_bits, 256)
+        W_sym = sp.Symbol("W", real=True)
+        P_sym_poly = (
+            -648 * W_sym**3 + 58380 * W_sym**2 - 706860 * W_sym + 2027025
+        )
+        P_sym_taylor_at_4 = (
+            92193
+            - 270924 * (W_sym - 4)
+            + 50604 * (W_sym - 4) ** 2
+            - 648 * (W_sym - 4) ** 3
+        )
+        taylor_diff_zero = bool(
+            sp.simplify(sp.expand(P_sym_poly - P_sym_taylor_at_4)) == 0
+        )
+        p_sym_at_4 = int(P_sym_poly.subs(W_sym, 4))
+        p_sym_at_25_4 = sp.Rational(P_sym_poly.subs(W_sym, sp.Rational(25, 4)))
+
+        h0_1_arb = evaluate_h0_arb(arb(1))
+        h0_1_closed_arb = arb(92193) / (arb(131072) * arb(2).sqrt())
+        h0_1_diff_encloses_zero = bool((h0_1_arb - h0_1_closed_arb).contains(0))
+
+        h0_2_arb = evaluate_h0_arb(arb(2))
+        h0_2_strictly_negative = bool(h0_2_arb.upper() < arb(0))
+        h0_5_arb = evaluate_h0_arb(arb(5))
+        h0_5_strictly_positive = bool(h0_5_arb.lower() > arb(0))
+        h0_10_arb = evaluate_h0_arb(arb(10))
+        h0_10_strictly_negative = bool(h0_10_arb.upper() < arb(0))
+
+        # Verify |h_0(X)| <= (92193/32768) (X + X^{-1})^{-5/2} <= h_0(1) across test scales
+        c0_bernstein = arb(92193) / arb(32768)
+        leading_coeff_arb = -arb(81) / arb(64)
+        sample_scales = [arb(1), arb(2), arb(5), arb(10), arb(100), arb(1000)]
+        scale_checks: List[Dict[str, Any]] = []
+        all_cs_and_bernstein_verified = True
+        for x_s in sample_scales:
+            h_val = evaluate_h0_arb(x_s)
+            is_one = bool(x_s == arb(1))
+            bern_env = (
+                h0_1_arb
+                if is_one
+                else c0_bernstein * ((x_s + arb(1) / x_s) ** arb("-2.5"))
+            )
+            cs_cert = certify_abs_le_bound_arb(
+                h_val, h0_1_arb, exact_self_equality=is_one
+            )
+            bern_cert = certify_abs_le_bound_arb(
+                h_val, bern_env, exact_self_equality=is_one
+            )
+            scaled_x52 = (x_s ** arb("2.5")) * h_val
+            if not (cs_cert["certified"] and bern_cert["certified"]):
+                all_cs_and_bernstein_verified = False
+            scale_checks.append(
+                {
+                    "X": str(float(x_s.mid())),
+                    "h0_X_certified": serialize_arb_certified(h_val),
+                    "X_pow_5_2_times_h0_X_certified": serialize_arb_certified(
+                        scaled_x52
+                    ),
+                    "abs_h0_X_le_h0_1_certified": cs_cert["certified"],
+                    "abs_h0_X_le_bernstein_envelope_certified": bern_cert[
+                        "certified"
+                    ],
+                }
+            )
+
+        return {
+            "h0_1_closed_form": "92193 / (512 * 2^{17/2}) = 92193 / (131072 * sqrt(2))",
+            "P_sym_at_W_eq_4_exact_int": p_sym_at_4,
+            "P_sym_taylor_at_W_eq_4": "92193 - 270924*(W - 4) + 50604*(W - 4)^2 - 648*(W - 4)^3",
+            "P_sym_taylor_identity_verified": taylor_diff_zero,
+            "h0_1_certified": serialize_arb_certified(h0_1_arb),
+            "h0_1_closed_form_diff_encloses_zero": h0_1_diff_encloses_zero,
+            "sign_change_witnesses_on_1_to_infty": {
+                "h0_is_strictly_positive_on_1_to_infty": False,
+                "h0_is_monotone_decreasing_on_1_to_infty": False,
+                "P_sym_at_X_eq_2_W_eq_25_over_4_rational": f"{p_sym_at_25_4.p}/{p_sym_at_25_4.q}",
+                "h0_2_certified": serialize_arb_certified(h0_2_arb),
+                "h0_2_strictly_negative_verified": h0_2_strictly_negative,
+                "h0_5_certified": serialize_arb_certified(h0_5_arb),
+                "h0_5_strictly_positive_verified": h0_5_strictly_positive,
+                "h0_10_certified": serialize_arb_certified(h0_10_arb),
+                "h0_10_strictly_negative_verified": h0_10_strictly_negative,
+            },
+            "valid_global_bound_derivation": (
+                "By the multiplicative autocorrelation identity h_0(tau^{|K|}) = <T_{|K|} psi_tau, psi_tau>_{L^2(dy/y)} "
+                "and unitary dilation Cauchy-Schwarz on L^2(R_{>0}, dy/y), |h_0(X_K)| <= ||T_{|K|} psi_tau||_{L^2} ||psi_tau||_{L^2} "
+                "= ||psi_tau||_{L^2}^2 = h_0(1) for all K in R (and independently by the symmetric Bernstein bound "
+                "|h_0(X)| <= (92193/32768) (X + X^{-1})^{-5/2} <= h_0(1), Lean Theorem 5)."
+            ),
+            "leading_large_X_asymptotic": {
+                "formula": "h_0(X) = -(81/64) X^{-5/2} (1 + O(X^{-2})) = O(X^{-5/2}) as X -> infty",
+                "leading_coefficient_exact": "-648 / 512 = -81 / 64 = -1.265625",
+                "leading_coefficient_certified": serialize_arb_certified(
+                    leading_coeff_arb
+                ),
+                "global_bernstein_decay_constant": "92193 / 32768 = 2.813507080078125",
+            },
+            "all_cauchy_schwarz_and_bernstein_checks_verified": all_cs_and_bernstein_verified,
+            "sample_scale_evaluations": scale_checks,
+        }
+    finally:
+        flint_ctx.prec = saved_prec
+
+
+def verify_euler_resolvent_R0_spatial_and_mellin_identity_arb(
+    prec_bits: int = 256,
+) -> Dict[str, Any]:
+    """Certify in SymPy and 256-bit Arb the reconciled causal s = 0 Euler resolvent R_0
+    and pole-integral J(kappa) definitions:
+      1. Spatial and integration-by-parts definitions (with Euler derivative D = y d/dy):
+             (R_0 f)(y) := int_0^y (t/y)^{1/2} (D f)(t) dt/t
+                         = f(y) - (1/2) int_0^y (t/y)^{1/2} f(t) dt/t
+                         = ((I - (1/2) K_0) f)(y),
+         where (K_0 f)(y) := y^{-1/2} int_0^y f(t) t^{1/2} dt/t is the derivative-free causal operator.
+      2. Mellin / Fourier multiplier on L^2(R_{>0}, dy/y) (hat{f}(it) = int_0^infty f(y) y^{-it} dy/y):
+             hat{K_0 f}(it) = (1 / (1/2 + it)) hat{f}(it),
+             hat{R_0 f}(it) = (1 - (1/2) / (1/2 + it)) hat{f}(it) = (it / (1/2 + it)) hat{f}(it),
+             |hat{R_0 f}(it)|^2 = (t^2 / (t^2 + 1/4)) |hat{f}(it)|^2 = (1 - (1/4) / (t^2 + 1/4)) |hat{f}(it)|^2.
+      3. Exact inner-product identity with exponential weight e^{-u/2} in J(kappa):
+             J(kappa) := int_0^infty e^{-u/2} (h_0(e^{kappa+u}) + h_0(e^{kappa-u})) du
+                       = <K_0 T_K psi_tau, K_0 psi_tau>_{L^2(dy/y)},
+             4 <R_0 T_K psi_tau, R_0 psi_tau>_{L^2(dy/y)} = 4 h_0(e^kappa) - J(kappa).
+         By contrast, omitting the Euler derivative D (replacing R_0 by K_0) gives
+         4 ||K_0 psi_tau||_{L^2(dy/y)}^2 = 4 J(0) = 0.10383892848881212... != 4 h_0(1) - J(0) = 1.963490173955199...
+    """
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = max(prec_bits, 256)
+        tol_spec = 2 ** (-90)
+        pi_arb = arb.pi()
+        c0_bernstein = arb(92193) / arb(32768)
+
+        # Symbolic Mellin multiplier identity: 1 - (1/2)/(1/2 + i*t) == (i*t)/(1/2 + i*t)
+        # and |(i*t)/(1/2 + i*t)|^2 == t^2 / (t^2 + 1/4) == 1 - (1/4)/(t^2 + 1/4)
+        t_sym = sp.Symbol("t", real=True)
+        mult_diff = sp.simplify(
+            (1 - sp.Rational(1, 2) / (sp.Rational(1, 2) + sp.I * t_sym))
+            - (sp.I * t_sym) / (sp.Rational(1, 2) + sp.I * t_sym)
+        )
+        mod_sq_diff = sp.simplify(
+            (t_sym**2 / (t_sym**2 + sp.Rational(1, 4)))
+            - (1 - sp.Rational(1, 4) / (t_sym**2 + sp.Rational(1, 4)))
+        )
+        symbolic_mellin_multiplier_verified = bool(
+            mult_diff == 0 and mod_sq_diff == 0
+        )
+
+        # Spatial verification of (R_0 psi_tau)(y) = int_0^y (t/y)^{1/2} (D psi_tau)(t) dt/t
+        # vs psi_tau(y) - (1/2) y^{-1/2} int_0^y t^{1/2} psi_tau(t) dt/t at y in {1/2, 1, 2}.
+        # Since psi_tau(t) = t^{1/2} Phi_1^{(2)}(t) with Phi_1^{(2)}(t) = P_2(r) e^{-r}, r = pi t^2,
+        # we have t^{1/2} psi_tau(t) dt/t = Phi_1^{(2)}(t) dt and
+        # t^{1/2} (D psi_tau)(t) dt/t = ((1/2) Phi_1^{(2)}(t) + (D Phi_1^{(2)})(t)) dt,
+        # both of which are entire functions of t on [0, y]:
+        def _phi2_acb(t_c: acb) -> acb:
+            r_c = acb(pi_arb) * t_c * t_c
+            poly = (
+                r_c**4
+                - acb(7) * (r_c**3)
+                + (acb(41) / acb(4)) * (r_c**2)
+                - (acb(9) / acb(4)) * r_c
+            )
+            return poly * ((-r_c).exp())
+
+        def _t_sqrt_D_psi_tau_over_t_acb(t_c: acb) -> acb:
+            # t^{-1/2} (D psi_tau)(t) = (1/2) Phi_1^{(2)}(t) + 2 r d/dr(P_2(r) e^{-r}):
+            r_c = acb(pi_arb) * t_c * t_c
+            d_poly = (
+                -r_c**4
+                + acb(11) * (r_c**3)
+                - (acb(125) / acb(4)) * (r_c**2)
+                + (acb(91) / acb(4)) * r_c
+                - (acb(9) / acb(4))
+            ) * r_c
+            return (acb(1) / acb(2)) * _phi2_acb(t_c) + acb(2) * d_poly * (
+                (-r_c).exp()
+            )
+
+        spatial_ibp_checks: List[Dict[str, Any]] = []
+        all_spatial_ibp_enclose_zero = True
+        for y_val in [arb("0.5"), arb(1), arb(2)]:
+            sqrt_y = y_val.sqrt()
+
+            def _int_D_t(t_c: acb, analytic: bool = False) -> acb:
+                return _t_sqrt_D_psi_tau_over_t_acb(t_c)
+
+            def _int_psi_t(t_c: acb, analytic: bool = False) -> acb:
+                return _phi2_acb(t_c)
+
+            r0_from_D = (
+                acb.integral(
+                    _int_D_t,
+                    acb(0),
+                    acb(y_val.mid()),
+                    rel_tol=tol_spec,
+                    abs_tol=tol_spec,
+                ).real
+                / sqrt_y
+            )
+            k0_val = (
+                acb.integral(
+                    _int_psi_t,
+                    acb(0),
+                    acb(y_val.mid()),
+                    rel_tol=tol_spec,
+                    abs_tol=tol_spec,
+                ).real
+                / sqrt_y
+            )
+            psi_y = sqrt_y * _phi2_acb(acb(y_val)).real
+            r0_from_ibp = psi_y - arb("0.5") * k0_val
+            diff_r0 = r0_from_D - r0_from_ibp
+            encloses_zero = bool(diff_r0.contains(0))
+            if not encloses_zero:
+                all_spatial_ibp_enclose_zero = False
+            spatial_ibp_checks.append(
+                {
+                    "y": str(float(y_val.mid())),
+                    "R0_psi_tau_from_Euler_derivative_D_certified": serialize_arb_certified(
+                        r0_from_D
+                    ),
+                    "R0_psi_tau_from_IBP_f_minus_half_K0_f_certified": serialize_arb_certified(
+                        r0_from_ibp
+                    ),
+                    "derivative_free_K0_psi_tau_certified": serialize_arb_certified(
+                        k0_val
+                    ),
+                    "R0_D_minus_R0_IBP_diff_certified": serialize_arb_certified(
+                        diff_r0
+                    ),
+                    "R0_D_minus_R0_IBP_encloses_zero": encloses_zero,
+                }
+            )
+
+        # Evaluate J(0) = 2 int_0^infty e^{-u/2} h_0(e^u) du and compare
+        # 4 ||R_0 psi_tau||^2 = 4 h_0(1) - J(0) against 4 ||K_0 psi_tau||^2 = 4 J(0):
+        def _f_j0(u_c: acb, analytic: bool = False) -> acb:
+            return (
+                acb(2)
+                * evaluate_h0_acb(u_c.exp(), analytic=analytic)
+                * ((-u_c / acb(2)).exp())
+            )
+
+        u_top_J0 = 20
+        j0_fin = arb(0)
+        for m_step in range(0, 4 * u_top_J0):
+            j0_fin += acb.integral(
+                _f_j0,
+                acb(m_step) / acb(4),
+                acb(m_step + 1) / acb(4),
+                rel_tol=tol_spec,
+                abs_tol=tol_spec,
+            ).real
+        j0_tail = (
+            (arb(2) / arb(3))
+            * c0_bernstein
+            * ((-arb(3) * arb(u_top_J0)).exp())
+        )
+        j0_arb = j0_fin + arb(0, j0_tail.upper())
+        h0_1_arb = evaluate_h0_arb(arb(1))
+        four_r0_norm_sq = arb(4) * h0_1_arb - j0_arb
+        four_k0_norm_sq = arb(4) * j0_arb
+        discrepancy_r0_vs_k0 = four_r0_norm_sq - four_k0_norm_sq
+
+        return {
+            "euler_resolvent_R0_spatial_formula": (
+                "(R_0 f)(y) := int_0^y (t/y)^{1/2} (D f)(t) dt/t = f(y) - (1/2) int_0^y (t/y)^{1/2} f(t) dt/t,   D = y d/dy"
+            ),
+            "derivative_free_operator_K0_formula": (
+                "(K_0 f)(y) := y^{-1/2} int_0^y f(t) t^{1/2} dt/t,   so R_0 = K_0 D = I - (1/2) K_0"
+            ),
+            "mellin_multiplier_of_R0": "hat{R_0 f}(it) = (it / (1/2 + it)) hat{f}(it),   |hat{R_0 f}(it)|^2 = (1 - (1/4)/(t^2 + 1/4)) |hat{f}(it)|^2",
+            "pole_integral_J_kappa_definition": (
+                "J(kappa) := int_0^infty e^{-u/2} (h_0(e^{kappa+u}) + h_0(e^{kappa-u})) du "
+                "= int_1^infty x^{-1/2} (h_0(e^kappa x) + h_0(e^kappa x^{-1})) dx/x"
+            ),
+            "attempt_B_weight_vs_J_kappa_weight_distinction": (
+                "In J(kappa), the exponential weight is e^{-u/2} du = x^{-1/2} dx/x (arising from the "
+                "L^2(R_{>0}, dy/y) convolution of the s = 0 pole kernel k_0(y) = y^{-1/2} 1_{y>1}). "
+                "By contrast, the weight (e^{-3u/2} / (2 sinh u)) du = (x^{-3/2} / (x - x^{-1})) dx/x "
+                "belongs to the Attempt B conductor space H_tau^B difference-square integral "
+                "P_tau^B(K) = int_0^infty (e^{-3u/2} / (2 sinh u)) (2 h_0(e^kappa) - h_0(e^{kappa+u}) - h_0(e^{kappa-u})) du."
+            ),
+            "symbolic_mellin_multiplier_verified": symbolic_mellin_multiplier_verified,
+            "all_spatial_ibp_enclose_zero": all_spatial_ibp_enclose_zero,
+            "spatial_ibp_sample_checks": spatial_ibp_checks,
+            "J_0_certified": serialize_arb_certified(j0_arb),
+            "four_norm_R0_psi_tau_sq_eq_4_h0_1_minus_J_0_certified": serialize_arb_certified(
+                four_r0_norm_sq
+            ),
+            "four_norm_derivative_free_K0_psi_tau_sq_eq_4_J_0_certified": serialize_arb_certified(
+                four_k0_norm_sq
+            ),
+            "discrepancy_four_R0_sq_minus_four_K0_sq_certified": serialize_arb_certified(
+                discrepancy_r0_vs_k0
+            ),
+        }
+    finally:
+        flint_ctx.prec = saved_prec
+
+
+
 def certify_abs_le_bound_arb(
     value_arb: arb,
     bound_arb: arb,
@@ -1099,9 +1521,15 @@ def _compute_live_controlled_component_bounds_arb(
         c0_bernstein = arb(92193) / arb(32768)
 
         # 1. Pole + transfer archimedean term -(c_tau^B + 2) h_0(X_K) = -c_tau^A h_0(X_K):
-        # Since h_0(u) > 0 is strictly decreasing on [1, infty) (TC-044), its global maximum on
-        # X_K >= 1 is attained at X_K = 1 (K = 0): B_{h_0} = c_tau^A h_0(1).
-        # For large X_K, |c_tau^A h_0(X_K)| <= c_tau^A * (92193/32768) * X_K^{-5/2} = O(X_K^{-5/2}).
+        # Note: h_0(X) changes sign on [1, infty) (e.g., h_0(2) = -0.217430622... < 0), so
+        # |h_0(X_K)| <= h_0(1) is NOT proved by monotonicity/positivity; instead it follows
+        # unconditionally from the multiplicative autocorrelation identity
+        # h_0(tau^{|K|}) = <T_{|K|} psi_tau, psi_tau>_{L^2(dy/y)} and unitary dilation Cauchy-Schwarz
+        # |h_0(X_K)| <= ||T_{|K|} psi_tau||_{L^2(dy/y)} ||psi_tau||_{L^2(dy/y)} = ||psi_tau||_{L^2(dy/y)}^2 = h_0(1)
+        # (and independently from the symmetric Bernstein envelope |h_0(X)| <= (92193/32768)(X + X^{-1})^{-5/2} <= h_0(1)),
+        # giving B_{h_0} = c_tau^A h_0(1).
+        # For large X_K -> infty, h_0(X_K) ~ -(81/64) X_K^{-5/2} and
+        # |c_tau^A h_0(X_K)| <= c_tau^A * (92193/32768) * X_K^{-5/2} = O(X_K^{-5/2}).
         B_h0_arb = c_tau_A_arb * h0_1_arb
         C_h0_decay_arb = c_tau_A_arb * c0_bernstein
 
@@ -1302,6 +1730,7 @@ def verify_canonical_hilbert_schmidt_orbit_decomposition(
         all_hs_cauchy_schwarz_verified = True
         all_independent_tail_bounds_verified = True
         all_component_bounds_verified = True
+        all_sample_cutoffs_exact_clamped_certified = True
 
         for k_label, abs_key, k_a in grade_samples:
             abs_k = abs(k_a)
@@ -1326,6 +1755,9 @@ def verify_canonical_hilbert_schmidt_orbit_decomposition(
                 # Certified TC-049/TC-049R cutoffs H(X_K) = floor(X_K^{5/6}) and M(X_K) = ceil(max(2, X_K^{5/4})):
                 h_cut_int = certified_head_cutoff_H_X_arb(X_k, prec_bits=prec_bits)
                 m_cut_int = certified_coupled_cutoff_M_X_arb(X_k, prec_bits=prec_bits)
+                m_clamped_cert = certify_clamped_exact_cutoff_M_X_arb(
+                    X_k, prec_bits=prec_bits
+                )
 
                 # Direct finite-sum evaluation of R_{mu,head}(X_K) over 2 <= m <= H(X_K) (0 if H(X_K) < 2):
                 r_mu_head_abs = arb(0)
@@ -1379,6 +1811,7 @@ def verify_canonical_hilbert_schmidt_orbit_decomposition(
                     "w_log_XK_abs": w_log_XK_abs,
                     "h_cut_int": h_cut_int,
                     "m_cut_int": m_cut_int,
+                    "m_clamped_cert": m_clamped_cert,
                     "r_mu_head_abs": r_mu_head_abs,
                     "r_mu_band_abs": r_mu_band_abs,
                     "r_mu_tail_direct_abs": r_mu_tail_direct_abs,
@@ -1392,9 +1825,12 @@ def verify_canonical_hilbert_schmidt_orbit_decomposition(
             w_log_XK = cached["w_log_XK_abs"]
             h_cut_XK = cached["h_cut_int"]
             m_cut_XK = cached["m_cut_int"]
+            m_clamped_cert_XK = cached["m_clamped_cert"]
             r_mu_head_XK = cached["r_mu_head_abs"]
             r_mu_band_XK = cached["r_mu_band_abs"]
             r_mu_tail_direct_XK = cached["r_mu_tail_direct_abs"]
+            if not m_clamped_cert_XK["exact_clamped_characterization_certified"]:
+                all_sample_cutoffs_exact_clamped_certified = False
 
             w_prime_k = w_XK + w_inv_XK
             c_tau_k = w_arch_k - w_prime_k
@@ -1497,6 +1933,7 @@ def verify_canonical_hilbert_schmidt_orbit_decomposition(
                     "X_K_eq_tau_abs_K_certified": serialize_arb_certified(X_k),
                     "H_XK_eq_floor_XK_5_6": h_cut_XK,
                     "M_XK_eq_ceil_max_2_XK_5_4": m_cut_XK,
+                    "M_XK_clamped_exact_characterization": m_clamped_cert_XK,
                     "head_sum_is_empty": bool(h_cut_XK < 2),
                     "C_tau_K_certified": serialize_arb_certified(c_tau_k),
                     "P_tau_K_HS_orbit_certified": serialize_arb_certified(p_tau_k),
@@ -1562,6 +1999,24 @@ def verify_canonical_hilbert_schmidt_orbit_decomposition(
                 }
             )
 
+        r0_audit = verify_euler_resolvent_R0_spatial_and_mellin_identity_arb(
+            prec_bits=prec_bits
+        )
+        h0_audit = verify_h0_autocorrelation_cauchy_schwarz_and_sign_change_arb(
+            prec_bits=prec_bits
+        )
+        clamped_boundary_audit = {
+            "exact_X_eq_1_M_eq_2": certify_clamped_exact_cutoff_M_X_arb(
+                arb(1), prec_bits=prec_bits
+            ),
+            "exact_X_eq_16_M_eq_32": certify_clamped_exact_cutoff_M_X_arb(
+                arb(16), prec_bits=prec_bits
+            ),
+            "straddling_ball_X_eq_16_pm_1e_30_M_safe_eq_33": certify_clamped_exact_cutoff_M_X_arb(
+                arb(16, arb("1e-30").upper()), prec_bits=prec_bits
+            ),
+        }
+
         return {
             "positive_hilbert_space_and_unitary_orbit": {
                 "hilbert_space_H_tau_pos": "H_tau^pos := H_tau^B (+) L^2(R_{>0}, dy/y)",
@@ -1582,8 +2037,12 @@ def verify_canonical_hilbert_schmidt_orbit_decomposition(
                 ),
                 "isometric_embedding_J_tau": (
                     "J_tau(f) := (A_tau^B f, 2 R_0 f) in H_tau^pos = H_tau^B (+) L^2(R_{>0}, dy/y), "
-                    "where (R_0 f)(y) = y^{-1/2} int_0^y f(t) t^{1/2} dt/t is the s = 0 pole-resolvent."
+                    "where (R_0 f)(y) := int_0^y (t/y)^{1/2} (D f)(t) dt/t = f(y) - (1/2) int_0^y (t/y)^{1/2} f(t) dt/t "
+                    "(with Euler derivative D = y d/dy) is the causal s = 0 pole-resolvent with Mellin multiplier "
+                    "it / (1/2 + it) and 4 <R_0 T_K psi_tau, R_0 psi_tau>_{L^2(dy/y)} = 4 h_0(e^kappa) - J(kappa), "
+                    "J(kappa) := int_0^infty e^{-u/2} (h_0(e^{kappa+u}) + h_0(e^{kappa-u})) du."
                 ),
+                "euler_resolvent_R0_and_pole_integral_J_kappa_audit": r0_audit,
                 "unitary_representation_and_intertwining": (
                     "U_K (phi, psi) := (U_K^B phi, T_K psi) for all K in A_R, where (U_K^B phi)(x, y) = phi(x, tau^{-K} y) "
                     "and (T_K psi)(y) = psi(tau^{-K} y) are unitary dilations with U_K^* = U_{-K}, satisfying "
@@ -1595,8 +2054,10 @@ def verify_canonical_hilbert_schmidt_orbit_decomposition(
                 ),
                 "pole_integral_J_kappa_cancellation_identity": (
                     "<A_tau^B T_K psi_tau, A_tau^B psi_tau>_{H_tau^B} = W_arch(h_K) + c_tau^B h_0(X_K) - (2 h_0(X_K) - J(kappa)) "
-                    "and 4 <R_0 T_K psi_tau, R_0 psi_tau>_{L^2(dy/y)} = 4 h_0(X_K) - J(kappa), so the pole-transfer "
-                    "integral J(kappa) cancels identically in their sum P_tau(K) = W_arch(h_K) + (c_tau^B + 2) h_0(X_K)."
+                    "and 4 <R_0 T_K psi_tau, R_0 psi_tau>_{L^2(dy/y)} = 4 h_0(X_K) - J(kappa) "
+                    "(where J(kappa) = int_0^infty e^{-u/2} (h_0(e^{kappa+u}) + h_0(e^{kappa-u})) du has exponential weight e^{-u/2}, "
+                    "while P_tau^B(K) has weight e^{-3u/2}/(2 sinh u)), so J(kappa) cancels identically in their sum "
+                    "P_tau(K) = W_arch(h_K) + (c_tau^B + 2) h_0(X_K)."
                 ),
                 "matrix_coefficient_identity": (
                     "P_tau(K) := <B_K, B_0>_{HS} = <U_K Psi_0^pos, Psi_0^pos>_{H_tau^pos} "
@@ -1621,7 +2082,22 @@ def verify_canonical_hilbert_schmidt_orbit_decomposition(
                 ),
                 "cutoff_definitions_tc049r": {
                     "H_X_formula": "H(X) := floor(X^{5/6})",
+                    "H_X_exact_characterization": "H^6 <= X^5 < (H + 1)^6   (for X > 0, integer H >= 0)",
+                    "H_X_helper_location": "certified_head_cutoff_H_X_arb in tc/faithful_tau_arithmetic_spectral_realization.py",
                     "M_X_formula": "M(X) := ceil(max(2, X^{5/4}))",
+                    "M_X_clamped_exact_characterization": (
+                        "M >= 2  and  X^5 <= M^4  and  (M = 2  or  (M - 1)^4 < X^5)   (for X >= 1, integer M)"
+                    ),
+                    "M_X_helper_location_and_scope": (
+                        "certified_coupled_cutoff_M_X_arb in tc/prime_euler_moebius_recovery.py computes "
+                        "M_safe(X_ball) = max(2, int(((X_ball^5)^{1/4}).upper().ceil())) and certifies X_ball^5 <= M_safe^4 "
+                        "(a certified safe upper cutoff across X_ball). certify_clamped_exact_cutoff_M_X_arb in "
+                        "tc/faithful_tau_arithmetic_spectral_realization.py additionally verifies the clamped lower "
+                        "condition (M = 2 or (M - 1)^4 < X_ball^5) so M_safe(X_ball) = M(X) is exact on X_ball whenever "
+                        "(X_ball^5)^{1/4} does not straddle an integer >= 2."
+                    ),
+                    "all_sample_cutoffs_exact_clamped_certified": all_sample_cutoffs_exact_clamped_certified,
+                    "clamped_cutoff_boundary_audit": clamped_boundary_audit,
                     "R_mu_head_formula": "R_{mu,head}(X) := sum_{2 <= m <= H(X)} (mu(m)/sqrt(m)) W_log(X/m)  (0 when H(X) < 2)",
                     "R_mu_band_formula": "R_{mu,band}(X) := sum_{H(X) < m <= M(X)} (mu(m)/sqrt(m)) W_log(X/m)",
                     "R_mu_tail_formula": "R_{mu,tail}(X) := sum_{m > M(X)} (mu(m)/sqrt(m)) W_log(X/m)",
@@ -1634,6 +2110,7 @@ def verify_canonical_hilbert_schmidt_orbit_decomposition(
                         "2 <= m <= M(X) cancel in W(X) - W_y(X)."
                     ),
                 },
+                "h0_autocorrelation_cauchy_schwarz_and_sign_change_audit": h0_audit,
                 "controlled_remainder_formula": (
                     "E_{tau,controlled}(K) = -(c_tau^B + 2) h_0(X_K) - W(X_K^{-1}) - W_log(X_K) "
                     "- R_{mu,head}(X_K) - R_{mu,tail}(X_K),   X_K = tau^{|K|} >= 1"
@@ -1669,10 +2146,18 @@ def verify_canonical_hilbert_schmidt_orbit_decomposition(
                         "expression": "-(c_tau^B + 2) h_0(X_K) = -c_tau^A h_0(X_K)",
                         "domain": "X_K = tau^{|K|} >= 1 (all K in A_R)",
                         "inequality_used": (
-                            "Strict monotonicity 0 < h_0(X_K) <= h_0(1) on [1, infty) (global bound B_{h_0} = c_tau^A h_0(1)), "
-                            "and Bernstein envelope |h_0(X_K)| <= (92193/32768) X_K^{-5/2} for O(X_K^{-5/2}) decay."
+                            "Unitary dilation Cauchy-Schwarz on L^2(R_{>0}, dy/y): "
+                            "|h_0(X_K)| = |<T_{|K|} psi_tau, psi_tau>_{L^2(dy/y)}| <= ||psi_tau||_{L^2(dy/y)}^2 = h_0(1) "
+                            "= 92193 / (512 * 2^{17/2}) = 0.49736248380990124... (note: h_0 changes sign on [1, infty), "
+                            "with h_0(2) = -0.217430622... < 0, so the bound uses Cauchy-Schwarz / Bernstein envelope "
+                            "|h_0(X_K)| <= (92193/32768)(X_K + X_K^{-1})^{-5/2} <= h_0(1), NOT monotonicity), "
+                            "giving global bound B_{h_0} = c_tau^A h_0(1) and large-X_K asymptotic "
+                            "h_0(X_K) ~ -(81/64) X_K^{-5/2} = O(X_K^{-5/2}) with |h_0(X_K)| <= (92193/32768) X_K^{-5/2}."
                         ),
-                        "provenance": "TASK-TC-044 (h_0 monotonicity and Bernstein envelope) + TASK-TC-042F/043 (c_tau^A = c_tau^B + 2).",
+                        "provenance": (
+                            "Multiplicative autocorrelation Cauchy-Schwarz on L^2(R_{>0}, dy/y) + TASK-TC-040 "
+                            "symmetric Bernstein envelope (Lean Theorem 5) + TASK-TC-042F/043 (c_tau^A = c_tau^B + 2)."
+                        ),
                         "rounding_direction": "Outward-rounded Arb ball enclosure (.upper() provides certified upper bound).",
                         "bound_certified": serialize_arb_certified(B_h0_arb),
                         "asymptotic_decay_constant_C_h0_certified": serialize_arb_certified(
@@ -1736,11 +2221,11 @@ def verify_canonical_hilbert_schmidt_orbit_decomposition(
                 },
                 "large_grade_asymptotic_behavior_of_E_tau_controlled": (
                     "As |K| -> infty (X_K = tau^{|K|} -> infty): the first three components decay rapidly as "
-                    "|(c_tau^B + 2) h_0(X_K)| = O(X_K^{-5/2}), |W(X_K^{-1})| = O(X_K^{-5/2}), and "
-                    "|W_log(X_K)| <= C_{log,EM} X_K^{-5/2} = O(X_K^{-5/2}), while at the TC-049/TC-049R cutoffs "
-                    "H(X_K) = floor(X_K^{5/6}) and M(X_K) = ceil(max(2, X_K^{5/4})) the head and tail satisfy the "
-                    "proved uniform O(1) bounds |R_{mu,head}(X_K)| <= (5/6) C_{log,EM} and "
-                    "|R_{mu,tail}(X_K)| <= (1/2) C_{log,0}. Consequently, sup_{K in A_R} |E_{tau,controlled}(K)| <= B_ctrl < 17.987140 "
+                    "|(c_tau^B + 2) h_0(X_K)| = O(X_K^{-5/2}) (with h_0(X_K) ~ -(81/64) X_K^{-5/2}), "
+                    "|W(X_K^{-1})| = O(X_K^{-5/2}), and |W_log(X_K)| <= C_{log,EM} X_K^{-5/2} = O(X_K^{-5/2}), "
+                    "while at the TC-049/TC-049R cutoffs H(X_K) = floor(X_K^{5/6}) and M(X_K) = ceil(max(2, X_K^{5/4})) "
+                    "the head and tail satisfy the proved uniform O(1) bounds |R_{mu,head}(X_K)| <= (5/6) C_{log,EM} "
+                    "and |R_{mu,tail}(X_K)| <= (1/2) C_{log,0}. Consequently, sup_{K in A_R} |E_{tau,controlled}(K)| <= B_ctrl < 17.987140 "
                     "and limsup_{|K|->infty} |E_{tau,controlled}(K)| <= (5/6) C_{log,EM} + (1/2) C_{log,0} < 11.502478 "
                     "(establishing o(1) decay of R_{mu,head} would require cancellation or a strictly smaller exponent < 5/6, "
                     "and o(1) decay of R_{mu,tail} requires a cutoff growing faster than X_K^{5/4})."
@@ -1794,11 +2279,14 @@ def execute_task_tc050_faithful_spectral_realization_audit(
 
     report: Dict[str, Any] = {
         "task_id": TASK_TC_050_ID,
-        "repair_task_id": "TASK-TC-050R",
+        "repair_task_id": "TASK-TC-050R2",
+        "preceding_repair_task_id": "TASK-TC-050R",
         "parent_epic": EPIC_TC_042_ID,
         "starting_head": STARTING_HEAD_TC_050,
         "reviewed_baseline": REVIEWED_BASELINE_TC_050,
         "tc050r_reviewed_baseline": "2f7871fff666091c4152ecc8657f2345aacdd4fa",
+        "tc050r2_reviewed_head": "0e6ae36ce995ef3037652b3dfb67645325f990b1",
+        "tc050r_implementation_commit": "f5521363ea94774938fd37152d67d743413327ae",
         "status": FAITHFUL_TAU_ARITHMETIC_SPECTRAL_REALIZATION_STATUS,
         "subgate_tc043a_status": "OPEN",
         "rh_proved": False,
@@ -1813,6 +2301,72 @@ def execute_task_tc050_faithful_spectral_realization_audit(
                 "tate_rational_diagonal_character_rigidity_and_convolution_isometry",
                 "canonical_hilbert_schmidt_orbit_decomposition_and_resonant_band_equivalence",
             ],
+            "committed_lean_theorems_exact_scope": {
+                "theorem_51_tau_grade_star_involution_and_hyperbolic_pair_obstruction": {
+                    "parameters": "(tau K J delta B11 B12 B22 c1 c2 : ℝ) (htau : 1 < tau) (hK : K ≠ 0) (hB12 : 0 < B12)",
+                    "definitions_used": [
+                        "gradeRadialCharacter (tau K delta : ℝ) := tau ^ (K * delta)",
+                        "hyperbolicPairForm (B12 c1 c2 : ℝ) := 2 * B12 * c1 * c2",
+                        "jordanTwoByTwoSocleStep (lam c0 c1 : ℝ) : ℝ × ℝ := (lam * c0 + c1, lam * c1)",
+                    ],
+                    "proved_conjuncts": [
+                        "gradeRadialCharacter tau (K + J) delta = gradeRadialCharacter tau K delta * gradeRadialCharacter tau J delta ∧ gradeRadialCharacter tau (-K) delta = gradeRadialCharacter tau K (-delta)",
+                        "gradeRadialCharacter tau (-K) delta = gradeRadialCharacter tau K delta ↔ delta = 0",
+                        "delta ≠ 0 → (tau ^ (2 * K * delta) - 1) * B11 = 0 → (tau ^ (-(2 * K * delta)) - 1) * B22 = 0 → (B11 = 0 ∧ B22 = 0 ∧ B11 * c1 ^ 2 + 2 * B12 * c1 * c2 + B22 * c2 ^ 2 = hyperbolicPairForm B12 c1 c2 ∧ 0 < hyperbolicPairForm B12 1 1 ∧ hyperbolicPairForm B12 1 (-1) < 0)",
+                        "jordanTwoByTwoSocleStep (gradeRadialCharacter tau K delta) 1 0 = (gradeRadialCharacter tau K delta, 0) ∧ jordanTwoByTwoSocleStep (gradeRadialCharacter tau K delta) 0 1 = (1, gradeRadialCharacter tau K delta) ∧ (jordanTwoByTwoSocleStep (gradeRadialCharacter tau K delta) 0 1).1 ≠ 0",
+                    ],
+                    "external_analytic_scope_note": (
+                        "In (4), Lean proves the Jordan block basis-action identities showing the socle vector (1, 0) "
+                        "has zero nilpotent drift while (0, 1) has nonzero socle drift component 1 != 0; the Hilbert-norm "
+                        "growth deduction ||V_K l_{rho,1}||^2 = ||l_{rho,1} + (K log tau) l_{rho,0}||^2 for m_rho >= 2 "
+                        "is an external analytic corollary of that nonzero nilpotent drift."
+                    ),
+                },
+                "theorem_52_tate_rational_diagonal_character_rigidity_and_convolution_isometry": {
+                    "parameters": "(tau c_inf q K u J C_gh C_dil : ℝ) (T_conv : ℝ → ℝ) (htau : 1 < tau)",
+                    "definitions_used": [
+                        "adelicPhaseDiscrepancy (tau c_inf q : ℝ) := (tau - c_inf) * q",
+                        "logPrimeShiftAction (u J : ℝ) := u - J",
+                        "logScaleAction (scale u : ℝ) := scale * u",
+                    ],
+                    "proved_conjuncts": [
+                        "(adelicPhaseDiscrepancy tau c_inf 1 = 0 ↔ c_inf = tau) ∧ (c_inf = tau → adelicPhaseDiscrepancy tau c_inf q = 0)",
+                        "(tau ^ K) * (tau ^ (-K)) = 1",
+                        "logScaleAction (tau ^ (-K)) (logPrimeShiftAction u J) = logPrimeShiftAction (logScaleAction (tau ^ (-K)) u) (J * (tau ^ (-K))) ∧ logScaleAction (tau ^ (-K)) (logPrimeShiftAction u J) - logPrimeShiftAction (logScaleAction (tau ^ (-K)) u) J = (1 - tau ^ (-K)) * J",
+                        "C_dil = C_gh → T_conv C_dil = T_conv C_gh",
+                    ],
+                    "external_analytic_scope_note": (
+                        "Theorem 52 is parameterized over generic real tau > 1 (not specialized to 2 * Real.pi inside Lean); "
+                        "the principal-adele partial-fraction congruence sum_p {q}_p = q (mod 1) and multiplicative Haar "
+                        "convolution invariance (U_K g) * (U_K h)^* = g * h^* are external analytic inputs."
+                    ),
+                },
+                "theorem_53_canonical_hilbert_schmidt_orbit_decomposition_and_resonant_band_equivalence": {
+                    "parameters_and_hypotheses": (
+                        "(W_arch W_prime P_K P_0 c_tau_B h0_XK J_K c_pole_transfer_h0 W_reflected W_log_X R_head R_band_X R_tail "
+                        "B_h0 B_refl B_log C_log_EM C_log_0 B_head B_tail M_band M_C : ℝ) "
+                        "(h_arch : W_arch = P_K - c_pole_transfer_h0) "
+                        "(h_prime : W_prime = W_reflected + W_log_X + localizedResonantBandDecomp R_head R_band_X R_tail) "
+                        "(h_PK : |P_K| ≤ P_0) (h_h0 : |c_pole_transfer_h0| ≤ B_h0) (h_refl : |W_reflected| ≤ B_refl) "
+                        "(h_log : |W_log_X| ≤ B_log) (h_head : |R_head| ≤ B_head) (h_tail : |R_tail| ≤ B_tail)"
+                    ),
+                    "definitions_used": [
+                        "controlledCorrelationRemainder (c_pole_transfer_h0 W_reflected W_log_X R_head R_tail : ℝ) := -c_pole_transfer_h0 - W_reflected - W_log_X - R_head - R_tail",
+                        "canonicalCorrelationHSOrbitDecomp (P_K E_ctrl_K R_band_X : ℝ) := P_K + (E_ctrl_K - R_band_X)",
+                    ],
+                    "proved_conjuncts": [
+                        "((W_arch + c_tau_B * h0_XK - (2 * h0_XK - J_K)) + (4 * h0_XK - J_K) = W_arch + (c_tau_B + 2) * h0_XK) ∧ (0 ≤ P_0 → |P_0| ≤ P_0) ∧ C_K = canonicalCorrelationHSOrbitDecomp P_K E_ctrl_K R_band_X ∧ C_K = P_K + E_K",
+                        "|E_ctrl_K| ≤ B_ctrl ∧ |C_K - (P_K - R_band_X)| ≤ B_ctrl ∧ (B_head = (5/6) * C_log_EM → B_tail = (1/2) * C_log_0 → B_h0 < 2671923/1000000 → B_refl < 463730/1000000 → B_log < 3349009/1000000 → C_log_EM < 13468515/1000000 → C_log_0 < 557430/1000000 → B_ctrl < 17987140/1000000)",
+                        "(|R_band_X| ≤ M_band → (|E_K| ≤ B_ctrl + M_band ∧ |C_K| ≤ P_0 + B_ctrl + M_band)) ∧ (|C_K| ≤ M_C → (|E_K| ≤ M_C + P_0 ∧ |R_band_X| ≤ M_C + P_0 + B_ctrl))",
+                    ],
+                    "external_analytic_scope_note": (
+                        "Theorem 53 retains h_arch, h_prime, h_PK, and the five component inequalities as explicit hypotheses, "
+                        "proves the algebraic J_K-cancellation identity alongside h_arch, and proves B_ctrl < 17987140/1000000 "
+                        "conditionally from the rational upper-bound hypotheses. The integer-power cutoff predicates for "
+                        "H(X) = floor(X^{5/6}) and M(X) = ceil(max(2, X^{5/4})) are certified in Python Arb helpers rather than inside Theorem 53."
+                    ),
+                },
+            },
             "remaining_open_obligation": {
                 "obligation_id": "SUBGATE-TC-043A",
                 "status": "OPEN",

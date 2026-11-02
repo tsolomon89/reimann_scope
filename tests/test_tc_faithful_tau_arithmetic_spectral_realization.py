@@ -30,10 +30,13 @@ from tc.faithful_tau_arithmetic_spectral_realization import (
     TASK_TC_050_ID,
     certified_head_cutoff_H_X_arb,
     certify_abs_le_bound_arb,
+    certify_clamped_exact_cutoff_M_X_arb,
     evaluate_connes_consani_delta_arb,
     p_adic_fractional_part_rational,
     verify_adjoint_compatibility_and_hyperbolic_pair_obstruction,
     verify_canonical_hilbert_schmidt_orbit_decomposition,
+    verify_euler_resolvent_R0_spatial_and_mellin_identity_arb,
+    verify_h0_autocorrelation_cauchy_schwarz_and_sign_change_arb,
     verify_primary_literature_constructions_and_support_extension,
     verify_tau_joint_arithmetic_fourier_roles_and_transforms,
 )
@@ -255,8 +258,8 @@ def test_06_lean_formalization_and_arb_roundtrip_verification(
         assert thm_name in lean_live["actual_theorems"]
 
     sec6 = tc050_artifact["section_6_certified_arb_roundtrip_verification"]
-    assert sec6["total_certified_arb_balls_checked"] == 489
-    assert sec6["compared_against_live_original_arb_count"] == 489
+    assert sec6["total_certified_arb_balls_checked"] == 522
+    assert sec6["compared_against_live_original_arb_count"] == 522
     assert sec6["live_original_count_matches_enumerated_total"] is True
     assert sec6["all_enclose_original_256bit_arb_ball"] is True
     assert sec6["failed_paths"] == []
@@ -265,7 +268,7 @@ def test_06_lean_formalization_and_arb_roundtrip_verification(
     rt_recheck = verify_all_serialized_arb_in_tree(
         tc050_artifact, path_prefix="task_tc050"
     )
-    assert rt_recheck["total_certified_arb_balls_checked"] == 489
+    assert rt_recheck["total_certified_arb_balls_checked"] == 522
     assert (
         sec6["compared_against_live_original_arb_count"]
         == rt_recheck["total_certified_arb_balls_checked"]
@@ -515,4 +518,224 @@ def test_09_tc050r_markdown_review_table_matches_json_certificate(
         )
 
     assert matched_rows == 13
+
+
+def test_10_tc050r2_euler_resolvent_R0_spatial_mellin_and_J_kappa_weight(
+    tc050_artifact: dict,
+) -> None:
+    """Verify the causal s = 0 Euler resolvent identity
+    (R_0 f)(y) = int_0^y (t/y)^{1/2} (D f)(t) dt/t = f(y) - (1/2) int_0^y (t/y)^{1/2} f(t) dt/t,
+    the e^{-u/2} weight in J(kappa), and why omitting D fails to cancel J(kappa)."""
+    sec4_pos = tc050_artifact[
+        "section_4_canonical_hilbert_schmidt_orbit_decomposition"
+    ]["positive_hilbert_space_and_unitary_orbit"]
+    emb_str = sec4_pos["isometric_embedding_J_tau"]
+    assert "(D f)(t)" in emb_str
+    assert "f(y) - (1/2)" in emb_str
+    assert "e^{-u/2}" in emb_str
+    assert "e^{-3u/2}" not in emb_str
+
+    r0_audit = sec4_pos["euler_resolvent_R0_and_pole_integral_J_kappa_audit"]
+    assert r0_audit["symbolic_mellin_multiplier_verified"] is True
+    assert r0_audit["all_spatial_ibp_enclose_zero"] is True
+    assert math.isclose(
+        r0_audit["four_norm_R0_psi_tau_sq_eq_4_h0_1_minus_J_0_certified"][
+            "mid_float"
+        ],
+        1.963490173955199,
+        rel_tol=1e-14,
+    )
+    assert math.isclose(
+        r0_audit[
+            "four_norm_derivative_free_K0_psi_tau_sq_eq_4_J_0_certified"
+        ]["mid_float"],
+        0.10383904513761568,
+        rel_tol=1e-10,
+    )
+    assert (
+        r0_audit["discrepancy_four_R0_sq_minus_four_K0_sq_certified"][
+            "mid_float"
+        ]
+        > 1.859
+    )
+
+    live_r0 = verify_euler_resolvent_R0_spatial_and_mellin_identity_arb(
+        prec_bits=256
+    )
+    assert live_r0["all_spatial_ibp_enclose_zero"] is True
+
+
+def test_11_tc050r2_h0_autocorrelation_cauchy_schwarz_and_sign_change(
+    tc050_artifact: dict,
+) -> None:
+    """Verify h_0(1) = 92193 / (512 * 2^{17/2}) = 92193 / (131072 * sqrt(2)),
+    Taylor expansion at W = 4, sign-change witness h_0(2) < 0, unitary dilation
+    Cauchy-Schwarz bound |h_0(X)| <= h_0(1), and leading asymptotic -(81/64) X^{-5/2}."""
+    decomp = tc050_artifact[
+        "section_4_canonical_hilbert_schmidt_orbit_decomposition"
+    ]["exact_decomposition_and_controlled_remainder_bounds"]
+    h0_audit = decomp["h0_autocorrelation_cauchy_schwarz_and_sign_change_audit"]
+    assert h0_audit["P_sym_at_W_eq_4_exact_int"] == 92193
+    assert h0_audit["P_sym_taylor_identity_verified"] is True
+    assert h0_audit["h0_1_closed_form_diff_encloses_zero"] is True
+    assert (
+        h0_audit["sign_change_witnesses_on_1_to_infty"][
+            "h0_is_strictly_positive_on_1_to_infty"
+        ]
+        is False
+    )
+    assert (
+        h0_audit["sign_change_witnesses_on_1_to_infty"][
+            "h0_is_monotone_decreasing_on_1_to_infty"
+        ]
+        is False
+    )
+    assert (
+        h0_audit["sign_change_witnesses_on_1_to_infty"][
+            "h0_2_strictly_negative_verified"
+        ]
+        is True
+    )
+    assert math.isclose(
+        h0_audit["h0_1_certified"]["mid_float"],
+        92193.0 / (131072.0 * math.sqrt(2.0)),
+        rel_tol=1e-15,
+    )
+    assert math.isclose(
+        h0_audit["sign_change_witnesses_on_1_to_infty"]["h0_2_certified"][
+            "mid_float"
+        ],
+        -0.21743062244679337,
+        rel_tol=1e-14,
+    )
+    assert h0_audit["all_cauchy_schwarz_and_bernstein_checks_verified"] is True
+
+    comp1 = decomp["component_bound_provenance_records"][
+        "component_1_pole_plus_transfer_h0"
+    ]
+    assert "Cauchy-Schwarz" in comp1["inequality_used"]
+    assert "strictly decreasing" not in comp1["inequality_used"]
+
+    # Ensure stale 0.4863195 value and false monotonicity claim are absent from docs:
+    doc_text = (
+        REPO_ROOT
+        / "docs"
+        / "reviews"
+        / "TC_FAITHFUL_TAU_ARITHMETIC_SPECTRAL_REALIZATION.md"
+    ).read_text(encoding="utf-8")
+    assert "0.4863195" not in doc_text
+    assert "Strict monotonicity $0 < h_0(X_K)" not in doc_text
+
+    readme_text = (REPO_ROOT / "formal" / "RiemannScope" / "README.md").read_text(
+        encoding="utf-8"
+    )
+    assert "-648(W-4)^3 - 3336" not in readme_text
+    assert "- 58560(W-4)" not in readme_text
+    assert "92193 - 270924(W-4) + 50604(W-4)^2 - 648(W-4)^3" in readme_text
+
+
+def test_12_tc050r2_clamped_exact_cutoff_M_X_characterization_and_helper_scope(
+    tc050_artifact: dict,
+) -> None:
+    """Verify the clamped characterization M >= 2 and X^5 <= M^4 and (M = 2 or (M-1)^4 < X^5)
+    for M(X) = ceil(max(2, X^{5/4})), and distinguish exact M(X) from safe upper cutoff on straddling balls."""
+    saved_prec = flint_ctx.prec
+    flint_ctx.prec = 256
+    try:
+        # At X = 1, M(1) = 2: clamped characterization holds via M = 2 branch, while (M-1)^4 < X^5 is false:
+        c_1 = certify_clamped_exact_cutoff_M_X_arb(arb(1))
+        assert c_1["M_safe_upper_int"] == 2
+        assert c_1["M_lower_ceil_int"] == 2
+        assert c_1["m_ge_2"] is True
+        assert c_1["X5_le_M4_certified"] is True
+        assert c_1["unclamped_M_minus_1_pow4_lt_X5_holds"] is False
+        assert (
+            c_1["clamped_lower_M_eq_2_or_M_minus_1_pow4_lt_X5_certified"]
+            is True
+        )
+        assert c_1["exact_clamped_characterization_certified"] is True
+
+        # At X = 16, 16^{5/4} = 32 -> M(16) = 32 satisfies (M-1)^4 < X^5 <= M^4:
+        c_16 = certify_clamped_exact_cutoff_M_X_arb(arb(16))
+        assert c_16["M_safe_upper_int"] == 32
+        assert c_16["M_lower_ceil_int"] == 32
+        assert c_16["unclamped_M_minus_1_pow4_lt_X5_holds"] is True
+        assert c_16["exact_clamped_characterization_certified"] is True
+
+        # On a wide ball straddling X = 16, safe upper helper returns 33, while exact clamped check flags False:
+        c_straddle = certify_clamped_exact_cutoff_M_X_arb(
+            arb(arb(16).mid(), arb("1e-30"))
+        )
+        assert c_straddle["M_safe_upper_int"] == 33
+        assert c_straddle["M_lower_ceil_int"] == 32
+        assert c_straddle["exact_clamped_characterization_certified"] is False
+    finally:
+        flint_ctx.prec = saved_prec
+
+    decomp = tc050_artifact[
+        "section_4_canonical_hilbert_schmidt_orbit_decomposition"
+    ]["exact_decomposition_and_controlled_remainder_bounds"]
+    cutoffs = decomp["cutoff_definitions_tc049r"]
+    assert cutoffs["all_sample_cutoffs_exact_clamped_certified"] is True
+    for row in decomp["certified_grade_orbit_table"]:
+        assert (
+            row["M_XK_clamped_exact_characterization"][
+                "exact_clamped_characterization_certified"
+            ]
+            is True
+        )
+
+
+def test_13_tc050r2_committed_lean_theorems_and_multiplicity_scope_alignment(
+    tc050_artifact: dict,
+) -> None:
+    """Verify exact alignment between committed Lean 4 Theorems 51-53 and documentation/JSON records,
+    and verify the three-way multiplicity distinction (scalar correlation vs socle vs full H_-^0)."""
+    sec2_socle = tc050_artifact[
+        "section_2_adjoint_compatibility_and_hyperbolic_null_cone"
+    ]["multiplicity_and_jordan_socle_audit"][
+        "scalar_correlation_vs_operator_jordan_scope_distinction"
+    ]
+    assert "unconditionally in zero multiplicity" in (
+        sec2_socle["scalar_correlation_boundedness_equivalence"]
+    )
+    assert "RH alone" in sec2_socle["socle_operator_unitary_realization_equivalence"]
+    assert (
+        "RH + Simplicity"
+        in sec2_socle["full_generalized_eigenspace_unitary_realization_equivalence"]
+    )
+
+    sec5 = tc050_artifact[
+        "section_5_lean_formalization_and_remaining_obligation"
+    ]
+    lean_scope = sec5["committed_lean_theorems_exact_scope"]
+    assert (
+        "theorem_51_tau_grade_star_involution_and_hyperbolic_pair_obstruction"
+        in lean_scope
+    )
+    assert (
+        "theorem_52_tate_rational_diagonal_character_rigidity_and_convolution_isometry"
+        in lean_scope
+    )
+    assert (
+        "theorem_53_canonical_hilbert_schmidt_orbit_decomposition_and_resonant_band_equivalence"
+        in lean_scope
+    )
+
+    lean_text = (
+        REPO_ROOT
+        / "formal"
+        / "RiemannScope"
+        / "CanonicalThetaCorrelationBound.lean"
+    ).read_text(encoding="utf-8")
+    assert "92793" not in lean_text
+    assert "92193" in lean_text
+    for clause in (
+        "gradeRadialCharacter tau (-K) delta = gradeRadialCharacter tau K delta ↔ delta = 0",
+        "adelicPhaseDiscrepancy tau c_inf 1 = 0 ↔ c_inf = tau",
+        "C_dil = C_gh → T_conv C_dil = T_conv C_gh",
+        "B_ctrl < 17987140 / 1000000",
+    ):
+        assert clause in lean_text
+
 

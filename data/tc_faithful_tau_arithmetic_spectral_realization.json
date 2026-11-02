@@ -1,10 +1,13 @@
 {
   "task_id": "TASK-TC-050",
-  "repair_task_id": "TASK-TC-050R",
+  "repair_task_id": "TASK-TC-050R2",
+  "preceding_repair_task_id": "TASK-TC-050R",
   "parent_epic": "EPIC-TC-042",
   "starting_head": "e6472e03c008cc8d20be177f1d96bf904bd0a16b",
   "reviewed_baseline": "5da0eb79e1732ff871ee1c7fee729c62972aa406",
   "tc050r_reviewed_baseline": "2f7871fff666091c4152ecc8657f2345aacdd4fa",
+  "tc050r2_reviewed_head": "0e6ae36ce995ef3037652b3dfb67645325f990b1",
+  "tc050r_implementation_commit": "f5521363ea94774938fd37152d67d743413327ae",
   "status": "ADJOINT_COMPATIBILITY_HYPERBOLIC_NULL_CONE_AND_CANONICAL_HILBERT_SCHMIDT_ORBIT_DECOMPOSITION_PROVED_RESONANT_BAND_EQUIVALENCE_ISOLATED_SUBGATE_OPEN",
   "subgate_tc043a_status": "OPEN",
   "rh_proved": false,
@@ -912,7 +915,12 @@
     },
     "multiplicity_and_jordan_socle_audit": {
       "no_simplicity_assumption_required": true,
-      "socle_theorem_statement": "By Meyer (arXiv:math/0412277 Cor. 4.2 & Thm. 5.8), each nontrivial zero rho of xi(s) with multiplicity m_rho = ord_xi(rho) >= 1 contributes the finite-dimensional generalized eigenspace E_rho = ker((^t D_- - rho)^{m_rho}) of dimension m_rho >= 1. Even if m_rho > 1 and ^t D_- has a non-trivial nilpotent Jordan part N_rho on E_rho, the socle ker(^t D_- - rho) subset E_rho has dimension >= 1, and any nonzero socle vector l_{rho,0} in ker(^t D_- - rho) \\ {0} is a strict eigenvector satisfying U_K l_{rho,0} = tau^{K(rho - 1/2)} l_{rho,0}. Thus Target 1 requires only a positive inner product on the spectral realization (or on the socle) and never assumes simplicity of zeros.",
+      "socle_theorem_statement": "By Meyer (arXiv:math/0412277 Cor. 4.2 & Thm. 5.8), each nontrivial zero rho of xi(s) with multiplicity m_rho = ord_xi(rho) >= 1 contributes the finite-dimensional generalized eigenspace E_rho = ker((^t D_- - rho)^{m_rho}) of dimension m_rho >= 1. Even if m_rho > 1 and ^t D_- has a non-trivial nilpotent Jordan part N_rho on E_rho, the socle ker(^t D_- - rho) subset E_rho has dimension >= 1, and any nonzero socle vector l_{rho,0} in ker(^t D_- - rho) \\ {0} is a strict eigenvector satisfying U_K l_{rho,0} = tau^{K(rho - 1/2)} l_{rho,0}. Thus Target 1 requires only a positive inner product on the socle (or a semisimple multiplicity-weighted eigenspace) and never assumes simplicity of zeros.",
+      "scalar_correlation_vs_operator_jordan_scope_distinction": {
+        "scalar_correlation_boundedness_equivalence": "RH <==> sup_{K in A_R} |C_tau(K)| <= C_tau(0) <==> sup_{K in A_R} |C_tau(K)| < infty holds unconditionally in zero multiplicity m_rho >= 1 in BOTH directions: (i) Under RH (Re(rho) = 1/2), each distinct zero rho = 1/2 + i*gamma_rho of multiplicity m_rho = ord_xi(rho) >= 1 is a simple pole of -xi'(s)/xi(s) with residue m_rho, so -F_tau(s) F_tau(1-s) (xi'(s)/xi(s)) tau^{-K(s-1/2)} has residue m_rho |F_tau(rho)|^2 tau^{-i K gamma_rho} (with no polynomial drift in K), giving |C_tau(K)| <= sum_{rho distinct} m_rho |F_tau(rho)|^2 = C_tau(0) < infty; (ii) Conversely, by the Fixed-Seed RH Equivalence Theorem (TASK-TC-037 / Theorem 12), sup_{K in A_R} |C_tau(K)| < infty implies RH via Laplace-Carleman analytic continuation without assuming zero simplicity.",
+        "socle_operator_unitary_realization_equivalence": "Realizing the socle eigenvectors l_{rho,0} in ker(^t D_- - rho) \\ {0} (or a semisimple multiplicity-weighted eigenspace) in a positive-definite inner-product space with V_K^* = V_{-K} is equivalent to Re(rho) = 1/2 for all zeros (RH alone, arbitrary m_rho >= 1).",
+        "full_generalized_eigenspace_unitary_realization_equivalence": "Realizing the full generalized-eigenvector operator action on Meyer's cotangent quotient H_-^0 = (+) E_rho as a unitary representation on a Hilbert space is equivalent to RH + Simplicity (Re(rho) = 1/2 and m_rho = 1 for all zeros), because for m_rho >= 2 the nilpotent Jordan chain V_K l_{rho,1} = tau^{K(rho-1/2)} (l_{rho,1} + (K log tau) l_{rho,0}) has norm growing linearly in |K|."
+      },
       "jordan_socle_verifications": [
         {
           "multiplicity_m_rho": 1,
@@ -1316,10 +1324,145 @@
       "conductor_space_H_tau_B": "H_tau^B := L^2([1, infty) x R_{>0}, (x^{-3/2} / (x - x^{-1})) (dx/x) (dy/y))",
       "shift_difference_operator_A_tau_B": "(A_tau^B f)(x, y) := ((I - S_x^{-1}) f)(y) = f(y) - f(y/x)   (x >= 1, y > 0)",
       "two_sided_vs_one_sided_shift_reconciliation": "With (S_x f)(y) = f(xy) and (S_x^{-1} f)(y) = f(y/x), the inherited TC-042F/TC-043 Attempt B one-sided shift-difference (A_tau^B f)(x, y) = f(y) - f(y/x) satisfies int_0^infty ((A_tau^B T_K f)(x, y)) conj((A_tau^B f)(x, y)) dy/y = 2 h_0(e^kappa) - h_0(e^{kappa + u}) - h_0(e^{kappa - u}) (kappa = |K| log tau, u = log x). By contrast, a two-sided difference f(xy) - f(y/x) would evaluate to 2 h_0(e^kappa) - h_0(e^{kappa + 2u}) - h_0(e^{kappa - 2u}) (doubling the log-shift u -> 2u) unless x is replaced by x^{1/2} via the isometric change of variable y |-> x^{-1/2} y.",
-      "isometric_embedding_J_tau": "J_tau(f) := (A_tau^B f, 2 R_0 f) in H_tau^pos = H_tau^B (+) L^2(R_{>0}, dy/y), where (R_0 f)(y) = y^{-1/2} int_0^y f(t) t^{1/2} dt/t is the s = 0 pole-resolvent.",
+      "isometric_embedding_J_tau": "J_tau(f) := (A_tau^B f, 2 R_0 f) in H_tau^pos = H_tau^B (+) L^2(R_{>0}, dy/y), where (R_0 f)(y) := int_0^y (t/y)^{1/2} (D f)(t) dt/t = f(y) - (1/2) int_0^y (t/y)^{1/2} f(t) dt/t (with Euler derivative D = y d/dy) is the causal s = 0 pole-resolvent with Mellin multiplier it / (1/2 + it) and 4 <R_0 T_K psi_tau, R_0 psi_tau>_{L^2(dy/y)} = 4 h_0(e^kappa) - J(kappa), J(kappa) := int_0^infty e^{-u/2} (h_0(e^{kappa+u}) + h_0(e^{kappa-u})) du.",
+      "euler_resolvent_R0_and_pole_integral_J_kappa_audit": {
+        "euler_resolvent_R0_spatial_formula": "(R_0 f)(y) := int_0^y (t/y)^{1/2} (D f)(t) dt/t = f(y) - (1/2) int_0^y (t/y)^{1/2} f(t) dt/t,   D = y d/dy",
+        "derivative_free_operator_K0_formula": "(K_0 f)(y) := y^{-1/2} int_0^y f(t) t^{1/2} dt/t,   so R_0 = K_0 D = I - (1/2) K_0",
+        "mellin_multiplier_of_R0": "hat{R_0 f}(it) = (it / (1/2 + it)) hat{f}(it),   |hat{R_0 f}(it)|^2 = (1 - (1/4)/(t^2 + 1/4)) |hat{f}(it)|^2",
+        "pole_integral_J_kappa_definition": "J(kappa) := int_0^infty e^{-u/2} (h_0(e^{kappa+u}) + h_0(e^{kappa-u})) du = int_1^infty x^{-1/2} (h_0(e^kappa x) + h_0(e^kappa x^{-1})) dx/x",
+        "attempt_B_weight_vs_J_kappa_weight_distinction": "In J(kappa), the exponential weight is e^{-u/2} du = x^{-1/2} dx/x (arising from the L^2(R_{>0}, dy/y) convolution of the s = 0 pole kernel k_0(y) = y^{-1/2} 1_{y>1}). By contrast, the weight (e^{-3u/2} / (2 sinh u)) du = (x^{-3/2} / (x - x^{-1})) dx/x belongs to the Attempt B conductor space H_tau^B difference-square integral P_tau^B(K) = int_0^infty (e^{-3u/2} / (2 sinh u)) (2 h_0(e^kappa) - h_0(e^{kappa+u}) - h_0(e^{kappa-u})) du.",
+        "symbolic_mellin_multiplier_verified": true,
+        "all_spatial_ibp_enclose_zero": true,
+        "spatial_ibp_sample_checks": [
+          {
+            "y": "0.5",
+            "R0_psi_tau_from_Euler_derivative_D_certified": {
+              "mid_float": 0.4580166944365869,
+              "rad_float_outward": 1.646983880353341e-17,
+              "lower_dec": "4.580166944365868962160259544087840829145e-1",
+              "upper_dec": "4.580166944365868962160259544192235880121e-1",
+              "arb_ball_str": "[0.4580166944365868962160259544 +/- 1.93e-29]"
+            },
+            "R0_psi_tau_from_IBP_f_minus_half_K0_f_certified": {
+              "mid_float": 0.4580166944365869,
+              "rad_float_outward": 1.646983880352826e-17,
+              "lower_dec": "4.580166944365868962160259544139363839660e-1",
+              "upper_dec": "4.580166944365868962160259544140712869642e-1",
+              "arb_ball_str": "[0.4580166944365868962160259544140 +/- 7.13e-32]"
+            },
+            "derivative_free_K0_psi_tau_certified": {
+              "mid_float": 0.08001983087748263,
+              "rad_float_outward": 1.7061908220991815e-18,
+              "lower_dec": "8.001983087748263005689616247986659342242e-2",
+              "upper_dec": "8.001983087748263005689616248013639941719e-2",
+              "arb_ball_str": "[0.080019830877482630056896162480 +/- 1.37e-31]"
+            },
+            "R0_D_minus_R0_IBP_diff_certified": {
+              "mid_float": -1.7416234322391533e-39,
+              "rad_float_outward": 5.287204048448431e-30,
+              "lower_dec": "-5.287204050190053544555256053693421521756e-30",
+              "upper_dec": "5.287204046706806680076949173416373466916e-30",
+              "arb_ball_str": "[+/- 5.29e-30]"
+            },
+            "R0_D_minus_R0_IBP_encloses_zero": true
+          },
+          {
+            "y": "1.0",
+            "R0_psi_tau_from_Euler_derivative_D_certified": {
+              "mid_float": -1.090988153376519,
+              "rad_float_outward": 3.108164014431974e-17,
+              "lower_dec": "-1.090988153376519078645742639283654369738e+0",
+              "upper_dec": "-1.090988153376519078645742639283654309309e+0",
+              "arb_ball_str": "[-1.0909881533765190786457426392836543 +/- 6.98e-35]"
+            },
+            "R0_psi_tau_from_IBP_f_minus_half_K0_f_certified": {
+              "mid_float": -1.090988153376519,
+              "rad_float_outward": 3.108164014450039e-17,
+              "lower_dec": "-1.090988153376519078645742639464304058581e+0",
+              "upper_dec": "-1.090988153376519078645742639103004620466e+0",
+              "arb_ball_str": "[-1.090988153376519078645742639 +/- 4.65e-28]"
+            },
+            "derivative_free_K0_psi_tau_certified": {
+              "mid_float": -0.0253892628781403,
+              "rad_float_outward": 1.294684944949162e-18,
+              "lower_dec": "-2.538926287814030060124684498817601180380e-2",
+              "upper_dec": "-2.538926287814030060124684426557713858878e-2",
+              "arb_ball_str": "[-0.025389262878140300601246845 +/- 7.35e-28]"
+            },
+            "R0_D_minus_R0_IBP_diff_certified": {
+              "mid_float": 8.562922137713309e-52,
+              "rad_float_outward": 1.8064974933679844e-28,
+              "lower_dec": "-1.806497493367984205820550664256491790098e-28",
+              "upper_dec": "1.806497493367984205820567790100767216716e-28",
+              "arb_ball_str": "[+/- 1.81e-28]"
+            },
+            "R0_D_minus_R0_IBP_encloses_zero": true
+          },
+          {
+            "y": "2.0",
+            "R0_psi_tau_from_Euler_derivative_D_certified": {
+              "mid_float": 0.06410855695234222,
+              "rad_float_outward": 2.3832569074721984e-18,
+              "lower_dec": "6.410855695234221368989159896668568022888e-2",
+              "upper_dec": "6.410855695234221368989159901627400797179e-2",
+              "arb_ball_str": "[0.0641085569523422136898915990 +/- 3.34e-29]"
+            },
+            "R0_psi_tau_from_IBP_f_minus_half_K0_f_certified": {
+              "mid_float": 0.06410855695234222,
+              "rad_float_outward": 2.383256907447487e-18,
+              "lower_dec": "6.410855695234221368989159899139664488868e-2",
+              "upper_dec": "6.410855695234221368989159899156304340489e-2",
+              "arb_ball_str": "[0.064108556952342213689891598991 +/- 5.64e-31]"
+            },
+            "derivative_free_K0_psi_tau_certified": {
+              "mid_float": -0.0035769536551172464,
+              "rad_float_outward": 4.1271458370994205e-20,
+              "lower_dec": "-3.576953655117246337281605819325398118009e-3",
+              "upper_dec": "-3.576953655117246337281605818992601086750e-3",
+              "arb_ball_str": "[-0.003576953655117246337281605819 +/- 3.26e-31]"
+            },
+            "R0_D_minus_R0_IBP_diff_certified": {
+              "mid_float": -4.6447328622942665e-38,
+              "rad_float_outward": 2.487736315166411e-29,
+              "lower_dec": "-2.487736319811143631897908454990999106781e-29",
+              "upper_dec": "2.487736310521677907309375875344152470659e-29",
+              "arb_ball_str": "[+/- 2.49e-29]"
+            },
+            "R0_D_minus_R0_IBP_encloses_zero": true
+          }
+        ],
+        "J_0_certified": {
+          "mid_float": 0.025959761284406028,
+          "rad_float_outward": 1.4797922149957448e-18,
+          "lower_dec": "2.595976128440602636273844704626409945546e-2",
+          "upper_dec": "2.595976128440602636273860259748988740271e-2",
+          "arb_ball_str": "[0.025959761284406026362739 +/- 5.53e-25]"
+        },
+        "four_norm_R0_psi_tau_sq_eq_4_h0_1_minus_J_0_certified": {
+          "mid_float": 1.9634901739551989,
+          "rad_float_outward": 8.182718042615267e-17,
+          "lower_dec": "1.963490173955198951575708793506402360151e+0",
+          "upper_dec": "1.963490173955198951575708949057628533288e+0",
+          "arb_ball_str": "[1.963490173955198951575709 +/- 2.07e-25]"
+        },
+        "four_norm_derivative_free_K0_psi_tau_sq_eq_4_J_0_certified": {
+          "mid_float": 0.10383904513762411,
+          "rad_float_outward": 5.919168859982981e-18,
+          "lower_dec": "1.038390451376241054509537881850552422638e-1",
+          "upper_dec": "1.038390451376241054509544103899607051689e-1",
+          "arb_ball_str": "[0.103839045137624105450954 +/- 4.11e-25]"
+        },
+        "discrepancy_four_R0_sq_minus_four_K0_sq_certified": {
+          "mid_float": 1.8596511288175748,
+          "rad_float_outward": 7.38685614783212e-17,
+          "lower_dec": "1.859651128817574846124754383116441173500e+0",
+          "upper_dec": "1.859651128817574846124755160872573772506e+0",
+          "arb_ball_str": "[1.859651128817574846124755 +/- 6.17e-25]"
+        }
+      },
       "unitary_representation_and_intertwining": "U_K (phi, psi) := (U_K^B phi, T_K psi) for all K in A_R, where (U_K^B phi)(x, y) = phi(x, tau^{-K} y) and (T_K psi)(y) = psi(tau^{-K} y) are unitary dilations with U_K^* = U_{-K}, satisfying the exact intertwining identity J_tau(T_K f) = U_K J_tau(f).",
       "hilbert_schmidt_seed_operator_B_0": "B_0 := |Psi_0^pos><e_0| in HS(H_tau^pos), where Psi_0^pos := J_tau(psi_tau) = (A_tau^B psi_tau, 2 R_0 psi_tau) and e_0 in H_tau^pos is a fixed unit vector (||e_0|| = 1), with left unitary orbit B_K := U_K B_0 = |U_K Psi_0^pos><e_0|.",
-      "pole_integral_J_kappa_cancellation_identity": "<A_tau^B T_K psi_tau, A_tau^B psi_tau>_{H_tau^B} = W_arch(h_K) + c_tau^B h_0(X_K) - (2 h_0(X_K) - J(kappa)) and 4 <R_0 T_K psi_tau, R_0 psi_tau>_{L^2(dy/y)} = 4 h_0(X_K) - J(kappa), so the pole-transfer integral J(kappa) cancels identically in their sum P_tau(K) = W_arch(h_K) + (c_tau^B + 2) h_0(X_K).",
+      "pole_integral_J_kappa_cancellation_identity": "<A_tau^B T_K psi_tau, A_tau^B psi_tau>_{H_tau^B} = W_arch(h_K) + c_tau^B h_0(X_K) - (2 h_0(X_K) - J(kappa)) and 4 <R_0 T_K psi_tau, R_0 psi_tau>_{L^2(dy/y)} = 4 h_0(X_K) - J(kappa) (where J(kappa) = int_0^infty e^{-u/2} (h_0(e^{kappa+u}) + h_0(e^{kappa-u})) du has exponential weight e^{-u/2}, while P_tau^B(K) has weight e^{-3u/2}/(2 sinh u)), so J(kappa) cancels identically in their sum P_tau(K) = W_arch(h_K) + (c_tau^B + 2) h_0(X_K).",
       "matrix_coefficient_identity": "P_tau(K) := <B_K, B_0>_{HS} = <U_K Psi_0^pos, Psi_0^pos>_{H_tau^pos} = <A_tau^B T_K psi_tau, A_tau^B psi_tau>_{H_tau^B} + 4 <R_0 T_K psi_tau, R_0 psi_tau>_{L^2(dy/y)} = W_arch(h_K) + (c_tau^B + 2) h_0(tau^{|K|}) = W_arch(h_K) + c_tau^A h_0(tau^{|K|}).",
       "norm_B_0_HS_sq_eq_P_tau_0_certified": {
         "mid_float": 2.558258007415831,
@@ -1348,11 +1491,218 @@
       "decomposition_formula": "C_tau(K) = P_tau(K) + E_tau(K),   E_tau(K) = E_{tau,controlled}(K) - R_{mu,band}(tau^{|K|})",
       "cutoff_definitions_tc049r": {
         "H_X_formula": "H(X) := floor(X^{5/6})",
+        "H_X_exact_characterization": "H^6 <= X^5 < (H + 1)^6   (for X > 0, integer H >= 0)",
+        "H_X_helper_location": "certified_head_cutoff_H_X_arb in tc/faithful_tau_arithmetic_spectral_realization.py",
         "M_X_formula": "M(X) := ceil(max(2, X^{5/4}))",
+        "M_X_clamped_exact_characterization": "M >= 2  and  X^5 <= M^4  and  (M = 2  or  (M - 1)^4 < X^5)   (for X >= 1, integer M)",
+        "M_X_helper_location_and_scope": "certified_coupled_cutoff_M_X_arb in tc/prime_euler_moebius_recovery.py computes M_safe(X_ball) = max(2, int(((X_ball^5)^{1/4}).upper().ceil())) and certifies X_ball^5 <= M_safe^4 (a certified safe upper cutoff across X_ball). certify_clamped_exact_cutoff_M_X_arb in tc/faithful_tau_arithmetic_spectral_realization.py additionally verifies the clamped lower condition (M = 2 or (M - 1)^4 < X_ball^5) so M_safe(X_ball) = M(X) is exact on X_ball whenever (X_ball^5)^{1/4} does not straddle an integer >= 2.",
+        "all_sample_cutoffs_exact_clamped_certified": true,
+        "clamped_cutoff_boundary_audit": {
+          "exact_X_eq_1_M_eq_2": {
+            "M_safe_upper_int": 2,
+            "M_lower_ceil_int": 2,
+            "m_ge_2": true,
+            "X5_le_M4_certified": true,
+            "clamped_lower_M_eq_2_or_M_minus_1_pow4_lt_X5_certified": true,
+            "unclamped_M_minus_1_pow4_lt_X5_holds": false,
+            "exact_clamped_characterization_certified": true
+          },
+          "exact_X_eq_16_M_eq_32": {
+            "M_safe_upper_int": 32,
+            "M_lower_ceil_int": 32,
+            "m_ge_2": true,
+            "X5_le_M4_certified": true,
+            "clamped_lower_M_eq_2_or_M_minus_1_pow4_lt_X5_certified": true,
+            "unclamped_M_minus_1_pow4_lt_X5_holds": true,
+            "exact_clamped_characterization_certified": true
+          },
+          "straddling_ball_X_eq_16_pm_1e_30_M_safe_eq_33": {
+            "M_safe_upper_int": 33,
+            "M_lower_ceil_int": 32,
+            "m_ge_2": true,
+            "X5_le_M4_certified": true,
+            "clamped_lower_M_eq_2_or_M_minus_1_pow4_lt_X5_certified": false,
+            "unclamped_M_minus_1_pow4_lt_X5_holds": false,
+            "exact_clamped_characterization_certified": false
+          }
+        },
         "R_mu_head_formula": "R_{mu,head}(X) := sum_{2 <= m <= H(X)} (mu(m)/sqrt(m)) W_log(X/m)  (0 when H(X) < 2)",
         "R_mu_band_formula": "R_{mu,band}(X) := sum_{H(X) < m <= M(X)} (mu(m)/sqrt(m)) W_log(X/m)",
         "R_mu_tail_formula": "R_{mu,tail}(X) := sum_{m > M(X)} (mu(m)/sqrt(m)) W_log(X/m)",
         "divisor_vs_prime_cutoff_distinction": "H(X) and M(X) are divisor cutoffs on the integer index m in the full Moebius sum R_mu(X) = sum_{m>=2} (mu(m)/sqrt(m)) W_log(X/m). By contrast, y in the prime-sieved approximant W_y(X) = sum_{m | P_y} (mu(m)/sqrt(m)) W_log(X/m) is a prime factor cutoff (restricting to squarefree m with P^+(m) <= y, where max divisor is P_y = exp(vartheta(y))). For y >= M(X), every squarefree m <= M(X) divides P_y, so the shared head+band terms 2 <= m <= M(X) cancel in W(X) - W_y(X)."
+      },
+      "h0_autocorrelation_cauchy_schwarz_and_sign_change_audit": {
+        "h0_1_closed_form": "92193 / (512 * 2^{17/2}) = 92193 / (131072 * sqrt(2))",
+        "P_sym_at_W_eq_4_exact_int": 92193,
+        "P_sym_taylor_at_W_eq_4": "92193 - 270924*(W - 4) + 50604*(W - 4)^2 - 648*(W - 4)^3",
+        "P_sym_taylor_identity_verified": true,
+        "h0_1_certified": {
+          "mid_float": 0.4973624838099012,
+          "rad_float_outward": 2.0954208790777638e-17,
+          "lower_dec": "4.973624838099012444846118490259731100370e-1",
+          "upper_dec": "4.973624838099012444846118490259731100373e-1",
+          "arb_ball_str": "[0.4973624838099012444846118490259731100371 +/- 3.14e-41]"
+        },
+        "h0_1_closed_form_diff_encloses_zero": true,
+        "sign_change_witnesses_on_1_to_infty": {
+          "h0_is_strictly_positive_on_1_to_infty": false,
+          "h0_is_monotone_decreasing_on_1_to_infty": false,
+          "P_sym_at_X_eq_2_W_eq_25_over_4_rational": "-2148675/8",
+          "h0_2_certified": {
+            "mid_float": -0.21743062244679337,
+            "rad_float_outward": 1.1381570211259755e-17,
+            "lower_dec": "-2.174306224467933587578471227706870878542e-1",
+            "upper_dec": "-2.174306224467933587578471227706870878539e-1",
+            "arb_ball_str": "[-0.2174306224467933587578471227706870878541 +/- 2.44e-41]"
+          },
+          "h0_2_strictly_negative_verified": true,
+          "h0_5_certified": {
+            "mid_float": 0.020487243079138098,
+            "rad_float_outward": 5.296494092006196e-19,
+            "lower_dec": "2.048724307913809705487453840235513176702e-2",
+            "upper_dec": "2.048724307913809705487453840235513176705e-2",
+            "arb_ball_str": "[0.02048724307913809705487453840235513176703 +/- 4.56e-42]"
+          },
+          "h0_5_strictly_positive_verified": true,
+          "h0_10_certified": {
+            "mid_float": -0.0008538120198003002,
+            "rad_float_outward": 5.3834317073444206e-20,
+            "lower_dec": "-8.538120198003002507779380518179043151590e-4",
+            "upper_dec": "-8.538120198003002507779380518179043151587e-4",
+            "arb_ball_str": "[-0.0008538120198003002507779380518179043151588 +/- 2.82e-44]"
+          },
+          "h0_10_strictly_negative_verified": true
+        },
+        "valid_global_bound_derivation": "By the multiplicative autocorrelation identity h_0(tau^{|K|}) = <T_{|K|} psi_tau, psi_tau>_{L^2(dy/y)} and unitary dilation Cauchy-Schwarz on L^2(R_{>0}, dy/y), |h_0(X_K)| <= ||T_{|K|} psi_tau||_{L^2} ||psi_tau||_{L^2} = ||psi_tau||_{L^2}^2 = h_0(1) for all K in R (and independently by the symmetric Bernstein bound |h_0(X)| <= (92193/32768) (X + X^{-1})^{-5/2} <= h_0(1), Lean Theorem 5).",
+        "leading_large_X_asymptotic": {
+          "formula": "h_0(X) = -(81/64) X^{-5/2} (1 + O(X^{-2})) = O(X^{-5/2}) as X -> infty",
+          "leading_coefficient_exact": "-648 / 512 = -81 / 64 = -1.265625",
+          "leading_coefficient_certified": {
+            "mid_float": -1.265625,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "-1.265625000000000000000000000000000000001e+0",
+            "upper_dec": "-1.265624999999999999999999999999999999999e+0",
+            "arb_ball_str": "-1.265625000000000000000000000000000000000"
+          },
+          "global_bernstein_decay_constant": "92193 / 32768 = 2.813507080078125"
+        },
+        "all_cauchy_schwarz_and_bernstein_checks_verified": true,
+        "sample_scale_evaluations": [
+          {
+            "X": "1.0",
+            "h0_X_certified": {
+              "mid_float": 0.4973624838099012,
+              "rad_float_outward": 2.0954208790777638e-17,
+              "lower_dec": "4.973624838099012444846118490259731100370e-1",
+              "upper_dec": "4.973624838099012444846118490259731100373e-1",
+              "arb_ball_str": "[0.4973624838099012444846118490259731100371 +/- 3.14e-41]"
+            },
+            "X_pow_5_2_times_h0_X_certified": {
+              "mid_float": 0.4973624838099012,
+              "rad_float_outward": 2.0954208790777638e-17,
+              "lower_dec": "4.973624838099012444846118490259731100370e-1",
+              "upper_dec": "4.973624838099012444846118490259731100373e-1",
+              "arb_ball_str": "[0.4973624838099012444846118490259731100371 +/- 3.14e-41]"
+            },
+            "abs_h0_X_le_h0_1_certified": true,
+            "abs_h0_X_le_bernstein_envelope_certified": true
+          },
+          {
+            "X": "2.0",
+            "h0_X_certified": {
+              "mid_float": -0.21743062244679337,
+              "rad_float_outward": 1.1381570211259755e-17,
+              "lower_dec": "-2.174306224467933587578471227706870878542e-1",
+              "upper_dec": "-2.174306224467933587578471227706870878539e-1",
+              "arb_ball_str": "[-0.2174306224467933587578471227706870878541 +/- 2.44e-41]"
+            },
+            "X_pow_5_2_times_h0_X_certified": {
+              "mid_float": -1.2299733405579163,
+              "rad_float_outward": 2.5425674812211652e-17,
+              "lower_dec": "-1.229973340557916320238587195561260791089e+0",
+              "upper_dec": "-1.229973340557916320238587195561260791086e+0",
+              "arb_ball_str": "[-1.229973340557916320238587195561260791087 +/- 4.55e-40]"
+            },
+            "abs_h0_X_le_h0_1_certified": true,
+            "abs_h0_X_le_bernstein_envelope_certified": true
+          },
+          {
+            "X": "5.0",
+            "h0_X_certified": {
+              "mid_float": 0.020487243079138098,
+              "rad_float_outward": 5.296494092006196e-19,
+              "lower_dec": "2.048724307913809705487453840235513176702e-2",
+              "upper_dec": "2.048724307913809705487453840235513176705e-2",
+              "arb_ball_str": "[0.02048724307913809705487453840235513176703 +/- 4.56e-42]"
+            },
+            "X_pow_5_2_times_h0_X_certified": {
+              "mid_float": 1.1452717049128722,
+              "rad_float_outward": 9.160654815300656e-18,
+              "lower_dec": "1.145271704912872214597658523902941895901e+0",
+              "upper_dec": "1.145271704912872214597658523902941895904e+0",
+              "arb_ball_str": "[1.145271704912872214597658523902941895902 +/- 1.70e-40]"
+            },
+            "abs_h0_X_le_h0_1_certified": true,
+            "abs_h0_X_le_bernstein_envelope_certified": true
+          },
+          {
+            "X": "10.0",
+            "h0_X_certified": {
+              "mid_float": -0.0008538120198003002,
+              "rad_float_outward": 5.3834317073444206e-20,
+              "lower_dec": "-8.538120198003002507779380518179043151590e-4",
+              "upper_dec": "-8.538120198003002507779380518179043151587e-4",
+              "arb_ball_str": "[-0.0008538120198003002507779380518179043151588 +/- 2.82e-44]"
+            },
+            "X_pow_5_2_times_h0_X_certified": {
+              "mid_float": -0.26999906761977316,
+              "rad_float_outward": 1.4534178385091534e-17,
+              "lower_dec": "-2.699990676197731441874071746690383017614e-1",
+              "upper_dec": "-2.699990676197731441874071746690383017611e-1",
+              "arb_ball_str": "[-0.2699990676197731441874071746690383017613 +/- 3.16e-41]"
+            },
+            "abs_h0_X_le_h0_1_certified": true,
+            "abs_h0_X_le_bernstein_envelope_certified": true
+          },
+          {
+            "X": "100.0",
+            "h0_X_certified": {
+              "mid_float": -1.2539252279400034e-05,
+              "rad_float_outward": 2.7177504943667994e-22,
+              "lower_dec": "-1.253925227940003365212596778208060719232e-5",
+              "upper_dec": "-1.253925227940003365212596778208060719229e-5",
+              "arb_ball_str": "[-1.253925227940003365212596778208060719231e-5 +/- 1.01e-46]"
+            },
+            "X_pow_5_2_times_h0_X_certified": {
+              "mid_float": -1.2539252279400033,
+              "rad_float_outward": 9.219315424698606e-17,
+              "lower_dec": "-1.253925227940003365212596778208060719232e+0",
+              "upper_dec": "-1.253925227940003365212596778208060719229e+0",
+              "arb_ball_str": "[-1.253925227940003365212596778208060719231 +/- 1.01e-41]"
+            },
+            "abs_h0_X_le_h0_1_certified": true,
+            "abs_h0_X_le_bernstein_envelope_certified": true
+          },
+          {
+            "X": "1000.0",
+            "h0_X_certified": {
+              "mid_float": -4.0018870902431464e-08,
+              "rad_float_outward": 2.563083096059814e-24,
+              "lower_dec": "-4.001887090243146631244450221712855506613e-8",
+              "upper_dec": "-4.001887090243146631244450221712855506610e-8",
+              "arb_ball_str": "[-4.001887090243146631244450221712855506612e-8 +/- 1.90e-48]"
+            },
+            "X_pow_5_2_times_h0_X_certified": {
+              "mid_float": -1.2655078143992142,
+              "rad_float_outward": 6.237880867423603e-17,
+              "lower_dec": "-1.265507814399214163507871977220096940317e+0",
+              "upper_dec": "-1.265507814399214163507871977220096940314e+0",
+              "arb_ball_str": "[-1.265507814399214163507871977220096940316 +/- 2.02e-40]"
+            },
+            "abs_h0_X_le_h0_1_certified": true,
+            "abs_h0_X_le_bernstein_envelope_certified": true
+          }
+        ]
       },
       "controlled_remainder_formula": "E_{tau,controlled}(K) = -(c_tau^B + 2) h_0(X_K) - W(X_K^{-1}) - W_log(X_K) - R_{mu,head}(X_K) - R_{mu,tail}(X_K),   X_K = tau^{|K|} >= 1",
       "unconditional_component_bounds_over_all_K_in_A_R": {
@@ -1417,8 +1767,8 @@
         "component_1_pole_plus_transfer_h0": {
           "expression": "-(c_tau^B + 2) h_0(X_K) = -c_tau^A h_0(X_K)",
           "domain": "X_K = tau^{|K|} >= 1 (all K in A_R)",
-          "inequality_used": "Strict monotonicity 0 < h_0(X_K) <= h_0(1) on [1, infty) (global bound B_{h_0} = c_tau^A h_0(1)), and Bernstein envelope |h_0(X_K)| <= (92193/32768) X_K^{-5/2} for O(X_K^{-5/2}) decay.",
-          "provenance": "TASK-TC-044 (h_0 monotonicity and Bernstein envelope) + TASK-TC-042F/043 (c_tau^A = c_tau^B + 2).",
+          "inequality_used": "Unitary dilation Cauchy-Schwarz on L^2(R_{>0}, dy/y): |h_0(X_K)| = |<T_{|K|} psi_tau, psi_tau>_{L^2(dy/y)}| <= ||psi_tau||_{L^2(dy/y)}^2 = h_0(1) = 92193 / (512 * 2^{17/2}) = 0.49736248380990124... (note: h_0 changes sign on [1, infty), with h_0(2) = -0.217430622... < 0, so the bound uses Cauchy-Schwarz / Bernstein envelope |h_0(X_K)| <= (92193/32768)(X_K + X_K^{-1})^{-5/2} <= h_0(1), NOT monotonicity), giving global bound B_{h_0} = c_tau^A h_0(1) and large-X_K asymptotic h_0(X_K) ~ -(81/64) X_K^{-5/2} = O(X_K^{-5/2}) with |h_0(X_K)| <= (92193/32768) X_K^{-5/2}.",
+          "provenance": "Multiplicative autocorrelation Cauchy-Schwarz on L^2(R_{>0}, dy/y) + TASK-TC-040 symmetric Bernstein envelope (Lean Theorem 5) + TASK-TC-042F/043 (c_tau^A = c_tau^B + 2).",
           "rounding_direction": "Outward-rounded Arb ball enclosure (.upper() provides certified upper bound).",
           "bound_certified": {
             "mid_float": 2.671922488868445,
@@ -1506,7 +1856,7 @@
           }
         }
       },
-      "large_grade_asymptotic_behavior_of_E_tau_controlled": "As |K| -> infty (X_K = tau^{|K|} -> infty): the first three components decay rapidly as |(c_tau^B + 2) h_0(X_K)| = O(X_K^{-5/2}), |W(X_K^{-1})| = O(X_K^{-5/2}), and |W_log(X_K)| <= C_{log,EM} X_K^{-5/2} = O(X_K^{-5/2}), while at the TC-049/TC-049R cutoffs H(X_K) = floor(X_K^{5/6}) and M(X_K) = ceil(max(2, X_K^{5/4})) the head and tail satisfy the proved uniform O(1) bounds |R_{mu,head}(X_K)| <= (5/6) C_{log,EM} and |R_{mu,tail}(X_K)| <= (1/2) C_{log,0}. Consequently, sup_{K in A_R} |E_{tau,controlled}(K)| <= B_ctrl < 17.987140 and limsup_{|K|->infty} |E_{tau,controlled}(K)| <= (5/6) C_{log,EM} + (1/2) C_{log,0} < 11.502478 (establishing o(1) decay of R_{mu,head} would require cancellation or a strictly smaller exponent < 5/6, and o(1) decay of R_{mu,tail} requires a cutoff growing faster than X_K^{5/4}).",
+      "large_grade_asymptotic_behavior_of_E_tau_controlled": "As |K| -> infty (X_K = tau^{|K|} -> infty): the first three components decay rapidly as |(c_tau^B + 2) h_0(X_K)| = O(X_K^{-5/2}) (with h_0(X_K) ~ -(81/64) X_K^{-5/2}), |W(X_K^{-1})| = O(X_K^{-5/2}), and |W_log(X_K)| <= C_{log,EM} X_K^{-5/2} = O(X_K^{-5/2}), while at the TC-049/TC-049R cutoffs H(X_K) = floor(X_K^{5/6}) and M(X_K) = ceil(max(2, X_K^{5/4})) the head and tail satisfy the proved uniform O(1) bounds |R_{mu,head}(X_K)| <= (5/6) C_{log,EM} and |R_{mu,tail}(X_K)| <= (1/2) C_{log,0}. Consequently, sup_{K in A_R} |E_{tau,controlled}(K)| <= B_ctrl < 17.987140 and limsup_{|K|->infty} |E_{tau,controlled}(K)| <= (5/6) C_{log,EM} + (1/2) C_{log,0} < 11.502478 (establishing o(1) decay of R_{mu,head} would require cancellation or a strictly smaller exponent < 5/6, and o(1) decay of R_{mu,tail} requires a cutoff growing faster than X_K^{5/4}).",
       "all_orbit_reconstructions_enclose_zero": true,
       "all_independent_tail_bounds_verified": true,
       "all_component_bounds_verified": true,
@@ -1523,6 +1873,15 @@
           },
           "H_XK_eq_floor_XK_5_6": 1,
           "M_XK_eq_ceil_max_2_XK_5_4": 2,
+          "M_XK_clamped_exact_characterization": {
+            "M_safe_upper_int": 2,
+            "M_lower_ceil_int": 2,
+            "m_ge_2": true,
+            "X5_le_M4_certified": true,
+            "clamped_lower_M_eq_2_or_M_minus_1_pow4_lt_X5_certified": true,
+            "unclamped_M_minus_1_pow4_lt_X5_holds": false,
+            "exact_clamped_characterization_certified": true
+          },
           "head_sum_is_empty": true,
           "C_tau_K_certified": {
             "mid_float": 0.0009504777883195959,
@@ -1808,6 +2167,15 @@
           },
           "H_XK_eq_floor_XK_5_6": 1,
           "M_XK_eq_ceil_max_2_XK_5_4": 2,
+          "M_XK_clamped_exact_characterization": {
+            "M_safe_upper_int": 2,
+            "M_lower_ceil_int": 2,
+            "m_ge_2": true,
+            "X5_le_M4_certified": true,
+            "clamped_lower_M_eq_2_or_M_minus_1_pow4_lt_X5_certified": true,
+            "unclamped_M_minus_1_pow4_lt_X5_holds": true,
+            "exact_clamped_characterization_certified": true
+          },
           "head_sum_is_empty": true,
           "C_tau_K_certified": {
             "mid_float": 0.0009286118673507077,
@@ -2093,6 +2461,15 @@
           },
           "H_XK_eq_floor_XK_5_6": 1,
           "M_XK_eq_ceil_max_2_XK_5_4": 2,
+          "M_XK_clamped_exact_characterization": {
+            "M_safe_upper_int": 2,
+            "M_lower_ceil_int": 2,
+            "m_ge_2": true,
+            "X5_le_M4_certified": true,
+            "clamped_lower_M_eq_2_or_M_minus_1_pow4_lt_X5_certified": true,
+            "unclamped_M_minus_1_pow4_lt_X5_holds": true,
+            "exact_clamped_characterization_certified": true
+          },
           "head_sum_is_empty": true,
           "C_tau_K_certified": {
             "mid_float": 0.0009286118673507077,
@@ -2378,6 +2755,15 @@
           },
           "H_XK_eq_floor_XK_5_6": 2,
           "M_XK_eq_ceil_max_2_XK_5_4": 4,
+          "M_XK_clamped_exact_characterization": {
+            "M_safe_upper_int": 4,
+            "M_lower_ceil_int": 4,
+            "m_ge_2": true,
+            "X5_le_M4_certified": true,
+            "clamped_lower_M_eq_2_or_M_minus_1_pow4_lt_X5_certified": true,
+            "unclamped_M_minus_1_pow4_lt_X5_holds": true,
+            "exact_clamped_characterization_certified": true
+          },
           "head_sum_is_empty": false,
           "C_tau_K_certified": {
             "mid_float": 0.000866851208763009,
@@ -2663,6 +3049,15 @@
           },
           "H_XK_eq_floor_XK_5_6": 2,
           "M_XK_eq_ceil_max_2_XK_5_4": 4,
+          "M_XK_clamped_exact_characterization": {
+            "M_safe_upper_int": 4,
+            "M_lower_ceil_int": 4,
+            "m_ge_2": true,
+            "X5_le_M4_certified": true,
+            "clamped_lower_M_eq_2_or_M_minus_1_pow4_lt_X5_certified": true,
+            "unclamped_M_minus_1_pow4_lt_X5_holds": true,
+            "exact_clamped_characterization_certified": true
+          },
           "head_sum_is_empty": false,
           "C_tau_K_certified": {
             "mid_float": 0.000866851208763009,
@@ -2948,6 +3343,15 @@
           },
           "H_XK_eq_floor_XK_5_6": 4,
           "M_XK_eq_ceil_max_2_XK_5_4": 10,
+          "M_XK_clamped_exact_characterization": {
+            "M_safe_upper_int": 10,
+            "M_lower_ceil_int": 10,
+            "m_ge_2": true,
+            "X5_le_M4_certified": true,
+            "clamped_lower_M_eq_2_or_M_minus_1_pow4_lt_X5_certified": true,
+            "unclamped_M_minus_1_pow4_lt_X5_holds": true,
+            "exact_clamped_characterization_certified": true
+          },
           "head_sum_is_empty": false,
           "C_tau_K_certified": {
             "mid_float": 0.0006306299793521781,
@@ -3233,6 +3637,15 @@
           },
           "H_XK_eq_floor_XK_5_6": 4,
           "M_XK_eq_ceil_max_2_XK_5_4": 10,
+          "M_XK_clamped_exact_characterization": {
+            "M_safe_upper_int": 10,
+            "M_lower_ceil_int": 10,
+            "m_ge_2": true,
+            "X5_le_M4_certified": true,
+            "clamped_lower_M_eq_2_or_M_minus_1_pow4_lt_X5_certified": true,
+            "unclamped_M_minus_1_pow4_lt_X5_holds": true,
+            "exact_clamped_characterization_certified": true
+          },
           "head_sum_is_empty": false,
           "C_tau_K_certified": {
             "mid_float": 0.0006306299793521781,
@@ -3518,6 +3931,15 @@
           },
           "H_XK_eq_floor_XK_5_6": 8,
           "M_XK_eq_ceil_max_2_XK_5_4": 26,
+          "M_XK_clamped_exact_characterization": {
+            "M_safe_upper_int": 26,
+            "M_lower_ceil_int": 26,
+            "m_ge_2": true,
+            "X5_le_M4_certified": true,
+            "clamped_lower_M_eq_2_or_M_minus_1_pow4_lt_X5_certified": true,
+            "unclamped_M_minus_1_pow4_lt_X5_holds": true,
+            "exact_clamped_characterization_certified": true
+          },
           "head_sum_is_empty": false,
           "C_tau_K_certified": {
             "mid_float": 0.0005434601575187453,
@@ -3803,6 +4225,15 @@
           },
           "H_XK_eq_floor_XK_5_6": 8,
           "M_XK_eq_ceil_max_2_XK_5_4": 26,
+          "M_XK_clamped_exact_characterization": {
+            "M_safe_upper_int": 26,
+            "M_lower_ceil_int": 26,
+            "m_ge_2": true,
+            "X5_le_M4_certified": true,
+            "clamped_lower_M_eq_2_or_M_minus_1_pow4_lt_X5_certified": true,
+            "unclamped_M_minus_1_pow4_lt_X5_holds": true,
+            "exact_clamped_characterization_certified": true
+          },
           "head_sum_is_empty": false,
           "C_tau_K_certified": {
             "mid_float": 0.0005434601575187453,
@@ -4088,6 +4519,15 @@
           },
           "H_XK_eq_floor_XK_5_6": 9,
           "M_XK_eq_ceil_max_2_XK_5_4": 32,
+          "M_XK_clamped_exact_characterization": {
+            "M_safe_upper_int": 32,
+            "M_lower_ceil_int": 32,
+            "m_ge_2": true,
+            "X5_le_M4_certified": true,
+            "clamped_lower_M_eq_2_or_M_minus_1_pow4_lt_X5_certified": true,
+            "unclamped_M_minus_1_pow4_lt_X5_holds": true,
+            "exact_clamped_characterization_certified": true
+          },
           "head_sum_is_empty": false,
           "C_tau_K_certified": {
             "mid_float": 0.0002826351089130899,
@@ -4373,6 +4813,15 @@
           },
           "H_XK_eq_floor_XK_5_6": 9,
           "M_XK_eq_ceil_max_2_XK_5_4": 32,
+          "M_XK_clamped_exact_characterization": {
+            "M_safe_upper_int": 32,
+            "M_lower_ceil_int": 32,
+            "m_ge_2": true,
+            "X5_le_M4_certified": true,
+            "clamped_lower_M_eq_2_or_M_minus_1_pow4_lt_X5_certified": true,
+            "unclamped_M_minus_1_pow4_lt_X5_holds": true,
+            "exact_clamped_characterization_certified": true
+          },
           "head_sum_is_empty": false,
           "C_tau_K_certified": {
             "mid_float": 0.0002826351089130899,
@@ -4658,6 +5107,15 @@
           },
           "H_XK_eq_floor_XK_5_6": 21,
           "M_XK_eq_ceil_max_2_XK_5_4": 99,
+          "M_XK_clamped_exact_characterization": {
+            "M_safe_upper_int": 99,
+            "M_lower_ceil_int": 99,
+            "m_ge_2": true,
+            "X5_le_M4_certified": true,
+            "clamped_lower_M_eq_2_or_M_minus_1_pow4_lt_X5_certified": true,
+            "unclamped_M_minus_1_pow4_lt_X5_holds": true,
+            "exact_clamped_characterization_certified": true
+          },
           "head_sum_is_empty": false,
           "C_tau_K_certified": {
             "mid_float": -0.00012328253922320038,
@@ -4943,6 +5401,15 @@
           },
           "H_XK_eq_floor_XK_5_6": 21,
           "M_XK_eq_ceil_max_2_XK_5_4": 99,
+          "M_XK_clamped_exact_characterization": {
+            "M_safe_upper_int": 99,
+            "M_lower_ceil_int": 99,
+            "m_ge_2": true,
+            "X5_le_M4_certified": true,
+            "clamped_lower_M_eq_2_or_M_minus_1_pow4_lt_X5_certified": true,
+            "unclamped_M_minus_1_pow4_lt_X5_holds": true,
+            "exact_clamped_characterization_certified": true
+          },
           "head_sum_is_empty": false,
           "C_tau_K_certified": {
             "mid_float": -0.00012328253922320038,
@@ -5430,6 +5897,51 @@
       "tate_rational_diagonal_character_rigidity_and_convolution_isometry",
       "canonical_hilbert_schmidt_orbit_decomposition_and_resonant_band_equivalence"
     ],
+    "committed_lean_theorems_exact_scope": {
+      "theorem_51_tau_grade_star_involution_and_hyperbolic_pair_obstruction": {
+        "parameters": "(tau K J delta B11 B12 B22 c1 c2 : \u211d) (htau : 1 < tau) (hK : K \u2260 0) (hB12 : 0 < B12)",
+        "definitions_used": [
+          "gradeRadialCharacter (tau K delta : \u211d) := tau ^ (K * delta)",
+          "hyperbolicPairForm (B12 c1 c2 : \u211d) := 2 * B12 * c1 * c2",
+          "jordanTwoByTwoSocleStep (lam c0 c1 : \u211d) : \u211d \u00d7 \u211d := (lam * c0 + c1, lam * c1)"
+        ],
+        "proved_conjuncts": [
+          "gradeRadialCharacter tau (K + J) delta = gradeRadialCharacter tau K delta * gradeRadialCharacter tau J delta \u2227 gradeRadialCharacter tau (-K) delta = gradeRadialCharacter tau K (-delta)",
+          "gradeRadialCharacter tau (-K) delta = gradeRadialCharacter tau K delta \u2194 delta = 0",
+          "delta \u2260 0 \u2192 (tau ^ (2 * K * delta) - 1) * B11 = 0 \u2192 (tau ^ (-(2 * K * delta)) - 1) * B22 = 0 \u2192 (B11 = 0 \u2227 B22 = 0 \u2227 B11 * c1 ^ 2 + 2 * B12 * c1 * c2 + B22 * c2 ^ 2 = hyperbolicPairForm B12 c1 c2 \u2227 0 < hyperbolicPairForm B12 1 1 \u2227 hyperbolicPairForm B12 1 (-1) < 0)",
+          "jordanTwoByTwoSocleStep (gradeRadialCharacter tau K delta) 1 0 = (gradeRadialCharacter tau K delta, 0) \u2227 jordanTwoByTwoSocleStep (gradeRadialCharacter tau K delta) 0 1 = (1, gradeRadialCharacter tau K delta) \u2227 (jordanTwoByTwoSocleStep (gradeRadialCharacter tau K delta) 0 1).1 \u2260 0"
+        ],
+        "external_analytic_scope_note": "In (4), Lean proves the Jordan block basis-action identities showing the socle vector (1, 0) has zero nilpotent drift while (0, 1) has nonzero socle drift component 1 != 0; the Hilbert-norm growth deduction ||V_K l_{rho,1}||^2 = ||l_{rho,1} + (K log tau) l_{rho,0}||^2 for m_rho >= 2 is an external analytic corollary of that nonzero nilpotent drift."
+      },
+      "theorem_52_tate_rational_diagonal_character_rigidity_and_convolution_isometry": {
+        "parameters": "(tau c_inf q K u J C_gh C_dil : \u211d) (T_conv : \u211d \u2192 \u211d) (htau : 1 < tau)",
+        "definitions_used": [
+          "adelicPhaseDiscrepancy (tau c_inf q : \u211d) := (tau - c_inf) * q",
+          "logPrimeShiftAction (u J : \u211d) := u - J",
+          "logScaleAction (scale u : \u211d) := scale * u"
+        ],
+        "proved_conjuncts": [
+          "(adelicPhaseDiscrepancy tau c_inf 1 = 0 \u2194 c_inf = tau) \u2227 (c_inf = tau \u2192 adelicPhaseDiscrepancy tau c_inf q = 0)",
+          "(tau ^ K) * (tau ^ (-K)) = 1",
+          "logScaleAction (tau ^ (-K)) (logPrimeShiftAction u J) = logPrimeShiftAction (logScaleAction (tau ^ (-K)) u) (J * (tau ^ (-K))) \u2227 logScaleAction (tau ^ (-K)) (logPrimeShiftAction u J) - logPrimeShiftAction (logScaleAction (tau ^ (-K)) u) J = (1 - tau ^ (-K)) * J",
+          "C_dil = C_gh \u2192 T_conv C_dil = T_conv C_gh"
+        ],
+        "external_analytic_scope_note": "Theorem 52 is parameterized over generic real tau > 1 (not specialized to 2 * Real.pi inside Lean); the principal-adele partial-fraction congruence sum_p {q}_p = q (mod 1) and multiplicative Haar convolution invariance (U_K g) * (U_K h)^* = g * h^* are external analytic inputs."
+      },
+      "theorem_53_canonical_hilbert_schmidt_orbit_decomposition_and_resonant_band_equivalence": {
+        "parameters_and_hypotheses": "(W_arch W_prime P_K P_0 c_tau_B h0_XK J_K c_pole_transfer_h0 W_reflected W_log_X R_head R_band_X R_tail B_h0 B_refl B_log C_log_EM C_log_0 B_head B_tail M_band M_C : \u211d) (h_arch : W_arch = P_K - c_pole_transfer_h0) (h_prime : W_prime = W_reflected + W_log_X + localizedResonantBandDecomp R_head R_band_X R_tail) (h_PK : |P_K| \u2264 P_0) (h_h0 : |c_pole_transfer_h0| \u2264 B_h0) (h_refl : |W_reflected| \u2264 B_refl) (h_log : |W_log_X| \u2264 B_log) (h_head : |R_head| \u2264 B_head) (h_tail : |R_tail| \u2264 B_tail)",
+        "definitions_used": [
+          "controlledCorrelationRemainder (c_pole_transfer_h0 W_reflected W_log_X R_head R_tail : \u211d) := -c_pole_transfer_h0 - W_reflected - W_log_X - R_head - R_tail",
+          "canonicalCorrelationHSOrbitDecomp (P_K E_ctrl_K R_band_X : \u211d) := P_K + (E_ctrl_K - R_band_X)"
+        ],
+        "proved_conjuncts": [
+          "((W_arch + c_tau_B * h0_XK - (2 * h0_XK - J_K)) + (4 * h0_XK - J_K) = W_arch + (c_tau_B + 2) * h0_XK) \u2227 (0 \u2264 P_0 \u2192 |P_0| \u2264 P_0) \u2227 C_K = canonicalCorrelationHSOrbitDecomp P_K E_ctrl_K R_band_X \u2227 C_K = P_K + E_K",
+          "|E_ctrl_K| \u2264 B_ctrl \u2227 |C_K - (P_K - R_band_X)| \u2264 B_ctrl \u2227 (B_head = (5/6) * C_log_EM \u2192 B_tail = (1/2) * C_log_0 \u2192 B_h0 < 2671923/1000000 \u2192 B_refl < 463730/1000000 \u2192 B_log < 3349009/1000000 \u2192 C_log_EM < 13468515/1000000 \u2192 C_log_0 < 557430/1000000 \u2192 B_ctrl < 17987140/1000000)",
+          "(|R_band_X| \u2264 M_band \u2192 (|E_K| \u2264 B_ctrl + M_band \u2227 |C_K| \u2264 P_0 + B_ctrl + M_band)) \u2227 (|C_K| \u2264 M_C \u2192 (|E_K| \u2264 M_C + P_0 \u2227 |R_band_X| \u2264 M_C + P_0 + B_ctrl))"
+        ],
+        "external_analytic_scope_note": "Theorem 53 retains h_arch, h_prime, h_PK, and the five component inequalities as explicit hypotheses, proves the algebraic J_K-cancellation identity alongside h_arch, and proves B_ctrl < 17987140/1000000 conditionally from the rational upper-bound hypotheses. The integer-power cutoff predicates for H(X) = floor(X^{5/6}) and M(X) = ceil(max(2, X^{5/4})) are certified in Python Arb helpers rather than inside Theorem 53."
+      }
+    },
     "remaining_open_obligation": {
       "obligation_id": "SUBGATE-TC-043A",
       "status": "OPEN",
@@ -5437,8 +5949,8 @@
     }
   },
   "section_6_certified_arb_roundtrip_verification": {
-    "total_certified_arb_balls_checked": 489,
-    "compared_against_live_original_arb_count": 489,
+    "total_certified_arb_balls_checked": 522,
+    "compared_against_live_original_arb_count": 522,
     "live_original_count_matches_enumerated_total": true,
     "all_enclose_original_256bit_arb_ball": true,
     "failed_paths": [],
@@ -5562,9 +6074,42 @@
       "task_tc050.section_3_primary_literature_constructions_audit.connes_consani_2006_13771_compressed_scaling_trace.separated_grade_support_extension.threshold_K_for_prime_2_certified",
       "task_tc050.section_3_primary_literature_constructions_audit.connes_consani_2006_13771_compressed_scaling_trace.separated_grade_support_extension.threshold_K_for_prime_3_certified",
       "task_tc050.section_3_primary_literature_constructions_audit.connes_consani_2006_13771_compressed_scaling_trace.separated_grade_support_extension.threshold_K_for_prime_5_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.positive_hilbert_space_and_unitary_orbit.euler_resolvent_R0_and_pole_integral_J_kappa_audit.spatial_ibp_sample_checks[0].R0_psi_tau_from_Euler_derivative_D_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.positive_hilbert_space_and_unitary_orbit.euler_resolvent_R0_and_pole_integral_J_kappa_audit.spatial_ibp_sample_checks[0].R0_psi_tau_from_IBP_f_minus_half_K0_f_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.positive_hilbert_space_and_unitary_orbit.euler_resolvent_R0_and_pole_integral_J_kappa_audit.spatial_ibp_sample_checks[0].derivative_free_K0_psi_tau_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.positive_hilbert_space_and_unitary_orbit.euler_resolvent_R0_and_pole_integral_J_kappa_audit.spatial_ibp_sample_checks[0].R0_D_minus_R0_IBP_diff_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.positive_hilbert_space_and_unitary_orbit.euler_resolvent_R0_and_pole_integral_J_kappa_audit.spatial_ibp_sample_checks[1].R0_psi_tau_from_Euler_derivative_D_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.positive_hilbert_space_and_unitary_orbit.euler_resolvent_R0_and_pole_integral_J_kappa_audit.spatial_ibp_sample_checks[1].R0_psi_tau_from_IBP_f_minus_half_K0_f_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.positive_hilbert_space_and_unitary_orbit.euler_resolvent_R0_and_pole_integral_J_kappa_audit.spatial_ibp_sample_checks[1].derivative_free_K0_psi_tau_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.positive_hilbert_space_and_unitary_orbit.euler_resolvent_R0_and_pole_integral_J_kappa_audit.spatial_ibp_sample_checks[1].R0_D_minus_R0_IBP_diff_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.positive_hilbert_space_and_unitary_orbit.euler_resolvent_R0_and_pole_integral_J_kappa_audit.spatial_ibp_sample_checks[2].R0_psi_tau_from_Euler_derivative_D_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.positive_hilbert_space_and_unitary_orbit.euler_resolvent_R0_and_pole_integral_J_kappa_audit.spatial_ibp_sample_checks[2].R0_psi_tau_from_IBP_f_minus_half_K0_f_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.positive_hilbert_space_and_unitary_orbit.euler_resolvent_R0_and_pole_integral_J_kappa_audit.spatial_ibp_sample_checks[2].derivative_free_K0_psi_tau_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.positive_hilbert_space_and_unitary_orbit.euler_resolvent_R0_and_pole_integral_J_kappa_audit.spatial_ibp_sample_checks[2].R0_D_minus_R0_IBP_diff_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.positive_hilbert_space_and_unitary_orbit.euler_resolvent_R0_and_pole_integral_J_kappa_audit.J_0_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.positive_hilbert_space_and_unitary_orbit.euler_resolvent_R0_and_pole_integral_J_kappa_audit.four_norm_R0_psi_tau_sq_eq_4_h0_1_minus_J_0_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.positive_hilbert_space_and_unitary_orbit.euler_resolvent_R0_and_pole_integral_J_kappa_audit.four_norm_derivative_free_K0_psi_tau_sq_eq_4_J_0_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.positive_hilbert_space_and_unitary_orbit.euler_resolvent_R0_and_pole_integral_J_kappa_audit.discrepancy_four_R0_sq_minus_four_K0_sq_certified",
       "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.positive_hilbert_space_and_unitary_orbit.norm_B_0_HS_sq_eq_P_tau_0_certified",
       "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.positive_hilbert_space_and_unitary_orbit.norm_A_tau_B_psi_tau_sq_certified",
       "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.positive_hilbert_space_and_unitary_orbit.four_norm_R0_psi_tau_sq_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.exact_decomposition_and_controlled_remainder_bounds.h0_autocorrelation_cauchy_schwarz_and_sign_change_audit.h0_1_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.exact_decomposition_and_controlled_remainder_bounds.h0_autocorrelation_cauchy_schwarz_and_sign_change_audit.sign_change_witnesses_on_1_to_infty.h0_2_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.exact_decomposition_and_controlled_remainder_bounds.h0_autocorrelation_cauchy_schwarz_and_sign_change_audit.sign_change_witnesses_on_1_to_infty.h0_5_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.exact_decomposition_and_controlled_remainder_bounds.h0_autocorrelation_cauchy_schwarz_and_sign_change_audit.sign_change_witnesses_on_1_to_infty.h0_10_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.exact_decomposition_and_controlled_remainder_bounds.h0_autocorrelation_cauchy_schwarz_and_sign_change_audit.leading_large_X_asymptotic.leading_coefficient_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.exact_decomposition_and_controlled_remainder_bounds.h0_autocorrelation_cauchy_schwarz_and_sign_change_audit.sample_scale_evaluations[0].h0_X_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.exact_decomposition_and_controlled_remainder_bounds.h0_autocorrelation_cauchy_schwarz_and_sign_change_audit.sample_scale_evaluations[0].X_pow_5_2_times_h0_X_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.exact_decomposition_and_controlled_remainder_bounds.h0_autocorrelation_cauchy_schwarz_and_sign_change_audit.sample_scale_evaluations[1].h0_X_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.exact_decomposition_and_controlled_remainder_bounds.h0_autocorrelation_cauchy_schwarz_and_sign_change_audit.sample_scale_evaluations[1].X_pow_5_2_times_h0_X_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.exact_decomposition_and_controlled_remainder_bounds.h0_autocorrelation_cauchy_schwarz_and_sign_change_audit.sample_scale_evaluations[2].h0_X_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.exact_decomposition_and_controlled_remainder_bounds.h0_autocorrelation_cauchy_schwarz_and_sign_change_audit.sample_scale_evaluations[2].X_pow_5_2_times_h0_X_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.exact_decomposition_and_controlled_remainder_bounds.h0_autocorrelation_cauchy_schwarz_and_sign_change_audit.sample_scale_evaluations[3].h0_X_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.exact_decomposition_and_controlled_remainder_bounds.h0_autocorrelation_cauchy_schwarz_and_sign_change_audit.sample_scale_evaluations[3].X_pow_5_2_times_h0_X_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.exact_decomposition_and_controlled_remainder_bounds.h0_autocorrelation_cauchy_schwarz_and_sign_change_audit.sample_scale_evaluations[4].h0_X_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.exact_decomposition_and_controlled_remainder_bounds.h0_autocorrelation_cauchy_schwarz_and_sign_change_audit.sample_scale_evaluations[4].X_pow_5_2_times_h0_X_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.exact_decomposition_and_controlled_remainder_bounds.h0_autocorrelation_cauchy_schwarz_and_sign_change_audit.sample_scale_evaluations[5].h0_X_certified",
+      "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.exact_decomposition_and_controlled_remainder_bounds.h0_autocorrelation_cauchy_schwarz_and_sign_change_audit.sample_scale_evaluations[5].X_pow_5_2_times_h0_X_certified",
       "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.exact_decomposition_and_controlled_remainder_bounds.unconditional_component_bounds_over_all_K_in_A_R.abs_P_tau_K_bound_certified",
       "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.exact_decomposition_and_controlled_remainder_bounds.unconditional_component_bounds_over_all_K_in_A_R.abs_pole_plus_transfer_h0_bound_certified",
       "task_tc050.section_4_canonical_hilbert_schmidt_orbit_decomposition.exact_decomposition_and_controlled_remainder_bounds.unconditional_component_bounds_over_all_K_in_A_R.abs_W_inv_XK_bound_certified",

@@ -27,7 +27,7 @@ and its completed zeta correlation C_tau(K) = W_xi((T_K psi_tau) * psi_tau^*):
      the palindromic autocorrelation numerator satisfies
      -3 (216 (u^3 - 3 u) - 18164 (u^2 - 2) + 161020 u - 316875)
        = -648 W^3 + 58380 W^2 - 706860 W + 2027025,
-     which equals 92793 > 0 at W = 4 (alpha = 1).
+     which equals 92193 > 0 at W = 4 (alpha = 1).
 6. `mellin_convolution_endpoint_vanishing`:
      Vanishing of F_tau at s = 0, 1 implies H_K(1/2) = H_K(-1/2) = 0.
 7. `quartet_grade_symmetry_and_evenness`:
@@ -1833,19 +1833,21 @@ def logScaleAction (scale u : ℝ) : ℝ :=
   scale * u
 
 /-- Theorem 52: Tate Rational Diagonal Character Rigidity, Semidirect Intertwining of
-    Arithmetic vs. Analytic Prime Transforms, and Convolution-Trace Isometry (`TASK-TC-050` / `TASK-TC-050R`).
+    Arithmetic vs. Analytic Prime Transforms, and Convolution-Trace Isometry (`TASK-TC-050` / `TASK-TC-050R` / `TASK-TC-050R2`).
     Proof Scope & External Hypothesis Discharge:
-    - The reduction of the principal-adele character product to `adelicPhaseDiscrepancy tau c_inf q`
-      is discharged by the rational partial-fraction identity `q - sum_p {q}_p in Z` (Cassels–Fröhlich
-      Ch. XV, verified in `verify_tau_joint_arithmetic_fourier_roles_and_transforms`).
+    - Parameterized over generic real `tau > 1` (instantiated at `tau = 2 * pi` in the analytic
+      application); the reduction of the principal-adele character product to
+      `adelicPhaseDiscrepancy tau c_inf q` is discharged externally by the rational partial-fraction
+      identity `q - sum_p {q}_p in Z` (Cassels–Fröhlich Ch. XV, verified in
+      `verify_tau_joint_arithmetic_fourier_roles_and_transforms`).
     - In (4), the hypothesis `C_dil = C_gh` represents the multiplicative Haar change-of-variables
       identity `((U_K g) * (U_K h)^*)(alpha) = (g * h^*)(alpha)` on `R_+^×` (proved analytically in
       Section 3 of `docs/reviews/TC_FAITHFUL_TAU_ARITHMETIC_SPECTRAL_REALIZATION.md`), from which
       Lean verifies invariance of any linear trace functional `T_conv`.
     (1) Tate rational diagonal character rigidity:
-        For fixed local p-adic characters normalized with `tau = 2 * pi`, vanishing of the
-        rational-diagonal phase discrepancy `adelicPhaseDiscrepancy tau c_inf 1 = 0` at `q = 1`
-        uniquely forces `c_inf = tau` (and hence `adelicPhaseDiscrepancy tau c_inf q = 0` for all `q`).
+        For any `tau > 1` (in particular `tau = 2 * pi`), vanishing of the rational-diagonal phase
+        discrepancy `adelicPhaseDiscrepancy tau c_inf 1 = 0` at `q = 1` uniquely forces `c_inf = tau`
+        (and hence `adelicPhaseDiscrepancy tau c_inf q = 0` for all `q`).
     (2) Dual Poisson lattice volume invariance:
         For `tau > 1` and every real grade `K`, the scaled lattice covolume `tau^K` and dual
         lattice covolume `tau^{-K}` satisfy `(tau ^ K) * (tau ^ (-K)) = 1`.
@@ -1906,29 +1908,37 @@ def canonicalCorrelationHSOrbitDecomp (P_K E_ctrl_K R_band_X : ℝ) : ℝ :=
   P_K + (E_ctrl_K - R_band_X)
 
 /-- Theorem 53: Canonical Hilbert–Schmidt Unitary Orbit Decomposition and Resonant-Band
-    Boundedness Equivalence (`TASK-TC-050` / `TASK-TC-050R`).
+    Boundedness Equivalence (`TASK-TC-050` / `TASK-TC-050R` / `TASK-TC-050R2`).
     Proof Scope & External Hypothesis Discharge:
-    - Formalizes the Attempt B pole-integral `J(kappa)` cancellation between
-      `P_K^B := <A_tau^B T_K psi_tau, A_tau^B psi_tau>_{H_tau^B} = W_arch + c_tau^B * h0_XK - (2 * h0_XK - J_K)`
-      (where `(A_tau^B f)(x, y) = f(y) - f(y/x)` is the one-sided shift-difference operator from
-      `TC-042F`/`TC-043`) and `R_{0,K} := 4 <R_0 T_K psi_tau, R_0 psi_tau>_{L^2(dy/y)} = 4 * h0_XK - J_K`,
-      giving `P_K = P_K^B + R_{0,K} = W_arch + (c_tau^B + 2) * h0_XK` and discharging `h_arch`.
-    - Discharges the `TC-049`/`TC-049R` cutoff definitions `H(X) = floor(X^{5/6})` and
-      `M(X) = ceil(max(2, X^{5/4}))`, where `|R_head| <= (5/6) * C_log_EM` (`B_head`) and
-      `|R_tail| <= (1/2) * C_log_0` (`B_tail`) are proved uniform `O(1)` bounds, and verifies the
-      concrete rational upper bound `B_ctrl < 17987140 / 1000000` (`17.987140`) from the 256-bit Arb
-      component enclosures `B_h0 < 2.671923`, `B_refl < 0.463730`, `B_log < 3.349009`,
-      `C_log_EM < 13.468515`, and `C_log_0 < 0.557430`.
-    - Distinguishes both directions of the RH equivalence: the Fixed-Seed RH Equivalence Theorem
-      (`TASK-TC-037` / Theorem 12) shows `sup_K |C_tau(K)| < infty ==> RH` without assuming zero
-      simplicity, whereas the converse spectral triangle bound (`RH + simplicity ==> sup_K |C_tau(K)| < infty`)
-      uses absolute summability of simple critical-line zero coefficients.
+    - Retains `h_arch : W_arch = P_K - c_pole_transfer_h0`, `h_prime`, `h_PK`, and the five
+      component-bound inequalities `h_h0`, `h_refl`, `h_log`, `h_head`, `h_tail` as explicit
+      hypotheses, and proves alongside `h_arch` the Attempt B algebraic pole-integral `J(kappa)`
+      cancellation identity `(W_arch + c_tau_B * h0_XK - (2 * h0_XK - J_K)) + (4 * h0_XK - J_K)
+      = W_arch + (c_tau_B + 2) * h0_XK` (where `(A_tau^B f)(x, y) = f(y) - f(y/x)`,
+      `(R_0 f)(y) = int_0^y (t/y)^{1/2} (D f)(t) dt/t = f(y) - (1/2) int_0^y (t/y)^{1/2} f(t) dt/t`,
+      and `J(kappa) = int_0^infty e^{-u/2} (h_0(e^{kappa+u}) + h_0(e^{kappa-u})) du`).
+    - Under the supplied rational bound hypotheses (`B_head = (5/6) * C_log_EM`,
+      `B_tail = (1/2) * C_log_0`, `B_h0 < 2.671923`, `B_refl < 0.463730`, `B_log < 3.349009`,
+      `C_log_EM < 13.468515`, and `C_log_0 < 0.557430`), verifies `B_ctrl < 17987140 / 1000000`
+      (`17.987140`). The integer-power cutoff predicates for `H(X) = floor(X^{5/6})`
+      (`H^6 <= X^5 < (H+1)^6`) and `M(X) = ceil(max(2, X^{5/4}))`
+      (`M >= 2 ∧ X^5 <= M^4 ∧ (M = 2 ∨ (M-1)^4 < X^5)`) are certified externally in the Python
+      Arb helpers (`certified_head_cutoff_H_X_arb`, `certified_coupled_cutoff_M_X_arb`, and
+      `certify_clamped_exact_cutoff_M_X_arb`).
+    - Distinguishes scalar correlation boundedness from operator-level Jordan-chain unitarity:
+      for the scalar correlation `C_tau(K)`, BOTH directions of `RH <==> sup_K |C_tau(K)| < infty`
+      hold unconditionally in zero multiplicity `m_rho >= 1` (since `-xi'(s)/xi(s)` has simple poles
+      of residue `m_rho`, so under RH each distinct zero contributes `m_rho |F_tau(rho)|^2 tau^{-i K gamma_rho}`
+      with no polynomial drift in `K`, while `TASK-TC-037` / Theorem 12 proves the converse via
+      Laplace–Carleman continuation); by contrast, realizing the full generalized-eigenvector
+      action on Meyer's cotangent quotient `H_-^0` unitarily requires `RH + Simplicity` (while
+      realizing the socle eigenvectors requires `RH` alone).
     (1) Attempt B `J_K`-cancellation & exact decomposition identity:
         `(W_arch + c_tau_B * h0_XK - (2 * h0_XK - J_K)) + (4 * h0_XK - J_K) = W_arch + (c_tau_B + 2) * h0_XK`,
         `0 <= P_0 -> |P_0| <= P_0`, and `C_K = canonicalCorrelationHSOrbitDecomp P_K E_ctrl_K R_band_X = P_K + E_K`.
-    (2) Controlled remainder bound & concrete `TC-049R` rational bound discharge:
-        `|E_ctrl_K| <= B_ctrl`, `|C_K - (P_K - R_band_X)| <= B_ctrl`, and under the certified rational
-        enclosures with `B_head = (5/6) * C_log_EM` and `B_tail = (1/2) * C_log_0`, `B_ctrl < 17987140 / 1000000`.
+    (2) Controlled remainder bound & conditional `TC-049R` rational bound discharge:
+        `|E_ctrl_K| <= B_ctrl`, `|C_K - (P_K - R_band_X)| <= B_ctrl`, and under the rational
+        enclosure hypotheses with `B_head = (5/6) * C_log_EM` and `B_tail = (1/2) * C_log_0`, `B_ctrl < 17987140 / 1000000`.
     (3) Two-way boundedness equivalence between `C_tau(K)`, `E_tau(K)`, and `R_{mu,band}(tau^{|K|})`:
         - If `|R_band_X| <= M_band`, then `|E_K| <= B_ctrl + M_band` and `|C_K| <= P_0 + B_ctrl + M_band`.
         - Conversely, if `|C_K| <= M_C`, then `|E_K| <= M_C + P_0` and `|R_band_X| <= M_C + P_0 + B_ctrl`. -/
