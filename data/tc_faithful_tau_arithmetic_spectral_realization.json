@@ -1,11 +1,17 @@
 {
   "task_id": "TASK-TC-050",
   "continuation_task_id": "TASK-TC-051",
-  "repair_task_id": "TASK-TC-050R2",
-  "preceding_repair_task_id": "TASK-TC-050R",
+  "repair_task_id": "TASK-TC-051R",
+  "preceding_repair_task_ids": [
+    "TASK-TC-050R",
+    "TASK-TC-050R2"
+  ],
   "parent_epic": "EPIC-TC-042",
   "starting_head": "e6472e03c008cc8d20be177f1d96bf904bd0a16b",
   "tc051_starting_head": "d93ab512c2df75af2365a3963804c172baf0e867",
+  "tc051_merged_main_baseline": "b6f22dfee0dd6177ee855189304e7930f9ba3e20",
+  "tc051_implementation_commit": "333661eecd69738e8a67143e635b6db4f40170ce",
+  "tc051_branch_tip": "7ac0546b1177970ff0d87824f61643da2405c4c0",
   "reviewed_baseline": "5da0eb79e1732ff871ee1c7fee729c62972aa406",
   "tc050r_reviewed_baseline": "2f7871fff666091c4152ecc8657f2345aacdd4fa",
   "tc050r2_reviewed_head": "0e6ae36ce995ef3037652b3dfb67645325f990b1",
@@ -1860,6 +1866,37 @@
         }
       },
       "large_grade_asymptotic_behavior_of_E_tau_controlled": "As |K| -> infty (X_K = tau^{|K|} -> infty): the first three components decay rapidly as |(c_tau^B + 2) h_0(X_K)| = O(X_K^{-5/2}) (with h_0(X_K) ~ -(81/64) X_K^{-5/2}), |W(X_K^{-1})| = O(X_K^{-5/2}), and |W_log(X_K)| <= C_{log,EM} X_K^{-5/2} = O(X_K^{-5/2}), while at the TC-049/TC-049R cutoffs H(X_K) = floor(X_K^{5/6}) and M(X_K) = ceil(max(2, X_K^{5/4})) the head and tail satisfy the proved uniform O(1) bounds |R_{mu,head}(X_K)| <= (5/6) C_{log,EM} and |R_{mu,tail}(X_K)| <= (1/2) C_{log,0}. Consequently, sup_{K in A_R} |E_{tau,controlled}(K)| <= B_ctrl < 17.987140 and limsup_{|K|->infty} |E_{tau,controlled}(K)| <= (5/6) C_{log,EM} + (1/2) C_{log,0} < 11.502478 (establishing o(1) decay of R_{mu,head} would require cancellation or a strictly smaller exponent < 5/6, and o(1) decay of R_{mu,tail} requires a cutoff growing faster than X_K^{5/4}).",
+      "observable_radius_summary_across_13_sample_grades": {
+        "sample_grade_set": [
+          "0",
+          "1/4",
+          "-1/4",
+          "1/2",
+          "-1/2",
+          "1",
+          "-1",
+          "sqrt(2)",
+          "-sqrt(2)",
+          "3/2",
+          "-3/2",
+          "2",
+          "-2"
+        ],
+        "sample_grade_count": 13,
+        "per_observable_max_radius": {
+          "P_tau_K_HS_orbit_certified": 3.2177896726949885e-22,
+          "pole_plus_transfer_term_neg_c_tau_A_h0_certified": 6.343920144765458e-75,
+          "small_scale_prime_W_inv_XK_certified": 7.014613355449395e-09,
+          "divisor_aggregated_W_log_XK_certified": 6.584956625116378e-11,
+          "head_divisor_R_mu_head_XK_certified": 5.636159898167459e-11,
+          "resonant_band_R_mu_band_XK_direct_sum_certified": 5.6427494458683586e-11,
+          "super_scale_tail_R_mu_tail_XK_direct_certified": 0.000542015763130621,
+          "E_tau_controlled_K_certified": 0.0005420158868219005,
+          "E_tau_K_total_remainder_certified": 6.86915137748656e-05,
+          "C_tau_K_certified": 6.869151366117876e-05
+        },
+        "precision_scope_note": "Each observable's radius reflects its specific analytical truncation and quadrature budget: W_log(X_K), R_{mu,head}(X_K), and R_{mu,band}(X_K) (evaluated by 4th-order Euler-Maclaurin on [N0, infty)) have radii <= 6.59e-11 (6.58e-11, 5.64e-11, and 5.64e-11), P_tau(K) has radius <= 3.22e-22, -(c_tau^B+2)h_0(X_K) has radius <= 6.34e-75, and W(X_K^{-1}) has radius <= 7.01e-9, whereas R_{mu,tail}(X_K) and E_{tau,controlled}(K) include the direct super-scale tail remainder C_{log,0} X_K^{5/2} / (2 m_tail_cut^2) (radii 1.89e-5 at K=0 up to 5.42e-4 at |K|=2), and C_tau(K) and E_tau(K) include the prime-power Rosser-Schoenfeld tail on n > 16500 in W(X_K) (radii 1.40e-8 at K=0 up to 6.87e-5 at |K|=2)."
+      },
       "all_orbit_reconstructions_enclose_zero": true,
       "all_independent_tail_bounds_verified": true,
       "all_component_bounds_verified": true,
@@ -5974,7 +6011,7 @@
           "|B_p_low + B_p_high| \u2264 B_log + B_head + B_tail \u2227 (B_head = (5/6) * C_log_EM \u2192 B_tail = (1/2) * C_log_0 \u2192 B_log < 3349009/1000000 \u2192 C_log_EM < 13468515/1000000 \u2192 C_log_0 < 557430/1000000 \u2192 B_log + B_head + B_tail < 14851487/1000000)",
           "(|S_p_X| \u2264 M_S \u2227 |S_p_band_xp| \u2264 M_S \u2192 |R_X| \u2264 (1 + q) * M_S + q * (B_log + B_head + B_tail)) \u2227 (|R_X| \u2264 M_R \u2227 |S_p_band_xp| \u2264 M_S \u2192 |S_p_X| \u2264 M_R + q * M_S + q * (B_log + B_head + B_tail))"
         ],
-        "external_analytic_scope_note": "Theorem 54 proves the algebraic consequences of the single-prime separation and rescaled-band boundary decomposition from explicit hypotheses h_sep, h_rescaled, h_low, h_high; the squarefree divisibility partition m = p d (mu(p d) = 0 for p | d, mu(p d) = -mu(d) for p nmid d) and the interval cutoff comparisons H(X)/p <= H(X/p) and M(X/p) <= M(X)/p are proved analytically outside Lean."
+        "external_analytic_scope_note": "Theorem 54 proves the algebraic consequences of the single-prime separation and rescaled-band boundary decomposition from explicit hypotheses h_sep, h_rescaled, h_low, h_high; the squarefree divisibility partition m = p d (mu(p d) = 0 for p | d, mu(p d) = -mu(d) for p nmid d), the lower cutoff comparison H(X)/p <= H(X/p), and the upper boundary bound |Delta_{p,high}(X)| <= B_tail across both cutoff orderings (M(X)/p >= M(X/p) and the small-Y single-endpoint regime M(X)/p < M(X/p) when 1 <= X/p < 2^{4/5}) are proved analytically outside Lean."
       },
       "theorem_55_summation_by_parts_endpoint_bound_and_smooth_mertens_reduction": {
         "parameters_and_hypotheses": "(R_X M_B F_B I_mertens M_cut X25 C_log_0 M_I M_R : \u211d) (h_sbp : R_X = summationByPartsDecomp M_B F_B I_mertens) (h_M_pos : 0 < M_cut) (h_X25_nonneg : 0 \u2264 X25) (h_C_nonneg : 0 \u2264 C_log_0) (h_mertens_triv : |M_B| \u2264 M_cut) (h_F_bound : |F_B| * (M_cut ^ 3) \u2264 C_log_0 * X25) (h_cutoff_dom : X25 \u2264 M_cut ^ 2)",
@@ -6009,7 +6046,11 @@
   },
   "section_7_task_tc051_prime_separation_and_summation_by_parts": {
     "task_id": "TASK-TC-051",
+    "repair_task_id": "TASK-TC-051R",
     "starting_head": "d93ab512c2df75af2365a3963804c172baf0e867",
+    "tc051_merged_main_baseline": "b6f22dfee0dd6177ee855189304e7930f9ba3e20",
+    "tc051_implementation_commit": "333661eecd69738e8a67143e635b6db4f40170ce",
+    "tc051_branch_tip": "7ac0546b1177970ff0d87824f61643da2405c4c0",
     "subgate_tc043a_status": "OPEN",
     "rh_proved": false,
     "closure_target_formula": "exists B < infty forall X >= 1 : |sum_{H(X) < m <= M(X)} (mu(m)/sqrt(m)) W_log(X/m)| <= B, H(X) = floor(X^{5/6}), M(X) = ceil(max(2, X^{5/4}))",
@@ -6018,11 +6059,14 @@
       "arithmetic_and_fourier_actions": "Prime dilation D_p: X |-> X/p and Moebius sieve operator I - p^{-1/2} D_p on the divisor sum vs. tau-normalized Mellin-Fourier duality and unitary grade translation U_K on H_tau^pos.",
       "compatibility_identities_proved": [
         "R(X; A, B) = S_p(X; A, B) - p^{-1/2} S_p(X/p; A/p, B/p)   (exact single-prime separation)",
+        "R_j = S_j - q S_{j+1}, S_0 = sum_{j=0}^{L-1} q^j R_j + q^L S_L   (simultaneously rescaled arbitrary-interval tower)",
         "R_{mu,band}(X) = S_{p,band}(X) - p^{-1/2} S_{p,band}(X/p) - p^{-1/2} B_p(X)   (canonical rescaled-band separation)",
+        "S_{p,band}(X) = sum_{j=0}^{L-1} q^j (R_{mu,band}(X/p^j) + q B_p(X/p^j)) + q^L S_{p,band}(X/p^L)   (canonical-band inverse tower)",
+        "R(X; A, B) = sum_{d | P} (mu(d)/sqrt(d)) S_P(X/d; A/d, B/d)   (multi-prime inclusion-exclusion)",
         "R(X; A, B) = M_A(B) F_X(B) + int_A^B M_A(t) t^{-3/2} tilde{W}_log(X/t) dt   (exact summation by parts)"
       ],
       "unconditional_estimates_proved": [
-        "|B_p(X)| <= B_rescaled := B_log + (5/6) C_{log,EM} + (1/2) C_{log,0} < 14.851486   (all X >= 1, all primes p)",
+        "|B_p(X)| <= B_rescaled := B_log + (5/6) C_{log,EM} + (1/2) C_{log,0} < 14.851486   (all X >= 1, all primes p, across both M(X)/p >= M(X/p) and M(X)/p < M(X/p))",
         "|M_{H(X)}(M(X)) F_X(M(X))| <= C_{log,0} (X^{5/2} / M(X)^2) <= C_{log,0} < 0.557430   (all X >= 1)",
         "|R_{mu,band}(X) - I_{M,band}(X)| <= C_{log,0} < 0.557430   (all X >= 1)"
       ],
@@ -6031,7 +6075,8 @@
     },
     "prime_separation_and_rescaled_band_audit": {
       "exact_prime_separation_identity": "R(X; A, B) = S_p(X; A, B) - p^{-1/2} S_p(X / p; A / p, B / p)   (for all X > 0, 0 <= A < B, and prime p in P, using mu(p d) = 0 for p | d and mu(p d) = -mu(d) for p nmid d)",
-      "canonical_rescaled_band_identity": "R_{mu,band}(X) = S_{p,band}(X) - p^{-1/2} S_{p,band}(X / p) - p^{-1/2} B_p(X),   where B_p(X) = Delta_{p,low}(X) + Delta_{p,high}(X) is the rescaled cutoff boundary sum",
+      "rescaled_interval_inverse_tower_identity": "For R_j := R(X/p^j; A/p^j, B/p^j) and S_j := S_p(X/p^j; A/p^j, B/p^j) with q = p^{-1/2}, R_j = S_j - q S_{j+1} and S_0 = sum_{j=0}^{L-1} q^j R_j + q^L S_L for every L >= 1, terminating when B/p^L < 1 so S_L = 0.",
+      "canonical_rescaled_band_identity": "R_{mu,band}(X) = S_{p,band}(X) - p^{-1/2} S_{p,band}(X / p) - p^{-1/2} B_p(X),   where B_p(X) = Delta_{p,low}(X) + Delta_{p,high}(X) is the rescaled cutoff boundary sum, and S_{p,band}(X) = sum_{j=0}^{L-1} q^j (R_{mu,band}(X/p^j) + q B_p(X/p^j)) + q^L S_{p,band}(X/p^L) terminates at L = floor(log_p X) + 1 where X/p^L < 1 so S_{p,band}(X/p^L) = 0 by definition.",
       "unconditional_rescaled_boundary_bounds": {
         "B_rescaled_global_all_X_ge_1_and_all_p_certified": {
           "mid_float": 14.851481145648034,
@@ -6055,15 +6100,73 @@
           "lower_dec": "6.700620832085948550527207175609300880269e-1",
           "upper_dec": "6.700620832085948550527207175609300880272e-1",
           "arb_ball_str": "[0.6700620832085948550527207175609300880270 +/- 1.25e-41]"
+        },
+        "both_upper_cutoff_orderings_certified": true,
+        "small_Y_single_endpoint_regime_X2_p2": {
+          "X": 2,
+          "p": 2,
+          "Y_equals_X_over_p": 1,
+          "M_X": 3,
+          "M_X_over_p_ratio": "3/2 = 1.5",
+          "M_Y": 2,
+          "interval_M_X_over_p_to_M_Y": "(3/2, 2] containing only integer d = M(1) = 2",
+          "single_endpoint_unfiltered_term_2_neg_half_abs_W_log_half_certified": {
+            "mid_float": 0.013885400957675749,
+            "rad_float_outward": 4.0353538390861395e-11,
+            "lower_dec": "1.388540091732221185162096136344642697723e-2",
+            "upper_dec": "1.388540099802928698916922892613909904970e-2",
+            "arb_ball_str": "[0.0138854010 +/- 8.27e-11]"
+          },
+          "single_endpoint_le_B_tail_certified": true
         }
       },
       "two_way_coprime_band_equivalence_theorem": "For every fixed prime p in P (in particular p = 2, odd squarefree integers 2 nmid m), sup_{X >= 1} |R_{mu,band}(X)| < infty <==> sup_{X >= 1} |S_{p,band}(X)| < infty, with explicit two-way bounds |R_{mu,band}(X)| <= (1 + p^{-1/2}) sup_{Y>=1} |S_{p,band}(Y)| + p^{-1/2} B_rescaled and |S_{p,band}(X)| <= (1 - p^{-1/2})^{-1} (sup_{Y>=1} |R_{mu,band}(Y)| + p^{-1/2} B_rescaled).",
       "multi_prime_sieve_collapse_and_coset_obstruction": {
         "multi_prime_inclusion_exclusion_formula": "R(X; A, B) = sum_{d | P_P} (mu(d) / sqrt(d)) S_P(X / d; A / d, B / d)",
+        "p2_x1_interval_1_2_orientation_regression": {
+          "R_1_1_2_certified": {
+            "mid_float": -0.013885400957675749,
+            "rad_float_outward": 4.0353538390861395e-11,
+            "lower_dec": "-1.388540099802928698916922892613909904970e-2",
+            "upper_dec": "-1.388540091732221185162096136344642697723e-2",
+            "arb_ball_str": "[-0.0138854010 +/- 8.27e-11]"
+          },
+          "S2_1_1_2_certified": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "S2_half_half_1_certified": {
+            "mid_float": 0.01963692235333341,
+            "rad_float_outward": 5.706852164118647e-11,
+            "lower_dec": "1.963692229626488712827371471750872924386e-2",
+            "upper_dec": "1.963692241040192722526914934125877234550e-2",
+            "arb_ball_str": "[0.019636922 +/- 4.11e-10]"
+          },
+          "correct_formula_rhs_certified": {
+            "mid_float": -0.013885400957675749,
+            "rad_float_outward": 4.035353855349172e-11,
+            "lower_dec": "-1.388540099802928715179955479896476415082e-2",
+            "upper_dec": "-1.388540091732221168899063549062076187611e-2",
+            "arb_ball_str": "[-0.0138854010 +/- 8.27e-11]"
+          },
+          "reversed_formula_rhs_certified": {
+            "mid_float": -0.027770801915351497,
+            "rad_float_outward": 8.070707699856322e-11,
+            "lower_dec": "-2.777080199605857419517889234937908490089e-2",
+            "upper_dec": "-2.777080183464442348640148822979196715299e-2",
+            "arb_ball_str": "[-0.027770802 +/- 1.66e-10]"
+          },
+          "correct_orientation_encloses_zero": true,
+          "reversed_formula_detected_nonzero": true
+        },
         "three_prime_P_2_3_5_at_X_16_encloses_zero": true,
         "full_sieve_P_le_M_X_tautological_collapse_verified": true,
         "tautological_collapse_explanation": "When P = {p <= M(X)} sieves all primes up to M(X), the only positive integer k <= M(X)/d coprime to P_P is k = 1, so S_P(X/d; H(X)/d, M(X)/d) = 1_{H(X) < d <= M(X)} W_log(X/d), and the multi-prime expansion sum_{d | P_P} (mu(d)/sqrt(d)) S_P(...) collapses tautologically back to sum_{H(X) < d <= M(X)} (mu(d)/sqrt(d)) W_log(X/d) = R_{mu,band}(X).",
-        "multiplicative_coset_shift_note": "Prime dilation X_K |-> X_K / p = tau^{|K| - log_tau p} shifts out of the algebraic grade locus tau^{A_R} into the multiplicative coset p^{-1} tau^{A_R} because log_tau p = log p / log(2*pi) is not assumed algebraic; all rescaled boundary bounds hold on all of R_{>0} without assuming log_tau p in A_R.",
+        "multiplicative_coset_shift_note": "Whether log_tau p = log p / log(2*pi) lies in A_R is not assumed; if log_tau p notin A_R, then prime dilation X_K |-> X_K / p = tau^{|K| - log_tau p} leaves the algebraic grade locus tau^{A_R} for the multiplicative coset p^{-1} tau^{A_R}, whereas all rescaled boundary bounds are proved on all of R_{>0} without assuming log_tau p in A_R.",
+        "euler_product_log_expansion": "sum_{p <= y} log(1 + p^{-1/2}) = sum_{p <= y} p^{-1/2} - (1/2) sum_{p <= y} p^{-1} + O(1)",
         "euler_product_factor_growth": [
           {
             "y_prime_cutoff": 5,
@@ -6125,6 +6228,7 @@
       "all_prime_separation_identities_enclose_zero": true,
       "all_canonical_band_separations_enclose_zero": true,
       "all_boundary_bounds_certified": true,
+      "both_upper_cutoff_orderings_certified": true,
       "all_p_squared_obstructions_detected": true,
       "all_tower_telescoping_enclose_zero": true,
       "sample_band_prime_table": [
@@ -6136,6 +6240,7 @@
           "X_over_p_ge_1": false,
           "H_X_over_p": 0,
           "M_X_over_p": 0,
+          "upper_cutoff_ordering": "X/p < 1 (sub-unit regime)",
           "R_mu_band_X_certified": {
             "mid_float": -0.013885400957675749,
             "rad_float_outward": 4.0353538390861395e-11,
@@ -6199,6 +6304,7 @@
           "X_over_p_ge_1": false,
           "H_X_over_p": 0,
           "M_X_over_p": 0,
+          "upper_cutoff_ordering": "X/p < 1 (sub-unit regime)",
           "R_mu_band_X_certified": {
             "mid_float": -0.013885400957675749,
             "rad_float_outward": 4.0353538390861395e-11,
@@ -6262,6 +6368,7 @@
           "X_over_p_ge_1": true,
           "H_X_over_p": 1,
           "M_X_over_p": 2,
+          "upper_cutoff_ordering": "M(X)/p < M(X/p) (small-Y single-endpoint regime)",
           "R_mu_band_X_certified": {
             "mid_float": 0.01089889085880644,
             "rad_float_outward": 9.523624843196288e-14,
@@ -6325,6 +6432,7 @@
           "X_over_p_ge_1": false,
           "H_X_over_p": 0,
           "M_X_over_p": 0,
+          "upper_cutoff_ordering": "X/p < 1 (sub-unit regime)",
           "R_mu_band_X_certified": {
             "mid_float": 0.01089889085880644,
             "rad_float_outward": 9.523624843196288e-14,
@@ -6388,6 +6496,7 @@
           "X_over_p_ge_1": true,
           "H_X_over_p": 2,
           "M_X_over_p": 5,
+          "upper_cutoff_ordering": "M(X)/p >= M(X/p)",
           "R_mu_band_X_certified": {
             "mid_float": 0.030513754798526905,
             "rad_float_outward": 1.701108758512828e-13,
@@ -6451,6 +6560,7 @@
           "X_over_p_ge_1": true,
           "H_X_over_p": 1,
           "M_X_over_p": 3,
+          "upper_cutoff_ordering": "M(X)/p >= M(X/p)",
           "R_mu_band_X_certified": {
             "mid_float": 0.030513754798526905,
             "rad_float_outward": 1.701108758512828e-13,
@@ -6514,6 +6624,7 @@
           "X_over_p_ge_1": true,
           "H_X_over_p": 5,
           "M_X_over_p": 14,
+          "upper_cutoff_ordering": "M(X)/p >= M(X/p)",
           "R_mu_band_X_certified": {
             "mid_float": 0.005045633806463933,
             "rad_float_outward": 2.839757405468215e-13,
@@ -6577,6 +6688,7 @@
           "X_over_p_ge_1": true,
           "H_X_over_p": 4,
           "M_X_over_p": 9,
+          "upper_cutoff_ordering": "M(X)/p >= M(X/p)",
           "R_mu_band_X_certified": {
             "mid_float": 0.005045633806463933,
             "rad_float_outward": 2.839757405468215e-13,
@@ -6640,6 +6752,7 @@
           "X_over_p_ge_1": true,
           "H_X_over_p": 12,
           "M_X_over_p": 42,
+          "upper_cutoff_ordering": "M(X)/p >= M(X/p)",
           "R_mu_band_X_certified": {
             "mid_float": 0.009486997027107105,
             "rad_float_outward": 5.678009842581531e-11,
@@ -6703,6 +6816,7 @@
           "X_over_p_ge_1": true,
           "H_X_over_p": 8,
           "M_X_over_p": 26,
+          "upper_cutoff_ordering": "M(X)/p >= M(X/p)",
           "R_mu_band_X_certified": {
             "mid_float": 0.009486997027107105,
             "rad_float_outward": 5.678009842581531e-11,
@@ -6763,7 +6877,8 @@
         {
           "X_label": "tau^2",
           "prime_p": 2,
-          "steps_J_p_plus_1": 6,
+          "canonical_band_steps_J_p_plus_1": 6,
+          "rescaled_interval_terminal_L": 7,
           "S_p_band_X_certified": {
             "mid_float": 0.003489752130743207,
             "rad_float_outward": 4.198970643318691e-11,
@@ -6778,12 +6893,18 @@
             "upper_dec": "3.489752225247983195800153227952850659220e-3",
             "arb_ball_str": "[0.003489752 +/- 2.26e-10]"
           },
+          "rescaled_interval_L1_encloses_zero": true,
+          "rescaled_interval_L2_encloses_zero": true,
+          "rescaled_interval_terminal_encloses_zero": true,
+          "canonical_band_L1_encloses_zero": true,
+          "canonical_band_L2_encloses_zero": true,
           "tower_diff_encloses_zero": true
         },
         {
           "X_label": "tau^2",
           "prime_p": 3,
-          "steps_J_p_plus_1": 4,
+          "canonical_band_steps_J_p_plus_1": 4,
+          "rescaled_interval_terminal_L": 5,
           "S_p_band_X_certified": {
             "mid_float": 0.005884711337961577,
             "rad_float_outward": 4.793021133457401e-11,
@@ -6798,6 +6919,11 @@
             "upper_dec": "5.884711403915995197607204263336051837588e-3",
             "arb_ball_str": "[0.005884711 +/- 4.04e-10]"
           },
+          "rescaled_interval_L1_encloses_zero": true,
+          "rescaled_interval_L2_encloses_zero": true,
+          "rescaled_interval_terminal_encloses_zero": true,
+          "canonical_band_L1_encloses_zero": true,
+          "canonical_band_L2_encloses_zero": true,
           "tower_diff_encloses_zero": true
         }
       ]
@@ -6821,7 +6947,12 @@
       "termwise_euler_symbolic_verified": true,
       "all_jet_identities_enclose_zero": true,
       "all_sbp_ftc_enclose_zero": true,
+      "all_performed_sbp_quadrature_enclose_zero": true,
       "all_sbp_quadrature_enclose_zero": true,
+      "independent_quadrature_max_M_cutoff": 32,
+      "independent_quadrature_performed_count": 6,
+      "independent_quadrature_passed_count": 6,
+      "independent_quadrature_not_run_count": 1,
       "all_endpoint_bounds_certified": true,
       "all_smooth_mertens_transfer_certified": true,
       "jet_derivative_checks": [
@@ -6926,6 +7057,7 @@
             "upper_dec": "0",
             "arb_ball_str": "0"
           },
+          "independent_quadrature_status": "CERTIFIED_QUADRATURE",
           "smooth_mertens_integral_I_M_band_quadrature_certified": {
             "mid_float": 0.0,
             "rad_float_outward": 5e-324,
@@ -6973,6 +7105,7 @@
             "upper_dec": "5.141331710879214696381620098379667323952e-2",
             "arb_ball_str": "[0.051413317109 +/- 3.99e-13]"
           },
+          "independent_quadrature_status": "CERTIFIED_QUADRATURE",
           "smooth_mertens_integral_I_M_band_quadrature_certified": {
             "mid_float": 0.051391691452327075,
             "rad_float_outward": 9.010634744299916e-05,
@@ -7020,6 +7153,7 @@
             "upper_dec": "5.384405576496237694419128532561250660027e-3",
             "arb_ball_str": "[0.0053844055765 +/- 8.78e-14]"
           },
+          "independent_quadrature_status": "CERTIFIED_QUADRATURE",
           "smooth_mertens_integral_I_M_band_quadrature_certified": {
             "mid_float": 0.005379717533328148,
             "rad_float_outward": 1.9530265774392573e-05,
@@ -7067,6 +7201,7 @@
             "upper_dec": "3.051375479876538415318793018636196172579e-2",
             "arb_ball_str": "[0.030513754799 +/- 7.12e-13]"
           },
+          "independent_quadrature_status": "CERTIFIED_QUADRATURE",
           "smooth_mertens_integral_I_M_band_quadrature_certified": {
             "mid_float": 0.03049102812655337,
             "rad_float_outward": 9.472023668877348e-05,
@@ -7114,6 +7249,7 @@
             "upper_dec": "2.279117035904801936971349446884585775826e-2",
             "arb_ball_str": "[0.02279117036 +/- 1.98e-12]"
           },
+          "independent_quadrature_status": "CERTIFIED_QUADRATURE",
           "smooth_mertens_integral_I_M_band_quadrature_certified": {
             "mid_float": 0.022756920870197647,
             "rad_float_outward": 0.00014277475202106892,
@@ -7161,6 +7297,7 @@
             "upper_dec": "1.545968455576226987784489038476852220192e-2",
             "arb_ball_str": "[0.0154596845 +/- 5.58e-11]"
           },
+          "independent_quadrature_status": "CERTIFIED_QUADRATURE",
           "smooth_mertens_integral_I_M_band_quadrature_certified": {
             "mid_float": 0.015426833291458194,
             "rad_float_outward": 0.0001369479903132746,
@@ -7208,13 +7345,8 @@
             "upper_dec": "7.665357603536535493761753899048897208599e-3",
             "arb_ball_str": "[0.007665357 +/- 6.04e-10]"
           },
-          "smooth_mertens_integral_I_M_band_quadrature_certified": {
-            "mid_float": 0.007665357288569779,
-            "rad_float_outward": 3.149667560636855e-10,
-            "lower_dec": "7.665356973603023890419542838641034675712e-3",
-            "upper_dec": "7.665357603536535493761753899048897208599e-3",
-            "arb_ball_str": "[0.007665357 +/- 6.04e-10]"
-          },
+          "independent_quadrature_status": "NOT_RUN",
+          "smooth_mertens_integral_I_M_band_quadrature_certified": null,
           "sharp_endpoint_bound_C_log_0_X_5_2_over_M_sq_certified": {
             "mid_float": 0.5569535403710972,
             "rad_float_outward": 3.214584834218364e-17,
@@ -7223,7 +7355,7 @@
             "arb_ball_str": "[0.5569535403710972010733402958478479031487 +/- 1.87e-41]"
           },
           "sbp_ftc_identity_encloses_zero": true,
-          "sbp_quadrature_identity_encloses_zero": true,
+          "sbp_quadrature_identity_encloses_zero": null,
           "abs_endpoint_le_sharp_bound_certified": true,
           "abs_endpoint_le_C_log_0_certified": true,
           "abs_R_band_minus_I_M_band_le_C_log_0_certified": true
@@ -7231,7 +7363,7 @@
       ]
     },
     "sign_sequence_cancellation_discrimination_audit": {
-      "discrimination_summary": "Across X in [1, 64], |R_{mu,band}(X)| remains <= 0.03052 whereas the worst-case non-cancelling sign sequence sigma_m^{wc}(X) = |mu(m)| sgn(W_log(X/m)) grows as O(X^{1/2}), reaching 0.5494 at X = 64 (over 64x larger than |R_{mu,band}(64)| = 0.00856). For the non-cancelling sequences sigma_m = 1 and sigma_m = |mu(m)|, the smooth kernel W_log(X/t) supplies zero-moment oscillation across t ~ X, but only actual mu(m) combines kernel oscillation with arithmetic Mertens sign cancellation.",
+      "discrimination_summary": "Across the 9 tested grid points X in {1, 2, 4, tau, 10, 16, 25, tau^2, 64}, max |R_{mu,band}(X)| = |R_{mu,band}(64)| = 0.03059141547..., whereas at X = 64 ((H, M) = (32, 182)) the signed sums are R_{1,band}(64) = -0.01583365880... and R_{|mu|,band}(64) = 0.01904894182..., and the triangle-inequality majorant sum_{32 < m <= 182} (|mu(m)| / sqrt(m)) |W_log(64/m)| = 0.29032671364... (ratio 9.49046356... over |R_{mu,band}(64)|). This distinguishes signed sums |sum_m a_m m^{-1/2} W_log(X/m)| from absolute-value sums sum_m |a_m m^{-1/2} W_log(X/m)|; finite-grid evaluations do not determine the asymptotic behavior of R_{1,band}(X) or R_{|mu|,band}(X), and O(X^{1/2}) is an upper bound for the triangle-inequality majorant unless a matching lower bound is proved.",
       "max_abs_R_mu_band_on_tested_grid_certified": {
         "mid_float": 0.03059141546787108,
         "rad_float_outward": 1.017194129249246e-10,
@@ -7685,8 +7817,8 @@
     }
   },
   "section_6_certified_arb_roundtrip_verification": {
-    "total_certified_arb_balls_checked": 703,
-    "compared_against_live_original_arb_count": 703,
+    "total_certified_arb_balls_checked": 708,
+    "compared_against_live_original_arb_count": 708,
     "live_original_count_matches_enumerated_total": true,
     "all_enclose_original_256bit_arb_ball": true,
     "failed_paths": [],
@@ -8216,6 +8348,12 @@
       "task_tc050.section_7_task_tc051_prime_separation_and_summation_by_parts.prime_separation_and_rescaled_band_audit.unconditional_rescaled_boundary_bounds.B_rescaled_global_all_X_ge_1_and_all_p_certified",
       "task_tc050.section_7_task_tc051_prime_separation_and_summation_by_parts.prime_separation_and_rescaled_band_audit.unconditional_rescaled_boundary_bounds.B_rescaled_large_X_when_H_X_ge_p_certified",
       "task_tc050.section_7_task_tc051_prime_separation_and_summation_by_parts.prime_separation_and_rescaled_band_audit.unconditional_rescaled_boundary_bounds.B_subunit_when_X_lt_p_coeff_zeta3_C_log_0_certified",
+      "task_tc050.section_7_task_tc051_prime_separation_and_summation_by_parts.prime_separation_and_rescaled_band_audit.unconditional_rescaled_boundary_bounds.small_Y_single_endpoint_regime_X2_p2.single_endpoint_unfiltered_term_2_neg_half_abs_W_log_half_certified",
+      "task_tc050.section_7_task_tc051_prime_separation_and_summation_by_parts.prime_separation_and_rescaled_band_audit.multi_prime_sieve_collapse_and_coset_obstruction.p2_x1_interval_1_2_orientation_regression.R_1_1_2_certified",
+      "task_tc050.section_7_task_tc051_prime_separation_and_summation_by_parts.prime_separation_and_rescaled_band_audit.multi_prime_sieve_collapse_and_coset_obstruction.p2_x1_interval_1_2_orientation_regression.S2_1_1_2_certified",
+      "task_tc050.section_7_task_tc051_prime_separation_and_summation_by_parts.prime_separation_and_rescaled_band_audit.multi_prime_sieve_collapse_and_coset_obstruction.p2_x1_interval_1_2_orientation_regression.S2_half_half_1_certified",
+      "task_tc050.section_7_task_tc051_prime_separation_and_summation_by_parts.prime_separation_and_rescaled_band_audit.multi_prime_sieve_collapse_and_coset_obstruction.p2_x1_interval_1_2_orientation_regression.correct_formula_rhs_certified",
+      "task_tc050.section_7_task_tc051_prime_separation_and_summation_by_parts.prime_separation_and_rescaled_band_audit.multi_prime_sieve_collapse_and_coset_obstruction.p2_x1_interval_1_2_orientation_regression.reversed_formula_rhs_certified",
       "task_tc050.section_7_task_tc051_prime_separation_and_summation_by_parts.prime_separation_and_rescaled_band_audit.multi_prime_sieve_collapse_and_coset_obstruction.euler_product_factor_growth[0].prod_1_plus_p_neg_half_certified",
       "task_tc050.section_7_task_tc051_prime_separation_and_summation_by_parts.prime_separation_and_rescaled_band_audit.multi_prime_sieve_collapse_and_coset_obstruction.euler_product_factor_growth[1].prod_1_plus_p_neg_half_certified",
       "task_tc050.section_7_task_tc051_prime_separation_and_summation_by_parts.prime_separation_and_rescaled_band_audit.multi_prime_sieve_collapse_and_coset_obstruction.euler_product_factor_growth[2].prod_1_plus_p_neg_half_certified",
@@ -8337,7 +8475,6 @@
       "task_tc050.section_7_task_tc051_prime_separation_and_summation_by_parts.summation_by_parts_and_tilde_W_log_audit.summation_by_parts_table[6].R_mu_band_X_certified",
       "task_tc050.section_7_task_tc051_prime_separation_and_summation_by_parts.summation_by_parts_and_tilde_W_log_audit.summation_by_parts_table[6].upper_endpoint_term_M_B_F_B_certified",
       "task_tc050.section_7_task_tc051_prime_separation_and_summation_by_parts.summation_by_parts_and_tilde_W_log_audit.summation_by_parts_table[6].smooth_mertens_integral_I_M_band_ftc_certified",
-      "task_tc050.section_7_task_tc051_prime_separation_and_summation_by_parts.summation_by_parts_and_tilde_W_log_audit.summation_by_parts_table[6].smooth_mertens_integral_I_M_band_quadrature_certified",
       "task_tc050.section_7_task_tc051_prime_separation_and_summation_by_parts.summation_by_parts_and_tilde_W_log_audit.summation_by_parts_table[6].sharp_endpoint_bound_C_log_0_X_5_2_over_M_sq_certified",
       "task_tc050.section_7_task_tc051_prime_separation_and_summation_by_parts.sign_sequence_cancellation_discrimination_audit.max_abs_R_mu_band_on_tested_grid_certified",
       "task_tc050.section_7_task_tc051_prime_separation_and_summation_by_parts.sign_sequence_cancellation_discrimination_audit.sign_discrimination_table[0].R_mu_band_actual_certified",

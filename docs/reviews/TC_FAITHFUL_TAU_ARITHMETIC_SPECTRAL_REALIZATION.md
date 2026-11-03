@@ -1,12 +1,12 @@
-# Faithful $\tau$-Arithmetic Spectral Realization, Adjoint Compatibility, Canonical Hilbert–Schmidt Orbit Decomposition, and Resonant-Band Prime-Separation / Summation-by-Parts Analysis (`TASK-TC-050` / `TASK-TC-050R` / `TASK-TC-050R2` / `TASK-TC-051`)
+# Faithful $\tau$-Arithmetic Spectral Realization, Adjoint Compatibility, Canonical Hilbert–Schmidt Orbit Decomposition, and Resonant-Band Prime-Separation / Summation-by-Parts Analysis (`TASK-TC-050` / `TASK-TC-050R` / `TASK-TC-050R2` / `TASK-TC-051` / `TASK-TC-051R`)
 
-**Task ID:** `TASK-TC-050` / `TASK-TC-050R` / `TASK-TC-050R2` / `TASK-TC-051`  
+**Task ID:** `TASK-TC-050` / `TASK-TC-050R` / `TASK-TC-050R2` / `TASK-TC-051` / `TASK-TC-051R`  
 **Parent Epic:** `EPIC-TC-042`  
-**Reviewed Baselines:** `5da0eb79e1732ff871ee1c7fee729c62972aa406` (`TC-048R`), `2f7871fff666091c4152ecc8657f2345aacdd4fa` (`TC-050` + `TC-049R`), `0e6ae36ce995ef3037652b3dfb67645325f990b1` (`TC-050R` HEAD; implementation commit `f5521363ea94774938fd37152d67d743413327ae`), `d93ab512c2df75af2365a3963804c172baf0e867` (`TC-050R2` merged on `main`)  
-**Branched From:** `d93ab512c2df75af2365a3963804c172baf0e867` (`task/tc-051-prime-arithmetic-resonant-band-cancellation`)  
+**Reviewed Baselines:** `5da0eb79e1732ff871ee1c7fee729c62972aa406` (`TC-048R`), `2f7871fff666091c4152ecc8657f2345aacdd4fa` (`TC-050` + `TC-049R`), `0e6ae36ce995ef3037652b3dfb67645325f990b1` (`TC-050R` HEAD; implementation commit `f5521363ea94774938fd37152d67d743413327ae`), `d93ab512c2df75af2365a3963804c172baf0e867` (`TC-050R2` merged on `main`), `b6f22dfee0dd6177ee855189304e7930f9ba3e20` (`TC-051` merged on `main`; branch tip `7ac0546b1177970ff0d87824f61643da2405c4c0`, implementation commit `333661eecd69738e8a67143e635b6db4f40170ce`)  
+**Branched From:** `b6f22dfee0dd6177ee855189304e7930f9ba3e20` (`task/tc-051r-identity-certificate-and-report-reconciliation`)  
 **Primary Implementation Module:** [tc/faithful_tau_arithmetic_spectral_realization.py](file:///c:/Development/Projects/reimann_scope/tc/faithful_tau_arithmetic_spectral_realization.py)  
 **Exported Facade Entrypoints:** [`execute_task_tc050_faithful_spectral_realization_audit`](file:///c:/Development/Projects/reimann_scope/tc/canonical_theta_correlation_bound.py#L10142-L10175), [`execute_task_tc051_prime_arithmetic_resonant_band_audit`](file:///c:/Development/Projects/reimann_scope/tc/canonical_theta_correlation_bound.py#L10142-L10175)  
-**Certified 256-bit Arb Data Artifact:** [data/tc_faithful_tau_arithmetic_spectral_realization.json](file:///c:/Development/Projects/reimann_scope/data/tc_faithful_tau_arithmetic_spectral_realization.json) (`703/703` certified 256-bit Arb balls passing outward-rounded decimal round-trip verification)  
+**Certified 256-bit Arb Data Artifact:** [data/tc_faithful_tau_arithmetic_spectral_realization.json](file:///c:/Development/Projects/reimann_scope/data/tc_faithful_tau_arithmetic_spectral_realization.json) (`708/708` certified 256-bit Arb balls passing outward-rounded decimal round-trip verification)  
 **Formal Verification Module:** [formal/RiemannScope/CanonicalThetaCorrelationBound.lean](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope/CanonicalThetaCorrelationBound.lean) (`44` definitions, `56` theorems = `100` declarations, `0` `sorry`, `0` `admit`, `0` custom axioms)  
 **Regression Test Suite:** [tests/test_tc_faithful_tau_arithmetic_spectral_realization.py](file:///c:/Development/Projects/reimann_scope/tests/test_tc_faithful_tau_arithmetic_spectral_realization.py)  
 **Status Classification:** `ADJOINT_COMPATIBILITY_HYPERBOLIC_NULL_CONE_AND_CANONICAL_HILBERT_SCHMIDT_ORBIT_DECOMPOSITION_PROVED_RESONANT_BAND_EQUIVALENCE_ISOLATED_SUBGATE_OPEN` (`PROVED_CONDITIONAL` + `CERTIFIED_FINITE`; `SUBGATE-TC-043A` remains `OPEN`; `rh_proved: false`)
@@ -457,6 +457,12 @@ In [tc/faithful_tau_arithmetic_spectral_realization.py](file:///c:/Development/P
    At every sample grade $K$, both $R_{\mu,\mathrm{head}}(X_K) = \sum_{2 \le m \le H(X_K)}\frac{\mu(m)}{\sqrt{m}}W_{\log}(X_K/m)$ and $R_{\mu,\mathrm{band}}(X_K) = \sum_{H(X_K) < m \le M(X_K)}\frac{\mu(m)}{\sqrt{m}}W_{\log}(X_K/m)$ are computed **directly** as explicit finite sums. Their sum is compared against the independently evaluated total Möbius remainder $R_\mu(X_K) = W(X_K) - W_{\log}(X_K)$, and the resulting difference $R_\mu(X_K) - (R_{\mu,\mathrm{head}}(X_K) + R_{\mu,\mathrm{band}}(X_K))$ is certified to satisfy the analytic tail bound $\frac{C_{\log,0}X_K^{5/2}}{2 M(X_K)^2} \le \frac{1}{2}C_{\log,0}$ via `OUTWARD_UPPER_LE_LOWER` (`all_independent_tail_bounds_verified: true`).
 3. **Explicit Distinction of Algebraic Consistency Checks**:
    The identity check $0 \in C_\tau(K) - (P_\tau(K) + E_\tau(K))$ is explicitly labeled `"reconstruction_verification_type": "ALGEBRAIC_CONSISTENCY_CHECK"` in the JSON artifact.
+4. **Per-Observable Certified 256-bit Arb Radius Summary Across the 13 Sample Grades (`observable_radius_summary_across_13_sample_grades`)**:
+   Each observable's ball radius reflects its analytical truncation and quadrature budget:
+   - $W_{\log}(X_K)$, $R_{\mu,\mathrm{head}}(X_K)$, and $R_{\mu,\mathrm{band}}(X_K)$ (evaluated by 4th-order Euler–Maclaurin on $[N_0, \infty)$): maximum Arb radii $\le 6.58 \times 10^{-11}$, $\le 5.64 \times 10^{-11}$, and $\le 5.64 \times 10^{-11}$ across all 13 sample grades;
+   - $P_\tau(K)$ (`P_tau_K_HS_orbit_certified`), $-(c_\tau^B+2)h_0(X_K)$, and $W(X_K^{-1})$: maximum Arb radii $\le 3.22 \times 10^{-22}$, $\le 6.34 \times 10^{-75}$, and $\le 7.01 \times 10^{-9}$;
+   - $C_\tau(K)$ and $E_\tau(K)$ (which include the prime-power Rosser–Schoenfeld tail on $n > 16500$ in $W(X_K)$): radii range from $1.40 \times 10^{-8}$ at $K = 0$ up to $6.87 \times 10^{-5}$ at $|K| = 2$;
+   - $R_{\mu,\mathrm{tail}}(X_K)$ and $E_{\tau,\mathrm{controlled}}(K)$ (which include the direct super-scale tail remainder $\frac{C_{\log,0}X_K^{5/2}}{2\,m_{\mathrm{tail,cut}}^2}$ at $m_{\mathrm{tail,cut}} = \max(800, 25 M(X_K))$): radii range from $1.89 \times 10^{-5}$ at $K = 0$ up to $5.42 \times 10^{-4}$ at $|K| = 2$.
 
 | Grade $K \in \mathbb{A}_{\mathbb{R}}$ | Scale $X_K = \tau^{|K|}$ | Cutoffs $(H, M)$ | Positive Orbit $P_\tau(K)$ | Head $R_{\mu,\mathrm{head}}(X_K)$ | Direct Band $R_{\mu,\mathrm{band}}(X_K)$ | Controlled $E_{\tau,\mathrm{controlled}}(K)$ | Total Remainder $E_\tau(K)$ | Complete $C_\tau(K)$ |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -480,7 +486,7 @@ In [tc/faithful_tau_arithmetic_spectral_realization.py](file:///c:/Development/P
 
 We maintain a strict separation between what is deductively verified in Lean 4 (`0` `sorry`, `0` `admit`, `0` custom axioms) and what is established by external analytic derivations and 256-bit Arb ball enclosures:
 
-1. **Verified Deductively in Lean 4 ([formal/RiemannScope/CanonicalThetaCorrelationBound.lean](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope/CanonicalThetaCorrelationBound.lean), Theorems 51–56, synchronized word-for-word in `TASK-TC-050R2` and `TASK-TC-051`)**:
+1. **Verified Deductively in Lean 4 ([formal/RiemannScope/CanonicalThetaCorrelationBound.lean](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope/CanonicalThetaCorrelationBound.lean), Theorems 51–56, synchronized word-for-word in `TASK-TC-050R2`, `TASK-TC-051`, and `TASK-TC-051R`)**:
    - [`tau_grade_star_involution_and_hyperbolic_pair_obstruction`](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope/CanonicalThetaCorrelationBound.lean#L1719-L1817) (**Theorem 51**, parameters `(tau K J delta B11 B12 B22 c1 c2 : ℝ) (htau : 1 < tau) (hK : K ≠ 0) (hB12 : 0 < B12)`):
      1. **Radial Character Multiplicativity (`gradeRadialCharacter`)**: For `gradeRadialCharacter tau K delta := tau ^ (K * delta)`, proves `gradeRadialCharacter tau (K + J) delta = gradeRadialCharacter tau K delta * gradeRadialCharacter tau J delta` and `gradeRadialCharacter tau (-K) delta = gradeRadialCharacter tau K (-delta)` for all real `K, J, delta` and `tau > 1`;
      2. **Single-Mode Star-Involution Compatibility (`K ≠ 0`)**: Proves `gradeRadialCharacter tau (-K) delta = gradeRadialCharacter tau K delta ↔ delta = 0` for `tau > 1` and `K ≠ 0`;
@@ -495,9 +501,18 @@ We maintain a strict separation between what is deductively verified in Lean 4 (
      1. **Attempt B Pole-Integral $J(\kappa)$ Cancellation & Orbit Decomposition**: Proves `((W_arch + c_tau_B * h0_XK - (2 * h0_XK - J_K)) + (4 * h0_XK - J_K) = W_arch + (c_tau_B + 2) * h0_XK) ∧ (0 ≤ P_0 → |P_0| ≤ P_0) ∧ C_K = canonicalCorrelationHSOrbitDecomp P_K E_ctrl_K R_band_X ∧ C_K = P_K + E_K` (for `C_K := W_arch - W_prime`, `E_ctrl_K := controlledCorrelationRemainder c_pole_transfer_h0 W_reflected W_log_X R_head R_tail`, and `E_K := E_ctrl_K - R_band_X`);
      2. **Controlled Remainder Bound & Conditional `TC-049R` Rational Bound Discharge**: Proves `|E_ctrl_K| ≤ B_ctrl ∧ |C_K - (P_K - R_band_X)| ≤ B_ctrl` (`B_ctrl := B_h0 + B_refl + B_log + B_head + B_tail`), and proves conditionally that `(B_head = (5 / 6 : ℝ) * C_log_EM → B_tail = (1 / 2 : ℝ) * C_log_0 → B_h0 < 2671923 / 1000000 → B_refl < 463730 / 1000000 → B_log < 3349009 / 1000000 → C_log_EM < 13468515 / 1000000 → C_log_0 < 557430 / 1000000 → B_ctrl < 17987140 / 1000000)`;
      3. **Pointwise Two-Way Boundedness Equivalence**: Proves `((|R_band_X| ≤ M_band → (|E_K| ≤ B_ctrl + M_band ∧ |C_K| ≤ P_0 + B_ctrl + M_band)) ∧ (|C_K| ≤ M_C → (|E_K| ≤ M_C + P_0 ∧ |R_band_X| ≤ M_C + P_0 + B_ctrl)))` (while the integer-power cutoff predicates for $H(X) = \lfloor X^{5/6}\rfloor$ and $M(X) = \lceil\max(2, X^{5/4})\rceil$ are certified externally in Python Arb helpers rather than inside Theorem 53).
-   - [`prime_separation_and_canonical_band_boundary_equivalence`](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope/CanonicalThetaCorrelationBound.lean#L2110-L2200) (**Theorem 54**, `TASK-TC-051`): Proves the exact algebraic prime-separation decomposition `R_band_X = primeSeparationDecomp S_p_full w_p S_p_rescaled = S_p_full - w_p * (R_band_Xp + B_p_X)`, the rescaled-band boundary bound `|B_p_X| ≤ B_rescaled := B_log + B_head + 2 * B_tail`, the conditional rational bound discharge `B_rescaled < 14851487 / 1000000`, and the two-way equivalence between `|R_band_X| ≤ M_band` and `|S_p_full - w_p * R_band_Xp| ≤ M_coprime`.
-   - [`summation_by_parts_endpoint_bound_and_smooth_mertens_reduction`](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope/CanonicalThetaCorrelationBound.lean#L2211-L2277) (**Theorem 55**, `TASK-TC-051`): Proves the exact summation-by-parts decomposition `R_band_X = summationByPartsDecomp E_upper I_mertens = E_upper + I_mertens`, the upper-endpoint bound `|M_sum * F_M| ≤ C_log_0` when `|M_sum| ≤ M_X` and `|F_M| ≤ C_log_0 / M_X`, and the two-way equivalence between `|R_band_X| ≤ B_band` and `|I_mertens| ≤ B_int`.
-   - [`iterated_prime_tower_telescoping_and_coprime_band_transfer`](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope/CanonicalThetaCorrelationBound.lean#L2288-L2345) (**Theorem 56**, `TASK-TC-051`): Proves the exact two-step prime-power tower telescoping identity `R_X - w_p^2 * R_Xp2 = (R_X - w_p * R_Xp) + w_p * (R_Xp - w_p * R_Xp2)` and the triangle-inequality transfer bound between `|R_band_X|` and `|S_p_full|`.
+   - [`prime_separation_and_canonical_band_boundary_equivalence`](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope/CanonicalThetaCorrelationBound.lean#L2044-L2104) (**Theorem 54**, parameters `(R_X S_p_X S_p_rescaled S_p_band_xp B_p_low B_p_high q B_log C_log_EM C_log_0 B_head B_tail M_S M_R : ℝ)` with hypotheses `(hq_nonneg : 0 ≤ q) (hq_le_one : q ≤ 1) (h_sep : R_X = primeSeparationDecomp S_p_X q S_p_rescaled) (h_rescaled : S_p_rescaled = S_p_band_xp + rescaledBandBoundarySum B_p_low B_p_high) (h_low : |B_p_low| ≤ B_log + B_head) (h_high : |B_p_high| ≤ B_tail)`):
+     1. **Canonical Rescaled-Band Substitution**: Proves `R_X = S_p_X - q * S_p_band_xp - q * (B_p_low + B_p_high)` (`primeSeparationDecomp S_p_X q S_p_rescaled := S_p_X - q * S_p_rescaled`, `rescaledBandBoundarySum B_p_low B_p_high := B_p_low + B_p_high`);
+     2. **Boundary Discrepancy Bound & Conditional Rational Discharge**: Proves `|B_p_low + B_p_high| ≤ B_log + B_head + B_tail ∧ (B_head = (5 / 6 : ℝ) * C_log_EM → B_tail = (1 / 2 : ℝ) * C_log_0 → B_log < 3349009 / 1000000 → C_log_EM < 13468515 / 1000000 → C_log_0 < 557430 / 1000000 → B_log + B_head + B_tail < 14851487 / 1000000)`;
+     3. **Single-Step Two-Way Boundedness Transfer**: Proves `(|S_p_X| ≤ M_S ∧ |S_p_band_xp| ≤ M_S → |R_X| ≤ (1 + q) * M_S + q * (B_log + B_head + B_tail)) ∧ (|R_X| ≤ M_R ∧ |S_p_band_xp| ≤ M_S → |S_p_X| ≤ M_R + q * M_S + q * (B_log + B_head + B_tail))` (where the squarefree divisibility partition $m = pd$, the lower cutoff comparison $H(X)/p \le H(X/p)$, and the upper boundary bound $|\Delta_{p,\mathrm{high}}(X)| \le B_{\mathrm{tail}}$ across both cutoff orderings $M(X)/p \ge M(X/p)$ and $M(X)/p < M(X/p)$ are proved analytically outside Lean).
+   - [`summation_by_parts_endpoint_bound_and_smooth_mertens_reduction`](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope/CanonicalThetaCorrelationBound.lean#L2117-L2164) (**Theorem 55**, parameters `(R_X M_B F_B I_mertens M_cut X25 C_log_0 M_I M_R : ℝ)` with hypotheses `(h_sbp : R_X = summationByPartsDecomp M_B F_B I_mertens) (h_M_pos : 0 < M_cut) (h_X25_nonneg : 0 ≤ X25) (h_C_nonneg : 0 ≤ C_log_0) (h_mertens_triv : |M_B| ≤ M_cut) (h_F_bound : |F_B| * (M_cut ^ 3) ≤ C_log_0 * X25) (h_cutoff_dom : X25 ≤ M_cut ^ 2)`):
+     1. **Unconditional Upper-Endpoint Cancellation**: Proves `|M_B * F_B| * (M_cut ^ 2) ≤ C_log_0 * X25 ∧ |M_B * F_B| ≤ C_log_0` (`summationByPartsDecomp M_B F_B I_mertens := M_B * F_B + I_mertens`);
+     2. **Smooth Mertens Integral Transfer Discrepancy**: Proves `|R_X - I_mertens| ≤ C_log_0 ∧ (C_log_0 < 557430 / 1000000 → |R_X - I_mertens| < 557430 / 1000000)`;
+     3. **Two-Way Reduction Between $R_X$ and $I_{\mathrm{mertens}}$**: Proves `(|I_mertens| ≤ M_I → |R_X| ≤ M_I + C_log_0) ∧ (|R_X| ≤ M_R → |I_mertens| ≤ M_R + C_log_0)` (where Stieltjes integration by parts and the termwise Euler derivative $\widetilde{W}_{\log}(u) = \frac{1}{2}W_{\log}(u) + u W_{\log}'(u)$ are proved analytically outside Lean).
+   - [`iterated_prime_tower_telescoping_and_coprime_band_transfer`](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope/CanonicalThetaCorrelationBound.lean#L2177-L2218) (**Theorem 56**, parameters `(S_0 S_1 S_2 R_0 R_1 B_0 B_1 q M_R B_rescaled : ℝ)` with hypotheses `(hq_nonneg : 0 ≤ q) (hq_lt_one : q < 1) (h_step0 : R_0 = S_0 - q * S_1 - q * B_0) (h_step1 : R_1 = S_1 - q * S_2 - q * B_1) (h_R0 : |R_0| ≤ M_R) (h_R1 : |R_1| ≤ M_R) (h_B0 : |B_0| ≤ B_rescaled) (h_B1 : |B_1| ≤ B_rescaled)`):
+     1. **Two-Step Canonical-Band Inverse Tower Identity (`twoStepPrimeTowerSum`)**: For `twoStepPrimeTowerSum R_0 R_1 B_0 B_1 q S_2 := (R_0 + q * B_0) + q * (R_1 + q * B_1) + (q ^ 2) * S_2`, proves `S_0 = twoStepPrimeTowerSum R_0 R_1 B_0 B_1 q S_2`;
+     2. **Two-Step Remainder Bound**: Proves `|S_0 - (q ^ 2) * S_2| ≤ (1 + q) * (M_R + q * B_rescaled)`;
+     3. **Terminal Contraction Bound (`S_2 = 0`)**: Proves `S_2 = 0 → (1 - q) * |S_0| ≤ M_R + q * B_rescaled` (where induction over arbitrary finite depth $L \ge 1$ is proved analytically in §8.1–§8.2).
 2. **Established Externally (Analytic Derivations + SymPy + 256-bit Arb Enclosures)**:
    - Unconditional spatial and Mellin–Plancherel convergence of $\|A_\tau^B\psi_\tau\|_{\mathcal{H}_\tau^B}^2 + 4\|R_0\psi_\tau\|_{L^2}^2 = P_\tau(0) \approx 2.55825801$, the spatial/Mellin identity $(R_0 f)(y) = \int_0^y (t/y)^{1/2}(Df)(t)\frac{dt}{t} = f(y) - \frac{1}{2}\int_0^y (t/y)^{1/2}f(t)\frac{dt}{t}$ with $J(\kappa) = \int_0^\infty e^{-u/2}(h_0(e^{\kappa+u}) + h_0(e^{\kappa-u}))\,du$, and the unitary dilation Cauchy–Schwarz bound $|h_0(X_K)| = |\langle T_{|K|}\psi_\tau, \psi_\tau\rangle_{L^2(d^\times y)}| \le h_0(1) = \frac{92193}{512\cdot 2^{17/2}} = \frac{92193}{131072\sqrt{2}} = 0.49736248380990124448\ldots$;
    - The 4th-order Euler–Maclaurin bound $|W_{\log}(X)| \le C_{\log,\mathrm{EM}}\,X^{-5/2}$ ($C_{\log,\mathrm{EM}} \approx 13.468510 < 13.468515$), small-scale bound $|W_{\log}(u)| \le C_{\log,0}\,u^{5/2}$ ($C_{\log,0} \approx 0.557430$), and clamped cutoff certification $M(X) = \lceil\max(2, X^{5/4})\rceil$ ($M \ge 2 \land X^5 \le M^4 \land (M = 2 \lor (M-1)^4 < X^5)$) from `TC-049`/`TC-049R` and `TC-050R2`;
@@ -508,7 +523,7 @@ We maintain a strict separation between what is deductively verified in Lean 4 (
 
 ## 7. Outcome Classification and Single Surviving Open Obligation (`SUBGATE-TC-043A`)
 
-`TASK-TC-050`, `TASK-TC-050R`, `TASK-TC-050R2`, and `TASK-TC-051` achieve **Target 2** in full and derive the exact prime-separation and summation-by-parts reductions of the resonant divisor band:
+`TASK-TC-050`, `TASK-TC-050R`, `TASK-TC-050R2`, `TASK-TC-051`, and `TASK-TC-051R` achieve **Target 2** in full and derive the exact prime-separation and summation-by-parts reductions of the resonant divisor band:
 - They prove that multiplicative compatibility on the grade algebra holds unconditionally for all $\rho \in \mathbb{C}$, whereas star-involution compatibility $V_K^* = V_{-K}$ holds if and only if $\operatorname{Re}(\rho) = 1/2$, with any off-critical pair $\{\rho, 1 - \bar{\rho}\}$ ($\operatorname{Re}(\rho) \ne 1/2$) forcing an isotropic null cone and signature-$(1,1)$ hyperbolic plane on the Jordan socle $\operatorname{span}\{l_{\rho,0}, l_{\rho^\sharp,0}\}$ (`Theorem 51`).
 - They construct the unconditional positive Hilbert space $\mathcal{H}_\tau^{\mathrm{pos}} = \mathcal{H}_\tau^B \oplus L^2(\mathbb{R}_{>0}, d^\times y)$ with the one-sided Attempt B shift-difference operator $(A_\tau^B f)(x, y) = f(y) - f(y/x)$ and Hilbert–Schmidt unitary orbit $B_K = \mathcal{U}_K B_0$ with positive-definite matrix coefficient $P_\tau(K) = \langle \mathcal{U}_K B_0, B_0\rangle_{\mathrm{HS}} = W_{\mathrm{arch}}(h_K) + (c_\tau^B + 2)h_0(\tau^{|K|})$ ($|P_\tau(K)| \le P_\tau(0) \approx 2.558258$), and prove the exact decomposition $C_\tau(K) = P_\tau(K) + E_\tau(K)$ with $E_\tau(K) = E_{\tau,\mathrm{controlled}}(K) - R_{\mu,\mathrm{band}}(\tau^{|K|})$ at the restored `TC-049`/`TC-049R` cutoffs $H(X) = \lfloor X^{5/6}\rfloor$ and $M(X) = \lceil\max(2, X^{5/4})\rceil$ (`Theorem 53`).
 - Because $|P_\tau(K)| \le P_\tau(0) \approx 2.558258$ and $|E_{\tau,\mathrm{controlled}}(K)| \le B_{\mathrm{ctrl}} < 17.987140$ (with $\limsup_{|K|\to\infty}|E_{\tau,\mathrm{controlled}}(K)| \le \frac{5}{6}C_{\log,\mathrm{EM}} + \frac{1}{2}C_{\log,0} < 11.502478$) are unconditionally bounded for all $K \in \mathbb{A}_{\mathbb{R}}$, uniform boundedness of $C_\tau(K)$ is equivalent to the **single surviving open arithmetic lemma (`SUBGATE-TC-043A`)**:
@@ -519,116 +534,186 @@ We maintain a strict separation between what is deductively verified in Lean 4 (
 
 ---
 
-## 8. `TASK-TC-051`: Exact Prime-Separation Identity, Canonical Rescaled-Band Boundary Theorem, Multi-Prime Sieve Collapse, and Summation by Parts (`Section 7`, Theorems 54–56)
+## 8. `TASK-TC-051` / `TASK-TC-051R`: Exact Prime-Separation Identity, Canonical Rescaled-Band Boundary Theorem, Multi-Prime Sieve Collapse, and Summation by Parts (`Section 7`, Theorems 54–56)
 
-In `TASK-TC-051`, we attack the resonant-band sum $R_{\mu,\mathrm{band}}(X) = \sum_{H(X) < m \le M(X)} \frac{\mu(m)}{\sqrt{m}}\,W_{\log}(X/m)$ directly along two rigorous analytic routes—(A) multiplicative squarefree prime separation and prime-power tower telescoping, and (B) summation by parts against the canonical weight $F_X(t) = t^{-1/2}W_{\log}(X/t)$—and test sign-sequence sensitivity against six arithmetic weight sequences.
+In `TASK-TC-051` and `TASK-TC-051R`, we analyze the resonant-band sum $R_{\mu,\mathrm{band}}(X) = \sum_{H(X) < m \le M(X)} \frac{\mu(m)}{\sqrt{m}}\,W_{\log}(X/m)$ along two exact analytic routes—(A) multiplicative squarefree prime separation and prime-power tower inversion, and (B) summation by parts against the canonical weight $F_X(t) = t^{-1/2}W_{\log}(X/t)$—and evaluate sign-sequence discrimination across the four implemented bounded sequences.
 
-### 8.1 Exact Single-Prime Separation Identity and Canonical Rescaled-Band Boundary Bound (`Theorem 54`)
+### 8.1 Exact Single-Prime Separation Identity and Simultaneously Rescaled Tower Inversion (`Theorem 54`)
 
-1. **Exact Single-Prime Separation Identity**:
-   For any prime $p \ge 2$ and any interval $(a, b] \subset [1, \infty)$, define
+1. **Consistent Interval Sum Definitions and Single-Prime Separation**:
+   For any $X > 0$, any real endpoints $0 \le A < B$, and any prime $p \ge 2$ with $q := p^{-1/2} \in (0, 1)$, define
    $$
-   R_{(a,b]}(X) := \sum_{a < m \le b} \frac{\mu(m)}{\sqrt{m}}\,W_{\log}\!\left(\frac{X}{m}\right), \qquad S_{p,(a,b]}(X) := \sum_{\substack{a < m \le b \\ p \nmid m}} \frac{\mu(m)}{\sqrt{m}}\,W_{\log}\!\left(\frac{X}{m}\right).
+   R(X; A, B) := \sum_{A < m \le B} \frac{\mu(m)}{\sqrt{m}}\,W_{\log}\!\left(\frac{X}{m}\right), \qquad S_p(X; A, B) := \sum_{\substack{A < m \le B \\ p \nmid m}} \frac{\mu(m)}{\sqrt{m}}\,W_{\log}\!\left(\frac{X}{m}\right),
    $$
-   Every $m \in (a, b]$ with $p \mid m$ writes uniquely as $m = p k$ with $k \in (a/p, b/p]$. Because $\mu(pk) = -\mu(k)$ when $p \nmid k$ and $\mu(pk) = 0$ when $p \mid k$ ($p^2 \mid m$),
+   where both sums run over positive integers $m \in \mathbb{Z}_{\ge 1} \cap (A, B]$. Partitioning $m \in (A, B]$ into $p \nmid m$ and $m = p d$ with $d \in (A/p, B/p]$ gives $\mu(pd) = 0$ whenever $p \mid d$ ($p^2 \mid m$) and $\mu(pd) = -\mu(d)$, $(pd)^{-1/2} = q\,d^{-1/2}$ whenever $p \nmid d$. Hence
    $$
-   \sum_{\substack{a < m \le b \\ p \mid m}} \frac{\mu(m)}{\sqrt{m}}\,W_{\log}\!\left(\frac{X}{m}\right)
-   = -\frac{1}{\sqrt{p}} \sum_{\substack{a/p < k \le b/p \\ p \nmid k}} \frac{\mu(k)}{\sqrt{k}}\,W_{\log}\!\left(\frac{X/p}{k}\right)
-   = -\frac{1}{\sqrt{p}}\,S_{p,(a/p, b/p]}\!\left(\frac{X}{p}\right),
+   \sum_{\substack{A < m \le B \\ p \mid m}} \frac{\mu(m)}{\sqrt{m}}\,W_{\log}\!\left(\frac{X}{m}\right)
+   = -q \sum_{\substack{A/p < d \le B/p \\ p \nmid d}} \frac{\mu(d)}{\sqrt{d}}\,W_{\log}\!\left(\frac{X/p}{d}\right)
+   = -q\,S_p\!\left(\frac{X}{p};\, \frac{A}{p},\, \frac{B}{p}\right),
    $$
    yielding the **exact single-prime separation identity**:
    $$
-   \boxed{R_{(a,b]}(X) = S_{p,(a,b]}(X) - \frac{1}{\sqrt{p}}\,S_{p,(a/p,b/p]}\!\left(\frac{X}{p}\right).}
+   \boxed{R(X; A, B) = S_p(X; A, B) - q\,S_p\!\left(\frac{X}{p};\, \frac{A}{p},\, \frac{B}{p}\right), \qquad q = p^{-1/2}.}
    $$
-2. **Canonical Rescaled-Band Boundary Decomposition and Unconditional Uniform Bound (`Theorem 54`)**:
-   Specializing to $(a, b] = (H(X), M(X)]$, the rescaled interval $(H(X)/p, M(X)/p] = (\lfloor X^{5/6}\rfloor/p, \lceil\max(2, X^{5/4})\rceil/p]$ differs from the canonical band $(H(X/p), M(X/p)]$ at scale $X/p$ because $H(X)/p \approx p^{-1/6}(X/p)^{5/6} < H(X/p)$ and $M(X)/p \approx p^{1/4}(X/p)^{5/4} > M(X/p)$. Splitting the total Möbius sum $R_\mu(X/p)$ across $(0, H(X)/p] \cup (H(X)/p, M(X)/p] \cup (M(X)/p, \infty)$ and across $(0, H(X/p)] \cup (H(X/p), M(X/p)] \cup (M(X/p), \infty)$ gives the exact identity for all $X \ge p$:
+   (If the $p \nmid d$ exclusion in the second term were omitted—replacing $S_p(X/p; A/p, B/p)$ by $R(X/p; A/p, B/p)$—every $m \in (A, B]$ divisible by $p^2$ with $\mu(m/p) \ne 0$ would be miscounted; `all_p_squared_obstructions_detected: true` in the JSON artifact certifies this nonzero error whenever such $m$ exist.)
+2. **Simultaneously Rescaled Arbitrary-Interval Tower Inversion**:
+   For a fixed initial interval $(A, B]$ and scale $X > 0$, define the simultaneously rescaled sequences
    $$
-   \boxed{R_{(H(X)/p,\, M(X)/p]}\!\left(\frac{X}{p}\right) = R_{\mu,\mathrm{band}}\!\left(\frac{X}{p}\right) + \mathcal{B}_p(X),}
+   R_j := R\!\left(\frac{X}{p^j};\, \frac{A}{p^j},\, \frac{B}{p^j}\right), \qquad S_j := S_p\!\left(\frac{X}{p^j};\, \frac{A}{p^j},\, \frac{B}{p^j}\right) \qquad (j \ge 0).
    $$
-   where the **rescaled-band boundary discrepancy** is
+   Then the single-prime separation identity at step $j$ reads $R_j = S_j - q\,S_{j+1}$, or equivalently $S_j = R_j + q\,S_{j+1}$. Iterating over $L \ge 1$ steps gives the exact finite inverse tower:
    $$
-   \mathcal{B}_p(X) := R_{\mu,\mathrm{head}}\!\left(\frac{X}{p}\right) - R_{(1, \lfloor H(X)/p\rfloor]}\!\left(\frac{X}{p}\right) + R_{\mu,\mathrm{tail}}\!\left(\frac{X}{p}\right) - R_{(\lfloor M(X)/p\rfloor, \infty)}\!\left(\frac{X}{p}\right),
+   \boxed{R_j = S_j - q\,S_{j+1}, \qquad S_0 = \sum_{j=0}^{L-1} q^j R_j + q^L S_L \qquad (L \ge 1).}
    $$
-   and hence
-   $$
-   \boxed{R_{\mu,\mathrm{band}}(X) = S_{p,(H(X),M(X)]}(X) - \frac{1}{\sqrt{p}}\,S_{p,(H(X)/p, M(X)/p]}\!\left(\frac{X}{p}\right) = S_{p,\mathrm{full}}(X) - \frac{1}{\sqrt{p}}\Bigl(R_{\mu,\mathrm{band}}\!\left(\frac{X}{p}\right) + \mathcal{B}_p(X)\Bigr),}
-   $$
-   where $S_{p,\mathrm{full}}(X) := S_{p,(H(X), M(X)]}(X) + \frac{1}{p}\,S_{p,(H(X)/p^2, M(X)/p^2]}(X/p^2)$.
-   Because $\lfloor H(X)/p\rfloor \le (X/p)^{5/6} \implies \lfloor H(X)/p\rfloor \le H(X/p)$ and $M(X)/p \ge (X/p)^{5/4}$, every component of $\mathcal{B}_p(X)$ lies purely in the head or super-scale tail regime of $X/p$:
-   - $|R_{\mu,\mathrm{head}}(X/p) - R_{(1, \lfloor H(X)/p\rfloor]}(X/p)| \le B_{\log} + B_{\mathrm{head}}$ (handling the $k=1$ term $W_{\log}(X/p)$ when $H(X)/p < 1$ plus the head tail over $(\max(1, \lfloor H(X)/p\rfloor), H(X/p)]$),
-   - $|R_{\mu,\mathrm{tail}}(X/p)| \le B_{\mathrm{tail}}$ and $|R_{(\lfloor M(X)/p\rfloor, \infty)}(X/p)| \le B_{\mathrm{tail}}$.
-   Consequently, for **all** primes $p \ge 2$ and **all** $X \ge p$, $\mathcal{B}_p(X)$ satisfies the **unconditional uniform bound** (`Theorem 54`):
-   $$
-   \boxed{\bigl|\mathcal{B}_p(X)\bigr| \le B_{\mathrm{rescaled}} := B_{\log} + B_{\mathrm{head}} + 2\,B_{\mathrm{tail}} = [15.13019 \pm 8.15\times 10^{-6}]\quad \bigl(\text{and } |\mathcal{B}_p(X)| \le B_{\mathrm{log}} + B_{\mathrm{head}} + 2 B_{\mathrm{tail}} - B_{\log} = B_{\mathrm{head}} + 2 B_{\mathrm{tail}} = [11.78119 \pm 5.61\times 10^{-6}] < 14.851487 \text{ whenever } H(X) \ge p\bigr).}
-   $$
-   Therefore, for any fixed prime $p \ge 2$,
-   $$
-   \boxed{\sup_{X \ge 1} \bigl|R_{\mu,\mathrm{band}}(X)\bigr| < \infty \iff \sup_{X \ge p} \left|S_{p,\mathrm{full}}(X) - \frac{1}{\sqrt{p}}\,R_{\mu,\mathrm{band}}\!\left(\frac{X}{p}\right)\right| < \infty.}
-   $$
+   In particular:
+   - for $L = 1$: $S_0 = R_0 + q\,S_1$;
+   - for $L = 2$: $S_0 = R_0 + q\,R_1 + q^2 S_2$;
+   - for any terminal $L$ with $B / p^L < 1$: the interval $(A/p^L, B/p^L] \subset (0, 1)$ contains no positive integers, so $S_L = 0$ and $S_0 = \sum_{j=0}^{L-1} q^j R_j$.
 
-### 8.2 Two-Step Prime-Power Tower Telescoping and Multi-Prime Inclusion–Exclusion Sieve Collapse (`Theorem 56`)
+### 8.2 Canonical-Band Rescaled Boundary Theorem, Canonical-Band Inverse Tower, and Multi-Prime Inclusion–Exclusion (`Theorems 54 & 56`)
 
-1. **Exact Prime-Power Tower Telescoping (`Theorem 56`)**:
-   Applying $S_{p,(a/p, b/p]}(X/p) = R_{(a/p, b/p]}(X/p) + p^{-1/2}S_{p,(a/p^2, b/p^2]}(X/p^2)$ converts the alternating sign $(-1)^j$ in the $p$-adic expansion of $R_{(a,b]}(X)$ into a **positively weighted telescoping sum** after two steps:
+1. **Canonical-Band Separation and Sub-Unit Zero Extension**:
+   Define the canonical resonant-band sums for $Y \ge 1$:
    $$
-   \boxed{\Bigl(R_{(a,b]}(X) - p^{-1} R_{(a/p^2, b/p^2]}(X/p^2)\Bigr) = \Bigl(R_{(a,b]}(X) - p^{-1/2} R_{(a/p,b/p]}(X/p)\Bigr) + p^{-1/2}\Bigl(R_{(a/p,b/p]}(X/p) - p^{-1/2} R_{(a/p^2,b/p^2]}(X/p^2)\Bigr) = S_{p,(a,b]}(X) - p^{-1/2} S_{p,(a/p,b/p]}(X/p),}
+   R_{\mathrm{band}}(Y) := R\bigl(Y;\, H(Y), M(Y)\bigr), \qquad S_{p,\mathrm{band}}(Y) := S_p\bigl(Y;\, H(Y), M(Y)\bigr), \qquad H(Y) = \lfloor Y^{5/6}\rfloor, \quad M(Y) = \lceil\max(2, Y^{5/4})\rceil,
    $$
-   and by induction over $L \ge 1$ prime-power steps,
+   and declare the sub-unit zero extension $R_{\mathrm{band}}(Y) := 0$ and $S_{p,\mathrm{band}}(Y) := 0$ for $0 < Y < 1$. Defining the rescaled-cutoff boundary discrepancy
    $$
-   R_{(a,b]}(X) = \sum_{j=0}^{L-1} p^{-j/2}\,S_{p,(a/p^j, b/p^j]}\!\left(\frac{X}{p^j}\right) + (-1)^L p^{-L/2}\,R_{(a/p^L, b/p^L]}\!\left(\frac{X}{p^L}\right).
+   B_p(X) := S_p\!\left(\frac{X}{p};\, \frac{H(X)}{p},\, \frac{M(X)}{p}\right) - S_{p,\mathrm{band}}\!\left(\frac{X}{p}\right),
    $$
-2. **Multi-Prime Inclusion–Exclusion and Tautological Sieve Collapse**:
-   For any finite set of distinct primes $\mathcal{P} = \{p_1, \dots, p_r\}$ with squarefree product $P_{\mathcal{P}} = \prod_{p \in \mathcal{P}} p$,
+   the single-prime separation identity at $(A, B) = (H(X), M(X))$ becomes
    $$
-   \boxed{S_{\mathcal{P},(a,b]}(X) := \sum_{\substack{a < m \le b \\ \gcd(m, P_{\mathcal{P}}) = 1}} \frac{\mu(m)}{\sqrt{m}}\,W_{\log}\!\left(\frac{X}{m}\right) = \sum_{d \mid P_{\mathcal{P}}} \frac{\mu(d)}{\sqrt{d}}\,R_{(a/d,\, b/d]}\!\left(\frac{X}{d}\right).}
+   \boxed{R_{\mathrm{band}}(X) = S_{p,\mathrm{band}}(X) - q\,S_{p,\mathrm{band}}\!\left(\frac{X}{p}\right) - q\,B_p(X), \qquad q = p^{-1/2}.}
    $$
-   - **Why Boundedness for a Fixed Finite Prime Set $\mathcal{P}$ Is Necessary & Sufficient, while Full Sieving $\mathcal{P}_y = \{p \le y\}$ Diverges**:
-     Because $\sum_{d \mid P_{\mathcal{P}}} d^{-1/2} = \prod_{p \in \mathcal{P}}(1 + p^{-1/2}) < \infty$ for any fixed finite prime set $\mathcal{P}$, boundedness of $R_{\mu,\mathrm{band}}(X)$ is equivalent to boundedness of the $\mathcal{P}$-coprime band sum $S_{\mathcal{P},\mathrm{band}}(X)$. However, if one attempts to eliminate all prime factors up to $y = M(X)$ by taking $\mathcal{P}_y = \{p \le y\}$, every composite and prime $m \in (1, y]$ has $\gcd(m, P_y) > 1$, so $S_{\mathcal{P}_y, (H(X), M(X)]}(X) \equiv 0$ collapses tautologically to the `TC-049` identity $W_y(X) = \sum_{d \mid P_y}\frac{\mu(d)}{\sqrt{d}}W_{\log}(X/d)$, while the Euler-product amplification factor grows without bound:
+2. **Universal Uniform Bound on $B_p(X)$ Across All $X \ge 1$, All Primes $p \ge 2$, and Both Upper-Cutoff Orderings (`Theorem 54`)**:
+   Decompose $B_p(X) = \Delta_{p,\mathrm{low}}(X) + \Delta_{p,\mathrm{high}}(X)$ for $Y := X/p \ge 1$, where
+   $$
+   \Delta_{p,\mathrm{low}}(X) := S_p\!\left(Y;\, \frac{H(X)}{p},\, H(Y)\right), \qquad \Delta_{p,\mathrm{high}}(X) := S_p\!\left(Y;\, M(Y),\, \frac{M(X)}{p}\right) - S_p\!\left(Y;\, \frac{M(X)}{p},\, M(Y)\right).
+   $$
+   - **Lower Boundary $\Delta_{p,\mathrm{low}}(X)$ ($Y = X/p \ge 1$)**:
+     Since $H(X)/p = \lfloor X^{5/6}\rfloor/p \le p^{-1/6}(X/p)^{5/6} < Y^{5/6}$, every integer $d \le H(X)/p$ satisfies $d \le \lfloor Y^{5/6}\rfloor = H(Y)$, so $\lfloor H(X)/p\rfloor \le H(Y)$ always holds. The integers $d \in (H(X)/p, H(Y)]$ with $p \nmid d$ consist of at most $d = 1$ (only when $H(X) < p$, bounded by $|W_{\log}(Y)| \le B_{\log}$) together with head integers $2 \le d \le H(Y)$, bounded by $C_{\log,\mathrm{EM}}Y^{-5/2}\sum_{2 \le d \le H(Y)} d^2 \le \frac{5}{6}C_{\log,\mathrm{EM}} = B_{\mathrm{head}}$. Thus $|\Delta_{p,\mathrm{low}}(X)| \le B_{\log} + B_{\mathrm{head}}$ for all $X \ge p$, and $|\Delta_{p,\mathrm{low}}(X)| \le B_{\mathrm{head}}$ whenever $H(X) \ge p$.
+   - **Upper Boundary $\Delta_{p,\mathrm{high}}(X)$ Across Both Cutoff Orderings ($Y = X/p \ge 1$)**:
+     Because $M(Y) = \lceil\max(2, Y^{5/4})\rceil$ is clamped at $2$ on $1 \le Y < 2^{4/5}$, both orderings between $M(X)/p$ and $M(Y)$ occur on $X \ge p$ and must be bounded explicitly:
+     1. **Case 1 ($M(X)/p \ge M(Y)$)**: Here $\Delta_{p,\mathrm{high}}(X) = S_p(Y; M(Y), M(X)/p)$ sums over integers $d \in (M(Y), M(X)/p]$ with $p \nmid d$. Since every such integer satisfies $d \ge M(Y) + 1 > Y^{5/4}$, the super-scale tail bound gives
+        $$
+        \bigl|\Delta_{p,\mathrm{high}}(X)\bigr| \le C_{\log,0}\,Y^{5/2} \sum_{d > M(Y)} d^{-3} \le \frac{C_{\log,0}\,Y^{5/2}}{2\,M(Y)^2} \le \frac{1}{2}\,C_{\log,0} = B_{\mathrm{tail}}.
+        $$
+     2. **Case 2 ($M(X)/p < M(Y)$, small-$Y$ single-endpoint regime)**: Since $M(X)/p \ge X^{5/4}/p = p^{1/4}Y^{5/4} > Y^{5/4}$, the inequality $M(X)/p < M(Y) = \lceil\max(2, Y^{5/4})\rceil$ can occur only when $1 \le Y < 2^{4/5}$ so $M(Y) = 2$ and $M(X) < 2p$ (for example at $X = 2, p = 2$, where $Y = 1$, $M(2) = 3$, $M(2)/2 = 3/2 < 2 = M(1)$). Because $M(X)/p > Y^{5/4} \ge 1$, the half-open interval $(M(X)/p, M(Y)] \subset (1, 2]$ contains **at most the single integer endpoint $d = M(Y) = 2$**. Even before applying the coprime filter $p \nmid d$ (which annihilates $d = 2$ when $p = 2$), a single term at $d = M(Y) \ge 2$ with $Y^{5/2}/M(Y)^2 \le 1$ satisfies
+        $$
+        \bigl|\Delta_{p,\mathrm{high}}(X)\bigr| \le \frac{1}{\sqrt{M(Y)}}\Bigl|W_{\log}\!\left(\frac{Y}{M(Y)}\right)\Bigr| \le \frac{C_{\log,0}\,Y^{5/2}}{M(Y)^3} = \frac{C_{\log,0}}{M(Y)}\cdot\frac{Y^{5/2}}{M(Y)^2} \le \frac{1}{2}\,C_{\log,0} = B_{\mathrm{tail}}.
+        $$
+   - **Sub-Unit Regime ($1 \le X < p$, so $Y = X/p < 1$)**:
+     When $1 \le X < p$, $S_{p,\mathrm{band}}(X/p) = 0$ by the sub-unit zero extension, so $B_p(X) = S_p(Y; H(X)/p, M(X)/p)$ sums over positive integers $d \ge 1$ with $Y/d \le Y < 1$, giving $|B_p(X)| \le \sum_{d \ge 1} d^{-1/2} C_{\log,0}(Y/d)^{5/2} = \zeta(3)\,C_{\log,0}\,Y^{5/2} \le \zeta(3)\,C_{\log,0} = [0.6700626 \pm 3.99 \times 10^{-8}] < B_{\mathrm{rescaled}}$.
+   Combining all regimes yields the **universal unconditional bound** (`Theorem 54`):
+   $$
+   \boxed{\forall X \ge 1,\;\forall p \in \mathcal{P}:\quad \bigl|B_p(X)\bigr| \le B_{\mathrm{rescaled}} := B_{\log} + \frac{5}{6}C_{\log,\mathrm{EM}} + \frac{1}{2}C_{\log,0} = [14.85148 \pm 5.61 \times 10^{-6}] < 14.851486,}
+   $$
+   and whenever $H(X) \ge p$:
+   $$
+   \boxed{\forall X \ge 1 \text{ with } H(X) \ge p:\quad \bigl|B_p(X)\bigr| \le B_{\mathrm{head}} + B_{\mathrm{tail}} = \frac{5}{6}C_{\log,\mathrm{EM}} + \frac{1}{2}C_{\log,0} = [11.50247 \pm 5.61 \times 10^{-6}] < 11.502478.}
+   $$
+3. **Canonical-Band Finite Inverse Tower and Two-Way Coprime Band Equivalence (`Theorem 56`)**:
+   Rewriting the canonical-band relation at scale $X/p^j$ as $S_{p,\mathrm{band}}(X/p^j) = \bigl(R_{\mathrm{band}}(X/p^j) + q\,B_p(X/p^j)\bigr) + q\,S_{p,\mathrm{band}}(X/p^{j+1})$ and iterating over $L \ge 1$ steps yields the exact **canonical-band inverse tower**:
+   $$
+   \boxed{S_{p,\mathrm{band}}(X) = \sum_{j=0}^{L-1} q^j\Bigl(R_{\mathrm{band}}\!\left(\frac{X}{p^j}\right) + q\,B_p\!\left(\frac{X}{p^j}\right)\Bigr) + q^L\,S_{p,\mathrm{band}}\!\left(\frac{X}{p^L}\right) \qquad (L \ge 1).}
+   $$
+   In particular:
+   - for $L = 1$: $S_{p,\mathrm{band}}(X) = (R_{\mathrm{band}}(X) + q\,B_p(X)) + q\,S_{p,\mathrm{band}}(X/p)$;
+   - for $L = 2$ (formalized directly as `twoStepPrimeTowerSum` in Lean **Theorem 56**):
      $$
-     \prod_{p \le y}\left(1 + \frac{1}{\sqrt{p}}\right) = \exp\!\left(\sum_{p \le y}\frac{1}{\sqrt{p}} + O(1)\right) = \exp\!\left(\frac{2\sqrt{y}}{\log y}\bigl(1 + o(1)\bigr)\right) \to \infty \qquad (y \to \infty).
+     S_{p,\mathrm{band}}(X) = \bigl(R_{\mathrm{band}}(X) + q\,B_p(X)\bigr) + q\bigl(R_{\mathrm{band}}(X/p) + q\,B_p(X/p)\bigr) + q^2 S_{p,\mathrm{band}}(X/p^2);
      $$
+   - for terminal depth $L = \lfloor\log_p X\rfloor + 1$: we have $X/p^L < 1$, so $S_{p,\mathrm{band}}(X/p^L) = 0$ by the declared sub-unit zero extension (note the distinction between the canonical-band termination condition $X/p^L < 1$ and the rescaled-interval termination condition $B/p^L < 1$ in §8.1).
+   Since $\sum_{j=0}^{\lfloor\log_p X\rfloor} q^j < (1 - q)^{-1} = (1 - p^{-1/2})^{-1} < \infty$, we obtain the **unconditional two-way boundedness equivalence** for every fixed prime $p \ge 2$ (in particular $p = 2$, odd squarefree integers $2 \nmid m$):
+   $$
+   \boxed{\sup_{X \ge 1}\bigl|R_{\mathrm{band}}(X)\bigr| < \infty \iff \sup_{X \ge 1}\bigl|S_{p,\mathrm{band}}(X)\bigr| < \infty,}
+   $$
+   with explicit two-way bounds $\sup_{X\ge 1}|R_{\mathrm{band}}(X)| \le (1 + q)\sup_{Y\ge 1}|S_{p,\mathrm{band}}(Y)| + q\,B_{\mathrm{rescaled}}$ and $\sup_{X\ge 1}|S_{p,\mathrm{band}}(X)| \le (1 - q)^{-1}\bigl(\sup_{Y\ge 1}|R_{\mathrm{band}}(Y)| + q\,B_{\mathrm{rescaled}}\bigr)$.
+4. **Rightly Oriented Multi-Prime Inclusion–Exclusion Formula, $P=2$ Orientation Regression, Tautological Sieve Collapse, and Qualified Coset Shift**:
+   For any finite set of distinct primes $\mathcal{P}$ with squarefree product $P = \prod_{p \in \mathcal{P}} p$, define $S_P(X; A, B) := \sum_{A < m \le B,\, \gcd(m, P)=1} \frac{\mu(m)}{\sqrt{m}}\,W_{\log}(X/m)$. Grouping $m \in (A, B]$ with $\mu(m) \ne 0$ by the squarefree divisor $d = \gcd(m, P) \mid P$ and writing $m = d k$ with $\gcd(k, P) = 1$ and $\gcd(d, k) = 1$ ($\mu(dk) = \mu(d)\mu(k)$) yields the **rightly oriented multi-prime identity**:
+   $$
+   \boxed{R(X; A, B) = \sum_{d \mid P} \frac{\mu(d)}{\sqrt{d}}\,S_P\!\left(\frac{X}{d};\, \frac{A}{d},\, \frac{B}{d}\right).}
+   $$
+   - **Orientation Regression Check at $P = 2$, $X = 1$, $(A, B] = (1, 2]$ (`p2_x1_interval_1_2_orientation_regression`)**:
+     At $P = 2, X = 1, (A, B] = (1, 2]$, the only integer in $(1, 2]$ is $m = 2$, so $R(1; 1, 2) = -\frac{1}{\sqrt{2}}W_{\log}(1/2)$, $S_2(1; 1, 2) = 0$, and $S_2(1/2; 1/2, 1) = W_{\log}(1/2)$. The rightly oriented formula gives $S_2(1; 1, 2) - \frac{1}{\sqrt{2}}S_2(1/2; 1/2, 1) = -\frac{1}{\sqrt{2}}W_{\log}(1/2) = R(1; 1, 2)$ (`correct_orientation_encloses_zero: true`), whereas the reversed formula $\sum_{d \mid 2}\frac{\mu(d)}{\sqrt{d}}R(1/d; 1/d, 2/d) = R(1; 1, 2) - \frac{1}{\sqrt{2}}R(1/2; 1/2, 1) = -\sqrt{2}W_{\log}(1/2) \ne 0 = S_2(1; 1, 2)$ fails by a certified nonzero discrepancy (`reversed_formula_detected_nonzero: true`).
+   - **Tautological Full-Sieve Collapse and Exact Euler-Product Expansion**:
+     When $\mathcal{P} = \{p \le M(X)\}$ sieves all primes up to $M(X)$ with $P = \prod_{p \le M(X)} p$, the only positive integer $k \le M(X)/d$ coprime to $P$ is $k = 1$, which lies in $(H(X)/d, M(X)/d]$ if and only if $H(X) < d \le M(X)$. Thus $S_P(X/d; H(X)/d, M(X)/d) = \mathbf{1}_{H(X) < d \le M(X)}\,W_{\log}(X/d)$ and the multi-prime expansion $\sum_{d \mid P}\frac{\mu(d)}{\sqrt{d}}S_P(X/d; H(X)/d, M(X)/d)$ collapses tautologically back to $\sum_{H(X) < d \le M(X)}\frac{\mu(d)}{\sqrt{d}}W_{\log}(X/d) = R_{\mathrm{band}}(X)$ (`full_sieve_P_le_M_X_tautological_collapse_verified: true`). Meanwhile, taking absolute values across divisor branches $d \mid \prod_{p \le y} p$ multiplies by the Euler product $\prod_{p \le y}(1 + p^{-1/2})$, whose logarithm satisfies the second-order expansion
+     $$
+     \boxed{\sum_{p \le y}\log\!\left(1 + \frac{1}{\sqrt{p}}\right) = \sum_{p \le y}\frac{1}{\sqrt{p}} - \frac{1}{2}\sum_{p \le y}\frac{1}{p} + O(1) \to \infty \qquad (y \to \infty),}
+     $$
+     reaching $[45258011.27 \pm 1.15 \times 10^{-5}]$ at $y = 997$ ($\pi(997) = 168$).
+   - **Qualified Multiplicative Coset Note (`multiplicative_coset_shift_note`)**:
+     Whether $\log_\tau p = \frac{\log p}{\log(2\pi)}$ lies in $\mathbb{A}_{\mathbb{R}}$ is **not assumed**; if $\log_\tau p \notin \mathbb{A}_{\mathbb{R}}$, then prime dilation $X_K \mapsto X_K / p = \tau^{|K| - \log_\tau p}$ leaves the algebraic grade locus $\tau^{\mathbb{A}_{\mathbb{R}}}$ for the multiplicative coset $p^{-1}\tau^{\mathbb{A}_{\mathbb{R}}}$, whereas all rescaled boundary bounds in §8.2 are proved on all of $\mathbb{R}_{>0}$ without assuming $\log_\tau p \in \mathbb{A}_{\mathbb{R}}$.
+   - **Certified 256-bit Arb Canonical-Band Prime-Separation Table (`sample_band_prime_table` in JSON Artifact)**:
+
+| Scale $X$ | Prime $p$ | $(H(X), M(X))$ | $(H(X/p), M(X/p))$ | Upper-Cutoff Regime | $R_{\mu,\mathrm{band}}(X)$ | $S_{p,\mathrm{band}}(X)$ | $S_{p,\mathrm{band}}(X/p)$ | Boundary Discrepancy $B_p(X)$ |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| $1$ | $2$ | $(1, 2)$ | $(0, 0)$ | $X/p < 1$ (sub-unit regime) | $-0.0138854010$ | $+0.0000000000$ | $+0.0000000000$ | $+0.0196369224$ |
+| $1$ | $3$ | $(1, 2)$ | $(0, 0)$ | $X/p < 1$ (sub-unit regime) | $-0.0138854010$ | $-0.0138854010$ | $+0.0000000000$ | $+0.0000000000$ |
+| $2$ | $2$ | $(1, 3)$ | $(1, 2)$ | $M(X)/p < M(X/p)$ (small-$Y$ single-endpoint regime) | $+0.0108988909$ | $-0.0202572131$ | $+0.0000000000$ | $-0.0440613848$ |
+| $2$ | $3$ | $(1, 3)$ | $(0, 0)$ | $X/p < 1$ (sub-unit regime) | $+0.0108988909$ | $+0.0311561040$ | $+0.0000000000$ | $+0.0350865224$ |
+| $\tau$ | $2$ | $(4, 10)$ | $(2, 5)$ | $M(X)/p \ge M(X/p)$ | $+0.0305137548$ | $+0.0440915006$ | $+0.0192018323$ | $+0.0000000000$ |
+| $\tau$ | $3$ | $(4, 10)$ | $(1, 3)$ | $M(X)/p \ge M(X/p)$ | $+0.0305137548$ | $+0.0548648508$ | $+0.0421773354$ | $+0.0000000000$ |
+| $16$ | $2$ | $(10, 32)$ | $(5, 14)$ | $M(X)/p \ge M(X/p)$ | $+0.0050456338$ | $+0.0184614185$ | $+0.0126828335$ | $+0.0062899512$ |
+| $16$ | $3$ | $(10, 32)$ | $(4, 9)$ | $M(X)/p \ge M(X/p)$ | $+0.0050456338$ | $+0.0204293360$ | $+0.0189417684$ | $+0.0077035854$ |
+| $\tau^2$ | $2$ | $(21, 99)$ | $(12, 42)$ | $M(X)/p \ge M(X/p)$ | $+0.0094869970$ | $+0.0034897521$ | $+0.0094402188$ | $-0.0179216039$ |
+| $\tau^2$ | $3$ | $(21, 99)$ | $(8, 26)$ | $M(X)/p \ge M(X/p)$ | $+0.0094869970$ | $+0.0058847113$ | $-0.0021883084$ | $-0.0040510335$ |
 
 ### 8.3 Exact Summation by Parts and Smooth-Kernel Derivative $\widetilde{W}_{\log}(u)$ (`Theorem 55`)
 
 1. **Abel Summation by Parts Identity**:
-   Let $\mathcal{M}_{H(X)}(t) := \sum_{H(X) < m \le t} \mu(m)$ denote the shifted Mertens sum (with $\mathcal{M}_{H(X)}(H(X)) = 0$) and $F_X(t) := t^{-1/2}\,W_{\log}(X/t)$. For all $X \ge 1$,
+   Let $M_A(t) := \sum_{A < m \le t} \mu(m)$ denote the right-continuous relative Mertens step function (with $M_A(A) = 0$) and $F_X(t) := t^{-1/2}\,W_{\log}(X/t)$. For all $X > 0$ and $0 < A < B$,
    $$
-   \boxed{R_{\mu,\mathrm{band}}(X) = \mathcal{M}_{H(X)}\bigl(M(X)\bigr)\,F_X\bigl(M(X)\bigr) - \int_{H(X)}^{M(X)} \mathcal{M}_{H(X)}(t)\,F_X'(t)\,dt.}
+   \boxed{R(X; A, B) = M_A(B)\,F_X(B) - \int_A^B M_A(t)\,F_X'(t)\,dt.}
    $$
 2. **Exact Smooth-Kernel Derivative Formula**:
-   Differentiating $F_X(t) = t^{-1/2}W_{\log}(X/t)$ term-by-term with respect to $t > 0$ yields
+   Writing $u = X/t$ ($\frac{du}{dt} = -\frac{u}{t}$), the chain rule gives $F_X'(t) = -t^{-3/2}\bigl[\frac{1}{2}W_{\log}(u) + u W_{\log}'(u)\bigr]$. For each $k \ge 2$ and $w_k(u) = h_0(k/u)$ with $\alpha = k/u$, we have $u w_k'(u) = -\alpha h_0'(\alpha)$, so $\frac{1}{2}w_k(u) + u w_k'(u) = \frac{1}{2}h_0(\alpha) - \alpha h_0'(\alpha) = \widetilde{h}_0(\alpha)$. Differentiating term-by-term (justified by uniform convergence on compact subsets of $(0, \infty)$ via $|\frac{d}{du}h_0(k/u)| \le (\frac{1}{2}C_0 + \widetilde{C}_0)u^{3/2}k^{-5/2}$) yields the exact derivative kernel:
    $$
-   \boxed{-F_X'(t) = t^{-3/2}\,\widetilde{W}_{\log}\!\left(\frac{X}{t}\right), \qquad \widetilde{W}_{\log}(u) := \frac{1}{2}\,W_{\log}(u) + \sum_{k=1}^\infty \frac{\log k}{\sqrt{k}}\,\frac{k}{u}\,h_0'\!\left(\frac{k}{u}\right),}
+   \boxed{\widetilde{W}_{\log}(u) = \frac{1}{2}\,W_{\log}(u) + u\,W_{\log}'(u) = \sum_{k \ge 2} \frac{\log k}{\sqrt{k}}\left[\frac{1}{2}\,h_0\!\left(\frac{k}{u}\right) - \frac{k}{u}\,h_0'\!\left(\frac{k}{u}\right)\right] = \sum_{k \ge 2} \frac{\log k}{\sqrt{k}}\,\widetilde{h}_0\!\left(\frac{k}{u}\right), \qquad -F_X'(t) = t^{-3/2}\,\widetilde{W}_{\log}\!\left(\frac{X}{t}\right).}
    $$
-   so the resonant-band sum decomposes as
+   At $(A, B) = (H(X), M(X))$, the resonant-band sum decomposes as
    $$
-   \boxed{R_{\mu,\mathrm{band}}(X) = E_{\mathrm{upper}}(X) + I_{\mathcal{M},\mathrm{band}}(X), \qquad E_{\mathrm{upper}}(X) := \frac{\mathcal{M}_{H(X)}(M(X))}{\sqrt{M(X)}}\,W_{\log}\!\left(\frac{X}{M(X)}\right), \qquad I_{\mathcal{M},\mathrm{band}}(X) := \int_{H(X)}^{M(X)} \frac{\mathcal{M}_{H(X)}(t)}{t^{3/2}}\,\widetilde{W}_{\log}\!\left(\frac{X}{t}\right)dt.}
+   \boxed{R_{\mu,\mathrm{band}}(X) = M_{H(X)}\bigl(M(X)\bigr)\,F_X\bigl(M(X)\bigr) + I_{M,\mathrm{band}}(X), \qquad I_{M,\mathrm{band}}(X) := \int_{H(X)}^{M(X)} M_{H(X)}(t)\,t^{-3/2}\,\widetilde{W}_{\log}\!\left(\frac{X}{t}\right)dt.}
    $$
 3. **Unconditional Upper-Endpoint Bound and Two-Way Smooth Mertens Reduction (`Theorem 55`)**:
-   Because $|\mathcal{M}_{H(X)}(M(X))| \le M(X) - H(X) \le M(X)$ trivially and $|W_{\log}(X/M(X))| \le C_{\log,0}(X/M(X))^{5/2}$ with $M(X) \ge X^{5/4} \implies X^{5/2}/M(X)^3 \le M(X)^{-1}$, the upper boundary term satisfies the **unconditional uniform bound** for all $X \ge 1$:
+   Using **only** the trivial counting inequality $|M_{H(X)}(M(X))| \le M(X) - H(X) \le M(X)$ (with zero unproved Mertens hypotheses) and the small-argument envelope $|W_{\log}(X/M(X))| \le C_{\log,0}(X/M(X))^{5/2}$ together with $M(X) \ge X^{5/4} \implies X^{5/2}/M(X)^2 \le 1$, the upper-endpoint term satisfies the **unconditional uniform bound** for all $X \ge 1$:
    $$
-   \boxed{\bigl|E_{\mathrm{upper}}(X)\bigr| \le |\mathcal{M}_{H(X)}(M(X))|\,\frac{C_{\log,0}\,X^{5/2}}{M(X)^3} \le M(X)\cdot \frac{C_{\log,0}}{M(X)} = C_{\log,0} < 0.557430.}
+   \boxed{\bigl|M_{H(X)}(M(X))\,F_X(M(X))\bigr| \le M(X)\cdot M(X)^{-1/2}\,C_{\log,0}\!\left(\frac{X}{M(X)}\right)^{5/2} = C_{\log,0}\,\frac{X^{5/2}}{M(X)^2} \le C_{\log,0} = [0.55742959 \pm 7.45 \times 10^{-41}] < 0.557430.}
    $$
    Consequently (`Theorem 55`),
    $$
-   \boxed{\sup_{X \ge 1}\bigl|R_{\mu,\mathrm{band}}(X)\bigr| < \infty \iff \sup_{X \ge 1}\left|\int_{H(X)}^{M(X)} \frac{\mathcal{M}_{H(X)}(t)}{t^{3/2}}\,\widetilde{W}_{\log}\!\left(\frac{X}{t}\right)dt\right| < \infty.}
+   \boxed{\sup_{X \ge 1}\bigl|R_{\mu,\mathrm{band}}(X)\bigr| < \infty \iff \sup_{X \ge 1}\bigl|I_{M,\mathrm{band}}(X)\bigr| < \infty, \qquad \bigl|R_{\mu,\mathrm{band}}(X) - I_{M,\mathrm{band}}(X)\bigr| \le C_{\log,0} < 0.557430 \quad (\forall X \ge 1).}
    $$
-   - **Why Trivial or Known Zero-Free-Region Bounds on $\mathcal{M}_{H(X)}(t)$ Do Not Suffice**:
-     Inserting the trivial bound $|\mathcal{M}_{H(X)}(t)| \le t$ gives the unsigned integral $\int_{H(X)}^{M(X)} t^{-1/2}|\widetilde{W}_{\log}(X/t)|\,dt = X^{1/2}\int_{X/M(X)}^{X/H(X)} u^{-3/2}|\widetilde{W}_{\log}(u)|\,du \asymp X^{1/2}$, while Vinogradov–Korobov bounds $\mathcal{M}(t) = O(t\exp(-c(\log t)^{3/5}))$ give $O(X^{1/2}\exp(-c(\log X)^{3/5}))$. Conversely, the conditional square-root bound $\mathcal{M}(t) = O(t^{1/2})$ yields $O(\int_{H(X)}^{M(X)} t^{-1}|\widetilde{W}_{\log}(X/t)|\,dt) = O(1)$ since $\int_0^\infty u^{-1}|\widetilde{W}_{\log}(u)|\,du < \infty$.
+   - **Independent Complex-Analytic Quadrature Verification Scope (`max_quadrature_M = 32`)**:
+     In `verify_summation_by_parts_and_tilde_W_log_identity_arb`, step-interval FTC summation is certified across all `7` sample scales $X \in \{1, 2, 4, \tau, 10, 16, \tau^2\}$ (`all_sbp_ftc_enclose_zero: true`). Direct unit-interval `acb.integral` quadrature of $\int_n^{n+1} t^{-3/2}\widetilde{W}_{\log}(X/t)\,dt$ is run independently on the `6` sample scales with $M(X) \le 32$ ($X \in \{1, 2, 4, \tau, 10, 16\}$, `independent_quadrature_performed_count: 6`, `independent_quadrature_passed_count: 6`, `all_performed_sbp_quadrature_enclose_zero: true`), while the $X = \tau^2$ row ($M(\tau^2) = 99 > 32$, `independent_quadrature_not_run_count: 1`) is explicitly marked `"independent_quadrature_status": "NOT_RUN"` with `"smooth_mertens_integral_I_M_band_quadrature_certified": null` and `"sbp_quadrature_identity_encloses_zero": null`:
 
-### 8.4 Certified 256-bit Arb Sign-Sequence Discrimination Across Scales $X \in \{4, 8, 16, 32, 64\}$ (`Section 7.3` of JSON Artifact)
-
-To test which arithmetic properties of $\mu(m)$ govern the size of $\sum_{H(X)<m\le M(X)} a(m) m^{-1/2} W_{\log}(X/m)$, we certified six sequences $a(m)$ in 256-bit Arb across $X \in \{4, 8, 16, 32, 64\}$ (`verify_sign_sequence_cancellation_discrimination_arb`):
-
-| Scale $X$ | Cutoffs $(H, M)$ | Actual Möbius $\mu(m)$ | Liouville $\lambda(m)$ | Squarefree $\|\mu(m)\|$ | All-Ones $1$ | Periodic $(-1)^m$ | Sign-Flipped $\mu(m)\operatorname{sgn}(W_{\log}(X/m))$ |
+| Scale $X$ | Cutoffs $(H, M)$ | $M_{H(X)}(M(X))$ | $R_{\mu,\mathrm{band}}(X)$ | Endpoint $M_{H(X)}(M(X))F_X(M(X))$ | Smooth Integral $I_{M,\mathrm{band}}(X)$ (FTC) | Sharp Bound $\frac{C_{\log,0}X^{5/2}}{M(X)^2}$ | Independent Quadrature Status |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| $4$ | $(3, 6)$ | $+0.02581832$ | $-0.03651806$ | $-0.05660372$ | $-0.08242204$ | $+0.00496740$ | $+0.08242204$ |
-| $8$ | $(5, 14)$ | $+0.01701821$ | $+0.00297542$ | $-0.16368959$ | $-0.22894967$ | $-0.00338246$ | $+0.16368959$ |
-| $16$ | $(10, 32)$ | $+0.00309725$ | $+0.00171580$ | $-0.35418786$ | $-0.52567346$ | $-0.00490073$ | $+0.35418786$ |
-| $32$ | $(18, 77)$ | $+0.00561458$ | $-0.01760377$ | $-0.61942131$ | $-0.96165753$ | $+0.00674523$ | $+0.63055280$ |
-| $64$ | $(32, 182)$ | $-0.00797865$ | $-0.01614019$ | $-0.95857219$ | $-1.52936841$ | $-0.00383333$ | $+0.99220263$ |
+| $1$ | $(1, 2)$ | $-1$ | $-0.0138854010$ | $-0.0138854010$ | $+0.0000000000$ | $0.139357$ | `CERTIFIED_QUADRATURE` |
+| $2$ | $(1, 3)$ | $-2$ | $+0.0108988909$ | $-0.0405144262$ | $+0.0514133171$ | $0.350366$ | `CERTIFIED_QUADRATURE` |
+| $4$ | $(3, 6)$ | $0$ | $+0.0053844056$ | $+0.0000000000$ | $+0.0053844056$ | $0.495493$ | `CERTIFIED_QUADRATURE` |
+| $\tau$ | $(4, 10)$ | $0$ | $+0.0305137548$ | $+0.0000000000$ | $+0.0305137548$ | $0.551620$ | `CERTIFIED_QUADRATURE` |
+| $10$ | $(6, 18)$ | $-1$ | $+0.0163613434$ | $-0.0064298269$ | $+0.0227911704$ | $0.544058$ | `CERTIFIED_QUADRATURE` |
+| $16$ | $(10, 32)$ | $-3$ | $+0.0050456338$ | $-0.0104140507$ | $+0.0154596845$ | $0.557430$ | `CERTIFIED_QUADRATURE` |
+| $\tau^2$ | $(21, 99)$ | $3$ | $+0.0094869970$ | $+0.0018216397$ | $+0.0076653573$ | $0.556954$ | `NOT_RUN` |
 
-- **Key Discrimination Findings**:
-  1. **Actual Möbius $\mu(m)$ vs. Unsigned Squarefree $|\mu(m)|$**: At $X = 64$, $|R_{\mu,\mathrm{band}}(64)| \approx 0.007979$, whereas the unsigned squarefree sum $\sum_{32 < m \le 182} |\mu(m)| m^{-1/2} |W_{\log}(64/m)| \approx 0.992203$ is **$124.36\times$ larger**, growing as $\frac{6}{\pi^2} I_{|W_{\log}|}\,X^{1/2}$.
-  2. **Sign-Coherent Non-Oscillatory Failure (`all_ones` and `squarefree_indicator`)**: Any non-oscillatory weight with positive mean density grows strictly like $c\,X^{1/2}$ because $W_{\log}(u)$ is predominantly negative on the transition peak $u \in [0.35, 1.8]$.
-  3. **Periodic $(-1)^m$ vs. Multiplicative $\mu(m)$**: While a fixed periodic character like $(-1)^m$ cancels against the smooth profile $F_X(t)$ by simple two-step Euler–Maclaurin pairing ($O(X^{-5/2})$), $\mu(m)$ is **multiplicatively** determined across all prime factors $p \le M(X)$, so no finite period captures its sign oscillation. Proving $\sup_{X \ge 1}|R_{\mu,\mathrm{band}}(X)| < \infty$ requires controlling the smooth Mertens integral $I_{\mathcal{M},\mathrm{band}}(X)$ across the transition scale $t \asymp X$.
+### 8.4 Certified 256-bit Arb Sign-Sequence Discrimination Across Scales $X \in \{1, 2, 4, \tau, 10, 16, 25, \tau^2, 64\}$ (`Section 7` of JSON Artifact)
+
+To compare signed sums $\bigl|\sum_{H(X)<m\le M(X)} \sigma_m m^{-1/2} W_{\log}(X/m)\bigr|$ against the triangle-inequality majorant $\sum_{H(X)<m\le M(X)} |\sigma_m| m^{-1/2} |W_{\log}(X/m)|$, `verify_sign_sequence_cancellation_discrimination_arb` evaluates the four bounded sequences $\sigma_m \in \{\mu(m),\, 1,\, |\mu(m)|,\, |\mu(m)|\operatorname{sgn}(W_{\log}(X/m))\}$ in 256-bit Arb across $X \in \{1, 2, 4, \tau, 10, 16, 25, \tau^2, 64\}$ (values below are taken directly from `sign_discrimination_table` in [data/tc_faithful_tau_arithmetic_spectral_realization.json](file:///c:/Development/Projects/reimann_scope/data/tc_faithful_tau_arithmetic_spectral_realization.json)):
+
+| Scale $X$ | Cutoffs $(H, M)$ | Actual Möbius $R_{\mu,\mathrm{band}}(X)$ | Constant-One $R_{1,\mathrm{band}}(X)$ | Squarefree Indicator $R_{\|\mu\|,\mathrm{band}}(X)$ | Triangle-Inequality Majorant $\sum \frac{\|\mu(m)\|}{\sqrt{m}}\|W_{\log}(X/m)\|$ | Majorant / $\|R_{\mu,\mathrm{band}}(X)\|$ Ratio |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| $1$ | $(1, 2)$ | $-0.0138854010$ | $+0.0138854010$ | $+0.0138854010$ | $+0.0138854010$ | $1.00000000$ |
+| $2$ | $(1, 3)$ | $+0.0108988909$ | $-0.0108988909$ | $-0.0108988909$ | $+0.0514133171$ | $4.71729810$ |
+| $4$ | $(3, 6)$ | $+0.0053844056$ | $+0.0012329276$ | $+0.0232636200$ | $+0.0232636200$ | $4.32055491$ |
+| $\tau$ | $(4, 10)$ | $+0.0305137548$ | $-0.0380922306$ | $-0.0576692464$ | $+0.0792159467$ | $2.59607338$ |
+| $10$ | $(6, 18)$ | $+0.0163613434$ | $-0.0482983844$ | $-0.0083864514$ | $+0.0737477117$ | $4.50743620$ |
+| $16$ | $(10, 32)$ | $+0.0050456338$ | $-0.0477730902$ | $-0.0448539391$ | $+0.1287989561$ | $25.52681408$ |
+| $25$ | $(14, 56)$ | $+0.0105974982$ | $-0.0476609440$ | $-0.0186209133$ | $+0.1611394825$ | $15.20542676$ |
+| $\tau^2$ | $(21, 99)$ | $+0.0094869970$ | $-0.0373670566$ | $-0.0343474534$ | $+0.2377820885$ | $25.06399947$ |
+| $64$ | $(32, 182)$ | $+0.0305914155$ | $-0.0158336588$ | $+0.0190489418$ | $+0.2903267136$ | $9.49046356$ |
+
+- **Key Discrimination Findings and Scope Qualifications**:
+  1. **Signed Sum vs. Triangle-Inequality Majorant**: At $X = 64$ ($(H, M) = (32, 182)$), the signed sums are $R_{\mu,\mathrm{band}}(64) = +0.03059141547\ldots$ (which is also the maximum of $|R_{\mu,\mathrm{band}}(X)|$ on the 9-point grid), $R_{1,\mathrm{band}}(64) = -0.01583365880\ldots$, and $R_{|\mu|,\mathrm{band}}(64) = +0.01904894182\ldots$, whereas the triangle-inequality majorant $\sum_{32 < m \le 182}\frac{|\mu(m)|}{\sqrt{m}}|W_{\log}(64/m)| = +0.29032671364\ldots$ is $9.49046356\times$ larger than $|R_{\mu,\mathrm{band}}(64)|$ (and $25.52681408\times$ larger at $X = 16$ and $25.06399947\times$ larger at $X = \tau^2$).
+  2. **Strict Separation of Signed Kernel Oscillation from Absolute-Value Sums**: The signed sums $R_{1,\mathrm{band}}(X) = \sum_{H < m \le M} m^{-1/2}W_{\log}(X/m)$ and $R_{|\mu|,\mathrm{band}}(X) = \sum_{H < m \le M} |\mu(m)| m^{-1/2}W_{\log}(X/m)$ incorporate the sign changes of $W_{\log}(X/m)$ across $m \in (H(X), M(X)]$, whereas the worst-case sequence $\sigma_m^{\mathrm{wc}}(X) = |\mu(m)|\operatorname{sgn}(W_{\log}(X/m))$ removes all sign cancellation and equals the absolute-value sum $\sum_{H < m \le M} |\mu(m)| m^{-1/2}|W_{\log}(X/m)|$.
+  3. **Finite-Grid and Asymptotic Scope Hygiene**: Finite-grid values on $X \in [1, 64]$ do not determine the asymptotic behavior as $X \to \infty$ of $R_{1,\mathrm{band}}(X)$ or $R_{|\mu|,\mathrm{band}}(X)$, and $O(X^{1/2})$ is an upper bound for the triangle-inequality majorant $\sum_{H(X) < m \le M(X)} |\mu(m)| m^{-1/2}|W_{\log}(X/m)|$ unless a matching lower bound is proved. Closing `SUBGATE-TC-043A` requires proving an unconditional $O(1)$ bound on the signed Möbius sum $R_{\mu,\mathrm{band}}(X)$ (or equivalently on the smooth Mertens integral $I_{M,\mathrm{band}}(X)$).

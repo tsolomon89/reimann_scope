@@ -269,8 +269,8 @@ def test_06_lean_formalization_and_arb_roundtrip_verification(
         assert thm_name in lean_live["actual_theorems"]
 
     sec6 = tc050_artifact["section_6_certified_arb_roundtrip_verification"]
-    assert sec6["total_certified_arb_balls_checked"] == 703
-    assert sec6["compared_against_live_original_arb_count"] == 703
+    assert sec6["total_certified_arb_balls_checked"] == 708
+    assert sec6["compared_against_live_original_arb_count"] == 708
     assert sec6["live_original_count_matches_enumerated_total"] is True
     assert sec6["all_enclose_original_256bit_arb_ball"] is True
     assert sec6["failed_paths"] == []
@@ -279,7 +279,7 @@ def test_06_lean_formalization_and_arb_roundtrip_verification(
     rt_recheck = verify_all_serialized_arb_in_tree(
         tc050_artifact, path_prefix="task_tc050"
     )
-    assert rt_recheck["total_certified_arb_balls_checked"] == 703
+    assert rt_recheck["total_certified_arb_balls_checked"] == 708
     assert (
         sec6["compared_against_live_original_arb_count"]
         == rt_recheck["total_certified_arb_balls_checked"]
@@ -871,7 +871,19 @@ def test_17_tc051_summation_by_parts_tilde_W_log_and_unconditional_endpoint_boun
 
     for row in sbp["summation_by_parts_table"]:
         assert row["sbp_ftc_identity_encloses_zero"] is True
-        assert row["sbp_quadrature_identity_encloses_zero"] is True
+        if row["independent_quadrature_status"] == "CERTIFIED_QUADRATURE":
+            assert row["sbp_quadrature_identity_encloses_zero"] is True
+            assert (
+                row["smooth_mertens_integral_I_M_band_quadrature_certified"]
+                is not None
+            )
+        else:
+            assert row["independent_quadrature_status"] == "NOT_RUN"
+            assert row["sbp_quadrature_identity_encloses_zero"] is None
+            assert (
+                row["smooth_mertens_integral_I_M_band_quadrature_certified"]
+                is None
+            )
         assert row["abs_endpoint_le_sharp_bound_certified"] is True
         assert row["abs_endpoint_le_C_log_0_certified"] is True
         assert row["abs_R_band_minus_I_M_band_le_C_log_0_certified"] is True
@@ -919,6 +931,334 @@ def test_18_tc051_sign_sequence_discrimination_and_tc050r2_reporting_repairs(
     assert "13.468513" not in doc_text
     assert "maximal positive real offset" not in doc_text
     assert "\\operatorname*{Res}_{s=\\rho}\\bigl(-\\xi'(s)/\\xi(s)\\bigr) = -m_\\rho" in doc_text
+
+
+def test_19_tc051r_multi_prime_orientation_regression_and_small_Y_upper_cutoff(
+    tc050_artifact: dict,
+) -> None:
+    """Verify the P = {2}, X = 1, (A, B] = (1, 2] multi-prime orientation regression check
+    (confirming R(X; A, B) = sum_{d|P} (mu(d)/sqrt(d)) S_P(X/d; A/d, B/d) and rejecting the
+    reversed formula) and both upper-cutoff orderings M(X)/p >= M(X/p) and M(X)/p < M(X/p)."""
+    sec7 = tc050_artifact[
+        "section_7_task_tc051_prime_separation_and_summation_by_parts"
+    ]
+    p_audit = sec7["prime_separation_and_rescaled_band_audit"]
+    sieve = p_audit["multi_prime_sieve_collapse_and_coset_obstruction"]
+    orient = sieve["p2_x1_interval_1_2_orientation_regression"]
+    assert orient["correct_orientation_encloses_zero"] is True
+    assert orient["reversed_formula_detected_nonzero"] is True
+    assert orient["S2_1_1_2_certified"]["arb_ball_str"] == "0"
+    assert abs(orient["R_1_1_2_certified"]["mid_float"]) > 0.013
+    assert abs(orient["reversed_formula_rhs_certified"]["mid_float"]) > 0.027
+    assert "not assumed" in sieve["multiplicative_coset_shift_note"]
+    assert "-(1/2)" in sieve["euler_product_log_expansion"] or "- (1/2)" in sieve["euler_product_log_expansion"]
+
+    # Verify both upper-cutoff orderings in sample_band_prime_table:
+    assert p_audit["both_upper_cutoff_orderings_certified"] is True
+    small_y = p_audit["unconditional_rescaled_boundary_bounds"][
+        "small_Y_single_endpoint_regime_X2_p2"
+    ]
+    assert small_y["single_endpoint_le_B_tail_certified"] is True
+
+    table = p_audit["sample_band_prime_table"]
+    row_x2_p2 = [
+        r for r in table if r["X_label"] == "2" and r["prime_p"] == 2
+    ][0]
+    assert row_x2_p2["M_X"] == 3
+    assert row_x2_p2["M_X_over_p"] == 2
+    assert (
+        row_x2_p2["upper_cutoff_ordering"]
+        == "M(X)/p < M(X/p) (small-Y single-endpoint regime)"
+    )
+    assert row_x2_p2["canonical_band_sep_encloses_zero"] is True
+    assert row_x2_p2["abs_B_p_le_B_rescaled_certified"] is True
+
+    rows_ge_4 = [r for r in table if r["X_label"] not in ("1", "2")]
+    assert len(rows_ge_4) == 6
+    for r in rows_ge_4:
+        assert r["upper_cutoff_ordering"] == "M(X)/p >= M(X/p)"
+
+
+def test_20_tc051r_rescaled_interval_and_canonical_band_inverse_towers(
+    tc050_artifact: dict,
+) -> None:
+    """Verify both the simultaneously rescaled interval inverse tower
+    S_0 = sum_{j=0}^{L-1} q^j R_j + q^L S_L (matching Lean Theorem 56 at L = 2)
+    and the canonical-band inverse tower
+    S_{p,band}(X) = sum_{j=0}^{L-1} q^j (R_{mu,band}(X/p^j) + q B_p(X/p^j)) + q^L S_{p,band}(X/p^L)."""
+    sec7 = tc050_artifact[
+        "section_7_task_tc051_prime_separation_and_summation_by_parts"
+    ]
+    p_audit = sec7["prime_separation_and_rescaled_band_audit"]
+    assert p_audit["all_tower_telescoping_enclose_zero"] is True
+
+    towers = p_audit["iterated_prime_tower_checks"]
+    assert len(towers) == 2
+    for row in towers:
+        assert row["rescaled_interval_L1_encloses_zero"] is True
+        assert row["rescaled_interval_L2_encloses_zero"] is True
+        assert row["rescaled_interval_terminal_encloses_zero"] is True
+        assert row["canonical_band_L1_encloses_zero"] is True
+        assert row["canonical_band_L2_encloses_zero"] is True
+        assert row["tower_diff_encloses_zero"] is True
+        assert row["canonical_band_steps_J_p_plus_1"] >= 4
+        assert row["rescaled_interval_terminal_L"] >= 5
+
+
+def test_21_tc051r_skipped_quadrature_and_per_observable_arb_radii(
+    tc050_artifact: dict,
+) -> None:
+    """Verify that skipped quadrature rows report NOT_RUN and None fields rather than copying
+    I_mertens_ftc, and verify per-observable Arb radius reporting across the 13 sample grades."""
+    sec7 = tc050_artifact[
+        "section_7_task_tc051_prime_separation_and_summation_by_parts"
+    ]
+    sbp = sec7["summation_by_parts_and_tilde_W_log_audit"]
+    assert sbp["independent_quadrature_max_M_cutoff"] == 32
+    assert sbp["independent_quadrature_performed_count"] == 6
+    assert sbp["independent_quadrature_passed_count"] == 6
+    assert sbp["independent_quadrature_not_run_count"] == 1
+    assert sbp["all_performed_sbp_quadrature_enclose_zero"] is True
+
+    row_tau2 = [
+        r for r in sbp["summation_by_parts_table"] if r["X_label"] == "tau^2"
+    ][0]
+    assert row_tau2["M_X"] == 99
+    assert row_tau2["independent_quadrature_status"] == "NOT_RUN"
+    assert (
+        row_tau2["smooth_mertens_integral_I_M_band_quadrature_certified"]
+        is None
+    )
+    assert row_tau2["sbp_quadrature_identity_encloses_zero"] is None
+
+    # Direct live call with max_quadrature_M = 2 must mark all rows with M(X) > 2 as NOT_RUN:
+    live_sbp = verify_summation_by_parts_and_tilde_W_log_identity_arb(
+        prec_bits=256,
+        max_quadrature_M=2,
+    )
+    assert live_sbp["independent_quadrature_performed_count"] == 1
+    assert live_sbp["independent_quadrature_passed_count"] == 1
+    assert live_sbp["independent_quadrature_not_run_count"] == 6
+    row_live_4 = [
+        r for r in live_sbp["summation_by_parts_table"] if r["X_label"] == "4"
+    ][0]
+    assert row_live_4["independent_quadrature_status"] == "NOT_RUN"
+    assert (
+        row_live_4["smooth_mertens_integral_I_M_band_quadrature_certified"]
+        is None
+    )
+    assert row_live_4["sbp_quadrature_identity_encloses_zero"] is None
+
+    # Verify per-observable radius summary across the 13 sample grades:
+    decomp = tc050_artifact[
+        "section_4_canonical_hilbert_schmidt_orbit_decomposition"
+    ]["exact_decomposition_and_controlled_remainder_bounds"]
+    rad_summary = decomp["observable_radius_summary_across_13_sample_grades"][
+        "per_observable_max_radius"
+    ]
+    assert rad_summary["divisor_aggregated_W_log_XK_certified"] < 7.0e-11
+    assert rad_summary["head_divisor_R_mu_head_XK_certified"] < 6.0e-11
+    assert (
+        rad_summary["resonant_band_R_mu_band_XK_direct_sum_certified"] < 6.0e-11
+    )
+    assert rad_summary["P_tau_K_HS_orbit_certified"] < 4.0e-22
+    assert rad_summary["super_scale_tail_R_mu_tail_XK_direct_certified"] < 6.0e-4
+    assert rad_summary["E_tau_controlled_K_certified"] < 6.0e-4
+    assert rad_summary["E_tau_K_total_remainder_certified"] < 7.0e-5
+    assert rad_summary["C_tau_K_certified"] < 7.0e-5
+
+
+def test_22_tc051r_review_markdown_and_json_artifact_consistency(
+    tc050_artifact: dict,
+) -> None:
+    """Verify that the Section 8.2, 8.3, and 8.4 tables and narrative values in
+    docs/reviews/TC_FAITHFUL_TAU_ARITHMETIC_SPECTRAL_REALIZATION.md and
+    docs/reviews/TC_CANONICAL_THETA_CORRELATION_BOUND.md match the JSON artifact."""
+    sec7 = tc050_artifact[
+        "section_7_task_tc051_prime_separation_and_summation_by_parts"
+    ]
+    sep = sec7["prime_separation_and_rescaled_band_audit"]
+    sbp = sec7["summation_by_parts_and_tilde_W_log_audit"]
+    disc = sec7["sign_sequence_cancellation_discrimination_audit"]
+    by_xp_sep = {
+        (row["X_label"], row["prime_p"]): row
+        for row in sep["sample_band_prime_table"]
+    }
+    by_x_sbp = {row["X_label"]: row for row in sbp["summation_by_parts_table"]}
+    by_x_disc = {row["X_label"]: row for row in disc["sign_discrimination_table"]}
+
+    # Verify exact X = 64 values in JSON artifact:
+    r64 = by_x_disc["64"]
+    assert r64["H_X"] == 32
+    assert r64["M_X"] == 182
+    assert math.isclose(
+        r64["R_mu_band_actual_certified"]["mid_float"],
+        0.03059141547,
+        rel_tol=1e-9,
+    )
+    assert math.isclose(
+        r64["R_const_one_band_certified"]["mid_float"],
+        -0.01583365880,
+        rel_tol=1e-9,
+    )
+    assert math.isclose(
+        r64["R_squarefree_indicator_band_certified"]["mid_float"],
+        0.01904894183,
+        rel_tol=1e-9,
+    )
+    assert math.isclose(
+        r64["R_worst_case_abs_band_certified"]["mid_float"],
+        0.29032671364,
+        rel_tol=1e-9,
+    )
+    assert math.isclose(
+        r64["worst_case_to_actual_abs_ratio_certified"]["mid_float"],
+        9.49046357,
+        rel_tol=1e-7,
+    )
+
+    # Parse Section 8.2, 8.3, and 8.4 tables in TC_FAITHFUL_TAU_ARITHMETIC_SPECTRAL_REALIZATION.md:
+    doc_path = (
+        REPO_ROOT
+        / "docs"
+        / "reviews"
+        / "TC_FAITHFUL_TAU_ARITHMETIC_SPECTRAL_REALIZATION.md"
+    )
+    doc_text = doc_path.read_text(encoding="utf-8")
+    x_label_map = {
+        "$1$": "1",
+        "$2$": "2",
+        "$4$": "4",
+        "$\\tau$": "tau",
+        "$10$": "10",
+        "$16$": "16",
+        "$25$": "25",
+        "$\\tau^2$": "tau^2",
+        "$64$": "64",
+    }
+    matched_sep_rows = 0
+    matched_sbp_rows = 0
+    matched_disc_rows = 0
+    for line in doc_text.splitlines():
+        line_s = line.strip()
+        if not line_s.startswith("|"):
+            continue
+        cells = [c.strip() for c in line_s.strip("|").split("|")]
+        if (
+            len(cells) == 9
+            and cells[0] in x_label_map
+            and cells[1] in ("$2$", "$3$", "$5$")
+        ):
+            x_lbl = x_label_map[cells[0]]
+            p_val = int(cells[1].strip("$"))
+            row = by_xp_sep[(x_lbl, p_val)]
+            matched_sep_rows += 1
+            assert math.isclose(
+                float(cells[5].strip("$")),
+                row["R_mu_band_X_certified"]["mid_float"],
+                abs_tol=1e-9,
+            )
+            assert math.isclose(
+                float(cells[6].strip("$")),
+                row["S_p_band_X_certified"]["mid_float"],
+                abs_tol=1e-9,
+            )
+            assert math.isclose(
+                float(cells[7].strip("$")),
+                row["S_p_band_X_over_p_certified"]["mid_float"],
+                abs_tol=1e-9,
+            )
+            assert math.isclose(
+                float(cells[8].strip("$")),
+                row["B_p_X_boundary_certified"]["mid_float"],
+                abs_tol=1e-9,
+            )
+        elif (
+            len(cells) == 8
+            and cells[0] in x_label_map
+            and cells[1].startswith("$(")
+        ):
+            x_lbl = x_label_map[cells[0]]
+            row = by_x_sbp[x_lbl]
+            matched_sbp_rows += 1
+            assert math.isclose(
+                float(cells[3].strip("$")),
+                row["R_mu_band_X_certified"]["mid_float"],
+                abs_tol=1e-9,
+            )
+            assert math.isclose(
+                float(cells[4].strip("$")),
+                row["upper_endpoint_term_M_B_F_B_certified"]["mid_float"],
+                abs_tol=1e-9,
+            )
+            assert math.isclose(
+                float(cells[5].strip("$")),
+                row["smooth_mertens_integral_I_M_band_ftc_certified"][
+                    "mid_float"
+                ],
+                abs_tol=1e-9,
+            )
+        elif len(cells) == 7 and cells[0] in x_label_map and cells[1].startswith("$("):
+            x_lbl = x_label_map[cells[0]]
+            row = by_x_disc[x_lbl]
+            matched_disc_rows += 1
+            r_mu_doc = float(cells[2].strip("$"))
+            r_1_doc = float(cells[3].strip("$"))
+            r_sqf_doc = float(cells[4].strip("$"))
+            r_wc_doc = float(cells[5].strip("$"))
+            ratio_doc = float(cells[6].strip("$").rstrip("\\times"))
+            assert math.isclose(
+                r_mu_doc,
+                row["R_mu_band_actual_certified"]["mid_float"],
+                abs_tol=1e-9,
+            )
+            assert math.isclose(
+                r_1_doc,
+                row["R_const_one_band_certified"]["mid_float"],
+                abs_tol=1e-9,
+            )
+            assert math.isclose(
+                r_sqf_doc,
+                row["R_squarefree_indicator_band_certified"]["mid_float"],
+                abs_tol=1e-9,
+            )
+            assert math.isclose(
+                r_wc_doc,
+                row["R_worst_case_abs_band_certified"]["mid_float"],
+                abs_tol=1e-9,
+            )
+            assert math.isclose(
+                ratio_doc,
+                row["worst_case_to_actual_abs_ratio_certified"]["mid_float"],
+                abs_tol=1e-4,
+            )
+    assert matched_sep_rows == 10
+    assert matched_sbp_rows == 7
+    assert matched_disc_rows == 9
+
+    # Ensure stale pre-reconciliation X = 64 numbers are absent across all review and ledger files:
+    for rel_path in (
+        "docs/reviews/TC_FAITHFUL_TAU_ARITHMETIC_SPECTRAL_REALIZATION.md",
+        "docs/reviews/TC_CANONICAL_THETA_CORRELATION_BOUND.md",
+        "TRANSCENDENTAL_CONTINUATION.md",
+        "RESEARCH_LEDGER.md",
+        ".agents/corpus_map/obligation_register.md",
+    ):
+        text = (REPO_ROOT / rel_path).read_text(encoding="utf-8")
+        for stale_str in (
+            "0.0040964438",
+            "0.5621393982",
+            "137.23",
+            "124.36",
+            "0.1592684523",
+            "-0.0012834192",
+            "15.13020",
+            "15.13019",
+        ):
+            assert stale_str not in text, (
+                f"Found stale number {stale_str} in {rel_path}"
+            )
+
 
 
 
