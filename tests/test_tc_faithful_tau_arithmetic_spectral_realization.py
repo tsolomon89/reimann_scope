@@ -1075,23 +1075,43 @@ def test_21_tc051r_skipped_quadrature_and_per_observable_arb_radii(
     )
     assert row_live_4["sbp_quadrature_identity_encloses_zero"] is None
 
-    # Verify per-observable radius summary across the 13 sample grades:
-    decomp = tc050_artifact[
-        "section_4_canonical_hilbert_schmidt_orbit_decomposition"
-    ]["exact_decomposition_and_controlled_remainder_bounds"]
-    rad_summary = decomp["observable_radius_summary_across_13_sample_grades"][
-        "per_observable_max_radius"
-    ]
-    assert rad_summary["divisor_aggregated_W_log_XK_certified"] < 7.0e-11
-    assert rad_summary["head_divisor_R_mu_head_XK_certified"] < 6.0e-11
-    assert (
-        rad_summary["resonant_band_R_mu_band_XK_direct_sum_certified"] < 6.0e-11
-    )
-    assert rad_summary["P_tau_K_HS_orbit_certified"] < 4.0e-22
-    assert rad_summary["super_scale_tail_R_mu_tail_XK_direct_certified"] < 6.0e-4
-    assert rad_summary["E_tau_controlled_K_certified"] < 6.0e-4
-    assert rad_summary["E_tau_K_total_remainder_certified"] < 7.0e-5
-    assert rad_summary["C_tau_K_certified"] < 7.0e-5
+    # Verify per-observable radius summary and ceilings across the 13 sample grades:
+    sec4 = tc050_artifact["section_4_canonical_hilbert_schmidt_orbit_decomposition"]
+    assert "precision_scope_note" not in sec4
+    decomp = sec4["exact_decomposition_and_controlled_remainder_bounds"]
+    obs_summary = decomp["observable_radius_summary_across_13_sample_grades"]
+    assert obs_summary["all_declared_ceilings_verified"] is True
+
+    rad_k0 = obs_summary["per_observable_k0_radius"]
+    rad_max = obs_summary["per_observable_max_radius"]
+    declared = obs_summary["per_observable_declared_ceilings"]
+
+    expected_ceilings = {
+        "P_tau_K_HS_orbit_certified": (3.22e-22, 3.22e-22),
+        "pole_plus_transfer_term_neg_c_tau_A_h0_certified": (6.35e-75, 6.35e-75),
+        "small_scale_prime_W_inv_XK_certified": (7.02e-9, 7.02e-9),
+        "divisor_aggregated_W_log_XK_certified": (4.49e-14, 6.59e-11),
+        "head_divisor_R_mu_head_XK_certified": (0.0, 5.64e-11),
+        "resonant_band_R_mu_band_XK_direct_sum_certified": (4.04e-11, 5.65e-11),
+        "super_scale_tail_R_mu_tail_XK_direct_certified": (1.89e-5, 5.43e-4),
+        "E_tau_controlled_K_certified": (1.89e-5, 5.43e-4),
+        "E_tau_K_total_remainder_certified": (1.41e-8, 6.87e-5),
+        "C_tau_K_certified": (1.41e-8, 6.87e-5),
+    }
+    for obs_key, (exp_k0_ceil, exp_max_ceil) in expected_ceilings.items():
+        assert declared[obs_key]["k0_ceiling"] == exp_k0_ceil
+        assert declared[obs_key]["max_ceiling"] == exp_max_ceil
+        assert 0.0 <= rad_k0[obs_key] <= exp_k0_ceil
+        assert 0.0 <= rad_max[obs_key] <= exp_max_ceil
+
+    assert 1.88e-5 < rad_k0["super_scale_tail_R_mu_tail_XK_direct_certified"] <= 1.89e-5
+    assert 1.88e-5 < rad_k0["E_tau_controlled_K_certified"] <= 1.89e-5
+    assert 5.42e-4 < rad_max["super_scale_tail_R_mu_tail_XK_direct_certified"] <= 5.43e-4
+    assert 5.42e-4 < rad_max["E_tau_controlled_K_certified"] <= 5.43e-4
+    assert 1.40e-8 < rad_k0["E_tau_K_total_remainder_certified"] <= 1.41e-8
+    assert 1.40e-8 < rad_k0["C_tau_K_certified"] <= 1.41e-8
+    assert 6.86e-5 < rad_max["E_tau_K_total_remainder_certified"] <= 6.87e-5
+    assert 6.86e-5 < rad_max["C_tau_K_certified"] <= 6.87e-5
 
 
 def test_22_tc051r_review_markdown_and_json_artifact_consistency(
@@ -1299,18 +1319,28 @@ def test_22_tc051r_review_markdown_and_json_artifact_consistency(
             "external_analytic_scope_note"
         ]
     )
+    assert (
+        "precision_scope_note"
+        not in tc050_artifact[
+            "section_4_canonical_hilbert_schmidt_orbit_decomposition"
+        ]
+    )
     prec_note = tc050_artifact[
         "section_4_canonical_hilbert_schmidt_orbit_decomposition"
+    ]["exact_decomposition_and_controlled_remainder_bounds"][
+        "observable_radius_summary_across_13_sample_grades"
     ]["precision_scope_note"]
-    for ceil_str in (
-        "<= 6.59e-11",
-        "<= 5.65e-11",
-        "<= 6.35e-75",
-        "<= 7.02e-9",
-        "<= 5.43e-4",
-        "<= 1.41e-8",
+    assert "4.36e-7" not in prec_note
+    assert "E_{tau,controlled}(0) has radius <= 6.35e-75" not in prec_note
+    for expected_phrase in (
+        "W_log(X_K), R_{mu,head}(X_K), and R_{mu,band}(X_K) (evaluated by 4th-order Euler-Maclaurin on [N0, infty)) have radii <= 6.59e-11 (<= 6.59e-11, <= 5.64e-11, and <= 5.65e-11)",
+        "P_tau(K) has radius <= 3.22e-22",
+        "-(c_tau^B+2)h_0(X_K) has radius <= 6.35e-75",
+        "W(X_K^{-1}) has radius <= 7.02e-9",
+        "R_{mu,tail}(X_K) and E_{tau,controlled}(K) include the direct super-scale tail remainder C_{log,0} X_K^{5/2} / (2 m_tail_cut^2) and inner small-tail truncations (radii <= 1.89e-5 at K=0 up to <= 5.43e-4 at |K|=2)",
+        "C_tau(K) and E_tau(K) include the prime-power Rosser-Schoenfeld tail on n > 16500 in W(X_K) (radii <= 1.41e-8 at K=0 up to <= 6.87e-5 at |K|=2)",
     ):
-        assert ceil_str in prec_note
+        assert expected_phrase in prec_note
 
     # Ensure stale pre-reconciliation X = 64 numbers and false Case 2 claims are absent across all review and ledger files:
     for rel_path in (

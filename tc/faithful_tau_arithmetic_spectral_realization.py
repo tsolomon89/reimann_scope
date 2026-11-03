@@ -2188,36 +2188,94 @@ def verify_canonical_hilbert_schmidt_orbit_decomposition(
             ),
         }
 
+        obs_keys_tuple = (
+            "P_tau_K_HS_orbit_certified",
+            "pole_plus_transfer_term_neg_c_tau_A_h0_certified",
+            "small_scale_prime_W_inv_XK_certified",
+            "divisor_aggregated_W_log_XK_certified",
+            "head_divisor_R_mu_head_XK_certified",
+            "resonant_band_R_mu_band_XK_direct_sum_certified",
+            "super_scale_tail_R_mu_tail_XK_direct_certified",
+            "E_tau_controlled_K_certified",
+            "E_tau_K_total_remainder_certified",
+            "C_tau_K_certified",
+        )
+        k0_orbit_row = [r for r in orbit_rows if r["K_label"] == "0"][0]
+        per_observable_k0_radius: Dict[str, float] = {
+            obs_key: float(k0_orbit_row[obs_key]["enclosure_arb"].rad())
+            for obs_key in obs_keys_tuple
+        }
+        per_observable_max_radius: Dict[str, float] = {
+            obs_key: max(
+                float(r[obs_key]["enclosure_arb"].rad()) for r in orbit_rows
+            )
+            for obs_key in obs_keys_tuple
+        }
+        per_observable_declared_ceilings: Dict[str, Dict[str, float]] = {
+            "P_tau_K_HS_orbit_certified": {
+                "k0_ceiling": 3.22e-22,
+                "max_ceiling": 3.22e-22,
+            },
+            "pole_plus_transfer_term_neg_c_tau_A_h0_certified": {
+                "k0_ceiling": 6.35e-75,
+                "max_ceiling": 6.35e-75,
+            },
+            "small_scale_prime_W_inv_XK_certified": {
+                "k0_ceiling": 7.02e-9,
+                "max_ceiling": 7.02e-9,
+            },
+            "divisor_aggregated_W_log_XK_certified": {
+                "k0_ceiling": 4.49e-14,
+                "max_ceiling": 6.59e-11,
+            },
+            "head_divisor_R_mu_head_XK_certified": {
+                "k0_ceiling": 0.0,
+                "max_ceiling": 5.64e-11,
+            },
+            "resonant_band_R_mu_band_XK_direct_sum_certified": {
+                "k0_ceiling": 4.04e-11,
+                "max_ceiling": 5.65e-11,
+            },
+            "super_scale_tail_R_mu_tail_XK_direct_certified": {
+                "k0_ceiling": 1.89e-5,
+                "max_ceiling": 5.43e-4,
+            },
+            "E_tau_controlled_K_certified": {
+                "k0_ceiling": 1.89e-5,
+                "max_ceiling": 5.43e-4,
+            },
+            "E_tau_K_total_remainder_certified": {
+                "k0_ceiling": 1.41e-8,
+                "max_ceiling": 6.87e-5,
+            },
+            "C_tau_K_certified": {
+                "k0_ceiling": 1.41e-8,
+                "max_ceiling": 6.87e-5,
+            },
+        }
+        all_declared_ceilings_verified = bool(
+            all(
+                per_observable_k0_radius[obs_key] <= c["k0_ceiling"]
+                and per_observable_max_radius[obs_key] <= c["max_ceiling"]
+                for obs_key, c in per_observable_declared_ceilings.items()
+            )
+        )
         observable_radius_summary: Dict[str, Any] = {
             "sample_grade_set": [r["K_label"] for r in orbit_rows],
             "sample_grade_count": len(orbit_rows),
-            "per_observable_max_radius": {
-                obs_key: max(
-                    float(r[obs_key]["enclosure_arb"].rad())
-                    for r in orbit_rows
-                )
-                for obs_key in (
-                    "P_tau_K_HS_orbit_certified",
-                    "pole_plus_transfer_term_neg_c_tau_A_h0_certified",
-                    "small_scale_prime_W_inv_XK_certified",
-                    "divisor_aggregated_W_log_XK_certified",
-                    "head_divisor_R_mu_head_XK_certified",
-                    "resonant_band_R_mu_band_XK_direct_sum_certified",
-                    "super_scale_tail_R_mu_tail_XK_direct_certified",
-                    "E_tau_controlled_K_certified",
-                    "E_tau_K_total_remainder_certified",
-                    "C_tau_K_certified",
-                )
-            },
+            "per_observable_k0_radius": per_observable_k0_radius,
+            "per_observable_max_radius": per_observable_max_radius,
+            "per_observable_declared_ceilings": per_observable_declared_ceilings,
+            "all_declared_ceilings_verified": all_declared_ceilings_verified,
             "precision_scope_note": (
                 "Each observable's radius reflects its specific analytical truncation and quadrature budget "
                 "(all ceilings below are rounded upward): W_log(X_K), R_{mu,head}(X_K), and R_{mu,band}(X_K) "
                 "(evaluated by 4th-order Euler-Maclaurin on [N0, infty)) have radii <= 6.59e-11 (<= 6.59e-11, "
                 "<= 5.64e-11, and <= 5.65e-11), P_tau(K) has radius <= 3.22e-22, -(c_tau^B+2)h_0(X_K) has radius "
                 "<= 6.35e-75, and W(X_K^{-1}) has radius <= 7.02e-9, whereas R_{mu,tail}(X_K) and E_{tau,controlled}(K) "
-                "include the direct super-scale tail remainder C_{log,0} X_K^{5/2} / (2 m_tail_cut^2) (radii <= 4.36e-7 "
-                "at K=0 up to <= 5.43e-4 at |K|=2), and C_tau(K) and E_tau(K) include the prime-power Rosser-Schoenfeld "
-                "tail on n > 16500 in W(X_K) (radii <= 1.41e-8 at K=0 up to <= 6.87e-5 at |K|=2)."
+                "include the direct super-scale tail remainder C_{log,0} X_K^{5/2} / (2 m_tail_cut^2) and inner small-tail "
+                "truncations (radii <= 1.89e-5 at K=0 up to <= 5.43e-4 at |K|=2), and C_tau(K) and E_tau(K) include the "
+                "prime-power Rosser-Schoenfeld tail on n > 16500 in W(X_K) (radii <= 1.41e-8 at K=0 up to <= 6.87e-5 at |K|=2)."
             ),
         }
 
