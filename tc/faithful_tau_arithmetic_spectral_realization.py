@@ -2210,14 +2210,14 @@ def verify_canonical_hilbert_schmidt_orbit_decomposition(
                 )
             },
             "precision_scope_note": (
-                "Each observable's radius reflects its specific analytical truncation and quadrature budget: "
-                "W_log(X_K), R_{mu,head}(X_K), and R_{mu,band}(X_K) (evaluated by 4th-order Euler-Maclaurin "
-                "on [N0, infty)) have radii <= 6.59e-11 (6.58e-11, 5.64e-11, and 5.64e-11), P_tau(K) has radius "
-                "<= 3.22e-22, -(c_tau^B+2)h_0(X_K) has radius <= 6.34e-75, and W(X_K^{-1}) has radius <= 7.01e-9, "
-                "whereas R_{mu,tail}(X_K) and E_{tau,controlled}(K) include the direct super-scale tail remainder "
-                "C_{log,0} X_K^{5/2} / (2 m_tail_cut^2) (radii 1.89e-5 at K=0 up to 5.42e-4 at |K|=2), "
-                "and C_tau(K) and E_tau(K) include the prime-power Rosser-Schoenfeld tail on n > 16500 "
-                "in W(X_K) (radii 1.40e-8 at K=0 up to 6.87e-5 at |K|=2)."
+                "Each observable's radius reflects its specific analytical truncation and quadrature budget "
+                "(all ceilings below are rounded upward): W_log(X_K), R_{mu,head}(X_K), and R_{mu,band}(X_K) "
+                "(evaluated by 4th-order Euler-Maclaurin on [N0, infty)) have radii <= 6.59e-11 (<= 6.59e-11, "
+                "<= 5.64e-11, and <= 5.65e-11), P_tau(K) has radius <= 3.22e-22, -(c_tau^B+2)h_0(X_K) has radius "
+                "<= 6.35e-75, and W(X_K^{-1}) has radius <= 7.02e-9, whereas R_{mu,tail}(X_K) and E_{tau,controlled}(K) "
+                "include the direct super-scale tail remainder C_{log,0} X_K^{5/2} / (2 m_tail_cut^2) (radii <= 4.36e-7 "
+                "at K=0 up to <= 5.43e-4 at |K|=2), and C_tau(K) and E_tau(K) include the prime-power Rosser-Schoenfeld "
+                "tail on n > 16500 in W(X_K) (radii <= 1.41e-8 at K=0 up to <= 6.87e-5 at |K|=2)."
             ),
         }
 
@@ -2693,7 +2693,7 @@ def verify_prime_separation_identity_and_canonical_band_boundary_arb(
                         upper_ordering = "M(X)/p >= M(X/p)"
                     else:
                         upper_ordering = (
-                            "M(X)/p < M(X/p) (small-Y single-endpoint regime)"
+                            "M(X)/p < M(X/p) (single-endpoint regime N - 1 < M(X)/p < N)"
                         )
                     high_cert = certify_abs_le_bound_arb(delta_high, B_tail_arb)
                     if not high_cert["certified"]:
@@ -2780,10 +2780,10 @@ def verify_prime_separation_identity_and_canonical_band_boundary_arb(
                         }
                     )
 
-        # Explicit small-Y single-endpoint upper-cutoff ordering check at X = 2, p = 2:
-        # Here Y = X/p = 1, M(2) = 3, M(2)/2 = 3/2 < 2 = M(1), so (M(2)/2, M(1)] = (3/2, 2]
-        # contains only the single integer endpoint d = M(1) = 2. For p = 2, 2 | d so Delta_{2,high}(2) = 0;
-        # even without coprime filtering, the single endpoint term 2^{-1/2} |W_log(1/2)| is <= (1/2) C_{log,0} = B_tail.
+        # Explicit single-endpoint upper-cutoff ordering checks (N - 1 < M(X)/p < N := M(Y)):
+        # (a) At X = 2, p = 2: Y = X/p = 1, M(2) = 3, M(2)/2 = 3/2 < 2 = M(1) = N, so (M(2)/2, M(1)] = (3/2, 2]
+        #     contains only the single integer endpoint d = N = 2 (annihilated by 2 | d, with unfiltered
+        #     magnitude 2^{-1/2} |W_log(1/2)| <= (1/2) C_{log,0} = B_tail).
         single_ep_d2_term = (arb(1) / arb(2).sqrt()) * abs(
             evaluate_W_log_em4_certified_arb(arb("0.5"), prec_bits=prec_bits)
         )
@@ -2791,6 +2791,78 @@ def verify_prime_separation_identity_and_canonical_band_boundary_arb(
             single_ep_d2_term, B_tail_arb
         )
         if not single_ep_d2_cert["certified"]:
+            both_upper_cutoff_orderings_certified = False
+
+        # (b) At X = 18/5 = 3.6, p = 2: Y = X/p = 9/5 = 1.8.
+        #     Exact integer powers give 4^4 = 256 < (18/5)^5 = 1889568/3125 = 604.66176 <= 625 = 5^4 => M(18/5) = 5,
+        #     2^6 = 64 <= (18/5)^5 < 729 = 3^6 => H(18/5) = 2, and
+        #     2^4 = 16 < (9/5)^5 = 59049/3125 = 18.89568 <= 81 = 3^4 => N = M(9/5) = 3, H(9/5) = 1.
+        #     Thus N - 1 = 2 < M(X)/p = 5/2 = 2.5 < 3 = N = M(Y), and the omitted interval (5/2, 3]
+        #     contains only the single integer endpoint d = N = 3, which satisfies 2 nmid 3 and therefore
+        #     survives the coprime filter:
+        #         Delta_{2,high}(18/5) = -S_2(9/5; 5/2, 3) = -(mu(3)/sqrt(3)) W_log(3/5) = +(1/sqrt(3)) W_log(3/5) != 0,
+        #     satisfying |Delta_{2,high}(18/5)| <= C_{log,0} Y^{5/2} / N^3 <= (1/2) C_{log,0} = B_tail.
+        x_18_5 = arb(18) / arb(5)
+        y_9_5 = arb(9) / arb(5)
+        H_18_5 = certified_head_cutoff_H_X_arb(x_18_5, prec_bits=prec_bits)
+        M_18_5 = certified_coupled_cutoff_M_X_arb(x_18_5, prec_bits=prec_bits)
+        H_9_5 = certified_head_cutoff_H_X_arb(y_9_5, prec_bits=prec_bits)
+        M_9_5 = certified_coupled_cutoff_M_X_arb(y_9_5, prec_bits=prec_bits)
+        R_band_18_5 = evaluate_R_interval_arb(
+            x_18_5, arb(H_18_5), arb(M_18_5), prec_bits=prec_bits
+        )
+        S2_band_18_5 = evaluate_S_p_interval_arb(
+            x_18_5, arb(H_18_5), arb(M_18_5), 2, prec_bits=prec_bits
+        )
+        S2_band_9_5 = evaluate_S_p_interval_arb(
+            y_9_5, arb(H_9_5), arb(M_9_5), 2, prec_bits=prec_bits
+        )
+        delta_low_18_5 = evaluate_S_p_interval_arb(
+            y_9_5, arb(H_18_5) / arb(2), arb(H_9_5), 2, prec_bits=prec_bits
+        )
+        delta_high_18_5 = evaluate_S_p_interval_arb(
+            y_9_5, arb(M_9_5), arb(M_18_5) / arb(2), 2, prec_bits=prec_bits
+        ) - evaluate_S_p_interval_arb(
+            y_9_5, arb(M_18_5) / arb(2), arb(M_9_5), 2, prec_bits=prec_bits
+        )
+        expected_delta_high_18_5 = (arb(1) / arb(3).sqrt()) * evaluate_W_log_em4_certified_arb(
+            arb(3) / arb(5), prec_bits=prec_bits
+        )
+        delta_high_18_5_matches_d3 = bool(
+            (delta_high_18_5 - expected_delta_high_18_5).contains(0)
+        )
+        delta_high_18_5_nonzero = not bool(delta_high_18_5.contains(0))
+        sharp_n3_bound_18_5 = (
+            C_log_0_arb * (y_9_5 ** arb("2.5")) / (arb(M_9_5) ** arb(3))
+        )
+        cert_18_5_sharp = certify_abs_le_bound_arb(
+            delta_high_18_5, sharp_n3_bound_18_5
+        )
+        cert_18_5_tail = certify_abs_le_bound_arb(delta_high_18_5, B_tail_arb)
+        B2_18_5 = delta_low_18_5 + delta_high_18_5
+        canon_sep_18_5_ok = bool(
+            (
+                R_band_18_5
+                - (
+                    S2_band_18_5
+                    - (arb(1) / arb(2).sqrt()) * S2_band_9_5
+                    - (arb(1) / arb(2).sqrt()) * B2_18_5
+                )
+            ).contains(0)
+        )
+        cert_18_5_rescaled = certify_abs_le_bound_arb(B2_18_5, B_rescaled_arb)
+        if not (
+            H_18_5 == 2
+            and M_18_5 == 5
+            and H_9_5 == 1
+            and M_9_5 == 3
+            and delta_high_18_5_matches_d3
+            and delta_high_18_5_nonzero
+            and cert_18_5_sharp["certified"]
+            and cert_18_5_tail["certified"]
+            and canon_sep_18_5_ok
+            and cert_18_5_rescaled["certified"]
+        ):
             both_upper_cutoff_orderings_certified = False
 
         # 2. Verify iterated single-prime tower telescoping (both arbitrary-interval rescaled tower
@@ -3040,7 +3112,7 @@ def verify_prime_separation_identity_and_canonical_band_boundary_arb(
                 "R_{mu,band}(X) = S_{p,band}(X) - p^{-1/2} S_{p,band}(X / p) - p^{-1/2} B_p(X),   "
                 "where B_p(X) = Delta_{p,low}(X) + Delta_{p,high}(X) is the rescaled cutoff boundary sum, "
                 "and S_{p,band}(X) = sum_{j=0}^{L-1} q^j (R_{mu,band}(X/p^j) + q B_p(X/p^j)) + q^L S_{p,band}(X/p^L) "
-                "terminates at L = floor(log_p X) + 1 where X/p^L < 1 so S_{p,band}(X/p^L) = 0 by definition."
+                "holds for 1 <= L <= floor(log_p X) + 1 and terminates at L = floor(log_p X) + 1 where X/p^L < 1 so S_{p,band}(X/p^L) = 0 by definition."
             ),
             "unconditional_rescaled_boundary_bounds": {
                 "B_rescaled_global_all_X_ge_1_and_all_p_certified": serialize_arb_certified(
@@ -3062,13 +3134,59 @@ def verify_prime_separation_identity_and_canonical_band_boundary_arb(
                     "M_X": 3,
                     "M_X_over_p_ratio": "3/2 = 1.5",
                     "M_Y": 2,
-                    "interval_M_X_over_p_to_M_Y": "(3/2, 2] containing only integer d = M(1) = 2",
+                    "interval_M_X_over_p_to_M_Y": "(3/2, 2] containing only integer d = M(1) = 2 (filtered out by 2 nmid d)",
                     "single_endpoint_unfiltered_term_2_neg_half_abs_W_log_half_certified": serialize_arb_certified(
                         single_ep_d2_term
                     ),
                     "single_endpoint_le_B_tail_certified": single_ep_d2_cert[
                         "certified"
                     ],
+                },
+                "single_endpoint_coprime_surviving_regime_X_18_5_p2": {
+                    "X": "18/5 = 3.6",
+                    "p": 2,
+                    "Y_equals_X_over_p": "9/5 = 1.8",
+                    "H_X": H_18_5,
+                    "M_X": M_18_5,
+                    "H_Y": H_9_5,
+                    "M_Y": M_9_5,
+                    "M_X_over_p_ratio": "5/2 = 2.5",
+                    "single_endpoint_inequality": "N - 1 = 2 < M(X)/p = 5/2 < 3 = N := M(Y)",
+                    "interval_M_X_over_p_to_M_Y": "(5/2, 3] containing only integer d = M(9/5) = 3, which survives the coprime filter 2 nmid d",
+                    "delta_high_certified": serialize_arb_certified(delta_high_18_5),
+                    "single_endpoint_term_plus_3_neg_half_W_log_3_5_certified": serialize_arb_certified(
+                        expected_delta_high_18_5
+                    ),
+                    "delta_high_minus_single_endpoint_term_certified": serialize_arb_certified(
+                        delta_high_18_5 - expected_delta_high_18_5
+                    ),
+                    "delta_high_matches_single_endpoint_encloses_zero": delta_high_18_5_matches_d3,
+                    "delta_high_nonzero_certified": delta_high_18_5_nonzero,
+                    "abs_delta_high_certified": serialize_arb_certified(
+                        abs(delta_high_18_5)
+                    ),
+                    "analytic_single_endpoint_bound_C_log_0_Y_5_2_over_N3_certified": serialize_arb_certified(
+                        sharp_n3_bound_18_5
+                    ),
+                    "abs_delta_high_le_analytic_bound_certified": cert_18_5_sharp[
+                        "certified"
+                    ],
+                    "abs_delta_high_le_B_tail_certified": cert_18_5_tail["certified"],
+                    "R_band_X_certified": serialize_arb_certified(R_band_18_5),
+                    "S2_band_X_certified": serialize_arb_certified(S2_band_18_5),
+                    "S2_band_Y_certified": serialize_arb_certified(S2_band_9_5),
+                    "delta_low_certified": serialize_arb_certified(delta_low_18_5),
+                    "B2_X_certified": serialize_arb_certified(B2_18_5),
+                    "abs_B2_X_le_B_rescaled_certified": cert_18_5_rescaled["certified"],
+                    "canonical_band_separation_diff_certified": serialize_arb_certified(
+                        R_band_18_5
+                        - (
+                            S2_band_18_5
+                            - (arb(1) / arb(2).sqrt()) * S2_band_9_5
+                            - (arb(1) / arb(2).sqrt()) * B2_18_5
+                        )
+                    ),
+                    "canonical_band_separation_encloses_zero": canon_sep_18_5_ok,
                 },
             },
             "two_way_coprime_band_equivalence_theorem": (
@@ -3643,7 +3761,7 @@ def execute_task_tc051_prime_arithmetic_resonant_band_audit(
                 "R(X; A, B) = S_p(X; A, B) - p^{-1/2} S_p(X/p; A/p, B/p)   (exact single-prime separation)",
                 "R_j = S_j - q S_{j+1}, S_0 = sum_{j=0}^{L-1} q^j R_j + q^L S_L   (simultaneously rescaled arbitrary-interval tower)",
                 "R_{mu,band}(X) = S_{p,band}(X) - p^{-1/2} S_{p,band}(X/p) - p^{-1/2} B_p(X)   (canonical rescaled-band separation)",
-                "S_{p,band}(X) = sum_{j=0}^{L-1} q^j (R_{mu,band}(X/p^j) + q B_p(X/p^j)) + q^L S_{p,band}(X/p^L)   (canonical-band inverse tower)",
+                "S_{p,band}(X) = sum_{j=0}^{L-1} q^j (R_{mu,band}(X/p^j) + q B_p(X/p^j)) + q^L S_{p,band}(X/p^L)   (canonical-band inverse tower, 1 <= L <= floor(log_p X) + 1)",
                 "R(X; A, B) = sum_{d | P} (mu(d)/sqrt(d)) S_P(X/d; A/d, B/d)   (multi-prime inclusion-exclusion)",
                 "R(X; A, B) = M_A(B) F_X(B) + int_A^B M_A(t) t^{-3/2} tilde{W}_log(X/t) dt   (exact summation by parts)",
             ],
@@ -3822,9 +3940,9 @@ def execute_task_tc050_faithful_spectral_realization_audit(
                         "Theorem 54 proves the algebraic consequences of the single-prime separation and rescaled-band "
                         "boundary decomposition from explicit hypotheses h_sep, h_rescaled, h_low, h_high; the squarefree "
                         "divisibility partition m = p d (mu(p d) = 0 for p | d, mu(p d) = -mu(d) for p nmid d), the lower "
-                        "cutoff comparison H(X)/p <= H(X/p), and the upper boundary bound |Delta_{p,high}(X)| <= B_tail across "
-                        "both cutoff orderings (M(X)/p >= M(X/p) and the small-Y single-endpoint regime M(X)/p < M(X/p) when "
-                        "1 <= X/p < 2^{4/5}) are proved analytically outside Lean."
+                        "cutoff comparison floor(H(X)/p) <= H(X/p), and the upper boundary bound |Delta_{p,high}(X)| <= B_tail across "
+                        "both cutoff orderings (M(X)/p >= M(X/p) and the single-endpoint regime N - 1 < M(X)/p < N := M(X/p)) "
+                        "are proved analytically outside Lean."
                     ),
                 },
                 "theorem_55_summation_by_parts_endpoint_bound_and_smooth_mertens_reduction": {

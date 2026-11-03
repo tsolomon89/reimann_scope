@@ -269,8 +269,8 @@ def test_06_lean_formalization_and_arb_roundtrip_verification(
         assert thm_name in lean_live["actual_theorems"]
 
     sec6 = tc050_artifact["section_6_certified_arb_roundtrip_verification"]
-    assert sec6["total_certified_arb_balls_checked"] == 708
-    assert sec6["compared_against_live_original_arb_count"] == 708
+    assert sec6["total_certified_arb_balls_checked"] == 719
+    assert sec6["compared_against_live_original_arb_count"] == 719
     assert sec6["live_original_count_matches_enumerated_total"] is True
     assert sec6["all_enclose_original_256bit_arb_ball"] is True
     assert sec6["failed_paths"] == []
@@ -279,7 +279,7 @@ def test_06_lean_formalization_and_arb_roundtrip_verification(
     rt_recheck = verify_all_serialized_arb_in_tree(
         tc050_artifact, path_prefix="task_tc050"
     )
-    assert rt_recheck["total_certified_arb_balls_checked"] == 708
+    assert rt_recheck["total_certified_arb_balls_checked"] == 719
     assert (
         sec6["compared_against_live_original_arb_count"]
         == rt_recheck["total_certified_arb_balls_checked"]
@@ -953,12 +953,38 @@ def test_19_tc051r_multi_prime_orientation_regression_and_small_Y_upper_cutoff(
     assert "not assumed" in sieve["multiplicative_coset_shift_note"]
     assert "-(1/2)" in sieve["euler_product_log_expansion"] or "- (1/2)" in sieve["euler_product_log_expansion"]
 
-    # Verify both upper-cutoff orderings in sample_band_prime_table:
+    # Verify both upper-cutoff orderings in sample_band_prime_table and the X = 18/5, p = 2 regression:
     assert p_audit["both_upper_cutoff_orderings_certified"] is True
     small_y = p_audit["unconditional_rescaled_boundary_bounds"][
         "small_Y_single_endpoint_regime_X2_p2"
     ]
     assert small_y["single_endpoint_le_B_tail_certified"] is True
+
+    r18_5 = p_audit["unconditional_rescaled_boundary_bounds"][
+        "single_endpoint_coprime_surviving_regime_X_18_5_p2"
+    ]
+    assert r18_5["H_X"] == 2
+    assert r18_5["M_X"] == 5
+    assert r18_5["H_Y"] == 1
+    assert r18_5["M_Y"] == 3
+    assert r18_5["delta_high_matches_single_endpoint_encloses_zero"] is True
+    assert r18_5["delta_high_nonzero_certified"] is True
+    assert r18_5["abs_delta_high_le_analytic_bound_certified"] is True
+    assert r18_5["abs_delta_high_le_B_tail_certified"] is True
+    assert r18_5["abs_B2_X_le_B_rescaled_certified"] is True
+    assert r18_5["canonical_band_separation_encloses_zero"] is True
+    assert math.isclose(
+        r18_5["delta_high_certified"]["mid_float"], 0.01851256133, abs_tol=1e-9
+    )
+    assert math.isclose(
+        r18_5["R_band_X_certified"]["mid_float"], 0.03772775329, abs_tol=1e-9
+    )
+    assert math.isclose(
+        r18_5["S2_band_Y_certified"]["mid_float"], -0.01851256133, abs_tol=1e-9
+    )
+    assert math.isclose(
+        r18_5["B2_X_certified"]["mid_float"], 0.01851256133, abs_tol=1e-9
+    )
 
     table = p_audit["sample_band_prime_table"]
     row_x2_p2 = [
@@ -968,7 +994,7 @@ def test_19_tc051r_multi_prime_orientation_regression_and_small_Y_upper_cutoff(
     assert row_x2_p2["M_X_over_p"] == 2
     assert (
         row_x2_p2["upper_cutoff_ordering"]
-        == "M(X)/p < M(X/p) (small-Y single-endpoint regime)"
+        == "M(X)/p < M(X/p) (single-endpoint regime N - 1 < M(X)/p < N)"
     )
     assert row_x2_p2["canonical_band_sep_encloses_zero"] is True
     assert row_x2_p2["abs_B_p_le_B_rescaled_certified"] is True
@@ -1137,14 +1163,40 @@ def test_22_tc051r_review_markdown_and_json_artifact_consistency(
         "$64$": "64",
     }
     matched_sep_rows = 0
+    matched_18_5_row = False
     matched_sbp_rows = 0
     matched_disc_rows = 0
+    r18_5 = sep["unconditional_rescaled_boundary_bounds"][
+        "single_endpoint_coprime_surviving_regime_X_18_5_p2"
+    ]
     for line in doc_text.splitlines():
         line_s = line.strip()
         if not line_s.startswith("|"):
             continue
         cells = [c.strip() for c in line_s.strip("|").split("|")]
-        if (
+        if len(cells) == 9 and cells[0] == "$18/5$" and cells[1] == "$2$":
+            matched_18_5_row = True
+            assert math.isclose(
+                float(cells[5].strip("$")),
+                r18_5["R_band_X_certified"]["mid_float"],
+                abs_tol=1e-9,
+            )
+            assert math.isclose(
+                float(cells[6].strip("$")),
+                r18_5["S2_band_X_certified"]["mid_float"],
+                abs_tol=1e-9,
+            )
+            assert math.isclose(
+                float(cells[7].strip("$")),
+                r18_5["S2_band_Y_certified"]["mid_float"],
+                abs_tol=1e-9,
+            )
+            assert math.isclose(
+                float(cells[8].strip("$")),
+                r18_5["B2_X_certified"]["mid_float"],
+                abs_tol=1e-9,
+            )
+        elif (
             len(cells) == 9
             and cells[0] in x_label_map
             and cells[1] in ("$2$", "$3$", "$5$")
@@ -1233,10 +1285,34 @@ def test_22_tc051r_review_markdown_and_json_artifact_consistency(
                 abs_tol=1e-4,
             )
     assert matched_sep_rows == 10
+    assert matched_18_5_row is True
     assert matched_sbp_rows == 7
     assert matched_disc_rows == 9
 
-    # Ensure stale pre-reconciliation X = 64 numbers are absent across all review and ledger files:
+    assert "1 <= L <= floor(log_p X) + 1" in sep["canonical_rescaled_band_identity"]
+    assert "1 \\le L \\le \\lfloor\\log_p X\\rfloor + 1" in doc_text
+    assert "\\lfloor H(X)/p\\rfloor \\le H(X/p)" in doc_text
+    assert "floor(H(X)/p) <= H(X/p)" in (
+        tc050_artifact["section_5_lean_formalization_and_remaining_obligation"][
+            "committed_lean_theorems_exact_scope"
+        ]["theorem_54_prime_separation_and_canonical_band_boundary_equivalence"][
+            "external_analytic_scope_note"
+        ]
+    )
+    prec_note = tc050_artifact[
+        "section_4_canonical_hilbert_schmidt_orbit_decomposition"
+    ]["precision_scope_note"]
+    for ceil_str in (
+        "<= 6.59e-11",
+        "<= 5.65e-11",
+        "<= 6.35e-75",
+        "<= 7.02e-9",
+        "<= 5.43e-4",
+        "<= 1.41e-8",
+    ):
+        assert ceil_str in prec_note
+
+    # Ensure stale pre-reconciliation X = 64 numbers and false Case 2 claims are absent across all review and ledger files:
     for rel_path in (
         "docs/reviews/TC_FAITHFUL_TAU_ARITHMETIC_SPECTRAL_REALIZATION.md",
         "docs/reviews/TC_CANONICAL_THETA_CORRELATION_BOUND.md",
@@ -1254,9 +1330,13 @@ def test_22_tc051r_review_markdown_and_json_artifact_consistency(
             "-0.0012834192",
             "15.13020",
             "15.13019",
+            "can occur only when",
+            "1 <= X/p < 2^{4/5}",
+            "1 \\le X/p < 2^{4/5}",
+            "H(X)/p <= H(X/p)",
         ):
             assert stale_str not in text, (
-                f"Found stale number {stale_str} in {rel_path}"
+                f"Found stale string {stale_str} in {rel_path}"
             )
 
 
