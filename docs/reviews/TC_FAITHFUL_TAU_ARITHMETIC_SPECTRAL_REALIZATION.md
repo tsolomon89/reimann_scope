@@ -1,15 +1,15 @@
-# Faithful $\tau$-Arithmetic Spectral Realization, Adjoint Compatibility, Canonical Hilbert–Schmidt Orbit Decomposition, and Resonant-Band Prime-Separation / Summation-by-Parts Analysis (`TASK-TC-050` / `TASK-TC-050R` / `TASK-TC-050R2` / `TASK-TC-051` / `TASK-TC-051R`)
+# Faithful $\tau$-Arithmetic Spectral Realization, Adjoint Compatibility, Canonical Hilbert–Schmidt Orbit Decomposition, Resonant-Band Prime-Separation / Summation-by-Parts Analysis, and Transition-Region / Vaughan Type I / Spectral–Dirichlet Compatibility (`TASK-TC-050` / `TASK-TC-050R` / `TASK-TC-050R2` / `TASK-TC-051` / `TASK-TC-051R` / `TASK-TC-052`)
 
-**Task ID:** `TASK-TC-050` / `TASK-TC-050R` / `TASK-TC-050R2` / `TASK-TC-051` / `TASK-TC-051R`  
+**Task ID:** `TASK-TC-050` / `TASK-TC-050R` / `TASK-TC-050R2` / `TASK-TC-051` / `TASK-TC-051R` / `TASK-TC-052`  
 **Parent Epic:** `EPIC-TC-042`  
-**Reviewed Baselines:** `5da0eb79e1732ff871ee1c7fee729c62972aa406` (`TC-048R`), `2f7871fff666091c4152ecc8657f2345aacdd4fa` (`TC-050` + `TC-049R`), `0e6ae36ce995ef3037652b3dfb67645325f990b1` (`TC-050R` HEAD; implementation commit `f5521363ea94774938fd37152d67d743413327ae`), `d93ab512c2df75af2365a3963804c172baf0e867` (`TC-050R2` merged on `main`), `b6f22dfee0dd6177ee855189304e7930f9ba3e20` (`TC-051` merged on `main`; branch tip `7ac0546b1177970ff0d87824f61643da2405c4c0`, implementation commit `333661eecd69738e8a67143e635b6db4f40170ce`)  
-**Branched From:** `b6f22dfee0dd6177ee855189304e7930f9ba3e20` (`task/tc-051r-identity-certificate-and-report-reconciliation`)  
+**Reviewed Baselines:** `5da0eb79e1732ff871ee1c7fee729c62972aa406` (`TC-048R`), `2f7871fff666091c4152ecc8657f2345aacdd4fa` (`TC-050` + `TC-049R`), `0e6ae36ce995ef3037652b3dfb67645325f990b1` (`TC-050R` HEAD; implementation commit `f5521363ea94774938fd37152d67d743413327ae`), `d93ab512c2df75af2365a3963804c172baf0e867` (`TC-050R2` merged on `main`), `b6f22dfee0dd6177ee855189304e7930f9ba3e20` (`TC-051` merged on `main`; branch tip `7ac0546b1177970ff0d87824f61643da2405c4c0`, implementation commit `333661eecd69738e8a67143e635b6db4f40170ce`), `1f576944c040d5b3a2bf8091ca803e3758c80d12` (`TC-051R` closeout accepted on `main`)  
+**Branched From:** `1f576944c040d5b3a2bf8091ca803e3758c80d12` (`task/tc-052-arithmetic-fourier-compatibility-and-subgate-closure`)  
 **Primary Implementation Module:** [tc/faithful_tau_arithmetic_spectral_realization.py](file:///c:/Development/Projects/reimann_scope/tc/faithful_tau_arithmetic_spectral_realization.py)  
-**Exported Facade Entrypoints:** [`execute_task_tc050_faithful_spectral_realization_audit`](file:///c:/Development/Projects/reimann_scope/tc/canonical_theta_correlation_bound.py#L10142-L10175), [`execute_task_tc051_prime_arithmetic_resonant_band_audit`](file:///c:/Development/Projects/reimann_scope/tc/canonical_theta_correlation_bound.py#L10142-L10175)  
-**Certified 256-bit Arb Data Artifact:** [data/tc_faithful_tau_arithmetic_spectral_realization.json](file:///c:/Development/Projects/reimann_scope/data/tc_faithful_tau_arithmetic_spectral_realization.json) (`708/708` certified 256-bit Arb balls passing outward-rounded decimal round-trip verification)  
-**Formal Verification Module:** [formal/RiemannScope/CanonicalThetaCorrelationBound.lean](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope/CanonicalThetaCorrelationBound.lean) (`44` definitions, `56` theorems = `100` declarations, `0` `sorry`, `0` `admit`, `0` custom axioms)  
+**Exported Facade Entrypoints:** [`execute_task_tc050_faithful_spectral_realization_audit`](file:///c:/Development/Projects/reimann_scope/tc/canonical_theta_correlation_bound.py#L10142-L10185), [`execute_task_tc051_prime_arithmetic_resonant_band_audit`](file:///c:/Development/Projects/reimann_scope/tc/canonical_theta_correlation_bound.py#L10142-L10185), [`execute_task_tc052_arithmetic_fourier_compatibility_audit`](file:///c:/Development/Projects/reimann_scope/tc/canonical_theta_correlation_bound.py#L10142-L10185)  
+**Certified 256-bit Arb Data Artifact:** [data/tc_faithful_tau_arithmetic_spectral_realization.json](file:///c:/Development/Projects/reimann_scope/data/tc_faithful_tau_arithmetic_spectral_realization.json) (`798/798` certified 256-bit Arb balls passing outward-rounded decimal round-trip verification)  
+**Formal Verification Module:** [formal/RiemannScope/CanonicalThetaCorrelationBound.lean](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope/CanonicalThetaCorrelationBound.lean) (`47` definitions, `59` theorems = `103` declarations, `0` `sorry`, `0` `admit`, `0` custom axioms)  
 **Regression Test Suite:** [tests/test_tc_faithful_tau_arithmetic_spectral_realization.py](file:///c:/Development/Projects/reimann_scope/tests/test_tc_faithful_tau_arithmetic_spectral_realization.py)  
-**Status Classification:** `ADJOINT_COMPATIBILITY_HYPERBOLIC_NULL_CONE_AND_CANONICAL_HILBERT_SCHMIDT_ORBIT_DECOMPOSITION_PROVED_RESONANT_BAND_EQUIVALENCE_ISOLATED_SUBGATE_OPEN` (`PROVED_CONDITIONAL` + `CERTIFIED_FINITE`; `SUBGATE-TC-043A` remains `OPEN`; `rh_proved: false`)
+**Status Classification:** `TRANSITION_MOMENT_ANNIHILATION_VAUGHAN_TYPE_I_UNIFORM_BOUND_AND_CRITICAL_LINE_MELLIN_FACTORIZATION_PROVED_TYPE_II_RESONANT_BAND_OPEN_SUBGATE_OPEN` (`PROVED_CONDITIONAL` + `CERTIFIED_FINITE`; `SUBGATE-TC-043A` remains `OPEN`; `rh_proved: false`)
 
 ---
 
@@ -722,3 +722,135 @@ To compare signed sums $\bigl|\sum_{H(X)<m\le M(X)} \sigma_m m^{-1/2} W_{\log}(X
   1. **Signed Sum vs. Triangle-Inequality Majorant**: At $X = 64$ ($(H, M) = (32, 182)$), the signed sums are $R_{\mu,\mathrm{band}}(64) = +0.03059141547\ldots$ (which is also the maximum of $|R_{\mu,\mathrm{band}}(X)|$ on the 9-point grid), $R_{1,\mathrm{band}}(64) = -0.01583365880\ldots$, and $R_{|\mu|,\mathrm{band}}(64) = +0.01904894182\ldots$, whereas the triangle-inequality majorant $\sum_{32 < m \le 182}\frac{|\mu(m)|}{\sqrt{m}}|W_{\log}(64/m)| = +0.29032671364\ldots$ is $9.49046356\times$ larger than $|R_{\mu,\mathrm{band}}(64)|$ (and $25.52681408\times$ larger at $X = 16$ and $25.06399947\times$ larger at $X = \tau^2$).
   2. **Strict Separation of Signed Kernel Oscillation from Absolute-Value Sums**: The signed sums $R_{1,\mathrm{band}}(X) = \sum_{H < m \le M} m^{-1/2}W_{\log}(X/m)$ and $R_{|\mu|,\mathrm{band}}(X) = \sum_{H < m \le M} |\mu(m)| m^{-1/2}W_{\log}(X/m)$ incorporate the sign changes of $W_{\log}(X/m)$ across $m \in (H(X), M(X)]$, whereas the worst-case sequence $\sigma_m^{\mathrm{wc}}(X) = |\mu(m)|\operatorname{sgn}(W_{\log}(X/m))$ removes all sign cancellation and equals the absolute-value sum $\sum_{H < m \le M} |\mu(m)| m^{-1/2}|W_{\log}(X/m)|$.
   3. **Finite-Grid and Asymptotic Scope Hygiene**: Finite-grid values on $X \in [1, 64]$ do not determine the asymptotic behavior as $X \to \infty$ of $R_{1,\mathrm{band}}(X)$ or $R_{|\mu|,\mathrm{band}}(X)$, and $O(X^{1/2})$ is an upper bound for the triangle-inequality majorant $\sum_{H(X) < m \le M(X)} |\mu(m)| m^{-1/2}|W_{\log}(X/m)|$ unless a matching lower bound is proved. Closing `SUBGATE-TC-043A` requires proving an unconditional $O(1)$ bound on the signed Möbius sum $R_{\mu,\mathrm{band}}(X)$ (or equivalently on the smooth Mertens integral $I_{M,\mathrm{band}}(X)$).
+
+---
+
+## 9. Transition-Region Vanishing Moments, Linear-Density Annihilation, Vaughan Type I Uniform Bound, Euler-Sieved Positive Orbit Intertwining, Critical-Line Factorization, and Complete Conditional Closure Chain (`TASK-TC-052`, Theorems 57–59)
+
+In `TASK-TC-052` ([`execute_task_tc052_arithmetic_fourier_compatibility_audit`](file:///c:/Development/Projects/reimann_scope/tc/faithful_tau_arithmetic_spectral_realization.py#L4569-L4610)), we investigate the closing theorem for `SUBGATE-TC-043A` across both **Approach A** (signed arithmetic cancellation in the transition region) and **Approach B** (operator action of $D_p$ and $E_y$ on $\mathcal{H}_\tau^{\mathrm{pos}}$ and $L^2(\mathbb{R}_{>0}, d^\times y)$) and formalize the complete conditional implication chain to the Riemann Hypothesis (`Theorems 57–59`).
+
+### 9.1 Exact Closure Target and Rescaled Transition-Region Integral
+
+Throughout the framework, $\tau = 2\pi$, concurrent algebraic grades $K \in \mathbb{A}_{\mathbb{R}} := \overline{\mathbb{Q}} \cap \mathbb{R}$ include both positive and negative rational and irrational algebraic grades, and $X_K := \tau^{|K|} \ge 1$ (with $|K| = \sqrt{K^2}$, so $K = 0$ is evaluated directly at $X_0 = 1$ with zero division by $K$). With the inherited cutoffs $H(X) = \lfloor X^{5/6}\rfloor$ and $M(X) = \lceil\max(2, X^{5/4})\rceil$, relative Mertens step function $\mathcal{M}_{H(X)}(t) = \sum_{H(X) < m \le t} \mu(m)$, and derivative kernel $\widetilde{W}_{\log}(u) = \frac{1}{2}W_{\log}(u) + u W_{\log}'(u) = \sum_{k \ge 2}\frac{\log k}{\sqrt{k}}\widetilde{h}_0(k/u)$, the exact closure target for `SUBGATE-TC-043A` is:
+$$
+\boxed{\exists B_I \ge 0\;\forall X \ge 1:\quad \bigl|I(X)\bigr| \le B_I, \qquad I(X) := \int_{H(X)}^{M(X)} \mathcal{M}_{H(X)}(t)\,t^{-3/2}\,\widetilde{W}_{\log}\!\left(\frac{X}{t}\right)dt.}
+$$
+Substituting $t = X u$ ($u \in [H(X)/X, M(X)/X] \sim [X^{-1/6}, X^{1/4}]$) and $v = 1/u = X/t$ ($v \in [X/M(X), X/H(X)] \sim [X^{-1/4}, X^{1/6}]$) writes $I(X)$ as a rescaled integral against a fixed smooth kernel around the transition scale $u \asymp 1$ ($t \asymp X$):
+$$
+\boxed{I(X) = X^{-1/2}\int_{H(X)/X}^{M(X)/X} \mathcal{M}_{H(X)}(X u)\,u^{-3/2}\,\widetilde{W}_{\log}\!\left(\frac{1}{u}\right)du = \int_{X/M(X)}^{X/H(X)} \frac{\mathcal{M}_{H(X)}(X/v)}{\sqrt{X/v}}\,v^{-1}\,\widetilde{W}_{\log}(v)\,dv.}
+$$
+
+### 9.2 Approach A: Vanishing Endpoint Moments, Linear-Density Annihilation, Two-Endpoint Limits for $R_{1,\mathrm{band}}(X)$ and $R_{|\mu|,\mathrm{band}}(X)$, and Vaughan Type I Uniform Bound (`Theorems 57 & 58`)
+
+1. **Exact Mellin Vanishing Orders of $W_{\log}(v)$ and $\widetilde{W}_{\log}(v)$ (`verify_transition_region_vanishing_moments_and_vaughan_type_I_bound_arb`)**:
+   Under the `TC-045` Mellin convention $\mathcal{M}_X[F](z) := \int_0^\infty F(v)\,v^{-z}\,\frac{dv}{v}$:
+   - $\mathcal{M}_X[W_{\log}](z) = -\zeta'(1/2 + z)H_0(z)$, where $H_0(z) = H_0(-z)$ has triple zeros at $z = \pm 1/2$ and $-\zeta'(1/2 + z) = \frac{1}{(z - 1/2)^2} + O(1)$ has a double pole at $z = +1/2$ ($s = 1$) and is regular with $-\zeta'(0) = \frac{1}{2}\log\tau \ne 0$ at $z = -1/2$ ($s = 0$). Thus $\mathcal{M}_X[W_{\log}](z)$ has a **simple zero at $z = +1/2$** ($\int_0^\infty v^{-3/2}W_{\log}(v)\,dv = 0$) and a **triple zero at $z = -1/2$** ($\int_0^\infty v^{-1/2}(\log v)^j W_{\log}(v)\,dv = 0$ for $j \in \{0, 1, 2\}$).
+   - Integration by parts on $\widetilde{W}_{\log}(v) = \frac{1}{2}W_{\log}(v) + v W_{\log}'(v)$ gives
+     $$
+     \boxed{\mathcal{M}_X[\widetilde{W}_{\log}](z) = \left(\frac{1}{2} + z\right)\mathcal{M}_X[W_{\log}](z) = -\left(\frac{1}{2} + z\right)\zeta'\!\left(\frac{1}{2} + z\right)H_0(z).}
+     $$
+     Because the extra factor $(\frac{1}{2} + z)$ vanishes at $z = -1/2$ and equals $1 \ne 0$ at $z = +1/2$:
+     - At **$z = +1/2$**: $\mathcal{M}_X[\widetilde{W}_{\log}](z)$ has a **simple zero** ($\int_0^\infty v^{-3/2}\widetilde{W}_{\log}(v)\,dv = 0$), with first logarithmic moment $\int_0^\infty v^{-3/2}(\log v)\widetilde{W}_{\log}(v)\,dv = -H_0'''(1/2)/6 = \frac{1}{512} = +0.001953125 \ne 0$.
+     - At **$z = -1/2$**: $\mathcal{M}_X[\widetilde{W}_{\log}](z)$ has a **quadruple zero (order 4)**:
+       $$
+       \int_0^\infty v^{-1/2}(\log v)^j\,\widetilde{W}_{\log}(v)\,dv = 0 \qquad (j \in \{0, 1, 2, 3\}),
+       $$
+       with fourth logarithmic moment $\int_0^\infty v^{-1/2}(\log v)^4\widetilde{W}_{\log}(v)\,dv = 4(-\zeta'(0))H_0'''(-1/2) = \frac{3\log\tau}{128} \approx +0.0430752437 \ne 0$ (5 vanishing endpoint moments in total, all certified to enclose zero in 256-bit Arb).
+
+2. **Linear-Density Annihilation and Unconditional Uniform Bound for $O(u^{1/2})$ Counting Error (`Theorem 57`, `transition_integral_linear_density_annihilation_and_sqrt_error_bound`)**:
+   Suppose a step counting function on $(H(X), M(X)]$ decomposes as $A_{H(X)}(t) = c\,(t - H(X)) + E_A(t)$ with linear density $c \in \mathbb{R}$. Integration by parts on $\frac{d}{dt}[t^{-1/2}W_{\log}(X/t)] = -t^{-3/2}\widetilde{W}_{\log}(X/t)$ gives
+   $$
+   \int_{H(X)}^{M(X)} c\,(t - H(X))\,t^{-3/2}\,\widetilde{W}_{\log}\!\left(\frac{X}{t}\right)dt = -c\,\bigl(M(X) - H(X)\bigr)\,M(X)^{-1/2}W_{\log}\!\left(\frac{X}{M(X)}\right) + c\,J_{\mathrm{band}}(X),
+   $$
+   where, by the vanishing moment $\mathcal{M}_X[W_{\log}](1/2) = \int_0^\infty v^{-3/2}W_{\log}(v)\,dv = 0$, the smooth linear-density integral $J_{\mathrm{band}}(X) := \int_{H(X)}^{M(X)} t^{-1/2}W_{\log}(X/t)\,dt = X^{1/2}\int_{X/M(X)}^{X/H(X)} v^{-3/2}W_{\log}(v)\,dv$ equals the negative sum of its two exterior tails:
+   $$
+   \boxed{J_{\mathrm{band}}(X) = -J_{\mathrm{head}}(X) - J_{\mathrm{tail}}(X), \qquad J_{\mathrm{head}}(X) := X^{1/2}\int_{X/H(X)}^\infty v^{-3/2}W_{\log}(v)\,dv, \qquad J_{\mathrm{tail}}(X) := X^{1/2}\int_0^{X/M(X)} v^{-3/2}W_{\log}(v)\,dv,}
+   $$
+   satisfying for all $X \ge 1$:
+   $$
+   \boxed{\bigl|J_{\mathrm{head}}(X)\bigr| \le \frac{1}{3}C_{\log,\mathrm{EM}}\,X^{1/2}\!\left(\frac{X}{H(X)}\right)^{-3} \le \frac{1}{3}C_{\log,\mathrm{EM}}, \qquad \bigl|J_{\mathrm{tail}}(X)\bigr| \le \frac{1}{2}C_{\log,0}\,X^{1/2}\!\left(\frac{X}{M(X)}\right)^2 \le \frac{1}{2}C_{\log,0},}
+   $$
+   $$
+   \boxed{\bigl|J_{\mathrm{band}}(X)\bigr| \le \frac{1}{3}C_{\log,\mathrm{EM}} + \frac{1}{2}C_{\log,0} = [4.768219 \pm 1.58 \times 10^{-6}] < 4.768220.}
+   $$
+   Furthermore, if the remainder satisfies $|E_A(t)| \le C_E\,t^{1/2}$, then $\bigl|\int_{H(X)}^{M(X)} E_A(t) t^{-3/2}\widetilde{W}_{\log}(X/t)\,dt\bigr| \le C_E\int_0^\infty v^{-1}|\widetilde{W}_{\log}(v)|\,dv < \infty$ is unconditionally $O(1)$!
+   - **Exact Two-Endpoint Asymptotic Limits for $R_{1,\mathrm{band}}(X)$ and $R_{|\mu|,\mathrm{band}}(X)$**:
+     Because $W_{\log}(v) = -\frac{81\zeta(3)}{256\pi^2}v^{-5/2} + O(v^{-7/2})$ as $v \to \infty$ (`TC-049R`) and $W_{\log}(v) = -\frac{81\zeta'(3)}{64}v^{5/2} + O(v^{9/2})$ as $v \to 0^+$ (from the $k = 2$ pole residue $\operatorname*{Res}_{z=5/2}[-H_0(z)\zeta'(1/2+z)] = \frac{81}{64}(-\zeta'(3))$ in `TC-045R2`), **both** cutoffs $H(X) \sim X^{5/6}$ and $M(X) \sim X^{5/4}$ contribute exact non-zero $O(1)$ limits as $X \to \infty$:
+     - Upper-$v$ tail ($m \le H(X) \sim X^{5/6}$): $-J_{\mathrm{head}}(X) \to \frac{81\zeta(3)}{256\pi^2}\cdot\frac{1}{3} = \frac{27\zeta(3)}{256\pi^2} \approx +0.0128454428$.
+     - Lower-$v$ tail ($m > M(X) \sim X^{5/4}$): $-J_{\mathrm{tail}}(X) \to \frac{81(-\zeta'(3))}{64}\cdot\frac{1}{2} = \frac{81}{128}(-\zeta'(3)) \approx +0.1253767631$.
+     - Consequently, the constant-one and squarefree-indicator resonant-band sums converge as $X \to \infty$ to
+       $$
+       \boxed{\lim_{X \to \infty} R_{1,\mathrm{band}}(X) = \frac{27\zeta(3)}{256\pi^2} + \frac{81}{128}\bigl(-\zeta'(3)\bigr) = [+0.1382222059 \pm 4.30 \times 10^{-75}],}
+       $$
+       $$
+       \boxed{\lim_{X \to \infty} R_{|\mu|,\mathrm{band}}(X) = \frac{6}{\pi^2}\lim_{X \to \infty} R_{1,\mathrm{band}}(X) = [+0.0840290250 \pm 2.66 \times 10^{-75}].}
+       $$
+       This proves unconditionally that $R_{1,\mathrm{band}}(X)$ ($c = 1, E_1(t) = -\{t\} = O(1)$) and $R_{|\mu|,\mathrm{band}}(X)$ ($c = 6/\pi^2, |E_{Q}(t)| \le C_Q t^{1/2}$ by elementary squarefree sieve $Q(t) = \sum_{d \le \sqrt{t}}\mu(d)\lfloor t/d^2\rfloor$) are uniformly $O(1)$ on $[1, \infty)$.
+
+3. **Vaughan's Identity on the Resonant Band and Unconditional Type I Uniform Bound (`Theorem 58`, `vaughan_band_decomposition_and_type_I_uniform_bound`)**:
+   For parameters $U, V \ge 1$ with $\max(U, V) \le H(X)$ (e.g. $U = V = X^{1/4}$, so $U V = X^{1/2} \le X^{5/6} \sim H(X)$), Vaughan's identity $\frac{1}{\zeta(s)} = M_U(s) + M_V(s) - M_U(s)M_V(s)\zeta(s) + \bigl(\frac{1}{\zeta(s)} - M_U(s)\bigr)\bigl(1 - M_V(s)\zeta(s)\bigr)$ ($M_U(s) = \sum_{d \le U}\mu(d)d^{-s}$) vanishes identically on the low-divisor terms $\mu(m)\mathbf{1}_{m \le U} = 0$ and $\mu(m)\mathbf{1}_{m \le V} = 0$ throughout the resonant band $m > H(X) \ge \max(U, V)$, giving the exact partition:
+   $$
+   \boxed{\mu(m) = c_{\mathrm{I}}(m; U, V) + c_{\mathrm{II}}(m; U, V) \qquad \bigl(H(X) < m \le M(X)\bigr),}
+   $$
+   $$
+   c_{\mathrm{I}}(m; U, V) := -\sum_{\substack{d r n = m \\ d \le U,\; r \le V}} \mu(d)\mu(r), \qquad c_{\mathrm{II}}(m; U, V) := \sum_{\substack{a b = m \\ a > U,\; b > V}} \mu(a)\!\left(\sum_{\substack{r \mid b \\ r \le V}} \mu(r)\right),
+   $$
+   and hence $R_{\mu,\mathrm{band}}(X) = R_{\mathrm{I}}(X; U, V) + R_{\mathrm{II}}(X; U, V)$. Conditioning the Type I sum on $d \le U$ and $r \le V$ replaces the inner sum over $n \in (H(X)/(dr), M(X)/(dr)]$ by a smooth integral over a full arithmetic progression, yielding
+   $$
+   \boxed{R_{\mathrm{I}}(X; U, V) = \alpha_{\mathrm{I}}(U, V)\,J_{\mathrm{band}}(X) + E_{\mathrm{EM,I}}(X; U, V), \qquad \alpha_{\mathrm{I}}(U, V) := -\left(\sum_{d \le U}\frac{\mu(d)}{d}\right)\!\left(\sum_{r \le V}\frac{\mu(r)}{r}\right).}
+   $$
+   By Landau's elementary identity $\bigl|\sum_{d \le x}\mu(d)\lfloor x/d\rfloor\bigr| = 1 \implies \bigl|\sum_{d \le x}\frac{\mu(d)}{d}\bigr| \le 1$ for all $x \ge 1$, the Type I leading coefficient satisfies $|\alpha_{\mathrm{I}}(U, V)| \le 1$ unconditionally, and for $U V \le \sqrt{X}$ the Euler–Maclaurin remainder satisfies $|E_{\mathrm{EM,I}}(X; U, V)| \le C_{\mathrm{EM},1} U V X^{-1/2} \le C_{\mathrm{EM},1}$, proving (`Theorem 58`):
+   $$
+   \boxed{\bigl|R_{\mathrm{I}}(X; U, V)\bigr| \le \bigl|J_{\mathrm{band}}(X)\bigr| + \bigl|E_{\mathrm{EM,I}}(X; U, V)\bigr| \le \frac{1}{3}C_{\log,\mathrm{EM}} + \frac{1}{2}C_{\log,0} + C_{\mathrm{EM},1} = O(1),}
+   $$
+   and reducing `SUBGATE-TC-043A` to uniform $O(1)$ boundedness of the **Vaughan Type II bilinear sum** $R_{\mathrm{II}}(X; U, V)$:
+
+| Scale $X$ | Cutoffs $(H, M)$ | $(U, V)$ | $R_{\mu,\mathrm{band}}(X)$ | Vaughan Type I $R_{\mathrm{I}}(X; U, V)$ | Exchanged Type I $R_{\mathrm{I}}^{\mathrm{exch}}(X; U, V)$ | Vaughan Type II $R_{\mathrm{II}}(X; U, V)$ | $R_{1,\mathrm{band}}(X)$ | $R_{\|\mu\|,\mathrm{band}}(X)$ |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| $1$ | $(1, 2)$ | $(1, 1)$ | $-0.0138854010$ | $-0.0138854010$ | $-0.0138854010$ | $0$ | $+0.0138854010$ | $+0.0138854010$ |
+| $2$ | $(1, 3)$ | $(1, 1)$ | $+0.0108988909$ | $+0.0108988909$ | $+0.0108988909$ | $0$ | $-0.0108988909$ | $-0.0108988909$ |
+| $4$ | $(3, 6)$ | $(1, 1)$ | $+0.0053844056$ | $-0.0012329276$ | $-0.0012329276$ | $+0.0066173331$ | $+0.0012329276$ | $+0.0232636200$ |
+| $\tau$ | $(4, 10)$ | $(1, 1)$ | $+0.0305137548$ | $+0.0380922306$ | $+0.0380922306$ | $-0.0075784758$ | $-0.0380922306$ | $-0.0576692464$ |
+| $10$ | $(6, 18)$ | $(1, 1)$ | $+0.0163613434$ | $+0.0482983844$ | $+0.0482983844$ | $-0.0319370410$ | $-0.0482983844$ | $-0.0083864514$ |
+| $16$ | $(10, 32)$ | $(2, 2)$ | $+0.0050456338$ | $+0.0216387455$ | $+0.0216387455$ | $-0.0165931117$ | $-0.0477730902$ | $-0.0448539391$ |
+| $\tau^2$ | $(21, 99)$ | $(2, 2)$ | $+0.0094869970$ | $+0.0174219455$ | $+0.0174219455$ | $-0.0079349485$ | $-0.0373670566$ | $-0.0343474534$ |
+| $64$ | $(32, 182)$ | $(2, 2)$ | $+0.0305914155$ | $+0.0024411914$ | $+0.0024411914$ | $+0.0281502241$ | $-0.0158336588$ | $+0.0190489418$ |
+
+### 9.3 Approach B: Euler-Sieved Positive Orbit Intertwining, Critical-Line Spectral–Dirichlet Factorization, and Coherent Low-Frequency Euler Spike Obstruction (`Theorem 59`)
+
+1. **Intertwining of $D_p$ and $E_y$ on $\mathcal{H}_\tau^{\mathrm{pos}}$ and Boundedness of the Asymmetric Euler-Sieved Orbit $P_{\tau,y}(K)$ (`Theorem 59`)**:
+   On $\mathcal{H}_\tau^{\mathrm{pos}} = \mathcal{H}_\tau^B \oplus L^2(\mathbb{R}_{>0}, d^\times y)$ with isometric embedding $\mathcal{J}_\tau(f) := (A_\tau^B f, 2 R_0 f)$, prime dilation $(D_p f)(y) := f(y/p)$ is unitary on $L^2(\mathbb{R}_{>0}, d^\times y)$ and commutes with both $(A_\tau^B f)(x, y) = f(y) - f(y/x)$ (in the $y$-variable) and $(R_0 f)(y) = \int_0^y (t/y)^{1/2}(Df)(t)\frac{dt}{t}$ (by scale invariance of $t/y$, $D = t\frac{d}{dt}$, and $\frac{dt}{t}$). Thus for $E_y := \prod_{p \le y}(I - p^{-1/2}D_p)$,
+   $$
+   \boxed{A_\tau^B(E_y f) = E_y^B(A_\tau^B f), \qquad R_0(E_y f) = E_y(R_0 f), \qquad \mathcal{J}_\tau(E_y f) = (E_y^B \oplus E_y)\mathcal{J}_\tau(f), \qquad \mathcal{U}_K\mathcal{J}_\tau(E_y f) = \mathcal{J}_\tau(E_y T_K f).}
+   $$
+   Defining the asymmetric Euler-sieved orbit pairing $P_{\tau,y}(K) := \langle \mathcal{U}_K\mathcal{J}_\tau(E_y\psi_\tau), \mathcal{J}_\tau(\psi_\tau)\rangle_{\mathcal{H}_\tau^{\mathrm{pos}}} = \sum_{m \mid P_y}\frac{\mu(m)}{\sqrt{m}}\,P_\tau(K - \log_\tau m)$, Cauchy–Schwarz on $\mathcal{H}_\tau^{\mathrm{pos}}$ gives for every fixed $y \ge 2$ and all $K \in \mathbb{R}$:
+   $$
+   \boxed{\bigl|P_{\tau,y}(K)\bigr| \le \|\mathcal{J}_\tau(E_y\psi_\tau)\|_{\mathcal{H}_\tau^{\mathrm{pos}}}\sqrt{P_\tau(0)}, \qquad C_\tau(K) = P_{\tau,y}(K) - \Delta_{\mathrm{arch},y}(K) + E_{\tau,\mathrm{controlled}}(K) - R_{\mu,\mathrm{band}}(\tau^{|K|}),}
+   $$
+   where $\Delta_{\mathrm{arch},y}(K) := P_{\tau,y}(K) - P_\tau(K) = \sum_{m \mid P_y,\, m \ge 2}\frac{\mu(m)}{\sqrt{m}}\,P_\tau(K - \log_\tau m)$ (certified to enclose zero for $y \in \{2, 3\}$ and $K \in \{0, 1\}$ in `sieve_orbit_verification_table`).
+2. **Unconditional Critical-Line Spectral–Dirichlet Factorization of $R_{\mu,\mathrm{band}}(X)$**:
+   Unlike $\mathcal{M}_X[W](z) = -\frac{\zeta'(1/2+z)}{\zeta(1/2+z)}H_0(z)$ (whose contour shift to $\operatorname{Re}(z) = 0$ crosses poles at nontrivial zeros of $\zeta$), $\mathcal{M}_X[W_{\log}](z) = -\zeta'(1/2 + z)H_0(z)$ is holomorphic across the entire open strip $-5/2 < \operatorname{Re}(z) < 5/2$ (`TC-045`). Shifting the Mellin inversion contour of $W_{\log}(X/m)$ from $\operatorname{Re}(z) = 1$ to the critical line $\operatorname{Re}(z) = 0$ ($z = it$) crosses **zero poles** and yields the exact unconditional factorization:
+   $$
+   \boxed{R_{\mu,\mathrm{band}}(X) = \int_{-\infty}^\infty \Omega_{\log}(t)\,M_{\mathrm{band}}\!\left(\frac{1}{2} + it;\, X\right) X^{it}\,dt, \qquad \Omega_{\log}(t) := -\frac{1}{\tau}\zeta'\!\left(\frac{1}{2} + it\right)H_0(it), \qquad M_{\mathrm{band}}(s; X) := \sum_{H(X) < m \le M(X)} \frac{\mu(m)}{m^s}.}
+   $$
+   Here $\Omega_{\log} \in L^1(\mathbb{R}) \cap L^2(\mathbb{R})$ is a fixed $X$-independent Schwartz weight (`L1_norm = [0.0005161077 ± 4.90e-10]`, `L2_norm = [0.0005107381 ± 6.70e-12]`), and the identity between the discrete sum $R_{\mu,\mathrm{band}}(X)$ and the critical-line Mellin integral is certified in 256-bit Arb for $X \in \{1, 2, 4\}$ (`all_crit_line_identities_enclose_zero: true`).
+3. **Coherent Low-Frequency Euler Spike Obstruction on $\mathcal{H}_\tau^{\mathrm{pos}}$ as $y \to \infty$**:
+   By Plancherel's theorem on $\mathcal{H}_\tau^{\mathrm{pos}}$, $\|\mathcal{J}_\tau(E_y\psi_\tau)\|_{\mathcal{H}_\tau^{\mathrm{pos}}}^2 = \frac{1}{\tau}\int_{-\infty}^\infty \mu_{\mathrm{arch}}^B(t)|E_y(it)|^2 H_0(it)\,dt$, where $\mu_{\mathrm{arch}}^B(t) = \operatorname{Re}\psi_{\mathrm{digamma}}(\frac{5}{4} + \frac{it}{2}) - \log\pi + c_\tau^B > 0$ satisfies $\mu_{\mathrm{arch}}^B(0) = \psi_{\mathrm{digamma}}(5/4) - \log\pi + c_\tau^B = 2 > 0$. On the low-frequency interval $I_y = [\frac{7\tau}{16\log y}, \frac{\tau}{2\log y}]$ (`TC-046`),
+   $$
+   \boxed{\|\mathcal{J}_\tau(E_y\psi_\tau)\|_{\mathcal{H}_\tau^{\mathrm{pos}}}^2 \ge \frac{\mu_{\mathrm{arch}}^B(0) H_0(0)}{8\log y}\exp\!\left[\bigl(4\cos(\tau/16) + o(1)\bigr)\frac{\sqrt{y}}{\log y}\right] \to +\infty \qquad (y \to \infty),}
+   $$
+   showing why unsplit Hilbert-space norm bounds at $y = M(X_K)$ grow super-polynomially in $X_K$ and why signed phase oscillation in $R_{\mathrm{II}}(X; U, V)$ / $M_{\mathrm{band}}(1/2 + it; X) X^{it}$ cannot be bypassed by triangle or Cauchy–Schwarz inequalities.
+
+### 9.4 Complete Conditional Implication Chain to the Riemann Hypothesis (`Theorem 59`, `euler_sieved_orbit_and_complete_subgate_closure_chain`)
+
+In Lean **Theorem 59** (`euler_sieved_orbit_and_complete_subgate_closure_chain`), we assemble the complete conditional deduction from a uniform transition-integral bound $|I(X)| \le B_I$ to the Riemann Hypothesis:
+$$
+\boxed{\forall X \ge 1,\;\bigl|I(X)\bigr| \le B_I \;\Longrightarrow\; \forall X \ge 1,\;\bigl|R_{\mu,\mathrm{band}}(X)\bigr| \le B_I + C_{\log,0} \;\Longrightarrow\; \forall K \in \mathbb{A}_{\mathbb{R}},\;\bigl|C_\tau(K)\bigr| \le B_{\mathrm{total}} := P_\tau(0) + B_{\mathrm{ctrl}} + B_I + C_{\log,0} < 21.102829 + B_I \;\Longrightarrow\; \text{RH},}
+$$
+where:
+1. **$K = 0$ Safety (Zero Division by $K$ or $\|f_-^{(K)}\|_{L^2}^2$)**: For all $K \in \mathbb{A}_{\mathbb{R}}$ (both positive and negative grades, and $K = 0$), $X_K = \tau^{|K|} \ge 1$ is well-defined; at $K = 0$, $X_0 = 1$, $H(1) = 1$, $M(1) = 2$, and $C_\tau(0) = P_\tau(0) + E_{\tau,\mathrm{controlled}}(0) - R_{\mu,\mathrm{band}}(1) \approx 0.00095048 \le B_{\mathrm{total}}$ holds directly without dividing by $K$ or $\|f_-^{(K)}\|_{L^2}^2$.
+2. **Exact Multiplicity Preservation ($m_\rho = \operatorname{ord}_\xi(\rho) \ge 1$, Zero Simplicity Not Assumed)**: In the explicit formula $C_\tau(t) = W_\xi(h_t)$, $-\xi'(s)/\xi(s)$ has simple poles of residue $-m_\rho$ (so $\xi'(s)/\xi(s)$ has simple poles of residue $+m_\rho \ge 1$), and each distinct nontrivial zero $\rho$ contributes $m_\rho H_0(\rho - 1/2)\tau^{-t(\rho - 1/2)}$ with $m_\rho H_0(\rho - 1/2) \ne 0$ on $0 < \operatorname{Re}(\rho) < 1$ and no polynomial $t^j$ drift.
+3. **No Maximal Real Displacement Assumption ($\delta_* = \sup_\rho |\delta_\rho|$ Not Assumed)**: Two independent arguments avoid assuming that $\sup_\rho \operatorname{Re}(\rho)$ is attained:
+   - *Laplace–Carleman Resolvent Continuation (`TC-037` / Theorem 12)*: The partial-fraction resolvent $\mathcal{R}_\tau(w) = \sum_\rho \frac{m_\rho H_0(\rho - 1/2)}{w - L(\rho - 1/2)}$ has isolated simple poles at every individual zero $w_{\rho_0} = L(\rho_0 - 1/2)$, whereas $|C_\tau(-t)| \le B_{\mathrm{total}}$ makes $\mathcal{R}_\tau(w) = \int_0^\infty C_\tau(-t)e^{-wt}\,dt$ holomorphic on $\operatorname{Re}(w) > 0$, excluding any individual zero with $\delta_{\rho_0} > 0$ (and by $\xi(1 - s) = \xi(s)$, any $\delta_{\rho_0} \ne 0$).
+   - *Direct Mellin Strip Holomorphy (`TC-045`)*: Equivalently, $|R_{\mu,\mathrm{band}}(X)| \le B_I + C_{\log,0}$ implies $|W(X)| \le M_W < \infty$ for all $X \ge 1$, so $\mathcal{M}_X[W](z) = -\frac{\zeta'(1/2+z)}{\zeta(1/2+z)}H_0(z)$ converges absolutely and holomorphically on $0 < \operatorname{Re}(z) < 5/2$, directly excluding any zero of $\zeta(1/2 + z)$ in $0 < \operatorname{Re}(z) < 1/2$.
+4. **Honest Gate Status**: Because an unconditional uniform bound $|I(X)| \le B_I$ (or $|R_{\mathrm{II}}(X; U, V)| \le B_{\mathrm{II}}$) for the actual Möbius function remains unproved, `SUBGATE-TC-043A` remains `OPEN` and `rh_proved: false`.

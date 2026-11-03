@@ -300,7 +300,7 @@ def test_11_arithmetic_proof_attempts_and_open_subgate(artifact_payload):
 
 
 def test_12_lean_formalization_module_verified():
-    """Verify formal/RiemannScope/CanonicalThetaCorrelationBound.lean has 44 defs, 56 theorems, 0 sorry/admit, and non-vacuous residue hypothesis."""
+    """Verify formal/RiemannScope/CanonicalThetaCorrelationBound.lean has 47 defs, 59 theorems, 0 sorry/admit, and non-vacuous residue hypothesis."""
     assert LEAN_MODULE_PATH.exists()
     ver = verify_canonical_theta_correlation_lean_module()
     assert ver["matches_exact"] is True
@@ -308,8 +308,8 @@ def test_12_lean_formalization_module_verified():
     assert ver["contains_admit"] is False
     assert ver["actual_defs"] == CANONICAL_THETA_CORRELATION_LEAN_DEFS
     assert ver["actual_theorems"] == CANONICAL_THETA_CORRELATION_LEAN_THEOREMS
-    assert len(ver["actual_defs"]) == 44
-    assert len(ver["actual_theorems"]) == 56
+    assert len(ver["actual_defs"]) == 47
+    assert len(ver["actual_theorems"]) == 59
 
     lean_text = LEAN_MODULE_PATH.read_text(encoding="utf-8")
     # Ensure the vacuous universal quantification over res_sq is absent
