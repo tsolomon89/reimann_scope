@@ -3,9 +3,11 @@
   "continuation_task_id": "TASK-TC-051",
   "repair_task_id": "TASK-TC-051R",
   "subgate_closure_attempt_task_id": "TASK-TC-052",
+  "tc052_repair_task_id": "TASK-TC-052R",
   "preceding_repair_task_ids": [
     "TASK-TC-050R",
-    "TASK-TC-050R2"
+    "TASK-TC-050R2",
+    "TASK-TC-051R"
   ],
   "parent_epic": "EPIC-TC-042",
   "starting_head": "e6472e03c008cc8d20be177f1d96bf904bd0a16b",
@@ -14,6 +16,8 @@
   "tc051_implementation_commit": "333661eecd69738e8a67143e635b6db4f40170ce",
   "tc051_branch_tip": "7ac0546b1177970ff0d87824f61643da2405c4c0",
   "tc052_starting_head": "1f576944c040d5b3a2bf8091ca803e3758c80d12",
+  "tc052_merged_main_baseline": "916440e688c66d461daa04b17d7435e10e65f0d4",
+  "tc052_implementation_commit": "8414aa66f1127c636c68fcf8594833c570a3344a",
   "reviewed_baseline": "5da0eb79e1732ff871ee1c7fee729c62972aa406",
   "tc050r_reviewed_baseline": "2f7871fff666091c4152ecc8657f2345aacdd4fa",
   "tc050r2_reviewed_head": "0e6ae36ce995ef3037652b3dfb67645325f990b1",
@@ -1335,7 +1339,8 @@
       "conductor_space_H_tau_B": "H_tau^B := L^2([1, infty) x R_{>0}, (x^{-3/2} / (x - x^{-1})) (dx/x) (dy/y))",
       "shift_difference_operator_A_tau_B": "(A_tau^B f)(x, y) := ((I - S_x^{-1}) f)(y) = f(y) - f(y/x)   (x >= 1, y > 0)",
       "two_sided_vs_one_sided_shift_reconciliation": "With (S_x f)(y) = f(xy) and (S_x^{-1} f)(y) = f(y/x), the inherited TC-042F/TC-043 Attempt B one-sided shift-difference (A_tau^B f)(x, y) = f(y) - f(y/x) satisfies int_0^infty ((A_tau^B T_K f)(x, y)) conj((A_tau^B f)(x, y)) dy/y = 2 h_0(e^kappa) - h_0(e^{kappa + u}) - h_0(e^{kappa - u}) (kappa = |K| log tau, u = log x). By contrast, a two-sided difference f(xy) - f(y/x) would evaluate to 2 h_0(e^kappa) - h_0(e^{kappa + 2u}) - h_0(e^{kappa - 2u}) (doubling the log-shift u -> 2u) unless x is replaced by x^{1/2} via the isometric change of variable y |-> x^{-1/2} y.",
-      "isometric_embedding_J_tau": "J_tau(f) := (A_tau^B f, 2 R_0 f) in H_tau^pos = H_tau^B (+) L^2(R_{>0}, dy/y), where (R_0 f)(y) := int_0^y (t/y)^{1/2} (D f)(t) dt/t = f(y) - (1/2) int_0^y (t/y)^{1/2} f(t) dt/t (with Euler derivative D = y d/dy) is the causal s = 0 pole-resolvent with Mellin multiplier it / (1/2 + it) and 4 <R_0 T_K psi_tau, R_0 psi_tau>_{L^2(dy/y)} = 4 h_0(e^kappa) - J(kappa), J(kappa) := int_0^infty e^{-u/2} (h_0(e^{kappa+u}) + h_0(e^{kappa-u})) du.",
+      "isometric_embedding_J_tau": "J_tau(f) := (A_tau^B f, 2 R_0 f) in H_tau^pos = H_tau^B (+) L^2(R_{>0}, dy/y), where (R_0 f)(y) := int_0^y (t/y)^{1/2} (D f)(t) dt/t = f(y) - (1/2) int_0^y (t/y)^{1/2} f(t) dt/t (with Euler derivative D = y d/dy) is the causal s = 0 pole-resolvent with Mellin multiplier it / (1/2 + it) and 4 <R_0 T_K psi_tau, R_0 psi_tau>_{L^2(dy/y)} = 4 h_0(e^kappa) - J(kappa), J(kappa) := int_0^infty e^{-u/2} (h_0(e^{kappa+u}) + h_0(e^{kappa-u})) du. On the maximal domain D(J_tau) = {f in L^2(R_{>0}, dy/y) : int_R nu(t) |hat{f}(it)|^2 dt < infty} with Plancherel multiplier nu(t) = Re psi(5/4 + it/2) - psi(5/4) + 4 t^2 / (t^2 + 1/4) (nu(0) = 0, nu(t) > 0 for t != 0), J_tau is an isometric embedding from the weighted Hilbert space (D(J_tau), ||.||_{J_tau}) with ||f||_{J_tau}^2 := (1/tau) int_R nu(t) |hat{f}(it)|^2 dt = ||A_tau^B f||_{H_tau^B}^2 + 4 ||R_0 f||_{L^2(dy/y)}^2 into H_tau^pos (it is NOT an isometry with respect to the unweighted L^2(R_{>0}, dy/y) norm because nu(0) = 0).",
+      "operator_domain_and_plancherel_multiplier_nu": "D(J_tau) := {f in L^2(R_{>0}, dy/y) : int_{-infty}^infty nu(t) |hat{f}(it)|^2 dt < infty}, nu(t) := Re psi(5/4 + it/2) - psi(5/4) + 4 t^2 / (t^2 + 1/4) = [Re psi(1/4 + it/2) - log pi] + (c_tau^B + 2), satisfying nu(0) = 0, nu(t) >= 4 t^2 / (t^2 + 1/4) >= 0, and nu(t) = (16 - psi''(5/4)/8) t^2 + O(t^4) as t -> 0.",
       "euler_resolvent_R0_and_pole_integral_J_kappa_audit": {
         "euler_resolvent_R0_spatial_formula": "(R_0 f)(y) := int_0^y (t/y)^{1/2} (D f)(t) dt/t = f(y) - (1/2) int_0^y (t/y)^{1/2} f(t) dt/t,   D = y d/dy",
         "derivative_free_operator_K0_formula": "(K_0 f)(y) := y^{-1/2} int_0^y f(t) t^{1/2} dt/t,   so R_0 = K_0 D = I - (1/2) K_0",
@@ -6030,6 +6035,25 @@
       "vaughan_band_decomposition_and_type_I_uniform_bound",
       "euler_sieved_orbit_and_complete_subgate_closure_chain"
     ],
+    "tc052r_evidence_and_scope_separation": {
+      "concrete_analytic_results": [
+        "Exact Plancherel multiplier nu(t) = Re psi(5/4 + i t / 2) - psi(5/4) + 4 t^2 / (t^2 + 1/4) = [Re psi(1/4 + i t / 2) - log pi] + (c_tau^B + 2) for J_tau f = (A_tau^B f, 2 R_0 f), with nu(0) = 0, nu(t) >= 4 t^2 / (t^2 + 1/4) >= 0, and nu(t) = (16 - psi''(5/4)/8) t^2 + O(t^4) as t -> 0.",
+        "Reconciled Vaughan identity mu(m) = c_I(m; U, V) + c_II(m; U, V) for m > max(U, V) with c_II(m; U, V) = sum_{a b = m, a > U, b > V} mu(a) sum_{r | b, r > V} mu(r) = -sum_{a b = m, a > U, b > V} mu(a) sum_{r | b, r <= V} mu(r), and unconditional Type I bound |R_I(X; U, V)| <= B_J + C_{EM,I} via progression bounded-variation transfer ||F_X||_infty + Var_{(0,infty)}(F_X) <= C_{BV} X^{-1/2}.",
+        "Exact nonzero asymptotic limit lim_{X -> infty} J_band(X) = lim_{X -> infty} R_{1,band}(X) = L = 27 zeta(3)/(256 pi^2) + 81[-zeta'(3)]/128 = 0.1382222059... > 0, and unconditional O(1) boundedness R_{|mu|,band}(X) = (6/pi^2) J_band(X) + O(1) (with convergence to (6/pi^2) L conditional on E_Q(t) = o(sqrt(t))).",
+        "Proved whole-integrand Mellin tail bounds B_{Omega,1}^{tail}(T) <= 1.3719e-18 and B_{Omega,2}^{tail}(T) <= 7.3910e-37 at T = 48 via Euler-Weierstrass Gamma comparison and 1st-order Euler-Maclaurin zeta' growth bound."
+      ],
+      "conditional_lean_inequality_lemmas": [
+        "Theorems 57, 58, and 59 in formal/RiemannScope/CanonicalThetaCorrelationBound.lean are conditional real-arithmetic and inequality reductions over R whose final step in Theorem 59 applies the explicitly assumed analytic bridge implication h_bridge : (|C_K| <= P_0 + B_ctrl + B_I + C_log_0 -> delta_rho = 0)."
+      ],
+      "certified_finite_numerical_evaluations": [
+        "256-bit Arb enclosures of R_{mu,band}(X) via Mellin integration on [-48, 48] combined with proved infinite-tail bounds 2 A_X B_{Omega,1}^{tail}(48) at X in {1, 2, 4}.",
+        "256-bit Arb enclosures of ||Omega_log||_{L^1(R)} = [0.1008434929769 +/- 5.00e-14] >= sqrt(2)|R_{mu,band}(1)| = 0.0196369224... and ||Omega_log||_{L^2(R)} = [0.025900722690580 +/- 4.46e-16].",
+        "Exact rational verification of Landau's inequality |sum_{d <= N} mu(d)/d| <= 1 for 1 <= N <= 200 and Vaughan's identity at 8 sample scales X in [1, 64] plus the U = V = 1, m = 4 regression."
+      ],
+      "remaining_open_obligations": [
+        "SUBGATE-TC-043A (OPEN, rh_proved: false): prove uniform O(1) boundedness sup_{X >= 1} |R_{mu,band}(X)| < infty (equivalently sup_{X >= 1} |I(X)| < infty or sup_{X >= 1} |R_{II}(X; U, V)| < infty for U V <= sqrt(X)) without assuming RH."
+      ]
+    },
     "committed_lean_theorems_exact_scope": {
       "theorem_51_tau_grade_star_involution_and_hyperbolic_pair_obstruction": {
         "parameters": "(tau K J delta B11 B12 B22 c1 c2 : \u211d) (htau : 1 < tau) (hK : K \u2260 0) (hB12 : 0 < B12)",
@@ -6121,7 +6145,7 @@
           "|I_a| \u2264 c_a * ((1/3) * C_log_EM + (3/2) * C_log_0) + 2 * C_a * L_tilde_W \u2227 |R_a| \u2264 c_a * ((1/3) * C_log_EM + (1/2) * C_log_0) + B_E + 2 * C_a * L_tilde_W",
           "c_a = 0 \u2192 (|I_a| \u2264 2 * C_a * L_tilde_W \u2227 |R_a| \u2264 B_E + 2 * C_a * L_tilde_W)"
         ],
-        "external_analytic_scope_note": "Theorem 57 proves the algebraic cancellation of the linear boundary terms \u00b1 c_a * B_lin_M, the uniform tail bound on J_band from M_X[W_log](1/2) = 0 (J_band = -T_low - T_high), and the uniform O(1) bounds on I_a and R_a from explicit hypotheses; the Mellin vanishing moment int_0^infty v^{-3/2} W_log(v) dv = 0 and scale-invariant square-root integral estimate are proved analytically outside Lean."
+        "external_analytic_scope_note": "Conditional/algebraic real-inequality lemma: Theorem 57 proves the algebraic cancellation of the linear boundary terms \u00b1 c_a * B_lin_M, the uniform bound |J_band| <= (1/3) C_log_EM + (1/2) C_log_0 from the assumed tail identity J_band = -T_low - T_high, and the uniform O(1) bounds on I_a and R_a from explicit hypotheses; the Mellin vanishing moment int_0^infty v^{-3/2} W_log(v) dv = 0, the nonzero asymptotic limit lim_{X->infty} J_band(X) = L = 0.1382222059... > 0, and the scale-invariant square-root integral estimate are proved analytically outside Lean."
       },
       "theorem_58_vaughan_band_decomposition_and_type_I_uniform_bound": {
         "parameters_and_hypotheses": "(R_band R_I R_II S_mu_U S_mu_V J_band E_EM_I B_J C_EM_1 rho_UV M_II M_R : \u211d) (h_decomp : R_band = vaughanBandDecomp R_I R_II) (h_RI : R_I = -(S_mu_U * S_mu_V * J_band) + E_EM_I) (h_BJ_nonneg : 0 \u2264 B_J) (h_CEM_nonneg : 0 \u2264 C_EM_1) (h_rho_nonneg : 0 \u2264 rho_UV) (h_rho_le_one : rho_UV \u2264 1) (h_landau_U : |S_mu_U| \u2264 1) (h_landau_V : |S_mu_V| \u2264 1) (h_J_bound : |J_band| \u2264 B_J) (h_EM_bound : |E_EM_I| \u2264 C_EM_1 * rho_UV)",
@@ -6130,9 +6154,10 @@
         ],
         "proved_conjuncts": [
           "|S_mu_U * S_mu_V * J_band| \u2264 B_J \u2227 |E_EM_I| \u2264 C_EM_1 \u2227 |R_I| \u2264 B_J + C_EM_1",
-          "(|R_II| \u2264 M_II \u2192 |R_band| \u2264 B_J + C_EM_1 + M_II) \u2227 (|R_band| \u2264 M_R \u2192 |R_II| \u2264 M_R + B_J + C_EM_1)"
+          "(|R_II| \u2264 M_II \u2192 |R_band| \u2264 B_J + C_EM_1 + M_II) \u2227 (|R_band| \u2264 M_R \u2192 |R_II| \u2264 M_R + B_J + C_EM_1)",
+          "((-1 : \u211d) + 1 = 0 \u2227 (-1 : \u211d) + (-1 : \u211d) \u2260 0) \u2227 (\u2200 F_sup F_var inv_sqrt_X U_V : \u211d, 0 \u2264 U_V \u2192 2 * F_sup + F_var \u2264 C_EM_1 * inv_sqrt_X \u2192 (2 * F_sup + F_var) * U_V \u2264 C_EM_1 * (U_V * inv_sqrt_X))"
         ],
-        "external_analytic_scope_note": "Theorem 58 proves the contraction of the Landau factors |S_mu_U * S_mu_V| <= 1, the uniform Type I bound |R_I| <= B_J + C_EM_1 for rho_UV = U V / sqrt(X) <= 1, and the two-way boundedness equivalence between R_band and R_II; Vaughan's combinatorial divisor identity mu = c_I + c_II for m > max(U, V), Landau's inequality |sum_{d <= x} mu(d)/d| <= 1, and the Dilation\u2013Euler\u2013Maclaurin remainder bound are proved analytically and certified in Python Arb outside Lean."
+        "external_analytic_scope_note": "Conditional/algebraic real-inequality lemma: Theorem 58 proves the contraction of the Landau factors |S_mu_U * S_mu_V| <= 1, the uniform Type I bound |R_I| <= B_J + C_EM_1 for rho_UV = U V / sqrt(X) <= 1, the two-way boundedness equivalence between R_band and R_II, the U = V = 1, m = 4 sign-cancellation check, and the progression bounded-variation transfer (2 F_sup + F_var) U_V <= C_EM_1 (U_V inv_sqrt_X); Vaughan's combinatorial divisor identity mu = c_I + c_II for m > max(U, V), Landau's inequality |sum_{d <= x} mu(d)/d| <= 1, and the derivative BV bound ||F_X||_infty + Var(F_X) <= C_BV X^{-1/2} are proved analytically and certified in Python Arb outside Lean."
       },
       "theorem_59_euler_sieved_orbit_and_complete_subgate_closure_chain": {
         "parameters_and_hypotheses": "(C_K P_K P_y_K Delta_arch_y_K E_ctrl_K R_band_X I_X P_0 B_ctrl C_log_0 B_I N_y N_0 delta_rho : \u211d) (h_CK : C_K = canonicalCorrelationHSOrbitDecomp P_K E_ctrl_K R_band_X) (h_PK_sieve : P_K = P_y_K - Delta_arch_y_K) (h_PK_bound : |P_K| \u2264 P_0) (h_E_ctrl : |E_ctrl_K| \u2264 B_ctrl) (h_sbp_diff : |R_band_X - I_X| \u2264 C_log_0) (h_Py_cs : |P_y_K| \u2264 N_y * N_0)",
@@ -6141,9 +6166,10 @@
         ],
         "proved_conjuncts": [
           "C_K = eulerSievedCorrelationDecomp P_y_K Delta_arch_y_K E_ctrl_K R_band_X \u2227 |P_y_K - Delta_arch_y_K| \u2264 N_y * N_0 + |Delta_arch_y_K|",
+          "\u2200 nu_B t : \u211d, 0 \u2264 nu_B \u2192 (0 \u2264 nu_B + (4 * t ^ 2) / (t ^ 2 + 1 / 4) \u2227 (4 * t ^ 2) / (t ^ 2 + 1 / 4) \u2264 nu_B + (4 * t ^ 2) / (t ^ 2 + 1 / 4) \u2227 (t ^ 2 \u2264 1 \u2192 (16 / 5 : \u211d) * t ^ 2 \u2264 nu_B + (4 * t ^ 2) / (t ^ 2 + 1 / 4)))",
           "|I_X| \u2264 B_I \u2192 (|R_band_X| \u2264 B_I + C_log_0 \u2227 |C_K| \u2264 P_0 + B_ctrl + B_I + C_log_0 \u2227 (P_0 < 2558259/1000000 \u2192 B_ctrl < 17987140/1000000 \u2192 C_log_0 < 557430/1000000 \u2192 |C_K| < 21102829/1000000 + B_I) \u2227 ((|C_K| \u2264 P_0 + B_ctrl + B_I + C_log_0 \u2192 delta_rho = 0) \u2192 delta_rho = 0))"
         ],
-        "external_analytic_scope_note": "Theorem 59 proves the Approach B Euler-sieved correlation decomposition and the complete conditional deduction from |I_X| <= B_I to |R_band_X| <= B_I + C_log_0, |C_K| < 21.102829 + B_I, and delta_rho = 0; the Laplace\u2013Carleman isolated-pole continuation (Theorems 11 & 12) and Mellin strip holomorphy of M_X[W](z) on 0 < Re(z) < 5/2 are proved analytically."
+        "external_analytic_scope_note": "Conditional/algebraic real-inequality lemma: Theorem 59 proves the Approach B Euler-sieved correlation decomposition, the quadratic lower bound nu(t) = nu_B + 4 t^2 / (t^2 + 1/4) >= (16/5) t^2 for |t| <= 1 and nu_B >= 0, and the conditional deduction from |I_X| <= B_I to |R_band_X| <= B_I + C_log_0 and |C_K| < 21.102829 + B_I, whose final step applies the explicitly assumed implication h_bridge : (|C_K| <= P_0 + B_ctrl + B_I + C_log_0 -> delta_rho = 0). The Laplace\u2013Carleman isolated-pole continuation (Theorems 11 & 12) and Mellin strip holomorphy of M_X[W](z) on 0 < Re(z) < 5/2 are external analytic theorems."
       }
     },
     "remaining_open_obligation": {
@@ -8021,7 +8047,10 @@
   },
   "section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization": {
     "task_id": "TASK-TC-052",
+    "repair_task_id": "TASK-TC-052R",
     "starting_head": "1f576944c040d5b3a2bf8091ca803e3758c80d12",
+    "tc052_merged_main_baseline": "916440e688c66d461daa04b17d7435e10e65f0d4",
+    "tc052_implementation_commit": "8414aa66f1127c636c68fcf8594833c570a3344a",
     "subgate_tc043a_status": "OPEN",
     "rh_proved": false,
     "closing_theorem_target": "exists B_I >= 0 forall X >= 1 : |I(X)| := |int_{H(X)}^{M(X)} M_{H(X)}(t) t^{-3/2} tilde{W}_log(X/t) dt| <= B_I",
@@ -8040,6 +8069,14 @@
         "symbolic_moments_verified": true
       },
       "linear_density_annihilation_and_exact_limits": {
+        "W_log_small_v_asymptotic_formula": "W_log(v) = (81 zeta'(3) / 64) v^{5/2} + O(v^{9/2}) = -(81 [-zeta'(3)] / 64) v^{5/2} + O(v^{9/2}) < 0   (v -> 0^+)",
+        "W_log_small_v_leading_coeff_81_zeta_prime_3_over_64_certified": {
+          "mid_float": -0.25075352615213414,
+          "rad_float_outward": 4.824779086054912e-19,
+          "lower_dec": "-2.507535261521341424966441803400960866708e-1",
+          "upper_dec": "-2.507535261521341424966441803400960866705e-1",
+          "arb_ball_str": "[-0.2507535261521341424966441803400960866706 +/- 8.85e-42]"
+        },
         "J_band_definition": "J_band(X) := int_{H(X)}^{M(X)} t^{-1/2} W_log(X/t) dt = -X^{1/2} int_0^{X/M(X)} v^{-3/2} W_log(v) dv - X^{1/2} int_{X/H(X)}^infty v^{-3/2} W_log(v) dv",
         "J_band_uniform_bound_B_J_formula": "(1/3) C_{log,EM} + (1/2) C_{log,0} < 4.768220",
         "J_band_uniform_bound_B_J_certified": {
@@ -8049,6 +8086,7 @@
           "upper_dec": "4.768219703554018426659980314720604107739e+0",
           "arb_ball_str": "[4.76822 +/- 3.45e-6]"
         },
+        "floor_ceiling_endpoint_asymptotics": "For H(X) = floor(X^{5/6}) and M(X) = ceil(max(2, X^{5/4})), (H(X) / X^{5/6})^3 = 1 + O(X^{-5/6}) -> 1 and (X^{5/4} / M(X))^2 = 1 + O(X^{-5/4}) -> 1 as X -> infty, so -T_high(X) = (27 zeta(3) / (256 pi^2)) (H(X)/X^{5/6})^3 + O(X^{-1/6} log X) -> 27 zeta(3) / (256 pi^2) and -T_low(X) = (81 [-zeta'(3)] / 128) (X^{5/4}/M(X))^2 + O(X^{-1/2}) -> (81 / 128) (-zeta'(3)).",
         "upper_v_tail_limit_from_H_X_formula": "27 zeta(3) / (256 pi^2)",
         "upper_v_tail_limit_from_H_X_certified": {
           "mid_float": 0.012845442821509661,
@@ -8065,7 +8103,8 @@
           "upper_dec": "1.253767630760670712483220901700480433355e-1",
           "arb_ball_str": "[0.1253767630760670712483220901700480433353 +/- 4.43e-42]"
         },
-        "exact_limit_R_1_band_as_X_to_infty_formula": "lim_{X -> infty} R_{1,band}(X) = 27 zeta(3) / (256 pi^2) + (81 / 128) (-zeta'(3))",
+        "exact_limit_J_band_and_R_1_band_as_X_to_infty_formula": "lim_{X -> infty} J_band(X) = lim_{X -> infty} R_{1,band}(X) = L := 27 zeta(3) / (256 pi^2) + (81 / 128) (-zeta'(3)) > 0",
+        "exact_limit_R_1_band_as_X_to_infty_formula": "lim_{X -> infty} J_band(X) = lim_{X -> infty} R_{1,band}(X) = 27 zeta(3) / (256 pi^2) + (81 / 128) (-zeta'(3))",
         "exact_limit_R_1_band_as_X_to_infty_certified": {
           "mid_float": 0.13822220589757672,
           "rad_float_outward": 1.0314178856863315e-17,
@@ -8080,7 +8119,8 @@
           "upper_dec": "7.809092826511978948890014849630745952988e-3",
           "arb_ball_str": "[0.007809092826511978948890014849630745952987 +/- 6.86e-44]"
         },
-        "exact_limit_R_sqfree_band_as_X_to_infty_formula": "lim_{X -> infty} R_{|mu|,band}(X) = (6 / pi^2) (27 zeta(3) / (256 pi^2) + (81 / 128) (-zeta'(3))) = 81 zeta(3) / (128 pi^4) + 243 (-zeta'(3)) / (64 pi^2)",
+        "R_sqfree_band_unconditional_O1_scope_and_conditional_limit_note": "For a(m) = |mu(m)| = mu(m)^2, the elementary error bound |E_Q(t)| <= 2 sqrt(t) in Q(t) = (6/pi^2) t + E_Q(t) proves unconditionally that R_{|mu|,band}(X) = (6/pi^2) J_band(X) + O(1) is uniformly bounded for all X >= 1 (since |int_{H(X)}^{M(X)} E_{|\\mu|,H(X)}(t) t^{-3/2} tilde{W}_log(X/t) dt| <= 4 int_0^infty v^{-1} |tilde{W}_log(v)| dv = O(1)). Vanishing of that remainder integral so that lim_{X -> infty} R_{|mu|,band}(X) = (6/pi^2) L requires a sub-sqrt(t) squarefree error estimate E_Q(t) = o(sqrt(t)).",
+        "exact_limit_R_sqfree_band_as_X_to_infty_formula": "Conditional on E_Q(t) = o(sqrt(t)): lim_{X -> infty} R_{|mu|,band}(X) = (6 / pi^2) L = 81 zeta(3) / (128 pi^4) + 243 (-zeta'(3)) / (64 pi^2) (unconditionally R_{|mu|,band}(X) = (6 / pi^2) J_band(X) + O(1) = O(1) from |E_Q(t)| <= 2 sqrt(t))",
         "exact_limit_R_sqfree_band_as_X_to_infty_certified": {
           "mid_float": 0.08402902504318437,
           "rad_float_outward": 4.286436026538135e-18,
@@ -8269,9 +8309,88 @@
         ]
       },
       "vaughan_band_decomposition_and_type_I_audit": {
+        "published_vaughan_formulas": {
+          "c_I_formula": "c_I(m; U, V) := -sum_{d r n = m, d <= U, r <= V} mu(d) mu(r)",
+          "c_II_formula_r_gt_V": "c_{II}(m; U, V) := sum_{a b = m, a > U, b > V} mu(a) sum_{r | b, r > V} mu(r)",
+          "c_II_formula_negated_r_le_V": "c_{II}(m; U, V) = -sum_{a b = m, a > U, b > V} mu(a) sum_{r | b, r <= V} mu(r)   (since sum_{r | b} mu(r) = 0 for all b > V >= 1)",
+          "band_admissibility_condition": "max(U, V) <= H(X) ensures m > H(X) >= max(U, V) so mu(m) = c_I(m; U, V) + c_{II}(m; U, V) for all H(X) < m <= M(X), and U V <= sqrt(X) ensures |E_{EM,I}(X; U, V)| <= C_{EM,I} (U V / sqrt(X)) <= C_{EM,I}. Both hold for U = V = floor(X^{1/4}) across ALL X >= 1 (since 1 <= floor(X^{1/4}) <= floor(X^{5/6}) = H(X) and floor(X^{1/4})^2 <= sqrt(X)), without using the false small-X inequality sqrt(X) <= H(X) (which fails on 1 < X < 2^{6/5}, e.g. at X = 2 where H(2) = 1 < sqrt(2))."
+        },
+        "vaughan_m4_U1_V1_regression": {
+          "U": 1,
+          "V": 1,
+          "m": 4,
+          "m_gt_max_U_V": true,
+          "mu_4_actual": 0,
+          "c_I_4_1_1": -1,
+          "c_II_4_1_1_published_r_gt_V": 1,
+          "c_II_4_1_1_published_negated_r_le_V": 1,
+          "c_II_4_1_1_unnegated_r_le_V_wrong": -1,
+          "c_I_plus_c_II_equals_mu_4": true,
+          "unnegated_r_le_V_detected_wrong": true
+        },
+        "type_I_total_variation_and_sum_integral_discrepancy_proof": {
+          "tilde_psi0_polynomial_identities_verified": true,
+          "C0_tilde_psi_exact_rational": "8340237/3584",
+          "C1_tilde_psi_exact_rational": "95924679/4096",
+          "C2_tilde_psi_exact_rational": "132825555/512",
+          "tilde_A1_exact_rational": "17685797581/688128",
+          "tilde_A2_exact_rational": "14758395/1024",
+          "var_f_small_v_0_to_1_bound_certified": {
+            "mid_float": 1.0409706660234206,
+            "rad_float_outward": 7.663939256123815e-17,
+            "lower_dec": "1.040970666023420664359631033922417996580e+0",
+            "upper_dec": "1.040970666023420664359631033922417996583e+0",
+            "arb_ball_str": "[1.040970666023420664359631033922417996582 +/- 4.00e-40]"
+          },
+          "var_f_large_v_1_to_inf_bound_certified": {
+            "mid_float": 40115.34705084241,
+            "rad_float_outward": 7.853414567690048e-13,
+            "lower_dec": "4.011534705084240625775049603174603174602e+4",
+            "upper_dec": "4.011534705084240625775049603174603174605e+4",
+            "arb_ball_str": "[40115.34705084240625775049603174603174603 +/- 1.75e-36]"
+          },
+          "var_f_total_bound_V_f_certified": {
+            "mid_float": 40116.38802150843,
+            "rad_float_outward": 1.4684879226126244e-12,
+            "lower_dec": "4.011638802150842967841485566277995416401e+4",
+            "upper_dec": "4.011638802150842967841485566277995416404e+4",
+            "arb_ball_str": "[40116.38802150842967841485566277995416403 +/- 1.68e-36]"
+          },
+          "sup_f_bound_C_log_EM_certified": {
+            "mid_float": 13.46851,
+            "rad_float_outward": 4.730000014978374e-06,
+            "lower_dec": "1.346850526999998522569512715563178062437e+1",
+            "upper_dec": "1.346851473000001477430487284436821937563e+1",
+            "arb_ball_str": "[13.46851 +/- 4.74e-6]"
+          },
+          "C_BV_norm_plus_var_bound_certified": {
+            "mid_float": 40129.85653150843,
+            "rad_float_outward": 4.730002710520737e-06,
+            "lower_dec": "4.012985652677842964942969607473358222722e+4",
+            "upper_dec": "4.012985653623842970740001525082632610084e+4",
+            "arb_ball_str": "[40129.85653 +/- 6.24e-6]"
+          },
+          "C_EM_I_progression_discrepancy_constant_certified": {
+            "mid_float": 40143.32504150843,
+            "rad_float_outward": 9.460003467766416e-06,
+            "lower_dec": "4.014332503204842959202282705628320285557e+4",
+            "upper_dec": "4.014332505096842976480688426927670547248e+4",
+            "arb_ball_str": "[40143.3250 +/- 5.10e-5]"
+          },
+          "type_I_global_bound_B_J_plus_C_EM_I_certified": {
+            "mid_float": 40148.093259635316,
+            "rad_float_outward": 1.1036667894688608e-05,
+            "lower_dec": "4.014809324859865022937100454749633473364e+4",
+            "upper_dec": "4.014809327067198381165525367999543351144e+4",
+            "arb_ball_str": "[40148.0933 +/- 5.15e-5]"
+          },
+          "progression_discrepancy_theorem": "For any g of bounded variation on (0, infty) and any real 0 <= A <= B, partitioning at integer points floor(A) <= floor(B) gives |sum_{floor(A) < n <= floor(B)} g(n) - int_{floor(A)}^{floor(B)} g(u) du| <= Var_{(0,infty)}(g) and fractional endpoint integrals |int_{floor(A)}^A g(u) du| + |int_{floor(B)}^B g(u) du| <= 2 ||g||_infty, so |sum_{A < n <= B} g(n) - int_A^B g(u) du| <= 2 ||g||_infty + Var_{(0,infty)}(g). Applying this to g(u) = F_X(q u) on [H(X)/q, M(X)/q] for q = d r >= 1 (using scale invariance of ||.||_infty and Var) proves |sum_{H(X)/q < n <= M(X)/q} F_X(q n) - (1/q) J_band(X)| <= C_{EM,I} X^{-1/2} and hence |E_{EM,I}(X; U, V)| <= C_{EM,I} U V X^{-1/2}."
+        },
         "landau_moebius_harmonic_bound_verified_up_to_200": true,
         "max_abs_sum_mu_d_over_d_up_to_200_exact": "1/1",
+        "all_vaughan_admissibility_verified": true,
         "all_vaughan_identities_enclose_zero": true,
+        "all_type_I_em_bounds_certified": true,
         "vaughan_band_table": [
           {
             "X_label": "1",
@@ -8279,8 +8398,25 @@
             "M_X": 2,
             "U_cutoff": 1,
             "V_cutoff": 1,
+            "max_UV_le_H_X": true,
             "UV_le_sqrt_X": true,
+            "sqrt_X_le_H_X_holds_at_this_X": true,
             "pointwise_coeff_identity_mu_eq_cI_plus_cII": true,
+            "both_published_c_II_forms_match": true,
+            "S_mu_U_certified": {
+              "mid_float": 1.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "9.999999999999999999999999999999999999990e-1",
+              "upper_dec": "1.000000000000000000000000000000000000001e+0",
+              "arb_ball_str": "1.000000000000000000000000000000000000000"
+            },
+            "S_mu_V_certified": {
+              "mid_float": 1.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "9.999999999999999999999999999999999999990e-1",
+              "upper_dec": "1.000000000000000000000000000000000000001e+0",
+              "arb_ball_str": "1.000000000000000000000000000000000000000"
+            },
             "R_mu_band_X_certified": {
               "mid_float": -0.013885400957675749,
               "rad_float_outward": 4.0354154425600176e-11,
@@ -8297,9 +8433,9 @@
             },
             "R_type_I_exchanged_dilation_certified": {
               "mid_float": -0.013885400957675749,
-              "rad_float_outward": 4.035415453402039e-11,
-              "lower_dec": "-1.388540099802990313232822772171459746461e-2",
-              "upper_dec": "-1.388540091732159569059071313468223252128e-2",
+              "rad_float_outward": 4.0354154425600176e-11,
+              "lower_dec": "-1.388540099802990302390801047316415406387e-2",
+              "upper_dec": "-1.388540091732159579901093038323267592203e-2",
               "arb_ball_str": "[-0.0138854010 +/- 8.27e-11]"
             },
             "R_type_II_X_certified": {
@@ -8309,6 +8445,14 @@
               "upper_dec": "0",
               "arb_ball_str": "0"
             },
+            "type_I_analytic_bound_B_J_plus_C_EM_I_rho_UV_certified": {
+              "mid_float": 40148.093259635316,
+              "rad_float_outward": 1.1036667923110318e-05,
+              "lower_dec": "4.014809324859865020094929511709232729879e+4",
+              "upper_dec": "4.014809327067198384007696311039944094628e+4",
+              "arb_ball_str": "[40148.0933 +/- 5.15e-5]"
+            },
+            "abs_R_type_I_le_analytic_bound_certified": true,
             "vaughan_sum_difference_encloses_zero": true,
             "type_I_exchange_difference_encloses_zero": true
           },
@@ -8318,8 +8462,25 @@
             "M_X": 3,
             "U_cutoff": 1,
             "V_cutoff": 1,
+            "max_UV_le_H_X": true,
             "UV_le_sqrt_X": true,
+            "sqrt_X_le_H_X_holds_at_this_X": false,
             "pointwise_coeff_identity_mu_eq_cI_plus_cII": true,
+            "both_published_c_II_forms_match": true,
+            "S_mu_U_certified": {
+              "mid_float": 1.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "9.999999999999999999999999999999999999990e-1",
+              "upper_dec": "1.000000000000000000000000000000000000001e+0",
+              "arb_ball_str": "1.000000000000000000000000000000000000000"
+            },
+            "S_mu_V_certified": {
+              "mid_float": 1.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "9.999999999999999999999999999999999999990e-1",
+              "upper_dec": "1.000000000000000000000000000000000000001e+0",
+              "arb_ball_str": "1.000000000000000000000000000000000000000"
+            },
             "R_mu_band_X_certified": {
               "mid_float": 0.01089889085880644,
               "rad_float_outward": 9.523770224768783e-14,
@@ -8336,9 +8497,9 @@
             },
             "R_type_I_exchanged_dilation_certified": {
               "mid_float": 0.01089889085880644,
-              "rad_float_outward": 9.523770256532518e-14,
-              "lower_dec": "1.089889085871120280995309569224346879500e-2",
-              "upper_dec": "1.089889085890167754275134414472178678858e-2",
+              "rad_float_outward": 9.523770214180871e-14,
+              "lower_dec": "1.089889085871120281037661216587061896453e-2",
+              "upper_dec": "1.089889085890167754232782767109463661905e-2",
               "arb_ball_str": "[0.010898890859 +/- 2.89e-13]"
             },
             "R_type_II_X_certified": {
@@ -8348,6 +8509,14 @@
               "upper_dec": "0",
               "arb_ball_str": "0"
             },
+            "type_I_analytic_bound_B_J_plus_C_EM_I_rho_UV_certified": {
+              "mid_float": 28390.385574353244,
+              "rad_float_outward": 8.265898617845245e-06,
+              "lower_dec": "2.839038556608734539228097446046645934531e+4",
+              "upper_dec": "2.839038558261913929587680058337624366236e+4",
+              "arb_ball_str": "[28390.3856 +/- 3.40e-5]"
+            },
+            "abs_R_type_I_le_analytic_bound_certified": true,
             "vaughan_sum_difference_encloses_zero": true,
             "type_I_exchange_difference_encloses_zero": true
           },
@@ -8357,8 +8526,25 @@
             "M_X": 6,
             "U_cutoff": 1,
             "V_cutoff": 1,
+            "max_UV_le_H_X": true,
             "UV_le_sqrt_X": true,
+            "sqrt_X_le_H_X_holds_at_this_X": true,
             "pointwise_coeff_identity_mu_eq_cI_plus_cII": true,
+            "both_published_c_II_forms_match": true,
+            "S_mu_U_certified": {
+              "mid_float": 1.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "9.999999999999999999999999999999999999990e-1",
+              "upper_dec": "1.000000000000000000000000000000000000001e+0",
+              "arb_ball_str": "1.000000000000000000000000000000000000000"
+            },
+            "S_mu_V_certified": {
+              "mid_float": 1.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "9.999999999999999999999999999999999999990e-1",
+              "upper_dec": "1.000000000000000000000000000000000000001e+0",
+              "arb_ball_str": "1.000000000000000000000000000000000000000"
+            },
             "R_mu_band_X_certified": {
               "mid_float": 0.005384405576454247,
               "rad_float_outward": 4.1991419788008396e-14,
@@ -8375,9 +8561,9 @@
             },
             "R_type_I_exchanged_dilation_certified": {
               "mid_float": -0.0012329275584615537,
-              "rad_float_outward": 9.3940854776725e-14,
-              "lower_dec": "-1.232927558555494321734131917221096918459e-3",
-              "upper_dec": "-1.232927558367612820537967499810102699985e-3",
+              "rad_float_outward": 9.394085456496677e-14,
+              "lower_dec": "-1.232927558555494321522373680407521833692e-3",
+              "upper_dec": "-1.232927558367612820749725736623677784752e-3",
               "arb_ball_str": "[-0.001232927558 +/- 5.56e-13]"
             },
             "R_type_II_X_certified": {
@@ -8387,6 +8573,14 @@
               "upper_dec": "6.617333134998535544698931317150989916366e-3",
               "arb_ball_str": "[0.006617333135 +/- 1.67e-13]"
             },
+            "type_I_analytic_bound_B_J_plus_C_EM_I_rho_UV_certified": {
+              "mid_float": 20076.430738881103,
+              "rad_float_outward": 6.306667591691243e-06,
+              "lower_dec": "2.007643073257443543335959101935473330584e+4",
+              "upper_dec": "2.007643074518776892925181154535708077520e+4",
+              "arb_ball_str": "[20076.43074 +/- 7.43e-6]"
+            },
+            "abs_R_type_I_le_analytic_bound_certified": true,
             "vaughan_sum_difference_encloses_zero": true,
             "type_I_exchange_difference_encloses_zero": true
           },
@@ -8396,8 +8590,25 @@
             "M_X": 10,
             "U_cutoff": 1,
             "V_cutoff": 1,
+            "max_UV_le_H_X": true,
             "UV_le_sqrt_X": true,
+            "sqrt_X_le_H_X_holds_at_this_X": true,
             "pointwise_coeff_identity_mu_eq_cI_plus_cII": true,
+            "both_published_c_II_forms_match": true,
+            "S_mu_U_certified": {
+              "mid_float": 1.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "9.999999999999999999999999999999999999990e-1",
+              "upper_dec": "1.000000000000000000000000000000000000001e+0",
+              "arb_ball_str": "1.000000000000000000000000000000000000000"
+            },
+            "S_mu_V_certified": {
+              "mid_float": 1.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "9.999999999999999999999999999999999999990e-1",
+              "upper_dec": "1.000000000000000000000000000000000000001e+0",
+              "arb_ball_str": "1.000000000000000000000000000000000000000"
+            },
             "R_mu_band_X_certified": {
               "mid_float": 0.030513754798526905,
               "rad_float_outward": 1.7011347195608478e-13,
@@ -8414,9 +8625,9 @@
             },
             "R_type_I_exchanged_dilation_certified": {
               "mid_float": 0.03809223060198507,
-              "rad_float_outward": 2.043013763985314e-13,
-              "lower_dec": "3.809223060178076928292252184074976336202e-2",
-              "upper_dec": "3.809223060218936522544400835807901780185e-2",
+              "rad_float_outward": 2.0430137555149845e-13,
+              "lower_dec": "3.809223060178076928376955478800406370109e-2",
+              "upper_dec": "3.809223060218936522459697541082471746278e-2",
               "arb_ball_str": "[0.038092230602 +/- 2.20e-13]"
             },
             "R_type_II_X_certified": {
@@ -8426,6 +8637,14 @@
               "upper_dec": "-7.578475803308212780187927811461559641673e-3",
               "arb_ball_str": "[-0.007578475803 +/- 6.09e-13]"
             },
+            "type_I_analytic_bound_B_J_plus_C_EM_I_rho_UV_certified": {
+              "mid_float": 16019.637853082197,
+              "rad_float_outward": 5.350661433964998e-06,
+              "lower_dec": "1.601963784773153667555299808601843653362e+4",
+              "upper_dec": "1.601963785843285810454937792248087464019e+4",
+              "arb_ball_str": "[16019.63785 +/- 8.44e-6]"
+            },
+            "abs_R_type_I_le_analytic_bound_certified": true,
             "vaughan_sum_difference_encloses_zero": true,
             "type_I_exchange_difference_encloses_zero": true
           },
@@ -8435,8 +8654,25 @@
             "M_X": 18,
             "U_cutoff": 1,
             "V_cutoff": 1,
+            "max_UV_le_H_X": true,
             "UV_le_sqrt_X": true,
+            "sqrt_X_le_H_X_holds_at_this_X": true,
             "pointwise_coeff_identity_mu_eq_cI_plus_cII": true,
+            "both_published_c_II_forms_match": true,
+            "S_mu_U_certified": {
+              "mid_float": 1.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "9.999999999999999999999999999999999999990e-1",
+              "upper_dec": "1.000000000000000000000000000000000000001e+0",
+              "arb_ball_str": "1.000000000000000000000000000000000000000"
+            },
+            "S_mu_V_certified": {
+              "mid_float": 1.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "9.999999999999999999999999999999999999990e-1",
+              "upper_dec": "1.000000000000000000000000000000000000001e+0",
+              "arb_ball_str": "1.000000000000000000000000000000000000000"
+            },
             "R_mu_band_X_certified": {
               "mid_float": 0.016361343431059067,
               "rad_float_outward": 1.9668449182084348e-13,
@@ -8453,9 +8689,9 @@
             },
             "R_type_I_exchanged_dilation_certified": {
               "mid_float": 0.048298384385821555,
-              "rad_float_outward": 3.385955043695261e-13,
-              "lower_dec": "4.829838438548295960461632683746767213522e-2",
-              "upper_dec": "4.829838438616015052480444030152982392697e-2",
+              "rad_float_outward": 3.385955026754602e-13,
+              "lower_dec": "4.829838438548295960631039273197627281336e-2",
+              "upper_dec": "4.829838438616015052311037440702122324884e-2",
               "arb_ball_str": "[0.048298384386 +/- 5.18e-13]"
             },
             "R_type_II_X_certified": {
@@ -8465,6 +8701,14 @@
               "upper_dec": "-3.193704095451144617205420482466557912787e-2",
               "arb_ball_str": "[-0.031937040955 +/- 4.89e-13]"
             },
+            "type_I_analytic_bound_B_J_plus_C_EM_I_rho_UV_certified": {
+              "mid_float": 12699.202216490887,
+              "rad_float_outward": 4.568182160552163e-06,
+              "lower_dec": "1.269920221192270455201106183946401377706e+4",
+              "upper_dec": "1.269920222105906735787267048860237499268e+4",
+              "arb_ball_str": "[12699.20222 +/- 8.08e-6]"
+            },
+            "abs_R_type_I_le_analytic_bound_certified": true,
             "vaughan_sum_difference_encloses_zero": true,
             "type_I_exchange_difference_encloses_zero": true
           },
@@ -8474,8 +8718,25 @@
             "M_X": 32,
             "U_cutoff": 2,
             "V_cutoff": 2,
+            "max_UV_le_H_X": true,
             "UV_le_sqrt_X": true,
+            "sqrt_X_le_H_X_holds_at_this_X": true,
             "pointwise_coeff_identity_mu_eq_cI_plus_cII": true,
+            "both_published_c_II_forms_match": true,
+            "S_mu_U_certified": {
+              "mid_float": 0.5,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "4.999999999999999999999999999999999999999e-1",
+              "upper_dec": "5.000000000000000000000000000000000000001e-1",
+              "arb_ball_str": "0.5000000000000000000000000000000000000000"
+            },
+            "S_mu_V_certified": {
+              "mid_float": 0.5,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "4.999999999999999999999999999999999999999e-1",
+              "upper_dec": "5.000000000000000000000000000000000000001e-1",
+              "arb_ball_str": "0.5000000000000000000000000000000000000000"
+            },
             "R_mu_band_X_certified": {
               "mid_float": 0.005045633806463933,
               "rad_float_outward": 2.8398007333604447e-13,
@@ -8492,9 +8753,9 @@
             },
             "R_type_I_exchanged_dilation_certified": {
               "mid_float": 0.021638745544928242,
-              "rad_float_outward": 4.127614858799755e-11,
-              "lower_dec": "2.163874550365209571641837877226599127153e-2",
-              "upper_dec": "2.163874558620439090277253086231290077834e-2",
+              "rad_float_outward": 4.1276148371157115e-11,
+              "lower_dec": "2.163874550365209593325881326936687807302e-2",
+              "upper_dec": "2.163874558620439068593209636521201397685e-2",
               "arb_ball_str": "[0.0216387455 +/- 8.63e-11]"
             },
             "R_type_II_X_certified": {
@@ -8504,6 +8765,14 @@
               "upper_dec": "-1.659311173833994652523911550548680019432e-2",
               "arb_ball_str": "[-0.016593111738 +/- 5.89e-13]"
             },
+            "type_I_analytic_bound_B_J_plus_C_EM_I_rho_UV_certified": {
+              "mid_float": 40148.093259635316,
+              "rad_float_outward": 1.1036667923110318e-05,
+              "lower_dec": "4.014809324859865020094929511709232729879e+4",
+              "upper_dec": "4.014809327067198384007696311039944094628e+4",
+              "arb_ball_str": "[40148.0933 +/- 5.15e-5]"
+            },
+            "abs_R_type_I_le_analytic_bound_certified": true,
             "vaughan_sum_difference_encloses_zero": true,
             "type_I_exchange_difference_encloses_zero": true
           },
@@ -8513,8 +8782,25 @@
             "M_X": 99,
             "U_cutoff": 2,
             "V_cutoff": 2,
+            "max_UV_le_H_X": true,
             "UV_le_sqrt_X": true,
+            "sqrt_X_le_H_X_holds_at_this_X": true,
             "pointwise_coeff_identity_mu_eq_cI_plus_cII": true,
+            "both_published_c_II_forms_match": true,
+            "S_mu_U_certified": {
+              "mid_float": 0.5,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "4.999999999999999999999999999999999999999e-1",
+              "upper_dec": "5.000000000000000000000000000000000000001e-1",
+              "arb_ball_str": "0.5000000000000000000000000000000000000000"
+            },
+            "S_mu_V_certified": {
+              "mid_float": 0.5,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "4.999999999999999999999999999999999999999e-1",
+              "upper_dec": "5.000000000000000000000000000000000000001e-1",
+              "arb_ball_str": "0.5000000000000000000000000000000000000000"
+            },
             "R_mu_band_X_certified": {
               "mid_float": 0.009486997027107105,
               "rad_float_outward": 5.6780964733066695e-11,
@@ -8531,9 +8817,9 @@
             },
             "R_type_I_exchanged_dilation_certified": {
               "mid_float": 0.01742194552734703,
-              "rad_float_outward": 2.1492392921540298e-10,
-              "lower_dec": "1.742194531242309912200303937910866527478e-2",
-              "upper_dec": "1.742194574227095478238989660300667030633e-2",
+              "rad_float_outward": 2.149239274806795e-10,
+              "lower_dec": "1.742194531242310085672651535591575968671e-2",
+              "upper_dec": "1.742194574227095304766642062619957589440e-2",
               "arb_ball_str": "[0.017421946 +/- 6.88e-10]"
             },
             "R_type_II_X_certified": {
@@ -8543,6 +8829,14 @@
               "upper_dec": "-7.934948439341819629427340781368638339818e-3",
               "arb_ball_str": "[-0.0079349485 +/- 6.12e-11]"
             },
+            "type_I_analytic_bound_B_J_plus_C_EM_I_rho_UV_certified": {
+              "mid_float": 25560.80266812981,
+              "rad_float_outward": 7.5990909141992184e-06,
+              "lower_dec": "2.556080266053072188759778684944512420526e+4",
+              "upper_dec": "2.556080267572890154105061258197428756589e+4",
+              "arb_ball_str": "[25560.80267 +/- 9.47e-6]"
+            },
+            "abs_R_type_I_le_analytic_bound_certified": true,
             "vaughan_sum_difference_encloses_zero": true,
             "type_I_exchange_difference_encloses_zero": true
           },
@@ -8552,8 +8846,25 @@
             "M_X": 182,
             "U_cutoff": 2,
             "V_cutoff": 2,
+            "max_UV_le_H_X": true,
             "UV_le_sqrt_X": true,
+            "sqrt_X_le_H_X_holds_at_this_X": true,
             "pointwise_coeff_identity_mu_eq_cI_plus_cII": true,
+            "both_published_c_II_forms_match": true,
+            "S_mu_U_certified": {
+              "mid_float": 0.5,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "4.999999999999999999999999999999999999999e-1",
+              "upper_dec": "5.000000000000000000000000000000000000001e-1",
+              "arb_ball_str": "0.5000000000000000000000000000000000000000"
+            },
+            "S_mu_V_certified": {
+              "mid_float": 0.5,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "4.999999999999999999999999999999999999999e-1",
+              "upper_dec": "5.000000000000000000000000000000000000001e-1",
+              "arb_ball_str": "0.5000000000000000000000000000000000000000"
+            },
             "R_mu_band_X_certified": {
               "mid_float": 0.03059141546787108,
               "rad_float_outward": 1.0172096289060011e-10,
@@ -8570,9 +8881,9 @@
             },
             "R_type_I_exchanged_dilation_certified": {
               "mid_float": 0.0024411913831936505,
-              "rad_float_outward": 3.831954229570262e-10,
-              "lower_dec": "2.441190999998227572083679303579248535194e-3",
-              "upper_dec": "2.441191766389073322947593124728502170864e-3",
+              "rad_float_outward": 3.831954173191749e-10,
+              "lower_dec": "2.441190999998233209934976228202305373949e-3",
+              "upper_dec": "2.441191766389067685096296200105445332110e-3",
               "arb_ball_str": "[0.002441191 +/- 7.67e-10]"
             },
             "R_type_II_X_certified": {
@@ -8582,6 +8893,14 @@
               "upper_dec": "2.815022420391624586533083124008006551476e-2",
               "arb_ball_str": "[0.028150224 +/- 2.04e-10]"
             },
+            "type_I_analytic_bound_B_J_plus_C_EM_I_rho_UV_certified": {
+              "mid_float": 20076.430738881103,
+              "rad_float_outward": 6.306667591691243e-06,
+              "lower_dec": "2.007643073257443543335959101935473330584e+4",
+              "upper_dec": "2.007643074518776892925181154535708077520e+4",
+              "arb_ball_str": "[20076.43074 +/- 7.43e-6]"
+            },
+            "abs_R_type_I_le_analytic_bound_certified": true,
             "vaughan_sum_difference_encloses_zero": true,
             "type_I_exchange_difference_encloses_zero": true
           }
@@ -8604,6 +8923,8 @@
           {
             "y_cutoff": 2,
             "K_label": "0",
+            "shift_convention": "K + log_tau(m) (since D_m = T_{log_tau m} and T_K D_m = T_{K + log_tau m})",
+            "verification_type": "ALGEBRAIC_CONSISTENCY_CHECK",
             "P_tau_K_certified": {
               "mid_float": 2.558258007415831,
               "rad_float_outward": 2.1842252301323596e-16,
@@ -8630,6 +8951,8 @@
           {
             "y_cutoff": 2,
             "K_label": "1",
+            "shift_convention": "K + log_tau(m) (since D_m = T_{log_tau m} and T_K D_m = T_{K + log_tau m})",
+            "verification_type": "ALGEBRAIC_CONSISTENCY_CHECK",
             "P_tau_K_certified": {
               "mid_float": 0.024709267769339835,
               "rad_float_outward": 2.544529774350276e-19,
@@ -8656,6 +8979,8 @@
           {
             "y_cutoff": 3,
             "K_label": "0",
+            "shift_convention": "K + log_tau(m) (since D_m = T_{log_tau m} and T_K D_m = T_{K + log_tau m})",
+            "verification_type": "ALGEBRAIC_CONSISTENCY_CHECK",
             "P_tau_K_certified": {
               "mid_float": 2.558258007415831,
               "rad_float_outward": 2.1842252301323596e-16,
@@ -8682,6 +9007,8 @@
           {
             "y_cutoff": 3,
             "K_label": "1",
+            "shift_convention": "K + log_tau(m) (since D_m = T_{log_tau m} and T_K D_m = T_{K + log_tau m})",
+            "verification_type": "ALGEBRAIC_CONSISTENCY_CHECK",
             "P_tau_K_certified": {
               "mid_float": 0.024709267769339835,
               "rad_float_outward": 2.544529774350276e-19,
@@ -8707,15 +9034,149 @@
           }
         ]
       },
+      "plancherel_multiplier_nu_and_domain_audit": {
+        "nu_formula": "nu(t) := Re psi(5/4 + i t / 2) - psi(5/4) + 4 t^2 / (t^2 + 1/4) = [Re psi(1/4 + i t / 2) - log pi] + (c_tau^B + 2)",
+        "nu_B_component_formula": "nu_B(t) := int_1^infty (x^{-3/2} / (x - x^{-1})) 2 (1 - cos(t log x)) dx/x = Re psi(5/4 + i t / 2) - psi(5/4) = sum_{n=0}^infty (t^2 / 4) / ((n + 5/4)((n + 5/4)^2 + t^2 / 4)) >= 0",
+        "nu_R0_component_formula": "nu_{R0}(t) := 4 |i t / (1/2 + i t)|^2 = 4 t^2 / (t^2 + 1/4) >= 0",
+        "operator_domain_statement": "D(J_tau) := {f in L^2(R_{>0}, dy/y) : int_{-infty}^infty nu(t) |hat{f}(i t)|^2 dt < infty}. For f in D(J_tau) (and f in C^1(R_{>0}) with D f in L^2(dy/y) and lim_{y->0^+} y^{1/2} f(y) = 0 for the spatial derivative form of R_0 f), Mellin-Plancherel gives ||J_tau f||_{H_tau^pos}^2 = ||A_tau^B f||_{H_tau^B}^2 + 4 ||R_0 f||_{L^2(dy/y)}^2 = (1 / tau) int_{-infty}^infty nu(t) |hat{f}(i t)|^2 dt. Because nu(0) = 0, J_tau is an isometric embedding of (D(J_tau), ||.||_{J_tau}) into H_tau^pos, NOT an isometry for the unweighted L^2(R_{>0}, dy/y) norm.",
+        "nu_at_0_equals_zero": true,
+        "nu_nonnegative_and_quadratic_lower_bound": "nu(t) = nu_B(t) + 4 t^2 / (t^2 + 1/4) >= 4 t^2 / (t^2 + 1/4) >= 0 for all t in R",
+        "taylor_expansion_at_0_formula": "nu(t) = (16 - psi''(5/4) / 8) t^2 + O(t^4)   (t -> 0)",
+        "psi_5_4_certified": {
+          "mid_float": -0.22745353337626542,
+          "rad_float_outward": 1.2917048857818568e-17,
+          "lower_dec": "-2.274535333762654080895301460966835773674e-1",
+          "upper_dec": "-2.274535333762654080895301460966835773671e-1",
+          "arb_ball_str": "[-0.2274535333762654080895301460966835773672 +/- 4.45e-41]"
+        },
+        "psi_second_deriv_5_4_certified": {
+          "mid_float": -1.3277399375369203,
+          "rad_float_outward": 1.0624226717803703e-17,
+          "lower_dec": "-1.327739937536920333337967178843989887291e+0",
+          "upper_dec": "-1.327739937536920333337967178843989887288e+0",
+          "arb_ball_str": "[-1.327739937536920333337967178843989887290 +/- 1.91e-40]"
+        },
+        "nu_taylor_t2_coeff_16_minus_psi_d2_over_8_certified": {
+          "mid_float": 16.165967492192117,
+          "rad_float_outward": 1.552984206135494e-15,
+          "lower_dec": "1.616596749219211504166724589735549873590e+1",
+          "upper_dec": "1.616596749219211504166724589735549873593e+1",
+          "arb_ball_str": "[16.16596749219211504166724589735549873591 +/- 1.23e-39]"
+        },
+        "digamma_constant_reconciliation_encloses_zero": true,
+        "plancherel_A_tau_B_psi_tau_norm_sq_certified": {
+          "mid_float": 0.5947678334606322,
+          "rad_float_outward": 5.989731575107221e-14,
+          "lower_dec": "5.947678334605723252595195168116072890897e-1",
+          "upper_dec": "5.947678334606921043929374459476548973750e-1",
+          "arb_ball_str": "[0.5947678334606 +/- 9.22e-14]"
+        },
+        "plancherel_four_R0_psi_tau_norm_sq_certified": {
+          "mid_float": 1.9634901739551989,
+          "rad_float_outward": 2.1932516836301468e-16,
+          "lower_dec": "1.963490173955198809269780870768043311297e+0",
+          "upper_dec": "1.963490173955199089073696885919631384092e+0",
+          "arb_ball_str": "[1.963490173955199 +/- 1.91e-16]"
+        },
+        "plancherel_J_tau_psi_tau_norm_sq_certified": {
+          "mid_float": 2.558258007415831,
+          "rad_float_outward": 6.02121652822323e-14,
+          "lower_dec": "2.558258007415771134529155837767606958800e+0",
+          "upper_dec": "2.558258007415891193466778881679329923053e+0",
+          "arb_ball_str": "[2.558258007416 +/- 2.29e-13]"
+        },
+        "spatial_P_tau_0_certified": {
+          "mid_float": 2.558258007415831,
+          "rad_float_outward": 2.1842252301323596e-16,
+          "lower_dec": "2.558258007415831199724019661589265492468e+0",
+          "upper_dec": "2.558258007415831199724019662629757145058e+0",
+          "arb_ball_str": "[2.558258007415831199724019662 +/- 6.30e-28]"
+        },
+        "plancherel_minus_spatial_P_tau_0_diff_certified": {
+          "mid_float": -3.572605230238604e-17,
+          "rad_float_outward": 6.002946891740109e-14,
+          "lower_dec": "-6.006519496970346031114750390541133593581e-14",
+          "upper_dec": "5.999374286509868822539183069468150723915e-14",
+          "arb_ball_str": "[+/- 6.01e-14]"
+        },
+        "plancherel_reconciles_with_P_tau_0_encloses_zero": true
+      },
       "critical_line_spectral_dirichlet_factorization": {
         "formula": "R_{mu,band}(X) = int_{-infty}^infty Omega_log(t) M_band(1/2 + i t; X) X^{i t} dt, Omega_log(t) := -(1/tau) zeta'(1/2 + i t) H_0(i t), M_band(s; X) := sum_{H(X) < m <= M(X)} mu(m) m^{-s}",
         "pole_free_contour_shift_explanation": "Unlike M_X[W](z) = -(zeta'/zeta)(1/2 + z) H_0(z) (whose contour shift from Re(z) > 1/2 to Re(z) = 0 crosses poles at nontrivial zeros of zeta), M_X[W_log](z) = -zeta'(1/2 + z) H_0(z) is holomorphic across the entire open strip -5/2 < Re(z) < 5/2 (since the triple zero of H_0(z) at z = 1/2 cancels the double pole of -zeta'(1/2 + z) at s = 1), giving an unconditional critical-line integral representation of R_{mu,band}(X).",
+        "whole_integrand_tail_bound_theorem": "For T >= 40 and A_X := sum_{H(X) < m <= M(X)} |mu(m)| / sqrt(m), |M_band(1/2 + it; X) X^{it}| <= A_X, 0 < H_0(it) <= (Gamma(1/4)^2 / (512 sqrt(pi))) (t^2 + 1/4)^4 e^{-pi t / 2}, and |zeta'(1/2 + it)| <= 2 sqrt(t^2 + 1/4) + 1 + 1/(t^2 + 1/4) <= 4 (t^2 + 1/4), proving |int_{|t| >= T} Omega_log(t) M_band(1/2 + it; X) X^{it} dt| <= 2 A_X B_{Omega,1}^{tail}(T) with B_{Omega,1}^{tail}(T) := (Gamma(1/4)^2 / (32 pi^{3/2} tau)) (T^2 + 1/4)^5 e^{-pi T / 2}.",
+        "cutoff_T": 48,
+        "B_Omega_1_tail_T_certified": {
+          "mid_float": 1.3719016643484567e-18,
+          "rad_float_outward": 7.682991313070645e-35,
+          "lower_dec": "1.371901664348456727857448422465050864051e-18",
+          "upper_dec": "1.371901664348456727857448422465050864054e-18",
+          "arb_ball_str": "[1.371901664348456727857448422465050864052e-18 +/- 2.88e-58]"
+        },
+        "B_Omega_2_tail_T_certified": {
+          "mid_float": 7.391045088194895e-37,
+          "rad_float_outward": 1.8234734877811486e-53,
+          "lower_dec": "7.391045088194894744725557492971802729824e-37",
+          "upper_dec": "7.391045088194894744725557492971802729827e-37",
+          "arb_ball_str": "[7.391045088194894744725557492971802729825e-37 +/- 1.68e-77]"
+        },
+        "Omega_log_L1_norm_certified": {
+          "mid_float": 0.10084349297701865,
+          "rad_float_outward": 2.167109372402745e-12,
+          "lower_dec": "1.008434929748515439613622857705128191674e-1",
+          "upper_dec": "1.008434929791857506880630827005202613103e-1",
+          "arb_ball_str": "[0.10084349298 +/- 5.15e-12]"
+        },
+        "Omega_log_L2_sq_integral_certified": {
+          "mid_float": 0.0006708474358943377,
+          "rad_float_outward": 1.30453845551733e-13,
+          "lower_dec": "6.708474357638838379703598823881183214241e-4",
+          "upper_dec": "6.708474360247914804562703855737160189197e-4",
+          "arb_ball_str": "[0.000670847436 +/- 2.37e-13]"
+        },
+        "Omega_log_L2_norm_certified": {
+          "mid_float": 0.025900722690580233,
+          "rad_float_outward": 2.5183832612612343e-12,
+          "lower_dec": "2.590072268806184964851264951324338881021e-2",
+          "upper_dec": "2.590072269309861306750639858842433227439e-2",
+          "arb_ball_str": "[0.02590072269 +/- 3.10e-12]"
+        },
+        "sqrt2_abs_R_mu_band_1_certified": {
+          "mid_float": 0.01963692235333341,
+          "rad_float_outward": 5.706852191223701e-11,
+          "lower_dec": "1.963692229626488685722317159613262074200e-2",
+          "upper_dec": "1.963692241040192749631969246263488084737e-2",
+          "arb_ball_str": "[0.019636922 +/- 4.11e-10]"
+        },
+        "Omega_log_L1_ge_sqrt2_abs_R_band_1_certification": {
+          "certified": true,
+          "certification_mode": "OUTWARD_UPPER_LE_LOWER",
+          "outward_upper_le_lower": true,
+          "weak_overlap_lower_le_upper": true,
+          "abs_value_upper_str": "[0.01963692241040192749631969246263488084735123982328902428475679967184712961320 +/- 1.08e-78]",
+          "bound_lower_str": "[0.1008434929748515439613622857705128191675440050690746167915101934969771115580 +/- 2.59e-77]",
+          "margin_bound_minus_abs_certified": {
+            "mid_float": 0.08120657062368523,
+            "rad_float_outward": 5.92356298849401e-11,
+            "lower_dec": "8.120657056444961625497842238881145423123e-2",
+            "upper_dec": "8.120657068292086404090408202345412465708e-2",
+            "arb_ball_str": "[0.0812065706 +/- 8.30e-11]"
+          }
+        },
         "all_crit_line_identities_enclose_zero": true,
         "critical_line_verification_table": [
           {
             "X_label": "1",
             "H_X": 1,
             "M_X": 2,
+            "verification_type": "INDEPENDENT_DISCRETE_SUM_VS_MELLIN_INTEGRAL_CHECK",
+            "A_X_dirichlet_majorant_certified": {
+              "mid_float": 0.7071067811865476,
+              "rad_float_outward": 4.8336466567264573e-17,
+              "lower_dec": "7.071067811865475244008443621048490392847e-1",
+              "upper_dec": "7.071067811865475244008443621048490392850e-1",
+              "arb_ball_str": "[0.7071067811865475244008443621048490392848 +/- 3.60e-41]"
+            },
             "R_mu_band_discrete_sum_certified": {
               "mid_float": -0.013885400957675749,
               "rad_float_outward": 4.0353538390861395e-11,
@@ -8723,19 +9184,44 @@
               "upper_dec": "-1.388540091732221185162096136344642697723e-2",
               "arb_ball_str": "[-0.0138854010 +/- 8.27e-11]"
             },
+            "R_mu_band_finite_mellin_integral_on_neg_T_to_T_certified": {
+              "mid_float": -0.013885400941677749,
+              "rad_float_outward": 8.016242159969144e-16,
+              "lower_dec": "-1.388540094167855042262448403296254640531e-2",
+              "upper_dec": "-1.388540094167694792837498776979938807185e-2",
+              "arb_ball_str": "[-0.01388540094168 +/- 3.06e-15]"
+            },
+            "finite_integration_error_radius": 8.012471247481316e-16,
+            "proved_infinite_tail_bound_2_A_X_B_Omega_1_certified": {
+              "mid_float": 1.940161939963809e-18,
+              "rad_float_outward": 1.7713918510974695e-34,
+              "lower_dec": "1.940161939963809116717352208404153767824e-18",
+              "upper_dec": "1.940161939963809116717352208404153767827e-18",
+              "arb_ball_str": "[1.940161939963809116717352208404153767825e-18 +/- 3.46e-58]"
+            },
+            "infinite_tail_error_bound": 1.940161939963809e-18,
             "R_mu_band_critical_line_mellin_integral_certified": {
               "mid_float": -0.013885400941677749,
-              "rad_float_outward": 3.049700643230902e-18,
-              "lower_dec": "-1.388540094167775184810913034955133871738e-2",
-              "upper_dec": "-1.388540094167774660542948994748284805274e-2",
-              "arb_ball_str": "[-0.01388540094167775 +/- 3.40e-18]"
+              "rad_float_outward": 8.035643780498249e-16,
+              "lower_dec": "-1.388540094167855236278653694343959414830e-2",
+              "upper_dec": "-1.388540094167694598821293485932234032886e-2",
+              "arb_ball_str": "[-0.01388540094168 +/- 3.06e-15]"
             },
+            "combined_enclosure_radius": 8.031872868010421e-16,
             "difference_encloses_zero": true
           },
           {
             "X_label": "2",
             "H_X": 1,
             "M_X": 3,
+            "verification_type": "INDEPENDENT_DISCRETE_SUM_VS_MELLIN_INTEGRAL_CHECK",
+            "A_X_dirichlet_majorant_certified": {
+              "mid_float": 1.2844570503761732,
+              "rad_float_outward": 9.613611663460744e-17,
+              "lower_dec": "1.284457050376173288909993142606806494931e+0",
+              "upper_dec": "1.284457050376173288909993142606806494934e+0",
+              "arb_ball_str": "[1.284457050376173288909993142606806494932 +/- 4.38e-40]"
+            },
             "R_mu_band_discrete_sum_certified": {
               "mid_float": 0.01089889085880644,
               "rad_float_outward": 9.523624843196288e-14,
@@ -8743,19 +9229,44 @@
               "upper_dec": "1.089889085890167608859708205648813597367e-2",
               "arb_ball_str": "[0.010898890859 +/- 2.89e-13]"
             },
-            "R_mu_band_critical_line_mellin_integral_certified": {
-              "mid_float": 0.010898890858844101,
-              "rad_float_outward": 3.627243685688918e-18,
-              "lower_dec": "1.089889085884409934595837204263369719816e-2",
-              "upper_dec": "1.089889085884410498642556303097034835344e-2",
-              "arb_ball_str": "[0.01089889085884410 +/- 4.99e-18]"
+            "R_mu_band_finite_mellin_integral_on_neg_T_to_T_certified": {
+              "mid_float": 0.010898890858844103,
+              "rad_float_outward": 9.119791970840694e-16,
+              "lower_dec": "1.089889085884319111470826924973127625046e-2",
+              "upper_dec": "1.089889085884501370351252059126657874186e-2",
+              "arb_ball_str": "[0.01089889085884 +/- 5.02e-15]"
             },
+            "finite_integration_error_radius": 9.112944021256708e-16,
+            "proved_infinite_tail_bound_2_A_X_B_Omega_1_certified": {
+              "mid_float": 3.5242975303903636e-18,
+              "rad_float_outward": 2.5237435036806263e-34,
+              "lower_dec": "3.524297530390363323710966946356861780556e-18",
+              "upper_dec": "3.524297530390363323710966946356861780559e-18",
+              "arb_ball_str": "[3.524297530390363323710966946356861780558e-18 +/- 1.06e-58]"
+            },
+            "infinite_tail_error_bound": 3.5242975303903636e-18,
+            "R_mu_band_critical_line_mellin_integral_certified": {
+              "mid_float": 0.010898890858844103,
+              "rad_float_outward": 9.155034960368026e-16,
+              "lower_dec": "1.089889085884318759040931651650071625053e-2",
+              "upper_dec": "1.089889085884501722781147332449713874178e-2",
+              "arb_ball_str": "[0.01089889085884 +/- 5.02e-15]"
+            },
+            "combined_enclosure_radius": 9.14818701078404e-16,
             "difference_encloses_zero": true
           },
           {
             "X_label": "4",
             "H_X": 3,
             "M_X": 6,
+            "verification_type": "INDEPENDENT_DISCRETE_SUM_VS_MELLIN_INTEGRAL_CHECK",
+            "A_X_dirichlet_majorant_certified": {
+              "mid_float": 0.855461885963821,
+              "rad_float_outward": 4.4796746826350944e-17,
+              "lower_dec": "8.554618859638209556480487461972371457490e-1",
+              "upper_dec": "8.554618859638209556480487461972371457493e-1",
+              "arb_ball_str": "[0.8554618859638209556480487461972371457491 +/- 1.50e-41]"
+            },
             "R_mu_band_discrete_sum_certified": {
               "mid_float": 0.005384405576454247,
               "rad_float_outward": 4.1990778890512037e-14,
@@ -8763,25 +9274,50 @@
               "upper_dec": "5.384405576496237694260309854951069346452e-3",
               "arb_ball_str": "[0.0053844055765 +/- 8.78e-14]"
             },
+            "R_mu_band_finite_mellin_integral_on_neg_T_to_T_certified": {
+              "mid_float": 0.005384405576458679,
+              "rad_float_outward": 7.47768631773026e-16,
+              "lower_dec": "5.384405576457930859994546780556375013705e-3",
+              "upper_dec": "5.384405576459426054409846971849997108193e-3",
+              "arb_ball_str": "[0.00538440557646 +/- 2.07e-15]"
+            },
+            "finite_integration_error_radius": 7.475972076500956e-16,
+            "proved_infinite_tail_bound_2_A_X_B_Omega_1_certified": {
+              "mid_float": 2.347219170280871e-18,
+              "rad_float_outward": 1.5795963286160373e-34,
+              "lower_dec": "2.347219170280871324882686016957780118467e-18",
+              "upper_dec": "2.347219170280871324882686016957780118470e-18",
+              "arb_ball_str": "[2.347219170280871324882686016957780118469e-18 +/- 2.20e-58]"
+            },
+            "infinite_tail_error_bound": 2.347219170280871e-18,
             "R_mu_band_critical_line_mellin_integral_certified": {
               "mid_float": 0.005384405576458679,
-              "rad_float_outward": 2.7018521861633942e-18,
-              "lower_dec": "5.384405576458675926774133643077814538883e-3",
-              "upper_dec": "5.384405576458681197851944299251578848538e-3",
-              "arb_ball_str": "[0.00538440557645868 +/- 4.08e-18]"
+              "rad_float_outward": 7.50115851059735e-16,
+              "lower_dec": "5.384405576457928512775260071509302411147e-3",
+              "upper_dec": "5.384405576459428401629133680897069710750e-3",
+              "arb_ball_str": "[0.00538440557646 +/- 2.08e-15]"
             },
+            "combined_enclosure_radius": 7.499444269368047e-16,
             "difference_encloses_zero": true
           }
         ]
       },
       "low_frequency_euler_spike_obstruction_on_H_tau_pos": {
-        "plancherel_lower_bound_formula": "||J_tau(E_y psi_tau)||_{H_tau^pos}^2 >= mu_arch^B(0) ||E_y psi_tau||_{L^2(dy/y)}^2 >= (mu_arch^B(0) H_0(0) / (8 log y)) exp((4 cos(tau/16) + o(1)) sqrt(y) / log y) -> +infty",
-        "mu_arch_B_at_0_certified": {
-          "mid_float": 2.0,
-          "rad_float_outward": 1.3023524338732354e-76,
-          "lower_dec": "1.999999999999999999999999999999999999998e+0",
-          "upper_dec": "2.000000000000000000000000000000000000002e+0",
-          "arb_ball_str": "[2.000000000000000000000000000000000000000 +/- 1e-44]"
+        "plancherel_lower_bound_formula": "For all y >= 24 (where I_y := [7 tau / (16 log y), tau / (2 log y)] subset [0, 1]), nu(t) >= 4 t^2 / (t^2 + 1/4) >= (16 / 5) t^2 >= (49 tau^2 / 80) (log y)^{-2} and H_0(i t) >= H_0(0) on I_y, while |I_y| = tau / (16 log y) and inf_{t in I_y} |M_y(1/2 + i t)|^2 = |M_y(1/2 + i t_{y,-})|^2, proving ||J_tau(E_y psi_tau)||_{H_tau^pos}^2 >= (2 / tau) int_{I_y} nu(t) |M_y(1/2 + i t)|^2 H_0(i t) dt >= (49 tau^2 H_0(0) / (640 (log y)^3)) |M_y(1/2 + i t_{y,-})|^2 = (49 tau^2 H_0(0) / (640 (log y)^3)) exp[(4 cos(tau/16) + o(1)) sqrt(y) / log y] -> +infty as y -> infty.",
+        "nu_at_0_equals_0": true,
+        "nu_taylor_t2_coeff_certified": {
+          "mid_float": 16.165967492192117,
+          "rad_float_outward": 1.552984206135494e-15,
+          "lower_dec": "1.616596749219211504166724589735549873590e+1",
+          "upper_dec": "1.616596749219211504166724589735549873593e+1",
+          "arb_ball_str": "[16.16596749219211504166724589735549873591 +/- 1.23e-39]"
+        },
+        "spike_prefactor_C_spike_49_tau_sq_H0_0_over_640_certified": {
+          "mid_float": 8.551122628756101e-05,
+          "rad_float_outward": 6.300296803680112e-21,
+          "lower_dec": "8.551122628756100458647896603253051421401e-5",
+          "upper_dec": "8.551122628756100458647896603253051421404e-5",
+          "arb_ball_str": "[8.551122628756100458647896603253051421403e-5 +/- 3.42e-45]"
         },
         "H_0_at_0_certified": {
           "mid_float": 2.829093440706439e-05,
@@ -8827,7 +9363,7 @@
           "implication": "sup_{K in A_R} |C_tau(K)| <= M_C < infty  ===>  forall rho (xi(rho) = 0, m_rho = ord_xi(rho) >= 1) : Re(rho) = 1/2",
           "status": "PROVED_UNCONDITIONALLY",
           "proof_reference": "Lean Theorems 11, 12 & 59 + Laplace-Carleman & Mellin strip holomorphy",
-          "multiplicity_preservation": "In C_tau(t) = W_xi(h_t), -xi'(s)/xi(s) has simple poles of positive integer residue m_rho = ord_xi(rho) >= 1, so each distinct zero contributes m_rho H_0(rho - 1/2) tau^{-t(rho - 1/2)} with m_rho H_0(rho - 1/2) != 0 on 0 < Re(rho) < 1 and no polynomial t^j drift.",
+          "multiplicity_preservation": "In C_tau(t) = W_xi(h_t), -xi'(s)/xi(s) has simple poles of residue -m_rho = -ord_xi(rho) <= -1 (equivalently, xi'(s)/xi(s) has positive integer residue +m_rho = ord_xi(rho) >= 1), so contour orientation makes each distinct zero contribute m_rho H_0(rho - 1/2) tau^{-t(rho - 1/2)} with m_rho H_0(rho - 1/2) != 0 on 0 < Re(rho) < 1 and no polynomial t^j drift.",
           "no_maximal_displacement_assumption": "Two independent arguments avoid assuming sup_rho Re(rho) is attained: (i) Laplace-Carleman partial-fraction resolvent R_tau(w) = sum_rho m_rho a_rho / (w - L(rho - 1/2)) has isolated simple poles at every individual zero w_{rho_0} = L(rho_0 - 1/2), whereas |C_tau(-t)| <= M_C makes R_tau(w) holomorphic on Re(w) > 0; (ii) Equivalently, |R_{mu,band}(X)| <= B_I + C_{log,0} implies |W(X)| <= M_W < infty on [1, infty), making M_X[W](z) = -(zeta'(1/2+z)/zeta(1/2+z)) H_0(z) holomorphic on 0 < Re(z) < 5/2 and excluding any zero of zeta(1/2 + z) in 0 < Re(z) < 1/2."
         }
       ],
@@ -8844,8 +9380,8 @@
     "first_unresolved_mathematical_step": "Establishing uniform O(1) boundedness of the rescaled relative-Mertens transition integral I(X) = int_{X/M(X)}^{X/H(X)} (M_{H(X)}(X/v) / (X/v)^{1/2}) tilde{W}_log(v) dv/v (equivalently, uniform O(1) boundedness of the Vaughan Type II bilinear sum R_{II}(X; U, V) = sum_{u > U, v > V, H(X) < u v <= M(X)} (mu(u) b_v / sqrt(u v)) W_log(X/(u v)) for U V <= sqrt(X), or of the critical-line Dirichlet-polynomial integral int_{-infty}^infty Omega_log(t) M_band(1/2 + i t; X) X^{i t} dt) without assuming RH."
   },
   "section_6_certified_arb_roundtrip_verification": {
-    "total_certified_arb_balls_checked": 798,
-    "compared_against_live_original_arb_count": 798,
+    "total_certified_arb_balls_checked": 855,
+    "compared_against_live_original_arb_count": 855,
     "live_original_count_matches_enumerated_total": true,
     "all_enclose_original_256bit_arb_ball": true,
     "failed_paths": [],
@@ -9569,6 +10105,7 @@
       "task_tc050.section_7_task_tc051_prime_separation_and_summation_by_parts.sign_sequence_cancellation_discrimination_audit.sign_discrimination_table[8].R_worst_case_abs_band_certified",
       "task_tc050.section_7_task_tc051_prime_separation_and_summation_by_parts.sign_sequence_cancellation_discrimination_audit.sign_discrimination_table[8].worst_case_to_actual_abs_ratio_certified",
       "task_tc050.section_7_task_tc051_prime_separation_and_summation_by_parts.sign_sequence_cancellation_discrimination_audit.sign_discrimination_table[8].worst_case_divided_by_sqrt_X_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.linear_density_annihilation_and_exact_limits.W_log_small_v_leading_coeff_81_zeta_prime_3_over_64_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.linear_density_annihilation_and_exact_limits.J_band_uniform_bound_B_J_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.linear_density_annihilation_and_exact_limits.upper_v_tail_limit_from_H_X_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.linear_density_annihilation_and_exact_limits.lower_v_tail_limit_from_M_X_certified",
@@ -9593,38 +10130,69 @@
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.rescaled_transition_integral_verification.rescaled_integral_table[6].I_X_rescaled_v_variable_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.rescaled_transition_integral_verification.rescaled_integral_table[7].I_X_original_t_variable_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.rescaled_transition_integral_verification.rescaled_integral_table[7].I_X_rescaled_v_variable_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.type_I_total_variation_and_sum_integral_discrepancy_proof.var_f_small_v_0_to_1_bound_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.type_I_total_variation_and_sum_integral_discrepancy_proof.var_f_large_v_1_to_inf_bound_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.type_I_total_variation_and_sum_integral_discrepancy_proof.var_f_total_bound_V_f_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.type_I_total_variation_and_sum_integral_discrepancy_proof.sup_f_bound_C_log_EM_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.type_I_total_variation_and_sum_integral_discrepancy_proof.C_BV_norm_plus_var_bound_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.type_I_total_variation_and_sum_integral_discrepancy_proof.C_EM_I_progression_discrepancy_constant_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.type_I_total_variation_and_sum_integral_discrepancy_proof.type_I_global_bound_B_J_plus_C_EM_I_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[0].S_mu_U_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[0].S_mu_V_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[0].R_mu_band_X_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[0].R_type_I_X_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[0].R_type_I_exchanged_dilation_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[0].R_type_II_X_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[0].type_I_analytic_bound_B_J_plus_C_EM_I_rho_UV_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[1].S_mu_U_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[1].S_mu_V_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[1].R_mu_band_X_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[1].R_type_I_X_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[1].R_type_I_exchanged_dilation_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[1].R_type_II_X_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[1].type_I_analytic_bound_B_J_plus_C_EM_I_rho_UV_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[2].S_mu_U_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[2].S_mu_V_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[2].R_mu_band_X_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[2].R_type_I_X_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[2].R_type_I_exchanged_dilation_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[2].R_type_II_X_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[2].type_I_analytic_bound_B_J_plus_C_EM_I_rho_UV_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[3].S_mu_U_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[3].S_mu_V_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[3].R_mu_band_X_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[3].R_type_I_X_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[3].R_type_I_exchanged_dilation_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[3].R_type_II_X_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[3].type_I_analytic_bound_B_J_plus_C_EM_I_rho_UV_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[4].S_mu_U_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[4].S_mu_V_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[4].R_mu_band_X_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[4].R_type_I_X_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[4].R_type_I_exchanged_dilation_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[4].R_type_II_X_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[4].type_I_analytic_bound_B_J_plus_C_EM_I_rho_UV_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[5].S_mu_U_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[5].S_mu_V_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[5].R_mu_band_X_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[5].R_type_I_X_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[5].R_type_I_exchanged_dilation_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[5].R_type_II_X_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[5].type_I_analytic_bound_B_J_plus_C_EM_I_rho_UV_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[6].S_mu_U_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[6].S_mu_V_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[6].R_mu_band_X_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[6].R_type_I_X_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[6].R_type_I_exchanged_dilation_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[6].R_type_II_X_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[6].type_I_analytic_bound_B_J_plus_C_EM_I_rho_UV_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[7].S_mu_U_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[7].S_mu_V_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[7].R_mu_band_X_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[7].R_type_I_X_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[7].R_type_I_exchanged_dilation_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[7].R_type_II_X_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_a_signed_transition_region_cancellation.vaughan_band_decomposition_and_type_I_audit.vaughan_band_table[7].type_I_analytic_bound_B_J_plus_C_EM_I_rho_UV_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.operator_intertwining_on_H_tau_pos.sieve_orbit_verification_table[0].P_tau_K_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.operator_intertwining_on_H_tau_pos.sieve_orbit_verification_table[0].P_tau_y_K_sieved_orbit_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.operator_intertwining_on_H_tau_pos.sieve_orbit_verification_table[0].Delta_arch_y_K_certified",
@@ -9637,13 +10205,38 @@
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.operator_intertwining_on_H_tau_pos.sieve_orbit_verification_table[3].P_tau_K_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.operator_intertwining_on_H_tau_pos.sieve_orbit_verification_table[3].P_tau_y_K_sieved_orbit_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.operator_intertwining_on_H_tau_pos.sieve_orbit_verification_table[3].Delta_arch_y_K_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.plancherel_multiplier_nu_and_domain_audit.psi_5_4_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.plancherel_multiplier_nu_and_domain_audit.psi_second_deriv_5_4_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.plancherel_multiplier_nu_and_domain_audit.nu_taylor_t2_coeff_16_minus_psi_d2_over_8_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.plancherel_multiplier_nu_and_domain_audit.plancherel_A_tau_B_psi_tau_norm_sq_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.plancherel_multiplier_nu_and_domain_audit.plancherel_four_R0_psi_tau_norm_sq_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.plancherel_multiplier_nu_and_domain_audit.plancherel_J_tau_psi_tau_norm_sq_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.plancherel_multiplier_nu_and_domain_audit.spatial_P_tau_0_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.plancherel_multiplier_nu_and_domain_audit.plancherel_minus_spatial_P_tau_0_diff_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.critical_line_spectral_dirichlet_factorization.B_Omega_1_tail_T_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.critical_line_spectral_dirichlet_factorization.B_Omega_2_tail_T_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.critical_line_spectral_dirichlet_factorization.Omega_log_L1_norm_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.critical_line_spectral_dirichlet_factorization.Omega_log_L2_sq_integral_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.critical_line_spectral_dirichlet_factorization.Omega_log_L2_norm_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.critical_line_spectral_dirichlet_factorization.sqrt2_abs_R_mu_band_1_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.critical_line_spectral_dirichlet_factorization.Omega_log_L1_ge_sqrt2_abs_R_band_1_certification.margin_bound_minus_abs_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.critical_line_spectral_dirichlet_factorization.critical_line_verification_table[0].A_X_dirichlet_majorant_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.critical_line_spectral_dirichlet_factorization.critical_line_verification_table[0].R_mu_band_discrete_sum_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.critical_line_spectral_dirichlet_factorization.critical_line_verification_table[0].R_mu_band_finite_mellin_integral_on_neg_T_to_T_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.critical_line_spectral_dirichlet_factorization.critical_line_verification_table[0].proved_infinite_tail_bound_2_A_X_B_Omega_1_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.critical_line_spectral_dirichlet_factorization.critical_line_verification_table[0].R_mu_band_critical_line_mellin_integral_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.critical_line_spectral_dirichlet_factorization.critical_line_verification_table[1].A_X_dirichlet_majorant_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.critical_line_spectral_dirichlet_factorization.critical_line_verification_table[1].R_mu_band_discrete_sum_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.critical_line_spectral_dirichlet_factorization.critical_line_verification_table[1].R_mu_band_finite_mellin_integral_on_neg_T_to_T_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.critical_line_spectral_dirichlet_factorization.critical_line_verification_table[1].proved_infinite_tail_bound_2_A_X_B_Omega_1_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.critical_line_spectral_dirichlet_factorization.critical_line_verification_table[1].R_mu_band_critical_line_mellin_integral_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.critical_line_spectral_dirichlet_factorization.critical_line_verification_table[2].A_X_dirichlet_majorant_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.critical_line_spectral_dirichlet_factorization.critical_line_verification_table[2].R_mu_band_discrete_sum_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.critical_line_spectral_dirichlet_factorization.critical_line_verification_table[2].R_mu_band_finite_mellin_integral_on_neg_T_to_T_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.critical_line_spectral_dirichlet_factorization.critical_line_verification_table[2].proved_infinite_tail_bound_2_A_X_B_Omega_1_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.critical_line_spectral_dirichlet_factorization.critical_line_verification_table[2].R_mu_band_critical_line_mellin_integral_certified",
-      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.low_frequency_euler_spike_obstruction_on_H_tau_pos.mu_arch_B_at_0_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.low_frequency_euler_spike_obstruction_on_H_tau_pos.nu_taylor_t2_coeff_certified",
+      "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.low_frequency_euler_spike_obstruction_on_H_tau_pos.spike_prefactor_C_spike_49_tau_sq_H0_0_over_640_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.low_frequency_euler_spike_obstruction_on_H_tau_pos.H_0_at_0_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.low_frequency_euler_spike_obstruction_on_H_tau_pos.four_cos_tau_16_exponent_certified",
       "task_tc050.section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization.approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization.low_frequency_euler_spike_obstruction_on_H_tau_pos.P_tau_0_certified",

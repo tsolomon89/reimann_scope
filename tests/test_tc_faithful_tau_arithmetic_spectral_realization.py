@@ -269,8 +269,8 @@ def test_06_lean_formalization_and_arb_roundtrip_verification(
         assert thm_name in lean_live["actual_theorems"]
 
     sec6 = tc050_artifact["section_6_certified_arb_roundtrip_verification"]
-    assert sec6["total_certified_arb_balls_checked"] == 798
-    assert sec6["compared_against_live_original_arb_count"] == 798
+    assert sec6["total_certified_arb_balls_checked"] == 855
+    assert sec6["compared_against_live_original_arb_count"] == 855
     assert sec6["live_original_count_matches_enumerated_total"] is True
     assert sec6["all_enclose_original_256bit_arb_ball"] is True
     assert sec6["failed_paths"] == []
@@ -279,7 +279,7 @@ def test_06_lean_formalization_and_arb_roundtrip_verification(
     rt_recheck = verify_all_serialized_arb_in_tree(
         tc050_artifact, path_prefix="task_tc050"
     )
-    assert rt_recheck["total_certified_arb_balls_checked"] == 798
+    assert rt_recheck["total_certified_arb_balls_checked"] == 855
     assert (
         sec6["compared_against_live_original_arb_count"]
         == rt_recheck["total_certified_arb_balls_checked"]
@@ -1373,14 +1373,25 @@ def test_22_tc051r_review_markdown_and_json_artifact_consistency(
 def test_23_tc052_transition_vanishing_moments_linear_density_and_vaughan_type_I(
     tc050_artifact: dict,
 ) -> None:
-    """Verify TASK-TC-052 Approach A: Mellin vanishing moments of W_log and tilde{W}_log,
-    two-endpoint asymptotic limits for J_band(X), R_{1,band}(X), and R_{|mu|,band}(X),
-    rescaled transition-integral identity, Landau's Moebius harmonic bound, and Vaughan
-    band decomposition R_{mu,band}(X) = R_I(X; U, V) + R_{II}(X; U, V)."""
+    """Verify TASK-TC-052 / TASK-TC-052R Approach A: Mellin vanishing moments of W_log and
+    tilde{W}_log, negative small-v expansion of W_log(v), strictly positive two-endpoint
+    limit L > 0 for J_band(X) and R_{1,band}(X), unconditional O(1) vs conditional o(sqrt(t))
+    scope for R_{|mu|,band}(X), rescaled transition-integral identity, Landau's Moebius
+    harmonic bound, repaired Vaughan c_II sign (U=V=1, m=4 regression), and complete
+    Type I bounded-variation progression proof."""
     assert tc050_artifact["subgate_closure_attempt_task_id"] == "TASK-TC-052"
+    assert tc050_artifact["tc052_repair_task_id"] == "TASK-TC-052R"
     assert (
         tc050_artifact["tc052_starting_head"]
         == "1f576944c040d5b3a2bf8091ca803e3758c80d12"
+    )
+    assert (
+        tc050_artifact["tc052_merged_main_baseline"]
+        == "916440e688c66d461daa04b17d7435e10e65f0d4"
+    )
+    assert (
+        tc050_artifact["tc052_implementation_commit"]
+        == "8414aa66f1127c636c68fcf8594833c570a3344a"
     )
     assert tc050_artifact["subgate_tc043a_status"] == "OPEN"
     assert tc050_artifact["rh_proved"] is False
@@ -1389,6 +1400,7 @@ def test_23_tc052_transition_vanishing_moments_linear_density_and_vaughan_type_I
         "section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization"
     ]
     assert sec8["task_id"] == "TASK-TC-052"
+    assert sec8["repair_task_id"] == "TASK-TC-052R"
     assert sec8["subgate_tc043a_status"] == "OPEN"
     assert sec8["rh_proved"] is False
 
@@ -1400,8 +1412,19 @@ def test_23_tc052_transition_vanishing_moments_linear_density_and_vaughan_type_I
     assert moments["tilde_W_log_vanishing_order_at_z_pos_half"] == 1
     assert moments["tilde_W_log_vanishing_order_at_z_neg_half"] == 4
     assert moments["total_vanishing_endpoint_moments_of_tilde_W_log"] == 5
+    assert "1 / 512" in moments["first_log_moment_at_z_pos_half_formula"]
+    assert "3 log(tau) / 128" in moments["fourth_log_moment_at_z_neg_half_formula"]
 
     lin = app_a["linear_density_annihilation_and_exact_limits"]
+    assert "< 0   (v -> 0^+)" in lin["W_log_small_v_asymptotic_formula"]
+    assert (
+        float(
+            lin[
+                "W_log_small_v_leading_coeff_81_zeta_prime_3_over_64_certified"
+            ]["upper_dec"]
+        )
+        < -0.250753
+    )
     assert float(lin["J_band_uniform_bound_B_J_certified"]["upper_dec"]) < 4.768220
     assert math.isclose(
         lin["upper_v_tail_limit_from_H_X_certified"]["mid_float"],
@@ -1413,6 +1436,10 @@ def test_23_tc052_transition_vanishing_moments_linear_density_and_vaughan_type_I
         0.12537676308,
         abs_tol=1e-9,
     )
+    assert (
+        "lim_{X -> infty} J_band(X) = lim_{X -> infty} R_{1,band}(X) = L"
+        in lin["exact_limit_J_band_and_R_1_band_as_X_to_infty_formula"]
+    )
     assert math.isclose(
         lin["exact_limit_R_1_band_as_X_to_infty_certified"]["mid_float"],
         0.13822220590,
@@ -1423,6 +1450,9 @@ def test_23_tc052_transition_vanishing_moments_linear_density_and_vaughan_type_I
         0.08402902496,
         abs_tol=1e-9,
     )
+    sq_note = lin["R_sqfree_band_unconditional_O1_scope_and_conditional_limit_note"]
+    assert "uniformly bounded for all X >= 1" in sq_note
+    assert "E_Q(t) = o(sqrt(t))" in sq_note
 
     resc = app_a["rescaled_transition_integral_verification"]
     assert resc["all_rescaled_identities_enclose_zero"] is True
@@ -1433,21 +1463,62 @@ def test_23_tc052_transition_vanishing_moments_linear_density_and_vaughan_type_I
     vaughan = app_a["vaughan_band_decomposition_and_type_I_audit"]
     assert vaughan["landau_moebius_harmonic_bound_verified_up_to_200"] is True
     assert vaughan["max_abs_sum_mu_d_over_d_up_to_200_exact"] == "1/1"
+    assert vaughan["all_vaughan_admissibility_verified"] is True
     assert vaughan["all_vaughan_identities_enclose_zero"] is True
+    assert vaughan["all_type_I_em_bounds_certified"] is True
+
+    reg = vaughan["vaughan_m4_U1_V1_regression"]
+    assert reg["U"] == 1 and reg["V"] == 1 and reg["m"] == 4
+    assert reg["c_I_4_1_1"] == -1
+    assert reg["c_II_4_1_1_published_r_gt_V"] == 1
+    assert reg["c_II_4_1_1_published_negated_r_le_V"] == 1
+    assert reg["c_II_4_1_1_unnegated_r_le_V_wrong"] == -1
+    assert reg["c_I_plus_c_II_equals_mu_4"] is True
+    assert reg["unnegated_r_le_V_detected_wrong"] is True
+
+    bv_proof = vaughan[
+        "type_I_total_variation_and_sum_integral_discrepancy_proof"
+    ]
+    assert bv_proof["tilde_psi0_polynomial_identities_verified"] is True
+    assert (
+        float(bv_proof["C_BV_norm_plus_var_bound_certified"]["upper_dec"])
+        < 40130.0
+    )
+    assert (
+        float(
+            bv_proof["C_EM_I_progression_discrepancy_constant_certified"][
+                "upper_dec"
+            ]
+        )
+        < 40148.0
+    )
+    assert (
+        float(
+            bv_proof["type_I_global_bound_B_J_plus_C_EM_I_certified"][
+                "upper_dec"
+            ]
+        )
+        < 40152.70
+    )
+
     assert len(vaughan["vaughan_band_table"]) == 8
     for row in vaughan["vaughan_band_table"]:
         assert row["UV_le_sqrt_X"] is True
+        assert row["max_UV_le_H_X"] is True
         assert row["pointwise_coeff_identity_mu_eq_cI_plus_cII"] is True
+        assert row["both_published_c_II_forms_match"] is True
         assert row["vaughan_sum_difference_encloses_zero"] is True
         assert row["type_I_exchange_difference_encloses_zero"] is True
+        assert row["abs_R_type_I_le_analytic_bound_certified"] is True
 
 
 def test_24_tc052_euler_sieved_orbit_critical_line_mellin_and_closure_chain(
     tc050_artifact: dict,
 ) -> None:
-    """Verify TASK-TC-052 Approach B (operator intertwining on H_tau^pos, critical-line
-    Mellin representation of R_{mu,band}(X), and low-frequency Euler spike lower bound),
-    the complete conditional closure chain, and Lean Theorems 57-59."""
+    """Verify TASK-TC-052 / TASK-TC-052R Approach B (Plancherel multiplier nu(t) with
+    nu(0)=0, operator intertwining on H_tau^pos, proved critical-line Mellin certificates
+    for R_{mu,band}(X), and low-frequency Euler spike lower bound with (log y)^{-3}
+    prefactor), the complete conditional closure chain, and Lean Theorems 57-59."""
     sec8 = tc050_artifact[
         "section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization"
     ]
@@ -1459,18 +1530,54 @@ def test_24_tc052_euler_sieved_orbit_critical_line_mellin_and_closure_chain(
     assert len(inter["sieve_orbit_verification_table"]) == 4
     for row in inter["sieve_orbit_verification_table"]:
         assert row["P_tau_minus_P_y_plus_Delta_encloses_zero"] is True
+        assert "K + log_tau(m)" in row["shift_convention"]
+
+    planch = app_b["plancherel_multiplier_nu_and_domain_audit"]
+    assert planch["nu_at_0_equals_zero"] is True
+    assert ">= 4 t^2 / (t^2 + 1/4) >= 0" in planch[
+        "nu_nonnegative_and_quadratic_lower_bound"
+    ]
+    assert planch["digamma_constant_reconciliation_encloses_zero"] is True
+    assert planch["plancherel_reconciles_with_P_tau_0_encloses_zero"] is True
+    assert math.isclose(
+        planch["plancherel_J_tau_psi_tau_norm_sq_certified"]["mid_float"],
+        2.558258007415831,
+        abs_tol=1e-12,
+    )
 
     crit = app_b["critical_line_spectral_dirichlet_factorization"]
     assert crit["all_crit_line_identities_enclose_zero"] is True
+    assert crit["cutoff_T"] == 48
+    assert (
+        float(crit["B_Omega_1_tail_T_certified"]["upper_dec"]) < 1.372e-18
+    )
+    assert (
+        crit["Omega_log_L1_ge_sqrt2_abs_R_band_1_certification"]["certified"]
+        is True
+    )
+    assert 0.100843 < crit["Omega_log_L1_norm_certified"]["mid_float"] < 0.100844
+    assert 0.025900 < crit["Omega_log_L2_norm_certified"]["mid_float"] < 0.025901
     assert len(crit["critical_line_verification_table"]) == 3
     for row in crit["critical_line_verification_table"]:
         assert row["difference_encloses_zero"] is True
+        assert row["finite_integration_error_radius"] < 1e-13
+        assert row["infinite_tail_error_bound"] < 4e-18
 
     spike = app_b["low_frequency_euler_spike_obstruction_on_H_tau_pos"]
+    assert spike["nu_at_0_equals_0"] is True
     assert math.isclose(
-        spike["mu_arch_B_at_0_certified"]["mid_float"], 2.0, abs_tol=1e-15
+        spike["nu_taylor_t2_coeff_certified"]["mid_float"],
+        16.1659674922,
+        abs_tol=1e-8,
     )
-    assert float(spike["mu_arch_B_at_0_certified"]["lower_dec"]) > 1.999999999999999
+    assert (
+        float(
+            spike[
+                "spike_prefactor_C_spike_49_tau_sq_H0_0_over_640_certified"
+            ]["lower_dec"]
+        )
+        > 8.55e-05
+    )
     assert math.isclose(
         spike["four_cos_tau_16_exponent_certified"]["mid_float"],
         3.6955181300,
@@ -1497,6 +1604,7 @@ def test_24_tc052_euler_sieved_orbit_critical_line_mellin_and_closure_chain(
         "vaughan_band_decomposition_and_type_I_uniform_bound",
         "euler_sieved_orbit_and_complete_subgate_closure_chain",
     ]
+    assert "tc052r_evidence_and_scope_separation" in sec5
     scopes = sec5["committed_lean_theorems_exact_scope"]
     for thm_key in (
         "theorem_57_transition_integral_linear_density_annihilation_and_sqrt_error_bound",
@@ -1504,4 +1612,49 @@ def test_24_tc052_euler_sieved_orbit_critical_line_mellin_and_closure_chain(
         "theorem_59_euler_sieved_orbit_and_complete_subgate_closure_chain",
     ):
         assert thm_key in scopes
+        assert (
+            "Conditional/algebraic real-inequality lemma"
+            in scopes[thm_key]["external_analytic_scope_note"]
+        )
+
+
+def test_25_tc052r_repair_reconciliation_and_stale_claim_absence(
+    tc050_artifact: dict,
+) -> None:
+    """Verify all 7 TASK-TC-052R repair requirements and confirm that stale pre-repair
+    strings (lim J_band = 0, sqrt(X) <= H(X), 0.043399/0.043400, 1e-20 tail, mu_arch^B(0) = 2,
+    1/(512*pi), 3*log(tau)/(128*pi), P_tau(K - log_tau m)) are absent from the source,
+    artifact, review, and ledger files."""
+    for rel_path in (
+        "docs/reviews/TC_FAITHFUL_TAU_ARITHMETIC_SPECTRAL_REALIZATION.md",
+        "docs/reviews/TC_CANONICAL_THETA_CORRELATION_BOUND.md",
+        "TRANSCENDENTAL_CONTINUATION.md",
+        "RESEARCH_LEDGER.md",
+        ".agents/corpus_map/obligation_register.md",
+        "formal/RiemannScope/README.md",
+    ):
+        text = (REPO_ROOT / rel_path).read_text(encoding="utf-8")
+        for stale_str in (
+            "\\lim_{X\\to\\infty} J_{\\mathrm{band}}(X) = 0",
+            "\\lim_{X\\to\\infty}J_{\\mathrm{band}}(X) = 0",
+            "lim_{X->infty} J_band(X) = 0",
+            "0.043399",
+            "0.043400",
+            "0.251243",
+            "1/(512*pi)",
+            "3*log(tau)/(128*pi)",
+            "21103099/1000000",
+        ):
+            assert stale_str not in text, (
+                f"Found stale pre-TC-052R string {stale_str!r} in {rel_path}"
+            )
+
+    # Verify Lean file contains the repaired U=V=1, m=4 and nu(t) quadratic lower bound conjuncts:
+    lean_text = (
+        REPO_ROOT / "formal/RiemannScope/CanonicalThetaCorrelationBound.lean"
+    ).read_text(encoding="utf-8")
+    assert "((-1 : ℝ) + 1 = 0 ∧ (-1 : ℝ) + (-1 : ℝ) ≠ 0)" in lean_text
+    assert "(16 / 5 : ℝ) * t ^ 2 ≤ nu_B + (4 * t ^ 2) / (t ^ 2 + 1 / 4)" in lean_text
+    assert "Conditional/algebraic Euler-sieved" in lean_text
+
 

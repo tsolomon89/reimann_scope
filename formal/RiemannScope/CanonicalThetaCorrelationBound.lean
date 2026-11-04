@@ -2273,9 +2273,9 @@ theorem iterated_prime_tower_telescoping_and_coprime_band_transfer
     linarith
 
 /-! ## Section 51: Transition-Region Linear-Density Annihilation, Vaughan Type I Uniform Bound,
-    Euler-Sieved Positive Orbit Intertwining, and Complete Closure Chain (`TASK-TC-052`) -/
+    Euler-Sieved Positive Orbit Intertwining, and Complete Conditional Closure Chain (`TASK-TC-052` / `TASK-TC-052R`) -/
 
-/-- Decomposition of the transition-region band integral (`TASK-TC-052`):
+/-- Decomposition of the transition-region band integral (`TASK-TC-052` / `TASK-TC-052R`):
     `I_a(X) = c_a * J_band(X) - c_a * B_lin_M(X) + I_err(X)`,
     obtained by integrating the linear-density term `c_a * (t - H(X))` of
     `A_{H(X)}(t) = c_a * (t - H(X)) + (E_a(t) - E_a(H(X)))` by parts against
@@ -2285,17 +2285,20 @@ theorem iterated_prime_tower_telescoping_and_coprime_band_transfer
 def linearDensityTransitionDecomp (c_a J_band B_lin_M I_err : ℝ) : ℝ :=
   c_a * J_band - c_a * B_lin_M + I_err
 
-/-- **Theorem 57 (`TASK-TC-052`)**: Transition-integral linear-density annihilation and
-    scale-invariant square-root error transfer:
+/-- **Theorem 57 (`TASK-TC-052` / `TASK-TC-052R`)**: Conditional/algebraic transition-integral
+    linear-density reduction and scale-invariant square-root error transfer:
     (1) When the upper-endpoint term `A_{H(X)}(M(X)) F_X(M(X)) = c_a * B_lin_M + B_err_M`
         is added to `I_a(X)`, the linear boundary terms `± c_a * B_lin_M` cancel identically,
         giving `R_a = c_a * J_band + B_err_M + I_err`; moreover, from the vanishing-moment tail
-        identity `J_band = -T_low - T_high` (`M_X[W_log](1/2) = 0`), proves
-        `|J_band| <= (1/3) * C_log_EM + (1/2) * C_log_0 < 4768220 / 1000000`.
+        identity `J_band = -T_low - T_high` (`M_X[W_log](1/2) = 0`), proves the uniform bound
+        `|J_band| <= (1/3) * C_log_EM + (1/2) * C_log_0 < 4768220 / 1000000`
+        (analytically, `lim_{X -> infty} J_band(X) = L = 27 * zeta(3) / (256 * pi^2) + 81 * (-zeta'(3)) / 128 ≈ 0.1382222059 > 0`).
     (2) Under `0 <= c_a`, `|B_lin_M| <= C_log_0`, `|B_err_M| <= B_E`, and the scale-invariant
-        square-root remainder bound `|I_err| <= 2 * C_a * L_tilde_W`, proves the uniform bounds
+        square-root remainder bound `|I_err| <= 2 * C_a * L_tilde_W`, proves the uniform `O(1)` bounds
         `|I_a| <= c_a * ((1/3) * C_log_EM + (3/2) * C_log_0) + 2 * C_a * L_tilde_W` and
-        `|R_a| <= c_a * ((1/3) * C_log_EM + (1/2) * C_log_0) + B_E + 2 * C_a * L_tilde_W`.
+        `|R_a| <= c_a * ((1/3) * C_log_EM + (1/2) * C_log_0) + B_E + 2 * C_a * L_tilde_W`
+        (for `a_m = |mu(m)|`, elementary `|E_Q(t)| <= 2 * sqrt(t)` gives unconditional `O(1)` boundedness,
+        while asymptotic convergence to `(6 / pi^2) * L` is conditional on `E_Q(t) = o(sqrt(t))`).
     (3) Specializing to `c_a = 0` (zero linear density, e.g. under a relative Mertens bound
         `|M_{H(X)}(t)| <= C_M * sqrt(t)`), proves `|I_a| <= 2 * C_a * L_tilde_W` and
         `|R_a| <= B_E + 2 * C_a * L_tilde_W`. -/
@@ -2365,22 +2368,29 @@ theorem transition_integral_linear_density_annihilation_and_sqrt_error_bound
     · rw [h_Ra_id, hc0]
       exact abs_le.mpr ⟨by linarith, by linarith⟩
 
-/-- Vaughan decomposition of the resonant-band Möbius sum (`TASK-TC-052`):
+/-- Vaughan decomposition of the resonant-band Möbius sum (`TASK-TC-052` / `TASK-TC-052R`):
     `R_{mu,band}(X) = R_I(X; U, V) + R_{II}(X; U, V)`. -/
 def vaughanBandDecomp (R_I R_II : ℝ) : ℝ :=
   R_I + R_II
 
-/-- **Theorem 58 (`TASK-TC-052`)**: Vaughan band decomposition and unconditional Type I
-    uniform bound:
+/-- **Theorem 58 (`TASK-TC-052` / `TASK-TC-052R`)**: Conditional/algebraic Vaughan band
+    decomposition, progression bounded-variation transfer, and Type I uniform bound:
     (1) From `R_I = -(S_mu_U * S_mu_V * J_band) + E_EM_I`, Landau's elementary bounds
-        `|S_mu_U| <= 1` and `|S_mu_V| <= 1`, `|J_band| <= B_J`, and the Dilation–Euler–Maclaurin
-        remainder bound `|E_EM_I| <= C_EM_1 * rho_UV` with `0 <= rho_UV <= 1` (`rho_UV = U V / sqrt(X)`
+        `|S_mu_U| <= 1` and `|S_mu_V| <= 1`, `|J_band| <= B_J`, and the progression sum–integral
+        discrepancy bound `|E_EM_I| <= C_EM_1 * rho_UV` with `0 <= rho_UV <= 1` (`rho_UV = U V / sqrt(X)`
         for `U V <= sqrt(X)`), proves `|S_mu_U * S_mu_V * J_band| <= B_J`, `|E_EM_I| <= C_EM_1`,
         and `|R_I| <= B_J + C_EM_1`.
     (2) Proves the two-way uniform boundedness equivalence between `R_band = R_I + R_II`
         and the Vaughan Type II bilinear sum `R_II`:
         - If `|R_II| <= M_II`, then `|R_band| <= B_J + C_EM_1 + M_II`.
-        - Conversely, if `|R_band| <= M_R`, then `|R_II| <= M_R + B_J + C_EM_1`. -/
+        - Conversely, if `|R_band| <= M_R`, then `|R_II| <= M_R + B_J + C_EM_1`.
+    (3) Supporting `TASK-TC-052R` lemmas:
+        - At `U = V = 1, m = 4`, the corrected Type II coefficient `c_II(4; 1, 1) = +1` cancels
+          `c_I(4; 1, 1) = -1` to match `mu(4) = 0` (`(-1) + 1 = 0`), whereas the un-negated
+          `r <= V` inner sum gives `-1` and `(-1) + (-1) = -2 != 0`.
+        - For any progression bounded-variation envelope `2 * F_sup + F_var <= C_EM_1 * inv_sqrt_X`
+          and pair count `0 <= U_V`, summing over the `U_V = U * V` progressions yields
+          `(2 * F_sup + F_var) * U_V <= C_EM_1 * (U_V * inv_sqrt_X)`. -/
 theorem vaughan_band_decomposition_and_type_I_uniform_bound
     (R_band R_I R_II S_mu_U S_mu_V J_band E_EM_I B_J C_EM_1 rho_UV M_II M_R : ℝ)
     (h_decomp : R_band = vaughanBandDecomp R_I R_II)
@@ -2397,7 +2407,12 @@ theorem vaughan_band_decomposition_and_type_I_uniform_bound
       |E_EM_I| ≤ C_EM_1 ∧
       |R_I| ≤ B_J + C_EM_1) ∧
     ((|R_II| ≤ M_II → |R_band| ≤ B_J + C_EM_1 + M_II) ∧
-      (|R_band| ≤ M_R → |R_II| ≤ M_R + B_J + C_EM_1)) := by
+      (|R_band| ≤ M_R → |R_II| ≤ M_R + B_J + C_EM_1)) ∧
+    (((-1 : ℝ) + 1 = 0 ∧ (-1 : ℝ) + (-1 : ℝ) ≠ 0) ∧
+      (∀ F_sup F_var inv_sqrt_X U_V : ℝ,
+        0 ≤ U_V →
+        2 * F_sup + F_var ≤ C_EM_1 * inv_sqrt_X →
+        (2 * F_sup + F_var) * U_V ≤ C_EM_1 * (U_V * inv_sqrt_X))) := by
   have _ := h_BJ_nonneg
   have _ := h_rho_nonneg
   have h_abs_U_nonneg : 0 ≤ |S_mu_U| := abs_nonneg S_mu_U
@@ -2423,7 +2438,7 @@ theorem vaughan_band_decomposition_and_type_I_uniform_bound
     rw [h_RI]
     exact abs_le.mpr ⟨by linarith, by linarith⟩
   have hri := abs_le.mp h_RI_abs
-  refine ⟨⟨h_main_abs, h_EM_global, h_RI_abs⟩, ⟨?_, ?_⟩⟩
+  refine ⟨⟨h_main_abs, h_EM_global, h_RI_abs⟩, ⟨?_, ?_⟩, ⟨⟨by norm_num, by norm_num⟩, ?_⟩⟩
   · intro hRII
     have hrii := abs_le.mp hRII
     dsimp [vaughanBandDecomp] at h_decomp
@@ -2435,25 +2450,33 @@ theorem vaughan_band_decomposition_and_type_I_uniform_bound
     have h_RII_id : R_II = R_band - R_I := by linarith
     rw [h_RII_id]
     exact abs_le.mpr ⟨by linarith, by linarith⟩
+  · intro F_sup F_var inv_sqrt_X U_V hUV_nonneg hBV
+    have h_prod := mul_le_mul_of_nonneg_right hBV hUV_nonneg
+    linarith
 
-/-- Approach B Euler-sieved positive-orbit correlation decomposition (`TASK-TC-052`):
+/-- Approach B Euler-sieved positive-orbit correlation decomposition (`TASK-TC-052` / `TASK-TC-052R`):
     `C_tau(K) = P_{tau,y}(K) - Delta_{arch,y}(K) + E_{tau,controlled}(K) - R_{mu,band}(X_K)`. -/
 def eulerSievedCorrelationDecomp (P_y_K Delta_arch_y_K E_ctrl_K R_band_X : ℝ) : ℝ :=
   P_y_K - Delta_arch_y_K + E_ctrl_K - R_band_X
 
-/-- **Theorem 59 (`TASK-TC-052`)**: Approach B Euler-sieved positive-orbit decomposition
-    and complete conditional closure chain from `|I(X)| <= B_I` to `delta_rho = 0`:
+/-- **Theorem 59 (`TASK-TC-052` / `TASK-TC-052R`)**: Conditional/algebraic Euler-sieved
+    positive-orbit decomposition, Plancherel multiplier quadratic lower bound, and conditional
+    closure reduction from `|I(X)| <= B_I` to `delta_rho = 0` via an explicit bridge hypothesis:
     (1) Reconciles the Euler-sieved positive-orbit coefficient
         `P_{tau,y}(K) = <U_K J_tau(E_y psi_tau), J_tau(psi_tau)>_{H_tau^pos}` with `C_tau(K)` via
         `P_K = P_y_K - Delta_arch_y_K`, proving
         `C_K = eulerSievedCorrelationDecomp P_y_K Delta_arch_y_K E_ctrl_K R_band_X` and
         `|P_y_K - Delta_arch_y_K| <= N_y * N_0 + |Delta_arch_y_K|`.
-    (2) Complete conditional closure chain across all grades `K` (including `K = 0` without
-        dividing by `K`): if `|I_X| <= B_I`, then `|R_band_X| <= B_I + C_log_0` and
-        `|C_K| <= P_0 + B_ctrl + B_I + C_log_0` (with `< 21102829 / 1000000 + B_I` under the
-        certified rational bounds `P_0 < 2558259 / 1000000`, `B_ctrl < 17987140 / 1000000`,
-        and `C_log_0 < 557430 / 1000000`), which via the Laplace–Carleman / Mellin-strip
-        bridge implies `delta_rho = 0`. -/
+    (2) Supporting `TASK-TC-052R` Plancherel multiplier lemma for
+        `nu(t) = nu_B(t) + 4 * t^2 / (t^2 + 1/4)` (where `nu_B(t) = Re psi(5/4 + i t / 2) - psi(5/4) >= 0`
+        and `nu(0) = 0`): for all `nu_B >= 0` and `t in R`, `nu(t) >= 4 * t^2 / (t^2 + 1/4) >= 0`,
+        and whenever `t^2 <= 1`, `nu(t) >= (16 / 5) * t^2`.
+    (3) Conditional closure reduction across all grades `K`: if `|I_X| <= B_I`, then
+        `|R_band_X| <= B_I + C_log_0` and `|C_K| <= P_0 + B_ctrl + B_I + C_log_0`
+        (with `< 21102829 / 1000000 + B_I` under the rational bounds `P_0 < 2558259 / 1000000`,
+        `B_ctrl < 17987140 / 1000000`, and `C_log_0 < 557430 / 1000000`), and applying the
+        assumed analytic bridge implication `h_bridge : (|C_K| <= P_0 + B_ctrl + B_I + C_log_0 -> delta_rho = 0)`
+        yields `delta_rho = 0`. -/
 theorem euler_sieved_orbit_and_complete_subgate_closure_chain
     (C_K P_K P_y_K Delta_arch_y_K E_ctrl_K R_band_X I_X
       P_0 B_ctrl C_log_0 B_I N_y N_0 delta_rho : ℝ)
@@ -2465,6 +2488,11 @@ theorem euler_sieved_orbit_and_complete_subgate_closure_chain
     (h_Py_cs : |P_y_K| ≤ N_y * N_0) :
     (C_K = eulerSievedCorrelationDecomp P_y_K Delta_arch_y_K E_ctrl_K R_band_X ∧
       |P_y_K - Delta_arch_y_K| ≤ N_y * N_0 + |Delta_arch_y_K|) ∧
+    (∀ nu_B t : ℝ,
+      0 ≤ nu_B →
+      (0 ≤ nu_B + (4 * t ^ 2) / (t ^ 2 + 1 / 4) ∧
+        (4 * t ^ 2) / (t ^ 2 + 1 / 4) ≤ nu_B + (4 * t ^ 2) / (t ^ 2 + 1 / 4) ∧
+        (t ^ 2 ≤ 1 → (16 / 5 : ℝ) * t ^ 2 ≤ nu_B + (4 * t ^ 2) / (t ^ 2 + 1 / 4)))) ∧
     (|I_X| ≤ B_I →
       (|R_band_X| ≤ B_I + C_log_0 ∧
         |C_K| ≤ P_0 + B_ctrl + B_I + C_log_0 ∧
@@ -2484,20 +2512,41 @@ theorem euler_sieved_orbit_and_complete_subgate_closure_chain
     linarith
   have h_Py_diff_bound : |P_y_K - Delta_arch_y_K| ≤ N_y * N_0 + |Delta_arch_y_K| :=
     abs_le.mpr ⟨by linarith, by linarith⟩
-  refine ⟨⟨h_CK_sieve, h_Py_diff_bound⟩, ?_⟩
-  intro hI
-  have hi := abs_le.mp hI
-  have h_R_bound : |R_band_X| ≤ B_I + C_log_0 :=
-    abs_le.mpr ⟨by linarith, by linarith⟩
-  have hr := abs_le.mp h_R_bound
-  have h_CK_bound : |C_K| ≤ P_0 + B_ctrl + B_I + C_log_0 := by
-    dsimp [canonicalCorrelationHSOrbitDecomp] at h_CK
-    rw [h_CK]
-    exact abs_le.mpr ⟨by linarith, by linarith⟩
-  refine ⟨h_R_bound, h_CK_bound, ?_, ?_⟩
-  · intro hP0 hBctrl hC0
+  refine ⟨⟨h_CK_sieve, h_Py_diff_bound⟩, ?_, ?_⟩
+  · intro nu_B t hnu
+    have ht2_nonneg : 0 ≤ t ^ 2 := sq_nonneg t
+    have hdenom_pos : 0 < t ^ 2 + 1 / 4 := by linarith
+    have hnum_nonneg : 0 ≤ 4 * t ^ 2 := by linarith
+    have hfrac_nonneg : 0 ≤ (4 * t ^ 2) / (t ^ 2 + 1 / 4) :=
+      div_nonneg hnum_nonneg (le_of_lt hdenom_pos)
+    refine ⟨by linarith, by linarith, ?_⟩
+    intro ht_le_one
+    have h_quad_le : (16 / 5 : ℝ) * t ^ 2 ≤ (4 * t ^ 2) / (t ^ 2 + 1 / 4) := by
+      have h_prod_nonneg : 0 ≤ (16 / 5 : ℝ) * t ^ 2 * (1 - t ^ 2) := by
+        have h1 : 0 ≤ (16 / 5 : ℝ) * t ^ 2 := by linarith
+        have h2 : 0 ≤ 1 - t ^ 2 := by linarith
+        exact mul_nonneg h1 h2
+      have h_quot_nonneg : 0 ≤ ((16 / 5 : ℝ) * t ^ 2 * (1 - t ^ 2)) / (t ^ 2 + 1 / 4) :=
+        div_nonneg h_prod_nonneg (le_of_lt hdenom_pos)
+      have h_id : (4 * t ^ 2) / (t ^ 2 + 1 / 4) -
+          (16 / 5 : ℝ) * t ^ 2 * ((t ^ 2 + 1 / 4) / (t ^ 2 + 1 / 4)) =
+          ((16 / 5 : ℝ) * t ^ 2 * (1 - t ^ 2)) / (t ^ 2 + 1 / 4) := by ring
+      rw [div_self (ne_of_gt hdenom_pos)] at h_id
+      linarith
     linarith
-  · intro h_bridge
-    exact h_bridge h_CK_bound
+  · intro hI
+    have hi := abs_le.mp hI
+    have h_R_bound : |R_band_X| ≤ B_I + C_log_0 :=
+      abs_le.mpr ⟨by linarith, by linarith⟩
+    have hr := abs_le.mp h_R_bound
+    have h_CK_bound : |C_K| ≤ P_0 + B_ctrl + B_I + C_log_0 := by
+      dsimp [canonicalCorrelationHSOrbitDecomp] at h_CK
+      rw [h_CK]
+      exact abs_le.mpr ⟨by linarith, by linarith⟩
+    refine ⟨h_R_bound, h_CK_bound, ?_, ?_⟩
+    · intro hP0 hBctrl hC0
+      linarith
+    · intro h_bridge
+      exact h_bridge h_CK_bound
 
 end RiemannScope

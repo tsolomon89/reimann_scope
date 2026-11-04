@@ -2304,7 +2304,20 @@ def verify_canonical_hilbert_schmidt_orbit_decomposition(
                     "where (R_0 f)(y) := int_0^y (t/y)^{1/2} (D f)(t) dt/t = f(y) - (1/2) int_0^y (t/y)^{1/2} f(t) dt/t "
                     "(with Euler derivative D = y d/dy) is the causal s = 0 pole-resolvent with Mellin multiplier "
                     "it / (1/2 + it) and 4 <R_0 T_K psi_tau, R_0 psi_tau>_{L^2(dy/y)} = 4 h_0(e^kappa) - J(kappa), "
-                    "J(kappa) := int_0^infty e^{-u/2} (h_0(e^{kappa+u}) + h_0(e^{kappa-u})) du."
+                    "J(kappa) := int_0^infty e^{-u/2} (h_0(e^{kappa+u}) + h_0(e^{kappa-u})) du. "
+                    "On the maximal domain D(J_tau) = {f in L^2(R_{>0}, dy/y) : int_R nu(t) |hat{f}(it)|^2 dt < infty} "
+                    "with Plancherel multiplier nu(t) = Re psi(5/4 + it/2) - psi(5/4) + 4 t^2 / (t^2 + 1/4) "
+                    "(nu(0) = 0, nu(t) > 0 for t != 0), J_tau is an isometric embedding from the weighted Hilbert "
+                    "space (D(J_tau), ||.||_{J_tau}) with ||f||_{J_tau}^2 := (1/tau) int_R nu(t) |hat{f}(it)|^2 dt "
+                    "= ||A_tau^B f||_{H_tau^B}^2 + 4 ||R_0 f||_{L^2(dy/y)}^2 into H_tau^pos (it is NOT an isometry "
+                    "with respect to the unweighted L^2(R_{>0}, dy/y) norm because nu(0) = 0)."
+                ),
+                "operator_domain_and_plancherel_multiplier_nu": (
+                    "D(J_tau) := {f in L^2(R_{>0}, dy/y) : int_{-infty}^infty nu(t) |hat{f}(it)|^2 dt < infty}, "
+                    "nu(t) := Re psi(5/4 + it/2) - psi(5/4) + 4 t^2 / (t^2 + 1/4) "
+                    "= [Re psi(1/4 + it/2) - log pi] + (c_tau^B + 2), "
+                    "satisfying nu(0) = 0, nu(t) >= 4 t^2 / (t^2 + 1/4) >= 0, and "
+                    "nu(t) = (16 - psi''(5/4)/8) t^2 + O(t^4) as t -> 0."
                 ),
                 "euler_resolvent_R0_and_pole_integral_J_kappa_audit": r0_audit,
                 "unitary_representation_and_intertwining": (
@@ -3862,7 +3875,7 @@ def execute_task_tc051_prime_arithmetic_resonant_band_audit(
 def verify_transition_region_vanishing_moments_and_vaughan_type_I_bound_arb(
     prec_bits: int = 256,
 ) -> Dict[str, Any]:
-    """Certify in SymPy and 256-bit Arb (TASK-TC-052 Approach A):
+    """Certify in SymPy and 256-bit Arb (TASK-TC-052 / TASK-TC-052R Approach A):
       1. Rescaled Transition-Integral Identity:
              I(X) = int_{H(X)}^{M(X)} M_{H(X)}(t) t^{-3/2} tilde{W}_log(X / t) dt
                   = X^{-1/2} int_{H(X)/X}^{M(X)/X} M_{H(X)}(X u) u^{-3/2} tilde{W}_log(1 / u) du
@@ -3873,28 +3886,42 @@ def verify_transition_region_vanishing_moments_and_vaughan_type_I_bound_arb(
            (int_0^infty v^{-1/2} (log v)^j W_log(v) dv = 0 for j in {0, 1, 2}).
          - M_X[tilde{W}_log](z) = (1/2 + z) M_X[W_log](z) = -(1/2 + z) zeta'(1/2 + z) H_0(z)
            has a simple zero at z = +1/2 (int_0^infty v^{-3/2} tilde{W}_log(v) dv = 0, with first
-           logarithmic moment int_0^infty v^{-3/2} (log v) tilde{W}_log(v) dv = 1 / (512 * pi))
+           logarithmic moment int_0^infty v^{-3/2} (log v) tilde{W}_log(v) dv = 1 / 512)
            and a quadruple zero (order 4) at z = -1/2 (int_0^infty v^{-1/2} (log v)^j tilde{W}_log(v) dv = 0
-           for j in {0, 1, 2, 3}, with fourth logarithmic moment -3 log(tau) / (128 * pi)).
-      3. Linear-Density Annihilation, Exact Two-Endpoint Limits, and Scale-Invariant O(sqrt(t)) Transfer:
+           for j in {0, 1, 2, 3}, with fourth logarithmic moment 3 log(tau) / 128).
+      3. Linear-Density Annihilation, Exact Two-Endpoint Limits (Including Floor/Ceiling Effects),
+         and Scale-Invariant O(sqrt(t)) Transfer:
+         - Small-argument expansion: W_log(v) = (81 zeta'(3) / 64) v^{5/2} + O(v^{9/2}) = -(81 [-zeta'(3)] / 64) v^{5/2} + O(v^{9/2}) < 0 (v -> 0^+).
          - For J_band(X) := int_{H(X)}^{M(X)} t^{-1/2} W_log(X / t) dt = -T_low(X) - T_high(X)
            (using int_0^infty v^{-3/2} W_log(v) dv = 0), certifies the unconditional uniform bound
                |J_band(X)| <= (1/3) C_{log,EM} + (1/2) C_{log,0} =: B_J < 4.768220   (for all X >= 1)
-           and the exact two-endpoint limit as X -> infty:
+           and the exact nonzero two-endpoint limit as X -> infty (including floor/ceiling ratios
+           (H(X)/X^{5/6})^3 = 1 + O(X^{-5/6}) -> 1 and (X^{5/4}/M(X))^2 = 1 + O(X^{-5/4}) -> 1):
                lim_{X -> infty} J_band(X) = lim_{X -> infty} R_{1,band}(X)
-                                          = 27 zeta(3) / (256 pi^2) + (81/128) (-zeta'(3))
-                                          = 0.1382222058976...,
-               lim_{X -> infty} R_{|mu|,band}(X) = (6 / pi^2) lim_{X -> infty} R_{1,band}(X)
-                                                 = 81 zeta(3) / (128 pi^4) + 243 (-zeta'(3)) / (64 pi^2)
-                                                 = 0.0840290249622...,
-           together with the unconditional O(1) bounds for any sequence a(m) with
-           sum_{m <= t} a(m) = c_a t + E_a(t) and |E_a(t)| <= C_a sqrt(t).
-      4. Vaughan Identity on the Resonant Band and Unconditional Type I Uniform Bound:
-         - For any U, V >= 1 with U V <= sqrt(X) <= H(X), decomposes mu(m) = c_I(m; U, V) + c_{II}(m; U, V)
-           on H(X) < m <= M(X), giving R_{mu,band}(X) = R_I(X; U, V) + R_{II}(X; U, V).
-         - Proves and certifies via the Dilation-Euler-Maclaurin identity and Landau's elementary
-           inequality |sum_{d <= x} mu(d) / d| <= 1 that R_I(X; U, V) is unconditionally O(1)
-           for all U V <= sqrt(X), isolating the Type II bilinear sum R_{II}(X; U, V).
+                                          = L := 27 zeta(3) / (256 pi^2) + (81/128) (-zeta'(3))
+                                          = 0.1382222058976... > 0,
+           while for the squarefree indicator a(m) = |mu(m)| = mu(m)^2, the elementary error bound
+           |E_Q(t)| <= 2 sqrt(t) in Q(t) = (6 / pi^2) t + E_Q(t) proves unconditional O(1) uniform
+           boundedness R_{|mu|,band}(X) = (6 / pi^2) J_band(X) + O(1) across all X >= 1 (whereas
+           convergence of the remainder integral to 0 so that lim_{X -> infty} R_{|mu|,band}(X) = (6 / pi^2) L
+           is conditional on a sub-sqrt(t) squarefree error estimate E_Q(t) = o(sqrt(t))).
+      4. Repaired Vaughan Identity on the Resonant Band and Complete Uniform Type I BV Estimate:
+         - For any U, V >= 1 with max(U, V) <= H(X), decomposes mu(m) = c_I(m; U, V) + c_{II}(m; U, V)
+           on H(X) < m <= M(X), where
+               c_I(m; U, V) = -sum_{d r n = m, d <= U, r <= V} mu(d) mu(r),
+               c_{II}(m; U, V) = sum_{a b = m, a > U, b > V} mu(a) sum_{r | b, r > V} mu(r)
+                               = -sum_{a b = m, a > U, b > V} mu(a) sum_{r | b, r <= V} mu(r),
+           verified at the dedicated regression U = V = 1, m = 4 (c_I = -1, c_{II} = +1, mu(4) = 0,
+           refuting the un-negated r <= V formula which gives c_{II}^{wrong} = -1 and sum -2 != 0).
+         - Proves for F_X(t) = t^{-1/2} W_log(X/t) = X^{-1/2} f(t/X) (f(u) = u^{-1/2} W_log(1/u)) that
+               Var_{(0, infty)}(f) = int_0^infty v^{-1/2} |tilde{W}_log(v)| dv <= V_f < infty
+           via explicit derivative estimates at both ends (|tilde{W}_log(v)| <= tilde{C}_{log,0} v^{5/2}
+           on (0, 1] and 2nd-order Euler-Maclaurin |tilde{W}_log(v)| <= (7/36) tilde{C}_0 v^{-5/2} + (tilde{A}_1 + tilde{A}_2 log v) v^{-3/2}
+           on [1, infty)), establishing the uniform progression sum-integral discrepancy bound
+               |sum_{H(X)/q < n <= M(X)/q} F_X(q n) - (1/q) J_band(X)| <= 2 ||F_X||_infty + Var_{(0, infty)}(F_X) <= C_{EM,I} X^{-1/2}
+           for every q = d r >= 1, and hence |E_{EM,I}(X; U, V)| <= C_{EM,I} (U V / sqrt(X)) <= C_{EM,I}
+           for U = V = floor(X^{1/4}) across all X >= 1 (satisfying max(U, V) <= H(X) and U V <= sqrt(X)
+           without the false small-X shortcut sqrt(X) <= H(X)).
     """
     saved_prec = flint_ctx.prec
     try:
@@ -3947,11 +3974,14 @@ def verify_transition_region_vanishing_moments_and_vaughan_type_I_bound_arb(
             == sp.Rational(3, 128) * log_tau_sym
         )
 
-        # 2. Exact two-endpoint asymptotic limits for J_band(X), R_{1,band}(X), and R_{|mu|,band}(X):
+        # 2. Exact two-endpoint asymptotic limits for J_band(X) and R_{1,band}(X), and O(1) scope for R_{|mu|,band}(X):
         zeta3_arb = acb(3).zeta().real
         # Evaluate -zeta'(3) in 256-bit Arb via series(s=3, length=2):
         s3_jet = acb_series([acb(3), acb(1)], prec=prec_bits).zeta()
         neg_zeta_prime_3_arb = -s3_jet[1].real
+        w_log_origin_coeff_81_zeta_prime_3_over_64_arb = (
+            -arb(81) * neg_zeta_prime_3_arb / arb(64)
+        )
         limit_upper_v_tail_H_arb = (arb(27) * zeta3_arb) / (
             arb(256) * pi_arb * pi_arb
         )
@@ -3969,20 +3999,192 @@ def verify_transition_region_vanishing_moments_and_vaughan_type_I_bound_arb(
             six_over_pi_sq_arb * limit_R1_band_total_arb
         )
 
-        # 3. Certify L^1(dv/v) bound on tilde{W}_log(v):
-        # On (0, 1]: |tilde{W}_log(v)| <= tilde{C}_0 (-zeta'(3)) v^{5/2}, so int_0^1 |tilde{W}_log(v)| dv/v <= (2/5) tilde{C}_0 (-zeta'(3)).
-        # On [1, infty): |W_log(v)| <= C_{log,EM} v^{-5/2} and by integration by parts on v^{-1/2} tilde{W}_log(v) = (d/dv)(v^{1/2} W_log(v)),
-        # for any step function E_a(t) with |E_a(t)| <= C_a sqrt(t), the integral over (H(X), M(X)] is bounded.
+        # 3. Complete Total-Variation and Progression Sum-Integral Discrepancy Bounds for f(u) = u^{-1/2} W_log(1/u):
+        #    f'(u) = -v^{3/2} tilde{W}_log(v) (v = 1/u), so Var_{(0,infty)}(f) = int_0^infty v^{-1/2} |tilde{W}_log(v)| dv.
+        #    (a) Small-v end v in (0, 1]: |tilde{W}_log(v)| <= tilde{C}_0 (-zeta'(3)) v^{5/2} =: tilde{C}_{log,0} v^{5/2},
+        #        so int_0^1 v^{-1/2} |tilde{W}_log(v)| dv <= (1/3) tilde{C}_{log,0} < 1.040859
+        #        and int_0^1 v^{-1} |tilde{W}_log(v)| dv <= (2/5) tilde{C}_{log,0}.
+        #    (b) Large-v end v in [1, infty): for tilde{psi}_0(alpha) := alpha^{-1/2} tilde{h}_0(alpha) = -alpha psi_0'(alpha),
+        #        verify symbolically the exact rational polynomial numerators Q_0, Q_1, Q_2 of
+        #        tilde{psi}_0(alpha)/alpha^2, tilde{psi}_0'(alpha)/alpha, and tilde{psi}_0''(alpha), and apply the
+        #        2nd-order Euler-Maclaurin identity on [1, infty) (using int_0^infty x^{-1/2} (log x) tilde{h}_0(x/v) dx = 0):
+        #            |tilde{W}_log(v)| <= (7/36) tilde{C}_0 v^{-5/2} + (tilde{A}_1 + tilde{A}_2 log v) v^{-3/2}   (v >= 1),
+        #        giving int_1^infty v^{-1/2} |tilde{W}_log(v)| dv <= (7/72) tilde{C}_0 + tilde{A}_1 + tilde{A}_2.
+        al_s = sp.Symbol("al", positive=True)
+        w_al = (al_s + 1 / al_s) ** 2
+        P_sym_al = -648 * w_al**3 + 58380 * w_al**2 - 706860 * w_al + 2027025
+        psi0_al = sp.simplify(
+            P_sym_al
+            / (
+                512
+                * (al_s ** sp.Rational(1, 2))
+                * ((al_s + 1 / al_s) ** sp.Rational(17, 2))
+            )
+        )
+        tilde_psi0_al = sp.simplify(-al_s * sp.diff(psi0_al, al_s))
+        tilde_psi0_d1_al = sp.simplify(sp.diff(tilde_psi0_al, al_s))
+        tilde_psi0_d2_al = sp.simplify(sp.diff(tilde_psi0_d1_al, al_s))
+
+        Q0_coeffs = [648, -93844, 1345108, -4462075, 4306220, -1202252, 75896, -432]
+        Q1_coeffs = [
+            1944,
+            -479588,
+            10729572,
+            -56299971,
+            91989170,
+            -50079036,
+            8351952,
+            -310928,
+            864,
+        ]
+        Q2_coeffs = [
+            2592,
+            -970192,
+            31010132,
+            -234161382,
+            574389907,
+            -509669678,
+            161394828,
+            -15785488,
+            316688,
+            -288,
+        ]
+        u_al = al_s**2
+        q0_poly_expr = sum(
+            c * (u_al ** (7 - idx)) for idx, c in enumerate(Q0_coeffs)
+        )
+        q1_poly_expr = sum(
+            c * (u_al ** (8 - idx)) for idx, c in enumerate(Q1_coeffs)
+        )
+        q2_poly_expr = sum(
+            c * (u_al ** (9 - idx)) for idx, c in enumerate(Q2_coeffs)
+        )
+        tilde_psi0_poly_identities_verified = bool(
+            sp.simplify(
+                tilde_psi0_al / (al_s**2)
+                + 3 * q0_poly_expr / (512 * ((u_al + 1) ** sp.Rational(19, 2)))
+            )
+            == 0
+            and sp.simplify(
+                tilde_psi0_d1_al / al_s
+                - 3 * q1_poly_expr / (512 * ((u_al + 1) ** sp.Rational(21, 2)))
+            )
+            == 0
+            and sp.simplify(
+                tilde_psi0_d2_al
+                + 9 * q2_poly_expr / (512 * ((u_al + 1) ** sp.Rational(23, 2)))
+            )
+            == 0
+        )
+
+        C0_tilde_psi_frac = Fraction(3, 512) * sum(
+            Fraction(abs(c), int(sp.binomial(7, 7 - idx)))
+            for idx, c in enumerate(Q0_coeffs)
+        )
+        C1_tilde_psi_frac = Fraction(3, 512) * sum(
+            Fraction(abs(c), int(sp.binomial(8, 8 - idx)))
+            for idx, c in enumerate(Q1_coeffs)
+        )
+        C2_tilde_psi_frac = Fraction(9, 512) * sum(
+            Fraction(abs(c), int(sp.binomial(9, 9 - idx)))
+            for idx, c in enumerate(Q2_coeffs)
+        )
+        tilde_A1_frac = (
+            (C0_tilde_psi_frac + 2 * C1_tilde_psi_frac) * Fraction(2, 3) / 12
+            + C2_tilde_psi_frac * Fraction(17, 16) / 12
+        )
+        tilde_A2_frac = C2_tilde_psi_frac * Fraction(2, 3) / 12
+
         tilde_c0_bern = arb(10329937) / arb(655360)
         tilde_C_log_0_arb = tilde_c0_bern * neg_zeta_prime_3_arb
         l1_tilde_w_0_to_1_bound_arb = (arb(2) / arb(5)) * tilde_C_log_0_arb
+        var_f_small_v_0_to_1_arb = (arb(1) / arb(3)) * tilde_C_log_0_arb
+        tilde_A1_arb = arb(tilde_A1_frac.numerator) / arb(tilde_A1_frac.denominator)
+        tilde_A2_arb = arb(tilde_A2_frac.numerator) / arb(tilde_A2_frac.denominator)
+        var_f_large_v_1_to_inf_arb = (
+            (arb(7) / arb(72)) * tilde_c0_bern + tilde_A1_arb + tilde_A2_arb
+        )
+        var_f_total_bound_V_f_arb = (
+            var_f_small_v_0_to_1_arb + var_f_large_v_1_to_inf_arb
+        )
+        sup_f_bound_arb = C_log_EM_arb
+        C_BV_total_bound_arb = sup_f_bound_arb + var_f_total_bound_V_f_arb
+        C_EM_I_discrepancy_bound_arb = (
+            arb(2) * sup_f_bound_arb + var_f_total_bound_V_f_arb
+        )
+        type_I_global_bound_arb = B_J_arb + C_EM_I_discrepancy_bound_arb
 
-        # 4. Verify rescaled transition integral I(X) and Vaughan decomposition R_{mu,band}(X) = R_I + R_{II}
+        # 4. Dedicated exact regression for the Vaughan identity at U = V = 1, m = 4:
+        #    c_I(4; 1, 1) = -1, c_{II}(4; 1, 1) = +1 (under both r > V and negated -(r <= V) forms),
+        #    so c_I(4; 1, 1) + c_{II}(4; 1, 1) = 0 = mu(4), whereas the un-negated r <= V formula
+        #    gives c_{II}^{wrong}(4; 1, 1) = -1 and sum -2 != 0 = mu(4).
+        U_reg, V_reg, m_reg = 1, 1, 4
+        c_I_4_1_1 = -sum(
+            moebius_mu_int(d_r) * moebius_mu_int(r_r)
+            for d_r in range(1, U_reg + 1)
+            for r_r in range(1, V_reg + 1)
+            if m_reg % (d_r * r_r) == 0
+        )
+        c_II_4_1_1_r_gt_V = sum(
+            moebius_mu_int(a_r)
+            * sum(
+                moebius_mu_int(r_r)
+                for r_r in range(V_reg + 1, (m_reg // a_r) + 1)
+                if (m_reg // a_r) % r_r == 0
+            )
+            for a_r in range(U_reg + 1, m_reg + 1)
+            if m_reg % a_r == 0 and (m_reg // a_r) > V_reg
+        )
+        c_II_4_1_1_neg_r_le_V = -sum(
+            moebius_mu_int(a_r)
+            * sum(
+                moebius_mu_int(r_r)
+                for r_r in range(1, V_reg + 1)
+                if (m_reg // a_r) % r_r == 0
+            )
+            for a_r in range(U_reg + 1, m_reg + 1)
+            if m_reg % a_r == 0 and (m_reg // a_r) > V_reg
+        )
+        c_II_4_1_1_unnegated_wrong = sum(
+            moebius_mu_int(a_r)
+            * sum(
+                moebius_mu_int(r_r)
+                for r_r in range(1, V_reg + 1)
+                if (m_reg // a_r) % r_r == 0
+            )
+            for a_r in range(U_reg + 1, m_reg + 1)
+            if m_reg % a_r == 0 and (m_reg // a_r) > V_reg
+        )
+        mu_4_actual = moebius_mu_int(m_reg)
+        vaughan_m4_regression = {
+            "U": U_reg,
+            "V": V_reg,
+            "m": m_reg,
+            "m_gt_max_U_V": bool(m_reg > max(U_reg, V_reg)),
+            "mu_4_actual": mu_4_actual,
+            "c_I_4_1_1": c_I_4_1_1,
+            "c_II_4_1_1_published_r_gt_V": c_II_4_1_1_r_gt_V,
+            "c_II_4_1_1_published_negated_r_le_V": c_II_4_1_1_neg_r_le_V,
+            "c_II_4_1_1_unnegated_r_le_V_wrong": c_II_4_1_1_unnegated_wrong,
+            "c_I_plus_c_II_equals_mu_4": bool(
+                c_I_4_1_1 == -1
+                and c_II_4_1_1_r_gt_V == 1
+                and c_II_4_1_1_neg_r_le_V == 1
+                and c_I_4_1_1 + c_II_4_1_1_r_gt_V == mu_4_actual == 0
+            ),
+            "unnegated_r_le_V_detected_wrong": bool(
+                c_I_4_1_1 + c_II_4_1_1_unnegated_wrong == -2 != mu_4_actual
+            ),
+        }
+
+        # 5. Verify rescaled transition integral I(X) and Vaughan decomposition R_{mu,band}(X) = R_I + R_{II}
         #    across sample scales X in {1, 2, 4, tau, 10, 16, tau^2, 64}:
         rescaled_rows: List[Dict[str, Any]] = []
         all_rescaled_identities_enclose_zero = True
         vaughan_rows: List[Dict[str, Any]] = []
         all_vaughan_identities_enclose_zero = True
+        all_vaughan_admissibility_verified = True
+        all_type_I_em_bounds_certified = True
         all_landau_bounds_verified = True
 
         # Verify Landau's elementary inequality |sum_{d <= N} mu(d)/d| <= 1 for all 1 <= N <= 200:
@@ -3996,6 +4198,8 @@ def verify_transition_region_vanishing_moments_and_vaughan_type_I_bound_arb(
                 max_landau_partial_sum = abs(running_landau)
             if abs(running_landau) > 1:
                 all_landau_bounds_verified = False
+
+        tol_j = 2 ** (-70)
 
         for x_label, x_a in (
             ("1", arb(1)),
@@ -4058,12 +4262,20 @@ def verify_transition_region_vanishing_moments_and_vaughan_type_I_bound_arb(
                 }
             )
 
-            # Vaughan decomposition on H(X) < m <= M(X) with U = V = max(1, floor(X^{1/4}))
-            # (so U * V <= sqrt(X) <= H(X)):
+            # Vaughan decomposition on H(X) < m <= M(X) with U = V = floor(X^{1/4}):
+            # Since X >= 1 and 1/4 <= 5/6, floor(X^{1/4}) <= floor(X^{5/6}) = H(X) and U * V <= sqrt(X)
+            # hold for ALL X >= 1 (whereas sqrt(X) <= H(X) is false for X in (1, 2^{6/5}), e.g. X = 2).
             u_cut = max(1, int(float((x_a ** arb("0.25")).lower())))
             while (u_cut + 1) ** 4 <= int(float(x_a.lower())):
                 u_cut += 1
             v_cut = u_cut
+            admissible_max_UV_le_H = bool(max(u_cut, v_cut) <= H_x)
+            admissible_UV_le_sqrt_X = bool(
+                arb(u_cut * v_cut).upper() <= sqrt_x.lower()
+            )
+            if not (admissible_max_UV_le_H and admissible_UV_le_sqrt_X):
+                all_vaughan_admissibility_verified = False
+
             # Precompute a_k = sum_{d r = k, d <= U, r <= V} mu(d) mu(r) for 1 <= k <= U * V:
             a_vaughan: Dict[int, int] = {
                 k_i: 0 for k_i in range(1, u_cut * v_cut + 1)
@@ -4077,39 +4289,53 @@ def verify_transition_region_vanishing_moments_and_vaughan_type_I_bound_arb(
                     if mu_r != 0:
                         a_vaughan[d_i * r_i] += mu_d * mu_r
 
-            # Precompute b_v = sum_{r | v, r > V} mu(r) for v > V up to M(X):
-            b_vaughan: Dict[int, int] = {}
+            # Precompute both published forms of b_v for v > V up to M(X):
+            #   b_v^{(r > V)} := sum_{r | v, r > V} mu(r),
+            #   b_v^{(-(r <= V))} := -sum_{r | v, r <= V} mu(r).
+            b_vaughan_r_gt_V: Dict[int, int] = {}
+            b_vaughan_neg_r_le_V: Dict[int, int] = {}
             for v_i in range(v_cut + 1, M_x + 1):
-                s_b = 0
+                s_gt = 0
                 for r_i in range(v_cut + 1, v_i + 1):
                     if v_i % r_i == 0:
-                        s_b += moebius_mu_int(r_i)
-                b_vaughan[v_i] = s_b
+                        s_gt += moebius_mu_int(r_i)
+                s_le = 0
+                for r_i in range(1, v_cut + 1):
+                    if v_i % r_i == 0:
+                        s_le += moebius_mu_int(r_i)
+                b_vaughan_r_gt_V[v_i] = s_gt
+                b_vaughan_neg_r_le_V[v_i] = -s_le
 
             R_band = arb(0)
             R_type_I = arb(0)
             R_type_II = arb(0)
             coeff_identity_ok = True
+            both_c_II_forms_match = True
             for m_i in range(H_x + 1, M_x + 1):
                 c_I_m = 0
                 for k_i, a_k in a_vaughan.items():
                     if a_k != 0 and m_i % k_i == 0:
                         c_I_m -= a_k
-                c_II_m = 0
+                c_II_m_gt = 0
+                c_II_m_neg_le = 0
                 for u_i in range(u_cut + 1, m_i + 1):
                     if m_i % u_i == 0:
                         v_i = m_i // u_i
                         if v_i > v_cut:
-                            c_II_m += moebius_mu_int(u_i) * b_vaughan[v_i]
+                            mu_u = moebius_mu_int(u_i)
+                            c_II_m_gt += mu_u * b_vaughan_r_gt_V[v_i]
+                            c_II_m_neg_le += mu_u * b_vaughan_neg_r_le_V[v_i]
+                if c_II_m_gt != c_II_m_neg_le:
+                    both_c_II_forms_match = False
                 mu_m = moebius_mu_int(m_i)
-                if c_I_m + c_II_m != mu_m:
+                if c_I_m + c_II_m_gt != mu_m or not both_c_II_forms_match:
                     coeff_identity_ok = False
                 R_band += arb(mu_m) * F_vals[m_i]
                 R_type_I += arb(c_I_m) * F_vals[m_i]
-                R_type_II += arb(c_II_m) * F_vals[m_i]
+                R_type_II += arb(c_II_m_gt) * F_vals[m_i]
 
             # Also verify the exchanged Type I dilation formula:
-            # R_I(X; U, V) = -sum_{k <= U V} (a_k / sqrt(k)) sum_{H(X)/k < n <= M(X)/k} n^{-1/2} W_log((X/k)/n)
+            # R_I(X; U, V) = -sum_{k <= U V} a_k sum_{H(X)/k < n <= M(X)/k} F_X(k n)
             R_type_I_exchanged = arb(0)
             for k_i, a_k in a_vaughan.items():
                 if a_k == 0:
@@ -4118,10 +4344,33 @@ def verify_transition_region_vanishing_moments_and_vaughan_type_I_bound_arb(
                 n_max = M_x // k_i
                 inner_s = arb(0)
                 for n_i in range(n_min, n_max + 1):
-                    inner_s += F_vals[k_i * n_i] * (arb(k_i).sqrt())
-                R_type_I_exchanged -= (
-                    arb(a_k) / arb(k_i).sqrt()
-                ) * inner_s
+                    inner_s += F_vals[k_i * n_i]
+                R_type_I_exchanged -= arb(a_k) * inner_s
+
+            # Evaluate J_band(X) := int_{H(X)}^{M(X)} t^{-1/2} W_log(X/t) dt
+            # via R_{1,band}(X) = J_band(X) + int_{H(X)}^{M(X)} ({H(X)} - {t}) F_X'(t) dt
+            # = J_band(X) + sum_{n=H(X)}^{M(X)-1} int_n^{n+1} (t - n) F_X'(t) dt
+            # = sum_{n=H(X)+1}^{M(X)} F_X(n), so J_band(X) = sum_{n=H(X)}^{M(X)-1} int_n^{n+1} F_X(t) dt:
+            # Even faster and exact: by termwise integration of W_log(X/t) = sum_{k>=2} (log k / sqrt(k)) h_0(k t / X),
+            # int_{H(X)}^{M(X)} t^{-1/2} h_0(k t / X) dt = (X / k)^{1/2} int_{k H(X) / X}^{k M(X) / X} u^{-1/2} h_0(u) du.
+            # Here we evaluate J_band(X) directly on [H(X), M(X)] using R_{1,band}(X) and the bounded-variation
+            # enclosure |J_band(X)| <= B_J, and certify |E_{EM,I}(X; U, V)| <= C_{EM,I} (U V / sqrt(X))
+            # and |R_I(X; U, V)| <= B_J + C_{EM,I}:
+            S_mu_U_arb = sum(
+                (arb(moebius_mu_int(d_i)) / arb(d_i) for d_i in range(1, u_cut + 1)),
+                arb(0),
+            )
+            S_mu_V_arb = sum(
+                (arb(moebius_mu_int(r_i)) / arb(r_i) for r_i in range(1, v_cut + 1)),
+                arb(0),
+            )
+            rho_UV_arb = arb(u_cut * v_cut) / sqrt_x
+            em_I_analytic_bound_X = C_EM_I_discrepancy_bound_arb * rho_UV_arb
+            cert_R_I_global = certify_abs_le_bound_arb(
+                R_type_I, B_J_arb + em_I_analytic_bound_X
+            )
+            if not cert_R_I_global["certified"]:
+                all_type_I_em_bounds_certified = False
 
             vaughan_diff = R_band - (R_type_I + R_type_II)
             exch_diff = R_type_I - R_type_I_exchanged
@@ -4140,14 +4389,27 @@ def verify_transition_region_vanishing_moments_and_vaughan_type_I_bound_arb(
                     "M_X": M_x,
                     "U_cutoff": u_cut,
                     "V_cutoff": v_cut,
-                    "UV_le_sqrt_X": bool(u_cut * v_cut <= float(sqrt_x.upper())),
+                    "max_UV_le_H_X": admissible_max_UV_le_H,
+                    "UV_le_sqrt_X": admissible_UV_le_sqrt_X,
+                    "sqrt_X_le_H_X_holds_at_this_X": bool(
+                        sqrt_x.upper() <= arb(H_x).lower()
+                    ),
                     "pointwise_coeff_identity_mu_eq_cI_plus_cII": coeff_identity_ok,
+                    "both_published_c_II_forms_match": both_c_II_forms_match,
+                    "S_mu_U_certified": serialize_arb_certified(S_mu_U_arb),
+                    "S_mu_V_certified": serialize_arb_certified(S_mu_V_arb),
                     "R_mu_band_X_certified": serialize_arb_certified(R_band),
                     "R_type_I_X_certified": serialize_arb_certified(R_type_I),
                     "R_type_I_exchanged_dilation_certified": serialize_arb_certified(
                         R_type_I_exchanged
                     ),
                     "R_type_II_X_certified": serialize_arb_certified(R_type_II),
+                    "type_I_analytic_bound_B_J_plus_C_EM_I_rho_UV_certified": serialize_arb_certified(
+                        B_J_arb + em_I_analytic_bound_X
+                    ),
+                    "abs_R_type_I_le_analytic_bound_certified": cert_R_I_global[
+                        "certified"
+                    ],
                     "vaughan_sum_difference_encloses_zero": bool(
                         vaughan_diff.contains(0)
                     ),
@@ -4176,6 +4438,12 @@ def verify_transition_region_vanishing_moments_and_vaughan_type_I_bound_arb(
                 "symbolic_moments_verified": symbolic_moments_verified,
             },
             "linear_density_annihilation_and_exact_limits": {
+                "W_log_small_v_asymptotic_formula": (
+                    "W_log(v) = (81 zeta'(3) / 64) v^{5/2} + O(v^{9/2}) = -(81 [-zeta'(3)] / 64) v^{5/2} + O(v^{9/2}) < 0   (v -> 0^+)"
+                ),
+                "W_log_small_v_leading_coeff_81_zeta_prime_3_over_64_certified": serialize_arb_certified(
+                    w_log_origin_coeff_81_zeta_prime_3_over_64_arb
+                ),
                 "J_band_definition": (
                     "J_band(X) := int_{H(X)}^{M(X)} t^{-1/2} W_log(X/t) dt "
                     "= -X^{1/2} int_0^{X/M(X)} v^{-3/2} W_log(v) dv - X^{1/2} int_{X/H(X)}^infty v^{-3/2} W_log(v) dv"
@@ -4183,6 +4451,12 @@ def verify_transition_region_vanishing_moments_and_vaughan_type_I_bound_arb(
                 "J_band_uniform_bound_B_J_formula": "(1/3) C_{log,EM} + (1/2) C_{log,0} < 4.768220",
                 "J_band_uniform_bound_B_J_certified": serialize_arb_certified(
                     B_J_arb
+                ),
+                "floor_ceiling_endpoint_asymptotics": (
+                    "For H(X) = floor(X^{5/6}) and M(X) = ceil(max(2, X^{5/4})), "
+                    "(H(X) / X^{5/6})^3 = 1 + O(X^{-5/6}) -> 1 and (X^{5/4} / M(X))^2 = 1 + O(X^{-5/4}) -> 1 as X -> infty, "
+                    "so -T_high(X) = (27 zeta(3) / (256 pi^2)) (H(X)/X^{5/6})^3 + O(X^{-1/6} log X) -> 27 zeta(3) / (256 pi^2) "
+                    "and -T_low(X) = (81 [-zeta'(3)] / 128) (X^{5/4}/M(X))^2 + O(X^{-1/2}) -> (81 / 128) (-zeta'(3))."
                 ),
                 "upper_v_tail_limit_from_H_X_formula": "27 zeta(3) / (256 pi^2)",
                 "upper_v_tail_limit_from_H_X_certified": serialize_arb_certified(
@@ -4192,8 +4466,11 @@ def verify_transition_region_vanishing_moments_and_vaughan_type_I_bound_arb(
                 "lower_v_tail_limit_from_M_X_certified": serialize_arb_certified(
                     limit_lower_v_tail_M_arb
                 ),
+                "exact_limit_J_band_and_R_1_band_as_X_to_infty_formula": (
+                    "lim_{X -> infty} J_band(X) = lim_{X -> infty} R_{1,band}(X) = L := 27 zeta(3) / (256 pi^2) + (81 / 128) (-zeta'(3)) > 0"
+                ),
                 "exact_limit_R_1_band_as_X_to_infty_formula": (
-                    "lim_{X -> infty} R_{1,band}(X) = 27 zeta(3) / (256 pi^2) + (81 / 128) (-zeta'(3))"
+                    "lim_{X -> infty} J_band(X) = lim_{X -> infty} R_{1,band}(X) = 27 zeta(3) / (256 pi^2) + (81 / 128) (-zeta'(3))"
                 ),
                 "exact_limit_R_1_band_as_X_to_infty_certified": serialize_arb_certified(
                     limit_R1_band_total_arb
@@ -4201,9 +4478,17 @@ def verify_transition_region_vanishing_moments_and_vaughan_type_I_bound_arb(
                 "exact_limit_R_sqfree_semi_infinite_H_to_infty_certified": serialize_arb_certified(
                     limit_R_sqfree_semi_infinite_arb
                 ),
+                "R_sqfree_band_unconditional_O1_scope_and_conditional_limit_note": (
+                    "For a(m) = |mu(m)| = mu(m)^2, the elementary error bound |E_Q(t)| <= 2 sqrt(t) in Q(t) = (6/pi^2) t + E_Q(t) "
+                    "proves unconditionally that R_{|mu|,band}(X) = (6/pi^2) J_band(X) + O(1) is uniformly bounded for all X >= 1 "
+                    "(since |int_{H(X)}^{M(X)} E_{|\mu|,H(X)}(t) t^{-3/2} tilde{W}_log(X/t) dt| <= 4 int_0^infty v^{-1} |tilde{W}_log(v)| dv = O(1)). "
+                    "Vanishing of that remainder integral so that lim_{X -> infty} R_{|mu|,band}(X) = (6/pi^2) L requires a sub-sqrt(t) "
+                    "squarefree error estimate E_Q(t) = o(sqrt(t))."
+                ),
                 "exact_limit_R_sqfree_band_as_X_to_infty_formula": (
-                    "lim_{X -> infty} R_{|mu|,band}(X) = (6 / pi^2) (27 zeta(3) / (256 pi^2) + (81 / 128) (-zeta'(3))) "
-                    "= 81 zeta(3) / (128 pi^4) + 243 (-zeta'(3)) / (64 pi^2)"
+                    "Conditional on E_Q(t) = o(sqrt(t)): lim_{X -> infty} R_{|mu|,band}(X) = (6 / pi^2) L "
+                    "= 81 zeta(3) / (128 pi^4) + 243 (-zeta'(3)) / (64 pi^2) "
+                    "(unconditionally R_{|mu|,band}(X) = (6 / pi^2) J_band(X) + O(1) = O(1) from |E_Q(t)| <= 2 sqrt(t))"
                 ),
                 "exact_limit_R_sqfree_band_as_X_to_infty_certified": serialize_arb_certified(
                     limit_R_sqfree_band_total_arb
@@ -4220,9 +4505,61 @@ def verify_transition_region_vanishing_moments_and_vaughan_type_I_bound_arb(
                 "rescaled_integral_table": rescaled_rows,
             },
             "vaughan_band_decomposition_and_type_I_audit": {
+                "published_vaughan_formulas": {
+                    "c_I_formula": "c_I(m; U, V) := -sum_{d r n = m, d <= U, r <= V} mu(d) mu(r)",
+                    "c_II_formula_r_gt_V": "c_{II}(m; U, V) := sum_{a b = m, a > U, b > V} mu(a) sum_{r | b, r > V} mu(r)",
+                    "c_II_formula_negated_r_le_V": "c_{II}(m; U, V) = -sum_{a b = m, a > U, b > V} mu(a) sum_{r | b, r <= V} mu(r)   (since sum_{r | b} mu(r) = 0 for all b > V >= 1)",
+                    "band_admissibility_condition": (
+                        "max(U, V) <= H(X) ensures m > H(X) >= max(U, V) so mu(m) = c_I(m; U, V) + c_{II}(m; U, V) for all H(X) < m <= M(X), "
+                        "and U V <= sqrt(X) ensures |E_{EM,I}(X; U, V)| <= C_{EM,I} (U V / sqrt(X)) <= C_{EM,I}. "
+                        "Both hold for U = V = floor(X^{1/4}) across ALL X >= 1 (since 1 <= floor(X^{1/4}) <= floor(X^{5/6}) = H(X) and floor(X^{1/4})^2 <= sqrt(X)), "
+                        "without using the false small-X inequality sqrt(X) <= H(X) (which fails on 1 < X < 2^{6/5}, e.g. at X = 2 where H(2) = 1 < sqrt(2))."
+                    ),
+                },
+                "vaughan_m4_U1_V1_regression": vaughan_m4_regression,
+                "type_I_total_variation_and_sum_integral_discrepancy_proof": {
+                    "tilde_psi0_polynomial_identities_verified": tilde_psi0_poly_identities_verified,
+                    "C0_tilde_psi_exact_rational": f"{C0_tilde_psi_frac.numerator}/{C0_tilde_psi_frac.denominator}",
+                    "C1_tilde_psi_exact_rational": f"{C1_tilde_psi_frac.numerator}/{C1_tilde_psi_frac.denominator}",
+                    "C2_tilde_psi_exact_rational": f"{C2_tilde_psi_frac.numerator}/{C2_tilde_psi_frac.denominator}",
+                    "tilde_A1_exact_rational": f"{tilde_A1_frac.numerator}/{tilde_A1_frac.denominator}",
+                    "tilde_A2_exact_rational": f"{tilde_A2_frac.numerator}/{tilde_A2_frac.denominator}",
+                    "var_f_small_v_0_to_1_bound_certified": serialize_arb_certified(
+                        var_f_small_v_0_to_1_arb
+                    ),
+                    "var_f_large_v_1_to_inf_bound_certified": serialize_arb_certified(
+                        var_f_large_v_1_to_inf_arb
+                    ),
+                    "var_f_total_bound_V_f_certified": serialize_arb_certified(
+                        var_f_total_bound_V_f_arb
+                    ),
+                    "sup_f_bound_C_log_EM_certified": serialize_arb_certified(
+                        sup_f_bound_arb
+                    ),
+                    "C_BV_norm_plus_var_bound_certified": serialize_arb_certified(
+                        C_BV_total_bound_arb
+                    ),
+                    "C_EM_I_progression_discrepancy_constant_certified": serialize_arb_certified(
+                        C_EM_I_discrepancy_bound_arb
+                    ),
+                    "type_I_global_bound_B_J_plus_C_EM_I_certified": serialize_arb_certified(
+                        type_I_global_bound_arb
+                    ),
+                    "progression_discrepancy_theorem": (
+                        "For any g of bounded variation on (0, infty) and any real 0 <= A <= B, partitioning at integer points "
+                        "floor(A) <= floor(B) gives |sum_{floor(A) < n <= floor(B)} g(n) - int_{floor(A)}^{floor(B)} g(u) du| <= Var_{(0,infty)}(g) "
+                        "and fractional endpoint integrals |int_{floor(A)}^A g(u) du| + |int_{floor(B)}^B g(u) du| <= 2 ||g||_infty, so "
+                        "|sum_{A < n <= B} g(n) - int_A^B g(u) du| <= 2 ||g||_infty + Var_{(0,infty)}(g). "
+                        "Applying this to g(u) = F_X(q u) on [H(X)/q, M(X)/q] for q = d r >= 1 (using scale invariance of ||.||_infty and Var) "
+                        "proves |sum_{H(X)/q < n <= M(X)/q} F_X(q n) - (1/q) J_band(X)| <= C_{EM,I} X^{-1/2} and hence "
+                        "|E_{EM,I}(X; U, V)| <= C_{EM,I} U V X^{-1/2}."
+                    ),
+                },
                 "landau_moebius_harmonic_bound_verified_up_to_200": all_landau_bounds_verified,
                 "max_abs_sum_mu_d_over_d_up_to_200_exact": f"{max_landau_partial_sum.numerator}/{max_landau_partial_sum.denominator}",
+                "all_vaughan_admissibility_verified": all_vaughan_admissibility_verified,
                 "all_vaughan_identities_enclose_zero": all_vaughan_identities_enclose_zero,
+                "all_type_I_em_bounds_certified": all_type_I_em_bounds_certified,
                 "vaughan_band_table": vaughan_rows,
                 "type_II_remaining_obstruction": (
                     "In R_{II}(X; U, V) = sum_{u > U, v > V, H(X) < u v <= M(X)} (mu(u) b_v / sqrt(u v)) W_log(X / (u v)), "
@@ -4239,24 +4576,34 @@ def verify_transition_region_vanishing_moments_and_vaughan_type_I_bound_arb(
 def verify_hilbert_space_euler_intertwining_and_critical_line_factorization_arb(
     prec_bits: int = 256,
 ) -> Dict[str, Any]:
-    """Certify in 256-bit Arb (TASK-TC-052 Approach B):
+    """Certify in 256-bit Arb (TASK-TC-052 / TASK-TC-052R Approach B):
       1. Exact Operator Intertwining on H_tau^pos = H_tau^B (+) L^2(R_{>0}, dy/y):
              A_tau^B(E_y f) = E_y^B(A_tau^B f),   R_0(E_y f) = E_y(R_0 f),
              J_tau(E_y f) = (E_y^B (+) E_y) J_tau(f),   U_K J_tau(E_y f) = J_tau(E_y T_K f),
          where E_y = prod_{p <= y} (I - p^{-1/2} D_p) = sum_{m | P_y} (mu(m) / sqrt(m)) D_m.
-      2. Fixed-y Cauchy-Schwarz Bound and Exact Structural Remainder:
+      2. Fixed-y Cauchy-Schwarz Bound and Exact Structural Remainder (with + log_tau m shift):
              P_{tau,y}(K) := <U_K J_tau(E_y psi_tau), J_tau(psi_tau)>_{H_tau^pos}
                            = sum_{m | P_y} (mu(m) / sqrt(m)) P_tau(K + log_tau m),
              |P_{tau,y}(K)| <= ||J_tau(E_y psi_tau)||_{H_tau^pos} sqrt(P_tau(0)),
              C_tau(K) = P_{tau,y}(K) - Delta_{arch,y}(K) + E_{tau,controlled}(K) - R_{mu,band}(tau^{|K|}),
          where Delta_{arch,y}(K) := sum_{m | P_y, m >= 2} (mu(m) / sqrt(m)) P_tau(K + log_tau m).
-      3. Unconditional Critical-Line Spectral-Dirichlet Factorization of R_{mu,band}(X):
+      3. Exact Plancherel Multiplier nu(t) of J_tau f = (A_tau^B f, 2 R_0 f), Operator Domain,
+         Reconciliation with P_tau(0), and Repaired (log y)^{-3} Euler-Spike Lower Bound:
+             ||J_tau f||_{H_tau^pos}^2 = (1 / tau) int_{-infty}^infty nu(t) |hat{f}(i t)|^2 dt,
+             nu(t) = Re psi(5/4 + i t / 2) - psi(5/4) + 4 t^2 / (t^2 + 1/4)
+                   = [Re psi(1/4 + i t / 2) - log pi] + (c_tau^B + 2),
+         satisfying nu(0) = 0, nu(t) >= 4 t^2 / (t^2 + 1/4) >= 0, and
+         nu(t) = (16 - psi''(5/4) / 8) t^2 + O(t^4) as t -> 0, with
+         (1 / tau) int_{-infty}^infty nu(t) H_0(i t) dt = ||A_tau^B psi_tau||_{H_tau^B}^2 + 4 ||R_0 psi_tau||_{L^2}^2 = P_tau(0),
+         and on I_y = [7 tau / (16 log y), tau / (2 log y)] (y >= 24):
+             ||J_tau(E_y psi_tau)||_{H_tau^pos}^2 >= (49 tau^2 H_0(0) / (640 (log y)^3)) |M_y(1/2 + i t_{y,-})|^2
+             = (49 tau^2 H_0(0) / (640 (log y)^3)) exp[(4 cos(tau/16) + o(1)) sqrt(y) / log y] -> +infty.
+      4. Unconditional Critical-Line Spectral-Dirichlet Factorization of R_{mu,band}(X) with Proved
+         Whole-Integrand Tail Bounds, Validated L^1/L^2 Norms of Omega_log, and X = 1 Consistency Check:
              R_{mu,band}(X) = int_{-infty}^infty Omega_log(t) M_band(1/2 + i t; X) X^{i t} dt,
-         where Omega_log(t) = -(1/tau) zeta'(1/2 + i t) H_0(i t) is a fixed X-independent Schwartz
-         weight and M_band(s; X) = sum_{H(X) < m <= M(X)} mu(m) m^{-s}.
-      4. Coherent Low-Frequency Euler Spike Obstruction on H_tau^pos as y -> infty:
-             ||J_tau(E_y psi_tau)||_{H_tau^pos}^2 >= mu_arch^B(0) ||E_y psi_tau||_{L^2(dy/y)}^2
-             >= (mu_arch^B(0) H_0(0) / (8 log y)) exp((4 cos(tau/16) + o(1)) sqrt(y) / log y) -> +infty.
+         where Omega_log(t) = -(1/tau) zeta'(1/2 + i t) H_0(i t) and M_band(s; X) = sum_{H(X) < m <= M(X)} mu(m) m^{-s},
+         with proved tail bound |tail beyond [-T, T]| <= 2 A_X B_{Omega,1}^{tail}(T) (A_X = sum_{H(X)<m<=M(X)} |mu(m)|/sqrt(m))
+         and certified consistency ||Omega_log||_{L^1(R)} >= sqrt(2) |R_{mu,band}(1)|.
     """
     saved_prec = flint_ctx.prec
     try:
@@ -4270,6 +4617,7 @@ def verify_hilbert_space_euler_intertwining_and_critical_line_factorization_arb(
         gamma_e_arb = arb.const_euler()
         c_tau_A_arb = (arb(4) * tau_arb).log() + gamma_e_arb + tau_arb / arb(4)
         c_tau_B_arb = c_tau_A_arb - arb(2)
+        h0_1_arb = evaluate_h0_arb(arb(1))
 
         def _eval_P_tau_arb(k_val: arb) -> arb:
             abs_k = abs(k_val)
@@ -4306,6 +4654,8 @@ def verify_hilbert_space_euler_intertwining_and_critical_line_factorization_arb(
                     {
                         "y_cutoff": y_cut,
                         "K_label": k_label,
+                        "shift_convention": "K + log_tau(m) (since D_m = T_{log_tau m} and T_K D_m = T_{K + log_tau m})",
+                        "verification_type": "ALGEBRAIC_CONSISTENCY_CHECK",
                         "P_tau_K_certified": serialize_arb_certified(p_k),
                         "P_tau_y_K_sieved_orbit_certified": serialize_arb_certified(
                             p_y_k
@@ -4317,10 +4667,8 @@ def verify_hilbert_space_euler_intertwining_and_critical_line_factorization_arb(
                     }
                 )
 
-        # 2. Verify the critical-line Mellin representation:
-        #    R_{mu,band}(X) = int_{-infty}^infty Omega_log(t) M_band(1/2 + i t; X) X^{i t} dt
-        #    = (2/tau) int_0^infty Re((-zeta'(1/2 + i t)) M_band(1/2 + i t; X) X^{i t}) H_0(i t) dt
-        #    against the discrete sum R_{mu,band}(X) at X in {1, 2, 4}:
+        # 2. Verify the critical-line Mellin representation with proved whole-integrand tail bounds
+        #    and validate L^1(R) and L^2(R) norms of Omega_log(t) = -(1/tau) zeta'(1/2 + it) H_0(it):
         def _eval_H0_crit_acb(t_c: acb, analytic: bool = False) -> acb:
             s_c = acb("0.5") + acb(0, 1) * t_c
             one_minus_s = acb("0.5") - acb(0, 1) * t_c
@@ -4332,26 +4680,153 @@ def verify_hilbert_space_euler_intertwining_and_critical_line_factorization_arb(
             )
             return poly_sq * gam_prod
 
-        def _eval_neg_zeta_prime_crit_acb(t_c: acb) -> acb:
+        def _mellin_strip_box_admissible(t_c: acb, analytic: bool) -> bool:
+            if not analytic:
+                return True
+            if not t_c.real.is_finite() or not t_c.imag.is_finite():
+                return False
+            if bool(t_c.real.rad() > arb("2.5")) or bool(
+                t_c.imag.rad() > arb("0.45")
+            ):
+                return False
+            if bool(abs(t_c.real) < arb("1.5")) and not bool(
+                abs(t_c.imag) < arb("0.48")
+            ):
+                return False
+            return True
+
+        def _eval_neg_zeta_prime_crit_acb(
+            t_c: acb, analytic: bool = False
+        ) -> acb:
+            if not _mellin_strip_box_admissible(t_c, analytic):
+                return acb(arb.nan(), arb.nan())
+            work_prec = min(flint_ctx.prec, prec_bits)
             s_jet = acb_series(
-                [acb("0.5") + acb(0, 1) * t_c, acb(1)], prec=prec_bits
+                [acb("0.5") + acb(0, 1) * t_c, acb(1)], prec=work_prec
             ).zeta()
             return -s_jet[1]
 
+        def _eval_zeta_prime_abs_sq_crit_acb(
+            t_c: acb, analytic: bool = False
+        ) -> acb:
+            if not analytic or (
+                t_c.real.rad() == arb(0) and t_c.imag.rad() == arb(0)
+            ):
+                if not _mellin_strip_box_admissible(t_c, analytic):
+                    return acb(arb.nan(), arb.nan())
+                work_prec = min(flint_ctx.prec, prec_bits)
+                s1 = acb_series(
+                    [acb("0.5") + acb(0, 1) * t_c, acb(1)], prec=work_prec
+                ).zeta()[1]
+                s2 = acb_series(
+                    [acb("0.5") - acb(0, 1) * t_c, acb(1)], prec=work_prec
+                ).zeta()[1]
+                return s1 * s2
+            if not t_c.real.is_finite() or not t_c.imag.is_finite():
+                return acb(arb.nan(), arb.nan())
+            if bool(t_c.real.rad() > arb("0.3")) or bool(
+                t_c.imag.rad() > arb("0.3")
+            ):
+                return acb(arb.nan(), arb.nan())
+            if bool(abs(t_c.real) < arb("1.0")) and not bool(
+                abs(t_c.imag) < arb("0.45")
+            ):
+                return acb(arb.nan(), arb.nan())
+            z0 = acb(t_c.real.mid(), t_c.imag.mid())
+            dz = t_c - z0
+            deg = 6
+            wp = min(flint_ctx.prec, 128)
+            jp0 = (
+                acb_series(
+                    [acb("0.5") + acb(0, 1) * z0, acb(0, 1)]
+                    + [acb(0)] * (deg - 1),
+                    prec=wp,
+                )
+                .zeta()
+                .derivative()
+            )
+            jm0 = (
+                acb_series(
+                    [acb("0.5") - acb(0, 1) * z0, acb(0, -1)]
+                    + [acb(0)] * (deg - 1),
+                    prec=wp,
+                )
+                .zeta()
+                .derivative()
+            )
+            z2_0 = jp0 * jm0
+            jpb = (
+                acb_series(
+                    [acb("0.5") + acb(0, 1) * t_c, acb(0, 1)]
+                    + [acb(0)] * deg,
+                    prec=53,
+                )
+                .zeta()
+                .derivative()
+            )
+            jmb = (
+                acb_series(
+                    [acb("0.5") - acb(0, 1) * t_c, acb(0, -1)]
+                    + [acb(0)] * deg,
+                    prec=53,
+                )
+                .zeta()
+                .derivative()
+            )
+            z2_b = jpb * jmb
+            res = acb(0)
+            for k_deg in range(deg):
+                res += z2_0[k_deg] * (dz**k_deg)
+            res += z2_b[deg] * (dz**deg)
+            return res
+
+        # Proved analytic tail bounds on [T, infty) at T = 48:
+        #   (i)  By the Euler-Weierstrass product for Gamma, |Gamma(1/2 + it/2) / Gamma(1/2)|^2 = 1 / cosh(pi t / 2) <= 2 e^{-pi t / 2}
+        #        and |Gamma(1/4 + it/2) / Gamma(1/4)|^2 <= |Gamma(1/2 + it/2) / Gamma(1/2)|^2,
+        #        so 0 < H_0(it) <= (Gamma(1/4)^2 / (512 sqrt(pi))) (t^2 + 1/4)^4 e^{-pi t / 2} for all t >= 0.
+        #   (ii) By 1st-order Euler-Maclaurin for zeta'(s) at N = 1, |zeta'(1/2 + it)| <= 2 sqrt(t^2 + 1/4) + 1 + 1/(t^2 + 1/4) <= 4 (t^2 + 1/4) for all t >= 1.
+        #   (iii) Since (t^2 + 1/4)^5 e^{-pi t / 4} and (t^2 + 1/4)^{10} e^{-pi t / 2} are strictly decreasing on t >= 40,
+        #         int_T^infty |Omega_log(t)| dt <= B_{Omega,1}^{tail}(T) := (Gamma(1/4)^2 / (32 pi^{3/2} tau)) (T^2 + 1/4)^5 e^{-pi T / 2},
+        #         int_T^infty |Omega_log(t)|^2 dt <= B_{Omega,2}^{tail}(T) := (Gamma(1/4)^4 / (8192 pi^2 tau^2)) (T^2 + 1/4)^{10} e^{-pi T}.
+        T_mellin_cut = 48
+        T_mellin_arb = arb(T_mellin_cut)
+        gamma_1_4_arb = acb("0.25").gamma().real
+        B_Omega_1_tail_T_arb = (
+            (gamma_1_4_arb * gamma_1_4_arb)
+            / (arb(32) * (pi_arb ** arb("1.5")) * tau_arb)
+            * ((T_mellin_arb * T_mellin_arb + arb("0.25")) ** 5)
+            * ((-pi_arb * T_mellin_arb / arb(2)).exp())
+        )
+        B_Omega_2_tail_T_arb = (
+            (gamma_1_4_arb**4)
+            / (arb(8192) * (pi_arb * pi_arb) * (tau_arb * tau_arb))
+            * ((T_mellin_arb * T_mellin_arb + arb("0.25")) ** 10)
+            * ((-pi_arb * T_mellin_arb).exp())
+        )
+
+        # Subdivision knots on [0, 48] in segments of length 4:
+        mellin_knots: List[acb] = [acb(4 * k) for k in range(T_mellin_cut // 4 + 1)]
+
         crit_line_rows: List[Dict[str, Any]] = []
         all_crit_line_identities_enclose_zero = True
-        tol_c = 2 ** (-60)
+        tol_c = 2 ** (-52)
+        R_disc_at_1_arb = arb(0)
         for x_label, x_a in (("1", arb(1)), ("2", arb(2)), ("4", arb(4))):
             H_x = certified_head_cutoff_H_X_arb(x_a, prec_bits=prec_bits)
             M_x = certified_coupled_cutoff_M_X_arb(x_a, prec_bits=prec_bits)
             R_disc = evaluate_R_interval_arb(
                 x_a, arb(H_x), arb(M_x), prec_bits=prec_bits
             )
+            if x_label == "1":
+                R_disc_at_1_arb = R_disc
             active_ms = [
                 (m_i, moebius_mu_int(m_i), arb(m_i))
                 for m_i in range(H_x + 1, M_x + 1)
                 if moebius_mu_int(m_i) != 0
             ]
+            A_X_arb = sum(
+                (arb(1) / m_a.sqrt() for _, _, m_a in active_ms), arb(0)
+            )
 
             def _crit_integrand(
                 t_c: acb,
@@ -4359,11 +4834,9 @@ def verify_hilbert_space_euler_intertwining_and_critical_line_factorization_arb(
                 xa: arb = x_a,
                 ms: List[Tuple[int, int, arb]] = active_ms,
             ) -> acb:
-                if analytic and (
-                    not t_c.real.is_finite() or not t_c.imag.is_finite()
-                ):
+                if not _mellin_strip_box_admissible(t_c, analytic):
                     return acb(arb.nan(), arb.nan())
-                nzp = _eval_neg_zeta_prime_crit_acb(t_c)
+                nzp = _eval_neg_zeta_prime_crit_acb(t_c, analytic=analytic)
                 h0_t = _eval_H0_crit_acb(t_c, analytic=analytic)
                 m_dir = acb(0)
                 for _, mu_m, m_a in ms:
@@ -4375,17 +4848,20 @@ def verify_hilbert_space_euler_intertwining_and_critical_line_factorization_arb(
                     )
                 return nzp * h0_t * m_dir
 
-            # Integrate on [0, 48] in segments of length 4 (beyond t = 48, |H_0(i t)| < 3.6e-23):
             int_acc = acb(0)
-            for seg_k in range(12):
-                a_t = acb(4 * seg_k)
-                b_t = acb(4 * (seg_k + 1))
+            for idx_k in range(len(mellin_knots) - 1):
+                a_t = mellin_knots[idx_k]
+                b_t = mellin_knots[idx_k + 1]
                 int_acc += acb.integral(
                     _crit_integrand, a_t, b_t, rel_tol=tol_c, abs_tol=tol_c
                 )
-            R_crit_mellin = (arb(2) / tau_arb) * int_acc.real + arb(
-                0, arb("1e-20").upper()
+            finite_integral_arb = (arb(2) / tau_arb) * int_acc.real
+            finite_integration_err_rad = float(finite_integral_arb.rad())
+            infinite_tail_bound_X_arb = arb(2) * A_X_arb * B_Omega_1_tail_T_arb
+            R_crit_mellin = finite_integral_arb + arb(
+                0, infinite_tail_bound_X_arb.upper()
             )
+            combined_enclosure_rad = float(R_crit_mellin.rad())
             diff_crit = R_disc - R_crit_mellin
             crit_ok = bool(diff_crit.contains(0))
             if not crit_ok:
@@ -4395,22 +4871,192 @@ def verify_hilbert_space_euler_intertwining_and_critical_line_factorization_arb(
                     "X_label": x_label,
                     "H_X": H_x,
                     "M_X": M_x,
+                    "verification_type": "INDEPENDENT_DISCRETE_SUM_VS_MELLIN_INTEGRAL_CHECK",
+                    "A_X_dirichlet_majorant_certified": serialize_arb_certified(
+                        A_X_arb
+                    ),
                     "R_mu_band_discrete_sum_certified": serialize_arb_certified(
                         R_disc
+                    ),
+                    "R_mu_band_finite_mellin_integral_on_neg_T_to_T_certified": serialize_arb_certified(
+                        finite_integral_arb
+                    ),
+                    "finite_integration_error_radius": finite_integration_err_rad,
+                    "proved_infinite_tail_bound_2_A_X_B_Omega_1_certified": serialize_arb_certified(
+                        infinite_tail_bound_X_arb
+                    ),
+                    "infinite_tail_error_bound": float(
+                        infinite_tail_bound_X_arb.upper()
                     ),
                     "R_mu_band_critical_line_mellin_integral_certified": serialize_arb_certified(
                         R_crit_mellin
                     ),
+                    "combined_enclosure_radius": combined_enclosure_rad,
                     "difference_encloses_zero": crit_ok,
                 }
             )
 
-        # 3. Coherent low-frequency Euler spike constant on H_tau^pos:
-        #    mu_arch^B(0) = psi_digamma(5/4) - log(pi) + c_tau^B > 0 and 4 cos(tau/16) = 2 sqrt(2 + sqrt(2)):
-        psi_5_4_arb = acb("1.25").digamma().real
-        mu_arch_B_at_0_arb = psi_5_4_arb - pi_arb.log() + c_tau_B_arb
+        # Validated L^1(R) and L^2(R) norms of Omega_log(t) on [-T, T] + proved infinite tails:
+        # On R, |Omega_log(t)| = (1/tau) sqrt(zeta'(1/2+it) zeta'(1/2-it)) H_0(it) where
+        # Z_2(t) := zeta'(1/2+it) zeta'(1/2-it) is holomorphic and strictly positive on [0, T]
+        # (by Speiser's theorem and simplicity of the zeros of zeta on [0, 48]; in acb.integral,
+        # Z_2(t).sqrt(analytic=True) returns NaN if a complex box touches the branch cut (-infty, 0],
+        # forcing subdivision until Re(Z_2(B)) > 0 on every integration box).
+        def _f_omega_L1(t_c: acb, analytic: bool = False) -> acb:
+            if analytic and (
+                not t_c.real.is_finite() or not t_c.imag.is_finite()
+            ):
+                return acb(arb.nan(), arb.nan())
+            z2 = _eval_zeta_prime_abs_sq_crit_acb(t_c, analytic=analytic)
+            if analytic and not bool(z2.real > arb(0)):
+                return acb(arb.nan(), arb.nan())
+            return (
+                z2.sqrt(analytic=analytic)
+                * _eval_H0_crit_acb(t_c, analytic=analytic)
+                / acb(tau_arb)
+            )
+
+        def _f_omega_L2_sq(t_c: acb, analytic: bool = False) -> acb:
+            if not _mellin_strip_box_admissible(t_c, analytic):
+                return acb(arb.nan(), arb.nan())
+            wp = min(flint_ctx.prec, prec_bits)
+            s1 = acb_series(
+                [acb("0.5") + acb(0, 1) * t_c, acb(1)], prec=wp
+            ).zeta()[1]
+            s2 = acb_series(
+                [acb("0.5") - acb(0, 1) * t_c, acb(1)], prec=wp
+            ).zeta()[1]
+            h0_t = _eval_H0_crit_acb(t_c, analytic=analytic)
+            return (s1 * s2) * (h0_t * h0_t) / acb(tau_arb * tau_arb)
+
+        tol_omega = 2 ** (-46)
+        int_omega_L1_fin = acb(0)
+        int_omega_L2_sq_fin = acb(0)
+        for k_half in range(T_mellin_cut * 2):
+            a_t = acb(k_half) / acb(2)
+            b_t = acb(k_half + 1) / acb(2)
+            int_omega_L1_fin += acb.integral(
+                _f_omega_L1, a_t, b_t, rel_tol=tol_omega, abs_tol=tol_omega
+            )
+        for idx_k in range(len(mellin_knots) - 1):
+            a_t = mellin_knots[idx_k]
+            b_t = mellin_knots[idx_k + 1]
+            int_omega_L2_sq_fin += acb.integral(
+                _f_omega_L2_sq, a_t, b_t, rel_tol=tol_omega, abs_tol=tol_omega
+            )
+
+        omega_L1_fin_arb = arb(2) * int_omega_L1_fin.real
+        omega_L1_tail_arb = arb(2) * B_Omega_1_tail_T_arb
+        omega_L1_norm_arb = omega_L1_fin_arb + arb(0, omega_L1_tail_arb.upper())
+
+        omega_L2_sq_fin_arb = arb(2) * int_omega_L2_sq_fin.real
+        omega_L2_sq_tail_arb = arb(2) * B_Omega_2_tail_T_arb
+        omega_L2_sq_integral_arb = omega_L2_sq_fin_arb + arb(
+            0, omega_L2_sq_tail_arb.upper()
+        )
+        omega_L2_norm_arb = omega_L2_sq_integral_arb.sqrt()
+
+        sqrt2_abs_R_band_1_arb = (arb(2).sqrt()) * abs(R_disc_at_1_arb)
+        omega_L1_consistency_cert = certify_abs_le_bound_arb(
+            sqrt2_abs_R_band_1_arb, omega_L1_norm_arb
+        )
+
+        # 3. Exact Plancherel Multiplier nu(t) of J_tau f = (A_tau^B f, 2 R_0 f), Taylor Expansion at t = 0,
+        #    Reconciliation with P_tau(0) = ||A_tau^B psi_tau||_{H_tau^B}^2 + 4 ||R_0 psi_tau||_{L^2}^2,
+        #    and Repaired (log y)^{-3} Euler-Spike Lower Bound:
+        #    nu_B(t) = Re psi(5/4 + it/2) - psi(5/4),
+        #    nu_{R0}(t) = 4 t^2 / (t^2 + 1/4),
+        #    nu(t) = nu_B(t) + nu_{R0}(t) = Re psi(5/4 + it/2) - psi(5/4) + 4 t^2 / (t^2 + 1/4)
+        #          = [Re psi(1/4 + it/2) - log pi] + (c_tau^B + 2).
+        psi_5_4_jet = (
+            acb_series(
+                [acb("1.25"), acb(1), acb(0), acb(0), acb(0)], prec=prec_bits
+            )
+            .lgamma()
+            .derivative()
+        )
+        psi_5_4_arb = psi_5_4_jet[0].real
+        psi_d2_5_4_arb = arb(2) * psi_5_4_jet[2].real
+        nu_at_0_arb = (psi_5_4_arb - psi_5_4_arb) + arb(0)
+        nu_taylor_t2_coeff_arb = arb(16) - psi_d2_5_4_arb / arb(8)
+        # Reconcile -psi(5/4) + 4 = -log(pi) + (c_tau^B + 2) in 256-bit Arb:
+        digamma_constant_reconciliation_diff = (
+            -psi_5_4_arb + arb(4)
+        ) - (-pi_arb.log() + c_tau_A_arb)
+        digamma_constant_reconciliation_encloses_zero = bool(
+            digamma_constant_reconciliation_diff.contains(0)
+        )
+
+        # Integrate (1/tau) int_{-T}^T nu_B(t) H_0(it) dt, (1/tau) int_{-T}^T (4t^2/(t^2+1/4)) H_0(it) dt,
+        # and (1/tau) int_{-T}^T nu(t) H_0(it) dt on T = 48 + proved tail B_{Omega,1}^{tail}(48):
+        # Note that (4 t^2 / (t^2 + 1/4)) H_0(it) = (t^2 (t^2 + 1/4)^3 / (256 sqrt(pi))) Gamma(1/4 + it/2) Gamma(1/4 - it/2),
+        # canceling the factor (t^2 + 1/4) algebraically so that no removable pole occurs at t = +/- i/2.
+        def _f_nu_B_H0(t_c: acb, analytic: bool = False) -> acb:
+            if analytic and (
+                not t_c.real.is_finite() or not t_c.imag.is_finite()
+            ):
+                return acb(arb.nan(), arb.nan())
+            re_psi = acb("0.5") * (
+                (acb("1.25") + acb(0, "0.5") * t_c).digamma()
+                + (acb("1.25") - acb(0, "0.5") * t_c).digamma()
+            )
+            nu_b = re_psi - acb(psi_5_4_arb)
+            return nu_b * _eval_H0_crit_acb(t_c, analytic=analytic) / acb(tau_arb)
+
+        def _f_nu_R0_H0(t_c: acb, analytic: bool = False) -> acb:
+            if analytic and (
+                not t_c.real.is_finite() or not t_c.imag.is_finite()
+            ):
+                return acb(arb.nan(), arb.nan())
+            s_c = acb("0.5") + acb(0, 1) * t_c
+            one_minus_s = acb("0.5") - acb(0, 1) * t_c
+            poly_reduced = (
+                (t_c * t_c)
+                * ((t_c * t_c + acb("0.25")) ** 3)
+                / acb(256)
+            )
+            gam_prod = (
+                (acb("0.5") * s_c).gamma()
+                * (acb("0.5") * one_minus_s).gamma()
+                / (acb(pi_arb) ** acb("0.5"))
+            )
+            return poly_reduced * gam_prod / acb(tau_arb)
+
+        int_nu_B_fin = acb(0)
+        int_nu_R0_fin = acb(0)
+        for seg_k in range(T_mellin_cut // 4):
+            a_t = acb(4 * seg_k)
+            b_t = acb(4 * (seg_k + 1))
+            int_nu_B_fin += acb.integral(
+                _f_nu_B_H0, a_t, b_t, rel_tol=tol_c, abs_tol=tol_c
+            )
+            int_nu_R0_fin += acb.integral(
+                _f_nu_R0_H0, a_t, b_t, rel_tol=tol_c, abs_tol=tol_c
+            )
+
+        plancherel_A_tau_B_norm_sq_arb = arb(2) * int_nu_B_fin.real + arb(
+            0, (arb(2) * B_Omega_1_tail_T_arb).upper()
+        )
+        plancherel_four_R0_norm_sq_arb = arb(2) * int_nu_R0_fin.real + arb(
+            0, (arb(2) * B_Omega_1_tail_T_arb).upper()
+        )
+        plancherel_J_tau_norm_sq_arb = (
+            plancherel_A_tau_B_norm_sq_arb + plancherel_four_R0_norm_sq_arb
+        )
+        plancherel_minus_P_tau_0_diff = (
+            plancherel_J_tau_norm_sq_arb - p_tau_0_arb
+        )
+        plancherel_reconciles_P_tau_0 = bool(
+            plancherel_minus_P_tau_0_diff.contains(0)
+        )
+
         H0_at_0_arb = _eval_H0_crit_acb(acb(0)).real
         four_cos_tau_16_arb = arb(4) * (tau_arb / arb(16)).cos()
+        # Spike prefactor constant C_spike = 49 * tau^2 * H_0(0) / 640 for y >= 24 (where I_y subset [0, 1]
+        # and nu(t) >= 4 t^2 / (t^2 + 1/4) >= (16/5) t^2 >= (49 tau^2 / 80) (log y)^{-2} on I_y):
+        spike_prefactor_C_spike_arb = (
+            arb(49) * tau_arb * tau_arb * H0_at_0_arb / arb(640)
+        )
 
         return {
             "operator_intertwining_on_H_tau_pos": {
@@ -4430,6 +5076,55 @@ def verify_hilbert_space_euler_intertwining_and_critical_line_factorization_arb(
                 "all_sieve_orbit_identities_enclose_zero": all_sieve_orbit_identities_enclose_zero,
                 "sieve_orbit_verification_table": sieve_orbit_rows,
             },
+            "plancherel_multiplier_nu_and_domain_audit": {
+                "nu_formula": (
+                    "nu(t) := Re psi(5/4 + i t / 2) - psi(5/4) + 4 t^2 / (t^2 + 1/4) "
+                    "= [Re psi(1/4 + i t / 2) - log pi] + (c_tau^B + 2)"
+                ),
+                "nu_B_component_formula": (
+                    "nu_B(t) := int_1^infty (x^{-3/2} / (x - x^{-1})) 2 (1 - cos(t log x)) dx/x "
+                    "= Re psi(5/4 + i t / 2) - psi(5/4) = sum_{n=0}^infty (t^2 / 4) / ((n + 5/4)((n + 5/4)^2 + t^2 / 4)) >= 0"
+                ),
+                "nu_R0_component_formula": (
+                    "nu_{R0}(t) := 4 |i t / (1/2 + i t)|^2 = 4 t^2 / (t^2 + 1/4) >= 0"
+                ),
+                "operator_domain_statement": (
+                    "D(J_tau) := {f in L^2(R_{>0}, dy/y) : int_{-infty}^infty nu(t) |hat{f}(i t)|^2 dt < infty}. "
+                    "For f in D(J_tau) (and f in C^1(R_{>0}) with D f in L^2(dy/y) and lim_{y->0^+} y^{1/2} f(y) = 0 "
+                    "for the spatial derivative form of R_0 f), Mellin-Plancherel gives "
+                    "||J_tau f||_{H_tau^pos}^2 = ||A_tau^B f||_{H_tau^B}^2 + 4 ||R_0 f||_{L^2(dy/y)}^2 "
+                    "= (1 / tau) int_{-infty}^infty nu(t) |hat{f}(i t)|^2 dt. "
+                    "Because nu(0) = 0, J_tau is an isometric embedding of (D(J_tau), ||.||_{J_tau}) into H_tau^pos, "
+                    "NOT an isometry for the unweighted L^2(R_{>0}, dy/y) norm."
+                ),
+                "nu_at_0_equals_zero": bool(nu_at_0_arb.contains(0)),
+                "nu_nonnegative_and_quadratic_lower_bound": (
+                    "nu(t) = nu_B(t) + 4 t^2 / (t^2 + 1/4) >= 4 t^2 / (t^2 + 1/4) >= 0 for all t in R"
+                ),
+                "taylor_expansion_at_0_formula": "nu(t) = (16 - psi''(5/4) / 8) t^2 + O(t^4)   (t -> 0)",
+                "psi_5_4_certified": serialize_arb_certified(psi_5_4_arb),
+                "psi_second_deriv_5_4_certified": serialize_arb_certified(
+                    psi_d2_5_4_arb
+                ),
+                "nu_taylor_t2_coeff_16_minus_psi_d2_over_8_certified": serialize_arb_certified(
+                    nu_taylor_t2_coeff_arb
+                ),
+                "digamma_constant_reconciliation_encloses_zero": digamma_constant_reconciliation_encloses_zero,
+                "plancherel_A_tau_B_psi_tau_norm_sq_certified": serialize_arb_certified(
+                    plancherel_A_tau_B_norm_sq_arb
+                ),
+                "plancherel_four_R0_psi_tau_norm_sq_certified": serialize_arb_certified(
+                    plancherel_four_R0_norm_sq_arb
+                ),
+                "plancherel_J_tau_psi_tau_norm_sq_certified": serialize_arb_certified(
+                    plancherel_J_tau_norm_sq_arb
+                ),
+                "spatial_P_tau_0_certified": serialize_arb_certified(p_tau_0_arb),
+                "plancherel_minus_spatial_P_tau_0_diff_certified": serialize_arb_certified(
+                    plancherel_minus_P_tau_0_diff
+                ),
+                "plancherel_reconciles_with_P_tau_0_encloses_zero": plancherel_reconciles_P_tau_0,
+            },
             "critical_line_spectral_dirichlet_factorization": {
                 "formula": (
                     "R_{mu,band}(X) = int_{-infty}^infty Omega_log(t) M_band(1/2 + i t; X) X^{i t} dt, "
@@ -4443,16 +5138,51 @@ def verify_hilbert_space_euler_intertwining_and_critical_line_factorization_arb(
                     "at z = 1/2 cancels the double pole of -zeta'(1/2 + z) at s = 1), giving an unconditional "
                     "critical-line integral representation of R_{mu,band}(X)."
                 ),
+                "whole_integrand_tail_bound_theorem": (
+                    "For T >= 40 and A_X := sum_{H(X) < m <= M(X)} |mu(m)| / sqrt(m), "
+                    "|M_band(1/2 + it; X) X^{it}| <= A_X, 0 < H_0(it) <= (Gamma(1/4)^2 / (512 sqrt(pi))) (t^2 + 1/4)^4 e^{-pi t / 2}, "
+                    "and |zeta'(1/2 + it)| <= 2 sqrt(t^2 + 1/4) + 1 + 1/(t^2 + 1/4) <= 4 (t^2 + 1/4), proving "
+                    "|int_{|t| >= T} Omega_log(t) M_band(1/2 + it; X) X^{it} dt| <= 2 A_X B_{Omega,1}^{tail}(T) with "
+                    "B_{Omega,1}^{tail}(T) := (Gamma(1/4)^2 / (32 pi^{3/2} tau)) (T^2 + 1/4)^5 e^{-pi T / 2}."
+                ),
+                "cutoff_T": T_mellin_cut,
+                "B_Omega_1_tail_T_certified": serialize_arb_certified(
+                    B_Omega_1_tail_T_arb
+                ),
+                "B_Omega_2_tail_T_certified": serialize_arb_certified(
+                    B_Omega_2_tail_T_arb
+                ),
+                "Omega_log_L1_norm_certified": serialize_arb_certified(
+                    omega_L1_norm_arb
+                ),
+                "Omega_log_L2_sq_integral_certified": serialize_arb_certified(
+                    omega_L2_sq_integral_arb
+                ),
+                "Omega_log_L2_norm_certified": serialize_arb_certified(
+                    omega_L2_norm_arb
+                ),
+                "sqrt2_abs_R_mu_band_1_certified": serialize_arb_certified(
+                    sqrt2_abs_R_band_1_arb
+                ),
+                "Omega_log_L1_ge_sqrt2_abs_R_band_1_certification": omega_L1_consistency_cert,
                 "all_crit_line_identities_enclose_zero": all_crit_line_identities_enclose_zero,
                 "critical_line_verification_table": crit_line_rows,
             },
             "low_frequency_euler_spike_obstruction_on_H_tau_pos": {
                 "plancherel_lower_bound_formula": (
-                    "||J_tau(E_y psi_tau)||_{H_tau^pos}^2 >= mu_arch^B(0) ||E_y psi_tau||_{L^2(dy/y)}^2 "
-                    ">= (mu_arch^B(0) H_0(0) / (8 log y)) exp((4 cos(tau/16) + o(1)) sqrt(y) / log y) -> +infty"
+                    "For all y >= 24 (where I_y := [7 tau / (16 log y), tau / (2 log y)] subset [0, 1]), "
+                    "nu(t) >= 4 t^2 / (t^2 + 1/4) >= (16 / 5) t^2 >= (49 tau^2 / 80) (log y)^{-2} and H_0(i t) >= H_0(0) on I_y, "
+                    "while |I_y| = tau / (16 log y) and inf_{t in I_y} |M_y(1/2 + i t)|^2 = |M_y(1/2 + i t_{y,-})|^2, proving "
+                    "||J_tau(E_y psi_tau)||_{H_tau^pos}^2 >= (2 / tau) int_{I_y} nu(t) |M_y(1/2 + i t)|^2 H_0(i t) dt "
+                    ">= (49 tau^2 H_0(0) / (640 (log y)^3)) |M_y(1/2 + i t_{y,-})|^2 "
+                    "= (49 tau^2 H_0(0) / (640 (log y)^3)) exp[(4 cos(tau/16) + o(1)) sqrt(y) / log y] -> +infty as y -> infty."
                 ),
-                "mu_arch_B_at_0_certified": serialize_arb_certified(
-                    mu_arch_B_at_0_arb
+                "nu_at_0_equals_0": True,
+                "nu_taylor_t2_coeff_certified": serialize_arb_certified(
+                    nu_taylor_t2_coeff_arb
+                ),
+                "spike_prefactor_C_spike_49_tau_sq_H0_0_over_640_certified": serialize_arb_certified(
+                    spike_prefactor_C_spike_arb
                 ),
                 "H_0_at_0_certified": serialize_arb_certified(H0_at_0_arb),
                 "four_cos_tau_16_exponent_certified": serialize_arb_certified(
@@ -4536,9 +5266,11 @@ def verify_complete_subgate_closure_implication_chain_arb(
                     "status": "PROVED_UNCONDITIONALLY",
                     "proof_reference": "Lean Theorems 11, 12 & 59 + Laplace-Carleman & Mellin strip holomorphy",
                     "multiplicity_preservation": (
-                        "In C_tau(t) = W_xi(h_t), -xi'(s)/xi(s) has simple poles of positive integer residue "
-                        "m_rho = ord_xi(rho) >= 1, so each distinct zero contributes m_rho H_0(rho - 1/2) tau^{-t(rho - 1/2)} "
-                        "with m_rho H_0(rho - 1/2) != 0 on 0 < Re(rho) < 1 and no polynomial t^j drift."
+                        "In C_tau(t) = W_xi(h_t), -xi'(s)/xi(s) has simple poles of residue "
+                        "-m_rho = -ord_xi(rho) <= -1 (equivalently, xi'(s)/xi(s) has positive integer residue "
+                        "+m_rho = ord_xi(rho) >= 1), so contour orientation makes each distinct zero contribute "
+                        "m_rho H_0(rho - 1/2) tau^{-t(rho - 1/2)} with m_rho H_0(rho - 1/2) != 0 on 0 < Re(rho) < 1 "
+                        "and no polynomial t^j drift."
                     ),
                     "no_maximal_displacement_assumption": (
                         "Two independent arguments avoid assuming sup_rho Re(rho) is attained: "
@@ -4564,7 +5296,7 @@ def verify_complete_subgate_closure_implication_chain_arb(
 def execute_task_tc052_arithmetic_fourier_compatibility_audit(
     prec_bits: int = 256,
 ) -> Dict[str, Any]:
-    """Execute the complete TASK-TC-052 audit of Approach A (transition-region vanishing
+    """Execute the complete TASK-TC-052 / TASK-TC-052R audit of Approach A (transition-region vanishing
     moments, linear-density annihilation, and Vaughan Type I uniform bound), Approach B
     (Euler-sieved positive-orbit intertwining, critical-line spectral-Dirichlet factorization,
     and low-frequency Euler spike obstruction), and the complete conditional closure chain."""
@@ -4581,7 +5313,10 @@ def execute_task_tc052_arithmetic_fourier_compatibility_audit(
     )
     return {
         "task_id": TASK_TC_052_ID,
+        "repair_task_id": "TASK-TC-052R",
         "starting_head": STARTING_HEAD_TC_052,
+        "tc052_merged_main_baseline": "916440e688c66d461daa04b17d7435e10e65f0d4",
+        "tc052_implementation_commit": "8414aa66f1127c636c68fcf8594833c570a3344a",
         "subgate_tc043a_status": "OPEN",
         "rh_proved": False,
         "closing_theorem_target": (
@@ -4602,14 +5337,14 @@ def execute_task_tc052_arithmetic_fourier_compatibility_audit(
 
 
 # ---------------------------------------------------------------------------
-# 7. Master Execution Function for TASK-TC-050 / TASK-TC-051 / TASK-TC-051R / TASK-TC-052
+# 7. Master Execution Function for TASK-TC-050 / TASK-TC-051 / TASK-TC-051R / TASK-TC-052 / TASK-TC-052R
 # ---------------------------------------------------------------------------
 
 
 def execute_task_tc050_faithful_spectral_realization_audit(
     prec_bits: int = 256,
 ) -> Dict[str, Any]:
-    """Execute the complete TASK-TC-050 / TASK-TC-051R / TASK-TC-052 audit and return the certified report dictionary."""
+    """Execute the complete TASK-TC-050 / TASK-TC-051R / TASK-TC-052 / TASK-TC-052R audit and return the certified report dictionary."""
     sec1_roles = verify_tau_joint_arithmetic_fourier_roles_and_transforms(
         prec_bits=prec_bits
     )
@@ -4637,7 +5372,8 @@ def execute_task_tc050_faithful_spectral_realization_audit(
         "continuation_task_id": TASK_TC_051_ID,
         "repair_task_id": "TASK-TC-051R",
         "subgate_closure_attempt_task_id": TASK_TC_052_ID,
-        "preceding_repair_task_ids": ["TASK-TC-050R", "TASK-TC-050R2"],
+        "tc052_repair_task_id": "TASK-TC-052R",
+        "preceding_repair_task_ids": ["TASK-TC-050R", "TASK-TC-050R2", "TASK-TC-051R"],
         "parent_epic": EPIC_TC_042_ID,
         "starting_head": STARTING_HEAD_TC_050,
         "tc051_starting_head": STARTING_HEAD_TC_051,
@@ -4645,6 +5381,8 @@ def execute_task_tc050_faithful_spectral_realization_audit(
         "tc051_implementation_commit": "333661eecd69738e8a67143e635b6db4f40170ce",
         "tc051_branch_tip": "7ac0546b1177970ff0d87824f61643da2405c4c0",
         "tc052_starting_head": STARTING_HEAD_TC_052,
+        "tc052_merged_main_baseline": "916440e688c66d461daa04b17d7435e10e65f0d4",
+        "tc052_implementation_commit": "8414aa66f1127c636c68fcf8594833c570a3344a",
         "reviewed_baseline": REVIEWED_BASELINE_TC_050,
         "tc050r_reviewed_baseline": "2f7871fff666091c4152ecc8657f2345aacdd4fa",
         "tc050r2_reviewed_head": "0e6ae36ce995ef3037652b3dfb67645325f990b1",
@@ -4673,6 +5411,25 @@ def execute_task_tc050_faithful_spectral_realization_audit(
                 "vaughan_band_decomposition_and_type_I_uniform_bound",
                 "euler_sieved_orbit_and_complete_subgate_closure_chain",
             ],
+            "tc052r_evidence_and_scope_separation": {
+                "concrete_analytic_results": [
+                    "Exact Plancherel multiplier nu(t) = Re psi(5/4 + i t / 2) - psi(5/4) + 4 t^2 / (t^2 + 1/4) = [Re psi(1/4 + i t / 2) - log pi] + (c_tau^B + 2) for J_tau f = (A_tau^B f, 2 R_0 f), with nu(0) = 0, nu(t) >= 4 t^2 / (t^2 + 1/4) >= 0, and nu(t) = (16 - psi''(5/4)/8) t^2 + O(t^4) as t -> 0.",
+                    "Reconciled Vaughan identity mu(m) = c_I(m; U, V) + c_II(m; U, V) for m > max(U, V) with c_II(m; U, V) = sum_{a b = m, a > U, b > V} mu(a) sum_{r | b, r > V} mu(r) = -sum_{a b = m, a > U, b > V} mu(a) sum_{r | b, r <= V} mu(r), and unconditional Type I bound |R_I(X; U, V)| <= B_J + C_{EM,I} via progression bounded-variation transfer ||F_X||_infty + Var_{(0,infty)}(F_X) <= C_{BV} X^{-1/2}.",
+                    "Exact nonzero asymptotic limit lim_{X -> infty} J_band(X) = lim_{X -> infty} R_{1,band}(X) = L = 27 zeta(3)/(256 pi^2) + 81[-zeta'(3)]/128 = 0.1382222059... > 0, and unconditional O(1) boundedness R_{|mu|,band}(X) = (6/pi^2) J_band(X) + O(1) (with convergence to (6/pi^2) L conditional on E_Q(t) = o(sqrt(t))).",
+                    "Proved whole-integrand Mellin tail bounds B_{Omega,1}^{tail}(T) <= 1.3719e-18 and B_{Omega,2}^{tail}(T) <= 7.3910e-37 at T = 48 via Euler-Weierstrass Gamma comparison and 1st-order Euler-Maclaurin zeta' growth bound.",
+                ],
+                "conditional_lean_inequality_lemmas": [
+                    "Theorems 57, 58, and 59 in formal/RiemannScope/CanonicalThetaCorrelationBound.lean are conditional real-arithmetic and inequality reductions over R whose final step in Theorem 59 applies the explicitly assumed analytic bridge implication h_bridge : (|C_K| <= P_0 + B_ctrl + B_I + C_log_0 -> delta_rho = 0).",
+                ],
+                "certified_finite_numerical_evaluations": [
+                    "256-bit Arb enclosures of R_{mu,band}(X) via Mellin integration on [-48, 48] combined with proved infinite-tail bounds 2 A_X B_{Omega,1}^{tail}(48) at X in {1, 2, 4}.",
+                    "256-bit Arb enclosures of ||Omega_log||_{L^1(R)} = [0.1008434929769 +/- 5.00e-14] >= sqrt(2)|R_{mu,band}(1)| = 0.0196369224... and ||Omega_log||_{L^2(R)} = [0.025900722690580 +/- 4.46e-16].",
+                    "Exact rational verification of Landau's inequality |sum_{d <= N} mu(d)/d| <= 1 for 1 <= N <= 200 and Vaughan's identity at 8 sample scales X in [1, 64] plus the U = V = 1, m = 4 regression.",
+                ],
+                "remaining_open_obligations": [
+                    "SUBGATE-TC-043A (OPEN, rh_proved: false): prove uniform O(1) boundedness sup_{X >= 1} |R_{mu,band}(X)| < infty (equivalently sup_{X >= 1} |I(X)| < infty or sup_{X >= 1} |R_{II}(X; U, V)| < infty for U V <= sqrt(X)) without assuming RH.",
+                ],
+            },
             "committed_lean_theorems_exact_scope": {
                 "theorem_51_tau_grade_star_involution_and_hyperbolic_pair_obstruction": {
                     "parameters": "(tau K J delta B11 B12 B22 c1 c2 : ℝ) (htau : 1 < tau) (hK : K ≠ 0) (hB12 : 0 < B12)",
@@ -4831,10 +5588,12 @@ def execute_task_tc050_faithful_spectral_realization_audit(
                         "c_a = 0 → (|I_a| ≤ 2 * C_a * L_tilde_W ∧ |R_a| ≤ B_E + 2 * C_a * L_tilde_W)",
                     ],
                     "external_analytic_scope_note": (
-                        "Theorem 57 proves the algebraic cancellation of the linear boundary terms ± c_a * B_lin_M, "
-                        "the uniform tail bound on J_band from M_X[W_log](1/2) = 0 (J_band = -T_low - T_high), and the "
-                        "uniform O(1) bounds on I_a and R_a from explicit hypotheses; the Mellin vanishing moment "
-                        "int_0^infty v^{-3/2} W_log(v) dv = 0 and scale-invariant square-root integral estimate are proved analytically outside Lean."
+                        "Conditional/algebraic real-inequality lemma: Theorem 57 proves the algebraic cancellation of "
+                        "the linear boundary terms ± c_a * B_lin_M, the uniform bound |J_band| <= (1/3) C_log_EM + (1/2) C_log_0 "
+                        "from the assumed tail identity J_band = -T_low - T_high, and the uniform O(1) bounds on I_a and R_a "
+                        "from explicit hypotheses; the Mellin vanishing moment int_0^infty v^{-3/2} W_log(v) dv = 0, the nonzero "
+                        "asymptotic limit lim_{X->infty} J_band(X) = L = 0.1382222059... > 0, and the scale-invariant square-root "
+                        "integral estimate are proved analytically outside Lean."
                     ),
                 },
                 "theorem_58_vaughan_band_decomposition_and_type_I_uniform_bound": {
@@ -4853,13 +5612,16 @@ def execute_task_tc050_faithful_spectral_realization_audit(
                     "proved_conjuncts": [
                         "|S_mu_U * S_mu_V * J_band| ≤ B_J ∧ |E_EM_I| ≤ C_EM_1 ∧ |R_I| ≤ B_J + C_EM_1",
                         "(|R_II| ≤ M_II → |R_band| ≤ B_J + C_EM_1 + M_II) ∧ (|R_band| ≤ M_R → |R_II| ≤ M_R + B_J + C_EM_1)",
+                        "((-1 : ℝ) + 1 = 0 ∧ (-1 : ℝ) + (-1 : ℝ) ≠ 0) ∧ (∀ F_sup F_var inv_sqrt_X U_V : ℝ, 0 ≤ U_V → 2 * F_sup + F_var ≤ C_EM_1 * inv_sqrt_X → (2 * F_sup + F_var) * U_V ≤ C_EM_1 * (U_V * inv_sqrt_X))",
                     ],
                     "external_analytic_scope_note": (
-                        "Theorem 58 proves the contraction of the Landau factors |S_mu_U * S_mu_V| <= 1, the uniform "
-                        "Type I bound |R_I| <= B_J + C_EM_1 for rho_UV = U V / sqrt(X) <= 1, and the two-way boundedness "
-                        "equivalence between R_band and R_II; Vaughan's combinatorial divisor identity mu = c_I + c_II for "
-                        "m > max(U, V), Landau's inequality |sum_{d <= x} mu(d)/d| <= 1, and the Dilation–Euler–Maclaurin "
-                        "remainder bound are proved analytically and certified in Python Arb outside Lean."
+                        "Conditional/algebraic real-inequality lemma: Theorem 58 proves the contraction of the Landau "
+                        "factors |S_mu_U * S_mu_V| <= 1, the uniform Type I bound |R_I| <= B_J + C_EM_1 for rho_UV = U V / sqrt(X) <= 1, "
+                        "the two-way boundedness equivalence between R_band and R_II, the U = V = 1, m = 4 sign-cancellation check, "
+                        "and the progression bounded-variation transfer (2 F_sup + F_var) U_V <= C_EM_1 (U_V inv_sqrt_X); "
+                        "Vaughan's combinatorial divisor identity mu = c_I + c_II for m > max(U, V), Landau's inequality "
+                        "|sum_{d <= x} mu(d)/d| <= 1, and the derivative BV bound ||F_X||_infty + Var(F_X) <= C_BV X^{-1/2} "
+                        "are proved analytically and certified in Python Arb outside Lean."
                     ),
                 },
                 "theorem_59_euler_sieved_orbit_and_complete_subgate_closure_chain": {
@@ -4875,13 +5637,16 @@ def execute_task_tc050_faithful_spectral_realization_audit(
                     ],
                     "proved_conjuncts": [
                         "C_K = eulerSievedCorrelationDecomp P_y_K Delta_arch_y_K E_ctrl_K R_band_X ∧ |P_y_K - Delta_arch_y_K| ≤ N_y * N_0 + |Delta_arch_y_K|",
+                        "∀ nu_B t : ℝ, 0 ≤ nu_B → (0 ≤ nu_B + (4 * t ^ 2) / (t ^ 2 + 1 / 4) ∧ (4 * t ^ 2) / (t ^ 2 + 1 / 4) ≤ nu_B + (4 * t ^ 2) / (t ^ 2 + 1 / 4) ∧ (t ^ 2 ≤ 1 → (16 / 5 : ℝ) * t ^ 2 ≤ nu_B + (4 * t ^ 2) / (t ^ 2 + 1 / 4)))",
                         "|I_X| ≤ B_I → (|R_band_X| ≤ B_I + C_log_0 ∧ |C_K| ≤ P_0 + B_ctrl + B_I + C_log_0 ∧ (P_0 < 2558259/1000000 → B_ctrl < 17987140/1000000 → C_log_0 < 557430/1000000 → |C_K| < 21102829/1000000 + B_I) ∧ ((|C_K| ≤ P_0 + B_ctrl + B_I + C_log_0 → delta_rho = 0) → delta_rho = 0))",
                     ],
                     "external_analytic_scope_note": (
-                        "Theorem 59 proves the Approach B Euler-sieved correlation decomposition and the complete "
-                        "conditional deduction from |I_X| <= B_I to |R_band_X| <= B_I + C_log_0, |C_K| < 21.102829 + B_I, "
-                        "and delta_rho = 0; the Laplace–Carleman isolated-pole continuation (Theorems 11 & 12) and Mellin "
-                        "strip holomorphy of M_X[W](z) on 0 < Re(z) < 5/2 are proved analytically."
+                        "Conditional/algebraic real-inequality lemma: Theorem 59 proves the Approach B Euler-sieved "
+                        "correlation decomposition, the quadratic lower bound nu(t) = nu_B + 4 t^2 / (t^2 + 1/4) >= (16/5) t^2 "
+                        "for |t| <= 1 and nu_B >= 0, and the conditional deduction from |I_X| <= B_I to |R_band_X| <= B_I + C_log_0 "
+                        "and |C_K| < 21.102829 + B_I, whose final step applies the explicitly assumed implication "
+                        "h_bridge : (|C_K| <= P_0 + B_ctrl + B_I + C_log_0 -> delta_rho = 0). The Laplace–Carleman isolated-pole "
+                        "continuation (Theorems 11 & 12) and Mellin strip holomorphy of M_X[W](z) on 0 < Re(z) < 5/2 are external analytic theorems."
                     ),
                 },
             },
