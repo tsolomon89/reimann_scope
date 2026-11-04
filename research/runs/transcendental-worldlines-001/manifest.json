@@ -6,11 +6,11 @@
   "epistemic_class": "exact_control",
   "object_relationship": "same_object_coordinate_control",
   "classification": "canonical_experiment",
-  "started_at": "2026-08-28T20:35:58.534738+00:00",
-  "completed_at": "2026-08-28T20:35:59.109215+00:00",
+  "started_at": "2026-11-04T16:21:01.453370+00:00",
+  "completed_at": "2026-11-04T16:21:02.149025+00:00",
   "status": "complete",
-  "git_commit": "165321dfecd562c5eea4a0b49df781d8aa6ac254",
-  "producing_git_commit": "165321dfecd562c5eea4a0b49df781d8aa6ac254",
+  "git_commit": "1f311797ac0cbc847f25471c08d8ad99b9f47955",
+  "producing_git_commit": "1f311797ac0cbc847f25471c08d8ad99b9f47955",
   "git_dirty": false,
   "experiment_spec_sha256": "af70c107e93f687efeedade71ee131668d4cfdb89bbd29fdf652e3343fb3dd63",
   "precision": {
@@ -66,14 +66,14 @@
     "algorithm_version": "2.0.0"
   },
   "source_code_hashes": {
-    "certification.py": "ef8e13f7752b84e9a2293e8b158e6b8cf96268a1eaba9fc358c132b8413a1ce1",
+    "certification.py": "f1a6671380078439a3d3609337a18ca01e2f4ab33e54e715bcd2fd0e470667c7",
     "converter.py": "e782125e80ce8934c1388f24130ddfa7409a7603a4be974c2a8b708a10a42264",
-    "math_core.py": "750c9e55bbd95da1b0f7bf2d72532a56ed2ed8c7511e378afce4849c389e738b",
+    "math_core.py": "98cacf8a4f84ec4dff4bfd47c5e3658eb60800e3e00702b8abfa6d3505fd8559",
     "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
     "research/handlers/base.py": "e194798519435f33348bb8021afaa6a3ffd3ccb218b98586177830258eebda30",
     "research/handlers/worldlines.py": "96de02f6b0cca64131b37c5720cd0f93df50da4bcae8e411a318ed2839d1411a",
     "research_runner.py": "e3820498a16161e1dedcb0e46ae44fbd7ebdce2f06811da815f46230238e88b9",
-    "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
+    "transcendental.py": "840926935542b83ba69d034db77bdd4bb8fe376e79775e2b0e9a21bcedda3aa3",
     "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
     "zero_finder.py": "d104cc709b4c28ea5ebc8aa1e5b9b1b7aa84798831f380b19effe29fd15e4887"
   },
@@ -86,7 +86,7 @@
   "code_modules": [
     {
       "path": "certification.py",
-      "sha256": "ef8e13f7752b84e9a2293e8b158e6b8cf96268a1eaba9fc358c132b8413a1ce1"
+      "sha256": "f1a6671380078439a3d3609337a18ca01e2f4ab33e54e715bcd2fd0e470667c7"
     },
     {
       "path": "converter.py",
@@ -94,7 +94,7 @@
     },
     {
       "path": "math_core.py",
-      "sha256": "750c9e55bbd95da1b0f7bf2d72532a56ed2ed8c7511e378afce4849c389e738b"
+      "sha256": "98cacf8a4f84ec4dff4bfd47c5e3658eb60800e3e00702b8abfa6d3505fd8559"
     },
     {
       "path": "reference_data.py",
@@ -114,7 +114,7 @@
     },
     {
       "path": "transcendental.py",
-      "sha256": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c"
+      "sha256": "840926935542b83ba69d034db77bdd4bb8fe376e79775e2b0e9a21bcedda3aa3"
     },
     {
       "path": "transforms.py",
@@ -144,47 +144,47 @@
     }
   ],
   "consumed_certificates": [
-    "1297ad9301b0fb7a8494b5c3f7c0aa2427e927445bb94e7ff6a040a306911dd0",
-    "135b695371f608a5dcd1b707fffd9e07c3f0ed597310f47c2f1d051162e25b1f",
-    "1542950f0217427a8c4ebac9e51a0b7c79f6e4d01dcd8f662bee82bf0c2aab9e",
-    "1f4ae9dceef41e251c627e5aedb2090da133b10daea9c890d11f3cc4b87a2c4b",
-    "271fab31471a0bd6c3fceee22fc68628135ec50a8aeaf317e38dacc8a419a910",
-    "2bed4392040ed21da1cd47256d6e6d5dbab8e49e39743a90e1ff41297cb02e40",
-    "2ddaec83e7536327c0460db368f1eafd0a6db6d46e01cde7f63317e5d2641051",
-    "34c61b4b160ff3d7834a21915137e720f2aa83ff80efcc20f2b79fdbdf358788",
-    "4703ff9cd99ef1b6b938aa389bcfb3f22e39af85b90a5da18cf656c37f95df90",
-    "485b2c68f697bb9081d81fb5e3122d75b3a97668948b1d6f7ded8b4bc99f8149",
-    "4c248e074f4ea3e54d9875ddd424ad172d47a295cca4c9a5a9139cedc432d298",
-    "56beba5acf78bed299b07da055487f6c6fc02eafb5e579b4faa79c336980cbdb",
-    "5addf3e62ff33c1a3987b56d3847660cdba5efcb0b7ae0e77c3a1b47a8262cbc",
-    "5ff83fd094461e44a84d8ee7908b01e4c3c57f1de8742479e39211cd2c04bb05",
-    "6bc78d9f0f29946d5969b92319b2f58f62ea9db9e6fb07ff313f96bce7e410dd",
-    "71ddb43ff5da8f74717ac659346083a4c2cb7fe0680a4e9cbd6e3c7647001b55",
-    "76184b2cfec59e4c18d7286c546cffcdaf6ddd5d070a994a15045acd3c7bbd6d",
-    "7abcf4a1f12dd05d6e11eb6fb3b8a2b1b6bebecb3d25b68353c5753395ed2771",
-    "8bb5ae0f3660411934e44acebfb67b7a6e48865afe3f2d2c65a4dcbfedfaf676",
-    "8c36f6410ad597a20edc2ecf0c19f1eaea8db8b92eacb01d2f7eea2cf7204af5",
-    "93190f25b378de360a79ee103272ead1a18a1b6a95ed914a66cf90b324c997d7",
-    "95441c1881cdf8681361034935608be6929cf3997b3e5fe6d304ae3739ce7fb4",
-    "a0bff84a6b42cd479ef0782883975a3ebd4e76710cdf11a6c2ad194ad78169ed",
-    "a1451d6c98f741060fac933d42a259aaec729e551689cacccf95332aa9b3072c",
-    "a78388e240894b0b7325559bf60dcb6a526f44cbe9ca3e4675ea06ee6b2a0119",
-    "a8748b467424fc8cd74e0f7a8621e8c181d6cb6b083c32ffad17d74e77e2308e",
-    "a9fb21e5d9179cc7fb908963f61b647264906594da029f1e6bf6d1034bb6e2d0",
-    "afc6c75e66d07eb2721fb5c3bd2884f361e75bbdf1b456fca3ebe08a3943ec3a",
-    "b03288135a7ed265a217a48e7ea917eba9a5215ada7bd62cee4c1cdadf817dd7",
-    "b235447b953dd7201269fcae2b501fe9e633a4c0d75fef98b29e12a19065a257",
-    "c7299ab78184e4a62bc3b722d49d445f7a3a455b09a2b672cc3aa1c204c631ef",
-    "d557f22653a4369da5ccc9f30165b0d4e7ccbf4545d801c602ef1631c2fd453b",
-    "de55e0a1bdf0b43e33a1d2ce1b9bfc816aa397eb646b94a61160b6ba25106904",
-    "df34ef8ed6cecb0eb4ffb9799ab608e7920730227d1bf64f6193f606dd7990a8",
-    "edca7a5f53183bca8f77bdd02297fc98930eb5ee86bc89e612868419eb78163b",
-    "ff81cc784943c2727a6e6aa4365816b9ab67f1d294e7fa4e6f2e7ddb64293f6e"
+    "12adbc7aaedc298b53e3d399d73d5b01757f45086688d3a2fdb25c47510c83ed",
+    "14230904c8993ae469b343b37b3270ce940ce2dd6f18db68f09dbe42665c1b02",
+    "1ba5c2cdb93b38052e515c8c84ee50e34f4b23e111a637f7b3a8e7b7a2fb1090",
+    "34ba9381dbb9255dd601a7c71309dd51e129aca740029d5e2069c42fb7b492b2",
+    "3b68b2c614bc580d3ff93dfe6c140e29e24523ed53762c96c9bee3a43c23d464",
+    "42b94242aaa40caca3d50bfdf5aedcb4bf41c46109366911b38029e97ab84a3a",
+    "4e241399473a19a41ba12ebf77db0c34d347e7749ce865facaf0f6e794581288",
+    "4ff0df66bd9f313c8e2426ca68d519febc9b52323f0a7ca94b43625c265e9398",
+    "532aa520e53a353010b6d8570b30071205e4f6739b91df5c21024de6a3efc2d6",
+    "58155086a3db23710d585b27953b9bde3c383d3289e4561953e1318230f97154",
+    "6a576415d91fdb12937ccdebaf3d9add5031014e4924301e2462754be7db29c7",
+    "7922f02e1361e02529b4929c808f963c8a8fb9e59a15adafdfb006daf4bde91e",
+    "7d136f81a550f52ea0a2772e4bcd2a4cacab8ce2a7abdf8b4baa7513836fb13f",
+    "7f7ea8ec9b72861eb5771b820b752a4165a856dfdbfe452f6f118ead1b29b74a",
+    "85301fdebe67fad2d21482542f8eea12fe781d5e987077332a7378b48985a5ac",
+    "87b366f73e6e2761fb23659a5a69a0ea58c922b982f656cab34cabbecd89d3a6",
+    "8a649b18a84c84dd648a536071f88eb72f72401dfc0629b342469cfab19b8cf4",
+    "8ddd9488b46c0e74aee705d128c7b1d22aaed03b85061f1cd8285750c7b22fc7",
+    "9fa721177bf02ef627e101673dc2b48783be6ff39d2056daef6569bed6c3da47",
+    "a723f48f8c50732a8587ec0722565d0ec61c34d3bfb0d6d1ff75a739482666be",
+    "a8d727bfcb7f3b4371e5aeea29207ff0d369b3027d65f3ebd3a7abbc4127effa",
+    "b7c2cef7e4b926cf94640411780c06c653fc39e9e01c62a1066ddfdc1a730d81",
+    "c3165ab40dde2377e68a5f720a73274111253ebd3de32274d1b33dbda02af084",
+    "d7818fd00c6eb0d7af5a0b20e439576058b78ff8030b0d436d72ef86945334fb",
+    "dd3c4ddd12c0d6edf672458ab4adceeae9932833af76338a7ec2de858743d9ae",
+    "defd672bd9820b2394c43a00855a9ee1bec1693ffcd6bfeb86050304efc5e67d",
+    "df1111611477f053646d3d1bf74a6489fbade42a272aaee68a66981497d3ce0b",
+    "e2dfedb7e287dce1c8d6f45394f05a8b23287b0692f933565b1e37593bb587dc",
+    "e453d55ea6038c192b28f85a7ea7680e26c5d126faba75d64b095584c244dd12",
+    "e6871be08d69fbd746f76cfa72da96c49b304a42038faad1a26b6603699c25c6",
+    "ed42d46cc7dd1e76c1bec9e1ce60d4348440ab60df91334869034c83088f8f5c",
+    "edd7c86a576e2987ba4ecee3d8bb5920dbd3f9e56c5d7fbe3ec86e2bd976712f",
+    "f2b819614d2833b70991899e9699feb6dcc3dba1c22937b9e3bf27785a7f911e",
+    "fa51e97e4c367d5160340a9280b0057700c44ee99531555d0d8a2e673f666d19",
+    "fc061360c949e99730aade7ae86ef2aec5a86ff6a1a0b8ee4207acf0feff0215",
+    "fc7b0ccb792bf3f2a13cd914b06d856d8a02c1b437155aed28349bb24a10c00b"
   ],
   "artifacts": {
     "results_jsonl": {
       "path": "results.jsonl",
-      "sha256": "6f2a0828aa03187cd43266edae1e129f85cac5be29ca38fe582871ff5f92499a"
+      "sha256": "7da7175a54c1b6b50bec3658880f555a58b42b79677e071ece05567a29eb9a5d"
     },
     "summary_json": {
       "path": "summary.json",
@@ -192,24 +192,24 @@
     },
     "readme_md": {
       "path": "README.md",
-      "sha256": "52801210964392063e2522f9a5f06e230a6d2124d0576a634639030087f97b28"
+      "sha256": "72f8920435e854e18af8f5d6a70a3792d05b497544cdab8a12ab2ce08cef86d1"
     }
   },
   "execution_provenance": {
-    "results_sha256": "6f2a0828aa03187cd43266edae1e129f85cac5be29ca38fe582871ff5f92499a",
-    "producing_git_commit": "165321dfecd562c5eea4a0b49df781d8aa6ac254",
+    "results_sha256": "7da7175a54c1b6b50bec3658880f555a58b42b79677e071ece05567a29eb9a5d",
+    "producing_git_commit": "1f311797ac0cbc847f25471c08d8ad99b9f47955",
     "git_dirty": false,
-    "started_at": "2026-08-28T20:35:58.534738+00:00",
-    "completed_at": "2026-08-28T20:35:59.109215+00:00",
+    "started_at": "2026-11-04T16:21:01.453370+00:00",
+    "completed_at": "2026-11-04T16:21:02.149025+00:00",
     "source_code_hashes": {
-      "certification.py": "ef8e13f7752b84e9a2293e8b158e6b8cf96268a1eaba9fc358c132b8413a1ce1",
+      "certification.py": "f1a6671380078439a3d3609337a18ca01e2f4ab33e54e715bcd2fd0e470667c7",
       "converter.py": "e782125e80ce8934c1388f24130ddfa7409a7603a4be974c2a8b708a10a42264",
-      "math_core.py": "750c9e55bbd95da1b0f7bf2d72532a56ed2ed8c7511e378afce4849c389e738b",
+      "math_core.py": "98cacf8a4f84ec4dff4bfd47c5e3658eb60800e3e00702b8abfa6d3505fd8559",
       "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
       "research/handlers/base.py": "e194798519435f33348bb8021afaa6a3ffd3ccb218b98586177830258eebda30",
       "research/handlers/worldlines.py": "96de02f6b0cca64131b37c5720cd0f93df50da4bcae8e411a318ed2839d1411a",
       "research_runner.py": "e3820498a16161e1dedcb0e46ae44fbd7ebdce2f06811da815f46230238e88b9",
-      "transcendental.py": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c",
+      "transcendental.py": "840926935542b83ba69d034db77bdd4bb8fe376e79775e2b0e9a21bcedda3aa3",
       "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
       "zero_finder.py": "d104cc709b4c28ea5ebc8aa1e5b9b1b7aa84798831f380b19effe29fd15e4887"
     },
@@ -237,7 +237,7 @@
     "code_modules": [
       {
         "path": "certification.py",
-        "sha256": "ef8e13f7752b84e9a2293e8b158e6b8cf96268a1eaba9fc358c132b8413a1ce1"
+        "sha256": "f1a6671380078439a3d3609337a18ca01e2f4ab33e54e715bcd2fd0e470667c7"
       },
       {
         "path": "converter.py",
@@ -245,7 +245,7 @@
       },
       {
         "path": "math_core.py",
-        "sha256": "750c9e55bbd95da1b0f7bf2d72532a56ed2ed8c7511e378afce4849c389e738b"
+        "sha256": "98cacf8a4f84ec4dff4bfd47c5e3658eb60800e3e00702b8abfa6d3505fd8559"
       },
       {
         "path": "reference_data.py",
@@ -265,7 +265,7 @@
       },
       {
         "path": "transcendental.py",
-        "sha256": "782ac960930362058015bdd8e5a8911a1ab6f2d6b03d14778556ce61828b1a7c"
+        "sha256": "840926935542b83ba69d034db77bdd4bb8fe376e79775e2b0e9a21bcedda3aa3"
       },
       {
         "path": "transforms.py",
@@ -297,10 +297,10 @@
   },
   "summary_provenance": {
     "summary_sha256": "f707311b66dfd83baafdf9815196c52d410b3368f03772d653494ce5bb0bdaee",
-    "readme_sha256": "52801210964392063e2522f9a5f06e230a6d2124d0576a634639030087f97b28",
+    "readme_sha256": "72f8920435e854e18af8f5d6a70a3792d05b497544cdab8a12ab2ce08cef86d1",
     "diagnostics_sha256": null,
-    "summary_git_commit": "165321dfecd562c5eea4a0b49df781d8aa6ac254",
-    "summarized_at": "2026-08-28T20:35:59.109215+00:00",
+    "summary_git_commit": "1f311797ac0cbc847f25471c08d8ad99b9f47955",
+    "summarized_at": "2026-11-04T16:21:02.149025+00:00",
     "summarizer_source_hashes": {
       "research/handlers/base.py": "e194798519435f33348bb8021afaa6a3ffd3ccb218b98586177830258eebda30",
       "research/handlers/worldlines.py": "96de02f6b0cca64131b37c5720cd0f93df50da4bcae8e411a318ed2839d1411a",
