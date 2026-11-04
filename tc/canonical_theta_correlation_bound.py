@@ -9885,9 +9885,17 @@ def verify_canonical_theta_correlation_lean_module(
     )
     has_sorry = bool(re.search(r"\bsorry\b", clean_code))
     has_admit = bool(re.search(r"\badmit\b", clean_code))
+    expected_def_count = len(CANONICAL_THETA_CORRELATION_LEAN_DEFS)
+    actual_def_count = len(actual_defs)
+    expected_theorem_count = len(CANONICAL_THETA_CORRELATION_LEAN_THEOREMS)
+    actual_theorem_count = len(actual_theorems)
+    expected_total_declarations = expected_def_count + expected_theorem_count
+    actual_total_declarations = actual_def_count + actual_theorem_count
     matches_exact = (
         actual_defs == CANONICAL_THETA_CORRELATION_LEAN_DEFS
         and actual_theorems == CANONICAL_THETA_CORRELATION_LEAN_THEOREMS
+        and expected_total_declarations == 106
+        and actual_total_declarations == 106
         and not has_sorry
         and not has_admit
     )
@@ -9897,6 +9905,12 @@ def verify_canonical_theta_correlation_lean_module(
         "contains_sorry": has_sorry,
         "contains_admit": has_admit,
         "matches_exact": matches_exact,
+        "expected_def_count": expected_def_count,
+        "actual_def_count": actual_def_count,
+        "expected_theorem_count": expected_theorem_count,
+        "actual_theorem_count": actual_theorem_count,
+        "expected_total_declarations": expected_total_declarations,
+        "actual_total_declarations": actual_total_declarations,
         "expected_defs": CANONICAL_THETA_CORRELATION_LEAN_DEFS,
         "actual_defs": actual_defs,
         "expected_theorems": CANONICAL_THETA_CORRELATION_LEAN_THEOREMS,
@@ -9974,6 +9988,19 @@ def execute_task_tc051_prime_arithmetic_resonant_band_audit(
     )
 
     return _exec_tc051(prec_bits=prec_bits)
+
+
+def execute_task_tc052_arithmetic_fourier_compatibility_audit(
+    prec_bits: int = 256,
+) -> Dict[str, Any]:
+    """Execute TASK-TC-052 / TASK-TC-052R / TASK-TC-052R2: Arithmetic-Fourier compatibility,
+    transition-region vanishing moments, linear-density annihilation, Vaughan Type I uniform bound,
+    Plancherel multiplier nu(t), proved critical-line factorization certificates, and conditional closure chain."""
+    from tc.faithful_tau_arithmetic_spectral_realization import (
+        execute_task_tc052_arithmetic_fourier_compatibility_audit as _exec_tc052,
+    )
+
+    return _exec_tc052(prec_bits=prec_bits)
 
 
 def build_canonical_theta_correlation_bound_report(
