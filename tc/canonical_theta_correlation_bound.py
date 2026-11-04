@@ -267,6 +267,9 @@ CANONICAL_THETA_CORRELATION_LEAN_DEFS = [
     "rescaledBandBoundarySum",
     "summationByPartsDecomp",
     "twoStepPrimeTowerSum",
+    "linearDensityTransitionDecomp",
+    "vaughanBandDecomp",
+    "eulerSievedCorrelationDecomp",
 ]
 
 CANONICAL_THETA_CORRELATION_LEAN_THEOREMS = [
@@ -326,6 +329,9 @@ CANONICAL_THETA_CORRELATION_LEAN_THEOREMS = [
     "prime_separation_and_canonical_band_boundary_equivalence",
     "summation_by_parts_endpoint_bound_and_smooth_mertens_reduction",
     "iterated_prime_tower_telescoping_and_coprime_band_transfer",
+    "transition_integral_linear_density_annihilation_and_sqrt_error_bound",
+    "vaughan_band_decomposition_and_type_I_uniform_bound",
+    "euler_sieved_orbit_and_complete_subgate_closure_chain",
 ]
 
 TAU_FLOAT = 2.0 * math.pi

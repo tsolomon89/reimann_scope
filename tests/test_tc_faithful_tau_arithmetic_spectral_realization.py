@@ -269,8 +269,8 @@ def test_06_lean_formalization_and_arb_roundtrip_verification(
         assert thm_name in lean_live["actual_theorems"]
 
     sec6 = tc050_artifact["section_6_certified_arb_roundtrip_verification"]
-    assert sec6["total_certified_arb_balls_checked"] == 719
-    assert sec6["compared_against_live_original_arb_count"] == 719
+    assert sec6["total_certified_arb_balls_checked"] == 798
+    assert sec6["compared_against_live_original_arb_count"] == 798
     assert sec6["live_original_count_matches_enumerated_total"] is True
     assert sec6["all_enclose_original_256bit_arb_ball"] is True
     assert sec6["failed_paths"] == []
@@ -279,7 +279,7 @@ def test_06_lean_formalization_and_arb_roundtrip_verification(
     rt_recheck = verify_all_serialized_arb_in_tree(
         tc050_artifact, path_prefix="task_tc050"
     )
-    assert rt_recheck["total_certified_arb_balls_checked"] == 719
+    assert rt_recheck["total_certified_arb_balls_checked"] == 798
     assert (
         sec6["compared_against_live_original_arb_count"]
         == rt_recheck["total_certified_arb_balls_checked"]
@@ -909,11 +909,11 @@ def test_18_tc051_sign_sequence_discrimination_and_tc050r2_reporting_repairs(
     row_tau2 = [r for r in table if r["X_label"] == "tau^2"][0]
     assert row_tau2["worst_case_to_actual_abs_ratio_certified"]["mid_float"] > 25.0
 
-    # Verify Lean module declarations (44 defs + 56 theorems = 100 declarations):
+    # Verify Lean module declarations (47 defs + 59 theorems = 106 declarations):
     lean_audit = verify_canonical_theta_correlation_lean_module()
-    assert len(lean_audit["actual_defs"]) == 44
-    assert len(lean_audit["actual_theorems"]) == 56
-    assert len(lean_audit["actual_defs"]) + len(lean_audit["actual_theorems"]) == 100
+    assert len(lean_audit["actual_defs"]) == 47
+    assert len(lean_audit["actual_theorems"]) == 59
+    assert len(lean_audit["actual_defs"]) + len(lean_audit["actual_theorems"]) == 106
     assert lean_audit["matches_exact"] is True
     assert lean_audit["contains_sorry"] is False
     assert lean_audit["contains_admit"] is False
@@ -1370,5 +1370,138 @@ def test_22_tc051r_review_markdown_and_json_artifact_consistency(
             )
 
 
+def test_23_tc052_transition_vanishing_moments_linear_density_and_vaughan_type_I(
+    tc050_artifact: dict,
+) -> None:
+    """Verify TASK-TC-052 Approach A: Mellin vanishing moments of W_log and tilde{W}_log,
+    two-endpoint asymptotic limits for J_band(X), R_{1,band}(X), and R_{|mu|,band}(X),
+    rescaled transition-integral identity, Landau's Moebius harmonic bound, and Vaughan
+    band decomposition R_{mu,band}(X) = R_I(X; U, V) + R_{II}(X; U, V)."""
+    assert tc050_artifact["subgate_closure_attempt_task_id"] == "TASK-TC-052"
+    assert (
+        tc050_artifact["tc052_starting_head"]
+        == "1f576944c040d5b3a2bf8091ca803e3758c80d12"
+    )
+    assert tc050_artifact["subgate_tc043a_status"] == "OPEN"
+    assert tc050_artifact["rh_proved"] is False
 
+    sec8 = tc050_artifact[
+        "section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization"
+    ]
+    assert sec8["task_id"] == "TASK-TC-052"
+    assert sec8["subgate_tc043a_status"] == "OPEN"
+    assert sec8["rh_proved"] is False
+
+    app_a = sec8["approach_a_signed_transition_region_cancellation"]
+    moments = app_a["mellin_vanishing_moments_audit"]
+    assert moments["symbolic_moments_verified"] is True
+    assert moments["W_log_vanishing_order_at_z_pos_half"] == 1
+    assert moments["W_log_vanishing_order_at_z_neg_half"] == 3
+    assert moments["tilde_W_log_vanishing_order_at_z_pos_half"] == 1
+    assert moments["tilde_W_log_vanishing_order_at_z_neg_half"] == 4
+    assert moments["total_vanishing_endpoint_moments_of_tilde_W_log"] == 5
+
+    lin = app_a["linear_density_annihilation_and_exact_limits"]
+    assert float(lin["J_band_uniform_bound_B_J_certified"]["upper_dec"]) < 4.768220
+    assert math.isclose(
+        lin["upper_v_tail_limit_from_H_X_certified"]["mid_float"],
+        0.01284544282,
+        abs_tol=1e-9,
+    )
+    assert math.isclose(
+        lin["lower_v_tail_limit_from_M_X_certified"]["mid_float"],
+        0.12537676308,
+        abs_tol=1e-9,
+    )
+    assert math.isclose(
+        lin["exact_limit_R_1_band_as_X_to_infty_certified"]["mid_float"],
+        0.13822220590,
+        abs_tol=1e-9,
+    )
+    assert math.isclose(
+        lin["exact_limit_R_sqfree_band_as_X_to_infty_certified"]["mid_float"],
+        0.08402902496,
+        abs_tol=1e-9,
+    )
+
+    resc = app_a["rescaled_transition_integral_verification"]
+    assert resc["all_rescaled_identities_enclose_zero"] is True
+    assert len(resc["rescaled_integral_table"]) == 8
+    for row in resc["rescaled_integral_table"]:
+        assert row["difference_encloses_zero"] is True
+
+    vaughan = app_a["vaughan_band_decomposition_and_type_I_audit"]
+    assert vaughan["landau_moebius_harmonic_bound_verified_up_to_200"] is True
+    assert vaughan["max_abs_sum_mu_d_over_d_up_to_200_exact"] == "1/1"
+    assert vaughan["all_vaughan_identities_enclose_zero"] is True
+    assert len(vaughan["vaughan_band_table"]) == 8
+    for row in vaughan["vaughan_band_table"]:
+        assert row["UV_le_sqrt_X"] is True
+        assert row["pointwise_coeff_identity_mu_eq_cI_plus_cII"] is True
+        assert row["vaughan_sum_difference_encloses_zero"] is True
+        assert row["type_I_exchange_difference_encloses_zero"] is True
+
+
+def test_24_tc052_euler_sieved_orbit_critical_line_mellin_and_closure_chain(
+    tc050_artifact: dict,
+) -> None:
+    """Verify TASK-TC-052 Approach B (operator intertwining on H_tau^pos, critical-line
+    Mellin representation of R_{mu,band}(X), and low-frequency Euler spike lower bound),
+    the complete conditional closure chain, and Lean Theorems 57-59."""
+    sec8 = tc050_artifact[
+        "section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization"
+    ]
+    app_b = sec8[
+        "approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization"
+    ]
+    inter = app_b["operator_intertwining_on_H_tau_pos"]
+    assert inter["all_sieve_orbit_identities_enclose_zero"] is True
+    assert len(inter["sieve_orbit_verification_table"]) == 4
+    for row in inter["sieve_orbit_verification_table"]:
+        assert row["P_tau_minus_P_y_plus_Delta_encloses_zero"] is True
+
+    crit = app_b["critical_line_spectral_dirichlet_factorization"]
+    assert crit["all_crit_line_identities_enclose_zero"] is True
+    assert len(crit["critical_line_verification_table"]) == 3
+    for row in crit["critical_line_verification_table"]:
+        assert row["difference_encloses_zero"] is True
+
+    spike = app_b["low_frequency_euler_spike_obstruction_on_H_tau_pos"]
+    assert math.isclose(
+        spike["mu_arch_B_at_0_certified"]["mid_float"], 2.0, abs_tol=1e-15
+    )
+    assert float(spike["mu_arch_B_at_0_certified"]["lower_dec"]) > 1.999999999999999
+    assert math.isclose(
+        spike["four_cos_tau_16_exponent_certified"]["mid_float"],
+        3.6955181300,
+        abs_tol=1e-8,
+    )
+
+    chain = sec8["complete_conditional_closure_implication_chain"]
+    assert len(chain["implication_chain_links"]) == 3
+    assert (
+        chain["combined_base_constant_lt_rational_ceiling_certified"] is True
+    )
+    assert (
+        float(
+            chain[
+                "combined_base_constant_P0_plus_B_ctrl_plus_C_log_0_certified"
+            ]["upper_dec"]
+        )
+        < 21.102829
+    )
+
+    sec5 = tc050_artifact["section_5_lean_formalization_and_remaining_obligation"]
+    assert sec5["new_lean_theorems_tc052"] == [
+        "transition_integral_linear_density_annihilation_and_sqrt_error_bound",
+        "vaughan_band_decomposition_and_type_I_uniform_bound",
+        "euler_sieved_orbit_and_complete_subgate_closure_chain",
+    ]
+    scopes = sec5["committed_lean_theorems_exact_scope"]
+    for thm_key in (
+        "theorem_57_transition_integral_linear_density_annihilation_and_sqrt_error_bound",
+        "theorem_58_vaughan_band_decomposition_and_type_I_uniform_bound",
+        "theorem_59_euler_sieved_orbit_and_complete_subgate_closure_chain",
+    ):
+        assert thm_key in scopes
 
