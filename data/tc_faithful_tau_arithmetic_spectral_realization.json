@@ -6146,7 +6146,9 @@
         "external_analytic_scope_note": "Theorem 56 proves the two-step prime-power tower telescoping identity and geometric contraction bound (1 - q) |S_0| <= M_R + q B_rescaled when the sub-unit base term S_2 = 0; induction over arbitrary finite depth J_p(X) = floor(log_p X) is proved analytically in \u00a78.1."
       },
       "theorem_57_transition_integral_linear_density_annihilation_and_sqrt_error_bound": {
-        "declaration_name": "RiemannScope.CanonicalThetaCorrelationBound.transition_integral_linear_density_annihilation_and_sqrt_error_bound",
+        "declaration_name": "RiemannScope.transition_integral_linear_density_annihilation_and_sqrt_error_bound",
+        "print_axioms_command": "lake env lean --stdin  (input: import RiemannScope.CanonicalThetaCorrelationBound\\n#print axioms RiemannScope.transition_integral_linear_density_annihilation_and_sqrt_error_bound)",
+        "print_axioms_output": "'RiemannScope.transition_integral_linear_density_annihilation_and_sqrt_error_bound' depends on axioms: [propext, Classical.choice, Quot.sound]",
         "standard_lean_axioms_used": [
           "propext",
           "Classical.choice",
@@ -6165,7 +6167,9 @@
         "external_analytic_scope_note": "Conditional/algebraic real-inequality lemma: Theorem 57 proves the algebraic cancellation of the linear boundary terms \u00b1 c_a * B_lin_M, the uniform bound |J_band| <= (1/3) C_log_EM + (1/2) C_log_0 from the assumed tail identity J_band = -T_low - T_high, and the uniform O(1) bounds on I_a and R_a from explicit hypotheses; the Mellin vanishing moment int_0^infty v^{-3/2} W_log(v) dv = 0, the nonzero asymptotic limit lim_{X->infty} J_band(X) = L = 0.1382222059... > 0, and the scale-invariant square-root integral estimate are proved analytically outside Lean."
       },
       "theorem_58_vaughan_band_decomposition_and_type_I_uniform_bound": {
-        "declaration_name": "RiemannScope.CanonicalThetaCorrelationBound.vaughan_band_decomposition_and_type_I_uniform_bound",
+        "declaration_name": "RiemannScope.vaughan_band_decomposition_and_type_I_uniform_bound",
+        "print_axioms_command": "lake env lean --stdin  (input: import RiemannScope.CanonicalThetaCorrelationBound\\n#print axioms RiemannScope.vaughan_band_decomposition_and_type_I_uniform_bound)",
+        "print_axioms_output": "'RiemannScope.vaughan_band_decomposition_and_type_I_uniform_bound' depends on axioms: [propext, Classical.choice, Quot.sound]",
         "standard_lean_axioms_used": [
           "propext",
           "Classical.choice",
@@ -6184,7 +6188,9 @@
         "external_analytic_scope_note": "Conditional/algebraic real-inequality lemma: Theorem 58 proves the contraction of the Landau factors |S_mu_U * S_mu_V| <= 1, the uniform Type I bound |R_I| <= B_J + C_EM_1 for rho_UV = U V / sqrt(X) <= 1, the two-way boundedness equivalence between R_band and R_II, the U = V = 1, m = 4 sign-cancellation check, and the progression bounded-variation transfer (2 F_sup + F_var) U_V <= C_EM_1 (U_V inv_sqrt_X); Vaughan's combinatorial divisor identity mu = c_I + c_II for m > max(U, V), Landau's inequality |sum_{d <= x} mu(d)/d| <= 1, and the derivative BV bound ||F_X||_infty + Var(F_X) <= C_BV X^{-1/2} are proved analytically and certified in Python Arb outside Lean."
       },
       "theorem_59_euler_sieved_orbit_and_complete_subgate_closure_chain": {
-        "declaration_name": "RiemannScope.CanonicalThetaCorrelationBound.euler_sieved_orbit_and_complete_subgate_closure_chain",
+        "declaration_name": "RiemannScope.euler_sieved_orbit_and_complete_subgate_closure_chain",
+        "print_axioms_command": "lake env lean --stdin  (input: import RiemannScope.CanonicalThetaCorrelationBound\\n#print axioms RiemannScope.euler_sieved_orbit_and_complete_subgate_closure_chain)",
+        "print_axioms_output": "'RiemannScope.euler_sieved_orbit_and_complete_subgate_closure_chain' depends on axioms: [propext, Classical.choice, Quot.sound]",
         "standard_lean_axioms_used": [
           "propext",
           "Classical.choice",
@@ -8367,8 +8373,11 @@
           "C0_tilde_psi_exact_rational": "8340237/3584",
           "C1_tilde_psi_exact_rational": "95924679/4096",
           "C2_tilde_psi_exact_rational": "132825555/512",
+          "tilde_A1_formula": "(C0_tilde_psi + 2 * C1_tilde_psi) / 18 + (17 * C2_tilde_psi) / 192",
+          "tilde_A2_formula": "C2_tilde_psi / 18",
           "tilde_A1_exact_rational": "17685797581/688128",
           "tilde_A2_exact_rational": "14758395/1024",
+          "pointwise_tilde_W_log_large_v_estimate": "|tilde{W}_log(v)| <= (7/36) tilde{C}_0 v^{-5/2} + (tilde{A}_1 + tilde{A}_2 log v) v^{-3/2}   (v >= 1)",
           "var_f_small_v_0_to_1_bound_certified": {
             "mid_float": 1.0409706660234206,
             "rad_float_outward": 7.663939256123815e-17,
@@ -9073,7 +9082,7 @@
         "nu_B_component_formula": "nu_B(t) := int_1^infty (x^{-3/2} / (x - x^{-1})) 2 (1 - cos(t log x)) dx/x = Re psi(5/4 + i t / 2) - psi(5/4) = sum_{n=0}^infty (t^2 / 4) / ((n + 5/4)((n + 5/4)^2 + t^2 / 4)) >= 0",
         "nu_R0_component_formula": "nu_{R0}(t) := 4 |i t / (1/2 + i t)|^2 = 4 t^2 / (t^2 + 1/4) >= 0",
         "operator_domain_statement": "D(J_tau) := {f in L^2(R_{>0}, dy/y) : int_{-infty}^infty nu(t) |hat{f}(i t)|^2 dt < infty}. For f in D(J_tau) (and f in C^1(R_{>0}) with D f in L^2(dy/y) and lim_{y->0^+} y^{1/2} f(y) = 0 for the spatial derivative form of R_0 f), Mellin-Plancherel gives ||J_tau f||_{H_tau^pos}^2 = ||A_tau^B f||_{H_tau^B}^2 + 4 ||R_0 f||_{L^2(dy/y)}^2 = (1 / tau) int_{-infty}^infty nu(t) |hat{f}(i t)|^2 dt. Because nu(0) = 0 with nu(t) = (16 - psi''(5/4)/8) t^2 + O(t^4) as t -> 0, (D(J_tau), ||J_tau .||_{H_tau^pos}) is an inner-product space that is NOT complete (for example, hat{f}_n(t) = t^{-1} 1_{[1/n, 1]}(t) defines f_n in D(J_tau) subset L^2(R_{>0}, dy/y) that is Cauchy in the nu(t)-weighted norm since int_0^1 t^{-2} nu(t) dt < infty, whereas its weighted limit t^{-1} 1_{(0, 1]}(t) is not in L^2(R, dt)), and J_tau : D(J_tau) -> H_tau^pos is an isometric embedding of this inner-product space into the ambient Hilbert space H_tau^pos.",
-        "plancherel_component_tail_domination_note": "On |t| >= 48, nu_B(t) = sum_{n=0}^infty (t^2 / 4) / ((n + 5/4)((n + 5/4)^2 + t^2 / 4)) <= (zeta(3, 5/4) / 4) t^2 <= 4 (t^2 + 1/4) (since zeta(3, 5/4) / 4 ~ 0.14624 < 4) and nu_{R0}(t) = 4 t^2 / (t^2 + 1/4) <= 4 <= 4 (t^2 + 1/4), so both (1/tau) nu_B(t) H_0(it) and (1/tau) nu_{R0}(t) H_0(it) are bounded on |t| >= 48 by (4 (t^2 + 1/4) / tau) H_0(it) <= (Gamma(1/4)^2 / (128 sqrt(pi) tau)) (t^2 + 1/4)^5 e^{-pi |t| / 2}, whose two-sided integral on |t| >= 48 is bounded by 2 B_{Omega,1}^{tail}(48).",
+        "plancherel_component_tail_domination_note": "On |t| >= 48, nu_B(t) = sum_{n=0}^infty (t^2 / 4) / ((n + 5/4)((n + 5/4)^2 + t^2 / 4)) <= (zeta(3, 5/4) / 4) t^2 <= 4 (t^2 + 1/4) (since zeta(3, 5/4) / 4 = -psi''(5/4) / 8 ~ 0.1659674922 < 4) and nu_{R0}(t) = 4 t^2 / (t^2 + 1/4) <= 4 <= 4 (t^2 + 1/4), so both (1/tau) nu_B(t) H_0(it) and (1/tau) nu_{R0}(t) H_0(it) are bounded on |t| >= 48 by (4 (t^2 + 1/4) / tau) H_0(it) <= (Gamma(1/4)^2 / (128 sqrt(pi) tau)) (t^2 + 1/4)^5 e^{-pi |t| / 2}, whose two-sided integral on |t| >= 48 is bounded by 2 B_{Omega,1}^{tail}(48).",
         "nu_at_0_equals_zero": true,
         "nu_nonnegative_and_quadratic_lower_bound": "nu(t) = nu_B(t) + 4 t^2 / (t^2 + 1/4) >= 4 t^2 / (t^2 + 1/4) >= 0 for all t in R",
         "taylor_expansion_at_0_formula": "nu(t) = (16 - psi''(5/4) / 8) t^2 + O(t^4)   (t -> 0)",

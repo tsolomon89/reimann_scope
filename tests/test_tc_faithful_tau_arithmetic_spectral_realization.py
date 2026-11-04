@@ -2152,9 +2152,32 @@ def test_26_tc052r2_displayed_review_certificates_contain_full_generated_enclosu
     finally:
         flint_ctx.prec = saved_prec
 
-    # 3. Verify reconciled Type I constants, Lebesgue dv measure, |mu(d)*mu(r)| <= 1, and admissibility:
-    assert bv_proof["tilde_A1_exact_rational"] == "17685797581/688128"
-    assert bv_proof["tilde_A2_exact_rational"] == "14758395/1024"
+    # 3. Verify reconciled Type I constants (exact rational Fraction arithmetic), Lebesgue dv measure,
+    # |mu(d)*mu(r)| <= 1, and admissibility:
+    from fractions import Fraction
+
+    c0_frac = Fraction(bv_proof["C0_tilde_psi_exact_rational"])
+    c1_frac = Fraction(bv_proof["C1_tilde_psi_exact_rational"])
+    c2_frac = Fraction(bv_proof["C2_tilde_psi_exact_rational"])
+    a1_frac = Fraction(bv_proof["tilde_A1_exact_rational"])
+    a2_frac = Fraction(bv_proof["tilde_A2_exact_rational"])
+    assert c0_frac == Fraction(8340237, 3584)
+    assert c1_frac == Fraction(95924679, 4096)
+    assert c2_frac == Fraction(132825555, 512)
+    assert (c0_frac + 2 * c1_frac) / 18 + (17 * c2_frac) / 192 == a1_frac == Fraction(17685797581, 688128)
+    assert c2_frac / 18 == a2_frac == Fraction(14758395, 1024)
+    assert bv_proof["tilde_A1_formula"] == "(C0_tilde_psi + 2 * C1_tilde_psi) / 18 + (17 * C2_tilde_psi) / 192"
+    assert bv_proof["tilde_A2_formula"] == "C2_tilde_psi / 18"
+    assert "\\frac{8340237}{3584}" in rev_text
+    assert "\\frac{95924679}{4096}" in rev_text
+    assert "\\frac{132825555}{512}" in rev_text
+    assert "\\frac{C_0^{\\tilde{\\psi}} + 2 C_1^{\\tilde{\\psi}}}{18} + \\frac{17 C_2^{\\tilde{\\psi}}}{192} = \\frac{17685797581}{688128}" in rev_text
+    assert "\\frac{C_2^{\\tilde{\\psi}}}{18} = \\frac{132825555}{9216} = \\frac{14758395}{1024}" in rev_text
+    assert "\\frac{7}{36}\\widetilde{C}_0\\,v^{-5/2} + \\bigl(\\widetilde{A}_1 + \\widetilde{A}_2\\log v\\bigr)\\,v^{-3/2}" in rev_text
+    assert "\\zeta'(s) = -\\frac{1}{(s-1)^2} + \\int_1^\\infty \\left(\\{x\\} - \\frac{1}{2}\\right)(s\\log x - 1)x^{-s-1}\\,dx" in rev_text
+    assert "\\frac{\\zeta(3, 5/4)}{4}\\,t^2 \\le 4(t^2 + 1/4)" in rev_text
+    assert "0.1659674922 < 4" in rev_text
+    assert "0.1659674922 < 4" in planch["plancherel_component_tail_domination_note"]
     assert "\\operatorname{Var}_{(0,\\infty)}(F_X)" in rev_text
     assert "|\\mu(d)\\mu(r)| \\le 1" in rev_text
     assert (
@@ -2174,20 +2197,39 @@ def test_26_tc052r2_displayed_review_certificates_contain_full_generated_enclosu
     assert "**inner-product space that is not complete**" in rev_text
     assert "isometric embedding of this inner-product space" in rev_text
 
-    # 5. Verify Lean declaration sum 47 + 59 = 106 and Theorems 57-59 #print axioms & hypotheses:
+    # 5. Verify Lean declaration sum 47 + 59 = 106 and Theorems 57-59 exact declaration names,
+    # reproduced parameter/hypothesis signatures, and #print axioms command & verbatim output:
     sec5 = tc050_artifact["section_5_lean_formalization_and_remaining_obligation"]
     lean_ver = sec5["lean_module_verification"]
     assert len(lean_ver["actual_defs"]) == 47
     assert len(lean_ver["actual_theorems"]) == 59
     assert lean_ver["actual_total_declarations"] == 106
-    for thm_key in (
-        "theorem_57_transition_integral_linear_density_annihilation_and_sqrt_error_bound",
-        "theorem_58_vaughan_band_decomposition_and_type_I_uniform_bound",
-        "theorem_59_euler_sieved_orbit_and_complete_subgate_closure_chain",
-    ):
+    expected_thm_decls = {
+        "theorem_57_transition_integral_linear_density_annihilation_and_sqrt_error_bound": (
+            "RiemannScope.transition_integral_linear_density_annihilation_and_sqrt_error_bound"
+        ),
+        "theorem_58_vaughan_band_decomposition_and_type_I_uniform_bound": (
+            "RiemannScope.vaughan_band_decomposition_and_type_I_uniform_bound"
+        ),
+        "theorem_59_euler_sieved_orbit_and_complete_subgate_closure_chain": (
+            "RiemannScope.euler_sieved_orbit_and_complete_subgate_closure_chain"
+        ),
+    }
+    for thm_key, expected_decl in expected_thm_decls.items():
         t_info = sec5["committed_lean_theorems_exact_scope"][thm_key]
-        assert "declaration_name" in t_info
-        assert "parameters_and_hypotheses" in t_info
+        assert t_info["declaration_name"] == expected_decl
+        assert f"#print axioms {expected_decl}" in t_info["print_axioms_command"]
+        assert (
+            t_info["print_axioms_output"]
+            == f"'{expected_decl}' depends on axioms: [propext, Classical.choice, Quot.sound]"
+        )
+        assert expected_decl in rev_text
+        assert t_info["print_axioms_output"] in rev_text
+        params_part, hyps_part = t_info["parameters_and_hypotheses"].split(" : ℝ) ", 1)
+        assert (
+            f"parameters `{params_part} : ℝ)` with mathematical hypotheses `{hyps_part}`"
+            in rev_text
+        )
         assert t_info["standard_lean_axioms_used"] == [
             "propext",
             "Classical.choice",
@@ -2237,6 +2279,13 @@ def test_26_tc052r2_displayed_review_certificates_contain_full_generated_enclosu
             "47 `def` + 59 `theorem` = 103",
             "47 def + 59 theorem = 103",
             "`103` (`47` definitions + `59`",
+            "RiemannScope.CanonicalThetaCorrelationBound.",
+            "0.14624",
+            "\\log|5/4 + it/2| + 1 \\le 4",
+            "vaughanTypeIBandApprox",
+            "118067160/512",
+            "118067160}{512}",
+            "\\frac{C_0^{\\tilde{\\psi}}}{2} + \\frac{C_1^{\\tilde{\\psi}}}{2}",
         ):
             assert forbidden not in content, (
                 f"Found stale pre-TC-052R2 string {forbidden!r} in {rel_path}"

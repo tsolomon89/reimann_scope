@@ -4522,8 +4522,13 @@ def verify_transition_region_vanishing_moments_and_vaughan_type_I_bound_arb(
                     "C0_tilde_psi_exact_rational": f"{C0_tilde_psi_frac.numerator}/{C0_tilde_psi_frac.denominator}",
                     "C1_tilde_psi_exact_rational": f"{C1_tilde_psi_frac.numerator}/{C1_tilde_psi_frac.denominator}",
                     "C2_tilde_psi_exact_rational": f"{C2_tilde_psi_frac.numerator}/{C2_tilde_psi_frac.denominator}",
+                    "tilde_A1_formula": "(C0_tilde_psi + 2 * C1_tilde_psi) / 18 + (17 * C2_tilde_psi) / 192",
+                    "tilde_A2_formula": "C2_tilde_psi / 18",
                     "tilde_A1_exact_rational": f"{tilde_A1_frac.numerator}/{tilde_A1_frac.denominator}",
                     "tilde_A2_exact_rational": f"{tilde_A2_frac.numerator}/{tilde_A2_frac.denominator}",
+                    "pointwise_tilde_W_log_large_v_estimate": (
+                        "|tilde{W}_log(v)| <= (7/36) tilde{C}_0 v^{-5/2} + (tilde{A}_1 + tilde{A}_2 log v) v^{-3/2}   (v >= 1)"
+                    ),
                     "var_f_small_v_0_to_1_bound_certified": serialize_arb_certified(
                         var_f_small_v_0_to_1_arb
                     ),
@@ -5124,7 +5129,7 @@ def verify_hilbert_space_euler_intertwining_and_critical_line_factorization_arb(
                 ),
                 "plancherel_component_tail_domination_note": (
                     "On |t| >= 48, nu_B(t) = sum_{n=0}^infty (t^2 / 4) / ((n + 5/4)((n + 5/4)^2 + t^2 / 4)) "
-                    "<= (zeta(3, 5/4) / 4) t^2 <= 4 (t^2 + 1/4) (since zeta(3, 5/4) / 4 ~ 0.14624 < 4) and "
+                    "<= (zeta(3, 5/4) / 4) t^2 <= 4 (t^2 + 1/4) (since zeta(3, 5/4) / 4 = -psi''(5/4) / 8 ~ 0.1659674922 < 4) and "
                     "nu_{R0}(t) = 4 t^2 / (t^2 + 1/4) <= 4 <= 4 (t^2 + 1/4), so both (1/tau) nu_B(t) H_0(it) "
                     "and (1/tau) nu_{R0}(t) H_0(it) are bounded on |t| >= 48 by (4 (t^2 + 1/4) / tau) H_0(it) "
                     "<= (Gamma(1/4)^2 / (128 sqrt(pi) tau)) (t^2 + 1/4)^5 e^{-pi |t| / 2}, whose two-sided integral "
@@ -5620,7 +5625,15 @@ def execute_task_tc050_faithful_spectral_realization_audit(
                     ),
                 },
                 "theorem_57_transition_integral_linear_density_annihilation_and_sqrt_error_bound": {
-                    "declaration_name": "RiemannScope.CanonicalThetaCorrelationBound.transition_integral_linear_density_annihilation_and_sqrt_error_bound",
+                    "declaration_name": "RiemannScope.transition_integral_linear_density_annihilation_and_sqrt_error_bound",
+                    "print_axioms_command": (
+                        "lake env lean --stdin  (input: import RiemannScope.CanonicalThetaCorrelationBound\\n"
+                        "#print axioms RiemannScope.transition_integral_linear_density_annihilation_and_sqrt_error_bound)"
+                    ),
+                    "print_axioms_output": (
+                        "'RiemannScope.transition_integral_linear_density_annihilation_and_sqrt_error_bound' "
+                        "depends on axioms: [propext, Classical.choice, Quot.sound]"
+                    ),
                     "standard_lean_axioms_used": ["propext", "Classical.choice", "Quot.sound"],
                     "custom_lean_axioms_used": [],
                     "parameters_and_hypotheses": (
@@ -5652,7 +5665,15 @@ def execute_task_tc050_faithful_spectral_realization_audit(
                     ),
                 },
                 "theorem_58_vaughan_band_decomposition_and_type_I_uniform_bound": {
-                    "declaration_name": "RiemannScope.CanonicalThetaCorrelationBound.vaughan_band_decomposition_and_type_I_uniform_bound",
+                    "declaration_name": "RiemannScope.vaughan_band_decomposition_and_type_I_uniform_bound",
+                    "print_axioms_command": (
+                        "lake env lean --stdin  (input: import RiemannScope.CanonicalThetaCorrelationBound\\n"
+                        "#print axioms RiemannScope.vaughan_band_decomposition_and_type_I_uniform_bound)"
+                    ),
+                    "print_axioms_output": (
+                        "'RiemannScope.vaughan_band_decomposition_and_type_I_uniform_bound' "
+                        "depends on axioms: [propext, Classical.choice, Quot.sound]"
+                    ),
                     "standard_lean_axioms_used": ["propext", "Classical.choice", "Quot.sound"],
                     "custom_lean_axioms_used": [],
                     "parameters_and_hypotheses": (
@@ -5683,7 +5704,15 @@ def execute_task_tc050_faithful_spectral_realization_audit(
                     ),
                 },
                 "theorem_59_euler_sieved_orbit_and_complete_subgate_closure_chain": {
-                    "declaration_name": "RiemannScope.CanonicalThetaCorrelationBound.euler_sieved_orbit_and_complete_subgate_closure_chain",
+                    "declaration_name": "RiemannScope.euler_sieved_orbit_and_complete_subgate_closure_chain",
+                    "print_axioms_command": (
+                        "lake env lean --stdin  (input: import RiemannScope.CanonicalThetaCorrelationBound\\n"
+                        "#print axioms RiemannScope.euler_sieved_orbit_and_complete_subgate_closure_chain)"
+                    ),
+                    "print_axioms_output": (
+                        "'RiemannScope.euler_sieved_orbit_and_complete_subgate_closure_chain' "
+                        "depends on axioms: [propext, Classical.choice, Quot.sound]"
+                    ),
                     "standard_lean_axioms_used": ["propext", "Classical.choice", "Quot.sound"],
                     "custom_lean_axioms_used": [],
                     "parameters_and_hypotheses": (
