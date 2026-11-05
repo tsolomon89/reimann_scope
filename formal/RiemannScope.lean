@@ -7,6 +7,7 @@ import RiemannScope.Basic
 import RiemannScope.Grade
 import RiemannScope.TranscendentalContinuation
 import RiemannScope.ZeroWorldline
+import RiemannScope.TrivialZero
 import RiemannScope.RadialLeaf
 import RiemannScope.ZeroCharacter
 import RiemannScope.SymmetricDefect

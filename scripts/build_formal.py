@@ -34,6 +34,7 @@ FORMAL_SOURCE_FILES = [
     "formal/RiemannScope/RadialDefect.lean",
     "formal/RiemannScope/TranscendentalContinuation.lean",
     "formal/RiemannScope/ZeroWorldline.lean",
+    "formal/RiemannScope/TrivialZero.lean",
     "formal/RiemannScope/RadialLeaf.lean",
     "formal/RiemannScope/ZeroCharacter.lean",
     "formal/RiemannScope/SymmetricDefect.lean",

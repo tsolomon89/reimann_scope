@@ -374,6 +374,7 @@ from tc.canonical_theta_correlation_bound import (
     execute_task_tc042f_arithmetic_fourier_factorization,
     verify_canonical_theta_correlation_lean_module,
     write_canonical_theta_correlation_bound_artifact,
+    execute_task_tc053_trivial_zero_slopes_and_coprime_cancellation_audit,
 )
 
 __all__ = [
@@ -690,4 +691,5 @@ __all__ = [
     "execute_task_tc042f_arithmetic_fourier_factorization",
     "verify_canonical_theta_correlation_lean_module",
     "write_canonical_theta_correlation_bound_artifact",
+    "execute_task_tc053_trivial_zero_slopes_and_coprime_cancellation_audit",
 ]

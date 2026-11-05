@@ -3,7 +3,7 @@
   "certificate_type": "worldline_certificate",
   "status": "worldline_certified",
   "claim_type": "synthetic_radial_leaf",
-  "source_zero_hash": "d7818fd00c6eb0d7af5a0b20e439576058b78ff8030b0d436d72ef86945334fb",
+  "source_zero_hash": "5bcae2dcf908a26d1e992650e22bbe854128f2814417deb4d42616f5f7298fbd",
   "source_zero_family": "nontrivial",
   "source_zero_index": 1,
   "zero_family": "nontrivial",
@@ -24,18 +24,19 @@
   "defect_residual": "1.250142465868050511811248755818425606036946632222743433064483892475613964033008696434946486854933288e-101",
   "mathematical_claim": "Synthetic radial leaf s(0) = tau^0 * (rho_1 + +0.10) occupies invariant radial leaf R_tau = +0.10",
   "formal_theorem_reference": "RiemannScope.RadialLeaf.radialLeaf_worldline_invariance",
+  "transported_zero_theorem_reference": "RiemannScope.ZeroWorldline.zeroWorldline_is_zero",
   "precision_dps": 80,
   "library": "python-flint",
   "library_version": "0.6.0",
   "verifier_version": "2.0.0",
   "algorithm_version": "2.0.0",
-  "producing_git_commit": "7dc75e83f6b48e6ef436f55b573910e93d0f4f48",
+  "producing_git_commit": "0187b44ec346d3ce2ed127556c3418e3bb1056b5",
   "source_code_hashes": {
-    "certification.py": "f1a6671380078439a3d3609337a18ca01e2f4ab33e54e715bcd2fd0e470667c7",
+    "certification.py": "7eea76d76d423ad332a0ca8ac33eebc254570f217f13d9718740a6db71cee3d7",
     "transforms.py": "d81b192c669cee43ddae5a5a46056c466faf10799a28ac9afa8ddd1041b123a7",
     "reference_data.py": "4c1da7635fe3af6ec4bff081f9a1fea3e9bd6125e9f10209732080c4536a45d5",
     "math_core.py": "98cacf8a4f84ec4dff4bfd47c5e3658eb60800e3e00702b8abfa6d3505fd8559",
-    "transcendental.py": "840926935542b83ba69d034db77bdd4bb8fe376e79775e2b0e9a21bcedda3aa3",
+    "transcendental.py": "2b5b8a2b90965e77534a0961d0120690a5eb1b6acf1a50cd4a7f9040b967e85c",
     "converter.py": "e782125e80ce8934c1388f24130ddfa7409a7603a4be974c2a8b708a10a42264",
     "research_runner.py": "e3820498a16161e1dedcb0e46ae44fbd7ebdce2f06811da815f46230238e88b9",
     "zero_finder.py": "d104cc709b4c28ea5ebc8aa1e5b9b1b7aa84798831f380b19effe29fd15e4887"
@@ -56,11 +57,11 @@
     "verifier_version": "2.0.0",
     "algorithm_version": "2.0.0"
   },
-  "created_at": "2026-11-04T15:00:04.734159+00:00",
+  "created_at": "2026-11-05T13:46:19.200562+00:00",
   "invalidation_conditions": [
     "source_zero_hash_mismatch",
     "radial_residual_tolerance_exceeded",
     "formal_theorem_missing"
   ],
-  "certificate_hash": "e6f8c7a62f37070081427bea2ff1b97706be29533c606eb2d45e2f2c752ad411"
+  "certificate_hash": "20f94bf0f2fed4da5491b10fb8fbd05a62e5dab3936d6fbe8f43da8f81bd8e45"
 }

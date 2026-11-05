@@ -110,6 +110,7 @@ REQUIRED_FORMAL_SOURCES = [
     "formal/RiemannScope/RadialDefect.lean",
     "formal/RiemannScope/TranscendentalContinuation.lean",
     "formal/RiemannScope/ZeroWorldline.lean",
+    "formal/RiemannScope/TrivialZero.lean",
     "formal/RiemannScope/RadialLeaf.lean",
     "formal/RiemannScope/ZeroCharacter.lean",
     "formal/RiemannScope/SymmetricDefect.lean",
@@ -1007,6 +1008,7 @@ def certify_trivial_zero(m: int, dps: int = 80, git_commit: Optional[str] = None
                 "zeta_at_odd_negative_nonzero": neg_ctrl_odd_pass,
             },
             "formal_theorem_reference": "RiemannScope.TrivialZero.trivialZero_exact",
+            "transported_worldline_theorem_reference": "RiemannScope.TrivialZero.trivialZero_worldline_exact",
             "precision_dps": dps,
             "precision_bits": int(dps * 3.321928),
             "library": "python-flint",
@@ -1257,6 +1259,11 @@ def certify_worldline(
             "defect_residual": def_res_m,
             "mathematical_claim": math_claim,
             "formal_theorem_reference": "RiemannScope.RadialLeaf.radialLeaf_worldline_invariance",
+            "transported_zero_theorem_reference": (
+                "RiemannScope.TrivialZero.trivialZero_worldline_exact"
+                if is_trivial
+                else "RiemannScope.ZeroWorldline.zeroWorldline_is_zero"
+            ),
             "precision_dps": dps,
             "library": "python-flint",
             "library_version": FLINT_VERSION,
@@ -1517,6 +1524,23 @@ def _verify_trivial_zero_enclosure(cert: Dict[str, Any], anomalies: List[str]) -
     if z_odd.real.contains(zero_arb):
         anomalies.append(f"Negative control failed: zeta({s_exact + 1}) contains zero")
 
+    # Check formal theorem reference existence in Lean source
+    thm_ref = cert.get("formal_theorem_reference", "")
+    if thm_ref != "RiemannScope.TrivialZero.trivialZero_exact":
+        anomalies.append(f"Unexpected formal theorem reference: {thm_ref}")
+    tw_ref = cert.get("transported_worldline_theorem_reference")
+    if tw_ref is not None and tw_ref != "RiemannScope.TrivialZero.trivialZero_worldline_exact":
+        anomalies.append(f"Unexpected transported worldline theorem reference: {tw_ref}")
+    if thm_ref:
+        lean_file = os.path.join(REPO_ROOT, "formal", "RiemannScope", "TrivialZero.lean")
+        if os.path.exists(lean_file):
+            with open(lean_file, "r", encoding="utf-8") as lf:
+                lean_src = lf.read()
+                if "trivialZero_exact" not in lean_src or "trivialZero_worldline_exact" not in lean_src:
+                    anomalies.append(f"Referenced formal Lean theorem '{thm_ref}' not found in {lean_file}")
+        else:
+            anomalies.append(f"Lean source file {lean_file} not found")
+
     return (len(anomalies) == 0), anomalies
 
 
@@ -1761,6 +1785,18 @@ def _verify_worldline_continuation(
                     anomalies.append(f"Referenced formal Lean theorem '{thm_ref}' not found in {lean_file}")
         else:
             anomalies.append(f"Lean source file {lean_file} not found")
+
+    if is_trivial_src:
+        tz_ref = cert.get("transported_zero_theorem_reference")
+        if tz_ref is not None and tz_ref != "RiemannScope.TrivialZero.trivialZero_worldline_exact":
+            anomalies.append(f"Unexpected transported zero theorem reference: {tz_ref}")
+        triv_lean_file = os.path.join(REPO_ROOT, "formal", "RiemannScope", "TrivialZero.lean")
+        if os.path.exists(triv_lean_file):
+            with open(triv_lean_file, "r", encoding="utf-8") as tlf:
+                if "trivialZero_worldline_exact" not in tlf.read():
+                    anomalies.append(f"Referenced transported trivial-zero Lean theorem 'trivialZero_worldline_exact' not found in {triv_lean_file}")
+        else:
+            anomalies.append(f"Lean source file {triv_lean_file} not found")
 
     return (len(anomalies) == 0), anomalies
 

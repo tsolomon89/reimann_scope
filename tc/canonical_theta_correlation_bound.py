@@ -10003,6 +10003,18 @@ def execute_task_tc052_arithmetic_fourier_compatibility_audit(
     return _exec_tc052(prec_bits=prec_bits)
 
 
+def execute_task_tc053_trivial_zero_slopes_and_coprime_cancellation_audit(
+    prec_bits: int = 256,
+) -> Dict[str, Any]:
+    """Execute TASK-TC-053: Trivial-zero slopes, generalized Baez-Duarte connection,
+    common-factor expansion of Q(X)^2, and signed coprime block S(A) analysis."""
+    from tc.faithful_tau_arithmetic_spectral_realization import (
+        execute_task_tc053_trivial_zero_slopes_and_coprime_cancellation_audit as _exec_tc053,
+    )
+
+    return _exec_tc053(prec_bits=prec_bits)
+
+
 def build_canonical_theta_correlation_bound_report(
     n_primes_max: int = 25000, prec_bits: int = 256
 ) -> Dict[str, Any]:

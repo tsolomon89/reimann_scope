@@ -1293,4 +1293,39 @@ def test_adversarial_radial_witness_tampered_bounds_rejected():
     assert any("mismatch" in a.lower() or "not strictly negative" in a.lower() for a in anomalies)
 
 
+def test_trivial_zero_and_worldline_lean_theorem_reference_and_verification():
+    """Verify TASK-TC-053 TrivialZero.lean theorem references and transported worldline verification."""
+    if not certification.FLINT_AVAILABLE:
+        pytest.skip("FLINT/python-flint not available")
+
+    assert "formal/RiemannScope/TrivialZero.lean" in certification.REQUIRED_FORMAL_SOURCES
+
+    tz_cert = certification.certify_trivial_zero(1, dps=50)
+    assert tz_cert["formal_theorem_reference"] == "RiemannScope.TrivialZero.trivialZero_exact"
+    assert (
+        tz_cert["transported_worldline_theorem_reference"]
+        == "RiemannScope.TrivialZero.trivialZero_worldline_exact"
+    )
+    ok_tz, msgs_tz = certification.verify_certificate(tz_cert, check_provenance=False)
+    assert ok_tz, f"Trivial zero certificate verification failed: {msgs_tz}"
+
+    cert_store = {tz_cert["certificate_hash"]: tz_cert}
+    wl_tz = certification.certify_worldline(tz_cert, grade=1, delta="0.0", dps=50)
+    assert wl_tz["claim_type"] == "trivial_zero_worldline"
+    assert (
+        wl_tz["transported_zero_theorem_reference"]
+        == "RiemannScope.TrivialZero.trivialZero_worldline_exact"
+    )
+    ok_wl, msgs_wl = certification.verify_certificate(wl_tz, cert_store=cert_store, check_provenance=False)
+    assert ok_wl, f"Trivial zero worldline certificate verification failed: {msgs_wl}"
+
+    tampered = dict(tz_cert)
+    tampered["transported_worldline_theorem_reference"] = "RiemannScope.TrivialZero.nonexistent_theorem"
+    tampered["certificate_hash"] = certification._sha256_canonical(tampered)
+    ok_bad, msgs_bad = certification.verify_certificate(tampered, check_provenance=False)
+    assert not ok_bad
+    assert any("Unexpected transported worldline theorem reference" in m for m in msgs_bad)
+
+
+
 
