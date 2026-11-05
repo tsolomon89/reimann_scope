@@ -991,6 +991,7 @@ from tc.canonical_theta_correlation_bound import (
     STARTING_HEAD_TC_046,
     PRIME_EULER_MOEBIUS_RECOVERY_STATUS,
     execute_task_tc046_prime_euler_moebius_recovery,
+    execute_task_tc053_trivial_zero_slopes_and_coprime_cancellation_audit,
 )
 
 from tc.prime_euler_moebius_recovery import (
@@ -1897,5 +1898,6 @@ __all__ = [
     "compute_coupled_cutoff_comparison_bound_arb",
     "verify_symbolic_finite_prime_identities",
     "execute_task_tc046_prime_euler_moebius_recovery",
+    "execute_task_tc053_trivial_zero_slopes_and_coprime_cancellation_audit",
 ]
 

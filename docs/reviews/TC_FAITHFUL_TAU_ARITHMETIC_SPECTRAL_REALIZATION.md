@@ -1,15 +1,15 @@
-# Faithful $\tau$-Arithmetic Spectral Realization, Adjoint Compatibility, Canonical Hilbert–Schmidt Orbit Decomposition, Resonant-Band Prime-Separation / Summation-by-Parts Analysis, and Transition-Region / Vaughan Type I / Spectral–Dirichlet Compatibility (`TASK-TC-050` / `TASK-TC-050R` / `TASK-TC-050R2` / `TASK-TC-051` / `TASK-TC-051R` / `TASK-TC-052` / `TASK-TC-052R` / `TASK-TC-052R2`)
+# Faithful $\tau$-Arithmetic Spectral Realization, Adjoint Compatibility, Canonical Hilbert–Schmidt Orbit Decomposition, Resonant-Band Prime-Separation / Summation-by-Parts Analysis, Transition-Region / Vaughan Type I / Spectral–Dirichlet Compatibility, and Trivial-Zero Slopes / Coprime Squarefree Block Cancellation (`TASK-TC-050` / `TASK-TC-050R` / `TASK-TC-050R2` / `TASK-TC-051` / `TASK-TC-051R` / `TASK-TC-052` / `TASK-TC-052R` / `TASK-TC-052R2` / `TASK-TC-053`)
 
-**Task ID:** `TASK-TC-050` / `TASK-TC-050R` / `TASK-TC-050R2` / `TASK-TC-051` / `TASK-TC-051R` / `TASK-TC-052` / `TASK-TC-052R` / `TASK-TC-052R2`  
+**Task ID:** `TASK-TC-050` / `TASK-TC-050R` / `TASK-TC-050R2` / `TASK-TC-051` / `TASK-TC-051R` / `TASK-TC-052` / `TASK-TC-052R` / `TASK-TC-052R2` / `TASK-TC-053`  
 **Parent Epic:** `EPIC-TC-042`  
-**Reviewed Baselines:** `5da0eb79e1732ff871ee1c7fee729c62972aa406` (`TC-048R`), `2f7871fff666091c4152ecc8657f2345aacdd4fa` (`TC-050` + `TC-049R`), `0e6ae36ce995ef3037652b3dfb67645325f990b1` (`TC-050R` HEAD; implementation commit `f5521363ea94774938fd37152d67d743413327ae`), `d93ab512c2df75af2365a3963804c172baf0e867` (`TC-050R2` merged on `main`), `b6f22dfee0dd6177ee855189304e7930f9ba3e20` (`TC-051` merged on `main`; branch tip `7ac0546b1177970ff0d87824f61643da2405c4c0`, implementation commit `333661eecd69738e8a67143e635b6db4f40170ce`), `1f576944c040d5b3a2bf8091ca803e3758c80d12` (`TC-051R` closeout accepted on `main`), `916440e688c66d461daa04b17d7435e10e65f0d4` (`TC-052` merged on `main`; implementation commit `8414aa66f1127c636c68fcf8594833c570a3344a`), `7dc75e83f6b48e6ef436f55b573910e93d0f4f48` (`TC-052R` merged on `main`; implementation commit `f230b1a72c2c336522834703534bbdb8c15a250a`)  
-**Branched From:** `7dc75e83f6b48e6ef436f55b573910e93d0f4f48` (`task/tc-052r2-certificate-proof-and-verification-closeout`)  
+**Reviewed Baselines:** `5da0eb79e1732ff871ee1c7fee729c62972aa406` (`TC-048R`), `2f7871fff666091c4152ecc8657f2345aacdd4fa` (`TC-050` + `TC-049R`), `0e6ae36ce995ef3037652b3dfb67645325f990b1` (`TC-050R` HEAD; implementation commit `f5521363ea94774938fd37152d67d743413327ae`), `d93ab512c2df75af2365a3963804c172baf0e867` (`TC-050R2` merged on `main`), `b6f22dfee0dd6177ee855189304e7930f9ba3e20` (`TC-051` merged on `main`; branch tip `7ac0546b1177970ff0d87824f61643da2405c4c0`, implementation commit `333661eecd69738e8a67143e635b6db4f40170ce`), `1f576944c040d5b3a2bf8091ca803e3758c80d12` (`TC-051R` closeout accepted on `main`), `916440e688c66d461daa04b17d7435e10e65f0d4` (`TC-052` merged on `main`; implementation commit `8414aa66f1127c636c68fcf8594833c570a3344a`), `7dc75e83f6b48e6ef436f55b573910e93d0f4f48` (`TC-052R` merged on `main`; implementation commit `f230b1a72c2c336522834703534bbdb8c15a250a`), `c64596727e7142596acd073c6c8e4eb28f2eaee0` (`TC-052R2` merged on `main`)  
+**Branched From:** `c64596727e7142596acd073c6c8e4eb28f2eaee0` (`task/tc-053-trivial-zero-slopes-and-coprime-cancellation`)  
 **Primary Implementation Module:** [tc/faithful_tau_arithmetic_spectral_realization.py](file:///c:/Development/Projects/reimann_scope/tc/faithful_tau_arithmetic_spectral_realization.py)  
-**Exported Facade Entrypoints:** [`execute_task_tc050_faithful_spectral_realization_audit`](file:///c:/Development/Projects/reimann_scope/tc/canonical_theta_correlation_bound.py#L10142-L10185), [`execute_task_tc051_prime_arithmetic_resonant_band_audit`](file:///c:/Development/Projects/reimann_scope/tc/canonical_theta_correlation_bound.py#L10142-L10185), [`execute_task_tc052_arithmetic_fourier_compatibility_audit`](file:///c:/Development/Projects/reimann_scope/tc/canonical_theta_correlation_bound.py#L9993-L10004)  
-**Certified 256-bit Arb Data Artifact:** [data/tc_faithful_tau_arithmetic_spectral_realization.json](file:///c:/Development/Projects/reimann_scope/data/tc_faithful_tau_arithmetic_spectral_realization.json) (`855/855` certified 256-bit Arb balls passing outward-rounded decimal round-trip verification)  
-**Formal Verification Module:** [formal/RiemannScope/CanonicalThetaCorrelationBound.lean](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope/CanonicalThetaCorrelationBound.lean) (`47` definitions, `59` theorems = `106` declarations, `0` `sorry`, `0` `admit`, `0` custom axioms)  
+**Exported Facade Entrypoints:** [`execute_task_tc050_faithful_spectral_realization_audit`](file:///c:/Development/Projects/reimann_scope/tc/canonical_theta_correlation_bound.py#L10142-L10185), [`execute_task_tc051_prime_arithmetic_resonant_band_audit`](file:///c:/Development/Projects/reimann_scope/tc/canonical_theta_correlation_bound.py#L10142-L10185), [`execute_task_tc052_arithmetic_fourier_compatibility_audit`](file:///c:/Development/Projects/reimann_scope/tc/canonical_theta_correlation_bound.py#L9993-L10004), [`execute_task_tc053_trivial_zero_slopes_and_coprime_cancellation_audit`](file:///c:/Development/Projects/reimann_scope/tc/canonical_theta_correlation_bound.py#L9993-L10015)  
+**Certified 256-bit Arb Data Artifact:** [data/tc_faithful_tau_arithmetic_spectral_realization.json](file:///c:/Development/Projects/reimann_scope/data/tc_faithful_tau_arithmetic_spectral_realization.json) (`1175/1175` certified 256-bit Arb balls passing outward-rounded decimal round-trip verification)  
+**Formal Verification Modules:** [formal/RiemannScope/CanonicalThetaCorrelationBound.lean](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope/CanonicalThetaCorrelationBound.lean) (`47` definitions, `59` theorems = `106` declarations, `0` `sorry`, `0` `admit`, `0` custom axioms) and [formal/RiemannScope/TrivialZero.lean](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope/TrivialZero.lean) (`4` definitions, `10` theorems = `14` declarations, `0` `sorry`, `0` `admit`, `0` custom axioms)  
 **Regression Test Suite:** [tests/test_tc_faithful_tau_arithmetic_spectral_realization.py](file:///c:/Development/Projects/reimann_scope/tests/test_tc_faithful_tau_arithmetic_spectral_realization.py)  
-**Status Classification:** `TRANSITION_MOMENT_ANNIHILATION_VAUGHAN_TYPE_I_UNIFORM_BOUND_AND_CRITICAL_LINE_MELLIN_FACTORIZATION_PROVED_TYPE_II_RESONANT_BAND_OPEN_SUBGATE_OPEN` (`PROVED_CONDITIONAL` + `CERTIFIED_FINITE`; `SUBGATE-TC-043A` remains `OPEN`; `rh_proved: false`)
+**Status Classification:** `TRIVIAL_ZERO_SLOPE_IDENTITY_COMMON_FACTOR_EXPANSION_AND_DECOUPLED_L2_BLOCK_DECOMPOSITION_PROVED_BIVARIATE_EULER_CANCELLATION_OBSTRUCTED_SUBGATE_OPEN` (`PROVED_CONDITIONAL` + `CERTIFIED_FINITE`; `SUBGATE-TC-043A` remains `OPEN`; `rh_proved: false`)
 
 ---
 
@@ -965,3 +965,236 @@ where:
    - *Laplace–Carleman Resolvent Continuation (`TC-037` / Theorem 12)*: The partial-fraction resolvent $\mathcal{R}_\tau(w) = \sum_\rho \frac{m_\rho H_0(\rho - 1/2)}{w - L(\rho - 1/2)}$ has isolated simple poles at every individual zero $w_{\rho_0} = L(\rho_0 - 1/2)$, whereas $|C_\tau(-t)| \le B_{\mathrm{total}}$ makes $\mathcal{R}_\tau(w) = \int_0^\infty C_\tau(-t)e^{-wt}\,dt$ holomorphic on $\operatorname{Re}(w) > 0$, excluding any individual zero with $\delta_{\rho_0} > 0$ (and by $\xi(1 - s) = \xi(s)$, any $\delta_{\rho_0} \ne 0$).
    - *Direct Mellin Strip Holomorphy (`TC-045`)*: Equivalently, $|R_{\mu,\mathrm{band}}(X)| \le B_I + C_{\log,0}$ implies $|W(X)| \le M_W < \infty$ for all $X \ge 1$, so $\mathcal{M}_X[W](z) = -\frac{\zeta'(1/2+z)}{\zeta(1/2+z)}H_0(z)$ converges absolutely and holomorphically on $0 < \operatorname{Re}(z) < 5/2$, directly excluding any zero of $\zeta(1/2 + z)$ in $0 < \operatorname{Re}(z) < 1/2$.
 4. **Honest Gate Status**: Because an unconditional uniform bound $|I(X)| \le B_I$ (or $|R_{\mathrm{II}}(X; U, V)| \le B_{\mathrm{II}}$) for the actual Möbius function remains unproved, `SUBGATE-TC-043A` remains `OPEN` and `rh_proved: false`.
+
+---
+
+## 10. Trivial-Zero Slopes, Generalized Báez–Duarte Mellin Criterion, Common-Factor Expansion, and Coprime Squarefree Block Cancellation (`TASK-TC-053`, `section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation`)
+
+In `TASK-TC-053` (branched from the merged `TC-052R2` baseline `c64596727e7142596acd073c6c8e4eb28f2eaee0`), we investigate whether prime arithmetic forces cancellation between *different* squarefree integers once every factorization of the *same* integer has been accounted for, connecting the transported trivial-zero slopes of $Z_{a_K}(s) = \zeta(s / a_K)$ to the Gaussian-weighted Möbius sum $Q(X) = X^{5/2} G(X^2)$ and attacking the balanced coprime block $S(A) = \sum_{A^2 \le q < 4 A^2} \mu(q) w_A(q)$.
+
+### 10.1 Transported Trivial-Zero Slopes, Generalized Báez–Duarte Sequence, Gaussian Proxy $G(k) - c_k = O(k^{-2})$, and Mellin Grade-Energy Criterion (`section_1_trivial_zero_slopes_and_mellin_energy_criterion`)
+
+1. **Strict Separation of Grade $K$, Trivial-Zero Index $m$, and Finite-Difference Order $k$**:
+   Throughout Section 9 (`TASK-TC-053`), we keep three distinct indices strictly separated:
+   - $K \in \mathbb{A}_{\mathbb{R}} = \overline{\mathbb{Q}} \cap \mathbb{R}$ is the **algebraic scale grade** (both positive and negative grades), with scale factor $a_K := \tau^K$ ($\tau = 2\pi$) and grade-dilated zeta function $Z_{a_K}(s) := \zeta(s / a_K)$;
+   - $m \in \mathbb{Z}_{\ge 1}$ is the **trivial-zero index**, locating the transported trivial zero $s_{m, K} := -2 m a_K = -2 m \tau^K$ on the grade worldline $W_{-2m}(K)$;
+   - $k \in \mathbb{Z}_{\ge 0}$ is the **binomial finite-difference order** in the sequence $c_k$.
+
+2. **Exact Derivation of the Transported Trivial-Zero Slope Identity**:
+   By the chain rule, $Z_{a_K}'(s) = \frac{d}{ds}\zeta(s / a_K) = a_K^{-1}\zeta'(s / a_K)$, so evaluating at the transported trivial zero $s_{m, K} = -2 m a_K$ eliminates the scale factor $a_K$:
+   $$
+   \boxed{a_K Z_{a_K}'(-2 m a_K) = a_K \cdot a_K^{-1}\zeta'(-2m) = \zeta'(-2m) \qquad \forall K \in \mathbb{A}_{\mathbb{R}}, \; \forall m \in \mathbb{Z}_{\ge 1}.}
+   $$
+   Differentiating Riemann's asymmetric functional equation $\zeta(s) = 2^s \pi^{s-1}\sin\bigl(\frac{\pi s}{2}\bigr)\Gamma(1 - s)\zeta(1 - s)$ at $s = -2m$ (where $\sin(-\pi m) = 0$ annihilates the undifferentiated terms and $\frac{d}{ds}\sin(\frac{\pi s}{2})\big|_{s=-2m} = \frac{\pi}{2}\cos(-\pi m) = \frac{\pi}{2}(-1)^m$) gives
+   $$
+   \zeta'(-2m) = 2^{-2m}\pi^{-2m-1}\cdot\frac{\pi}{2}(-1)^m\,\Gamma(2m + 1)\,\zeta(2m + 1) = \frac{(-1)^m (2m)!}{2\,(2\pi)^{2m}}\,\zeta(2m + 1) = \frac{(-1)^m (2m)!}{2\,\tau^{2m}}\,\zeta(2m + 1),
+   $$
+   and hence
+   $$
+   \boxed{\frac{2(-1)^m \tau^{2m}}{(2m)!}\,a_K Z_{a_K}'(-2 m a_K) = \zeta(2m + 1) \qquad (\tau = 2\pi,\; m \in \mathbb{Z}_{\ge 1},\; K \in \mathbb{A}_{\mathbb{R}}),}
+   $$
+   verified symbolically (`symbolic_reflection_prefactor_verified: true`) and in 256-bit Arb across $m \in \{1, 2, 3\}$ and $K \in \{-1, 0, +1, \sqrt{2}\}$ (`all_worldline_zeros_enclose_zero: true`, `all_slope_identities_enclose_zero: true`).
+
+3. **Euler Product, Binomial Finite Differences $c_k$, and Role Separation (Grade Transport $K$ vs. Varying $m$)**:
+   For $s = 2j + 3 \ge 3$ ($m = j + 1 \ge 1$), absolute convergence of the Euler product gives $\frac{1}{\zeta(2j + 3)} = \prod_p \bigl(1 - p^{-(2j + 3)}\bigr) = \sum_{n=1}^\infty \frac{\mu(n)}{n^{2j+3}}$. Forming the $k$-th binomial forward difference over $j \in \{0, 1, \dots, k\}$ and interchanging the finite sum over $j$ with the absolutely convergent series over $n \ge 1$ yields
+   $$
+   \boxed{c_k := \sum_{j=0}^k (-1)^j \binom{k}{j}\frac{1}{\zeta(2j + 3)} = \sum_{n=1}^\infty \frac{\mu(n)}{n^3}\sum_{j=0}^k (-1)^j \binom{k}{j} n^{-2j} = \sum_{n=1}^\infty \frac{\mu(n)}{n^3}\bigl(1 - n^{-2}\bigr)^k.}
+   $$
+   - **Generalized Báez–Duarte Precedent & Primary Sources**:
+     - M. Riesz (1916), *Sur l'hypothèse de Riemann*, Acta Math. **40**, 185–190 (continuous power-series criterion $\sum_{k=1}^\infty \frac{(-1)^{k+1} x^k}{(k-1)!\,\zeta(2k)} = O_\varepsilon(x^{1/4 + \varepsilon})$);
+     - G. H. Hardy & J. E. Littlewood (1918), *Contributions to the theory of the Riemann zeta-function and the theory of the distribution of primes*, Acta Math. **41**, 119–196 (§2.5 Mellin equivalence of Riesz's criterion);
+     - L. Báez–Duarte (2003), *A new necessary and sufficient condition for the Riemann hypothesis*, `arXiv:math/0307215`, and (2005), *A sequential Riesz-like criterion for the Riemann hypothesis*, Int. J. Math. Math. Sci. **2005**(21), 3527–3537 (discrete sequence $c_k^{\mathrm{BD}} = \sum_{j=0}^k (-1)^j \binom{k}{j}\frac{1}{\zeta(2j + 2)} = \sum_{n=1}^\infty \frac{\mu(n)}{n^2}(1 - n^{-2})^k$, of which $c_k$ is the odd-argument shift $2j + 2 \mapsto 2j + 3$ obtained from the trivial-zero slopes $\zeta'(-2(j+1))$).
+   - **What Grade Transport $K$ Contributes vs. What Varying $m$ Contributes**:
+     - *Grade transport $K$*: Contributes **pure multiplicative scale covariance** $a_K Z_{a_K}'(-2 m a_K) = \zeta'(-2m)$, which is identically independent of $K$ at every fixed $m$; varying $K$ at fixed $m$ does not generate new Dirichlet-series moments. In the continuous Mellin setting, grade transport $Y_k = \tau^k$ partitions $[1, \infty)$ into multiplicative grade blocks $[\tau^k, \tau^{k+1}]$ of uniform logarithmic length $\log\tau$.
+     - *Varying $m = j + 1 \in \{1, \dots, k + 1\}$*: Samples the reciprocal Dirichlet series $\sum_{n \ge 1}\mu(n)n^{-s} = 1/\zeta(s)$ at distinct odd integers $s = 2m + 1 = 2j + 3$, producing the polynomial weight $(1 - n^{-2})^k$ that localizes on squarefree integers $n \asymp \sqrt{k}$.
+
+4. **Gaussian Proxy $G(t)$, $Q(X) = X^{5/2}G(X^2)$, and Explicit Proof of $G(k) - c_k = O(k^{-2})$**:
+   Set
+   $$
+   \boxed{G(t) := \sum_{n=1}^\infty \frac{\mu(n)}{n^3} e^{-t / n^2} \quad (t > 0), \qquad Q(X) := X^{5/2} G(X^2) = X^{5/2}\sum_{n=1}^\infty \frac{\mu(n)}{n^3} e^{-X^2 / n^2} \quad (X > 0).}
+   $$
+   For every integer $k \ge 1$, splitting $G(k) - c_k$ into $n = 1$ and $n \ge 2$ gives:
+   - **$n = 1$ Term**: At $n = 1$, $(1 - 1^{-2})^k = 0$ for all $k \ge 1$, while $e^{-k / 1^2} = e^{-k} > 0$. Since $\sup_{t > 0} t^2 e^{-t} = 4 e^{-2}$ (attained at $t = 2$, where $k^2 e^{2-k} \le 4$ for all $k \ge 1$ with exact equality at $k = 2$), the $n = 1$ term satisfies
+     $$
+     0 < e^{-k} \le 4 e^{-2}\,k^{-2} = C_1\,k^{-2}, \qquad C_1 := 4 e^{-2} \approx 0.5413411329.
+     $$
+   - **$n \ge 2$ Sum**: For $n \ge 2$, $x := n^{-2} \in (0, 1/4]$. Since $\log(1 - x) = -x - \sum_{r=2}^\infty \frac{x^r}{r}$ satisfies $0 < -x - \log(1 - x) \le \frac{x^2}{2}\sum_{r=0}^\infty (1/4)^r = \frac{2}{3}x^2$, the mean-value inequality $1 - e^{-\delta} \le \delta$ for $\delta = k(-x - \log(1-x)) > 0$ gives
+     $$
+     0 < e^{-k/n^2} - \bigl(1 - n^{-2}\bigr)^k = e^{-k/n^2}\bigl(1 - e^{-\delta}\bigr) \le \frac{2}{3}\,k\,n^{-4}\,e^{-k/n^2}.
+     $$
+     Summing over $n \ge 2$ and comparing the unimodal function $f_k(u) := u^{-7} e^{-k / u^2}$ on $(0, \infty)$ (which attains its unique global maximum $f_k(\sqrt{2k/7}) = \bigl(\frac{7}{2e}\bigr)^{7/2} k^{-7/2}$ at $u_* = \sqrt{2k/7}$ and has total integral $\int_0^\infty u^{-7} e^{-k/u^2}\,du = k^{-3}\int_0^\infty v^2 e^{-v}\,dv = k^{-3}$) gives $\sum_{n=2}^\infty n^{-7} e^{-k/n^2} \le \int_0^\infty f_k(u)\,du + \sup_{u > 0} f_k(u) \le \bigl(1 + (\frac{7}{2e})^{7/2}\bigr)k^{-3}$, and hence
+     $$
+     \Biggl|\sum_{n=2}^\infty \frac{\mu(n)}{n^3}\Bigl(e^{-k/n^2} - (1 - n^{-2})^k\Bigr)\Biggr| \le \frac{2}{3}\,k\sum_{n=2}^\infty n^{-7} e^{-k/n^2} \le C_2\,k^{-2}, \qquad C_2 := \frac{2}{3}\left(1 + \left(\frac{7}{2e}\right)^{7/2}\right) \approx 2.2814572550.
+     $$
+   - **Combined Explicit $O(k^{-2})$ Bound**:
+     $$
+     \boxed{\bigl|G(k) - c_k\bigr| \le C_{G,c}\,k^{-2} \qquad \forall k \ge 1, \qquad C_{G,c} := 4 e^{-2} + \frac{2}{3}\left(1 + \left(\frac{7}{2e}\right)^{7/2}\right) = \bigl[2.822798387987013361092201192203292862020 \pm 2.00 \times 10^{-39}\bigr] < \frac{7}{2} = 3.5,}
+     $$
+     certified in 256-bit Arb across $k \in \{0, 1, 2, 4, 8, 16, 32, 64\}$ (`all_G_k_minus_c_k_bounds_certified: true`).
+
+5. **Mellin Identity for $Q(X)$ and Five-Step Proof of the Sufficient Grade-Energy Criterion**:
+   - **Mellin Identity on $\frac{1}{2} < \operatorname{Re} z < \frac{5}{2}$**: For $\frac{1}{2} < \sigma := \operatorname{Re} z < \frac{5}{2}$, substituting $w = X^2 / n^2$ ($X = n w^{1/2}$, $\frac{dX}{X} = \frac{1}{2}\frac{dw}{w}$) gives $\int_0^\infty X^{5/2 - z} e^{-X^2/n^2}\frac{dX}{X} = \frac{1}{2}\Gamma\!\bigl(\frac{5}{4} - \frac{z}{2}\bigr)n^{5/2 - z}$. Since $\sum_{n=1}^\infty n^{-3}\int_0^\infty X^{5/2-\sigma} e^{-X^2/n^2}\frac{dX}{X} = \frac{1}{2}\Gamma\!\bigl(\frac{5}{4} - \frac{\sigma}{2}\bigr)\sum_{n=1}^\infty n^{-(1/2 + \sigma)} = \frac{1}{2}\Gamma\!\bigl(\frac{5}{4} - \frac{\sigma}{2}\bigr)\zeta\!\bigl(\frac{1}{2} + \sigma\bigr) < \infty$ for $\frac{1}{2} < \sigma < \frac{5}{2}$, Fubini–Tonelli justifies termwise integration and yields:
+     $$
+     \boxed{\mathcal{M}[Q](z) := \int_0^\infty Q(X) X^{-z}\frac{dX}{X} = \frac{\Gamma(5/4 - z/2)}{2\,\zeta(1/2 + z)} \qquad \left(\frac{1}{2} < \operatorname{Re} z < \frac{5}{2}\right),}
+     $$
+     certified symbolically (`mellin_symbolic_termwise_verified: true`) and in 256-bit Arb at $z \in \{1, 3/2, 2\}$ (`all_mellin_strip_checks_enclose_zero: true`).
+   - **Sufficient Grade-Energy Criterion (`SUFFICIENT_CRITERION_CONDITIONAL_ON_ARITHMETIC_ENERGY_PREMISE`)**: Suppose that for every $\varepsilon > 0$ there exists $C_\varepsilon < \infty$ such that
+     $$
+     \int_Y^{\tau Y} |Q(X)|^2 \frac{dX}{X} \le C_\varepsilon Y^\varepsilon \qquad \forall Y \ge 1
+     $$
+     (where real $Y \ge 1$ and discrete grade blocks $Y_k = \tau^k$, $k \in \mathbb{Z}_{\ge 0}$, are equivalent up to a factor of $\tau^\varepsilon$). Then off-critical zeros of $\zeta(s)$ are excluded by the following five steps:
+     1. *Small-$X$ convergence on $(0, 1]$*: Since $|G(X^2)| \le \sum_{n=1}^\infty n^{-3} = \zeta(3)$, $|Q(X)| \le \zeta(3) X^{5/2}$ for all $X > 0$, so $\int_0^1 |Q(X)| X^{-\sigma}\frac{dX}{X} \le \frac{\zeta(3)}{5/2 - \sigma} < \infty$ for every $\sigma = \operatorname{Re} z < 5/2$.
+     2. *Cauchy–Schwarz on grade blocks $[\tau^k, \tau^{k+1}]$ ($k \ge 0$, $Y_k = \tau^k \ge 1$)*: For any $\sigma = \operatorname{Re} z > 0$, choosing $\varepsilon = \sigma > 0$ gives
+        $$
+        \int_{\tau^k}^{\tau^{k+1}} |Q(X)| X^{-\sigma}\frac{dX}{X} \le \left(\int_{\tau^k}^{\tau^{k+1}} |Q(X)|^2\frac{dX}{X}\right)^{1/2}\left(\int_{\tau^k}^{\tau^{k+1}} X^{-2\sigma}\frac{dX}{X}\right)^{1/2} \le \bigl(C_\sigma \tau^{k\sigma}\bigr)^{1/2}\bigl((\log\tau)\tau^{-2k\sigma}\bigr)^{1/2} = \sqrt{C_\sigma\log\tau}\,\tau^{-k\sigma/2}.
+        $$
+     3. *Geometric summation over $k \ge 0$ and holomorphy on $0 < \operatorname{Re} z < 5/2$*: Since $\tau = 2\pi > 1$ and $\sigma > 0$, $\sum_{k=0}^\infty \tau^{-k\sigma/2} = \frac{1}{1 - \tau^{-\sigma/2}} < \infty$ converges uniformly on compact subsets of $\{0 < \operatorname{Re} z < 5/2\}$, so $\mathcal{M}[Q](z)$ converges absolutely and defines a holomorphic function on the full strip $0 < \operatorname{Re} z < 5/2$.
+     4. *Strip overlap and nonvanishing of $\Gamma(5/4 - z/2)$*: The strip $\{0 < \operatorname{Re} z < 5/2\}$ overlaps the initial absolute-convergence strip $\{1/2 < \operatorname{Re} z < 5/2\}$ on $\{1/2 < \operatorname{Re} z < 5/2\}$, so by analytic continuation $\mathcal{M}[Q](z) = \frac{\Gamma(5/4 - z/2)}{2\zeta(1/2 + z)}$ holds throughout $0 < \operatorname{Re} z < 5/2$. Because $\Gamma(w)$ has no zeros anywhere in $\mathbb{C}$ (and is holomorphic on $\operatorname{Re} w = 5/4 - \operatorname{Re} z / 2 > 0$), any zero $\rho = 1/2 + z_0$ of $\zeta(s)$ with $1/2 < \operatorname{Re}\rho < 1$ ($0 < \operatorname{Re} z_0 < 1/2$) would create a pole of $\frac{\Gamma(5/4 - z/2)}{2\zeta(1/2 + z)}$ at $z_0$, contradicting holomorphy of $\mathcal{M}[Q](z)$.
+     5. *Functional-equation reflection*: $\xi(1 - s) = \xi(s)$ reflects any nontrivial zero with $0 < \operatorname{Re}\rho < 1/2$ to $1 - \rho$ with $1/2 < \operatorname{Re}(1 - \rho) < 1$, excluding all off-critical nontrivial zeros of $\zeta(s)$.
+
+### 10.2 Common-Factor Expansion, Coprime Squarefree Counting Estimate, Gaussian Leading Term, and Valid Growing Range (`section_2_common_factor_expansion_and_coprime_squarefree_asymptotics`)
+
+1. **Common-Factor Bijection $(m, n) = (dr, ds)$ and Exact Möbius Factorization**:
+   Every ordered pair $(m, n) \in \mathbb{Z}_{\ge 1}^2$ factors uniquely as $m = dr$, $n = ds$ with $d = \gcd(m, n) \ge 1$ and $\gcd(r, s) = 1$. Since $\mu$ is multiplicative and vanishes on squares:
+   - If $\gcd(d, rs) > 1$, some prime $p \mid d$ also divides $r$ or $s$, so $p^2 \mid dr$ or $p^2 \mid ds$, giving $\mu(dr)\mu(ds) = 0$;
+   - If $\gcd(d, rs) = 1$, then $\gcd(d, r) = \gcd(d, s) = 1$, so $\mu(dr) = \mu(d)\mu(r)$ and $\mu(ds) = \mu(d)\mu(s)$, yielding
+     $$
+     \boxed{\mu(dr)\mu(ds) = \mathbf{1}_{\gcd(d, rs) = 1}\,\mu(d)^2\,\mu(r)\mu(s) \qquad (\gcd(r, s) = 1),}
+     $$
+     verified across all $60 \times 60 = 3600$ ordered pairs $1 \le m, n \le 60$ (`all_mobius_splits_exact: true`) and in Lean (`common_factor_mobius_split_and_valid_growing_range_exponent`). Expanding $Q(X)^2$ over $(d, r, s)$ gives
+     $$
+     Q(X)^2 = \sum_{\substack{r, s \ge 1 \\ \gcd(r, s) = 1}} \frac{\mu(r)\mu(s)}{(rs)^3}\,X^5\sum_{\substack{d \ge 1 \\ \gcd(d, rs) = 1}} \frac{\mu(d)^2}{d^6}\exp\!\left(-\frac{X^2}{d^2}\bigl(r^{-2} + s^{-2}\bigr)\right).
+     $$
+
+2. **Coprime Squarefree Counting Estimate $N_q(t) = \kappa(q)t + O(2^{\omega(q)}\sqrt{t})$**:
+   For $q \ge 1$ and $t \ge 1$, inserting $\mu(d)^2 = \sum_{a^2 \mid d}\mu(a)$ into $N_q(t) := \sum_{d \le t,\, \gcd(d, q)=1}\mu(d)^2$ gives
+   $$
+   N_q(t) = \sum_{\substack{1 \le a \le \sqrt{t} \\ \gcd(a, q) = 1}} \mu(a)\,\#\bigl\{m \le t / a^2 : \gcd(m, q) = 1\bigr\}.
+   $$
+   By inclusion-exclusion over squarefree divisors $e \mid q$, $\#\{m \le y : \gcd(m, q) = 1\} = \sum_{e \mid q}\mu(e)\lfloor y/e\rfloor = y\prod_{p \mid q}\bigl(1 - \frac{1}{p}\bigr) + \theta_q(y)$ with $|\theta_q(y)| \le \sum_{e \mid q}|\mu(e)| = 2^{\omega(q)}$. Substituting $y = t / a^2$ and completing the tail $\sum_{a > \sqrt{t}} a^{-2} \le 2 t^{-1/2}$ yields
+   $$
+   \boxed{N_q(t) = \kappa(q)\,t + R_q(t), \qquad \kappa(q) := \frac{1}{\zeta(2)}\prod_{p \mid q}\frac{p}{p + 1}, \qquad \bigl|R_q(t)\bigr| \le \bigl(2^{\omega(q)} + 2\bigr)\sqrt{t} \le 3\cdot 2^{\omega(q)}\sqrt{t} \quad (t \ge 1),}
+   $$
+   since $\prod_{p \mid q}(1 - p^{-1})\sum_{\gcd(a, q)=1}\frac{\mu(a)}{a^2} = \frac{1}{\zeta(2)}\prod_{p \mid q}\frac{1 - p^{-1}}{1 - p^{-2}} = \frac{1}{\zeta(2)}\prod_{p \mid q}\frac{p}{p + 1}$. Certified in 256-bit Arb across $q \in \{1, 2, 6, 30, 210\}$ and $t \in \{10, 50, 200, 1000\}$ (`all_counting_bounds_certified: true`).
+
+3. **Gaussian Integral Evaluation, Scale-Independent Leading Term, Total Error, and Valid Growing Range $A \le X^{1/3 - \delta}$**:
+   - **Gaussian Moment Identity & Leading Term**: For $\alpha := r^{-2} + s^{-2} = \frac{r^2 + s^2}{(rs)^2} > 0$, substituting $u = X / t$ ($t = X / u$, $dt = -X u^{-2} du$) in $X^5\int_0^\infty t^{-6} e^{-\alpha X^2 / t^2}\,dt$ gives
+     $$
+     \int_0^\infty u^4 e^{-\alpha u^2}\,du = \frac{1}{2}\alpha^{-5/2}\Gamma\!\left(\frac{5}{2}\right) = \frac{3\sqrt{\pi}}{8}\,\alpha^{-5/2} = \frac{3\sqrt{\pi}}{8}\,\frac{(rs)^5}{(r^2 + s^2)^{5/2}},
+     $$
+     and multiplying by $\frac{\mu(r)\mu(s)}{(rs)^3}\kappa(rs)$ confirms the exact scale-independent pairwise leading contribution:
+     $$
+     \boxed{L_{r, s} := \frac{3\sqrt{\pi}}{8}\,\mu(r)\mu(s)\,\kappa(rs)\,\frac{(rs)^2}{(r^2 + s^2)^{5/2}},}
+     $$
+     verified symbolically (`gaussian_symbolic_verified: true`) and against the exact $d$-sum at $(r, s) = (2, 3)$ across $X \in \{4, 16, 64, 256\}$ (`all_pairwise_error_bounds_certified: true`).
+   - **Total Error up to $A$ and Valid Growing Range $A \le X^{1/3 - \delta}$**:
+     By Stieltjes integration by parts of $\int_1^\infty t^{-6} e^{-\alpha X^2 / t^2}\,dN_{rs}(t)$ with $|R_{rs}(t)| \le 3\cdot 2^{\omega(rs)}\sqrt{t}$, the pairwise remainder $E_{r,s}(X)$ satisfies $|E_{r,s}(X)| \le \frac{15}{2}\frac{2^{\omega(rs)}}{\sqrt{X}}\frac{rs}{(r^2 + s^2)^2}$ (and even the sharper homogeneous bound $O\bigl(2^{\omega(rs)} X^{-1/2} (rs)^{3/2}/(r^2+s^2)^{9/4}\bigr)$). Summing the proposed bound over $1 \le r, s \le A$ with $2^{\omega(rs)} \le d(r)d(s) = O_\varepsilon((rs)^{\varepsilon/2})$ gives the proposed total error $O_\varepsilon\bigl(A^{3/2 + \varepsilon} / \sqrt{X}\bigr)$ for every $\varepsilon > 0$. For $A \le X^{1/3 - \delta}$ with $0 < \delta < 1/3$:
+     $$
+     \boxed{A^{3/2 + \varepsilon} X^{-1/2} \le X^{(1/3 - \delta)(3/2 + \varepsilon) - 1/2} = X^{-\frac{3}{2}\delta + (1/3 - \delta)\varepsilon} \;\xrightarrow{X \to \infty}\; 0 \quad \Longleftrightarrow \quad 0 < \varepsilon < \frac{3\delta}{2(1/3 - \delta)},}
+     $$
+     and in particular choosing $\varepsilon \in \bigl(0, \frac{3}{2}\delta\bigr]$ guarantees $-\frac{3}{2}\delta + (1/3 - \delta)\varepsilon \le -\delta < 0$, so the total error is $O_\delta(X^{-\delta}) \to 0$ (`exponent_identity_symbolic_verified: true`, formalized in Lean `common_factor_mobius_split_and_valid_growing_range_exponent`).
+
+### 10.3 Attack on the Signed Coprime Block $S(A)$: Benchmarks, Two-Prime Stratum, Attempt 1 (Bivariate Euler Product Obstruction), and Attempt 2 (Regrouping by $q$ & Decoupled $L^2$ Walfisz Bound) (`section_3_signed_coprime_block_attempts_and_regrouping`)
+
+1. **Balanced Block Regrouping by $q = rs$ with $\kappa(q)$ Appearing Once**:
+   On the half-open dyadic block $A \le r, s < 2A$, every coprime pair $(r, s)$ has product $q = rs \in [A^2, 4A^2)$ with $\mu(r)\mu(s) = \mu(rs) = \mu(q)$. Regrouping by $q = rs$ gives
+   $$
+   \boxed{S(A) := \sum_{\substack{A \le r, s < 2A \\ \gcd(r, s) = 1}} L_{r, s} = \sum_{A^2 \le q < 4 A^2} \mu(q)\,w_A(q), \qquad w_A(q) := \frac{3\sqrt{\pi}}{8}\,\kappa(q)\,q^2 \sum_{\substack{rs = q \\ A \le r, s < 2A \\ \gcd(r, s) = 1}} \frac{1}{(r^2 + s^2)^{5/2}} \ge 0,}
+   $$
+   where $\kappa(q) = \frac{1}{\zeta(2)}\prod_{p \mid q}\frac{p}{p + 1}$ appears **once** in $w_A(q)$.
+
+2. **Exact 2D Antiderivative, Non-Asymptotic $O(A)$ Benchmark, and Positive Two-Prime Stratum $S_{2\text{-prime}}(A) \asymp \frac{A}{\log^2 A}$**:
+   - **Exact 2D Antiderivative & Explicit Non-Asymptotic $O(A)$ Bound**:
+     The homogeneous kernel $\frac{(rs)^2}{(r^2 + s^2)^{5/2}}$ has the exact 2D antiderivative (`antiderivative_symbolic_verified: true`, `box_integral_symbolic_verified: true`):
+     $$
+     \frac{\partial^2}{\partial r\,\partial s}\!\left(\frac{rs}{3\sqrt{r^2 + s^2}}\right) = \frac{(rs)^2}{(r^2 + s^2)^{5/2}}, \qquad \iint_{[1, 2]^2} \frac{(xy)^2}{(x^2 + y^2)^{5/2}}\,dx\,dy = \frac{15\sqrt{2} - 8\sqrt{5}}{30} \approx 0.1108219872.
+     $$
+     Using $\kappa(rs) \le \frac{1}{\zeta(2)} = \frac{6}{\pi^2}$ and $(r^2 + s^2)^{-5/2} \le 2^{-5/2}(rs)^{-5/2}$ so $\frac{(rs)^2}{(r^2+s^2)^{5/2}} \le 2^{-5/2}(rs)^{-1/2}$, along with $\sum_{A \le r < 2A} r^{-1/2} \le 2(\sqrt{2}-1)\sqrt{A} + A^{-1/2}$ for all $A \ge 1$, we obtain the explicit non-asymptotic unsigned bound valid for all $A \ge 1$:
+     $$
+     \boxed{\bigl|S(A)\bigr| \le S_{\mathrm{abs}}(A) := \sum_{A^2 \le q < 4A^2} |\mu(q)|\,w_A(q) \le \frac{9}{16\sqrt{2}\,\pi^{3/2}}\bigl(2(\sqrt{2} - 1)\sqrt{A} + A^{-1/2}\bigr)^2 \le C_{\mathrm{block}}\,A \qquad \forall A \ge 1,}
+     $$
+     where $C_{\mathrm{block}} := \frac{9(2\sqrt{2} - 1)^2}{16\sqrt{2}\,\pi^{3/2}} = [0.2388020390525650552804189993008810046850 \pm 2.00 \times 10^{-40}] < 0.239$ (`all_unsigned_bounds_certified: true`).
+   - **Positive Two-Prime Stratum ($\omega(q) = 2$)**:
+     For every $A \ge 2$, any squarefree $q = rs$ with $A \le r, s < 2A$, $\gcd(r, s) = 1$, and $\omega(q) = \omega(r) + \omega(s) = 2$ must satisfy $\omega(r) = \omega(s) = 1$ because $r, s \ge 2$ cannot equal $1$. Hence for $A \ge 2$, the $\omega(q) = 2$ stratum consists **100% of products of two distinct primes** $r = p_1 \ne p_2 = s$ in $[A, 2A)$, all carrying the positive sign $\mu(p_1 p_2) = +1$:
+     $$
+     \boxed{S_{2\text{-prime}}(A) = \sum_{\substack{A \le p_1, p_2 < 2A \\ p_1 \ne p_2}} \frac{3\sqrt{\pi}}{8}\,\kappa(p_1 p_2)\,\frac{(p_1 p_2)^2}{(p_1^2 + p_2^2)^{5/2}} = \left(\frac{3\sqrt{\pi}}{8\zeta(2)}\,\frac{15\sqrt{2} - 8\sqrt{5}}{30} + o(1)\right)\frac{A}{\log^2 A} > 0 \qquad (A \ge 2).}
+     $$
+     Therefore, any cancellation below $\frac{A}{\log^2 A}$ requires signed cancellation between the positive $\omega(q) = 2$ prime-pair stratum (together with even $\omega(q) \ge 4$) and the negative odd-$\omega(q) \ge 3$ strata ($\mu(q) = -1$).
+
+3. **Attempt 1 — Prime-by-Prime Bivariate Euler Product and Exact Nonvanishing Obstruction on $\operatorname{Re} s_i \ge 1/2$**:
+   Removing the smooth homogeneous weight $\frac{(rs)^2}{(r^2+s^2)^{5/2}}$ via 2D Mellin inversion reduces the arithmetic core of $S(A)$ to the bivariate Dirichlet series of the coprime multiplicative weight $f(r, s) := \mathbf{1}_{\gcd(r,s)=1}\,\mu(r)\mu(s)\prod_{p \mid rs}\frac{p}{p + 1}$. Because $f(r, s)$ is multiplicative across prime pairs $(p^a, p^b)$ and supported on $(a, b) \in \{(0, 0), (1, 0), (0, 1)\}$, it factors prime-by-prime on $\operatorname{Re} s_1 > 1, \operatorname{Re} s_2 > 1$:
+   $$
+   \boxed{\mathcal{D}(s_1, s_2) := \sum_{\substack{r, s \ge 1 \\ \gcd(r, s) = 1}} \frac{\mu(r)\mu(s)\widetilde{\kappa}(rs)}{r^{s_1} s^{s_2}} = \prod_p \left(1 - \frac{p}{p + 1}\bigl(p^{-s_1} + p^{-s_2}\bigr)\right) = \frac{\mathcal{H}(s_1, s_2)}{\zeta(s_1)\zeta(s_2)},}
+   $$
+   where the correction Euler product
+   $$
+   \mathcal{H}(s_1, s_2) = \prod_p \frac{1 - \frac{p}{p + 1}(p^{-s_1} + p^{-s_2})}{(1 - p^{-s_1})(1 - p^{-s_2})} = \prod_p \left(1 + \frac{\frac{1}{p + 1}(p^{-s_1} + p^{-s_2}) - p^{-(s_1 + s_2)}}{(1 - p^{-s_1})(1 - p^{-s_2})}\right)
+   $$
+   converges absolutely and holomorphically on the open domain
+   $$
+   \Omega_{\mathcal{H}} := \bigl\{(s_1, s_2) \in \mathbb{C}^2 : \operatorname{Re} s_1 > 0,\; \operatorname{Re} s_2 > 0,\; \operatorname{Re}(s_1 + s_2) > 1\bigr\},
+   $$
+   since $|(p+1)^{-1}(p^{-s_1}+p^{-s_2})| \ll p^{-1-\min(\operatorname{Re} s_1, \operatorname{Re} s_2)}$ and $|p^{-(s_1+s_2)}| = p^{-\operatorname{Re}(s_1+s_2)}$ are summable over primes $p$ on $\Omega_{\mathcal{H}}$.
+   - **Exact AM–GM Nonvanishing Proof (`am_gm_nonvanishing_proof`, Lean `signed_block_bivariate_euler_nonvanishing_and_parity_regrouping`)**:
+     For $\operatorname{Re} s_1 \ge 1/2$ and $\operatorname{Re} s_2 \ge 1/2$ and every prime $p \ge 2$, $|p^{-s_i}| \le p^{-1/2}$, so
+     $$
+     \boxed{\left|\frac{p}{p + 1}\bigl(p^{-s_1} + p^{-s_2}\bigr)\right| \le \frac{p}{p + 1}\cdot \frac{2}{\sqrt{p}} = \frac{2\sqrt{p}}{p + 1} = 1 - \frac{(\sqrt{p} - 1)^2}{p + 1} < 1 \qquad \forall p \ge 2.}
+     $$
+     At $p = 2$, the maximum perturbation is $\frac{2\sqrt{2}}{3} \approx 0.942809 < 1$ and the minimum local Euler factor modulus on $\operatorname{Re} s_1, \operatorname{Re} s_2 \ge 1/2$ is $1 - \frac{2\sqrt{2}}{3} = \frac{(\sqrt{2}-1)^2}{3} \approx 0.057191 > 0$ (`all_attempt1_local_factors_strictly_positive: true`). Consequently, every local factor of $\mathcal{D}(s_1, s_2)$ and $\mathcal{H}(s_1, s_2)$ is **strictly nonzero** on $\{\operatorname{Re} s_1 \ge 1/2, \operatorname{Re} s_2 \ge 1/2\} \cap \Omega_{\mathcal{H}}$. Thus **the numerator $\mathcal{H}(s_1, s_2)$ can never vanish to cancel off-critical zeros of $\zeta(s_1)\zeta(s_2)$ in $1/2 < \operatorname{Re} s_i < 1$**, and along the diagonal $\operatorname{Re}(s_1 + s_2) = 1$ the coprimality restriction $\gcd(r, s) = 1$ introduces the inverse-zeta pole of $\zeta(s_1 + s_2)^{-1}$.
+
+4. **Attempt 2 — Direct Regrouping by $q$, Logarithmic Möbius Identity $\mu(q)\log q = -\sum_{uv=q}\Lambda(u)\mu(v)$, and Decoupled $L^2$ Walfisz Saving**:
+   - **Direct Regrouping by $q$ and Exact Exchange with $\mu(q)\log q = -\sum_{uv=q}\Lambda(u)\mu(v)$**:
+     For $A \ge 2$, every $q \in [A^2, 4A^2)$ satisfies $q \ge 4 > 1$, so $\log q > 0$. Substituting the exact arithmetic identity $\mu(q)\log q = -\sum_{uv = q}\Lambda(u)\mu(v)$ into $S(A) = \sum_{A^2 \le q < 4A^2} \mu(q) w_A(q)$ and exchanging the summation order yields
+     $$
+     \boxed{S(A) = -\sum_{2 \le u < 4A^2} \Lambda(u) \sum_{\lceil A^2 / u\rceil \le v < \lceil 4A^2 / u\rceil} \mu(v)\,\frac{w_A(uv)}{\log(uv)} \qquad (A \ge 2),}
+     $$
+     where $w_A(uv)$ carries the full factorization multiplicity of coprime pairs $(r, s) \in [A, 2A)^2$ with $rs = uv$ (and prime powers $u = p^a$ with $a \ge 2$ cancel identically via $\Lambda(p)\mu(pm) + \Lambda(p^2)\mu(m) = \log p\cdot(-\mu(m)) + \log p\cdot\mu(m) = 0$ for $\gcd(p, m) = 1$), certified in 256-bit Arb across all tested blocks (`all_log_mobius_exchanges_enclose_zero: true`). Applying the triangle inequality to the exchanged sum or across the prime-factor parity strata $\omega(q) = 2$ (positive) vs. odd $\omega(q) \ge 3$ (negative) collapses back to $S_{2\text{-prime}}(A) + |S_{\mathrm{odd}}(A)| + |S_{\mathrm{even}\ge 4}(A)| = S_{\mathrm{abs}}(A) \asymp A$, losing the parity cancellation (`signed_block_bivariate_euler_nonvanishing_and_parity_regrouping`).
+   - **Decoupled $L^2$-Integral Inclusion-Exclusion and Unconditional Walfisz Saving**:
+     Expanding the coprimality indicator $\mathbf{1}_{\gcd(r,s)=1} = \sum_{e \mid \gcd(r,s)}\mu(e)$ decouples $\zeta(2)\kappa(rs) = \widetilde{\kappa}(r)\widetilde{\kappa}(s)$ (for $\gcd(r, s) = 1$) into positive rank-one $L^2$ Gaussian integrals:
+     $$
+     \boxed{S(A) = \frac{1}{\zeta(2)}\sum_{1 \le e < 2A}\frac{\mu(e)\,\widetilde{\kappa}(e)^2}{e}\,I_e\!\left(\frac{A}{e}\right), \qquad I_e(B) := \int_0^\infty u^4\Biggl(\sum_{\substack{B \le r < 2B \\ \gcd(r, e) = 1}}\frac{\mu(r)\widetilde{\kappa}(r)}{r^3}\,e^{-u^2/r^2}\Biggr)^2 du \ge 0,}
+     $$
+     certified in 256-bit Arb to agree identically with $S(A)$ across all 11 tested blocks $A \in \{1/2, 1, 2, 4, 9/2, 6, 8, 16, 32, 35, 64\}$ (`all_direct_vs_decoupled_L2_enclose_zero: true`). Applying 2D summation by parts against the smooth kernel $\frac{(rs)^2}{(r^2+s^2)^{5/2}}$ (whose mixed partial derivative is $\ge 0$ and integrates to $\frac{15\sqrt{2}-8\sqrt{5}}{30}A$) and bounding the 1D summatory function $M_e(t) := \sum_{B \le r \le t,\, \gcd(r, e)=1}\mu(r)\widetilde{\kappa}(r)$ via the Korobov–Vinogradov–Walfisz theorem yields the **unconditional sub-linear saving**:
+     $$
+     \boxed{\bigl|S(A)\bigr| \ll A\exp\!\bigl(-c_0(\log A)^{3/5}(\log\log A)^{-1/5}\bigr) \ll_C \frac{A}{(\log A)^C} \qquad \forall C > 0,}
+     $$
+     which unconditionally beats both the $O(A)$ unsigned benchmark and the $S_{2\text{-prime}}(A) \asymp \frac{A}{\log^2 A}$ two-prime stratum, while a fixed power saving $|S(A)| \le C A^{1 - \eta}$ ($\eta > 0$) remains obstructed by potential off-critical zeros of $\zeta(s)$ in $\sum_{\gcd(r,e)=1}\mu(r)\widetilde{\kappa}(r)r^{-s} = \frac{K_e(s)}{\zeta(s)}$.
+
+5. **Edge-Case Regrouping Regressions and Balanced-Block Evaluation Table**:
+   All six required edge-case classes are verified in 256-bit Arb (`edge_cases_verified: true`):
+   - *Repeated coprime factorizations of the same squarefree $q$*:
+     - At $A = 6$, $q = 66 = 2 \cdot 3 \cdot 11$ ($\mu(66) = -1$) has $2$ ordered coprime factorizations in $[6, 12)^2$, namely $(6, 11)$ and $(11, 6)$, with $w_6(66) = [0.005224056775485917310781671764619177988921 \pm 2.00 \times 10^{-41}]$;
+     - At $A = 35$, $q = 2310 = 2 \cdot 3 \cdot 5 \cdot 7 \cdot 11$ ($\mu(2310) = -1$) has $4$ ordered coprime factorizations in $[35, 70)^2$, namely $(35, 66), (42, 55), (55, 42), (66, 35)$, with $w_{35}(2310) = [0.001527401243306262121849534637683093362364 \pm 2.00 \times 10^{-42}]$.
+   - *Nonsquarefree coprime factorizations ($\mu(q) = 0$)*: At $A = 4$, $q = 20 = 4 \times 5 = 5 \times 4$ has $2$ coprime factorizations in $[4, 8)^2$ with positive weight $w_4(20) = [0.01668459039204983979825298513603613054339 \pm 2.00 \times 10^{-41}] > 0$, but $\mu(20) = 0$ annihilates $\mu(20)w_4(20) = 0$.
+   - *Diagonal coprime pair $(r, s) = (1, 1)$*: Occurs if and only if $1 \in [A, 2A)$ (e.g. $A = 1$, where $q = 1$, $\omega(1) = 0$, $\mu(1) = +1$, and $S(1) = w_1(1) \approx +0.0714303404$), whereas for all $A > 1$ any diagonal pair $(r, r)$ has $\gcd(r, r) = r > 1$ (`diagonal_coprime_pair_count == 0`).
+   - *Empty block ($A = 1/2$)*: $[1/2, 1) \cap \mathbb{Z} = \emptyset$, so all four sum representations equal $0$ identically.
+   - *Half-open boundary $[A, 2A)$*: At $A = 4$, $r, s \in \{4, 5, 6, 7\}$ excludes the upper endpoint $2A = 8$; at fractional $A = 9/2 = 4.5$, $r, s \in \{5, 6, 7, 8\}$ excludes $2A = 9$.
+
+| Block $A$ | Integer Range $[r_{\min}, r_{\max}]$ | Coprime Pairs | $S(A)$ Direct Pair Sum | $S(A)$ Regrouped $q$-Sum | $S(A)$ Decoupled $L^2$-Sum | $S_{\mathrm{abs}}(A)$ Unsigned Majorant | $S_{2\text{-prime}}(A)$ ($\omega(q)=2$) | $\|S_{\mathrm{odd}}(A)\|$ ($\omega(q)$ odd) | $S_{\mathrm{even}\ge 4,\text{or }0}(A)$ | Non-Asymptotic Bound |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| $1/2$ | $\emptyset$ | $0$ | $0$ | $0$ | $0$ | $0$ | $0$ | $0$ | $0$ | $0$ |
+| $1$ | $[1, 1]$ | $1$ | $+0.0714303404$ | $+0.0714303404$ | $+0.0714303404$ | $0.0714303404$ | $0$ | $0$ | $0.0714303404$ | $0.2388020391$ |
+| $2$ | $[2, 3]$ | $2$ | $+0.0238727159$ | $+0.0238727159$ | $+0.0238727159$ | $0.0238727159$ | $0.0238727159$ | $0$ | $0$ | $0.2521089044$ |
+| $4$ | $[4, 7]$ | $10$ | $-0.0044669136$ | $-0.0044669136$ | $-0.0044669136$ | $0.0351148541$ | $0.0153239703$ | $0.0197908839$ | $0$ | $0.3322953904$ |
+| $9/2$ | $[5, 8]$ | $10$ | $-0.0044669136$ | $-0.0044669136$ | $-0.0044669136$ | $0.0351148541$ | $0.0153239703$ | $0.0197908839$ | $0$ | $0.3548222320$ |
+| $6$ | $[6, 11]$ | $22$ | $-0.0183496227$ | $-0.0183496227$ | $-0.0183496227$ | $0.0387480338$ | $0.0101992055$ | $0.0285488282$ | $0$ | $0.4243869331$ |
+| $8$ | $[8, 15]$ | $36$ | $-0.0222736084$ | $-0.0222736084$ | $-0.0222736084$ | $0.0490629797$ | $0.0098218103$ | $0.0356682941$ | $0.0035728754$ | $0.5194547400$ |
+| $16$ | $[16, 31]$ | $164$ | $+0.0109004064$ | $+0.0109004064$ | $+0.0109004064$ | $0.1157340012$ | $0.0489476697$ | $0.0524167974$ | $0.0143695341$ | $0.9071666281$ |
+| $32$ | $[32, 63]$ | $612$ | $-0.0329603116$ | $-0.0329603116$ | $-0.0329603116$ | $0.2574233683$ | $0.0554931451$ | $0.1451918400$ | $0.0567383832$ | $1.6892869988$ |
+| $35$ | $[35, 69]$ | $750$ | $-0.0243065366$ | $-0.0243065366$ | $-0.0243065366$ | $0.2913348692$ | $0.0698600625$ | $0.1578207029$ | $0.0636541038$ | $1.8361617742$ |
+| $64$ | $[64, 127]$ | $2502$ | $-0.0068022108$ | $-0.0068022108$ | $-0.0068022108$ | $0.5414610658$ | $0.1087909087$ | $0.2741316383$ | $0.1585385188$ | $3.2568760373$ |
+
+### 10.4 Trivial-Zero Lean 4 Formalization (`formal/RiemannScope/TrivialZero.lean`) and Certificate Theorem-Reference Repair (`section_4_trivial_zero_lean_formalization_and_scope`)
+
+In `TASK-TC-053`, we resolved the `RiemannScope.TrivialZero.trivialZero_exact` missing-module defect by creating and compiling [formal/RiemannScope/TrivialZero.lean](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope/TrivialZero.lean) (`4` definitions + `10` theorems = `14` declarations, `0` `sorry`, `0` `admit`, `0` custom axioms, imported in [formal/RiemannScope.lean](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope.lean) and registered in `REQUIRED_FORMAL_SOURCES` in [certification.py](file:///c:/Development/Projects/reimann_scope/certification.py) and `FORMAL_SOURCE_FILES` in [scripts/build_formal.py](file:///c:/Development/Projects/reimann_scope/scripts/build_formal.py)):
+1. **Concrete Mathlib Trivial-Zero and Transported Worldline Theorems**:
+   - `RiemannScope.TrivialZero.trivialZero_exact` (and top-level alias `RiemannScope.trivialZero_exact`): proves `riemannZeta (trivialZeroLocation m) = 0` for all `m : ℕ` (`trivialZeroLocation m := -2 * ((m : ℂ) + 1)`) directly from Mathlib's `riemannZeta_neg_two_mul_nat_add_one`;
+   - `RiemannScope.TrivialZero.trivialZero_worldline_exact` (and top-level alias `RiemannScope.trivialZero_worldline_exact`): proves `F_tau riemannZeta (zeroWorldline (trivialZeroLocation m) k) k = 0` for all `m : ℕ` and `k : ℝ` by combining `trivialZero_exact` with `zeroWorldline_is_zero`;
+   - `RiemannScope.TrivialZero.trivialZero_radialLeaf_exact` and `RiemannScope.TrivialZero.trivialZero_zero_eq_neg_half`: prove radial-leaf invariance `R_tau (zeroWorldline (trivialZeroLocation m) k) k = (trivialZeroLocation m).re - 1 / 2` and `trivialZeroLocation 0 = -2 ∧ (trivialZeroLocation 0).re - 1 / 2 = -5 / 2`.
+2. **Scalar Algebraic/Deductive Theorems for `TASK-TC-053`**:
+   - `RiemannScope.TrivialZero.trivial_zero_slope_scale_invariance_and_grade_energy_criterion`: proves scale invariance `a_K * (d_m / a_K) = d_m` (`a_K ≠ 0`), `normalizedTrivialZeroSlope pref a_K (d_m / a_K) = pref * d_m`, the rational ceiling bound `C1 + C2 < 7 / 2` for `C1 < 541342 / 1000000` and `C2 < 2281458 / 1000000`, and the grade-interval Cauchy–Schwarz square bound;
+   - `RiemannScope.TrivialZero.common_factor_mobius_split_and_valid_growing_range_exponent`: proves `(mu_d ^ 2 = 1 → (mu_d * mu_r) * (mu_d * mu_s) = (mu_d ^ 2) * (mu_r * mu_s) ∧ (mu_d * mu_r) * (mu_d * mu_s) = mu_r * mu_s)`, `(two_pow_omega + 2) * sqrt_t ≤ 3 * two_pow_omega * sqrt_t`, and `3 * (1 / 3 - delta) / 2 + eps * (1 / 3 - delta) - 1 / 2 ≤ -delta` for `0 < delta < 1 / 3` and `0 < eps ≤ (3 / 2) * delta`;
+   - `RiemannScope.TrivialZero.signed_block_bivariate_euler_nonvanishing_and_parity_regrouping`: proves local bivariate Euler factor positivity `0 < (sqrt_p - 1) ^ 2 / (p + 1) ∧ (sqrt_p - 1) ^ 2 / (p + 1) ≤ bivariateLocalEulerFactor p u v` for `p ≥ 2`, `sqrt_p > 1`, `sqrt_p ^ 2 = p`, and `|u|, |v| ≤ 1 / sqrt_p`, the log-weighted Möbius parity rearrangement `S_log_2 = -S_log_odd_ge_3 - S_log_even_ge_4 - R_log_pp`, and `|S_A| ≤ S_abs ∧ S_abs ≤ C_block * A`.
+3. **Certificate Verifier Repair**:
+   In [certification.py](file:///c:/Development/Projects/reimann_scope/certification.py), `certify_trivial_zero` and `certify_worldline` now record both `"formal_theorem_reference": "RiemannScope.TrivialZero.trivialZero_exact"` and `"transported_worldline_theorem_reference": "RiemannScope.TrivialZero.trivialZero_worldline_exact"` (with `_verify_trivial_zero_enclosure` and `_verify_worldline_continuation` verifying that `formal/RiemannScope/TrivialZero.lean` exists on disk and declares both theorems).
+

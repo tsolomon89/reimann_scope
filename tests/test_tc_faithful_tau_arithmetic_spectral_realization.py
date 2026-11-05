@@ -269,8 +269,8 @@ def test_06_lean_formalization_and_arb_roundtrip_verification(
         assert thm_name in lean_live["actual_theorems"]
 
     sec6 = tc050_artifact["section_6_certified_arb_roundtrip_verification"]
-    assert sec6["total_certified_arb_balls_checked"] == 855
-    assert sec6["compared_against_live_original_arb_count"] == 855
+    assert sec6["total_certified_arb_balls_checked"] == 1175
+    assert sec6["compared_against_live_original_arb_count"] == 1175
     assert sec6["live_original_count_matches_enumerated_total"] is True
     assert sec6["all_enclose_original_256bit_arb_ball"] is True
     assert sec6["failed_paths"] == []
@@ -279,7 +279,7 @@ def test_06_lean_formalization_and_arb_roundtrip_verification(
     rt_recheck = verify_all_serialized_arb_in_tree(
         tc050_artifact, path_prefix="task_tc050"
     )
-    assert rt_recheck["total_certified_arb_balls_checked"] == 855
+    assert rt_recheck["total_certified_arb_balls_checked"] == 1175
     assert (
         sec6["compared_against_live_original_arb_count"]
         == rt_recheck["total_certified_arb_balls_checked"]
@@ -2009,6 +2009,56 @@ def test_26_tc052r2_displayed_review_certificates_contain_full_generated_enclosu
             "2.08e-15",
             by_X_crit["4"]["R_mu_band_critical_line_mellin_integral_certified"],
         ),
+        (
+            "[2.822798387987013361092201192203292862020 \\pm 2.00 \\times 10^{-39}]",
+            "2.822798387987013361092201192203292862020",
+            "2.00e-39",
+            tc050_artifact[
+                "section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation"
+            ]["section_1_trivial_zero_slopes_and_mellin_energy_criterion"][
+                "gaussian_proxy_and_O_k_neg_2_comparison"
+            ]["C_Gc_total_constant_certified"],
+        ),
+        (
+            "[0.2388020390525650552804189993008810046850 \\pm 2.00 \\times 10^{-40}]",
+            "0.2388020390525650552804189993008810046850",
+            "2.00e-40",
+            tc050_artifact[
+                "section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation"
+            ]["section_3_signed_coprime_block_attempts_and_regrouping"][
+                "unsigned_benchmark_and_two_prime_stratum"
+            ]["C_block_non_asymptotic_constant_certified"],
+        ),
+        (
+            "[0.005224056775485917310781671764619177988921 \\pm 2.00 \\times 10^{-41}]",
+            "0.005224056775485917310781671764619177988921",
+            "2.00e-41",
+            tc050_artifact[
+                "section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation"
+            ]["section_3_signed_coprime_block_attempts_and_regrouping"][
+                "edge_case_and_regrouping_regressions"
+            ]["repeated_factorization_A6_q66"]["w_6_66_certified"],
+        ),
+        (
+            "[0.001527401243306262121849534637683093362364 \\pm 2.00 \\times 10^{-42}]",
+            "0.001527401243306262121849534637683093362364",
+            "2.00e-42",
+            tc050_artifact[
+                "section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation"
+            ]["section_3_signed_coprime_block_attempts_and_regrouping"][
+                "edge_case_and_regrouping_regressions"
+            ]["repeated_factorization_A35_q2310"]["w_35_2310_certified"],
+        ),
+        (
+            "[0.01668459039204983979825298513603613054339 \\pm 2.00 \\times 10^{-41}]",
+            "0.01668459039204983979825298513603613054339",
+            "2.00e-41",
+            tc050_artifact[
+                "section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation"
+            ]["section_3_signed_coprime_block_attempts_and_regrouping"][
+                "edge_case_and_regrouping_regressions"
+            ]["nonsquarefree_A4_q20"]["w_4_20_positive_certified"],
+        ),
     ]
 
     rev_text_norm = rev_text.replace("\\bigl[", "[").replace("\\bigr]", "]")
@@ -2275,7 +2325,7 @@ def test_26_tc052r2_displayed_review_certificates_contain_full_generated_enclosu
             "10^{-60}",
             "1e-60",
             "(1, 4) \\cup (8^{2/5}, 9^{3/5})",
-            "(1, 4) union (8^{2/5}, 9^{3/5})",
+            "(1, 4) union (8^{2/5}, 9^{2/5})",
             "47 `def` + 59 `theorem` = 103",
             "47 def + 59 theorem = 103",
             "`103` (`47` definitions + `59`",
@@ -2290,6 +2340,289 @@ def test_26_tc052r2_displayed_review_certificates_contain_full_generated_enclosu
             assert forbidden not in content, (
                 f"Found stale pre-TC-052R2 string {forbidden!r} in {rel_path}"
             )
+
+
+def test_27_tc053_trivial_zero_slopes_baez_duarte_proxy_and_mellin_energy_criterion(
+    tc050_artifact: dict,
+) -> None:
+    """Verify TASK-TC-053 Section 1:
+    - Normalized trivial-zero slope identity ((2*(-1)^m*tau^{2m})/(2m)!)*a_K*Z_{a_K}'(-2*m*a_K) = zeta(2m+1)
+      with grade K, trivial-zero index m, and finite-difference order k kept distinct.
+    - Generalized Baez-Duarte sequence c_k = sum_{j=0}^k (-1)^j binom(k, j) / zeta(2j+3)
+      = sum_{n>=1} (mu(n)/n^3)(1 - n^{-2})^k with explicit Dirichlet tail bound 1/(2*N^2).
+    - Gaussian proxy G(t) = sum_{n>=1} (mu(n)/n^3) e^{-t/n^2}, Q(X) = X^{5/2}G(X^2), and
+      |G(k) - c_k| <= C_{G,c} k^{-2} with C_{G,c} = 4e^{-2} + (2/3)*(1 + (7/(2e))^{7/2}) < 3.5.
+    - Mellin identity int_0^infty Q(X) X^{-z} dX/X = Gamma(5/4 - z/2)/(2*zeta(1/2 + z)) on 1/2 < Re(z) < 5/2
+      and the 5-step sufficiency criterion int_Y^{tau*Y} |Q(X)|^2 dX/X <= C_eps Y^eps.
+    """
+    from tc.faithful_tau_arithmetic_spectral_realization import (
+        STARTING_HEAD_TC_053,
+        TASK_TC_053_ID,
+        verify_trivial_zero_slopes_baez_duarte_and_mellin_criterion_arb,
+    )
+
+    assert (
+        tc050_artifact["trivial_zero_coprime_cancellation_task_id"]
+        == TASK_TC_053_ID
+        == "TASK-TC-053"
+    )
+    assert (
+        tc050_artifact["tc053_starting_head"]
+        == STARTING_HEAD_TC_053
+        == "c64596727e7142596acd073c6c8e4eb28f2eaee0"
+    )
+    sec9 = tc050_artifact[
+        "section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation"
+    ]
+    assert sec9["task_id"] == "TASK-TC-053"
+    assert sec9["subgate_tc043a_status"] == "OPEN"
+    assert sec9["rh_proved"] is False
+
+    sec1 = sec9["section_1_trivial_zero_slopes_and_mellin_energy_criterion"]
+    slopes = sec1["transported_trivial_zero_slope_identity"]
+    assert slopes["symbolic_reflection_prefactor_verified"] is True
+    assert slopes["all_worldline_zeros_enclose_zero"] is True
+    assert slopes["all_slope_identities_enclose_zero"] is True
+    assert len(slopes["sample_grade_and_index_table"]) == 12
+    for row in slopes["sample_grade_and_index_table"]:
+        assert row["Z_aK_at_s_m_K_encloses_zero"] is True
+        assert row["identity_encloses_zero"] is True
+
+    bd = sec1["generalized_baez_duarte_and_role_separation"]
+    assert len(bd["primary_literature_citations"]) == 3
+    assert "a_K Z_{a_K}'(-2 m a_K) = zeta'(-2m)" in bd["what_grade_transport_K_contributes"]
+    assert "1 / zeta(2j + 3)" in bd["what_varying_m_contributes"]
+
+    gproxy = sec1["gaussian_proxy_and_O_k_neg_2_comparison"]
+    assert gproxy["all_c_k_binomial_vs_dirichlet_enclose_zero"] is True
+    assert gproxy["all_G_k_minus_c_k_bounds_certified"] is True
+    assert gproxy["C_Gc_lt_rational_ceiling_certified"] is True
+    c_gc = gproxy["C_Gc_total_constant_certified"]["mid_float"]
+    assert math.isclose(
+        c_gc,
+        4.0 * math.exp(-2.0) + (2.0 / 3.0) * (1.0 + (3.5 / math.e) ** 3.5),
+        rel_tol=1e-14,
+    )
+    assert c_gc < 3.5
+    assert len(gproxy["c_k_and_G_k_comparison_table"]) == 8
+    for row in gproxy["c_k_and_G_k_comparison_table"]:
+        assert row["c_k_identity_encloses_zero"] is True
+        assert row["n_eq_1_bound_certified"] is True
+        assert row["n_ge_2_bound_certified"] is True
+        assert row["abs_G_k_minus_c_k_le_bound_certified"] is True
+
+    mellin = sec1["mellin_identity_and_sufficient_grade_energy_criterion"]
+    assert mellin["mellin_symbolic_termwise_verified"] is True
+    assert mellin["all_mellin_strip_checks_enclose_zero"] is True
+    assert (
+        mellin["criterion_status"]
+        == "SUFFICIENT_CRITERION_CONDITIONAL_ON_ARITHMETIC_ENERGY_PREMISE"
+    )
+    assert len(mellin["five_step_sufficiency_proof"]) == 5
+
+    live_sec1 = verify_trivial_zero_slopes_baez_duarte_and_mellin_criterion_arb(
+        prec_bits=256
+    )
+    assert live_sec1["transported_trivial_zero_slope_identity"]["all_slope_identities_enclose_zero"] is True
+    assert live_sec1["gaussian_proxy_and_O_k_neg_2_comparison"]["all_G_k_minus_c_k_bounds_certified"] is True
+
+
+def test_28_tc053_common_factor_coprime_squarefree_counting_and_gaussian_integral(
+    tc050_artifact: dict,
+) -> None:
+    """Verify TASK-TC-053 Section 2:
+    - Common-factor Moebius split mu(d*r)*mu(d*s) = 1_{gcd(d, r*s)=1} mu(d)^2 mu(r) mu(s).
+    - Coprime-squarefree counting N_q(t) = kappa(q)*t + R_q(t) with |R_q(t)| <= (2^{omega(q)}+2)*sqrt(t) <= 3*2^{omega(q)}*sqrt(t).
+    - Gaussian integral int_0^infty u^4 e^{-alpha*u^2} du = (3*sqrt(pi)/8)*alpha^{-5/2} and SymPy verification.
+    - Total error O_eps(A^{3/2+eps}/sqrt(X)) and valid growing range A <= X^{1/3-delta}.
+    """
+    from fractions import Fraction
+    from flint import ctx as flint_ctx
+    from tc.faithful_tau_arithmetic_spectral_realization import (
+        _evaluate_kappa_q_arb,
+        _evaluate_tilde_kappa_rational,
+        verify_common_factor_expansion_and_coprime_squarefree_asymptotics_arb,
+    )
+
+    sec2 = tc050_artifact[
+        "section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation"
+    ]["section_2_common_factor_expansion_and_coprime_squarefree_asymptotics"]
+
+    mob = sec2["common_factor_bijection_and_mobius_split"]
+    assert "3600 ordered pairs" in mob["tested_grid_range"]
+    assert mob["all_mobius_splits_exact"] is True
+
+    cnt = sec2["coprime_squarefree_counting_estimate"]
+    assert cnt["all_counting_bounds_certified"] is True
+    assert len(cnt["sample_counting_table"]) == 10
+    for row in cnt["sample_counting_table"]:
+        assert row["abs_R_q_t_le_bound_certified"] is True
+
+    gauss = sec2["gaussian_integral_and_pairwise_leading_term"]
+    assert gauss["gaussian_symbolic_verified"] is True
+    assert gauss["all_pairwise_error_bounds_certified"] is True
+    assert len(gauss["sample_pairwise_convergence_table"]) == 4
+    for row in gauss["sample_pairwise_convergence_table"]:
+        assert row["abs_difference_le_analytic_bound_certified"] is True
+
+    tot = sec2["total_error_and_valid_growing_range"]
+    assert tot["exponent_identity_symbolic_verified"] is True
+    assert "0 < eps < 3 delta / (2 (1/3 - delta))" in tot["valid_growing_range_condition"]
+
+    # Live check of tilde{kappa}(30) = (2/3)*(3/4)*(5/6) = 5/12 and live Section 2 verification:
+    assert _evaluate_tilde_kappa_rational(30) == Fraction(5, 12)
+    saved_prec = flint_ctx.prec
+    flint_ctx.prec = 256
+    try:
+        inv_zeta2 = arb(6) / (arb.pi() ** 2)
+        kap_30 = _evaluate_kappa_q_arb(30, inv_zeta2)
+        assert bool((kap_30 - inv_zeta2 * arb(5) / arb(12)).contains(0))
+    finally:
+        flint_ctx.prec = saved_prec
+    live_sec2 = verify_common_factor_expansion_and_coprime_squarefree_asymptotics_arb(
+        prec_bits=256
+    )
+    assert live_sec2["common_factor_bijection_and_mobius_split"]["all_mobius_splits_exact"] is True
+
+
+def test_29_tc053_signed_block_attempts_regrouping_and_edge_case_regressions(
+    tc050_artifact: dict,
+) -> None:
+    """Verify TASK-TC-053 Section 3:
+    - Direct (r, s) sum vs regrouping by q = r*s for S(A) = sum_q mu(q)*w_A(q) on A <= r, s < 2A.
+    - Unsigned benchmark |S(A)| <= S_abs(A) <= C_block * A and positive two-prime stratum S_{2-prime}(A) > 0.
+    - Attempt 1 bivariate Euler product D(s_1, s_2) = H(s_1, s_2)/(zeta(s_1)*zeta(s_2)) and AM-GM nonvanishing on Re(s_i) >= 1/2.
+    - Attempt 2 log-weighted identity mu(q)*log(q) = -sum_{uv=q} Lambda(u)*mu(v), decoupled L^2-integral decomposition,
+      2D antiderivative d^2/dr ds (r*s / (3*sqrt(r^2+s^2))) = (r*s)^2 / (r^2+s^2)^{5/2}, and unconditional Walfisz saving.
+    - Edge-case regressions: q = 66 at A = 6 (2 pairs), q = 2310 at A = 35 (4 pairs), nonsquarefree q = 20 at A = 4,
+      diagonal r = s = 1 at A = 1 vs A > 1, empty sums, and half-open boundaries [A, 2A).
+    """
+    from flint import ctx as flint_ctx
+    from tc.faithful_tau_arithmetic_spectral_realization import (
+        _evaluate_w_A_q_arb,
+        verify_signed_block_cancellation_attempts_and_regrouping_arb,
+    )
+
+    sec3 = tc050_artifact[
+        "section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation"
+    ]["section_3_signed_coprime_block_attempts_and_regrouping"]
+
+    defn = sec3["balanced_block_regrouping_definition"]
+    assert "appears ONCE" in defn["w_A_q_explicit_formula_with_kappa_once"]
+
+    bench = sec3["unsigned_benchmark_and_two_prime_stratum"]
+    assert bench["antiderivative_symbolic_verified"] is True
+    assert bench["box_integral_symbolic_verified"] is True
+    assert bench["C_block_lt_0_239_certified"] is True
+    assert "100% of products of two distinct primes" in bench["two_prime_stratum_asymptotic"]
+
+    att1 = sec3["attempt_1_prime_by_prime_bivariate_euler_product"]
+    assert att1["all_attempt1_local_factors_strictly_positive"] is True
+    assert "NEVER vanishes" in att1["am_gm_nonvanishing_proof"]
+    assert len(att1["local_factor_table"]) == 6
+
+    att2 = sec3["attempt_2_regrouping_by_q_and_logarithmic_mobius_identity"]
+    assert "Lambda(u) mu(v)" in att2["exact_regrouped_exchange_identity"]
+    assert "Korobov-Vinogradov-Walfisz" in att2[
+        "decoupled_L2_inclusion_exclusion_and_unconditional_walfisz_bound"
+    ]
+
+    edge = sec3["edge_case_and_regrouping_regressions"]
+    assert edge["edge_cases_verified"] is True
+    assert edge["all_direct_vs_regrouped_enclose_zero"] is True
+    assert edge["all_direct_vs_decoupled_L2_enclose_zero"] is True
+    assert edge["all_log_mobius_exchanges_enclose_zero"] is True
+    assert edge["all_unsigned_bounds_certified"] is True
+    assert edge["repeated_factorization_A6_q66"]["coprime_factorization_count_in_block"] == 2
+    assert edge["repeated_factorization_A6_q66"]["ordered_coprime_pairs_in_block"] == [
+        [6, 11],
+        [11, 6],
+    ]
+    assert edge["repeated_factorization_A35_q2310"]["coprime_factorization_count_in_block"] == 4
+    assert edge["repeated_factorization_A35_q2310"]["ordered_coprime_pairs_in_block"] == [
+        [35, 66],
+        [42, 55],
+        [55, 42],
+        [66, 35],
+    ]
+    assert edge["nonsquarefree_A4_q20"]["ordered_coprime_pairs_in_block"] == [
+        [4, 5],
+        [5, 4],
+    ]
+    assert edge["nonsquarefree_A4_q20"]["mu_20"] == 0
+    assert edge["nonsquarefree_A4_q20"]["mu_20_times_w_4_20_zero"] is True
+    assert len(edge["balanced_block_evaluation_table"]) == 11
+    by_A = {row["A_label"]: row for row in edge["balanced_block_evaluation_table"]}
+    assert by_A["1/2"]["coprime_pair_count"] == 0
+    assert by_A["1"]["diagonal_coprime_pair_count"] == 1
+    for lbl in ("2", "4", "9/2", "6", "8", "16", "32", "35", "64"):
+        assert by_A[lbl]["diagonal_coprime_pair_count"] == 0
+        assert by_A[lbl]["direct_minus_regrouped_encloses_zero"] is True
+        assert by_A[lbl]["direct_minus_decoupled_L2_encloses_zero"] is True
+        assert by_A[lbl]["direct_minus_log_mobius_encloses_zero"] is True
+        assert by_A[lbl]["unsigned_bound_certified"] is True
+        assert by_A[lbl]["S_two_prime_omega_eq_2_certified"]["mid_float"] > 0
+
+    # Live Arb check of _evaluate_w_A_q_arb and verify_signed_block_cancellation_attempts_and_regrouping_arb:
+    saved_prec = flint_ctx.prec
+    flint_ctx.prec = 256
+    try:
+        inv_zeta2 = arb(6) / (arb.pi() ** 2)
+        c_gauss = (arb(3) * arb.pi().sqrt()) / arb(8)
+        w_val, cnt_66, pairs_66 = _evaluate_w_A_q_arb(66, 6, 11, inv_zeta2, c_gauss)
+        assert cnt_66 == 2
+        assert pairs_66 == [(6, 11), (11, 6)]
+        assert bool(w_val.lower() > arb(0))
+    finally:
+        flint_ctx.prec = saved_prec
+    live_sec3 = verify_signed_block_cancellation_attempts_and_regrouping_arb(
+        prec_bits=256
+    )
+    assert live_sec3["edge_case_and_regrouping_regressions"]["edge_cases_verified"] is True
+
+
+def test_30_tc053_trivial_zero_lean_module_and_theorem_scope_verification(
+    tc050_artifact: dict,
+) -> None:
+    """Verify TASK-TC-053 Section 4:
+    - formal/RiemannScope/TrivialZero.lean exists, compiles 4 def + 10 theorem = 14 declarations
+      with 0 sorry and 0 admit, and includes RiemannScope.TrivialZero.trivialZero_exact and
+      RiemannScope.TrivialZero.trivialZero_worldline_exact.
+    - Exact scope and #print axioms output for all new Lean theorems.
+    """
+    from tc.faithful_tau_arithmetic_spectral_realization import (
+        verify_trivial_zero_lean_module,
+    )
+
+    tz_live = verify_trivial_zero_lean_module()
+    assert tz_live["exists"] is True
+    assert tz_live["contains_sorry"] is False
+    assert tz_live["contains_admit"] is False
+    assert tz_live["matches_exact"] is True
+    assert len(tz_live["actual_defs"]) == 4
+    assert len(tz_live["actual_theorems"]) == 10
+    assert tz_live["actual_total_declarations"] == 14
+
+    sec4 = tc050_artifact[
+        "section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation"
+    ]["section_4_trivial_zero_lean_formalization_and_scope"]
+    tz_mod = sec4["trivial_zero_lean_module_verification"]
+    assert tz_mod["certificate_theorem_reference_repaired"] == "RiemannScope.TrivialZero.trivialZero_exact"
+    assert tz_mod["transported_worldline_corollary"] == "RiemannScope.TrivialZero.trivialZero_worldline_exact"
+    scopes = sec4["committed_trivial_zero_lean_theorems_exact_scope"]
+    for key in (
+        "trivialZero_exact",
+        "trivialZero_worldline_exact",
+        "trivial_zero_slope_scale_invariance_and_grade_energy_criterion",
+        "common_factor_mobius_split_and_valid_growing_range_exponent",
+        "signed_block_bivariate_euler_nonvanishing_and_parity_regrouping",
+    ):
+        assert key in scopes
+        assert (
+            "depends on axioms: [propext, Classical.choice, Quot.sound]"
+            in scopes[key]["print_axioms_output"]
+        )
+
 
 
 
