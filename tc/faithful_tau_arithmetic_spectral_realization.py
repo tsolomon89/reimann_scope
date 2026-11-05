@@ -4263,8 +4263,8 @@ def verify_transition_region_vanishing_moments_and_vaughan_type_I_bound_arb(
             )
 
             # Vaughan decomposition on H(X) < m <= M(X) with U = V = floor(X^{1/4}):
-            # Since X >= 1 and 1/4 <= 5/6, floor(X^{1/4}) <= floor(X^{5/6}) = H(X) and U * V <= sqrt(X)
-            # hold for ALL X >= 1 (whereas sqrt(X) <= H(X) is false for X in (1, 2^{6/5}), e.g. X = 2).
+            # Since X >= 1 and 1/4 <= 5/6, 1 <= floor(X^{1/4}) <= floor(X^{5/6}) = H(X) and
+            # U * V = floor(X^{1/4})^2 <= (X^{1/4})^2 = sqrt(X) hold directly for ALL X >= 1.
             u_cut = max(1, int(float((x_a ** arb("0.25")).lower())))
             while (u_cut + 1) ** 4 <= int(float(x_a.lower())):
                 u_cut += 1
@@ -4512,8 +4512,8 @@ def verify_transition_region_vanishing_moments_and_vaughan_type_I_bound_arb(
                     "band_admissibility_condition": (
                         "max(U, V) <= H(X) ensures m > H(X) >= max(U, V) so mu(m) = c_I(m; U, V) + c_{II}(m; U, V) for all H(X) < m <= M(X), "
                         "and U V <= sqrt(X) ensures |E_{EM,I}(X; U, V)| <= C_{EM,I} (U V / sqrt(X)) <= C_{EM,I}. "
-                        "Both hold for U = V = floor(X^{1/4}) across ALL X >= 1 (since 1 <= floor(X^{1/4}) <= floor(X^{5/6}) = H(X) and floor(X^{1/4})^2 <= sqrt(X)), "
-                        "without using the false small-X inequality sqrt(X) <= H(X) (which fails on 1 < X < 2^{6/5}, e.g. at X = 2 where H(2) = 1 < sqrt(2))."
+                        "Both hold directly for U = V = floor(X^{1/4}) across ALL X >= 1 because X >= 1 implies 1 <= X^{1/4} <= X^{5/6}, "
+                        "hence floor(X^{1/4}) <= floor(X^{5/6}) = H(X) and U V = floor(X^{1/4})^2 <= (X^{1/4})^2 = sqrt(X)."
                     ),
                 },
                 "vaughan_m4_U1_V1_regression": vaughan_m4_regression,
@@ -4522,8 +4522,13 @@ def verify_transition_region_vanishing_moments_and_vaughan_type_I_bound_arb(
                     "C0_tilde_psi_exact_rational": f"{C0_tilde_psi_frac.numerator}/{C0_tilde_psi_frac.denominator}",
                     "C1_tilde_psi_exact_rational": f"{C1_tilde_psi_frac.numerator}/{C1_tilde_psi_frac.denominator}",
                     "C2_tilde_psi_exact_rational": f"{C2_tilde_psi_frac.numerator}/{C2_tilde_psi_frac.denominator}",
+                    "tilde_A1_formula": "(C0_tilde_psi + 2 * C1_tilde_psi) / 18 + (17 * C2_tilde_psi) / 192",
+                    "tilde_A2_formula": "C2_tilde_psi / 18",
                     "tilde_A1_exact_rational": f"{tilde_A1_frac.numerator}/{tilde_A1_frac.denominator}",
                     "tilde_A2_exact_rational": f"{tilde_A2_frac.numerator}/{tilde_A2_frac.denominator}",
+                    "pointwise_tilde_W_log_large_v_estimate": (
+                        "|tilde{W}_log(v)| <= (7/36) tilde{C}_0 v^{-5/2} + (tilde{A}_1 + tilde{A}_2 log v) v^{-3/2}   (v >= 1)"
+                    ),
                     "var_f_small_v_0_to_1_bound_certified": serialize_arb_certified(
                         var_f_small_v_0_to_1_arb
                     ),
@@ -4669,6 +4674,26 @@ def verify_hilbert_space_euler_intertwining_and_critical_line_factorization_arb(
 
         # 2. Verify the critical-line Mellin representation with proved whole-integrand tail bounds
         #    and validate L^1(R) and L^2(R) norms of Omega_log(t) = -(1/tau) zeta'(1/2 + it) H_0(it):
+        #    First verify symbolically that at s = 1/2 + i t, s(s - 1) = -(t^2 + 1/4) so that
+        #    ((s(s - 1))^4) / 1024 = ((t^2 + 1/4)^4) / 1024 and
+        #    H_0(i t) = ((t^2 + 1/4)^4 / (1024 sqrt(pi))) |Gamma(1/4 + i t / 2)|^2:
+        t_sym = sp.Symbol("t", real=True)
+        s_sym = sp.Rational(1, 2) + sp.I * t_sym
+        h0_crit_poly_identity_verified = bool(
+            sp.expand(
+                ((s_sym * (s_sym - 1)) ** 4) / 1024
+                - ((t_sym**2 + sp.Rational(1, 4)) ** 4) / 1024
+            )
+            == 0
+            and sp.expand(
+                (4 * t_sym**2 / (t_sym**2 + sp.Rational(1, 4)))
+                * ((t_sym**2 + sp.Rational(1, 4)) ** 4)
+                / 1024
+                - (t_sym**2 * ((t_sym**2 + sp.Rational(1, 4)) ** 3)) / 256
+            )
+            == 0
+        )
+
         def _eval_H0_crit_acb(t_c: acb, analytic: bool = False) -> acb:
             s_c = acb("0.5") + acb(0, 1) * t_c
             one_minus_s = acb("0.5") - acb(0, 1) * t_c
@@ -4898,10 +4923,11 @@ def verify_hilbert_space_euler_intertwining_and_critical_line_factorization_arb(
 
         # Validated L^1(R) and L^2(R) norms of Omega_log(t) on [-T, T] + proved infinite tails:
         # On R, |Omega_log(t)| = (1/tau) sqrt(zeta'(1/2+it) zeta'(1/2-it)) H_0(it) where
-        # Z_2(t) := zeta'(1/2+it) zeta'(1/2-it) is holomorphic and strictly positive on [0, T]
-        # (by Speiser's theorem and simplicity of the zeros of zeta on [0, 48]; in acb.integral,
-        # Z_2(t).sqrt(analytic=True) returns NaN if a complex box touches the branch cut (-infty, 0],
-        # forcing subdivision until Re(Z_2(B)) > 0 on every integration box).
+        # Z_2(z) := zeta'(1/2+iz) zeta'(1/2-iz) is evaluated on complex boxes by a degree-6 centered
+        # Taylor polynomial at z_0 = mid(z) with interval Lagrange remainder on z, and positivity on
+        # every integration box is certified directly by the ball guard bool(z2.real > arb(0)) before
+        # calling z2.sqrt(analytic=analytic) (returning NaN to force subdivision if a complex box
+        # touches the branch cut (-infty, 0]).
         def _f_omega_L1(t_c: acb, analytic: bool = False) -> acb:
             if analytic and (
                 not t_c.real.is_finite() or not t_c.imag.is_finite()
@@ -5094,8 +5120,20 @@ def verify_hilbert_space_euler_intertwining_and_critical_line_factorization_arb(
                     "for the spatial derivative form of R_0 f), Mellin-Plancherel gives "
                     "||J_tau f||_{H_tau^pos}^2 = ||A_tau^B f||_{H_tau^B}^2 + 4 ||R_0 f||_{L^2(dy/y)}^2 "
                     "= (1 / tau) int_{-infty}^infty nu(t) |hat{f}(i t)|^2 dt. "
-                    "Because nu(0) = 0, J_tau is an isometric embedding of (D(J_tau), ||.||_{J_tau}) into H_tau^pos, "
-                    "NOT an isometry for the unweighted L^2(R_{>0}, dy/y) norm."
+                    "Because nu(0) = 0 with nu(t) = (16 - psi''(5/4)/8) t^2 + O(t^4) as t -> 0, "
+                    "(D(J_tau), ||J_tau .||_{H_tau^pos}) is an inner-product space that is NOT complete "
+                    "(for example, hat{f}_n(t) = t^{-1} 1_{[1/n, 1]}(t) defines f_n in D(J_tau) subset L^2(R_{>0}, dy/y) "
+                    "that is Cauchy in the nu(t)-weighted norm since int_0^1 t^{-2} nu(t) dt < infty, whereas its "
+                    "weighted limit t^{-1} 1_{(0, 1]}(t) is not in L^2(R, dt)), and J_tau : D(J_tau) -> H_tau^pos "
+                    "is an isometric embedding of this inner-product space into the ambient Hilbert space H_tau^pos."
+                ),
+                "plancherel_component_tail_domination_note": (
+                    "On |t| >= 48, nu_B(t) = sum_{n=0}^infty (t^2 / 4) / ((n + 5/4)((n + 5/4)^2 + t^2 / 4)) "
+                    "<= (zeta(3, 5/4) / 4) t^2 <= 4 (t^2 + 1/4) (since zeta(3, 5/4) / 4 = -psi''(5/4) / 8 ~ 0.1659674922 < 4) and "
+                    "nu_{R0}(t) = 4 t^2 / (t^2 + 1/4) <= 4 <= 4 (t^2 + 1/4), so both (1/tau) nu_B(t) H_0(it) "
+                    "and (1/tau) nu_{R0}(t) H_0(it) are bounded on |t| >= 48 by (4 (t^2 + 1/4) / tau) H_0(it) "
+                    "<= (Gamma(1/4)^2 / (128 sqrt(pi) tau)) (t^2 + 1/4)^5 e^{-pi |t| / 2}, whose two-sided integral "
+                    "on |t| >= 48 is bounded by 2 B_{Omega,1}^{tail}(48)."
                 ),
                 "nu_at_0_equals_zero": bool(nu_at_0_arb.contains(0)),
                 "nu_nonnegative_and_quadratic_lower_bound": (
@@ -5138,12 +5176,25 @@ def verify_hilbert_space_euler_intertwining_and_critical_line_factorization_arb(
                     "at z = 1/2 cancels the double pole of -zeta'(1/2 + z) at s = 1), giving an unconditional "
                     "critical-line integral representation of R_{mu,band}(X)."
                 ),
+                "H0_critical_line_canonical_formula": (
+                    "H_0(i t) = ((t^2 + 1/4)^4 / (1024 sqrt(pi))) Gamma(1/4 + i t / 2) Gamma(1/4 - i t / 2) "
+                    "= ((t^2 + 1/4)^4 / (1024 sqrt(pi))) |Gamma(1/4 + i t / 2)|^2   (since s(s - 1) = -(t^2 + 1/4) at s = 1/2 + i t)"
+                ),
+                "H0_critical_line_polynomial_identity_verified": h0_crit_poly_identity_verified,
                 "whole_integrand_tail_bound_theorem": (
                     "For T >= 40 and A_X := sum_{H(X) < m <= M(X)} |mu(m)| / sqrt(m), "
                     "|M_band(1/2 + it; X) X^{it}| <= A_X, 0 < H_0(it) <= (Gamma(1/4)^2 / (512 sqrt(pi))) (t^2 + 1/4)^4 e^{-pi t / 2}, "
-                    "and |zeta'(1/2 + it)| <= 2 sqrt(t^2 + 1/4) + 1 + 1/(t^2 + 1/4) <= 4 (t^2 + 1/4), proving "
-                    "|int_{|t| >= T} Omega_log(t) M_band(1/2 + it; X) X^{it} dt| <= 2 A_X B_{Omega,1}^{tail}(T) with "
-                    "B_{Omega,1}^{tail}(T) := (Gamma(1/4)^2 / (32 pi^{3/2} tau)) (T^2 + 1/4)^5 e^{-pi T / 2}."
+                    "and |zeta'(1/2 + it)| <= 2 sqrt(t^2 + 1/4) + 1 + 1/(t^2 + 1/4) <= 4 (t^2 + 1/4), proving the one-sided tail bounds "
+                    "int_T^infty |Omega_log(t)| dt <= B_{Omega,1}^{tail}(T) := (Gamma(1/4)^2 / (32 pi^{3/2} tau)) (T^2 + 1/4)^5 e^{-pi T / 2} "
+                    "and int_T^infty |Omega_log(t)|^2 dt <= B_{Omega,2}^{tail}(T) := (Gamma(1/4)^4 / (8192 pi^2 tau^2)) (T^2 + 1/4)^{10} e^{-pi T}, "
+                    "so the two-sided norm tails on |t| >= T are bounded by 2 B_{Omega,1}^{tail}(T) and 2 B_{Omega,2}^{tail}(T), "
+                    "and the two-sided band-integral tail satisfies |int_{|t| >= T} Omega_log(t) M_band(1/2 + it; X) X^{it} dt| <= 2 A_X B_{Omega,1}^{tail}(T)."
+                ),
+                "omega_L1_quadrature_method": (
+                    "Evaluates Z_2(z) := zeta'(1/2 + i z) zeta'(1/2 - i z) on complex boxes via a degree-6 centered Taylor "
+                    "polynomial at z_0 = mid(z) with interval Lagrange remainder on z, checks bool(z2.real > arb(0)) to "
+                    "certify strict positivity away from the branch cut (-infty, 0], and applies z2.sqrt(analytic=analytic) "
+                    "on 96 subintervals of width 1/2 across [0, 48]."
                 ),
                 "cutoff_T": T_mellin_cut,
                 "B_Omega_1_tail_T_certified": serialize_arb_certified(
@@ -5314,9 +5365,12 @@ def execute_task_tc052_arithmetic_fourier_compatibility_audit(
     return {
         "task_id": TASK_TC_052_ID,
         "repair_task_id": "TASK-TC-052R",
+        "followup_repair_task_id": "TASK-TC-052R2",
         "starting_head": STARTING_HEAD_TC_052,
         "tc052_merged_main_baseline": "916440e688c66d461daa04b17d7435e10e65f0d4",
         "tc052_implementation_commit": "8414aa66f1127c636c68fcf8594833c570a3344a",
+        "tc052r_merged_main_baseline": "7dc75e83f6b48e6ef436f55b573910e93d0f4f48",
+        "tc052r_implementation_commit": "f230b1a72c2c336522834703534bbdb8c15a250a",
         "subgate_tc043a_status": "OPEN",
         "rh_proved": False,
         "closing_theorem_target": (
@@ -5373,7 +5427,8 @@ def execute_task_tc050_faithful_spectral_realization_audit(
         "repair_task_id": "TASK-TC-051R",
         "subgate_closure_attempt_task_id": TASK_TC_052_ID,
         "tc052_repair_task_id": "TASK-TC-052R",
-        "preceding_repair_task_ids": ["TASK-TC-050R", "TASK-TC-050R2", "TASK-TC-051R"],
+        "tc052_followup_repair_task_id": "TASK-TC-052R2",
+        "preceding_repair_task_ids": ["TASK-TC-050R", "TASK-TC-050R2", "TASK-TC-051R", "TASK-TC-052R"],
         "parent_epic": EPIC_TC_042_ID,
         "starting_head": STARTING_HEAD_TC_050,
         "tc051_starting_head": STARTING_HEAD_TC_051,
@@ -5383,6 +5438,8 @@ def execute_task_tc050_faithful_spectral_realization_audit(
         "tc052_starting_head": STARTING_HEAD_TC_052,
         "tc052_merged_main_baseline": "916440e688c66d461daa04b17d7435e10e65f0d4",
         "tc052_implementation_commit": "8414aa66f1127c636c68fcf8594833c570a3344a",
+        "tc052r_merged_main_baseline": "7dc75e83f6b48e6ef436f55b573910e93d0f4f48",
+        "tc052r_implementation_commit": "f230b1a72c2c336522834703534bbdb8c15a250a",
         "reviewed_baseline": REVIEWED_BASELINE_TC_050,
         "tc050r_reviewed_baseline": "2f7871fff666091c4152ecc8657f2345aacdd4fa",
         "tc050r2_reviewed_head": "0e6ae36ce995ef3037652b3dfb67645325f990b1",
@@ -5413,17 +5470,17 @@ def execute_task_tc050_faithful_spectral_realization_audit(
             ],
             "tc052r_evidence_and_scope_separation": {
                 "concrete_analytic_results": [
-                    "Exact Plancherel multiplier nu(t) = Re psi(5/4 + i t / 2) - psi(5/4) + 4 t^2 / (t^2 + 1/4) = [Re psi(1/4 + i t / 2) - log pi] + (c_tau^B + 2) for J_tau f = (A_tau^B f, 2 R_0 f), with nu(0) = 0, nu(t) >= 4 t^2 / (t^2 + 1/4) >= 0, and nu(t) = (16 - psi''(5/4)/8) t^2 + O(t^4) as t -> 0.",
-                    "Reconciled Vaughan identity mu(m) = c_I(m; U, V) + c_II(m; U, V) for m > max(U, V) with c_II(m; U, V) = sum_{a b = m, a > U, b > V} mu(a) sum_{r | b, r > V} mu(r) = -sum_{a b = m, a > U, b > V} mu(a) sum_{r | b, r <= V} mu(r), and unconditional Type I bound |R_I(X; U, V)| <= B_J + C_{EM,I} via progression bounded-variation transfer ||F_X||_infty + Var_{(0,infty)}(F_X) <= C_{BV} X^{-1/2}.",
+                    "Exact Plancherel multiplier nu(t) = Re psi(5/4 + i t / 2) - psi(5/4) + 4 t^2 / (t^2 + 1/4) = [Re psi(1/4 + i t / 2) - log pi] + (c_tau^B + 2) for J_tau f = (A_tau^B f, 2 R_0 f), with nu(0) = 0, nu(t) >= 4 t^2 / (t^2 + 1/4) >= 0, and nu(t) = (16 - psi''(5/4)/8) t^2 + O(t^4) as t -> 0 (where (D(J_tau), ||J_tau .||_{H_tau^pos}) is an inner-product space that is not complete because nu(t) ~ c t^2 at t -> 0, and J_tau is an isometric embedding of this inner-product space into H_tau^pos).",
+                    "Reconciled Vaughan identity mu(m) = c_I(m; U, V) + c_II(m; U, V) for m > max(U, V) with c_II(m; U, V) = sum_{a b = m, a > U, b > V} mu(a) sum_{r | b, r > V} mu(r) = -sum_{a b = m, a > U, b > V} mu(a) sum_{r | b, r <= V} mu(r), and unconditional Type I bound |R_I(X; U, V)| <= B_J + C_{EM,I} = [40148.0933 +/- 5.15e-5] < 40148.0934 via progression bounded-variation transfer ||F_X||_infty + Var_{(0,infty)}(F_X) <= C_{BV} X^{-1/2} (C_{BV} = [40129.85653 +/- 6.24e-6], C_{EM,I} = [40143.3250 +/- 5.10e-5], tilde{A}_1 = 17685797581/688128, tilde{A}_2 = 14758395/1024 = 132825555/9216).",
                     "Exact nonzero asymptotic limit lim_{X -> infty} J_band(X) = lim_{X -> infty} R_{1,band}(X) = L = 27 zeta(3)/(256 pi^2) + 81[-zeta'(3)]/128 = 0.1382222059... > 0, and unconditional O(1) boundedness R_{|mu|,band}(X) = (6/pi^2) J_band(X) + O(1) (with convergence to (6/pi^2) L conditional on E_Q(t) = o(sqrt(t))).",
-                    "Proved whole-integrand Mellin tail bounds B_{Omega,1}^{tail}(T) <= 1.3719e-18 and B_{Omega,2}^{tail}(T) <= 7.3910e-37 at T = 48 via Euler-Weierstrass Gamma comparison and 1st-order Euler-Maclaurin zeta' growth bound.",
+                    "Proved one-sided Mellin tail bounds B_{Omega,1}^{tail}(T) <= 1.3719e-18 and B_{Omega,2}^{tail}(T) <= 7.3910e-37 at T = 48 via Euler-Weierstrass Gamma comparison and 1st-order Euler-Maclaurin zeta' growth bound (yielding two-sided norm tails 2 B_{Omega,j}^{tail}(48) and band-integral tail 2 A_X B_{Omega,1}^{tail}(48)).",
                 ],
                 "conditional_lean_inequality_lemmas": [
-                    "Theorems 57, 58, and 59 in formal/RiemannScope/CanonicalThetaCorrelationBound.lean are conditional real-arithmetic and inequality reductions over R whose final step in Theorem 59 applies the explicitly assumed analytic bridge implication h_bridge : (|C_K| <= P_0 + B_ctrl + B_I + C_log_0 -> delta_rho = 0).",
+                    "Theorems 57, 58, and 59 in formal/RiemannScope/CanonicalThetaCorrelationBound.lean (47 def + 59 theorem = 106 total declarations) are conditional real-arithmetic and inequality reductions over R whose final step in Theorem 59 applies the explicitly assumed analytic bridge implication h_bridge : (|C_K| <= P_0 + B_ctrl + B_I + C_log_0 -> delta_rho = 0), and whose #print axioms output is [propext, Classical.choice, Quot.sound] (0 custom axioms).",
                 ],
                 "certified_finite_numerical_evaluations": [
                     "256-bit Arb enclosures of R_{mu,band}(X) via Mellin integration on [-48, 48] combined with proved infinite-tail bounds 2 A_X B_{Omega,1}^{tail}(48) at X in {1, 2, 4}.",
-                    "256-bit Arb enclosures of ||Omega_log||_{L^1(R)} = [0.1008434929769 +/- 5.00e-14] >= sqrt(2)|R_{mu,band}(1)| = 0.0196369224... and ||Omega_log||_{L^2(R)} = [0.025900722690580 +/- 4.46e-16].",
+                    "256-bit Arb enclosures of ||Omega_log||_{L^1(R)} = [0.10084349298 +/- 5.15e-12] >= sqrt(2)|R_{mu,band}(1)| = [0.01963692241634130198014767621401007578986 +/- 3.04e-41] and ||Omega_log||_{L^2(R)} = [0.02590072269 +/- 3.10e-12] (with squared L^2 integral int_R |Omega_log(t)|^2 dt = [0.000670847436 +/- 2.37e-13]).",
                     "Exact rational verification of Landau's inequality |sum_{d <= N} mu(d)/d| <= 1 for 1 <= N <= 200 and Vaughan's identity at 8 sample scales X in [1, 64] plus the U = V = 1, m = 4 regression.",
                 ],
                 "remaining_open_obligations": [
@@ -5568,6 +5625,17 @@ def execute_task_tc050_faithful_spectral_realization_audit(
                     ),
                 },
                 "theorem_57_transition_integral_linear_density_annihilation_and_sqrt_error_bound": {
+                    "declaration_name": "RiemannScope.transition_integral_linear_density_annihilation_and_sqrt_error_bound",
+                    "print_axioms_command": (
+                        "lake env lean --stdin  (input: import RiemannScope.CanonicalThetaCorrelationBound\\n"
+                        "#print axioms RiemannScope.transition_integral_linear_density_annihilation_and_sqrt_error_bound)"
+                    ),
+                    "print_axioms_output": (
+                        "'RiemannScope.transition_integral_linear_density_annihilation_and_sqrt_error_bound' "
+                        "depends on axioms: [propext, Classical.choice, Quot.sound]"
+                    ),
+                    "standard_lean_axioms_used": ["propext", "Classical.choice", "Quot.sound"],
+                    "custom_lean_axioms_used": [],
                     "parameters_and_hypotheses": (
                         "(I_a R_a c_a J_band T_low T_high B_lin_M B_err_M I_err C_log_EM C_log_0 B_E C_a L_tilde_W : ℝ) "
                         "(hc_a_nonneg : 0 ≤ c_a) "
@@ -5597,6 +5665,17 @@ def execute_task_tc050_faithful_spectral_realization_audit(
                     ),
                 },
                 "theorem_58_vaughan_band_decomposition_and_type_I_uniform_bound": {
+                    "declaration_name": "RiemannScope.vaughan_band_decomposition_and_type_I_uniform_bound",
+                    "print_axioms_command": (
+                        "lake env lean --stdin  (input: import RiemannScope.CanonicalThetaCorrelationBound\\n"
+                        "#print axioms RiemannScope.vaughan_band_decomposition_and_type_I_uniform_bound)"
+                    ),
+                    "print_axioms_output": (
+                        "'RiemannScope.vaughan_band_decomposition_and_type_I_uniform_bound' "
+                        "depends on axioms: [propext, Classical.choice, Quot.sound]"
+                    ),
+                    "standard_lean_axioms_used": ["propext", "Classical.choice", "Quot.sound"],
+                    "custom_lean_axioms_used": [],
                     "parameters_and_hypotheses": (
                         "(R_band R_I R_II S_mu_U S_mu_V J_band E_EM_I B_J C_EM_1 rho_UV M_II M_R : ℝ) "
                         "(h_decomp : R_band = vaughanBandDecomp R_I R_II) "
@@ -5625,6 +5704,17 @@ def execute_task_tc050_faithful_spectral_realization_audit(
                     ),
                 },
                 "theorem_59_euler_sieved_orbit_and_complete_subgate_closure_chain": {
+                    "declaration_name": "RiemannScope.euler_sieved_orbit_and_complete_subgate_closure_chain",
+                    "print_axioms_command": (
+                        "lake env lean --stdin  (input: import RiemannScope.CanonicalThetaCorrelationBound\\n"
+                        "#print axioms RiemannScope.euler_sieved_orbit_and_complete_subgate_closure_chain)"
+                    ),
+                    "print_axioms_output": (
+                        "'RiemannScope.euler_sieved_orbit_and_complete_subgate_closure_chain' "
+                        "depends on axioms: [propext, Classical.choice, Quot.sound]"
+                    ),
+                    "standard_lean_axioms_used": ["propext", "Classical.choice", "Quot.sound"],
+                    "custom_lean_axioms_used": [],
                     "parameters_and_hypotheses": (
                         "(C_K P_K P_y_K Delta_arch_y_K E_ctrl_K R_band_X I_X P_0 B_ctrl C_log_0 B_I N_y N_0 delta_rho : ℝ) "
                         "(h_CK : C_K = canonicalCorrelationHSOrbitDecomp P_K E_ctrl_K R_band_X) "

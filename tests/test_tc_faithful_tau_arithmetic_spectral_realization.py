@@ -1552,6 +1552,9 @@ def test_24_tc052_euler_sieved_orbit_critical_line_mellin_and_closure_chain(
         float(crit["B_Omega_1_tail_T_certified"]["upper_dec"]) < 1.372e-18
     )
     assert (
+        float(crit["B_Omega_2_tail_T_certified"]["upper_dec"]) < 7.392e-37
+    )
+    assert (
         crit["Omega_log_L1_ge_sqrt2_abs_R_band_1_certification"]["certified"]
         is True
     )
@@ -1656,5 +1659,637 @@ def test_25_tc052r_repair_reconciliation_and_stale_claim_absence(
     assert "((-1 : ℝ) + 1 = 0 ∧ (-1 : ℝ) + (-1 : ℝ) ≠ 0)" in lean_text
     assert "(16 / 5 : ℝ) * t ^ 2 ≤ nu_B + (4 * t ^ 2) / (t ^ 2 + 1 / 4)" in lean_text
     assert "Conditional/algebraic Euler-sieved" in lean_text
+
+
+def test_26_tc052r2_displayed_review_certificates_contain_full_generated_enclosures_and_sync(
+    tc050_artifact: dict,
+) -> None:
+    """Verify TASK-TC-052R2 requirements:
+    1. Every displayed [mid \\pm rad] certificate interval in Section 8/9 of
+       docs/reviews/TC_FAITHFUL_TAU_ARITHMETIC_SPECTRAL_REALIZATION.md strictly contains the
+       entire generated certificate enclosure ([Decimal(lower_dec), Decimal(upper_dec)] and
+       arb(arb_ball_str)), and the named Mellin error components (finite_integration_error_radius,
+       infinite_tail_error_bound, combined_enclosure_radius) match separately.
+    2. H_0(it) = ((t^2 + 1/4)^4 / (1024 * sqrt(pi))) * |Gamma(1/4 + i*t/2)|^2, one-sided vs
+       two-sided B_{Omega,j}^{tail}(T) convention, actual degree-6 Taylor + bool(z2.real > arb(0))
+       quadrature, and Plancherel tail bound 2 * B_{Omega,1}^{tail}(48).
+    3. Type I Lebesgue measure dv, |mu(d)*mu(r)| <= 1, direct admissibility floor(X^{1/4}) <= floor(X^{5/6}),
+       O(X^{-5/6}) and O(X^{-5/4}) cutoff perturbations, and updated Type I constants
+       (tilde_A1 = 17685797581/688128, tilde_A2 = 14758395/1024, V_f, C_BV, C_EM_I, B_J + C_EM_I).
+    4. Non-completeness of (D(J_tau), ||J_tau .||_{H_tau^pos}) as an inner-product space and
+       isometric embedding into H_tau^pos.
+    5. Lean declaration count 47 + 59 = 106, Theorems 57-59 declaration names, mathematical
+       hypotheses (h_EM_bound, h_bridge), and #print axioms output ([propext, Classical.choice, Quot.sound]).
+    """
+    from decimal import Decimal, getcontext
+    import re
+    from tc.canonical_theta_correlation_bound import evaluate_f_tau_acb
+
+    sec8 = tc050_artifact[
+        "section_8_task_tc052_transition_cancellation_and_spectral_dirichlet_factorization"
+    ]
+    assert sec8["followup_repair_task_id"] == "TASK-TC-052R2"
+    assert sec8["subgate_tc043a_status"] == "OPEN"
+    assert sec8["rh_proved"] is False
+
+    app_a = sec8["approach_a_signed_transition_region_cancellation"]
+    lin = app_a["linear_density_annihilation_and_exact_limits"]
+    vaughan = app_a["vaughan_band_decomposition_and_type_I_audit"]
+    bv_proof = vaughan["type_I_total_variation_and_sum_integral_discrepancy_proof"]
+
+    app_b = sec8[
+        "approach_b_hilbert_space_euler_intertwining_and_critical_line_factorization"
+    ]
+    planch = app_b["plancherel_multiplier_nu_and_domain_audit"]
+    crit = app_b["critical_line_spectral_dirichlet_factorization"]
+    spike = app_b["low_frequency_euler_spike_obstruction_on_H_tau_pos"]
+    chain = sec8["complete_conditional_closure_implication_chain"]
+
+    rev_text = (
+        REPO_ROOT / "docs/reviews/TC_FAITHFUL_TAU_ARITHMETIC_SPECTRAL_REALIZATION.md"
+    ).read_text(encoding="utf-8")
+
+    # 1. Verify all displayed [mid \pm rad] certificate intervals across the entire review
+    # strictly contain the full generated certificate enclosures in both Decimal(100) and 256-bit Arb:
+    decomp = tc050_artifact[
+        "section_4_canonical_hilbert_schmidt_orbit_decomposition"
+    ]["exact_decomposition_and_controlled_remainder_bounds"]
+    prov = decomp["component_bound_provenance_records"]
+    bounds = decomp["unconditional_component_bounds_over_all_K_in_A_R"]
+    sec7_psep = tc050_artifact[
+        "section_7_task_tc051_prime_separation_and_summation_by_parts"
+    ]["prime_separation_and_rescaled_band_audit"]
+    sec7_bdry = sec7_psep["unconditional_rescaled_boundary_bounds"]
+    by_X_crit = {r["X_label"]: r for r in crit["critical_line_verification_table"]}
+
+    displayed_cert_checks = [
+        (
+            "[13.46851 \\pm 4.74 \\times 10^{-6}]",
+            "13.46851",
+            "4.74e-6",
+            prov["component_3_divisor_aggregated_W_log_XK"][
+                "large_scale_decay_constant_C_log_EM_certified"
+            ],
+        ),
+        (
+            "[13.46851 \\pm 4.74\\times 10^{-6}]",
+            "13.46851",
+            "4.74e-6",
+            prov["component_3_divisor_aggregated_W_log_XK"][
+                "large_scale_decay_constant_C_log_EM_certified"
+            ],
+        ),
+        (
+            "[16.16596749219211504166724589735549873591 \\pm 2.00 \\times 10^{-38}]",
+            "16.16596749219211504166724589735549873591",
+            "2.00e-38",
+            planch["nu_taylor_t2_coeff_16_minus_psi_d2_over_8_certified"],
+        ),
+        (
+            "[2.671922488868445008137488237241150824707 \\pm 2.00 \\times 10^{-39}]",
+            "2.671922488868445008137488237241150824707",
+            "2.00e-39",
+            prov["component_1_pole_plus_transfer_h0"]["bound_certified"],
+        ),
+        (
+            "[0.46372978 \\pm 7.98\\times 10^{-9}]",
+            "0.46372978",
+            "7.98e-9",
+            prov["component_2_reflected_small_scale_prime_W_inv_XK"]["bound_certified"],
+        ),
+        (
+            "[3.34900801876069131272842822 \\pm 5.40\\times 10^{-27}]",
+            "3.34900801876069131272842822",
+            "5.40e-27",
+            prov["component_3_divisor_aggregated_W_log_XK"]["bound_certified"],
+        ),
+        (
+            "[11.22376 \\pm 5.61\\times 10^{-6}]",
+            "11.22376",
+            "5.61e-6",
+            prov["component_4_head_divisor_R_mu_head_XK"]["bound_certified"],
+        ),
+        (
+            "[0.2787147935540087649401176325966251750389 \\pm 2.00 \\times 10^{-40}]",
+            "0.2787147935540087649401176325966251750389",
+            "2.00e-40",
+            prov["component_5_super_scale_tail_R_mu_tail_XK"]["bound_certified"],
+        ),
+        (
+            "[17.98713 \\pm 7.37\\times 10^{-6}]",
+            "17.98713",
+            "7.37e-6",
+            bounds["abs_E_tau_controlled_global_bound_certified"],
+        ),
+        (
+            "[11.50247 \\pm 7.07\\times 10^{-6}]",
+            "11.50247",
+            "7.07e-6",
+            bounds["abs_E_tau_controlled_limsup_bound_certified"],
+        ),
+        (
+            "[11.50247 \\pm 7.07 \\times 10^{-6}]",
+            "11.50247",
+            "7.07e-6",
+            bounds["abs_E_tau_controlled_limsup_bound_certified"],
+        ),
+        (
+            "[0.0185125613290 \\pm 2.58 \\times 10^{-14}]",
+            "0.0185125613290",
+            "2.58e-14",
+            sec7_bdry["single_endpoint_coprime_surviving_regime_X_18_5_p2"][
+                "delta_high_certified"
+            ],
+        ),
+        (
+            "[0.6700620832085948550527207175609300880270 \\pm 2.00 \\times 10^{-40}]",
+            "0.6700620832085948550527207175609300880270",
+            "2.00e-40",
+            sec7_bdry["B_subunit_when_X_lt_p_coeff_zeta3_C_log_0_certified"],
+        ),
+        (
+            "[14.85148 \\pm 5.09 \\times 10^{-6}]",
+            "14.85148",
+            "5.09e-6",
+            sec7_bdry["B_rescaled_global_all_X_ge_1_and_all_p_certified"],
+        ),
+        (
+            "[127804.0331068035324510388681825571283193 \\pm 2.00 \\times 10^{-34}]",
+            "127804.0331068035324510388681825571283193",
+            "2.00e-34",
+            sec7_psep["multi_prime_sieve_collapse_and_coset_obstruction"][
+                "euler_product_factor_growth"
+            ][-1]["prod_1_plus_p_neg_half_certified"],
+        ),
+        (
+            "[0.5574295871080175298802352651932503500777 \\pm 2.00 \\times 10^{-40}]",
+            "0.5574295871080175298802352651932503500777",
+            "2.00e-40",
+            prov["component_5_super_scale_tail_R_mu_tail_XK"][
+                "small_argument_constant_C_log_0_certified"
+            ],
+        ),
+        (
+            "[4.76822 \\pm 3.45 \\times 10^{-6}]",
+            "4.76822",
+            "3.45e-6",
+            lin["J_band_uniform_bound_B_J_certified"],
+        ),
+        (
+            "[+0.01284544282150966111041861441751842139795 \\pm 2.00 \\times 10^{-41}]",
+            "0.01284544282150966111041861441751842139795",
+            "2.00e-41",
+            lin["upper_v_tail_limit_from_H_X_certified"],
+        ),
+        (
+            "[+0.1253767630760670712483220901700480433353 \\pm 2.00 \\times 10^{-40}]",
+            "0.1253767630760670712483220901700480433353",
+            "2.00e-40",
+            lin["lower_v_tail_limit_from_M_X_certified"],
+        ),
+        (
+            "[+0.1382222058975767323587407045875664647333 \\pm 2.00 \\times 10^{-40}]",
+            "0.1382222058975767323587407045875664647333",
+            "2.00e-40",
+            lin["exact_limit_R_1_band_as_X_to_infty_certified"],
+        ),
+        (
+            "[+0.08402902504318437033701087820794188618435 \\pm 2.00 \\times 10^{-41}]",
+            "0.08402902504318437033701087820794188618435",
+            "2.00e-41",
+            lin["exact_limit_R_sqfree_band_as_X_to_infty_certified"],
+        ),
+        (
+            "[3.122911998070261993078893101767253989745 \\pm 2.00 \\times 10^{-39}]",
+            "3.122911998070261993078893101767253989745",
+            "2.00e-39",
+            lin["tilde_C_log_0_origin_constant_certified"],
+        ),
+        (
+            "[1.040970666023420664359631033922417996582 \\pm 2.00 \\times 10^{-39}]",
+            "1.040970666023420664359631033922417996582",
+            "2.00e-39",
+            bv_proof["var_f_small_v_0_to_1_bound_certified"],
+        ),
+        (
+            "[40115.34705084240625775049603174603174603 \\pm 2.00 \\times 10^{-35}]",
+            "40115.34705084240625775049603174603174603",
+            "2.00e-35",
+            bv_proof["var_f_large_v_1_to_inf_bound_certified"],
+        ),
+        (
+            "[40116.38802150842967841485566277995416403 \\pm 2.00 \\times 10^{-35}]",
+            "40116.38802150842967841485566277995416403",
+            "2.00e-35",
+            bv_proof["var_f_total_bound_V_f_certified"],
+        ),
+        (
+            "[40129.85653 \\pm 6.24 \\times 10^{-6}]",
+            "40129.85653",
+            "6.24e-6",
+            bv_proof["C_BV_norm_plus_var_bound_certified"],
+        ),
+        (
+            "[40143.3250 \\pm 5.10 \\times 10^{-5}]",
+            "40143.3250",
+            "5.10e-5",
+            bv_proof["C_EM_I_progression_discrepancy_constant_certified"],
+        ),
+        (
+            "[40148.0933 \\pm 5.15 \\times 10^{-5}]",
+            "40148.0933",
+            "5.15e-5",
+            bv_proof["type_I_global_bound_B_J_plus_C_EM_I_certified"],
+        ),
+        (
+            "[1.371901664348456727857448422465050864052 \\times 10^{-18} \\pm 2.00 \\times 10^{-57}]",
+            "1.371901664348456727857448422465050864052e-18",
+            "2.00e-57",
+            crit["B_Omega_1_tail_T_certified"],
+        ),
+        (
+            "[7.391045088194894744725557492971802729825 \\times 10^{-37} \\pm 2.00 \\times 10^{-76}]",
+            "7.391045088194894744725557492971802729825e-37",
+            "2.00e-76",
+            crit["B_Omega_2_tail_T_certified"],
+        ),
+        (
+            "[0.10084349298 \\pm 5.15 \\times 10^{-12}]",
+            "0.10084349298",
+            "5.15e-12",
+            crit["Omega_log_L1_norm_certified"],
+        ),
+        (
+            "[0.02590072269 \\pm 3.10 \\times 10^{-12}]",
+            "0.02590072269",
+            "3.10e-12",
+            crit["Omega_log_L2_norm_certified"],
+        ),
+        (
+            "[0.000670847436 \\pm 2.37 \\times 10^{-13}]",
+            "0.000670847436",
+            "2.37e-13",
+            crit["Omega_log_L2_sq_integral_certified"],
+        ),
+        (
+            "[0.019636922 \\pm 4.11 \\times 10^{-10}]",
+            "0.019636922",
+            "4.11e-10",
+            crit["sqrt2_abs_R_mu_band_1_certified"],
+        ),
+        (
+            "[0.7071067811865475244008443621048490392848 \\pm 2.00 \\times 10^{-40}]",
+            "0.7071067811865475244008443621048490392848",
+            "2.00e-40",
+            by_X_crit["1"]["A_X_dirichlet_majorant_certified"],
+        ),
+        (
+            "[-0.0138854010 \\pm 8.27 \\times 10^{-11}]",
+            "-0.0138854010",
+            "8.27e-11",
+            by_X_crit["1"]["R_mu_band_discrete_sum_certified"],
+        ),
+        (
+            "[-0.01388540094168 \\pm 3.06 \\times 10^{-15}]",
+            "-0.01388540094168",
+            "3.06e-15",
+            by_X_crit["1"]["R_mu_band_finite_mellin_integral_on_neg_T_to_T_certified"],
+        ),
+        (
+            "[-0.01388540094168 \\pm 3.06 \\times 10^{-15}]",
+            "-0.01388540094168",
+            "3.06e-15",
+            by_X_crit["1"]["R_mu_band_critical_line_mellin_integral_certified"],
+        ),
+        (
+            "[1.284457050376173288909993142606806494932 \\pm 2.00 \\times 10^{-39}]",
+            "1.284457050376173288909993142606806494932",
+            "2.00e-39",
+            by_X_crit["2"]["A_X_dirichlet_majorant_certified"],
+        ),
+        (
+            "[0.010898890859 \\pm 2.89 \\times 10^{-13}]",
+            "0.010898890859",
+            "2.89e-13",
+            by_X_crit["2"]["R_mu_band_discrete_sum_certified"],
+        ),
+        (
+            "[0.01089889085884 \\pm 5.02 \\times 10^{-15}]",
+            "0.01089889085884",
+            "5.02e-15",
+            by_X_crit["2"]["R_mu_band_finite_mellin_integral_on_neg_T_to_T_certified"],
+        ),
+        (
+            "[0.01089889085884 \\pm 5.02 \\times 10^{-15}]",
+            "0.01089889085884",
+            "5.02e-15",
+            by_X_crit["2"]["R_mu_band_critical_line_mellin_integral_certified"],
+        ),
+        (
+            "[0.8554618859638209556480487461972371457491 \\pm 2.00 \\times 10^{-40}]",
+            "0.8554618859638209556480487461972371457491",
+            "2.00e-40",
+            by_X_crit["4"]["A_X_dirichlet_majorant_certified"],
+        ),
+        (
+            "[0.0053844055765 \\pm 8.78 \\times 10^{-14}]",
+            "0.0053844055765",
+            "8.78e-14",
+            by_X_crit["4"]["R_mu_band_discrete_sum_certified"],
+        ),
+        (
+            "[0.00538440557646 \\pm 2.08 \\times 10^{-15}]",
+            "0.00538440557646",
+            "2.08e-15",
+            by_X_crit["4"]["R_mu_band_finite_mellin_integral_on_neg_T_to_T_certified"],
+        ),
+        (
+            "[0.00538440557646 \\pm 2.08 \\times 10^{-15}]",
+            "0.00538440557646",
+            "2.08e-15",
+            by_X_crit["4"]["R_mu_band_critical_line_mellin_integral_certified"],
+        ),
+    ]
+
+    rev_text_norm = rev_text.replace("\\bigl[", "[").replace("\\bigr]", "]")
+    getcontext().prec = 100
+    from flint import ctx as flint_ctx
+
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = 256
+        for disp_str, mid_s, rad_s, cert in displayed_cert_checks:
+            assert disp_str in rev_text_norm, f"Missing displayed interval {disp_str!r} in review"
+            d_mid = Decimal(mid_s)
+            d_rad = Decimal(rad_s)
+            disp_low = d_mid - d_rad
+            disp_high = d_mid + d_rad
+            c_low = Decimal(cert["lower_dec"])
+            c_high = Decimal(cert["upper_dec"])
+            assert disp_low <= c_low <= c_high <= disp_high, (
+                f"Displayed interval {disp_str} does not contain Decimal certificate [{c_low}, {c_high}]"
+            )
+            b_cert = arb(cert["arb_ball_str"])
+            b_disp = arb(mid_s) + arb(0, rad_s)
+            assert bool(b_disp.lower() <= b_cert.lower()) and bool(
+                b_disp.upper() >= b_cert.upper()
+            ), f"Displayed interval {disp_str} does not contain Arb ball {cert['arb_ball_str']}"
+    finally:
+        flint_ctx.prec = saved_prec
+
+    # Also verify that EVERY [\pm] interval in the ENTIRE review is in displayed_cert_checks:
+    found_intervals = set(re.findall(r"\[[^\[\]\n]*\\pm[^\[\]\n]*\]", rev_text_norm))
+    expected_intervals = {item[0] for item in displayed_cert_checks}
+    assert found_intervals == expected_intervals, (
+        f"Unaccounted or mismatched intervals in review: {found_intervals ^ expected_intervals}"
+    )
+
+    # Separately compare the named Mellin error components for X in {1, 2, 4}:
+    mellin_error_display_rows = [
+        (
+            "1",
+            "8.012471247481316 \\times 10^{-16}",
+            8.012471247481316e-16,
+            "1.940161939963809 \\times 10^{-18}",
+            1.940161939963809e-18,
+            "8.031872868010421 \\times 10^{-16}",
+            8.031872868010421e-16,
+        ),
+        (
+            "2",
+            "9.112944021256708 \\times 10^{-16}",
+            9.112944021256708e-16,
+            "3.5242975303903636 \\times 10^{-18}",
+            3.5242975303903636e-18,
+            "9.14818701078404 \\times 10^{-16}",
+            9.14818701078404e-16,
+        ),
+        (
+            "4",
+            "7.475972076500956 \\times 10^{-16}",
+            7.475972076500956e-16,
+            "2.347219170280871 \\times 10^{-18}",
+            2.347219170280871e-18,
+            "7.499444269368047 \\times 10^{-16}",
+            7.499444269368047e-16,
+        ),
+    ]
+    for (
+        x_lbl,
+        fin_str,
+        fin_expected,
+        tail_str,
+        tail_expected,
+        comb_str,
+        comb_expected,
+    ) in mellin_error_display_rows:
+        row = by_X_crit[x_lbl]
+        assert fin_str in rev_text and tail_str in rev_text and comb_str in rev_text
+        fin_err = row["finite_integration_error_radius"]
+        tail_err = row["infinite_tail_error_bound"]
+        comb_err = row["combined_enclosure_radius"]
+        assert math.isclose(fin_err, fin_expected, rel_tol=1e-15)
+        assert math.isclose(tail_err, tail_expected, rel_tol=1e-15)
+        assert math.isclose(comb_err, comb_expected, rel_tol=1e-15)
+        assert (
+            fin_err
+            <= row["R_mu_band_finite_mellin_integral_on_neg_T_to_T_certified"][
+                "rad_float_outward"
+            ]
+        )
+        assert math.isclose(
+            tail_err,
+            float(
+                row["proved_infinite_tail_bound_2_A_X_B_Omega_1_certified"][
+                    "upper_dec"
+                ]
+            ),
+            rel_tol=1e-15,
+        )
+        assert (
+            comb_err
+            <= row["R_mu_band_critical_line_mellin_integral_certified"][
+                "rad_float_outward"
+            ]
+        )
+        assert fin_err + tail_err <= comb_err
+        assert math.isclose(fin_err + tail_err, comb_err, rel_tol=1e-8)
+
+    # 2. Verify H_0(it) formula, one-sided vs two-sided tail convention, and quadrature description:
+    assert crit["H0_critical_line_polynomial_identity_verified"] is True
+    assert (
+        "H_0(i t) = ((t^2 + 1/4)^4 / (1024 sqrt(pi))) Gamma(1/4 + i t / 2) Gamma(1/4 - i t / 2)"
+        in crit["H0_critical_line_canonical_formula"]
+    )
+    assert "one-sided tail bounds" in crit["whole_integrand_tail_bound_theorem"]
+    assert "two-sided norm tails on |t| >= T are bounded by 2 B_{Omega,1}^{tail}(T)" in crit[
+        "whole_integrand_tail_bound_theorem"
+    ]
+    assert "degree-6 centered Taylor" in crit["omega_L1_quadrature_method"]
+    assert "bool(z2.real > arb(0))" in crit["omega_L1_quadrature_method"]
+    assert "plancherel_component_tail_domination_note" in planch
+    assert "2 B_{Omega,1}^{tail}(48)" in planch[
+        "plancherel_component_tail_domination_note"
+    ]
+
+    # Live Arb check of H_0(it) = ((t^2 + 1/4)^4 / (1024 * sqrt(pi))) * |Gamma(1/4 + i*t/2)|^2:
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = 256
+        for t_int in (0, 1, 2, 5, 10):
+            t_a = arb(t_int)
+            s_c = acb(arb(1) / arb(2), t_a)
+            one_minus_s = acb(arb(1) / arb(2), -t_a)
+            h0_live = (evaluate_f_tau_acb(s_c) * evaluate_f_tau_acb(one_minus_s)).real
+            g_val = acb(arb(1) / arb(4), t_a / arb(2)).gamma()
+            h0_formula = (
+                ((t_a * t_a + arb(1) / arb(4)) ** 4)
+                / (arb(1024) * arb.pi().sqrt())
+                * (abs(g_val) ** 2)
+            )
+            assert bool((h0_live - h0_formula).contains(0))
+            assert float(abs(h0_live - h0_formula).upper()) < 1e-70
+    finally:
+        flint_ctx.prec = saved_prec
+
+    # 3. Verify reconciled Type I constants (exact rational Fraction arithmetic), Lebesgue dv measure,
+    # |mu(d)*mu(r)| <= 1, and admissibility:
+    from fractions import Fraction
+
+    c0_frac = Fraction(bv_proof["C0_tilde_psi_exact_rational"])
+    c1_frac = Fraction(bv_proof["C1_tilde_psi_exact_rational"])
+    c2_frac = Fraction(bv_proof["C2_tilde_psi_exact_rational"])
+    a1_frac = Fraction(bv_proof["tilde_A1_exact_rational"])
+    a2_frac = Fraction(bv_proof["tilde_A2_exact_rational"])
+    assert c0_frac == Fraction(8340237, 3584)
+    assert c1_frac == Fraction(95924679, 4096)
+    assert c2_frac == Fraction(132825555, 512)
+    assert (c0_frac + 2 * c1_frac) / 18 + (17 * c2_frac) / 192 == a1_frac == Fraction(17685797581, 688128)
+    assert c2_frac / 18 == a2_frac == Fraction(14758395, 1024)
+    assert bv_proof["tilde_A1_formula"] == "(C0_tilde_psi + 2 * C1_tilde_psi) / 18 + (17 * C2_tilde_psi) / 192"
+    assert bv_proof["tilde_A2_formula"] == "C2_tilde_psi / 18"
+    assert "\\frac{8340237}{3584}" in rev_text
+    assert "\\frac{95924679}{4096}" in rev_text
+    assert "\\frac{132825555}{512}" in rev_text
+    assert "\\frac{C_0^{\\tilde{\\psi}} + 2 C_1^{\\tilde{\\psi}}}{18} + \\frac{17 C_2^{\\tilde{\\psi}}}{192} = \\frac{17685797581}{688128}" in rev_text
+    assert "\\frac{C_2^{\\tilde{\\psi}}}{18} = \\frac{132825555}{9216} = \\frac{14758395}{1024}" in rev_text
+    assert "\\frac{7}{36}\\widetilde{C}_0\\,v^{-5/2} + \\bigl(\\widetilde{A}_1 + \\widetilde{A}_2\\log v\\bigr)\\,v^{-3/2}" in rev_text
+    assert "\\zeta'(s) = -\\frac{1}{(s-1)^2} + \\int_1^\\infty \\left(\\{x\\} - \\frac{1}{2}\\right)(s\\log x - 1)x^{-s-1}\\,dx" in rev_text
+    assert "\\frac{\\zeta(3, 5/4)}{4}\\,t^2 \\le 4(t^2 + 1/4)" in rev_text
+    assert "0.1659674922 < 4" in rev_text
+    assert "0.1659674922 < 4" in planch["plancherel_component_tail_domination_note"]
+    assert "\\operatorname{Var}_{(0,\\infty)}(F_X)" in rev_text
+    assert "|\\mu(d)\\mu(r)| \\le 1" in rev_text
+    assert (
+        "floor(X^{1/4}) <= floor(X^{5/6}) = H(X)"
+        in vaughan["published_vaughan_formulas"]["band_admissibility_condition"]
+    )
+    assert (
+        "O(X^{-5/6})" in lin["floor_ceiling_endpoint_asymptotics"]
+        and "O(X^{-5/4})" in lin["floor_ceiling_endpoint_asymptotics"]
+    )
+
+    # 4. Verify non-completeness of (D(J_tau), ||J_tau .||_{H_tau^pos}) and isometric embedding:
+    assert "is NOT complete" in planch["operator_domain_statement"]
+    assert "isometric embedding of this inner-product space" in planch[
+        "operator_domain_statement"
+    ]
+    assert "**inner-product space that is not complete**" in rev_text
+    assert "isometric embedding of this inner-product space" in rev_text
+
+    # 5. Verify Lean declaration sum 47 + 59 = 106 and Theorems 57-59 exact declaration names,
+    # reproduced parameter/hypothesis signatures, and #print axioms command & verbatim output:
+    sec5 = tc050_artifact["section_5_lean_formalization_and_remaining_obligation"]
+    lean_ver = sec5["lean_module_verification"]
+    assert len(lean_ver["actual_defs"]) == 47
+    assert len(lean_ver["actual_theorems"]) == 59
+    assert lean_ver["actual_total_declarations"] == 106
+    expected_thm_decls = {
+        "theorem_57_transition_integral_linear_density_annihilation_and_sqrt_error_bound": (
+            "RiemannScope.transition_integral_linear_density_annihilation_and_sqrt_error_bound"
+        ),
+        "theorem_58_vaughan_band_decomposition_and_type_I_uniform_bound": (
+            "RiemannScope.vaughan_band_decomposition_and_type_I_uniform_bound"
+        ),
+        "theorem_59_euler_sieved_orbit_and_complete_subgate_closure_chain": (
+            "RiemannScope.euler_sieved_orbit_and_complete_subgate_closure_chain"
+        ),
+    }
+    for thm_key, expected_decl in expected_thm_decls.items():
+        t_info = sec5["committed_lean_theorems_exact_scope"][thm_key]
+        assert t_info["declaration_name"] == expected_decl
+        assert f"#print axioms {expected_decl}" in t_info["print_axioms_command"]
+        assert (
+            t_info["print_axioms_output"]
+            == f"'{expected_decl}' depends on axioms: [propext, Classical.choice, Quot.sound]"
+        )
+        assert expected_decl in rev_text
+        assert t_info["print_axioms_output"] in rev_text
+        params_part, hyps_part = t_info["parameters_and_hypotheses"].split(" : ℝ) ", 1)
+        assert (
+            f"parameters `{params_part} : ℝ)` with mathematical hypotheses `{hyps_part}`"
+            in rev_text
+        )
+        assert t_info["standard_lean_axioms_used"] == [
+            "propext",
+            "Classical.choice",
+            "Quot.sound",
+        ]
+        assert t_info["custom_lean_axioms_used"] == []
+
+    tc042_json = json.loads(
+        (REPO_ROOT / "data/tc_canonical_theta_correlation_bound.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    lean_sec10 = tc042_json["section_10_lean_formalization_audit"]
+    assert len(lean_sec10["actual_defs"]) == 47
+    assert len(lean_sec10["actual_theorems"]) == 59
+    assert lean_sec10["actual_total_declarations"] == 106
+
+    # Ensure stale pre-TC-052R2 strings are completely absent across code, artifacts, and docs:
+    for rel_path in (
+        "tc/faithful_tau_arithmetic_spectral_realization.py",
+        "tc/canonical_theta_correlation_bound.py",
+        "data/tc_faithful_tau_arithmetic_spectral_realization.json",
+        "data/tc_canonical_theta_correlation_bound.json",
+        "docs/reviews/TC_FAITHFUL_TAU_ARITHMETIC_SPECTRAL_REALIZATION.md",
+        "docs/reviews/TC_CANONICAL_THETA_CORRELATION_BOUND.md",
+        "TRANSCENDENTAL_CONTINUATION.md",
+        "RESEARCH_LEDGER.md",
+        ".agents/corpus_map/obligation_register.md",
+        "formal/RiemannScope/README.md",
+    ):
+        content = (REPO_ROOT / rel_path).read_text(encoding="utf-8")
+        for forbidden in (
+            "-0.0138854010 \\pm 1.94",
+            "0.855335",
+            "16.1782231607907",
+            "40147.9219",
+            "23585258875/917504",
+            "23585258875}{917504}",
+            "118067160/458752",
+            "118067160}{458752}",
+            "(t^2 + 9/4)^2",
+            "(t^2+9/4)^2",
+            "10^{-60}",
+            "1e-60",
+            "(1, 4) \\cup (8^{2/5}, 9^{3/5})",
+            "(1, 4) union (8^{2/5}, 9^{3/5})",
+            "47 `def` + 59 `theorem` = 103",
+            "47 def + 59 theorem = 103",
+            "`103` (`47` definitions + `59`",
+            "RiemannScope.CanonicalThetaCorrelationBound.",
+            "0.14624",
+            "\\log|5/4 + it/2| + 1 \\le 4",
+            "vaughanTypeIBandApprox",
+            "118067160/512",
+            "118067160}{512}",
+            "\\frac{C_0^{\\tilde{\\psi}}}{2} + \\frac{C_1^{\\tilde{\\psi}}}{2}",
+        ):
+            assert forbidden not in content, (
+                f"Found stale pre-TC-052R2 string {forbidden!r} in {rel_path}"
+            )
+
 
 
