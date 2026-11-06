@@ -269,8 +269,8 @@ def test_06_lean_formalization_and_arb_roundtrip_verification(
         assert thm_name in lean_live["actual_theorems"]
 
     sec6 = tc050_artifact["section_6_certified_arb_roundtrip_verification"]
-    assert sec6["total_certified_arb_balls_checked"] == 1258
-    assert sec6["compared_against_live_original_arb_count"] == 1258
+    assert sec6["total_certified_arb_balls_checked"] == 1283
+    assert sec6["compared_against_live_original_arb_count"] == 1283
     assert sec6["live_original_count_matches_enumerated_total"] is True
     assert sec6["all_enclose_original_256bit_arb_ball"] is True
     assert sec6["failed_paths"] == []
@@ -279,7 +279,7 @@ def test_06_lean_formalization_and_arb_roundtrip_verification(
     rt_recheck = verify_all_serialized_arb_in_tree(
         tc050_artifact, path_prefix="task_tc050"
     )
-    assert rt_recheck["total_certified_arb_balls_checked"] == 1258
+    assert rt_recheck["total_certified_arb_balls_checked"] == 1283
     assert (
         sec6["compared_against_live_original_arb_count"]
         == rt_recheck["total_certified_arb_balls_checked"]
@@ -2140,29 +2140,29 @@ def test_26_tc052r2_displayed_review_certificates_contain_full_generated_enclosu
             ]["full_excess_over_old_bound_certified"],
         ),
         (
-            "[6.759126424066078899532960393703499341216 \\pm 2.00 \\times 10^{-39}]",
-            "6.759126424066078899532960393703499341216",
+            "[2.152085805199425799330038459692797743742 \\pm 2.00 \\times 10^{-39}]",
+            "2.152085805199425799330038459692797743742",
             "2.00e-39",
             tc050_artifact[
                 "section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation"
             ]["section_2_common_factor_expansion_and_coprime_squarefree_asymptotics"][
                 "gaussian_integral_and_pairwise_leading_term"
-            ]["I_abs_stieltjes_integral_certified"],
+            ]["J_stieltjes_integral_certified"],
         ),
         (
-            "[20.27737927219823669859888118111049802365 \\pm 2.00 \\times 10^{-38}]",
-            "20.27737927219823669859888118111049802365",
-            "2.00e-38",
+            "[6.456257415598277397990115379078393231226 \\pm 2.00 \\times 10^{-39}]",
+            "6.456257415598277397990115379078393231226",
+            "2.00e-39",
             tc050_artifact[
                 "section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation"
             ]["section_2_common_factor_expansion_and_coprime_squarefree_asymptotics"][
                 "gaussian_integral_and_pairwise_leading_term"
-            ]["C_pair_sharp_3_I_abs_certified"],
+            ]["three_J_stieltjes_constant_certified"],
         ),
         (
-            "[24.41672357016680253012411397649103735716 \\pm 2.00 \\times 10^{-38}]",
-            "24.41672357016680253012411397649103735716",
-            "2.00e-38",
+            "[7.334728145729494680425400563915115544141 \\pm 2.00 \\times 10^{-39}]",
+            "7.334728145729494680425400563915115544141",
+            "2.00e-39",
             tc050_artifact[
                 "section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation"
             ]["section_2_common_factor_expansion_and_coprime_squarefree_asymptotics"][
@@ -2170,8 +2170,8 @@ def test_26_tc052r2_displayed_review_certificates_contain_full_generated_enclosu
             ]["C_pair_closed_form_upper_bound_certified"],
         ),
         (
-            "[0.3995625300165519700235101982261794259293 \\pm 2.00 \\times 10^{-40}]",
-            "0.3995625300165519700235101982261794259293",
+            "[0.1272195244161310364758966152354706030606 \\pm 2.00 \\times 10^{-40}]",
+            "0.1272195244161310364758966152354706030606",
             "2.00e-40",
             tc050_artifact[
                 "section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation"
@@ -2180,21 +2180,77 @@ def test_26_tc052r2_displayed_review_certificates_contain_full_generated_enclosu
             ]["replacement_bound_with_C_sharp_at_29_31_30_certified"],
         ),
         (
-            "[1.679378605318050370452005359999016468301 \\pm 2.00 \\times 10^{-39}]",
-            "1.679378605318050370452005359999016468301",
+            "[2.209708691207961013752638631577653247765 \\pm 2.00 \\times 10^{-39}]",
+            "2.209708691207961013752638631577653247765",
             "2.00e-39",
             tc050_artifact[
                 "section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation"
             ]["section_3_signed_coprime_block_attempts_and_regrouping"][
                 "attempt_2_regrouping_by_q_and_unconditional_signed_block_proof"
             ]["kernel_mixed_partial_sign_change_and_absolute_derivative_bounds"][
-                "M_var_19_over_8_sqrt2_certified"
+                "M_var_25_over_8_sqrt2_certified"
             ],
         ),
         (
-            "[9.1 \\pm 0.090]",
-            "9.1",
-            "0.090",
+            "[0.00001456325666387955721403184752881533273340 \\pm 2.00 \\times 10^{-44}]",
+            "0.00001456325666387955721403184752881533273340",
+            "2.00e-44",
+            tc050_artifact[
+                "section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation"
+            ]["section_3_signed_coprime_block_attempts_and_regrouping"][
+                "attempt_2_regrouping_by_q_and_unconditional_signed_block_proof"
+            ]["four_step_unconditional_walfisz_convolution_proof"][
+                "euler_tail_majorant_repair"
+            ]["discarded_majorant_failure_at_p2003_theta_3_4"][
+                "log_F_2003_3_4_certified"
+            ],
+        ),
+        (
+            "[0.000006669884755011093590413754887978666600517 \\pm 2.00 \\times 10^{-45}]",
+            "0.000006669884755011093590413754887978666600517",
+            "2.00e-45",
+            tc050_artifact[
+                "section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation"
+            ]["section_3_signed_coprime_block_attempts_and_regrouping"][
+                "attempt_2_regrouping_by_q_and_unconditional_signed_block_proof"
+            ]["four_step_unconditional_walfisz_convolution_proof"][
+                "euler_tail_majorant_repair"
+            ]["discarded_majorant_failure_at_p2003_theta_3_4"][
+                "discarded_majorant_4_p_pow_neg_7_4_certified"
+            ],
+        ),
+        (
+            "[0.05396838768546253991162240291534870105926 \\pm 2.00 \\times 10^{-41}]",
+            "0.05396838768546253991162240291534870105926",
+            "2.00e-41",
+            tc050_artifact[
+                "section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation"
+            ]["section_3_signed_coprime_block_attempts_and_regrouping"][
+                "attempt_2_regrouping_by_q_and_unconditional_signed_block_proof"
+            ]["four_step_unconditional_walfisz_convolution_proof"][
+                "euler_tail_majorant_repair"
+            ]["proved_replacement_tail_majorant_B_P_theta"][
+                "B_2000_3_4_certified"
+            ],
+        ),
+        (
+            "[0.001501000625375218875070351583996100101076 \\pm 2.00 \\times 10^{-42}]",
+            "0.001501000625375218875070351583996100101076",
+            "2.00e-42",
+            tc050_artifact[
+                "section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation"
+            ]["section_3_signed_coprime_block_attempts_and_regrouping"][
+                "attempt_2_regrouping_by_q_and_unconditional_signed_block_proof"
+            ]["four_step_unconditional_walfisz_convolution_proof"][
+                "euler_tail_majorant_repair"
+            ]["proved_replacement_tail_majorant_B_P_theta"][
+                "B_2000_1_certified"
+            ],
+        ),
+        (
+            "[9.0 \\pm 0.528]",
+            "9.0",
+            "0.528",
             tc050_artifact[
                 "section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation"
             ]["section_3_signed_coprime_block_attempts_and_regrouping"][
@@ -2216,9 +2272,21 @@ def test_26_tc052r2_displayed_review_certificates_contain_full_generated_enclosu
             ],
         ),
         (
-            "[14.0 \\pm 0.622]",
-            "14.0",
-            "0.622",
+            "[127.0 \\pm 0.584]",
+            "127.0",
+            "0.584",
+            tc050_artifact[
+                "section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation"
+            ]["section_3_signed_coprime_block_attempts_and_regrouping"][
+                "attempt_2_regrouping_by_q_and_unconditional_signed_block_proof"
+            ]["four_step_unconditional_walfisz_convolution_proof"][
+                "main_range_coeff_16_M_var_C_h_1_certified"
+            ],
+        ),
+        (
+            "[15.0 \\pm 0.638]",
+            "15.0",
+            "0.638",
             tc050_artifact[
                 "section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation"
             ]["section_3_signed_coprime_block_attempts_and_regrouping"][
@@ -2631,6 +2699,10 @@ def test_28_tc053_common_factor_coprime_squarefree_counting_and_gaussian_integra
     assert gauss["gaussian_symbolic_verified"] is True
     assert gauss["homogeneous_degree_neg_half_symbolic_verified"] is True
     assert gauss["I_abs_direct_vs_ibp_agree"] is True
+    assert gauss["J_encloses_reference_2_1520858051994258"] is True
+    assert gauss["three_J_encloses_reference_6_4562574155982774"] is True
+    assert gauss["three_J_lt_8_certified"] is True
+    assert gauss["three_J_closed_lt_8_certified"] is True
     assert gauss["C_pair_sharp_lt_21_certified"] is True
     assert gauss["C_pair_closed_lt_25_certified"] is True
     assert gauss["all_pairwise_error_bounds_certified"] is True
@@ -2893,15 +2965,25 @@ def test_31_tc053r_counterexample_replacement_pairwise_bound_and_uniform_signed_
         == "TASK-TC-053R"
     )
     assert (
+        tc050_artifact["tc053_followup_repair_task_id"]
+        == "TASK-TC-053R2"
+    )
+    assert (
         tc050_artifact["tc053_merged_main_baseline"]
         == "793d327d2f151170ceb34536ed92f99b11e17969"
+    )
+    assert (
+        tc050_artifact["tc053r_merged_main_baseline"]
+        == "c82e439708b0b6031db6a77bf3977688d9f0758b"
     )
 
     sec9 = tc050_artifact[
         "section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation"
     ]
     assert sec9["repair_task_id"] == "TASK-TC-053R"
+    assert sec9["followup_repair_task_id"] == "TASK-TC-053R2"
     assert sec9["tc053_merged_main_baseline"] == "793d327d2f151170ceb34536ed92f99b11e17969"
+    assert sec9["tc053r_merged_main_baseline"] == "c82e439708b0b6031db6a77bf3977688d9f0758b"
     assert sec9["subgate_tc043a_status"] == "OPEN"
     assert sec9["rh_proved"] is False
 
@@ -2939,16 +3021,16 @@ def test_31_tc053r_counterexample_replacement_pairwise_bound_and_uniform_signed_
         assert bool(diff_ce.lower() > arb("0.000761129"))
         assert bool(diff_ce.lower() > arb(0))
 
-        # Replacement constant C_pair^sharp = 3 * I_abs < 21 and C_pair^closed < 25:
+        # Replacement constant 3*J < 7.33473 < 8:
         gauss_sec = sec9["section_2_common_factor_expansion_and_coprime_squarefree_asymptotics"][
             "gaussian_integral_and_pairwise_leading_term"
         ]
-        c_sharp = arb(gauss_sec["C_pair_sharp_3_I_abs_certified"]["arb_ball_str"])
+        c_sharp = arb(gauss_sec["three_J_stieltjes_constant_certified"]["arb_ball_str"])
         c_closed = arb(
             gauss_sec["C_pair_closed_form_upper_bound_certified"]["arb_ball_str"]
         )
-        assert bool((arb(21) - c_sharp).lower() > arb(0))
-        assert bool((arb(25) - c_closed).lower() > arb(0))
+        assert bool((arb(8) - c_sharp).lower() > arb(0))
+        assert bool((arb(8) - c_closed).lower() > arb(0))
         assert bool((c_closed - c_sharp).lower() > arb(0))
 
         b_new_sharp = (
@@ -2990,7 +3072,7 @@ def test_31_tc053r_counterexample_replacement_pairwise_bound_and_uniform_signed_
         "attempt_2_regrouping_by_q_and_unconditional_signed_block_proof"
     ]
     f4 = att2["four_step_unconditional_walfisz_convolution_proof"]
-    assert f4["C_h_3_4_certified"]["mid_float"] < 9.5
+    assert f4["C_h_3_4_certified"]["mid_float"] < 9.6
     assert f4["C_h_1_certified"]["mid_float"] < 3.7
 
     # 4. Verify review document and source file do not assert the old false pairwise formula or K_rs >= 0:
@@ -2999,11 +3081,208 @@ def test_31_tc053r_counterexample_replacement_pairwise_bound_and_uniform_signed_
         repo_root / "docs" / "reviews" / "TC_FAITHFUL_TAU_ARITHMETIC_SPECTRAL_REALIZATION.md"
     ).read_text(encoding="utf-8")
     assert "contradiction_strictly_positive_lower_bound_certified" in review_text
-    assert "C_{\\mathrm{pair}}^{\\mathrm{sharp}}" in review_text
+    assert "6.456257415598277397990115379078393231226" in review_text
     assert "-6r^4 + 23r^2 s^2 - 6s^4" in review_text
     assert "S_{2\\text{-prime}}(5/2) = 0" in review_text
     assert "1 + \\tau^\\varepsilon" in review_text
     assert "riemannZeta 0 = -1 / 2" in review_text
+
+
+def test_32_tc053r2_stieltjes_substitution_variation_constant_and_euler_tail_regressions(
+    tc050_artifact: dict,
+) -> None:
+    """Verify TASK-TC-053R2 closeout repairs and regressions:
+    1. Stieltjes change of variables from phi_L(t) = t^{-6} e^{-L^2/t^2} under v = L^2/t^2, t = L v^{-1/2},
+       |dt| = (L/2) v^{-3/2} dv yields int_0^infty sqrt(t) |phi_L'(t)| dt = L^{-11/2} J with
+       J = int_0^infty v^{7/4} |v - 3| e^{-v} dv = 2 int_0^infty u^{9/2} |u^2 - 3| e^{-u^2} du
+         = 2 * 3^{11/4} e^{-3} - (1/4) * [Gamma(11/4) - 2*gamma(11/4, 3)]
+         = [2.152085805199425799330038459692797743742 +- 1.15e-40]
+       and 3*J = [6.456257415598277397990115379078393231226 +- 3.45e-40]
+               <= 6 * 3^{11/4} e^{-3} + (63/64)*Gamma(3/4) < 8 (C = 8).
+    2. Variation constant M_var = 2^{-5/2} + 2*(3/(4*sqrt(2))) + 11/(8*sqrt(2)) = 25/(8*sqrt(2))
+       = [2.209708691207961013752638631577653247765 +- 1.13e-40].
+    3. Counterexample at p = 2003, theta = 3/4 falsifying log F_p(3/4) <= 4*p^{-7/4}:
+       log F_2003(3/4) - 4*(2003)^{-7/4} > +7.89337e-6 > 0, and proved Euler-tail majorant
+       0 <= sum_{p>P} log F_p(theta) <= B(P, theta) = 2*a/(theta * P^theta) + a^2 / ((2*theta - 1) * P^{2*theta - 1})
+       with a = (1 - P^{-theta})^{-1} at P = 2000 for theta in {3/4, 1}, together with updated C_{h,3/4}, C_{h,1},
+       16 * M_var * C_{h,1}, and 9 * C_{h,3/4} / (4 * sqrt(2)).
+    4. Large-A domain A >= A_0 := e^{2e} ~ 229.6516640835, small-A bound |S(A)| <= C_block * A on 1 <= A < e^{2e},
+       and complete removal of discarded TASK-TC-053R strings across code, data, and reviews.
+    """
+    from pathlib import Path
+    import sympy as sp
+    from flint import acb, arb, ctx as flint_ctx
+
+    sec9 = tc050_artifact[
+        "section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation"
+    ]
+    gauss = sec9["section_2_common_factor_expansion_and_coprime_squarefree_asymptotics"][
+        "gaussian_integral_and_pairwise_leading_term"
+    ]
+    ce_pair = sec9["section_2_common_factor_expansion_and_coprime_squarefree_asymptotics"][
+        "counterexample_r29_s31_X30_falsifying_old_pairwise_bound"
+    ]
+    att2 = sec9["section_3_signed_coprime_block_attempts_and_regrouping"][
+        "attempt_2_regrouping_by_q_and_unconditional_signed_block_proof"
+    ]
+    k_var = att2["kernel_mixed_partial_sign_change_and_absolute_derivative_bounds"]
+    f4 = att2["four_step_unconditional_walfisz_convolution_proof"]
+
+    # 1. Symbolic verification of the v = L^2 / t^2 and u = L / t substitutions and M_var = 25 / (8 * sqrt(2)):
+    L_s, t_s, v_s, u_s = sp.symbols("L t v u", positive=True)
+    phi_L = t_s ** (-6) * sp.exp(-(L_s ** 2) / (t_s ** 2))
+    dphi_dt = sp.diff(phi_L, t_s)
+    # Substitute t = L * v^{-1/2}, |dt| = (L/2) * v^{-3/2} dv into sqrt(t) * |phi_L'(t)| dt:
+    integrand_v = (
+        sp.sqrt(L_s * v_s ** (-sp.Rational(1, 2)))
+        * (2 * (L_s * v_s ** (-sp.Rational(1, 2))) ** (-7) * sp.exp(-v_s))
+        * (L_s / 2)
+        * v_s ** (-sp.Rational(3, 2))
+    )
+    assert sp.simplify(integrand_v / (L_s ** (-sp.Rational(11, 2)) * v_s ** sp.Rational(7, 4) * sp.exp(-v_s))) == 1
+
+    # Substitute u = L / t, v = u^2, dv = 2 u du:
+    integrand_u = (v_s ** sp.Rational(7, 4) * sp.exp(-v_s)).subs(v_s, u_s ** 2) * (2 * u_s)
+    assert sp.simplify(integrand_u / (2 * u_s ** sp.Rational(9, 2) * sp.exp(-(u_s ** 2)))) == 1
+
+    # Symbolic verification of M_var = 2^{-5/2} + 2*(3/(4*sqrt(2))) + 11/(8*sqrt(2)) = 25/(8*sqrt(2)):
+    m_var_sym = (
+        sp.Rational(1, 1) / (2 ** sp.Rational(5, 2))
+        + 2 * sp.Rational(3, 4) / sp.sqrt(2)
+        + sp.Rational(11, 8) / sp.sqrt(2)
+    )
+    assert sp.simplify(m_var_sym - 25 / (8 * sp.sqrt(2))) == 0
+
+    # 2. Live 256-bit Arb check of J, 3*J, M_var, p=2003 counterexample, and B(2000, theta):
+    saved_prec = flint_ctx.prec
+    flint_ctx.prec = 256
+    try:
+        q11_4 = arb(11) / arb(4)
+        q3_4 = arb(3) / arb(4)
+        three_b = arb(3)
+        gamma_11_4 = q11_4.gamma()
+        # Alternating power series for lower incomplete gamma(11/4, 3) = 3^{11/4} sum_{n=0}^{100} (-3)^n / (n! (n + 11/4)):
+        total_series = arb(0)
+        neg3 = -arb(3)
+        fact_n = arb(1)
+        pow_neg3 = arb(1)
+        for n_i in range(101):
+            if n_i > 0:
+                fact_n = fact_n * arb(n_i)
+                pow_neg3 = pow_neg3 * neg3
+            total_series += pow_neg3 / (fact_n * (arb(n_i) + q11_4))
+        rem_rad = (
+            (three_b ** (q11_4 + arb(101)))
+            / (fact_n * arb(101) * (arb(101) + q11_4))
+        ).upper()
+        lower_11_4_3 = (three_b ** q11_4) * total_series + arb(0, rem_rad)
+        j_arb = (
+            arb(2) * (three_b ** q11_4) * (-three_b).exp()
+            - (arb(1) / arb(4)) * (gamma_11_4 - arb(2) * lower_11_4_3)
+        )
+        three_j_arb = arb(3) * j_arb
+        closed_arb = (
+            arb(6) * (three_b ** q11_4) * (-three_b).exp()
+            + (arb(63) / arb(64)) * q3_4.gamma()
+        )
+        assert bool(abs(j_arb - arb("2.1520858051994258")).upper() < arb("1e-16"))
+        assert bool(abs(three_j_arb - arb("6.4562574155982774")).upper() < arb("1e-16"))
+        assert bool((closed_arb - three_j_arb).lower() > arb(0))
+        assert bool((arb(8) - closed_arb).lower() > arb(0))
+        assert bool(
+            j_arb.overlaps(arb(gauss["J_stieltjes_integral_certified"]["arb_ball_str"]))
+        )
+        assert bool(
+            three_j_arb.overlaps(
+                arb(gauss["three_J_stieltjes_constant_certified"]["arb_ball_str"])
+            )
+        )
+
+        # M_var = 25 / (8 * sqrt(2)):
+        m_var_arb = arb(25) / (arb(8) * arb(2).sqrt())
+        assert bool(
+            m_var_arb.overlaps(
+                arb(k_var["M_var_25_over_8_sqrt2_certified"]["arb_ball_str"])
+            )
+        )
+
+        # Counterexample at p = 2003, theta = 3/4:
+        p_ce = arb(2003)
+        p_pow_34 = p_ce ** (-q3_4)
+        f_2003_34 = arb(1) + (
+            arb(2) * p_pow_34 + (p_ce - arb(1)) * (p_ce ** (-arb(3) / arb(2)))
+        ) / ((p_ce + arb(1)) * ((arb(1) - p_pow_34) ** 2))
+        log_f_2003_34 = f_2003_34.log()
+        old_maj_2003 = arb(4) * (p_ce ** (-arb(7) / arb(4)))
+        diff_2003 = log_f_2003_34 - old_maj_2003
+        assert bool(diff_2003.lower() > arb("7.89337e-6"))
+        assert bool(diff_2003.lower() > arb(0))
+
+        # Proved Euler-tail majorant B(2000, theta) for theta in {3/4, 1}:
+        p_cut = arb(2000)
+        a_34 = arb(1) / (arb(1) - (p_cut ** (-q3_4)))
+        b_2000_34 = (arb(2) * a_34) / (q3_4 * (p_cut ** q3_4)) + (a_34 ** 2) / (
+            (arb(1) / arb(2)) * (p_cut.sqrt())
+        )
+        a_1 = arb(1) / (arb(1) - (arb(1) / p_cut))
+        b_2000_1 = (arb(2) * a_1) / p_cut + (a_1 ** 2) / p_cut
+        tail_rep = f4["euler_tail_majorant_repair"][
+            "proved_replacement_tail_majorant_B_P_theta"
+        ]
+        assert bool(
+            b_2000_34.overlaps(arb(tail_rep["B_2000_3_4_certified"]["arb_ball_str"]))
+        )
+        assert bool(
+            b_2000_1.overlaps(arb(tail_rep["B_2000_1_certified"]["arb_ball_str"]))
+        )
+    finally:
+        flint_ctx.prec = saved_prec
+
+    assert f4["euler_tail_majorant_repair"][
+        "discarded_majorant_failure_at_p2003_theta_3_4"
+    ]["discarded_majorant_fails_at_2003_certified"] is True
+    assert f4["euler_tail_majorant_repair"][
+        "proved_replacement_tail_majorant_B_P_theta"
+    ]["replacement_majorant_holds_at_2003"] is True
+    assert f4["euler_tail_majorant_repair"][
+        "proved_replacement_tail_majorant_B_P_theta"
+    ]["multi_cutoff_consistency_P_500_1000_2000_5000_certified"] is True
+    assert ce_pair["replacement_bound_holds_certified"] is True
+    assert "A >= A_0 := e^{2e}" in f4["step_4_combined_unconditional_bound"]
+    assert "conditional route to a fixed power saving" in sec9[
+        "surviving_unconditional_results_and_remaining_obstruction"
+    ]["precise_arithmetic_obstruction_to_power_saving"]
+
+    # 3. Verify that discarded pre-TC-053R2 formulas and numbers do not appear in code, artifacts, or reviews:
+    repo_root = Path(__file__).resolve().parents[1]
+    for rel_path in (
+        "tc/faithful_tau_arithmetic_spectral_realization.py",
+        "data/tc_faithful_tau_arithmetic_spectral_realization.json",
+        "docs/reviews/TC_FAITHFUL_TAU_ARITHMETIC_SPECTRAL_REALIZATION.md",
+        "docs/reviews/TC_CANONICAL_THETA_CORRELATION_BOUND.md",
+        "TRANSCENDENTAL_CONTINUATION.md",
+        "RESEARCH_LEDGER.md",
+        ".agents/corpus_map/obligation_register.md",
+    ):
+        content = (repo_root / rel_path).read_text(encoding="utf-8")
+        for forbidden in (
+            "v^{11/4}|v - 3|",
+            "v^{11/4}\\,|v - 3|",
+            "u^{13/2}|u^2 - 3|",
+            "u^{13/2}\\,|u^2 - 3|",
+            "6.759126424",
+            "20.27737927",
+            "24.41672357",
+            "0.3995625300",
+            "1.679378605",
+            "19 / (8 * sqrt(2))",
+            "\\frac{19}{8\\sqrt{2}}",
+            "M_var_19_over_8_sqrt2_certified",
+        ):
+            assert forbidden not in content, (
+                f"Found discarded pre-TC-053R2 string {forbidden!r} in {rel_path}"
+            )
+
 
 
 
