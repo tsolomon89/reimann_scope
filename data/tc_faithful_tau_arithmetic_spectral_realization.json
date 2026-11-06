@@ -6,12 +6,14 @@
   "tc052_repair_task_id": "TASK-TC-052R",
   "tc052_followup_repair_task_id": "TASK-TC-052R2",
   "trivial_zero_coprime_cancellation_task_id": "TASK-TC-053",
+  "tc053_repair_task_id": "TASK-TC-053R",
   "preceding_repair_task_ids": [
     "TASK-TC-050R",
     "TASK-TC-050R2",
     "TASK-TC-051R",
     "TASK-TC-052R",
-    "TASK-TC-052R2"
+    "TASK-TC-052R2",
+    "TASK-TC-053R"
   ],
   "parent_epic": "EPIC-TC-042",
   "starting_head": "e6472e03c008cc8d20be177f1d96bf904bd0a16b",
@@ -26,6 +28,7 @@
   "tc052r_implementation_commit": "f230b1a72c2c336522834703534bbdb8c15a250a",
   "tc053_starting_head": "c64596727e7142596acd073c6c8e4eb28f2eaee0",
   "tc052r2_merged_main_baseline": "c64596727e7142596acd073c6c8e4eb28f2eaee0",
+  "tc053_merged_main_baseline": "793d327d2f151170ceb34536ed92f99b11e17969",
   "reviewed_baseline": "5da0eb79e1732ff871ee1c7fee729c62972aa406",
   "tc050r_reviewed_baseline": "2f7871fff666091c4152ecc8657f2345aacdd4fa",
   "tc050r2_reviewed_head": "0e6ae36ce995ef3037652b3dfb67645325f990b1",
@@ -9440,8 +9443,10 @@
   },
   "section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation": {
     "task_id": "TASK-TC-053",
+    "repair_task_id": "TASK-TC-053R",
     "starting_head": "c64596727e7142596acd073c6c8e4eb28f2eaee0",
     "tc052r2_merged_main_baseline": "c64596727e7142596acd073c6c8e4eb28f2eaee0",
+    "tc053_merged_main_baseline": "793d327d2f151170ceb34536ed92f99b11e17969",
     "subgate_tc043a_status": "OPEN",
     "rh_proved": false,
     "section_1_trivial_zero_slopes_and_mellin_energy_criterion": {
@@ -10661,10 +10666,11 @@
           }
         ],
         "criterion_status": "SUFFICIENT_CRITERION_CONDITIONAL_ON_ARITHMETIC_ENERGY_PREMISE",
-        "sufficient_energy_premise_statement": "forall eps > 0 exists C_eps < infty forall Y >= 1 : int_Y^{tau Y} |Q(X)|^2 dX/X <= C_eps Y^eps   (where extensions to all real Y >= 1 or discrete grade blocks Y_k = tau^k >= 1 are equivalent up to a factor of tau).",
+        "sufficient_energy_premise_statement": "forall eps > 0 exists C_eps < infty forall Y >= 1 : int_Y^{tau Y} |Q(X)|^2 dX/X <= C_eps Y^eps   (where passing from aligned discrete grade blocks Y_k = tau^k >= 1 to arbitrary real Y >= 1 incurs the exact covering constant 1 + tau^eps because [Y, tau Y] subset [tau^k, tau^{k+2}] with k = floor(log Y / log tau) >= 0 spans at most two consecutive aligned grade blocks).",
+        "grade_block_covering_constant_formula": "1 + tau^eps   (since [Y, tau Y] subset [tau^k, tau^{k+2}] for k = floor(log Y / log tau) >= 0, giving C_eps * tau^{k eps} + C_eps * tau^{(k+1) eps} = (1 + tau^eps) C_eps tau^{k eps} <= (1 + tau^eps) C_eps Y^eps)",
         "five_step_sufficiency_proof": [
           "(a) Small-X bound on (0, 1]: |G(X^2)| <= sum_{n>=1} n^{-3} = zeta(3) implies |Q(X)| <= zeta(3) X^{5/2}, so int_0^1 |Q(X)| X^{-sigma} dX/X <= zeta(3) / (5/2 - sigma) < infty for all sigma = Re(z) < 5/2.",
-          "(b) Cauchy-Schwarz on multiplicative grade intervals [tau^k, tau^{k+1}] (k >= 0, Y_k = tau^k >= 1): for sigma = Re(z) > 0, choosing eps = sigma > 0 gives int_{tau^k}^{tau^{k+1}} |Q(X)| X^{-sigma} dX/X <= (int_{tau^k}^{tau^{k+1}} |Q(X)|^2 dX/X)^{1/2} (int_{tau^k}^{tau^{k+1}} X^{-2*sigma} dX/X)^{1/2} <= sqrt(C_sigma log tau) tau^{-k*sigma/2}.",
+          "(b) Cauchy-Schwarz on multiplicative grade intervals [tau^k, tau^{k+1}] (k >= 0, Y_k = tau^k >= 1): for sigma = Re(z) > 0, choosing eps = sigma > 0 gives int_{tau^k}^{tau^{k+1}} |Q(X)| X^{-sigma} dX/X <= (int_{tau^k}^{tau^{k+1}} |Q(X)|^2 dX/X)^{1/2} (int_{tau^k}^{tau^{k+1}} X^{-2*sigma} dX/X)^{1/2} <= sqrt(C_sigma log tau) tau^{-k*sigma/2} (and if only the discrete grade-block bound at Y_k = tau^k is assumed, any real interval [Y, tau Y] subset [tau^k, tau^{k+2}] satisfies int_Y^{tau Y} |Q(X)|^2 dX/X <= (1 + tau^eps) C_eps Y^eps with exact covering constant 1 + tau^eps).",
           "(c) Geometric summation over k >= 0 and holomorphy on 0 < Re(z) < 5/2: since tau = 2*pi > 1 and sigma > 0, sum_{k>=0} tau^{-k*sigma/2} = 1 / (1 - tau^{-sigma/2}) < infty converges uniformly on compact subsets of {0 < Re(z) < 5/2}, so M[Q](z) = int_0^infty Q(X) X^{-z} dX/X is holomorphic on 0 < Re(z) < 5/2.",
           "(d) Strip overlap and nonvanishing of Gamma(5/4 - z/2): {0 < Re(z) < 5/2} overlaps the initial absolute-convergence strip {1/2 < Re(z) < 5/2} on (1/2, 5/2) x i*R, so by analytic continuation M[Q](z) = Gamma(5/4 - z/2) / (2 zeta(1/2 + z)) on 0 < Re(z) < 5/2. Because Gamma(w) has no zeros in C (and is holomorphic on Re(w) = 5/4 - Re(z)/2 > 0), any zero rho = 1/2 + z_0 of zeta(s) with 1/2 < Re(rho) < 1 (0 < Re(z_0) < 1/2) would create a pole of Gamma(5/4 - z/2) / (2 zeta(1/2 + z)) at z_0, contradicting holomorphy of M[Q](z).",
           "(e) Functional-equation reflection: xi(1 - s) = xi(s) reflects any zero with 0 < Re(rho) < 1/2 to 1 - rho with 1/2 < Re(1 - rho) < 1, excluding all off-critical nontrivial zeros of zeta(s)."
@@ -10682,8 +10688,9 @@
       },
       "coprime_squarefree_counting_estimate": {
         "formula": "N_q(t) := sum_{d <= t, gcd(d, q) = 1} mu(d)^2 = kappa(q) t + R_q(t),   kappa(q) = (1 / zeta(2)) prod_{p | q} (p / (p + 1))",
-        "explicit_remainder_bound": "|R_q(t)| <= (2^{omega(q)} + 2) sqrt(t) <= 3 * 2^{omega(q)} sqrt(t)   for all t >= 1",
-        "proof_summary": "Expanding 1_{gcd(d, q)=1} = sum_{e | q} mu(e) 1_{e | d} (with d = e m, gcd(e, m) = 1) reduces N_q(t) to sum_{e | q} mu(e) N_{e}(t / e), and inserting mu(d)^2 = sum_{a^2 | d} mu(a) with |{m <= y : a^2 | m, gcd(m, q)=1} - (y/a^2) prod_{p|q}(1 - 1/p)| <= 2^{omega(q)} yields kappa(q) = (1/zeta(2)) prod_{p|q}(1 - 1/p)/(1 - 1/p^2) = (1/zeta(2)) prod_{p|q}(p/(p+1)) and |R_q(t)| <= (2^{omega(q)} + 2) sqrt(t).",
+        "explicit_remainder_bound": "|R_q(t)| <= (2^{omega(q)} + 2) sqrt(t) <= 3 * 2^{omega(q)} sqrt(t)   for all t > 0 (including 0 < t < 1, where N_q(t) = 0 and |R_q(t)| = kappa(q) t <= (6/pi^2) sqrt(t) < (2^{omega(q)} + 2) sqrt(t))",
+        "sub_unit_t_bound_certified": true,
+        "proof_summary": "For t >= 1, expanding 1_{gcd(d, q)=1} = sum_{e | q} mu(e) 1_{e | d} and mu(d)^2 = sum_{a^2 | d} mu(a) with |{m <= y : a^2 | m, gcd(m, q)=1} - (y/a^2) prod_{p|q}(1 - 1/p)| <= 2^{omega(q)} yields kappa(q) = (1/zeta(2)) prod_{p|q}(1 - 1/p)/(1 - 1/p^2) = (1/zeta(2)) prod_{p|q}(p/(p+1)) and |R_q(t)| <= (2^{omega(q)} + 2) sqrt(t). For 0 < t < 1, N_q(t) = 0 so R_q(t) = -kappa(q) t, and since 0 < kappa(q) <= 6/pi^2 < 1 and t < sqrt(t) on (0, 1), |R_q(t)| <= (6/pi^2) sqrt(t) < (2^{omega(q)} + 2) sqrt(t).",
         "all_counting_bounds_certified": true,
         "sample_counting_table": [
           {
@@ -11048,10 +11055,127 @@
           }
         ]
       },
+      "counterexample_r29_s31_X30_falsifying_old_pairwise_bound": {
+        "r": 29,
+        "s": 31,
+        "X": 30,
+        "q_eq_rs": 899,
+        "r_sq_plus_s_sq": 1802,
+        "mu_r_times_mu_s": 1,
+        "omega_rs": 2,
+        "two_pow_omega_rs": 4,
+        "all_d_sum_terms_nonnegative": true,
+        "d_eq_1_contribution_certified": {
+          "mid_float": 0.004496116626444836,
+          "rad_float_outward": 1.4065602004035552e-19,
+          "lower_dec": "4.496116626444835904165753124575485457893e-3",
+          "upper_dec": "4.496116626444835904165753124575485457896e-3",
+          "arb_ball_str": "[0.004496116626444835904165753124575485457894 +/- 4.80e-43]"
+        },
+        "full_d_sum_contribution_certified": {
+          "mid_float": 0.004852248120771122,
+          "rad_float_outward": 4.510160892973812e-19,
+          "lower_dec": "4.852248120771121796269500126500854417758e-3",
+          "upper_dec": "4.852248120771122214328150849804834516773e-3",
+          "arb_ball_str": "[0.004852248120771122 +/- 2.15e-19]"
+        },
+        "scale_independent_leading_term_L_29_31_certified": {
+          "mid_float": 0.002218597833835925,
+          "rad_float_outward": 2.1528247700683355e-19,
+          "lower_dec": "2.218597833835925105427052279021906936626e-3",
+          "upper_dec": "2.218597833835925105427052279021906936629e-3",
+          "arb_ball_str": "[0.002218597833835925105427052279021906936628 +/- 2.59e-44]"
+        },
+        "d_eq_1_error_lower_bound_E_29_31_d1_certified": {
+          "mid_float": 0.002277518792608911,
+          "rad_float_outward": 7.462645696647804e-20,
+          "lower_dec": "2.277518792608910798738700845553578521265e-3",
+          "upper_dec": "2.277518792608910798738700845553578521268e-3",
+          "arb_ball_str": "[0.002277518792608910798738700845553578521267 +/- 4.95e-43]"
+        },
+        "full_error_E_29_31_30_certified": {
+          "mid_float": 0.002633650286935197,
+          "rad_float_outward": 2.3261769751196126e-19,
+          "lower_dec": "2.633650286935196690842447645530555744551e-3",
+          "upper_dec": "2.633650286935197108901098772731319316724e-3",
+          "arb_ball_str": "[0.002633650286935197 +/- 3.10e-19]"
+        },
+        "old_asserted_upper_bound_certified": {
+          "mid_float": 0.0015163894205511706,
+          "rad_float_outward": 4.738571818567738e-20,
+          "lower_dec": "1.516389420551170594757261430873825969736e-3",
+          "upper_dec": "1.516389420551170594757261430873825969739e-3",
+          "arb_ball_str": "[0.001516389420551170594757261430873825969737 +/- 4.04e-43]"
+        },
+        "d1_excess_over_old_bound_certified": {
+          "mid_float": 0.0007611293720577402,
+          "rad_float_outward": 2.724073878080066e-20,
+          "lower_dec": "7.611293720577402039814394146797525515290e-4",
+          "upper_dec": "7.611293720577402039814394146797525515293e-4",
+          "arb_ball_str": "[0.0007611293720577402039814394146797525515291 +/- 2.21e-45]"
+        },
+        "full_excess_over_old_bound_certified": {
+          "mid_float": 0.0011172608663840263,
+          "rad_float_outward": 2.328266720028654e-19,
+          "lower_dec": "1.117260866384026096085186012708338038235e-3",
+          "upper_dec": "1.117260866384026514143837543805885083566e-3",
+          "arb_ball_str": "[0.001117260866384026 +/- 5.15e-19]"
+        },
+        "d1_excess_strictly_positive_lower_bound": 0.0007611293720577402,
+        "contradiction_strictly_positive_lower_bound_certified": true,
+        "replacement_bound_with_C_sharp_at_29_31_30_certified": {
+          "mid_float": 0.39956253001655195,
+          "rad_float_outward": 1.6685543646454796e-17,
+          "lower_dec": "3.995625300165519700235101982261794259292e-1",
+          "upper_dec": "3.995625300165519700235101982261794259295e-1",
+          "arb_ball_str": "[0.3995625300165519700235101982261794259293 +/- 2.64e-41]"
+        },
+        "replacement_bound_with_C_21_at_29_31_30_certified": {
+          "mid_float": 0.41380165640300504,
+          "rad_float_outward": 1.4898557713775398e-17,
+          "lower_dec": "4.138016564030050508320754883132997703500e-1",
+          "upper_dec": "4.138016564030050508320754883132997703503e-1",
+          "arb_ball_str": "[0.4138016564030050508320754883132997703501 +/- 4.53e-41]"
+        },
+        "replacement_bound_margin_over_full_error_certified": {
+          "mid_float": 0.39692887972961677,
+          "rad_float_outward": 5.2087778815272025e-18,
+          "lower_dec": "3.969288797296167729146090990495513231393e-1",
+          "upper_dec": "3.969288797296167733326677509845456536581e-1",
+          "arb_ball_str": "[0.396928879729616773 +/- 3.33e-19]"
+        },
+        "replacement_bound_holds_certified": true,
+        "diagnosis_and_scope_note": "At (r, s, X) = (29, 31, 30), the old pairwise bound failed because rescaling int_0^infty sqrt(t) |d/dt(t^{-6} e^{-L^2/t^2})| dt = L^{-11/2} I_abs with L = X sqrt(r^2+s^2)/(r s) and multiplying by X^5/(r s)^3 gives X^{-1/2} (r s)^{5/2} / (r^2 + s^2)^{11/4} (homogeneous of degree -1/2 in (r, s), evaluating at (29, 31) to 899^{5/2} / 1802^{11/4} = 0.0265768...), whereas the old formula had homogeneous degree -2 (evaluating to 899 / 1802^2 = 0.00027685..., smaller by a factor of ~96). This falsifies the old pairwise inequality while leaving the aggregate growing-range upper bound O_eps(A^{3/2+eps}/sqrt(X)) intact via the proved replacement pairwise bound below."
+      },
       "gaussian_integral_and_pairwise_leading_term": {
         "gaussian_moment_identity": "int_0^infty u^4 exp(-alpha u^2) du = (3 sqrt(pi) / 8) alpha^{-5/2}   (Re(alpha) > 0)",
         "pairwise_leading_term_formula": "(3 sqrt(pi) / 8) mu(r) mu(s) kappa(r s) ((r s)^2 / (r^2 + s^2)^{5/2})",
         "gaussian_symbolic_verified": true,
+        "homogeneous_degree_neg_half_symbolic_verified": true,
+        "I_abs_stieltjes_integral_certified": {
+          "mid_float": 6.759126424066079,
+          "rad_float_outward": 4.310107833147003e-16,
+          "lower_dec": "6.759126424066078899532960393703499341214e+0",
+          "upper_dec": "6.759126424066078899532960393703499341217e+0",
+          "arb_ball_str": "[6.759126424066078899532960393703499341216 +/- 4.73e-40]"
+        },
+        "I_abs_direct_vs_ibp_agree": true,
+        "C_pair_sharp_3_I_abs_certified": {
+          "mid_float": 20.277379272198235,
+          "rad_float_outward": 1.371502909156275e-15,
+          "lower_dec": "2.027737927219823669859888118111049802363e+1",
+          "upper_dec": "2.027737927219823669859888118111049802366e+1",
+          "arb_ball_str": "[20.27737927219823669859888118111049802365 +/- 3.42e-39]"
+        },
+        "C_pair_sharp_lt_21_certified": true,
+        "C_pair_closed_form_upper_bound_certified": {
+          "mid_float": 24.416723570166802,
+          "rad_float_outward": 5.813798632822014e-16,
+          "lower_dec": "2.441672357016680253012411397649103735715e+1",
+          "upper_dec": "2.441672357016680253012411397649103735718e+1",
+          "arb_ball_str": "[24.41672357016680253012411397649103735716 +/- 1.93e-39]"
+        },
+        "C_pair_closed_lt_25_certified": true,
         "all_pairwise_error_bounds_certified": true,
         "sample_pairwise_convergence_table": [
           {
@@ -11080,11 +11204,18 @@
               "arb_ball_str": "[0.0030194745862663 +/- 4.33e-17]"
             },
             "analytic_O_X_neg_half_remainder_bound_certified": {
-              "mid_float": 0.5325443786982249,
-              "rad_float_outward": 5.5182682880777016e-17,
-              "lower_dec": "5.325443786982248520710059171597633136093e-1",
-              "upper_dec": "5.325443786982248520710059171597633136096e-1",
-              "arb_ball_str": "[0.5325443786982248520710059171597633136095 +/- 3.26e-41]"
+              "mid_float": 3.0908343287692084,
+              "rad_float_outward": 1.5369590015580357e-16,
+              "lower_dec": "3.090834328769208537087642401097696504230e+0",
+              "upper_dec": "3.090834328769208537087642401097696504233e+0",
+              "arb_ball_str": "[3.090834328769208537087642401097696504232 +/- 4.08e-40]"
+            },
+            "bound_minus_abs_difference_certified": {
+              "mid_float": 3.0878148541829424,
+              "rad_float_outward": 2.4283484394898046e-16,
+              "lower_dec": "3.087814854182942193887370603011373067445e+0",
+              "upper_dec": "3.087814854182942253146630735148173639234e+0",
+              "arb_ball_str": "[3.0878148541829422 +/- 5.32e-17]"
             },
             "abs_difference_le_analytic_bound_certified": true
           },
@@ -11114,11 +11245,18 @@
               "arb_ball_str": "[0.0041481954831 +/- 4.87e-14]"
             },
             "analytic_O_X_neg_half_remainder_bound_certified": {
-              "mid_float": 0.26627218934911245,
-              "rad_float_outward": 2.7591341440388508e-17,
-              "lower_dec": "2.662721893491124260355029585798816568046e-1",
-              "upper_dec": "2.662721893491124260355029585798816568049e-1",
-              "arb_ball_str": "[0.2662721893491124260355029585798816568047 +/- 3.38e-41]"
+              "mid_float": 1.5454171643846042,
+              "rad_float_outward": 7.684795007790178e-17,
+              "lower_dec": "1.545417164384604268543821200548848252114e+0",
+              "upper_dec": "1.545417164384604268543821200548848252117e+0",
+              "arb_ball_str": "[1.545417164384604268543821200548848252116 +/- 2.04e-40]"
+            },
+            "bound_minus_abs_difference_certified": {
+              "mid_float": 1.5412689689015227,
+              "rad_float_outward": 3.0431886511610626e-14,
+              "lower_dec": "1.541268968901492219407078050163563709762e+0",
+              "upper_dec": "1.541268968901552900889453358247349218715e+0",
+              "arb_ball_str": "[1.5412689689015 +/- 5.30e-14]"
             },
             "abs_difference_le_analytic_bound_certified": true
           },
@@ -11148,11 +11286,18 @@
               "arb_ball_str": "[-0.0009528138 +/- 7.07e-11]"
             },
             "analytic_O_X_neg_half_remainder_bound_certified": {
-              "mid_float": 0.13313609467455623,
-              "rad_float_outward": 1.3795670720194254e-17,
-              "lower_dec": "1.331360946745562130177514792899408284022e-1",
-              "upper_dec": "1.331360946745562130177514792899408284025e-1",
-              "arb_ball_str": "[0.1331360946745562130177514792899408284024 +/- 3.32e-41]"
+              "mid_float": 0.7727085821923021,
+              "rad_float_outward": 3.842397503895089e-17,
+              "lower_dec": "7.727085821923021342719106002744241260577e-1",
+              "upper_dec": "7.727085821923021342719106002744241260580e-1",
+              "arb_ball_str": "[0.7727085821923021342719106002744241260579 +/- 1.89e-42]"
+            },
+            "bound_minus_abs_difference_certified": {
+              "mid_float": 0.7717557684319033,
+              "rad_float_outward": 3.1068936123780375e-11,
+              "lower_dec": "7.717557684008343977360319711601510148296e-1",
+              "upper_dec": "7.717557684629722356883474489565121798492e-1",
+              "arb_ball_str": "[0.7717557684 +/- 6.30e-11]"
             },
             "abs_difference_le_analytic_bound_certified": true
           },
@@ -11182,20 +11327,69 @@
               "arb_ball_str": "[0.0003002 +/- 7.81e-8]"
             },
             "analytic_O_X_neg_half_remainder_bound_certified": {
-              "mid_float": 0.06656804733727811,
-              "rad_float_outward": 6.897835360097127e-18,
-              "lower_dec": "6.656804733727810650887573964497041420117e-2",
-              "upper_dec": "6.656804733727810650887573964497041420120e-2",
-              "arb_ball_str": "[0.06656804733727810650887573964497041420118 +/- 3.44e-42]"
+              "mid_float": 0.38635429109615105,
+              "rad_float_outward": 1.9211987519475446e-17,
+              "lower_dec": "3.863542910961510671359553001372120630288e-1",
+              "upper_dec": "3.863542910961510671359553001372120630291e-1",
+              "arb_ball_str": "[0.3863542910961510671359553001372120630289 +/- 4.91e-41]"
+            },
+            "bound_minus_abs_difference_certified": {
+              "mid_float": 0.386054137321204,
+              "rad_float_outward": 3.181457304006544e-08,
+              "lower_dec": "3.860541055066310041499456769376506153690e-1",
+              "upper_dec": "3.860541691357770673209949404114835951676e-1",
+              "arb_ball_str": "[0.3860541 +/- 6.92e-8]"
+            },
+            "abs_difference_le_analytic_bound_certified": true
+          },
+          {
+            "X": 30,
+            "r": 29,
+            "s": 31,
+            "exact_d_sum_contribution_certified": {
+              "mid_float": 0.004852248120771122,
+              "rad_float_outward": 4.510160892973812e-19,
+              "lower_dec": "4.852248120771121796269500126500854417758e-3",
+              "upper_dec": "4.852248120771122214328150849804834516773e-3",
+              "arb_ball_str": "[0.004852248120771122 +/- 2.15e-19]"
+            },
+            "scale_independent_leading_term_certified": {
+              "mid_float": 0.002218597833835925,
+              "rad_float_outward": 2.1528247700683355e-19,
+              "lower_dec": "2.218597833835925105427052279021906936626e-3",
+              "upper_dec": "2.218597833835925105427052279021906936629e-3",
+              "arb_ball_str": "[0.002218597833835925105427052279021906936628 +/- 2.59e-44]"
+            },
+            "difference_exact_minus_leading_certified": {
+              "mid_float": 0.002633650286935197,
+              "rad_float_outward": 2.3261769751196126e-19,
+              "lower_dec": "2.633650286935196690842447645530555744551e-3",
+              "upper_dec": "2.633650286935197108901098772731319316724e-3",
+              "arb_ball_str": "[0.002633650286935197 +/- 3.10e-19]"
+            },
+            "analytic_O_X_neg_half_remainder_bound_certified": {
+              "mid_float": 0.39956253001655195,
+              "rad_float_outward": 1.6685543646454796e-17,
+              "lower_dec": "3.995625300165519700235101982261794259292e-1",
+              "upper_dec": "3.995625300165519700235101982261794259295e-1",
+              "arb_ball_str": "[0.3995625300165519700235101982261794259293 +/- 2.64e-41]"
+            },
+            "bound_minus_abs_difference_certified": {
+              "mid_float": 0.39692887972961677,
+              "rad_float_outward": 5.2087778815272025e-18,
+              "lower_dec": "3.969288797296167729146090990495513231393e-1",
+              "upper_dec": "3.969288797296167733326677509845456536581e-1",
+              "arb_ball_str": "[0.396928879729616773 +/- 3.33e-19]"
             },
             "abs_difference_le_analytic_bound_certified": true
           }
         ]
       },
       "total_error_and_valid_growing_range": {
-        "pairwise_remainder_bound": "|E_{r,s}(X)| <= (15 / 2) (2^{omega(r s)} / sqrt(X)) (r s / (r^2 + s^2)^2) <= (15 / 8) (2^{omega(r) + omega(s)} / sqrt(X)) (r s / (r + s)^4)",
-        "summed_error_bound_up_to_A": "sum_{1 <= r, s <= A, gcd(r, s) = 1} |E_{r,s}(X)| = O(A (log(2A))^6 / sqrt(X)) = O_eps(A^{3/2 + eps} / sqrt(X))   for every eps > 0",
-        "valid_growing_range_condition": "For A <= X^{1/3 - delta} with 0 < delta < 1/3, A^{3/2 + eps} / sqrt(X) <= X^{-(3/2) delta + (1/3 - delta) eps}, which decays to 0 as X -> infty if and only if 0 < eps < 3 delta / (2 (1/3 - delta)); in particular, choosing eps = (3/2) delta gives O(X^{-delta - delta^2 * 3/2}) = O(X^{-delta}) -> 0.",
+        "replacement_pairwise_remainder_bound": "|E_{r,s}(X)| <= (2^{omega(r s)} + 2) I_abs X^{-1/2} ((r s)^{5/2} / (r^2 + s^2)^{11/4}) <= C 2^{omega(r s)} X^{-1/2} ((r s)^{5/2} / (r^2 + s^2)^{11/4}),   with C = C_pair^{sharp} = 3 I_abs = 20.2773792722... < 21 (and closed-form upper bound C_pair^{closed} = 6 * 3^{15/4} e^{-3} + (315/64) Gamma(3/4) = 24.4167235702... < 25)",
+        "stieltjes_derivation_and_boundary_terms": "Writing L = X sqrt(r^{-2} + s^{-2}) = X sqrt(r^2 + s^2) / (r s) and phi_L(t) = t^{-6} exp(-L^2 / t^2), Stieltjes integration by parts of R_{r s}(t) = N_{r s}(t) - kappa(r s) t against phi_L(t) on (0, infty) has vanishing boundary terms at both endpoints: as t -> 0^+, R_{r s}(t) = -kappa(r s) t = O(t) while phi_L(t) vanishes faster than any power of t; as t -> infty, |R_{r s}(t)| <= 3 * 2^{omega(r s)} sqrt(t) while phi_L(t) <= t^{-6}, so |R_{r s}(t) phi_L(t)| = O(t^{-11/2}) -> 0. Since |R_{r s}(t)| <= 3 * 2^{omega(r s)} sqrt(t) holds for all t > 0 (including 0 < t < 1) and int_0^infty sqrt(t) |phi_L'(t)| dt = L^{-11/2} I_abs under u = L / t, multiplying by X^5 / (r s)^3 gives X^5 (r s)^{-3} L^{-11/2} = X^{-1/2} (r s)^{5/2} / (r^2 + s^2)^{11/4}.",
+        "summed_error_bound_up_to_A": "Using r^2 + s^2 >= 2 r s => (r s)^{5/2} / (r^2 + s^2)^{11/4} <= 2^{-11/4} r^{-1/4} s^{-1/4} (or ordering 1 <= r <= s <= A where (r s)^{5/2} / (r^2 + s^2)^{11/4} <= r^{5/2} s^{-3}), summing over all coprime 1 <= r, s <= A (equal and unequal factors alike) gives sum_{1 <= r, s <= A, gcd(r, s) = 1} |E_{r,s}(X)| <= 2^{-11/4} C X^{-1/2} (sum_{1 <= r <= A} 2^{omega(r)} r^{-1/4})^2 << A^{3/2} log^2(2A) / sqrt(X) = O_eps(A^{3/2 + eps} / sqrt(X)) for every eps > 0.",
+        "valid_growing_range_upper_bound_condition": "For A <= X^{1/3 - delta} with 0 < delta < 1/3, the upper bound O_eps(A^{3/2 + eps} / sqrt(X)) is majorized by X^{(1/3 - delta)(3/2 + eps) - 1/2} = X^{-(3/2) delta + (1/3 - delta) eps}; the exponent of this upper bound is strictly negative if and only if 0 < eps < 3 delta / (2 (1/3 - delta)) (and choosing eps = (3/2) delta gives an O(X^{-delta}) upper bound -> 0). This condition characterizes when the power-saving upper bound X^{(1/3 - delta)(3/2 + eps) - 1/2} decays to 0 (and already A^{3/2} log^2(2A) / sqrt(X) <= X^{-(3/2) delta} log^2(2 X) -> 0 without any eps-inflation), rather than being a necessary condition on the actual error sum.",
         "exponent_identity_symbolic_verified": true
       }
     },
@@ -11225,12 +11419,14 @@
           "arb_ball_str": "[0.2388020390525650552804189993008810046850 +/- 2.36e-42]"
         },
         "C_block_lt_0_239_certified": true,
-        "two_prime_stratum_asymptotic": "For A >= 2, every squarefree q = r s with A <= r, s < 2A, gcd(r, s) = 1, and omega(q) = 2 must have omega(r) = omega(s) = 1 (since r, s >= 2), so the omega(q) = 2 stratum consists 100% of products of two distinct primes r = p_1, s = p_2 in [A, 2A) with mu(p_1 p_2) = +1, giving S_{2-prime}(A) = (1/zeta(2))(3 sqrt(pi)/8)((15 sqrt(2) - 8 sqrt(5))/30 + o(1)) (A / log^2 A) > 0."
+        "two_prime_stratum_asymptotic": "For A >= 2, every squarefree q = r s with A <= r, s < 2A, gcd(r, s) = 1, and omega(q) = 2 must have omega(r) = omega(s) = 1 (since r, s >= 2), so the omega(q) = 2 stratum consists 100% of products of two distinct primes r = p_1 != s = p_2 in [A, 2A) with mu(p_1 p_2) = +1. At A = 5/2, [5/2, 5) intersect Z = {3, 4} contains only the single prime 3, so S_{2-prime}(5/2) = 0; for all A >= 6 (by Ramanujan 1919, as well as A in {2, 3, 4, 9/2}), [A, 2A) contains at least two distinct primes and S_{2-prime}(A) = (1/zeta(2))(3 sqrt(pi)/8)((15 sqrt(2) - 8 sqrt(5))/30 + o(1)) (A / log^2 A) > 0.",
+        "single_prime_block_A_5_over_2_two_prime_sum_zero": true
       },
       "attempt_1_prime_by_prime_bivariate_euler_product": {
         "dirichlet_generating_series": "D(s_1, s_2) := sum_{r, s >= 1, gcd(r, s) = 1} (mu(r) mu(s) prod_{p | r s} (p/(p+1))) r^{-s_1} s^{-s_2} = prod_p (1 - (p / (p + 1)) (p^{-s_1} + p^{-s_2})) = H(s_1, s_2) / (zeta(s_1) zeta(s_2))",
-        "correction_euler_product_H": "H(s_1, s_2) = prod_p [1 + ((p + 1)^{-1} (p^{-s_1} + p^{-s_2}) - p^{-(s_1 + s_2)}) / ((1 - p^{-s_1})(1 - p^{-s_2}))], absolutely convergent and holomorphic on {Re(s_1) > 0, Re(s_2) > 0, Re(s_1 + s_2) > 1}.",
-        "am_gm_nonvanishing_proof": "For Re(s_1) >= 1/2 and Re(s_2) >= 1/2 and every prime p >= 2, |(p/(p+1))(p^{-s_1} + p^{-s_2})| <= (p/(p+1))(2 / sqrt(p)) = 2 sqrt(p) / (p + 1) < 1 because p + 1 - 2 sqrt(p) = (sqrt(p) - 1)^2 > 0. Therefore every local factor of D(s_1, s_2) and H(s_1, s_2) is strictly nonzero on Re(s_1), Re(s_2) >= 1/2, so H(s_1, s_2) NEVER vanishes to cancel off-critical zeros of zeta(s_1) zeta(s_2) in 1/2 < Re(s_i) < 1 (and at s_1 + s_2 = 1 the coprimality restriction gcd(r, s) = 1 introduces the inverse-zeta pole of 1 / zeta(s_1 + s_2)).",
+        "correction_euler_product_H": "H(s_1, s_2) = prod_p H_p(p^{-s_1}, p^{-s_2}) with H_p(x, y) = 1 + ((p + 1)^{-1} (x + y) - x y) / ((1 - x)(1 - y)), absolutely convergent and holomorphic on the open domain Omega_H = {Re(s_1) > 0, Re(s_2) > 0, Re(s_1 + s_2) > 1}.",
+        "local_vs_infinite_product_and_boundary_behavior": "Distinguishes local factor nonvanishing from infinite Euler product convergence: (1) For Re(s_1) >= 1/2, Re(s_2) >= 1/2, and every prime p >= 2, |(p/(p+1))(p^{-s_1} + p^{-s_2})| <= 2 sqrt(p)/(p+1) < 1 by AM-GM, so every individual local factor H_p(p^{-s_1}, p^{-s_2}) is strictly nonzero. (2) On the interior region Omega_H intersect {Re(s_1) >= 1/2, Re(s_2) >= 1/2} = {Re(s_1) >= 1/2, Re(s_2) >= 1/2, Re(s_1 + s_2) > 1}, sum_p |H_p(p^{-s_1}, p^{-s_2}) - 1| < infty converges absolutely, so the infinite product H(s_1, s_2) is holomorphic and strictly nonzero; in particular, at any off-critical zero rho_0 with Re(rho_0) > 1/2 and any Re(s_2) >= 1/2, Re(rho_0 + s_2) > 1 lies strictly inside Omega_H, so H(rho_0, s_2) != 0 cannot cancel the pole of 1 / (zeta(s_1) zeta(s_2)). (3) At the boundary point s_1 = s_2 = 1/2 (where s_1 + s_2 = 1 lies on the boundary of Omega_H), H_p(p^{-1/2}, p^{-1/2}) - 1 = (2 sqrt(p)/(p+1) - 1/p)/(1 - p^{-1/2})^2 = -1/p + O(p^{-3/2}), so sum_p (H_p(p^{-1/2}, p^{-1/2}) - 1) = -infty diverges; moreover, in the coprimality factorization H(s_1, s_2) = G_coprime(s_1, s_2) / zeta(s_1 + s_2), the factor 1 / zeta(s_1 + s_2) has a ZERO at s_1 + s_2 = 1 (because zeta(s_1 + s_2) has a simple pole at s_1 + s_2 = 1).",
+        "boundary_s1_eq_s2_eq_half_divergence_symbolic_verified": true,
         "all_attempt1_local_factors_strictly_positive": true,
         "local_factor_table": [
           {
@@ -11343,10 +11539,60 @@
           }
         ]
       },
-      "attempt_2_regrouping_by_q_and_logarithmic_mobius_identity": {
-        "exact_regrouped_exchange_identity": "For A >= 2 (where q >= A^2 >= 4 > 1 so log q > 0), substituting mu(q) = -(1 / log q) sum_{u v = q} Lambda(u) mu(v) into S(A) = sum_q mu(q) w_A(q) yields S(A) = -sum_{2 <= u < 4 A^2} Lambda(u) sum_{ceil(A^2/u) <= v < ceil(4A^2/u)} mu(v) w_A(u v) / log(u v).",
-        "surviving_sum_and_triangle_inequality_loss": "In the exchanged sum, each q = u v carries the factorization multiplicity of coprime pairs (r, s) in [A, 2A)^2 with r s = u v (where prime powers u = p^a with a >= 2 are automatically annihilated because w_A(q) is supported on squarefree q whenever both factors r, s are restricted by mu(r)mu(s), or by prime-square cancellation Lambda(p)mu(p m) + Lambda(p^2)mu(m) = 0). Applying the triangle inequality across the parity strata omega(q) = 2 (positive) and odd omega(q) >= 3 (negative) bounds |S(A)| by S_{2-prime}(A) + |S_{odd}(A)| + |S_{even >= 4}(A)| = S_abs(A) ~ c A, losing all cancellation between prime-factor parity classes.",
-        "decoupled_L2_inclusion_exclusion_and_unconditional_walfisz_bound": "Expanding 1_{gcd(r, s) = 1} = sum_{e | gcd(r, s)} mu(e) decouples the coprime weight zeta(2) kappa(r s) = tilde{kappa}(r) tilde{kappa}(s) into positive rank-one L^2 integrals: S(A) = (1/zeta(2)) sum_{1 <= e < 2A} (mu(e) tilde{kappa}(e)^2 / e) I_e(A / e), where I_e(B) = int_0^infty u^4 (sum_{B <= r < 2B, gcd(r, e)=1} (mu(r) tilde{kappa}(r) / r^3) exp(-u^2/r^2))^2 du >= 0. Applying 2D summation by parts against the smooth kernel (r s)^2 / (r^2 + s^2)^{5/2} and the Korobov-Vinogradov-Walfisz bound on sum_{B <= r <= t, gcd(r, e)=1} mu(r) tilde{kappa}(r) proves unconditionally |S(A)| << A exp(-c_0 (log A)^{3/5} (log log A)^{-1/5}) <<_C A / (log A)^C for every C > 0 (improving unconditionally over both O(A) and S_{2-prime}(A) ~ c_2 A / log^2 A), while a fixed power saving |S(A)| <= C A^{1 - eta} remains obstructed by off-critical zeros of zeta(s) in sum_{r>=1} mu(r) tilde{kappa}(r) r^{-s} = K_1(s)/zeta(s)."
+      "attempt_2_regrouping_by_q_and_unconditional_signed_block_proof": {
+        "exact_regrouped_exchange_identity": "For r_min = ceil(A) >= 2 (where every q in [r_min^2, r_max^2] has q >= 4 > 1 so log q > 0), substituting mu(q) = -(1 / log q) sum_{u v = q} Lambda(u) mu(v) into S(A) = sum_q mu(q) w_A(q) yields S(A) = -sum_{2 <= u < 4 A^2} Lambda(u) sum_{ceil(A^2/u) <= v < ceil(4A^2/u)} mu(v) w_A(u v) / log(u v).",
+        "surviving_sum_and_triangle_inequality_loss": "In the exchanged sum, each q = u v carries the factorization multiplicity of coprime pairs (r, s) in [A, 2A)^2 with r s = u v (where prime powers u = p^a with a >= 2 are annihilated by prime-square cancellation Lambda(p)mu(p m) + Lambda(p^2)mu(m) = 0). Applying the triangle inequality across the parity strata omega(q) = 2 (positive) and odd omega(q) >= 3 (negative) bounds |S(A)| by S_{2-prime}(A) + |S_{odd}(A)| + |S_{even >= 4}(A)| = S_abs(A) ~ c A.",
+        "kernel_mixed_partial_sign_change_and_absolute_derivative_bounds": {
+          "K_rs_formula": "K_{rs}(r, s) = r s (-6 r^4 + 23 r^2 s^2 - 6 s^4) / (r^2 + s^2)^{9/2}",
+          "K_rs_symbolic_verified": true,
+          "K_rs_at_1_1_exact": "11 / (16 sqrt(2))",
+          "K_rs_at_1_2_exact": "-4 sqrt(5) / 625",
+          "K_rs_at_1_2_certified": {
+            "mid_float": -0.014310835055998655,
+            "rad_float_outward": 4.899194865157068e-19,
+            "lower_dec": "-1.431083505599865405701871147988016790683e-2",
+            "upper_dec": "-1.431083505599865405701871147988016790680e-2",
+            "arb_ball_str": "[-0.01431083505599865405701871147988016790682 +/- 4.27e-44]"
+          },
+          "K_rs_at_1_2_strictly_negative": true,
+          "absolute_derivative_bounds_on_box_A_to_2A": "On [A, 2A]^2 (where r, s >= A => r^2 + s^2 >= max(2 A^2, 2 r s)), |K(r, s)| <= 2^{-5/2} A^{-1}, |K_r(r, s)| <= (3 / (4 sqrt(2))) A^{-2}, |K_s(r, s)| <= (3 / (4 sqrt(2))) A^{-2}, and |K_{rs}(r, s)| <= (11 / (8 sqrt(2))) A^{-3}, giving total 2D Stieltjes variation constant M_var = 2^{-5/2} + 2 * (3/(4 sqrt(2))) + 11/(8 sqrt(2)) = 19 / (8 sqrt(2)).",
+          "M_var_19_over_8_sqrt2_certified": {
+            "mid_float": 1.6793786053180504,
+            "rad_float_outward": 1.7654593442552148e-17,
+            "lower_dec": "1.679378605318050370452005359999016468300e+0",
+            "upper_dec": "1.679378605318050370452005359999016468303e+0",
+            "arb_ball_str": "[1.679378605318050370452005359999016468301 +/- 4.86e-40]"
+          }
+        },
+        "four_step_unconditional_walfisz_convolution_proof": {
+          "step_1_multiplicative_convolution_f_eq_mu_tensor_mu_conv_h": "Write f(r, s) := 1_{gcd(r, s)=1} mu(r) mu(s) tilde{kappa}(r s) = sum_{d | r, e | s} h(d, e) mu(r/d) mu(s/e), where sum_{d, e >= 1} h(d, e) d^{-s_1} e^{-s_2} = H(s_1, s_2) has prime-power values h(1, 1) = 1, h(p^a, 1) = h(1, p^b) = 1/(p+1) (a, b >= 1), and h(p^a, p^b) = -(p-1)/(p+1) (a, b >= 1). For every theta > 1/2, C_{h,theta} := sum_{d,e>=1} |h(d,e)| (d e)^{-theta} = prod_p (1 + 2/((p+1)(p^theta - 1)) + (p-1)/((p+1)(p^theta - 1)^2)) < infty, and S(A) = (3 sqrt(pi) / (8 zeta(2))) sum_{1 <= d, e < 2A} h(d, e) T_{d, e}(A) with T_{d, e}(A) := sum_{A/d <= m < 2A/d} sum_{A/e <= n < 2A/e} mu(m) mu(n) K(d m, e n).",
+          "h_local_series_identity_symbolic_verified": true,
+          "all_h_convolutions_exact_up_to_40": true,
+          "C_h_1_certified": {
+            "mid_float": 3.6068132407963276,
+            "rad_float_outward": 0.0036068186163902287,
+            "lower_dec": "3.603206422179937362670898437499999999999e+0",
+            "upper_dec": "3.610420059412717819213867187500000000001e+0",
+            "arb_ball_str": "[3.61 +/- 6.80e-3]"
+          },
+          "C_h_3_4_certified": {
+            "mid_float": 9.108341254293919,
+            "rad_float_outward": 0.08121275156736375,
+            "lower_dec": "9.027128502726554870605468749999999999999e+0",
+            "upper_dec": "9.189554005861282348632812500000000000001e+0",
+            "arb_ball_str": "[9.1 +/- 0.0896]"
+          },
+          "step_2_uniform_walfisz_bound_on_main_range_d_e_le_sqrt_A": "For 1 <= d, e <= sqrt(A), the inner intervals [B_1, 2 B_1) = [A/d, 2A/d) and [B_2, 2 B_2) = [A/e, 2A/e) satisfy B_1, B_2 >= sqrt(A), and T_{d, e}(A) is a 2D sum of the ordinary unweighted Moebius function mu(m) mu(n) with NO coprimality parameter. By the unconditional Korobov (1958)-Vinogradov (1958)-Walfisz (1963, Ch. V, \u00a75, Satz 2) bound |M(x)| <= C_W x exp(-c_0 Phi(x)) (Phi(x) = (log x)^{3/5} (log log x)^{-1/5}) and 2D Stieltjes summation by parts with all four boundary/integral terms bounded via M_var = 19/(8 sqrt(2)), |T_{d, e}(A)| <= (16 C_W^2 M_var A / (d e)) exp(-2 c_1 Phi(A)) uniformly in 1 <= d, e <= sqrt(A) (c_1 = 2^{-3/5} c_0 > 0), so sum_{1 <= d, e <= sqrt(A)} |h(d, e)| |T_{d, e}(A)| <= 16 C_W^2 M_var C_{h,1} A exp(-2 c_1 Phi(A)).",
+          "step_3_tail_range_max_d_e_gt_sqrt_A_and_short_intervals": "If d >= 2A or e >= 2A, [A/d, 2A/d) intersect Z or [A/e, 2A/e) intersect Z is empty so T_{d, e}(A) = 0. For 1 <= d, e < 2A, #(Z intersect [A/d, 2A/d)) <= A/d + 1 < 3A/d and #(Z intersect [A/e, 2A/e)) < 3A/e, so |K(d m, e n)| <= 2^{-5/2} A^{-1} gives the unconditional elementary bound |T_{d, e}(A)| <= (9 / (4 sqrt(2))) A / (d e). Whenever max(d, e) > sqrt(A) (with d, e >= 1), d e >= max(d, e) > A^{1/2}, so (d e)^{-1} = (d e)^{-1/4} (d e)^{-3/4} < A^{-1/8} (d e)^{-3/4}, and summing against |h(d, e)| yields the polynomial tail bound sum_{1 <= d, e < 2A, max(d,e) > sqrt(A)} |h(d, e)| |T_{d, e}(A)| <= (9 C_{h,3/4} / (4 sqrt(2))) A^{7/8} = O(A^{7/8}).",
+          "tail_bound_coefficient_9_Ch34_over_4sqrt2_certified": {
+            "mid_float": 14.49128220230341,
+            "rad_float_outward": 0.12920875102281573,
+            "lower_dec": "1.436207345128059387207031249999999999999e+1",
+            "upper_dec": "1.462049095332622528076171875000000000001e+1",
+            "arb_ball_str": "[1.4e+1 +/- 0.621]"
+          },
+          "step_4_combined_unconditional_bound": "Combining Steps 2 and 3 establishes unconditionally for all A >= 1: |S(A)| <= (3 sqrt(pi) / (8 zeta(2))) [16 C_W^2 M_var C_{h,1} A exp(-2 c_1 Phi(A)) + (9 C_{h,3/4} / (4 sqrt(2))) A^{7/8}] << A exp(-c (log A)^{3/5} (log log A)^{-1/5}) <<_D A / (log A)^D for every fixed D > 0, rigorously beating both the unsigned O(A) benchmark and the two-prime stratum S_{2-prime}(A) ~ c_2 A / log^2 A."
+        }
       },
       "edge_case_and_regrouping_regressions": {
         "edge_cases_verified": true,
@@ -11428,9 +11674,24 @@
           },
           "mu_20_times_w_4_20_zero": true
         },
+        "single_prime_block_A_5_over_2": {
+          "A_label": "5/2",
+          "integer_range": [
+            3,
+            4
+          ],
+          "primes_in_block": [
+            3
+          ],
+          "distinct_prime_pair_count": 0,
+          "S_two_prime_is_zero": true
+        },
         "all_direct_vs_regrouped_enclose_zero": true,
         "all_direct_vs_decoupled_L2_enclose_zero": true,
+        "all_direct_vs_h_convolution_enclose_zero": true,
         "all_log_mobius_exchanges_enclose_zero": true,
+        "applicable_log_mobius_count": 10,
+        "skipped_log_mobius_count": 2,
         "all_unsigned_bounds_certified": true,
         "balanced_block_evaluation_table": [
           {
@@ -11463,16 +11724,20 @@
               "upper_dec": "0",
               "arb_ball_str": "0"
             },
-            "S_A_log_mobius_exchange_certified": {
+            "S_A_h_convolution_sum_certified": {
               "mid_float": 0.0,
               "rad_float_outward": 5e-324,
               "lower_dec": "0",
               "upper_dec": "0",
               "arb_ball_str": "0"
             },
+            "log_mobius_status": "SKIPPED",
+            "log_mobius_skip_reason": "Empty integer range [1/2, 1) intersect Z = empty (no q >= 2 terms)",
+            "S_A_log_mobius_exchange_certified": null,
             "direct_minus_regrouped_encloses_zero": true,
             "direct_minus_decoupled_L2_encloses_zero": true,
-            "direct_minus_log_mobius_encloses_zero": true,
+            "direct_minus_h_convolution_encloses_zero": true,
+            "direct_minus_log_mobius_encloses_zero": null,
             "S_abs_A_unsigned_majorant_certified": {
               "mid_float": 0.0,
               "rad_float_outward": 5e-324,
@@ -11480,6 +11745,21 @@
               "upper_dec": "0",
               "arb_ball_str": "0"
             },
+            "S_pos_A_positive_parity_certified": {
+              "mid_float": 0.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "0",
+              "upper_dec": "0",
+              "arb_ball_str": "0"
+            },
+            "S_neg_A_negative_parity_certified": {
+              "mid_float": 0.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "0",
+              "upper_dec": "0",
+              "arb_ball_str": "0"
+            },
+            "parity_decomposition_S_abs_mp_S_eq_2_S_neg_pos_certified": true,
             "S_two_prime_omega_eq_2_certified": {
               "mid_float": 0.0,
               "rad_float_outward": 5e-324,
@@ -11502,6 +11782,13 @@
               "arb_ball_str": "0"
             },
             "non_asymptotic_O_A_upper_bound_certified": {
+              "mid_float": 0.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "0",
+              "upper_dec": "0",
+              "arb_ball_str": "0"
+            },
+            "unsigned_bound_minus_S_abs_margin_certified": {
               "mid_float": 0.0,
               "rad_float_outward": 5e-324,
               "lower_dec": "0",
@@ -11540,16 +11827,20 @@
               "upper_dec": "7.143034042602109100898371805146552267445e-2",
               "arb_ball_str": "[0.07143034042602109100898371805146552267444 +/- 4.37e-42]"
             },
-            "S_A_log_mobius_exchange_certified": {
+            "S_A_h_convolution_sum_certified": {
               "mid_float": 0.07143034042602109,
               "rad_float_outward": 2.6575788761640507e-18,
               "lower_dec": "7.143034042602109100898371805146552267442e-2",
               "upper_dec": "7.143034042602109100898371805146552267445e-2",
               "arb_ball_str": "[0.07143034042602109100898371805146552267444 +/- 4.37e-42]"
             },
+            "log_mobius_status": "SKIPPED",
+            "log_mobius_skip_reason": "Contains q = 1 = 1 * 1 where log(1) = 0, so division by log(q) in mu(q) = -(1/log q)(Lambda * mu)(q) is inapplicable",
+            "S_A_log_mobius_exchange_certified": null,
             "direct_minus_regrouped_encloses_zero": true,
             "direct_minus_decoupled_L2_encloses_zero": true,
-            "direct_minus_log_mobius_encloses_zero": true,
+            "direct_minus_h_convolution_encloses_zero": true,
+            "direct_minus_log_mobius_encloses_zero": null,
             "S_abs_A_unsigned_majorant_certified": {
               "mid_float": 0.07143034042602109,
               "rad_float_outward": 2.6575788761640507e-18,
@@ -11557,6 +11848,21 @@
               "upper_dec": "7.143034042602109100898371805146552267445e-2",
               "arb_ball_str": "[0.07143034042602109100898371805146552267444 +/- 4.37e-42]"
             },
+            "S_pos_A_positive_parity_certified": {
+              "mid_float": 0.07143034042602109,
+              "rad_float_outward": 2.6575788761640507e-18,
+              "lower_dec": "7.143034042602109100898371805146552267442e-2",
+              "upper_dec": "7.143034042602109100898371805146552267445e-2",
+              "arb_ball_str": "[0.07143034042602109100898371805146552267444 +/- 4.37e-42]"
+            },
+            "S_neg_A_negative_parity_certified": {
+              "mid_float": 0.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "0",
+              "upper_dec": "0",
+              "arb_ball_str": "0"
+            },
+            "parity_decomposition_S_abs_mp_S_eq_2_S_neg_pos_certified": true,
             "S_two_prime_omega_eq_2_certified": {
               "mid_float": 0.0,
               "rad_float_outward": 5e-324,
@@ -11584,6 +11890,13 @@
               "lower_dec": "2.388020390525650552804189993008810046849e-1",
               "upper_dec": "2.388020390525650552804189993008810046852e-1",
               "arb_ball_str": "[0.2388020390525650552804189993008810046850 +/- 2.36e-42]"
+            },
+            "unsigned_bound_minus_S_abs_margin_certified": {
+              "mid_float": 0.16737169862654397,
+              "rad_float_outward": 4.51943431745678e-18,
+              "lower_dec": "1.673716986265439642714352812494154820104e-1",
+              "upper_dec": "1.673716986265439642714352812494154820107e-1",
+              "arb_ball_str": "[0.1673716986265439642714352812494154820106 +/- 3.33e-41]"
             },
             "unsigned_bound_certified": true
           },
@@ -11617,6 +11930,15 @@
               "upper_dec": "2.387271586529787079773425878435290217633e-2",
               "arb_ball_str": "[0.02387271586529787079773425878435290217632 +/- 2.71e-43]"
             },
+            "S_A_h_convolution_sum_certified": {
+              "mid_float": 0.02387271586529787,
+              "rad_float_outward": 3.4594460683970005e-20,
+              "lower_dec": "2.387271586529787079773425878435290217630e-2",
+              "upper_dec": "2.387271586529787079773425878435290217633e-2",
+              "arb_ball_str": "[0.02387271586529787079773425878435290217632 +/- 2.71e-43]"
+            },
+            "log_mobius_status": "APPLICABLE_AND_CERTIFIED",
+            "log_mobius_skip_reason": null,
             "S_A_log_mobius_exchange_certified": {
               "mid_float": 0.02387271586529787,
               "rad_float_outward": 3.4594460683970005e-20,
@@ -11626,6 +11948,7 @@
             },
             "direct_minus_regrouped_encloses_zero": true,
             "direct_minus_decoupled_L2_encloses_zero": true,
+            "direct_minus_h_convolution_encloses_zero": true,
             "direct_minus_log_mobius_encloses_zero": true,
             "S_abs_A_unsigned_majorant_certified": {
               "mid_float": 0.02387271586529787,
@@ -11634,6 +11957,21 @@
               "upper_dec": "2.387271586529787079773425878435290217633e-2",
               "arb_ball_str": "[0.02387271586529787079773425878435290217632 +/- 2.71e-43]"
             },
+            "S_pos_A_positive_parity_certified": {
+              "mid_float": 0.02387271586529787,
+              "rad_float_outward": 3.4594460683970005e-20,
+              "lower_dec": "2.387271586529787079773425878435290217630e-2",
+              "upper_dec": "2.387271586529787079773425878435290217633e-2",
+              "arb_ball_str": "[0.02387271586529787079773425878435290217632 +/- 2.71e-43]"
+            },
+            "S_neg_A_negative_parity_certified": {
+              "mid_float": 0.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "0",
+              "upper_dec": "0",
+              "arb_ball_str": "0"
+            },
+            "parity_decomposition_S_abs_mp_S_eq_2_S_neg_pos_certified": true,
             "S_two_prime_omega_eq_2_certified": {
               "mid_float": 0.02387271586529787,
               "rad_float_outward": 3.4594460683970005e-20,
@@ -11661,6 +11999,122 @@
               "lower_dec": "2.521089043885580742828628305681171166710e-1",
               "upper_dec": "2.521089043885580742828628305681171166713e-1",
               "arb_ball_str": "[0.2521089043885580742828628305681171166712 +/- 2.46e-41]"
+            },
+            "unsigned_bound_minus_S_abs_margin_certified": {
+              "mid_float": 0.2282361885232602,
+              "rad_float_outward": 1.180004603990766e-17,
+              "lower_dec": "2.282361885232602034851285717837642144947e-1",
+              "upper_dec": "2.282361885232602034851285717837642144950e-1",
+              "arb_ball_str": "[0.2282361885232602034851285717837642144949 +/- 4.43e-41]"
+            },
+            "unsigned_bound_certified": true
+          },
+          {
+            "A_label": "5/2",
+            "A_float": 2.5,
+            "integer_range_r_min_to_r_max": [
+              3,
+              4
+            ],
+            "coprime_pair_count": 2,
+            "diagonal_coprime_pair_count": 0,
+            "S_A_direct_pair_sum_certified": {
+              "mid_float": 0.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "0",
+              "upper_dec": "0",
+              "arb_ball_str": "0"
+            },
+            "S_A_regrouped_q_sum_certified": {
+              "mid_float": 0.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "0",
+              "upper_dec": "0",
+              "arb_ball_str": "0"
+            },
+            "S_A_decoupled_L2_sum_certified": {
+              "mid_float": 1.349401336733507e-79,
+              "rad_float_outward": 3.366016617451294e-78,
+              "lower_dec": "-3.231076483777942796876310479923417434516e-78",
+              "upper_dec": "3.500956751124644191419633975635929921113e-78",
+              "arb_ball_str": "[+/- 3.51e-78]"
+            },
+            "S_A_h_convolution_sum_certified": {
+              "mid_float": -1.2540841562438858e-78,
+              "rad_float_outward": 5.7022561673818355e-78,
+              "lower_dec": "-6.956340323625720223674381213756325702092e-78",
+              "upper_dec": "4.448172011137948821778297841583195480211e-78",
+              "arb_ball_str": "[+/- 6.96e-78]"
+            },
+            "log_mobius_status": "APPLICABLE_AND_CERTIFIED",
+            "log_mobius_skip_reason": null,
+            "S_A_log_mobius_exchange_certified": {
+              "mid_float": 0.0,
+              "rad_float_outward": 1.6177865690570765e-80,
+              "lower_dec": "-1.617786569057076340068744075621189698233e-80",
+              "upper_dec": "1.617786569057076340068744075621189698233e-80",
+              "arb_ball_str": "[+/- 1.62e-80]"
+            },
+            "direct_minus_regrouped_encloses_zero": true,
+            "direct_minus_decoupled_L2_encloses_zero": true,
+            "direct_minus_h_convolution_encloses_zero": true,
+            "direct_minus_log_mobius_encloses_zero": true,
+            "S_abs_A_unsigned_majorant_certified": {
+              "mid_float": 0.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "0",
+              "upper_dec": "0",
+              "arb_ball_str": "0"
+            },
+            "S_pos_A_positive_parity_certified": {
+              "mid_float": 0.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "0",
+              "upper_dec": "0",
+              "arb_ball_str": "0"
+            },
+            "S_neg_A_negative_parity_certified": {
+              "mid_float": 0.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "0",
+              "upper_dec": "0",
+              "arb_ball_str": "0"
+            },
+            "parity_decomposition_S_abs_mp_S_eq_2_S_neg_pos_certified": true,
+            "S_two_prime_omega_eq_2_certified": {
+              "mid_float": 0.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "0",
+              "upper_dec": "0",
+              "arb_ball_str": "0"
+            },
+            "S_odd_omega_magnitude_certified": {
+              "mid_float": 0.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "0",
+              "upper_dec": "0",
+              "arb_ball_str": "0"
+            },
+            "S_even_omega_ge_4_or_0_certified": {
+              "mid_float": 0.0,
+              "rad_float_outward": 5e-324,
+              "lower_dec": "0",
+              "upper_dec": "0",
+              "arb_ball_str": "0"
+            },
+            "non_asymptotic_O_A_upper_bound_certified": {
+              "mid_float": 0.2694768881204577,
+              "rad_float_outward": 2.2550972254912033e-17,
+              "lower_dec": "2.694768881204577474354323039094550010653e-1",
+              "upper_dec": "2.694768881204577474354323039094550010656e-1",
+              "arb_ball_str": "[0.2694768881204577474354323039094550010654 +/- 2.74e-41]"
+            },
+            "unsigned_bound_minus_S_abs_margin_certified": {
+              "mid_float": 0.2694768881204577,
+              "rad_float_outward": 2.2550972254912033e-17,
+              "lower_dec": "2.694768881204577474354323039094550010653e-1",
+              "upper_dec": "2.694768881204577474354323039094550010656e-1",
+              "arb_ball_str": "[0.2694768881204577474354323039094550010654 +/- 2.74e-41]"
             },
             "unsigned_bound_certified": true
           },
@@ -11694,6 +12148,15 @@
               "upper_dec": "-4.466913573022636627697358881791899477635e-3",
               "arb_ball_str": "[-0.004466913573022636627697358881791899477636 +/- 6.09e-44]"
             },
+            "S_A_h_convolution_sum_certified": {
+              "mid_float": -0.004466913573022637,
+              "rad_float_outward": 3.5295090874174153e-20,
+              "lower_dec": "-4.466913573022636627697358881791899477638e-3",
+              "upper_dec": "-4.466913573022636627697358881791899477635e-3",
+              "arb_ball_str": "[-0.004466913573022636627697358881791899477636 +/- 6.09e-44]"
+            },
+            "log_mobius_status": "APPLICABLE_AND_CERTIFIED",
+            "log_mobius_skip_reason": null,
             "S_A_log_mobius_exchange_certified": {
               "mid_float": -0.004466913573022637,
               "rad_float_outward": 3.5295090874174153e-20,
@@ -11703,6 +12166,7 @@
             },
             "direct_minus_regrouped_encloses_zero": true,
             "direct_minus_decoupled_L2_encloses_zero": true,
+            "direct_minus_h_convolution_encloses_zero": true,
             "direct_minus_log_mobius_encloses_zero": true,
             "S_abs_A_unsigned_majorant_certified": {
               "mid_float": 0.03511485413728619,
@@ -11711,6 +12175,21 @@
               "upper_dec": "3.511485413728619030565312804984611045944e-2",
               "arb_ball_str": "[0.03511485413728619030565312804984611045942 +/- 2.91e-42]"
             },
+            "S_pos_A_positive_parity_certified": {
+              "mid_float": 0.015323970282131777,
+              "rad_float_outward": 4.2898646082853824e-19,
+              "lower_dec": "1.532397028213177683897788458402710549088e-2",
+              "upper_dec": "1.532397028213177683897788458402710549091e-2",
+              "arb_ball_str": "[0.01532397028213177683897788458402710549089 +/- 3.42e-42]"
+            },
+            "S_neg_A_negative_parity_certified": {
+              "mid_float": 0.019790883855154415,
+              "rad_float_outward": 1.2610531079427678e-18,
+              "lower_dec": "1.979088385515441346667524346581900496851e-2",
+              "upper_dec": "1.979088385515441346667524346581900496854e-2",
+              "arb_ball_str": "[0.01979088385515441346667524346581900496853 +/- 5.20e-43]"
+            },
+            "parity_decomposition_S_abs_mp_S_eq_2_S_neg_pos_certified": true,
             "S_two_prime_omega_eq_2_certified": {
               "mid_float": 0.015323970282131777,
               "rad_float_outward": 4.2898646082853824e-19,
@@ -11738,6 +12217,13 @@
               "lower_dec": "3.322953903800599305444882816411884826492e-1",
               "upper_dec": "3.322953903800599305444882816411884826495e-1",
               "arb_ball_str": "[0.3322953903800599305444882816411884826493 +/- 4.84e-41]"
+            },
+            "unsigned_bound_minus_S_abs_margin_certified": {
+              "mid_float": 0.29718053624277374,
+              "rad_float_outward": 4.572307891654894e-19,
+              "lower_dec": "2.971805362427737402388351535913423721898e-1",
+              "upper_dec": "2.971805362427737402388351535913423721901e-1",
+              "arb_ball_str": "[0.2971805362427737402388351535913423721899 +/- 2.55e-41]"
             },
             "unsigned_bound_certified": true
           },
@@ -11771,6 +12257,15 @@
               "upper_dec": "-4.466913573022636627697358881791899477635e-3",
               "arb_ball_str": "[-0.004466913573022636627697358881791899477636 +/- 6.09e-44]"
             },
+            "S_A_h_convolution_sum_certified": {
+              "mid_float": -0.004466913573022637,
+              "rad_float_outward": 3.5295090874174153e-20,
+              "lower_dec": "-4.466913573022636627697358881791899477638e-3",
+              "upper_dec": "-4.466913573022636627697358881791899477635e-3",
+              "arb_ball_str": "[-0.004466913573022636627697358881791899477636 +/- 6.09e-44]"
+            },
+            "log_mobius_status": "APPLICABLE_AND_CERTIFIED",
+            "log_mobius_skip_reason": null,
             "S_A_log_mobius_exchange_certified": {
               "mid_float": -0.004466913573022637,
               "rad_float_outward": 3.5295090874174153e-20,
@@ -11780,6 +12275,7 @@
             },
             "direct_minus_regrouped_encloses_zero": true,
             "direct_minus_decoupled_L2_encloses_zero": true,
+            "direct_minus_h_convolution_encloses_zero": true,
             "direct_minus_log_mobius_encloses_zero": true,
             "S_abs_A_unsigned_majorant_certified": {
               "mid_float": 0.03511485413728619,
@@ -11788,6 +12284,21 @@
               "upper_dec": "3.511485413728619030565312804984611045944e-2",
               "arb_ball_str": "[0.03511485413728619030565312804984611045942 +/- 2.91e-42]"
             },
+            "S_pos_A_positive_parity_certified": {
+              "mid_float": 0.015323970282131777,
+              "rad_float_outward": 4.2898646082853824e-19,
+              "lower_dec": "1.532397028213177683897788458402710549088e-2",
+              "upper_dec": "1.532397028213177683897788458402710549091e-2",
+              "arb_ball_str": "[0.01532397028213177683897788458402710549089 +/- 3.42e-42]"
+            },
+            "S_neg_A_negative_parity_certified": {
+              "mid_float": 0.019790883855154415,
+              "rad_float_outward": 1.2610531079427678e-18,
+              "lower_dec": "1.979088385515441346667524346581900496851e-2",
+              "upper_dec": "1.979088385515441346667524346581900496854e-2",
+              "arb_ball_str": "[0.01979088385515441346667524346581900496853 +/- 5.20e-43]"
+            },
+            "parity_decomposition_S_abs_mp_S_eq_2_S_neg_pos_certified": true,
             "S_two_prime_omega_eq_2_certified": {
               "mid_float": 0.015323970282131777,
               "rad_float_outward": 4.2898646082853824e-19,
@@ -11815,6 +12326,13 @@
               "lower_dec": "3.548222320316166824921510235084655436810e-1",
               "upper_dec": "3.548222320316166824921510235084655436813e-1",
               "arb_ball_str": "[0.3548222320316166824921510235084655436812 +/- 1.68e-42]"
+            },
+            "unsigned_bound_minus_S_abs_margin_certified": {
+              "mid_float": 0.3197073778943305,
+              "rad_float_outward": 2.115947945603284e-17,
+              "lower_dec": "3.197073778943304921864978954586194332216e-1",
+              "upper_dec": "3.197073778943304921864978954586194332219e-1",
+              "arb_ball_str": "[0.3197073778943304921864978954586194332218 +/- 2.46e-41]"
             },
             "unsigned_bound_certified": true
           },
@@ -11848,6 +12366,15 @@
               "upper_dec": "-1.834962269200036050948087882506944598791e-2",
               "arb_ball_str": "[-0.01834962269200036050948087882506944598793 +/- 4.96e-42]"
             },
+            "S_A_h_convolution_sum_certified": {
+              "mid_float": -0.01834962269200036,
+              "rad_float_outward": 1.2563858800901464e-18,
+              "lower_dec": "-1.834962269200036050948087882506944598794e-2",
+              "upper_dec": "-1.834962269200036050948087882506944598791e-2",
+              "arb_ball_str": "[-0.01834962269200036050948087882506944598793 +/- 4.96e-42]"
+            },
+            "log_mobius_status": "APPLICABLE_AND_CERTIFIED",
+            "log_mobius_skip_reason": null,
             "S_A_log_mobius_exchange_certified": {
               "mid_float": -0.01834962269200036,
               "rad_float_outward": 1.2563858800901464e-18,
@@ -11857,6 +12384,7 @@
             },
             "direct_minus_regrouped_encloses_zero": true,
             "direct_minus_decoupled_L2_encloses_zero": true,
+            "direct_minus_h_convolution_encloses_zero": true,
             "direct_minus_log_mobius_encloses_zero": true,
             "S_abs_A_unsigned_majorant_certified": {
               "mid_float": 0.038748033760381155,
@@ -11865,6 +12393,21 @@
               "upper_dec": "3.874803376038115214094297242763541494692e-2",
               "arb_ball_str": "[0.03874803376038115214094297242763541494691 +/- 3.82e-42]"
             },
+            "S_pos_A_positive_parity_certified": {
+              "mid_float": 0.010199205534190396,
+              "rad_float_outward": 3.4498979051395595e-19,
+              "lower_dec": "1.019920553419039581573104680128298447948e-2",
+              "upper_dec": "1.019920553419039581573104680128298447951e-2",
+              "arb_ball_str": "[0.01019920553419039581573104680128298447949 +/- 5.71e-43]"
+            },
+            "S_neg_A_negative_parity_certified": {
+              "mid_float": 0.028548828226190755,
+              "rad_float_outward": 9.113960895761906e-19,
+              "lower_dec": "2.854882822619075632521192562635243046740e-2",
+              "upper_dec": "2.854882822619075632521192562635243046743e-2",
+              "arb_ball_str": "[0.02854882822619075632521192562635243046742 +/- 4.39e-42]"
+            },
+            "parity_decomposition_S_abs_mp_S_eq_2_S_neg_pos_certified": true,
             "S_two_prime_omega_eq_2_certified": {
               "mid_float": 0.010199205534190396,
               "rad_float_outward": 3.4498979051395595e-19,
@@ -11892,6 +12435,13 @@
               "lower_dec": "4.243869331092319686409443523895041024064e-1",
               "upper_dec": "4.243869331092319686409443523895041024067e-1",
               "arb_ball_str": "[0.4243869331092319686409443523895041024066 +/- 6.21e-42]"
+            },
+            "unsigned_bound_minus_S_abs_margin_certified": {
+              "mid_float": 0.3856388993488508,
+              "rad_float_outward": 6.190526038324561e-20,
+              "lower_dec": "3.856388993488508165000013799618686874595e-1",
+              "upper_dec": "3.856388993488508165000013799618686874598e-1",
+              "arb_ball_str": "[0.3856388993488508165000013799618686874597 +/- 1.24e-41]"
             },
             "unsigned_bound_certified": true
           },
@@ -11925,6 +12475,15 @@
               "upper_dec": "-2.227360842427347150963517560622745950323e-2",
               "arb_ball_str": "[-0.02227360842427347150963517560622745950324 +/- 1.22e-42]"
             },
+            "S_A_h_convolution_sum_certified": {
+              "mid_float": -0.02227360842427347,
+              "rad_float_outward": 6.913464751493946e-19,
+              "lower_dec": "-2.227360842427347150963517560622745950326e-2",
+              "upper_dec": "-2.227360842427347150963517560622745950323e-2",
+              "arb_ball_str": "[-0.02227360842427347150963517560622745950324 +/- 1.22e-42]"
+            },
+            "log_mobius_status": "APPLICABLE_AND_CERTIFIED",
+            "log_mobius_skip_reason": null,
             "S_A_log_mobius_exchange_certified": {
               "mid_float": -0.02227360842427347,
               "rad_float_outward": 6.913464751493946e-19,
@@ -11934,6 +12493,7 @@
             },
             "direct_minus_regrouped_encloses_zero": true,
             "direct_minus_decoupled_L2_encloses_zero": true,
+            "direct_minus_h_convolution_encloses_zero": true,
             "direct_minus_log_mobius_encloses_zero": true,
             "S_abs_A_unsigned_majorant_certified": {
               "mid_float": 0.049062979688056285,
@@ -11942,6 +12502,21 @@
               "upper_dec": "4.906297968805628459166062315336242832420e-2",
               "arb_ball_str": "[0.04906297968805628459166062315336242832418 +/- 3.60e-42]"
             },
+            "S_pos_A_positive_parity_certified": {
+              "mid_float": 0.013394685631891407,
+              "rad_float_outward": 6.382708802495449e-19,
+              "lower_dec": "1.339468563189140654101272377356748441046e-2",
+              "upper_dec": "1.339468563189140654101272377356748441049e-2",
+              "arb_ball_str": "[0.01339468563189140654101272377356748441047 +/- 1.20e-42]"
+            },
+            "S_neg_A_negative_parity_certified": {
+              "mid_float": 0.03566829405616488,
+              "rad_float_outward": 3.4163713570537646e-18,
+              "lower_dec": "3.566829405616487805064789937979494391370e-2",
+              "upper_dec": "3.566829405616487805064789937979494391373e-2",
+              "arb_ball_str": "[0.03566829405616487805064789937979494391371 +/- 2.41e-42]"
+            },
+            "parity_decomposition_S_abs_mp_S_eq_2_S_neg_pos_certified": true,
             "S_two_prime_omega_eq_2_certified": {
               "mid_float": 0.00982181027313062,
               "rad_float_outward": 2.4258395516411085e-19,
@@ -11969,6 +12544,13 @@
               "lower_dec": "5.194547400228215521961080780566307856085e-1",
               "upper_dec": "5.194547400228215521961080780566307856088e-1",
               "arb_ball_str": "[0.5194547400228215521961080780566307856086 +/- 7.45e-42]"
+            },
+            "unsigned_bound_minus_S_abs_margin_certified": {
+              "mid_float": 0.47039176033476526,
+              "rad_float_outward": 4.430441332476906e-18,
+              "lower_dec": "4.703917603347652676044474549032683572843e-1",
+              "upper_dec": "4.703917603347652676044474549032683572846e-1",
+              "arb_ball_str": "[0.4703917603347652676044474549032683572844 +/- 2.39e-41]"
             },
             "unsigned_bound_certified": true
           },
@@ -12002,6 +12584,15 @@
               "upper_dec": "1.090040640668387020702800416319794124403e-2",
               "arb_ball_str": "[0.01090040640668387020702800416319794124401 +/- 3.12e-42]"
             },
+            "S_A_h_convolution_sum_certified": {
+              "mid_float": 0.01090040640668387,
+              "rad_float_outward": 3.756140298701733e-20,
+              "lower_dec": "1.090040640668387020702800416319794124400e-2",
+              "upper_dec": "1.090040640668387020702800416319794124403e-2",
+              "arb_ball_str": "[0.01090040640668387020702800416319794124401 +/- 3.12e-42]"
+            },
+            "log_mobius_status": "APPLICABLE_AND_CERTIFIED",
+            "log_mobius_skip_reason": null,
             "S_A_log_mobius_exchange_certified": {
               "mid_float": 0.01090040640668387,
               "rad_float_outward": 3.756140298701733e-20,
@@ -12011,6 +12602,7 @@
             },
             "direct_minus_regrouped_encloses_zero": true,
             "direct_minus_decoupled_L2_encloses_zero": true,
+            "direct_minus_h_convolution_encloses_zero": true,
             "direct_minus_log_mobius_encloses_zero": true,
             "S_abs_A_unsigned_majorant_certified": {
               "mid_float": 0.11573400117963721,
@@ -12019,6 +12611,21 @@
               "upper_dec": "1.157340011796372161036162580203579442915e-1",
               "arb_ball_str": "[0.1157340011796372161036162580203579442913 +/- 2.08e-41]"
             },
+            "S_pos_A_positive_parity_certified": {
+              "mid_float": 0.06331720379316054,
+              "rad_float_outward": 3.4510121341139516e-18,
+              "lower_dec": "6.331720379316054315532213109177794276765e-2",
+              "upper_dec": "6.331720379316054315532213109177794276768e-2",
+              "arb_ball_str": "[0.06331720379316054315532213109177794276767 +/- 3.05e-42]"
+            },
+            "S_neg_A_negative_parity_certified": {
+              "mid_float": 0.05241679738647667,
+              "rad_float_outward": 1.7538500611241617e-18,
+              "lower_dec": "5.241679738647667294829412692858000152364e-2",
+              "upper_dec": "5.241679738647667294829412692858000152367e-2",
+              "arb_ball_str": "[0.05241679738647667294829412692858000152365 +/- 3.84e-42]"
+            },
+            "parity_decomposition_S_abs_mp_S_eq_2_S_neg_pos_certified": true,
             "S_two_prime_omega_eq_2_certified": {
               "mid_float": 0.04894766968282703,
               "rad_float_outward": 5.103584571916225e-20,
@@ -12046,6 +12653,13 @@
               "lower_dec": "9.071666281382237500635321180221651770284e-1",
               "upper_dec": "9.071666281382237500635321180221651770287e-1",
               "arb_ball_str": "[0.9071666281382237500635321180221651770286 +/- 1.77e-41]"
+            },
+            "unsigned_bound_minus_S_abs_margin_certified": {
+              "mid_float": 0.7914326269585865,
+              "rad_float_outward": 1.80626066052051e-17,
+              "lower_dec": "7.914326269585865339599158600018072327371e-1",
+              "upper_dec": "7.914326269585865339599158600018072327374e-1",
+              "arb_ball_str": "[0.7914326269585865339599158600018072327373 +/- 3.85e-41]"
             },
             "unsigned_bound_certified": true
           },
@@ -12079,6 +12693,15 @@
               "upper_dec": "-3.296031161239053128972833459652243173423e-2",
               "arb_ball_str": "[-0.03296031161239053128972833459652243173424 +/- 7.10e-43]"
             },
+            "S_A_h_convolution_sum_certified": {
+              "mid_float": -0.03296031161239053,
+              "rad_float_outward": 1.9082742943819073e-18,
+              "lower_dec": "-3.296031161239053128972833459652243173426e-2",
+              "upper_dec": "-3.296031161239053128972833459652243173423e-2",
+              "arb_ball_str": "[-0.03296031161239053128972833459652243173424 +/- 7.10e-43]"
+            },
+            "log_mobius_status": "APPLICABLE_AND_CERTIFIED",
+            "log_mobius_skip_reason": null,
             "S_A_log_mobius_exchange_certified": {
               "mid_float": -0.03296031161239053,
               "rad_float_outward": 1.9082742943819073e-18,
@@ -12088,6 +12711,7 @@
             },
             "direct_minus_regrouped_encloses_zero": true,
             "direct_minus_decoupled_L2_encloses_zero": true,
+            "direct_minus_h_convolution_encloses_zero": true,
             "direct_minus_log_mobius_encloses_zero": true,
             "S_abs_A_unsigned_majorant_certified": {
               "mid_float": 0.25742336833319035,
@@ -12096,6 +12720,21 @@
               "upper_dec": "2.574233683331903638950350853790763342870e-1",
               "arb_ball_str": "[0.2574233683331903638950350853790763342868 +/- 8.10e-42]"
             },
+            "S_pos_A_positive_parity_certified": {
+              "mid_float": 0.11223152836039992,
+              "rad_float_outward": 9.909574689521505e-19,
+              "lower_dec": "1.122315283603999163026533753912769512761e-1",
+              "upper_dec": "1.122315283603999163026533753912769512764e-1",
+              "arb_ball_str": "[0.1122315283603999163026533753912769512763 +/- 1.64e-41]"
+            },
+            "S_neg_A_negative_parity_certified": {
+              "mid_float": 0.14519183997279045,
+              "rad_float_outward": 9.173168254297566e-19,
+              "lower_dec": "1.451918399727904475923817099877993830104e-1",
+              "upper_dec": "1.451918399727904475923817099877993830107e-1",
+              "arb_ball_str": "[0.1451918399727904475923817099877993830105 +/- 2.45e-41]"
+            },
+            "parity_decomposition_S_abs_mp_S_eq_2_S_neg_pos_certified": true,
             "S_two_prime_omega_eq_2_certified": {
               "mid_float": 0.055493145138938396,
               "rad_float_outward": 1.0791387467064035e-18,
@@ -12123,6 +12762,13 @@
               "lower_dec": "1.689286998783967623080472421520558852618e+0",
               "upper_dec": "1.689286998783967623080472421520558852621e+0",
               "arb_ball_str": "[1.689286998783967623080472421520558852619 +/- 2.61e-40]"
+            },
+            "unsigned_bound_minus_S_abs_margin_certified": {
+              "mid_float": 1.4318636304507772,
+              "rad_float_outward": 1.198044087986579e-17,
+              "lower_dec": "1.431863630450777259185437336141482518331e+0",
+              "upper_dec": "1.431863630450777259185437336141482518334e+0",
+              "arb_ball_str": "[1.431863630450777259185437336141482518332 +/- 4.53e-40]"
             },
             "unsigned_bound_certified": true
           },
@@ -12156,6 +12802,15 @@
               "upper_dec": "-2.430653655086794484538042523677093443899e-2",
               "arb_ball_str": "[-0.02430653655086794484538042523677093443901 +/- 3.96e-42]"
             },
+            "S_A_h_convolution_sum_certified": {
+              "mid_float": -0.024306536550867945,
+              "rad_float_outward": 2.7803043736999005e-19,
+              "lower_dec": "-2.430653655086794484538042523677093443902e-2",
+              "upper_dec": "-2.430653655086794484538042523677093443899e-2",
+              "arb_ball_str": "[-0.02430653655086794484538042523677093443901 +/- 3.96e-42]"
+            },
+            "log_mobius_status": "APPLICABLE_AND_CERTIFIED",
+            "log_mobius_skip_reason": null,
             "S_A_log_mobius_exchange_certified": {
               "mid_float": -0.024306536550867945,
               "rad_float_outward": 2.7803043736999005e-19,
@@ -12165,6 +12820,7 @@
             },
             "direct_minus_regrouped_encloses_zero": true,
             "direct_minus_decoupled_L2_encloses_zero": true,
+            "direct_minus_h_convolution_encloses_zero": true,
             "direct_minus_log_mobius_encloses_zero": true,
             "S_abs_A_unsigned_majorant_certified": {
               "mid_float": 0.2913348691560298,
@@ -12173,6 +12829,21 @@
               "upper_dec": "2.913348691560297695882543704652918832030e-1",
               "arb_ball_str": "[0.2913348691560297695882543704652918832029 +/- 2.76e-41]"
             },
+            "S_pos_A_positive_parity_certified": {
+              "mid_float": 0.13351416630258092,
+              "rad_float_outward": 9.847286485558203e-18,
+              "lower_dec": "1.335141663025809123714369726142604743818e-1",
+              "upper_dec": "1.335141663025809123714369726142604743821e-1",
+              "arb_ball_str": "[0.1335141663025809123714369726142604743819 +/- 3.32e-41]"
+            },
+            "S_neg_A_negative_parity_certified": {
+              "mid_float": 0.15782070285344885,
+              "rad_float_outward": 1.0691364788793495e-17,
+              "lower_dec": "1.578207028534488572168173978510314088208e-1",
+              "upper_dec": "1.578207028534488572168173978510314088211e-1",
+              "arb_ball_str": "[0.1578207028534488572168173978510314088209 +/- 3.93e-41]"
+            },
+            "parity_decomposition_S_abs_mp_S_eq_2_S_neg_pos_certified": true,
             "S_two_prime_omega_eq_2_certified": {
               "mid_float": 0.06986006251099007,
               "rad_float_outward": 5.826671708014085e-18,
@@ -12200,6 +12871,13 @@
               "lower_dec": "1.836161774161980045821791143154684761366e+0",
               "upper_dec": "1.836161774161980045821791143154684761369e+0",
               "arb_ball_str": "[1.836161774161980045821791143154684761368 +/- 1.62e-41]"
+            },
+            "unsigned_bound_minus_S_abs_margin_certified": {
+              "mid_float": 1.5448269050059502,
+              "rad_float_outward": 6.346545238853767e-17,
+              "lower_dec": "1.544826905005950276233536772689392878164e+0",
+              "upper_dec": "1.544826905005950276233536772689392878167e+0",
+              "arb_ball_str": "[1.544826905005950276233536772689392878165 +/- 1.12e-40]"
             },
             "unsigned_bound_certified": true
           },
@@ -12233,6 +12911,15 @@
               "upper_dec": "-6.802210789662755288731452405898035086503e-3",
               "arb_ball_str": "[-0.006802210789662755288731452405898035086505 +/- 3.03e-43]"
             },
+            "S_A_h_convolution_sum_certified": {
+              "mid_float": -0.006802210789662756,
+              "rad_float_outward": 4.093169939563381e-19,
+              "lower_dec": "-6.802210789662755288731452405898035086506e-3",
+              "upper_dec": "-6.802210789662755288731452405898035086503e-3",
+              "arb_ball_str": "[-0.006802210789662755288731452405898035086505 +/- 3.03e-43]"
+            },
+            "log_mobius_status": "APPLICABLE_AND_CERTIFIED",
+            "log_mobius_skip_reason": null,
             "S_A_log_mobius_exchange_certified": {
               "mid_float": -0.006802210789662756,
               "rad_float_outward": 4.093169939563381e-19,
@@ -12242,6 +12929,7 @@
             },
             "direct_minus_regrouped_encloses_zero": true,
             "direct_minus_decoupled_L2_encloses_zero": true,
+            "direct_minus_h_convolution_encloses_zero": true,
             "direct_minus_log_mobius_encloses_zero": true,
             "S_abs_A_unsigned_majorant_certified": {
               "mid_float": 0.5414610658313314,
@@ -12250,6 +12938,21 @@
               "upper_dec": "5.414610658313314009648413941586261111123e-1",
               "arb_ball_str": "[0.5414610658313314009648413941586261111121 +/- 3.21e-41]"
             },
+            "S_pos_A_positive_parity_certified": {
+              "mid_float": 0.26732942752083433,
+              "rad_float_outward": 5.630824477460885e-18,
+              "lower_dec": "2.673294275208343228380549708763640380127e-1",
+              "upper_dec": "2.673294275208343228380549708763640380130e-1",
+              "arb_ball_str": "[0.2673294275208343228380549708763640380128 +/- 1.37e-41]"
+            },
+            "S_neg_A_negative_parity_certified": {
+              "mid_float": 0.2741316383104971,
+              "rad_float_outward": 5.172779733428819e-18,
+              "lower_dec": "2.741316383104970781267864232822620730992e-1",
+              "upper_dec": "2.741316383104970781267864232822620730995e-1",
+              "arb_ball_str": "[0.2741316383104970781267864232822620730993 +/- 1.84e-41]"
+            },
+            "parity_decomposition_S_abs_mp_S_eq_2_S_neg_pos_certified": true,
             "S_two_prime_omega_eq_2_certified": {
               "mid_float": 0.10879090874612199,
               "rad_float_outward": 6.237846063276565e-19,
@@ -12277,6 +12980,13 @@
               "lower_dec": "3.256876037282925107755399140301008650174e+0",
               "upper_dec": "3.256876037282925107755399140301008650177e+0",
               "arb_ball_str": "[3.256876037282925107755399140301008650176 +/- 1.89e-41]"
+            },
+            "unsigned_bound_minus_S_abs_margin_certified": {
+              "mid_float": 2.715414971451594,
+              "rad_float_outward": 1.217425198663769e-16,
+              "lower_dec": "2.715414971451593706790557746142382539062e+0",
+              "upper_dec": "2.715414971451593706790557746142382539065e+0",
+              "arb_ball_str": "[2.715414971451593706790557746142382539064 +/- 1.51e-40]"
             },
             "unsigned_bound_certified": true
           }
@@ -12335,57 +13045,84 @@
         "certificate_theorem_reference_repaired": "RiemannScope.TrivialZero.trivialZero_exact",
         "transported_worldline_corollary": "RiemannScope.TrivialZero.trivialZero_worldline_exact"
       },
+      "namespace_and_scope_separation_summary": "In formal/RiemannScope/TrivialZero.lean (4 def + 10 theorem = 14 declarations, 0 sorry, 0 custom axioms): (1) The 4 definitions (trivialZeroLocation, normalizedTrivialZeroSlope, commonFactorPairwiseLeadingTerm, bivariateLocalEulerFactor), tau_pos, the 3 worldline/leaf lemmas (zeroWorldline_at_zero, zeroWorldline_is_zero, normalizedRadialLeaf_at_zeroWorldline), and the 3 TASK-TC-053 scalar real-algebra lemmas (trivial_zero_slope_scale_invariance_and_grade_energy_criterion, common_factor_mobius_split_and_valid_growing_range_exponent, signed_block_bivariate_euler_nonvanishing_and_parity_regrouping) live in namespace RiemannScope (NOT RiemannScope.TrivialZero). (2) The 4 Mathlib-backed complex zeta theorems (trivialZero_exact, trivialZero_worldline_exact, trivialZero_radialLeaf_exact, trivialZero_zero_eq_neg_half) live in namespace RiemannScope.TrivialZero. (3) RiemannScope.TrivialZero.trivialZero_zero_eq_neg_half has exact statement `riemannZeta 0 = -1 / 2` (proved by `riemannZeta_zero`). (4) RiemannScope.common_factor_mobius_split_and_valid_growing_range_exponent receives `h_mobius : mu_dr_ds = ind_coprime * mu_d ^ 2 * mu_r * mu_s` as an explicit hypothesis over R and proves the case split `(ind_coprime = 0 -> mu_dr_ds = 0) and (ind_coprime = 1 -> mu_d ^ 2 = 1 -> mu_dr_ds = mu_r * mu_s)`, while the arithmetic identity for the integer Moebius function and the analytic Walfisz/convolution bound |S(A)| << A exp(-c Phi(A)) are proved outside Lean.",
       "committed_trivial_zero_lean_theorems_exact_scope": {
         "trivialZero_exact": {
           "declaration_name": "RiemannScope.TrivialZero.trivialZero_exact",
+          "namespace": "RiemannScope.TrivialZero",
+          "check_output": "RiemannScope.TrivialZero.trivialZero_exact (n : \u2115) : riemannZeta (-2 * (\u2191n + 1)) = 0",
           "signature": "(n : \u2115) : riemannZeta (-2 * ((n : \u2102) + 1)) = 0",
-          "print_axioms_command": "lake env lean --stdin  (input: import RiemannScope\\n#print axioms RiemannScope.TrivialZero.trivialZero_exact)",
+          "print_axioms_command": "lake env lean --stdin  (input: import RiemannScope.TrivialZero\\n#print axioms RiemannScope.TrivialZero.trivialZero_exact)",
           "print_axioms_output": "'RiemannScope.TrivialZero.trivialZero_exact' depends on axioms: [propext, Classical.choice, Quot.sound]",
           "scope_note": "Concrete theorem over C proving zeta(-2(n+1)) = 0 for all n : N directly from Mathlib's riemannZeta_neg_two_mul_nat_add_one."
         },
         "trivialZero_worldline_exact": {
           "declaration_name": "RiemannScope.TrivialZero.trivialZero_worldline_exact",
+          "namespace": "RiemannScope.TrivialZero",
+          "check_output": "RiemannScope.TrivialZero.trivialZero_worldline_exact (n : \u2115) (k : \u211d) : RiemannScope.extendedContinuation riemannZeta k (RiemannScope.zeroWorldline (-2 * (\u2191n + 1)) k) = 0",
           "signature": "(n : \u2115) (k : \u211d) : extendedContinuation riemannZeta k (zeroWorldline (-2 * ((n : \u2102) + 1)) k) = 0",
-          "print_axioms_command": "lake env lean --stdin  (input: import RiemannScope\\n#print axioms RiemannScope.TrivialZero.trivialZero_worldline_exact)",
+          "print_axioms_command": "lake env lean --stdin  (input: import RiemannScope.TrivialZero\\n#print axioms RiemannScope.TrivialZero.trivialZero_worldline_exact)",
           "print_axioms_output": "'RiemannScope.TrivialZero.trivialZero_worldline_exact' depends on axioms: [propext, Classical.choice, Quot.sound]",
           "scope_note": "Concrete transported-zero corollary combining Mathlib's riemannZeta_neg_two_mul_nat_add_one with zeroWorldline_is_zero and tau_pos : 0 < tau."
         },
+        "trivialZero_radialLeaf_exact": {
+          "declaration_name": "RiemannScope.TrivialZero.trivialZero_radialLeaf_exact",
+          "namespace": "RiemannScope.TrivialZero",
+          "check_output": "RiemannScope.TrivialZero.trivialZero_radialLeaf_exact (n : \u2115) (k : \u211d) : RiemannScope.normalizedRadialLeaf k (RiemannScope.zeroWorldline { re := -2 * (\u2191n + 1), im := 0 } k) = -2 * (\u2191n + 1) - 1 / 2",
+          "signature": "(n : \u2115) (k : \u211d) : normalizedRadialLeaf k (zeroWorldline \u27e8-2 * ((n : \u211d) + 1), 0\u27e9 k) = -2 * ((n : \u211d) + 1) - 1 / 2",
+          "print_axioms_command": "lake env lean --stdin  (input: import RiemannScope.TrivialZero\\n#print axioms RiemannScope.TrivialZero.trivialZero_radialLeaf_exact)",
+          "print_axioms_output": "'RiemannScope.TrivialZero.trivialZero_radialLeaf_exact' depends on axioms: [propext, Classical.choice, Quot.sound]",
+          "scope_note": "Proves that normalizedRadialLeaf k along the n-th trivial-zero worldline equals -2(n+1) - 1/2."
+        },
+        "trivialZero_zero_eq_neg_half": {
+          "declaration_name": "RiemannScope.TrivialZero.trivialZero_zero_eq_neg_half",
+          "namespace": "RiemannScope.TrivialZero",
+          "check_output": "RiemannScope.TrivialZero.trivialZero_zero_eq_neg_half : riemannZeta 0 = -1 / 2",
+          "print_output": "theorem RiemannScope.TrivialZero.trivialZero_zero_eq_neg_half : riemannZeta 0 = -1 / 2 :=\nriemannZeta_zero",
+          "signature": ": riemannZeta 0 = -1 / 2",
+          "print_axioms_command": "lake env lean --stdin  (input: import RiemannScope.TrivialZero\\n#print axioms RiemannScope.TrivialZero.trivialZero_zero_eq_neg_half)",
+          "print_axioms_output": "'RiemannScope.TrivialZero.trivialZero_zero_eq_neg_half' depends on axioms: [propext, Classical.choice, Quot.sound]",
+          "scope_note": "Direct wrapper around Mathlib's `riemannZeta_zero` proving `riemannZeta 0 = -1 / 2` (does NOT mention trivialZeroLocation 0 = -2)."
+        },
         "trivial_zero_slope_scale_invariance_and_grade_energy_criterion": {
           "declaration_name": "RiemannScope.trivial_zero_slope_scale_invariance_and_grade_energy_criterion",
+          "namespace": "RiemannScope",
           "parameters_and_hypotheses": "(sgn_m tau_pow_2m fact_2m a_K d_aK d_0 zeta_2m_plus_1 G_k c_k e_neg_k R_ge_2 C_1 C_2 inv_k_sq E_Y W_Y C_eps Y_pow_eps log_tau Y_pow_neg_2sigma delta_rho : \u211d) (haK : a_K \u2260 0) (hfact : fact_2m \u2260 0) (htau2m : tau_pow_2m \u2260 0) (hsgn : sgn_m ^ 2 = 1) (h_chain : d_aK = d_0 / a_K) (h_reflection : d_0 = ((sgn_m * fact_2m) / (2 * tau_pow_2m)) * zeta_2m_plus_1) (h_diff : G_k - c_k = e_neg_k + R_ge_2) (h_n1 : 0 \u2264 e_neg_k \u2227 e_neg_k \u2264 C_1 * inv_k_sq) (h_nge2 : |R_ge_2| \u2264 C_2 * inv_k_sq) (h_EY : 0 \u2264 E_Y \u2227 E_Y \u2264 C_eps * Y_pow_eps) (h_WY : 0 \u2264 W_Y \u2227 W_Y \u2264 log_tau * Y_pow_neg_2sigma) (h_Ceps_nonneg : 0 \u2264 C_eps) (h_Yeps_nonneg : 0 \u2264 Y_pow_eps)",
-          "print_axioms_command": "lake env lean --stdin  (input: import RiemannScope\\n#print axioms RiemannScope.trivial_zero_slope_scale_invariance_and_grade_energy_criterion)",
+          "print_axioms_command": "lake env lean --stdin  (input: import RiemannScope.TrivialZero\\n#print axioms RiemannScope.trivial_zero_slope_scale_invariance_and_grade_energy_criterion)",
           "print_axioms_output": "'RiemannScope.trivial_zero_slope_scale_invariance_and_grade_energy_criterion' depends on axioms: [propext, Classical.choice, Quot.sound]",
-          "scope_note": "Proves over R the scale-invariance cancellation a_K * d_aK = d_0 and normalized slope identity = zeta_{2m+1}, the triangle-inequality combination |G_k - c_k| <= (C_1 + C_2) k^{-2}, and the grade-interval Cauchy-Schwarz product bound; differentiation of the functional equation and Mellin analytic continuation are proved analytically outside Lean."
+          "scope_note": "Scalar real-algebra lemma in namespace RiemannScope: proves over R the scale-invariance cancellation a_K * d_aK = d_0 and normalized slope identity = zeta_{2m+1} from explicit hypotheses h_chain and h_reflection, the triangle-inequality combination |G_k - c_k| <= (C_1 + C_2) k^{-2}, and the product inequality E_Y * W_Y <= C_eps * log_tau * (Y_pow_eps * Y_pow_neg_2sigma) followed by modus ponens; differentiation of the functional equation and Mellin analytic continuation are proved analytically outside Lean."
         },
         "common_factor_mobius_split_and_valid_growing_range_exponent": {
           "declaration_name": "RiemannScope.common_factor_mobius_split_and_valid_growing_range_exponent",
+          "namespace": "RiemannScope",
           "parameters_and_hypotheses": "(mu_dr_ds ind_coprime mu_d mu_r mu_s X_pow_5 rs_cubed rs_sq r2_plus_s2_pow_5_2 c_gauss kappa_rs delta eps : \u211d) (h_mobius : mu_dr_ds = ind_coprime * (mu_d ^ 2) * mu_r * mu_s) (hX5 : X_pow_5 \u2260 0) (hrs3 : rs_cubed \u2260 0) (hdelta_pos : 0 < delta) (hdelta_lt : delta < 1 / 3)",
-          "print_axioms_command": "lake env lean --stdin  (input: import RiemannScope\\n#print axioms RiemannScope.common_factor_mobius_split_and_valid_growing_range_exponent)",
+          "print_axioms_command": "lake env lean --stdin  (input: import RiemannScope.TrivialZero\\n#print axioms RiemannScope.common_factor_mobius_split_and_valid_growing_range_exponent)",
           "print_axioms_output": "'RiemannScope.common_factor_mobius_split_and_valid_growing_range_exponent' depends on axioms: [propext, Classical.choice, Quot.sound]",
-          "scope_note": "Proves over R the common-factor M\u00f6bius case split, exact X^5 and (rs)^3 cancellation in the Gaussian leading term, and the growing-range exponent equivalence (1/3 - delta)(3/2 + eps) - 1/2 < 0 <-> eps < 3 delta / (2(1/3 - delta)); the coprime-squarefree counting estimate N_q(t) and Gaussian integral evaluation are proved analytically and certified in 256-bit Arb outside Lean."
+          "scope_note": "Scalar real-algebra lemma in namespace RiemannScope: receives `h_mobius : mu_dr_ds = ind_coprime * (mu_d ^ 2) * mu_r * mu_s` as an explicit real premise and proves the case split `(ind_coprime = 0 -> mu_dr_ds = 0)` and `(ind_coprime = 1 -> mu_d ^ 2 = 1 -> mu_dr_ds = mu_r * mu_s)`, the algebraic X^5 and (rs)^3 cancellation in the Gaussian leading term, and the upper-bound exponent equivalence (1/3 - delta)(3/2 + eps) - 1/2 < 0 <-> eps < 3 delta / (2(1/3 - delta)); the arithmetic Moebius factorization, the replacement Stieltjes pairwise bound |E_{r,s}(X)| <= C 2^{omega(rs)} X^{-1/2} (rs)^{5/2}/(r^2+s^2)^{11/4}, and the Gaussian integral are proved outside Lean."
         },
         "signed_block_bivariate_euler_nonvanishing_and_parity_regrouping": {
           "declaration_name": "RiemannScope.signed_block_bivariate_euler_nonvanishing_and_parity_regrouping",
+          "namespace": "RiemannScope",
           "parameters_and_hypotheses": "(p sqrt_p x_1 x_2 log_p mu_m S_A S_two_prime S_odd_omega S_even_ge_4 B_S : \u211d) (hp_eq : p = sqrt_p ^ 2) (hsqrt_gt_one : 1 < sqrt_p) (hx1 : 1 - x_1 \u2260 0) (hx2 : 1 - x_2 \u2260 0) (h_parity_decomp : S_A = S_two_prime - S_odd_omega + S_even_ge_4)",
-          "print_axioms_command": "lake env lean --stdin  (input: import RiemannScope\\n#print axioms RiemannScope.signed_block_bivariate_euler_nonvanishing_and_parity_regrouping)",
+          "print_axioms_command": "lake env lean --stdin  (input: import RiemannScope.TrivialZero\\n#print axioms RiemannScope.signed_block_bivariate_euler_nonvanishing_and_parity_regrouping)",
           "print_axioms_output": "'RiemannScope.signed_block_bivariate_euler_nonvanishing_and_parity_regrouping' depends on axioms: [propext, Classical.choice, Quot.sound]",
-          "scope_note": "Proves over R the local bivariate Euler-factor ratio identity, AM-GM inequality 2 sqrt_p / (p + 1) < 1 and strict positivity 1 - (p/(p+1))(x_1 + x_2) >= 1 - 2 sqrt_p/(p+1) > 0 for x_1 + x_2 <= 2/sqrt_p, prime-square cancellation in -sum_{u v = q} Lambda(u) mu(v), and the parity-stratum lower/upper comparison; infinite Euler-product convergence and Walfisz summation by parts are proved analytically outside Lean."
+          "scope_note": "Scalar real-algebra lemma in namespace RiemannScope: proves over R the single-prime local bivariate Euler-factor ratio identity, the AM-GM inequality 2 sqrt_p / (p + 1) < 1 and strict positivity 1 - (p/(p+1))(x_1 + x_2) >= 1 - 2 sqrt_p/(p+1) > 0 for x_1 + x_2 <= 2/sqrt_p, prime-square cancellation -(log_p * (-mu_m) + log_p * mu_m) = 0, and the parity-stratum linear inequalities from h_parity_decomp; infinite Euler-product convergence on Omega_H and the 4-step uniform convolution/Walfisz bound |S(A)| << A exp(-c Phi(A)) are proved analytically outside Lean."
         }
       }
     },
     "surviving_unconditional_results_and_remaining_obstruction": {
       "surviving_unconditional_theorems": [
         "Exact transported trivial-zero slope identity (2(-1)^m tau^{2m}/(2m)!) a_K Z_{a_K}'(-2m a_K) = zeta(2m+1) across all K in A_R and m >= 1, and finite-difference identity c_k = sum_{j=0}^k (-1)^j binom(k,j)/zeta(2j+3) = sum_{n>=1} (mu(n)/n^3)(1 - n^{-2})^k.",
-        "Unconditional O(k^{-2}) Gaussian-proxy comparison |G(k) - c_k| <= (4 e^{-2} + (2/3)(1 + (7/(2e))^{7/2})) k^{-2} < 2.1547 k^{-2} for all k >= 1 (explicitly accounting for the n = 1 term e^{-k}).",
-        "Exact common-factor expansion of Q(X)^2 over m = d r, n = d s (gcd(r,s) = 1), explicit coprime-squarefree counting remainder |R_q(t)| <= (2^{omega(q)} + 2) sqrt(t), and summed error O_eps(A^{3/2+eps}/sqrt(X)) vanishing on A <= X^{1/3-delta} for 0 < eps < 3 delta / (2(1/3-delta)).",
-        "Exact regrouping S(A) = sum_q mu(q) w_A(q) on [A, 2A)^2, exact decoupled L^2-inclusion-exclusion decomposition S(A) = (1/zeta(2)) sum_{e<2A} (mu(e) tilde{kappa}(e)^2 / e) I_e(A/e) with I_e(B) >= 0, non-asymptotic bound |S(A)| <= S_abs(A) < 0.239 A for all A >= 1, and unconditional Walfisz saving |S(A)| << A exp(-c_0 (log A)^{3/5} (log log A)^{-1/5}) <<_C A (log A)^{-C} for all C > 0 (beating both O(A) and S_{2-prime}(A) ~ c_2 A / log^2 A)."
+        "Unconditional O(k^{-2}) Gaussian-proxy comparison |G(k) - c_k| <= (4 e^{-2} + (2/3)(1 + (7/(2e))^{7/2})) k^{-2} < 3.5 k^{-2} for all k >= 1 (explicitly accounting for the n = 1 term e^{-k}), and conditional grade-interval L^2 energy criterion with exact covering constant 1 + tau^eps.",
+        "Exact common-factor expansion of Q(X)^2 over m = d r, n = d s (gcd(r,s) = 1), explicit coprime-squarefree counting remainder |R_q(t)| <= (2^{omega(q)} + 2) sqrt(t) across all t > 0, certified counterexample at (r, s, X) = (29, 31, 30) falsifying the old pairwise formula, proved replacement pairwise bound |E_{r,s}(X)| <= C 2^{omega(rs)} X^{-1/2} ((r s)^{5/2} / (r^2 + s^2)^{11/4}) (C = 3 I_abs < 21), and summed error O(A^{3/2} log^2(2A)/sqrt(X)) = O_eps(A^{3/2+eps}/sqrt(X)) vanishing on A <= X^{1/3-delta} for 0 < eps < 3 delta / (2(1/3-delta)).",
+        "Exact regrouping S(A) = sum_q mu(q) w_A(q) on [A, 2A)^2, exact decoupled L^2-inclusion-exclusion decomposition S(A) = (1/zeta(2)) sum_{e<2A} (mu(e) tilde{kappa}(e)^2 / e) I_e(A/e) with I_e(B) >= 0, exact multiplicative convolution decomposition f = (mu tensor mu) * h with C_{h,3/4} < infty, non-asymptotic bound |S(A)| <= S_abs(A) < 0.239 A for all A >= 1, and complete 4-step unconditional uniform Walfisz saving |S(A)| << A exp(-c (log A)^{3/5} (log log A)^{-1/5}) <<_D A / (log A)^D for all D > 0 (rigorously beating both O(A) and S_{2-prime}(A) ~ c_2 A / log^2 A)."
       ],
-      "precise_arithmetic_obstruction_to_power_saving": "In Attempt 1, the bivariate Euler product D(s_1, s_2) = H(s_1, s_2) / (zeta(s_1) zeta(s_2)) has local factors 1 - (p/(p+1))(p^{-s_1} + p^{-s_2}) >= 1 - 2 sqrt(p)/(p+1) > 0 on Re(s_1), Re(s_2) >= 1/2, so the numerator H(s_1, s_2) never vanishes on Re(s_i) >= 1/2 to cancel off-critical zeros of zeta(s_1) zeta(s_2). In Attempt 2 and the decoupled L^2 decomposition, each inner sum sum_{B <= r < 2B, gcd(r,e)=1} (mu(r) tilde{kappa}(r) / r^3) exp(-u^2/r^2) has Mellin Dirichlet series sum_{r>=1, gcd(r,e)=1} mu(r) tilde{kappa}(r) r^{-s} = K_e(s) / zeta(s) with K_e(s) != 0 on Re(s) >= 1/2, so upgrading the unconditional Walfisz saving O_C(A (log A)^{-C}) to a fixed polynomial saving |S(A)| <= C A^{1 - eta} (eta > 0) requires a zero-free strip Re(s) > 1 - eta' for zeta(s)."
+      "precise_arithmetic_obstruction_to_power_saving": "In Attempt 1, the bivariate Euler product D(s_1, s_2) = H(s_1, s_2) / (zeta(s_1) zeta(s_2)) has local factors 1 - (p/(p+1))(p^{-s_1} + p^{-s_2}) >= 1 - 2 sqrt(p)/(p+1) > 0 on Re(s_1), Re(s_2) >= 1/2 and H(s_1, s_2) converges absolutely and never vanishes on the interior region {Re(s_1) >= 1/2, Re(s_2) >= 1/2, Re(s_1 + s_2) > 1}, so H(s_1, s_2) cannot cancel off-critical zeros of zeta(s_1) zeta(s_2) in 1/2 < Re(s_i) < 1. In the convolution decomposition S(A) = (3 sqrt(pi)/(8 zeta(2))) sum_{d,e<2A} h(d,e) T_{d,e}(A), upgrading the unconditional Korobov-Vinogradov-Walfisz saving |S(A)| << A exp(-c Phi(A)) <<_D A / (log A)^D to a fixed power saving |S(A)| <= C A^{1 - eta} (eta > 0) requires power-saving cancellation in the unweighted Moebius sum M(x) = sum_{m <= x} mu(m), i.e., a zero-free strip Re(s) > 1 - eta' for zeta(s)."
     }
   },
   "section_6_certified_arb_roundtrip_verification": {
-    "total_certified_arb_balls_checked": 1175,
-    "compared_against_live_original_arb_count": 1175,
+    "total_certified_arb_balls_checked": 1258,
+    "compared_against_live_original_arb_count": 1258,
     "live_original_count_matches_enumerated_total": true,
     "all_enclose_original_256bit_arb_ball": true,
     "failed_paths": [],
@@ -13433,22 +14170,45 @@
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.coprime_squarefree_counting_estimate.sample_counting_table[9].main_term_kappa_q_t_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.coprime_squarefree_counting_estimate.sample_counting_table[9].remainder_R_q_t_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.coprime_squarefree_counting_estimate.sample_counting_table[9].analytic_remainder_bound_2_pow_omega_plus_2_sqrt_t_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.counterexample_r29_s31_X30_falsifying_old_pairwise_bound.d_eq_1_contribution_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.counterexample_r29_s31_X30_falsifying_old_pairwise_bound.full_d_sum_contribution_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.counterexample_r29_s31_X30_falsifying_old_pairwise_bound.scale_independent_leading_term_L_29_31_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.counterexample_r29_s31_X30_falsifying_old_pairwise_bound.d_eq_1_error_lower_bound_E_29_31_d1_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.counterexample_r29_s31_X30_falsifying_old_pairwise_bound.full_error_E_29_31_30_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.counterexample_r29_s31_X30_falsifying_old_pairwise_bound.old_asserted_upper_bound_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.counterexample_r29_s31_X30_falsifying_old_pairwise_bound.d1_excess_over_old_bound_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.counterexample_r29_s31_X30_falsifying_old_pairwise_bound.full_excess_over_old_bound_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.counterexample_r29_s31_X30_falsifying_old_pairwise_bound.replacement_bound_with_C_sharp_at_29_31_30_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.counterexample_r29_s31_X30_falsifying_old_pairwise_bound.replacement_bound_with_C_21_at_29_31_30_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.counterexample_r29_s31_X30_falsifying_old_pairwise_bound.replacement_bound_margin_over_full_error_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.gaussian_integral_and_pairwise_leading_term.I_abs_stieltjes_integral_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.gaussian_integral_and_pairwise_leading_term.C_pair_sharp_3_I_abs_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.gaussian_integral_and_pairwise_leading_term.C_pair_closed_form_upper_bound_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.gaussian_integral_and_pairwise_leading_term.sample_pairwise_convergence_table[0].exact_d_sum_contribution_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.gaussian_integral_and_pairwise_leading_term.sample_pairwise_convergence_table[0].scale_independent_leading_term_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.gaussian_integral_and_pairwise_leading_term.sample_pairwise_convergence_table[0].difference_exact_minus_leading_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.gaussian_integral_and_pairwise_leading_term.sample_pairwise_convergence_table[0].analytic_O_X_neg_half_remainder_bound_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.gaussian_integral_and_pairwise_leading_term.sample_pairwise_convergence_table[0].bound_minus_abs_difference_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.gaussian_integral_and_pairwise_leading_term.sample_pairwise_convergence_table[1].exact_d_sum_contribution_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.gaussian_integral_and_pairwise_leading_term.sample_pairwise_convergence_table[1].scale_independent_leading_term_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.gaussian_integral_and_pairwise_leading_term.sample_pairwise_convergence_table[1].difference_exact_minus_leading_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.gaussian_integral_and_pairwise_leading_term.sample_pairwise_convergence_table[1].analytic_O_X_neg_half_remainder_bound_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.gaussian_integral_and_pairwise_leading_term.sample_pairwise_convergence_table[1].bound_minus_abs_difference_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.gaussian_integral_and_pairwise_leading_term.sample_pairwise_convergence_table[2].exact_d_sum_contribution_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.gaussian_integral_and_pairwise_leading_term.sample_pairwise_convergence_table[2].scale_independent_leading_term_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.gaussian_integral_and_pairwise_leading_term.sample_pairwise_convergence_table[2].difference_exact_minus_leading_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.gaussian_integral_and_pairwise_leading_term.sample_pairwise_convergence_table[2].analytic_O_X_neg_half_remainder_bound_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.gaussian_integral_and_pairwise_leading_term.sample_pairwise_convergence_table[2].bound_minus_abs_difference_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.gaussian_integral_and_pairwise_leading_term.sample_pairwise_convergence_table[3].exact_d_sum_contribution_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.gaussian_integral_and_pairwise_leading_term.sample_pairwise_convergence_table[3].scale_independent_leading_term_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.gaussian_integral_and_pairwise_leading_term.sample_pairwise_convergence_table[3].difference_exact_minus_leading_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.gaussian_integral_and_pairwise_leading_term.sample_pairwise_convergence_table[3].analytic_O_X_neg_half_remainder_bound_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.gaussian_integral_and_pairwise_leading_term.sample_pairwise_convergence_table[3].bound_minus_abs_difference_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.gaussian_integral_and_pairwise_leading_term.sample_pairwise_convergence_table[4].exact_d_sum_contribution_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.gaussian_integral_and_pairwise_leading_term.sample_pairwise_convergence_table[4].scale_independent_leading_term_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.gaussian_integral_and_pairwise_leading_term.sample_pairwise_convergence_table[4].difference_exact_minus_leading_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.gaussian_integral_and_pairwise_leading_term.sample_pairwise_convergence_table[4].analytic_O_X_neg_half_remainder_bound_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_2_common_factor_expansion_and_coprime_squarefree_asymptotics.gaussian_integral_and_pairwise_leading_term.sample_pairwise_convergence_table[4].bound_minus_abs_difference_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.unsigned_benchmark_and_two_prime_stratum.unit_box_geometric_integral_15_sqrt2_minus_8_sqrt5_over_30_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.unsigned_benchmark_and_two_prime_stratum.C_block_non_asymptotic_constant_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.attempt_1_prime_by_prime_bivariate_euler_product.local_factor_table[0].max_perturbation_2_sqrt_p_over_p_plus_1_certified",
@@ -13463,108 +14223,168 @@
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.attempt_1_prime_by_prime_bivariate_euler_product.local_factor_table[4].min_local_euler_factor_on_Re_ge_half_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.attempt_1_prime_by_prime_bivariate_euler_product.local_factor_table[5].max_perturbation_2_sqrt_p_over_p_plus_1_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.attempt_1_prime_by_prime_bivariate_euler_product.local_factor_table[5].min_local_euler_factor_on_Re_ge_half_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.attempt_2_regrouping_by_q_and_unconditional_signed_block_proof.kernel_mixed_partial_sign_change_and_absolute_derivative_bounds.K_rs_at_1_2_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.attempt_2_regrouping_by_q_and_unconditional_signed_block_proof.kernel_mixed_partial_sign_change_and_absolute_derivative_bounds.M_var_19_over_8_sqrt2_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.attempt_2_regrouping_by_q_and_unconditional_signed_block_proof.four_step_unconditional_walfisz_convolution_proof.C_h_1_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.attempt_2_regrouping_by_q_and_unconditional_signed_block_proof.four_step_unconditional_walfisz_convolution_proof.C_h_3_4_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.attempt_2_regrouping_by_q_and_unconditional_signed_block_proof.four_step_unconditional_walfisz_convolution_proof.tail_bound_coefficient_9_Ch34_over_4sqrt2_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.repeated_factorization_A6_q66.w_6_66_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.repeated_factorization_A35_q2310.w_35_2310_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.nonsquarefree_A4_q20.w_4_20_positive_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[0].S_A_direct_pair_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[0].S_A_regrouped_q_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[0].S_A_decoupled_L2_sum_certified",
-      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[0].S_A_log_mobius_exchange_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[0].S_A_h_convolution_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[0].S_abs_A_unsigned_majorant_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[0].S_pos_A_positive_parity_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[0].S_neg_A_negative_parity_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[0].S_two_prime_omega_eq_2_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[0].S_odd_omega_magnitude_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[0].S_even_omega_ge_4_or_0_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[0].non_asymptotic_O_A_upper_bound_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[0].unsigned_bound_minus_S_abs_margin_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[1].S_A_direct_pair_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[1].S_A_regrouped_q_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[1].S_A_decoupled_L2_sum_certified",
-      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[1].S_A_log_mobius_exchange_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[1].S_A_h_convolution_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[1].S_abs_A_unsigned_majorant_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[1].S_pos_A_positive_parity_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[1].S_neg_A_negative_parity_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[1].S_two_prime_omega_eq_2_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[1].S_odd_omega_magnitude_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[1].S_even_omega_ge_4_or_0_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[1].non_asymptotic_O_A_upper_bound_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[1].unsigned_bound_minus_S_abs_margin_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[2].S_A_direct_pair_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[2].S_A_regrouped_q_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[2].S_A_decoupled_L2_sum_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[2].S_A_h_convolution_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[2].S_A_log_mobius_exchange_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[2].S_abs_A_unsigned_majorant_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[2].S_pos_A_positive_parity_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[2].S_neg_A_negative_parity_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[2].S_two_prime_omega_eq_2_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[2].S_odd_omega_magnitude_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[2].S_even_omega_ge_4_or_0_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[2].non_asymptotic_O_A_upper_bound_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[2].unsigned_bound_minus_S_abs_margin_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[3].S_A_direct_pair_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[3].S_A_regrouped_q_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[3].S_A_decoupled_L2_sum_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[3].S_A_h_convolution_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[3].S_A_log_mobius_exchange_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[3].S_abs_A_unsigned_majorant_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[3].S_pos_A_positive_parity_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[3].S_neg_A_negative_parity_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[3].S_two_prime_omega_eq_2_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[3].S_odd_omega_magnitude_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[3].S_even_omega_ge_4_or_0_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[3].non_asymptotic_O_A_upper_bound_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[3].unsigned_bound_minus_S_abs_margin_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[4].S_A_direct_pair_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[4].S_A_regrouped_q_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[4].S_A_decoupled_L2_sum_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[4].S_A_h_convolution_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[4].S_A_log_mobius_exchange_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[4].S_abs_A_unsigned_majorant_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[4].S_pos_A_positive_parity_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[4].S_neg_A_negative_parity_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[4].S_two_prime_omega_eq_2_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[4].S_odd_omega_magnitude_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[4].S_even_omega_ge_4_or_0_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[4].non_asymptotic_O_A_upper_bound_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[4].unsigned_bound_minus_S_abs_margin_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[5].S_A_direct_pair_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[5].S_A_regrouped_q_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[5].S_A_decoupled_L2_sum_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[5].S_A_h_convolution_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[5].S_A_log_mobius_exchange_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[5].S_abs_A_unsigned_majorant_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[5].S_pos_A_positive_parity_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[5].S_neg_A_negative_parity_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[5].S_two_prime_omega_eq_2_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[5].S_odd_omega_magnitude_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[5].S_even_omega_ge_4_or_0_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[5].non_asymptotic_O_A_upper_bound_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[5].unsigned_bound_minus_S_abs_margin_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[6].S_A_direct_pair_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[6].S_A_regrouped_q_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[6].S_A_decoupled_L2_sum_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[6].S_A_h_convolution_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[6].S_A_log_mobius_exchange_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[6].S_abs_A_unsigned_majorant_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[6].S_pos_A_positive_parity_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[6].S_neg_A_negative_parity_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[6].S_two_prime_omega_eq_2_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[6].S_odd_omega_magnitude_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[6].S_even_omega_ge_4_or_0_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[6].non_asymptotic_O_A_upper_bound_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[6].unsigned_bound_minus_S_abs_margin_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[7].S_A_direct_pair_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[7].S_A_regrouped_q_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[7].S_A_decoupled_L2_sum_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[7].S_A_h_convolution_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[7].S_A_log_mobius_exchange_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[7].S_abs_A_unsigned_majorant_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[7].S_pos_A_positive_parity_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[7].S_neg_A_negative_parity_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[7].S_two_prime_omega_eq_2_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[7].S_odd_omega_magnitude_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[7].S_even_omega_ge_4_or_0_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[7].non_asymptotic_O_A_upper_bound_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[7].unsigned_bound_minus_S_abs_margin_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[8].S_A_direct_pair_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[8].S_A_regrouped_q_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[8].S_A_decoupled_L2_sum_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[8].S_A_h_convolution_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[8].S_A_log_mobius_exchange_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[8].S_abs_A_unsigned_majorant_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[8].S_pos_A_positive_parity_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[8].S_neg_A_negative_parity_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[8].S_two_prime_omega_eq_2_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[8].S_odd_omega_magnitude_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[8].S_even_omega_ge_4_or_0_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[8].non_asymptotic_O_A_upper_bound_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[8].unsigned_bound_minus_S_abs_margin_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[9].S_A_direct_pair_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[9].S_A_regrouped_q_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[9].S_A_decoupled_L2_sum_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[9].S_A_h_convolution_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[9].S_A_log_mobius_exchange_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[9].S_abs_A_unsigned_majorant_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[9].S_pos_A_positive_parity_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[9].S_neg_A_negative_parity_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[9].S_two_prime_omega_eq_2_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[9].S_odd_omega_magnitude_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[9].S_even_omega_ge_4_or_0_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[9].non_asymptotic_O_A_upper_bound_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[9].unsigned_bound_minus_S_abs_margin_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[10].S_A_direct_pair_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[10].S_A_regrouped_q_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[10].S_A_decoupled_L2_sum_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[10].S_A_h_convolution_sum_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[10].S_A_log_mobius_exchange_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[10].S_abs_A_unsigned_majorant_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[10].S_pos_A_positive_parity_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[10].S_neg_A_negative_parity_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[10].S_two_prime_omega_eq_2_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[10].S_odd_omega_magnitude_certified",
       "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[10].S_even_omega_ge_4_or_0_certified",
-      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[10].non_asymptotic_O_A_upper_bound_certified"
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[10].non_asymptotic_O_A_upper_bound_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[10].unsigned_bound_minus_S_abs_margin_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[11].S_A_direct_pair_sum_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[11].S_A_regrouped_q_sum_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[11].S_A_decoupled_L2_sum_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[11].S_A_h_convolution_sum_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[11].S_A_log_mobius_exchange_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[11].S_abs_A_unsigned_majorant_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[11].S_pos_A_positive_parity_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[11].S_neg_A_negative_parity_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[11].S_two_prime_omega_eq_2_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[11].S_odd_omega_magnitude_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[11].S_even_omega_ge_4_or_0_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[11].non_asymptotic_O_A_upper_bound_certified",
+      "task_tc050.section_9_task_tc053_trivial_zero_slopes_and_coprime_cancellation.section_3_signed_coprime_block_attempts_and_regrouping.edge_case_and_regrouping_regressions.balanced_block_evaluation_table[11].unsigned_bound_minus_S_abs_margin_certified"
     ]
   }
 }
