@@ -1,20 +1,27 @@
-# TASK-TC-054 Mathematical Review: Liouville Square-Dilation Transfer, Unconstrained Common-Factor Expansion, Transition Poisson Summation, and Separable Gaussian Decoupling
+# TASK-TC-054 / TASK-TC-054R Mathematical Review: Liouville Square-Dilation Transfer, Unconstrained Common-Factor Expansion, Transition Poisson Summation, and Separable Gaussian Decoupling
 
-- **Task ID**: `TASK-TC-054`
+- **Task ID**: `TASK-TC-054` (repaired in `TASK-TC-054R`)
 - **Parent Epic**: `EPIC-TC-042`
-- **Branch**: `task/tc-054-liouville-square-dilation-and-transition-cancellation`
+- **Branch**: `task/tc-054r-abel-poisson-certification-and-arithmetic-scope-repair`
 - **Prior Merged `main` Baseline (`TC-053R`)**: `c82e439708b0b6031db6a77bf3977688d9f0758b`
 - **Reviewed `TC-053R2` Implementation Commit**: `cc303030138c670e8f01aaaab483bbeca6bc17d1`
 - **Reviewed `TC-053R2` Tip**: `21576861ecd0dcbf874afec91b299fd6060f4f03`
+- **Reviewed `TC-054` Implementation Commit**: `8f6afcfb9161aa77c74bc40605ac4fabae8b432e`
+- **Reviewed `TC-054` Tip**: `cdee197acc9c3e75a4c8cffc94c10bec1bcb97fa`
 - **Subgate Status**: `SUBGATE-TC-043A: OPEN` (`rh_proved: false`)
 - **Primary Implementation Module**: [`tc/liouville_square_dilation.py`](../../tc/liouville_square_dilation.py)
 - **Certified Data Artifact**: [`data/tc_liouville_square_dilation.json`](../../data/tc_liouville_square_dilation.json)
-- **Formal Lean 4 Module**: [`formal/RiemannScope/LiouvilleSquareDilation.lean`](../../formal/RiemannScope/LiouvilleSquareDilation.lean) (`5` definitions + `5` public theorems + `1` private helper theorem = `11` declarations; `0` `sorry`, `0` custom `axiom`)
+- **Formal Lean 4 Module**: [`formal/RiemannScope/LiouvilleSquareDilation.lean`](../../formal/RiemannScope/LiouvilleSquareDilation.lean) (`10` definitions + `8` public theorems + `6` private helper theorems = `24` declarations; `0` `sorry`, `0` custom `axiom`)
 - **Verification Test Suite**: [`tests/test_tc_liouville_square_dilation.py`](../../tests/test_tc_liouville_square_dilation.py)
 
 ---
 
-## 1. Executive Summary & Mission Status
+## 1. Executive Summary, Notation, & Mission Status
+
+Throughout this document we preserve the project's native circle constant $\tau := 2\pi$ and declare complex coordinates explicitly:
+- Mellin/Dirichlet complex variables are written $z = a + i b$ with $a, b \in \mathbb{R}$ ($a = \operatorname{Re} z$);
+- Nontrivial zeros of $\zeta$ are written $\rho = x + i y$ with $x, y \in \mathbb{R}$ ($x = \operatorname{Re}\rho$), where the critical line is $x = 1/2$;
+- Admissible TC grades $K \in \mathbb{A}_{\mathbb{R}} := \overline{\mathbb{Q}} \cap \mathbb{R}$ remain real algebraic, whereas positive real scales $X, Y, M > 0$ and the real norm weight $\eta > 0$ in $\|f\|_\eta := \bigl(\int_0^\infty |f(X)|^2 X^{-2\eta}\frac{dX}{X}\bigr)^{1/2}$ are auxiliary continuum parameters and do not automatically become TC grades.
 
 In `TASK-TC-053R` and `TASK-TC-053R2`, the common-factor expansion of the Möbius Gaussian sum
 $$Q_\mu(X) := X^{5/2}\sum_{n\ge 1}\frac{\mu(n)}{n^3}e^{-X^2/n^2}$$
@@ -22,58 +29,61 @@ encountered two coupled structural barriers when expanding $Q_\mu(X)^2$ over $m 
 1. **Common-Factor Coprimality Barrier ($A \le X^{1/3-\delta}$)**: Because $\mu(d r)\mu(d s) = \mu(d)^2 \mathbf{1}_{\gcd(d, r s)=1}\mu(r)\mu(s)$, the inner sum over $d$ is restricted to squarefree integers $d$ coprime to $q = r s$. Approximating $\sum_{\gcd(d, rs)=1} \mu(d)^2 d^{-6} e^{-L^2/d^2}$ by its continuous integral introduces the squarefree-coprime counting remainder $|R_q(t)| \le (2^{\omega(q)} + 2)\sqrt{t}$, producing an $O(L^{-11/2})$ pairwise error that restricts the asymptotic Gaussian kernel reduction to the sub-cubic range $A \le X^{1/3-\delta}$.
 2. **Signed-Block Barrier**: On a single balanced block $[A, 2A)^2$, the decoupled convolution $f = (\mu \otimes \mu) * h$ combined with Korobov–Vinogradov–Walfisz yields the unconditional super-polynomial logarithmic saving $|S(A)| \ll A\exp(-c(\log A)^{3/5}(\log\log A)^{-1/5}) \ll_D A(\log A)^{-D}$ for every $D > 0$, but does not control the transition region $A \asymp X$ or provide a fixed power saving without a zero-free strip for $\zeta(s)$.
 
-`TASK-TC-054` reformulates the problem using **Liouville's completely multiplicative function** $\lambda(n) = (-1)^{\Omega(n)}$ ($\lambda(1) = 1$) and proves **six unconditional theorems**, while isolating the exact analytic obstruction that keeps `SUBGATE-TC-043A` `OPEN` (`rh_proved: false`):
+`TASK-TC-054` and its repair `TASK-TC-054R` reformulate the problem using **Liouville's completely multiplicative function** $\lambda(n) = (-1)^{\Omega(n)}$ ($\lambda(1) = 1$) and establish **six unconditional theorems**, while repairing the dyadic Abel scaling, Poisson summation regularity hypotheses, hypergeometric Fourier tail certification, exact rational block cutoffs, unequal-block upper bound, and Lean 4 positive-integer arithmetic linkage, and isolating the exact analytic obstruction that keeps `SUBGATE-TC-043A` `OPEN` (`rh_proved: false`):
 
 1. **Theorem 1 (Reversible Square-Divisor Convolution & Gaussian Square-Dilation Transfer, §2–§3)**:
    For all $n \ge 1$,
    $$\lambda(n) = \sum_{d^2 \mid n}\mu\!\left(\frac{n}{d^2}\right), \qquad \mu(n) = \sum_{d^2 \mid n}\mu(d)\lambda\!\left(\frac{n}{d^2}\right).$$
-   For $Q_a(X) = X^{5/2}\sum_{n\ge 1}\frac{a(n)}{n^3}e^{-X^2/n^2}$ ($a \in \{\mu, \lambda\}$), $|Q_a(X)| \le \zeta(3)X^{5/2}$, the $N > T$ truncation tail is bounded by $\frac{X^{5/2}}{2 T^2}$, and Fubini's theorem yields the exact reversible square-dilation transfer
+   For $Q_a(X) = X^{5/2}\sum_{n\ge 1}\frac{a(n)}{n^3}e^{-X^2/n^2}$ ($a \in \{\mu, \lambda\}$), $|Q_a(X)| \le \zeta(3)X^{5/2}$, the $n > T$ truncation tail is bounded by $\frac{X^{5/2}}{2 T^2}$, and Fubini's theorem yields the exact reversible square-dilation transfer
    $$Q_\lambda(X) = \sum_{d\ge 1}\frac{Q_\mu(X/d^2)}{d}, \qquad Q_\mu(X) = \sum_{d\ge 1}\frac{\mu(d)\,Q_\lambda(X/d^2)}{d},$$
    with dilation tail ($d > D$) bounded in magnitude by $\frac{\zeta(3)X^{5/2}}{5 D^5}$.
 
 2. **Theorem 2 (Reversible Weighted $L^2$ Norm Equivalence & Grade-Interval Criterion, §3)**:
-   For the weighted norm $\|f\|_\sigma := \bigl(\int_0^\infty |f(X)|^2 X^{-2\sigma}\frac{dX}{X}\bigr)^{1/2}$, any dilation $a > 0$ satisfies $\|f(\cdot/a)\|_\sigma = a^{-\sigma}\|f\|_\sigma$, and for every $\sigma > 0$,
-   $$\|Q_\lambda\|_\sigma \le \zeta(1 + 2\sigma)\,\|Q_\mu\|_\sigma, \qquad \|Q_\mu\|_\sigma \le \frac{\zeta(1 + 2\sigma)}{\zeta(2 + 4\sigma)}\,\|Q_\lambda\|_\sigma.$$
+   For the weighted norm $\|f\|_\eta := \bigl(\int_0^\infty |f(X)|^2 X^{-2\eta}\frac{dX}{X}\bigr)^{1/2}$ with $\eta > 0$, any dilation $a > 0$ satisfies $\|f(\cdot/a)\|_\eta = a^{-\eta}\|f\|_\eta$, and for every $\eta > 0$,
+   $$\|Q_\lambda\|_\eta \le \zeta(1 + 2\eta)\,\|Q_\mu\|_\eta, \qquad \|Q_\mu\|_\eta \le \frac{\zeta(1 + 2\eta)}{\zeta(2 + 4\eta)}\,\|Q_\lambda\|_\eta.$$
    Consequently, for both $a = \mu$ and $a = \lambda$,
-   $$\left(\forall \varepsilon > 0\;\exists C_\varepsilon < \infty\;\forall Y \ge 1,\;\int_Y^{\tau Y}|Q_a(X)|^2\,\frac{dX}{X} \le C_\varepsilon Y^\varepsilon\right) \Longleftrightarrow \bigl(\forall \sigma \in (0, 5/2),\;\|Q_a\|_\sigma < \infty\bigr).$$
-   At $\sigma = 0$ there is no bounded inverse because $\sum_{d\ge 1} d^{-1} = \infty$, with $\zeta(1+2\sigma) \sim \frac{1}{2\sigma}$ and $\frac{\zeta(1+2\sigma)}{\zeta(2+4\sigma)} \sim \frac{3}{\pi^2\sigma}$ as $\sigma \to 0^+$.
+   $$\left(\forall \varepsilon > 0\;\exists C_\varepsilon < \infty\;\forall Y \ge 1,\;\int_Y^{\tau Y}|Q_a(X)|^2\,\frac{dX}{X} \le C_\varepsilon Y^\varepsilon\right) \Longleftrightarrow \bigl(\forall \eta \in (0, 5/2),\;\|Q_a\|_\eta < \infty\bigr).$$
+   As $\eta \downarrow 0$, the Minkowski triangle-inequality upper-bound multipliers diverge as $\zeta(1+2\eta) \sim \frac{1}{2\eta}$ and $\frac{\zeta(1+2\eta)}{\zeta(2+4\eta)} \sim \frac{1}{2\zeta(2)\eta} = \frac{12}{\tau^2\eta}$, reflecting the simple pole of the Mellin symbol $\zeta(1 + 2z)$ at $z = 0$ on the unweighted line $\operatorname{Re} z = 0$.
 
 3. **Theorem 3 (Unconstrained Common-Factor Expansion & Fixed-Order Euler–Maclaurin Bound up to $A \le X^{1-\delta}$, §4)**:
    By complete multiplicativity, $\lambda(d r)\lambda(d s) = \lambda(d)^2\lambda(r)\lambda(s) = \lambda(r)\lambda(s)$ for **every** integer $d \ge 1$, eliminating both the squarefree factor $\mu(d)^2$ and the coprimality condition $\gcd(d, r s) = 1$. Hence
    $$Q_\lambda(X)^2 = \sum_{\substack{r, s \ge 1 \\ \gcd(r, s) = 1}}\frac{\lambda(r)\lambda(s)\,X^5}{(r s)^3}\sum_{d\ge 1} d^{-6} e^{-L^2/d^2}, \qquad L = X\sqrt{r^{-2} + s^{-2}}.$$
-   For $f(v) = v^{-6}e^{-1/v^2}$ ($v > 0$, $f(0) = 0$) and every even integer $N \ge 2$, periodic Bernoulli integration by parts proves
-   $$\left|\sum_{d\ge 1} d^{-6}e^{-L^2/d^2} - \frac{3\sqrt{\pi}}{8}L^{-5}\right| \le C_N L^{-5-N}, \qquad C_N := \frac{2\zeta(N)}{\tau^N}\int_0^\infty \bigl|f^{(N)}(v)\bigr|\,dv,$$
+   With $c_0 := \int_0^\infty v^{-6}e^{-1/v^2}\,dv = \frac{1}{2}\Gamma(5/2) = \frac{3\sqrt{\tau/2}}{8}$, for $f(v) = v^{-6}e^{-1/v^2}$ ($v > 0$, $f(0) = 0$) and every even integer $N \ge 2$, periodic Bernoulli integration by parts proves
+   $$\left|\sum_{d\ge 1} d^{-6}e^{-L^2/d^2} - c_0 L^{-5}\right| \le C_N L^{-5-N}, \qquad C_N := \frac{2\zeta(N)}{\tau^N}\int_0^\infty \bigl|f^{(N)}(v)\bigr|\,dv,$$
    with certified 256-bit Arb constants
+   $$c_0 = \frac{3\sqrt{\tau/2}}{8} \in [0.6646701940895685102368128062529294435491 \pm 2.00 \times 10^{-40}],$$
    $$C_2 = \frac{f'(v_-) - f'(v_+)}{6} = [1.851257667016958056850958359201349291641 \pm 3.54 \times 10^{-40}], \qquad v_\pm = \sqrt{\frac{15 \pm \sqrt{57}}{42}},$$
    $$C_4 = \frac{1}{720}\int_0^\infty \bigl|f^{(4)}(v)\bigr|\,dv = [8.752371760035365551239039765015814873069 \pm 3.16 \times 10^{-39}].$$
    Summing over $1 \le r, s \le A$ ($\gcd(r, s) = 1$) gives
    $$\sum_{\substack{1 \le r, s \le A \\ \gcd(r, s) = 1}}\bigl|E^\lambda_{r,s}(X)\bigr| \le C_N 2^{-(N+5)/2}\frac{A^{N+1}}{X^N},$$
-   which tends to $0$ throughout the **entire subtransition regime** $A \le X^{1-\delta}$ whenever $(N+1)\delta > 1$ (already reaching $A \le X^{2/3-\eta}$ at $N = 2$ and $A \le X^{1-\delta}$ for arbitrary fixed $\delta \in (0, 1)$ by choosing $N = 2\lceil 1/(2\delta)\rceil$).
+   which tends to $0$ throughout the **entire subtransition regime** $A \le X^{1-\delta}$ whenever $(N+1)\delta > 1$ (already reaching $A \le X^{2/3-\varepsilon}$ at $N = 2$ and $A \le X^{1-\delta}$ for arbitrary fixed $\delta \in (0, 1)$ by choosing $N = 2\lceil 1/(2\delta)\rceil$).
 
-4. **Theorem 4 (Exact Transition Poisson Summation & Certified Non-Positivity of $\widehat{f}$, §5)**:
-   The even extension $f(-v) = f(v)$ ($f(0) = 0$) belongs to the Schwartz class $\mathcal{S}(\mathbb{R})$, and Poisson summation yields the exact identity valid for **all** $L > 0$:
-   $$\sum_{d\ge 1} d^{-6}e^{-L^2/d^2} = L^{-5}\left[\frac{3\sqrt{\pi}}{8} + \sum_{j\ge 1}\widehat{f}(j L)\right], \qquad \widehat{f}(\xi) := 2\int_0^\infty v^{-6}e^{-1/v^2}\cos(\tau\xi v)\,dv.$$
-   Evaluating $\widehat{f}(\xi)$ via its exact Mellin–Barnes residue expansion in 256-bit Arb certifies sign changes:
+4. **Theorem 4 (Exact Transition Poisson Summation on $C^1(\mathbb{R}/\mathbb{Z})$ & Certified Non-Positivity of $\widehat{f}$, §5)**:
+   The even extension $f(v) = |v|^{-6}e^{-1/v^2}$ ($v \ne 0$, $f(0) = 0$) is **not** in the Schwartz class $\mathcal{S}(\mathbb{R})$ because $v^6 f(v) = e^{-1/v^2} \to 1 \ne 0$ as $|v| \to \infty$, but $f \in C^\infty(\mathbb{R})$ is flat at $0$, satisfies $f^{(j)}(v) = O(|v|^{-6-j})$ as $|v| \to \infty$, has $f^{(j)} \in L^1(\mathbb{R})$ for all $j \ge 0$, and its periodization $\mathcal{P}_L(x) = \sum_{n\in\mathbb{Z}}f((n+x)/L)$ converges uniformly with its first derivative on $[0, 1]$ to a $C^1(\mathbb{R}/\mathbb{Z})$ function ([DLMF 1.8.14](https://dlmf.nist.gov/1.8#E14)). Poisson summation therefore yields the exact identity valid for **all** $L > 0$:
+   $$\sum_{d\ge 1} d^{-6}e^{-L^2/d^2} = L^{-5}\left[c_0 + \sum_{j\ge 1}\widehat{f}(j L)\right], \qquad \widehat{f}(\xi) := 2\int_0^\infty v^{-6}e^{-1/v^2}\cos(\tau\xi v)\,dv.$$
+   Evaluating $\widehat{f}(\xi)$ via its certified Mellin–Barnes residue expansion (with monotonic tail ratio certification $R_{\mathrm{even}}, R_{\mathrm{odd}} \le 1/2$ and independent `acb.integral` quadrature cross-checks) in 256-bit Arb certifies sign changes:
    $$\widehat{f}(1/2) = [-0.5628546550179851263755109492164491931001 \pm 4.04 \times 10^{-41}] < 0,$$
+   $$\widehat{f}(4/\tau) = [-0.7757751802167744117629682956314216290713 \pm 2.04 \times 10^{-41}] < 0,$$
    $$\widehat{f}(1) = [-0.3668367826642069184644449070564857828859 \pm 4.03 \times 10^{-41}] < 0,$$
    $$\widehat{f}(3/2) = [0.2636171831500303372338138695632955698496 \pm 2.39 \times 10^{-41}] > 0,$$
    $$\widehat{f}(2) = [0.1247126116325928138362162976104693467978 \pm 9.77 \times 10^{-42}] > 0.$$
 
-5. **Theorem 5 (Replacement Theorem — Exact Separable Gaussian Decoupling & Global Super-Polynomial Logarithmic Energy Saving, §6A)**:
+5. **Theorem 5 (Exact Separable Gaussian Decoupling, Repaired Dyadic Abel Scaling, & Global Stieltjes Energy Saving, §6A)**:
    In Attack A, the bivariate coprime Dirichlet series
    $$\mathcal{D}_\lambda(u, v) := \sum_{\gcd(r, s)=1}\frac{\lambda(r)\lambda(s)}{r^u s^v} = \frac{\zeta(2u)\zeta(2v)}{\zeta(u)\zeta(v)\zeta(u+v)} \qquad (\operatorname{Re} u > 1,\;\operatorname{Re} v > 1)$$
-   cannot cancel off-critical poles at $(u, v) = (\rho, \bar{\rho})$ ($\operatorname{Re}\rho = \beta > 1/2$) because $2\beta > 1$ lies inside the Euler-product half-plane where $\zeta(2\rho) \ne 0$ and $\zeta(2\beta) > 1$. However, retaining the **exact separable Gaussian kernel** $e^{-X^2(r^{-2}+s^{-2})/d^2} = e^{-X^2/(d^2 r^2)}e^{-X^2/(d^2 s^2)}$ before Euler–Maclaurin expansion and applying $\mathbf{1}_{\gcd(r,s)=1} = \sum_{e \mid \gcd(r,s)}\mu(e)$ ($r = e m$, $s = e n$) decouples every dyadic rectangular block $B_{A,B}(X)$ into 1D unweighted Liouville Gaussian sums:
+   cannot cancel off-critical poles at $(u, v) = (\rho, \bar{\rho})$ ($\rho = x + i y$ with $x > 1/2$) because $2x > 1$ lies inside the Euler-product half-plane where $\zeta(2\rho) \ne 0$ and $\zeta(2x) > 1$. Retaining the **exact separable Gaussian kernel** $e^{-X^2(r^{-2}+s^{-2})/d^2} = e^{-X^2/(d^2 r^2)}e^{-X^2/(d^2 s^2)}$ and applying $\mathbf{1}_{\gcd(r,s)=1} = \sum_{e \mid \gcd(r,s)}\mu(e)$ ($r = e m$, $s = e n$) decouples every rectangular block $B_{A,B}(X)$ into 1D unweighted Liouville Gaussian sums:
    $$B_{A,B}(X) = \sum_{1 \le e < 2\min(A,B)}\frac{\mu(e)}{e}\sum_{d\ge 1}\frac{1}{d}\,U_\lambda\!\left(\frac{X}{d e}; \frac{A}{e}\right)U_\lambda\!\left(\frac{X}{d e}; \frac{B}{e}\right),$$
-   where $U_\lambda(Y; M) := Y^{5/2}\sum_{M \le m < 2M}\frac{\lambda(m)}{m^3}e^{-Y^2/m^2}$. Because $m, n$ carry **no coprimality constraint** to $d e$, partial summation with the Korobov–Vinogradov–Walfisz bound $L_\lambda(x) = \sum_{m \le x}\lambda(m) \ll x\exp(-c_0\Phi(x))$ ($\Phi(x) = (\log x)^{3/5}(\log\log x)^{-1/5}$) and convergent divisor weights $\sum_{e\ge 1} e^{-2} = \sum_{d\ge 1} d^{-2} = \pi^2/6$ proves the unconditional **global** grade-interval energy saving:
-   $$\boxed{\int_Y^{\tau Y}\bigl|Q_\lambda(X)\bigr|^2\,\frac{dX}{X} \;\ll\; Y\exp\!\left(-2 c_1 (\log Y)^{3/5}(\log\log Y)^{-1/5}\right) \;\ll_D\; \frac{Y}{(\log Y)^D} \qquad (\forall D > 0,\;Y \ge 2),}$$
-   beating the unsigned $O(Y)$ benchmark across the **entire integral** (including the transition $A, B \asymp X$) without encountering the $O_N(X)$ Euler–Maclaurin blowup.
+   where $U_\lambda(Y; M) := Y^{5/2}\sum_{M \le m < 2M}\frac{\lambda(m)}{m^3}e^{-Y^2/m^2}$ satisfies the **repaired** dyadic Abel bound (for $M \ge 16$)
+   $$\bigl|U_\lambda(Y; M)\bigr| \;\ll\; M^{1/2}\min\!\left(\frac{M}{Y}, \left(\frac{Y}{M}\right)^{5/2}\right)\exp\bigl(-c\,\Phi(M)\bigr), \qquad \Phi(t) := (\log t)^{3/5}(\log\log t)^{-1/5}.$$
+   Furthermore, global Stieltjes integration by parts directly on $Q_\lambda(X) = -X^{5/2}\int_1^\infty L_\lambda(t)\frac{d}{dt}(t^{-3}e^{-X^2/t^2})\,dt$ split at $t = \sqrt{X}$ ($X \ge 256$) proves $|Q_\lambda(X)| \ll \sqrt{X}\exp(-c_1\Phi(X))$ and the unconditional **global** grade-interval energy saving:
+   $$\boxed{E_\lambda(Y) := \int_Y^{\tau Y}\bigl|Q_\lambda(X)\bigr|^2\,\frac{dX}{X} \;\ll\; Y\exp\!\left(-2 c_2 (\log Y)^{3/5}(\log\log Y)^{-1/5}\right) \;\ll_D\; \frac{Y}{(\log Y)^D} \qquad (\forall D > 0,\;Y \ge 2).}$$
 
 6. **Theorem 6 (Dyadic Parity Annihilation, Cross-Scale Energy Identity, and Off-Critical Mode Non-Vanishing, §6B)**:
    The dyadic parity combination
    $$Q_{\lambda,\mathrm{odd}}(X) := Q_\lambda(X) + 2^{-1/2}Q_\lambda(X/2) = X^{5/2}\sum_{\substack{m\ge 1 \\ 2 \nmid m}}\frac{\lambda(m)}{m^3}e^{-X^2/m^2}$$
    annihilates all even indices $n = 2^a m$ ($a \ge 1$) by canceling $\lambda(2^{a-1}m) + \lambda(2^a m) = 0$, admits the convergent dyadic inverse $Q_\lambda(X) = \sum_{j\ge 0}(-1)^j 2^{-j/2}Q_{\lambda,\mathrm{odd}}(X/2^j)$, satisfies the exact grade-interval energy identity
    $$\int_Y^{\tau Y}\bigl|Q_{\lambda,\mathrm{odd}}(X)\bigr|^2\,\frac{dX}{X} = \int_Y^{\tau Y}\bigl|Q_\lambda(X)\bigr|^2\,\frac{dX}{X} + \frac{1}{2}\int_{Y/2}^{\tau Y/2}\bigl|Q_\lambda(X)\bigr|^2\,\frac{dX}{X} + \sqrt{2}\int_Y^{\tau Y}Q_\lambda(X)Q_\lambda(X/2)\,\frac{dX}{X},$$
-   and satisfies the two-sided weighted norm equivalence $(1 - 2^{-1/2-\sigma})\|Q_\lambda\|_\sigma \le \|Q_{\lambda,\mathrm{odd}}\|_\sigma \le (1 + 2^{-1/2-\sigma})\|Q_\lambda\|_\sigma$ for all $\sigma > -1/2$. On any off-critical mode $X^{\rho - 1/2}$ ($\operatorname{Re}\rho = \beta > 0$), the multiplier $1 + 2^{-\rho}$ satisfies $0 < 1 - 2^{-\beta} \le |1 + 2^{-\rho}| \le 1 + 2^{-\beta} < 2$ and never vanishes.
+   and satisfies the two-sided weighted norm equivalence $(1 - 2^{-1/2-\eta})\|Q_\lambda\|_\eta \le \|Q_{\lambda,\mathrm{odd}}\|_\eta \le (1 + 2^{-1/2-\eta})\|Q_\lambda\|_\eta$ for all $\eta > -1/2$. On any off-critical mode $X^{\rho - 1/2}$ ($\rho = x + i y$ with $x > 0$), the multiplier $1 + 2^{-\rho}$ satisfies $0 < 1 - 2^{-x} \le |1 + 2^{-\rho}| \le 1 + 2^{-x} < 2$ and never vanishes.
 
 ---
 
@@ -99,10 +109,10 @@ $$\lambda(n) = \sum_{d^2 \mid n}\mu\!\left(\frac{n}{d^2}\right), \qquad \mu(n) =
    - If $k = 0$: $\mu(1)(-1)^0 = 1 = \mu(1)$.
    - If $k = 1$: $\lfloor 1/2\rfloor = 0$, so $\mu(1)(-1)^1 = -1 = \mu(p)$.
    - If $k \ge 2$: $\lfloor k/2\rfloor \ge 1$ and $\mu(p^j) = 0$ for all $j \ge 2$, so only $j = 0$ and $j = 1$ survive, giving $(-1)^k(\mu(1) + \mu(p)) = (-1)^k(1 - 1) = 0 = \mu(p^k)$.
-By multiplicativity across prime-power factors $n = \prod_p p^{v_p(n)}$, both identities hold for all $n \ge 1$. Notice the corresponding Dirichlet-series relation for $\operatorname{Re} s > 1$:
+By multiplicativity across prime-power factors $n = \prod_p p^{v_p(n)}$, both identities hold for all $n \ge 1$. Notice the corresponding Dirichlet-series relation for $s \in \mathbb{C}$ with $\operatorname{Re} s > 1$:
 $$\sum_{n\ge 1}\frac{\lambda(n)}{n^s} = \left(\sum_{d\ge 1}\frac{1}{d^{2s}}\right)\left(\sum_{m\ge 1}\frac{\mu(m)}{m^s}\right) = \frac{\zeta(2s)}{\zeta(s)}. \qquad \square$$
 
- Both prime-power identities and complete multiplicativity are formally verified in Lean 4 (`liouville_complete_multiplicativity_and_common_factor_cancellation_nat` and `prime_power_square_divisor_moebius_liouville_inversion_nat` in [`formal/RiemannScope/LiouvilleSquareDilation.lean`](../../formal/RiemannScope/LiouvilleSquareDilation.lean)) and checked in Python across all $1 \le n \le 200$ and all $1 \le d, r, s \le 30$ ($27{,}000$ triples).
+In [`formal/RiemannScope/LiouvilleSquareDilation.lean`](../../formal/RiemannScope/LiouvilleSquareDilation.lean), these results are proved both on exponent models (`liouville_complete_multiplicativity_and_common_factor_cancellation_nat`, `prime_power_square_divisor_moebius_liouville_inversion_nat`) and directly on actual positive integers $n \ge 1$ connected to Mathlib's `ArithmeticFunction.cardFactors`, `Nat.factorization`, and `ArithmeticFunction.moebius` (`actual_omega_factorization_and_liouville_common_factor_cancellation_nat`, `actual_prime_power_and_factored_square_divisor_moebius_liouville_inversion_nat`), and verified in Python across all $1 \le n \le 200$ and all $1 \le d, r, s \le 30$ ($27{,}000$ triples).
 
 ---
 
@@ -137,20 +147,20 @@ Since $|a(n)| \le 1$ and $e^{-X^2/n^2} \le 1$ for all $n \ge 1$ and $X > 0$:
 | $4$ | `[-0.37511 +/- 5.31e-6]` | `[-0.37511 +/- 5.40e-6]` | `[-0.22166 +/- 5.98e-6]` | `[-0.22166 +/- 6.07e-6]` | `True` |
 | $8$ | `[-0.10406 +/- 8.84e-6]` | `[-0.1041 +/- 4.94e-5]` | `[-0.14527 +/- 6.97e-6]` | `[-0.14527 +/- 7.48e-6]` | `True` |
 
-### 3.2 Weighted $L^2$ Dilation Norm Equivalence and $\sigma \to 0^+$ Pole Analysis
+### 3.2 Weighted $L^2$ Dilation Norm Equivalence and $\eta \downarrow 0$ Scope Analysis
 
-For $\sigma > 0$, define the weighted multiplicative $L^2$ norm on $(0, \infty)$:
-$$\|f\|_\sigma := \left(\int_0^\infty |f(X)|^2 X^{-2\sigma}\,\frac{dX}{X}\right)^{1/2}.$$
+For real norm weight $\eta > 0$, define the weighted multiplicative $L^2$ norm on $(0, \infty)$:
+$$\|f\|_\eta := \left(\int_0^\infty |f(X)|^2 X^{-2\eta}\,\frac{dX}{X}\right)^{1/2}.$$
 Under the change of variables $X = a Y$ ($a > 0$, $\frac{dX}{X} = \frac{dY}{Y}$):
-$$\|f(\cdot/a)\|_\sigma^2 = \int_0^\infty |f(X/a)|^2 X^{-2\sigma}\,\frac{dX}{X} = \int_0^\infty |f(Y)|^2 (a Y)^{-2\sigma}\,\frac{dY}{Y} = a^{-2\sigma}\|f\|_\sigma^2 \implies \|f(\cdot/a)\|_\sigma = a^{-\sigma}\|f\|_\sigma.$$
-In particular, for $a = d^2$, $\|f(\cdot/d^2)\|_\sigma = d^{-2\sigma}\|f\|_\sigma$. Applying Minkowski's integral inequality to $Q_\lambda(X) = \sum_{d\ge 1} d^{-1} Q_\mu(X/d^2)$ and $Q_\mu(X) = \sum_{d\ge 1}\mu(d) d^{-1} Q_\lambda(X/d^2)$ for any $\sigma > 0$ yields:
-$$\|Q_\lambda\|_\sigma \le \sum_{d\ge 1}\frac{\|Q_\mu(\cdot/d^2)\|_\sigma}{d} = \left(\sum_{d\ge 1} d^{-1-2\sigma}\right)\|Q_\mu\|_\sigma = \zeta(1 + 2\sigma)\,\|Q_\mu\|_\sigma,$$
-$$\|Q_\mu\|_\sigma \le \sum_{d\ge 1}\frac{|\mu(d)|\,\|Q_\lambda(\cdot/d^2)\|_\sigma}{d} = \left(\sum_{d\ge 1}\mu(d)^2 d^{-1-2\sigma}\right)\|Q_\lambda\|_\sigma = \frac{\zeta(1 + 2\sigma)}{\zeta(2 + 4\sigma)}\,\|Q_\lambda\|_\sigma.$$
-- **Behavior as $\sigma \to 0^+$**: Since $\zeta(1 + 2\sigma) = \frac{1}{2\sigma} + \gamma + O(\sigma)$, both multipliers blow up like $O(\sigma^{-1})$ as $\sigma \to 0^+$:
-  $$\lim_{\sigma \to 0^+}\sigma\,\zeta(1 + 2\sigma) = \frac{1}{2} = 0.5, \qquad \lim_{\sigma \to 0^+}\sigma\,\frac{\zeta(1 + 2\sigma)}{\zeta(2 + 4\sigma)} = \frac{1}{2\zeta(2)} = \frac{3}{\pi^2} \approx 0.3039635509,$$
-  so the transfer operator has **no bounded inverse at $\sigma = 0$**, while it is a bounded linear isomorphism on $L^2((0, \infty), X^{-2\sigma}\frac{dX}{X})$ for every fixed $\sigma > 0$.
+$$\|f(\cdot/a)\|_\eta^2 = \int_0^\infty |f(X/a)|^2 X^{-2\eta}\,\frac{dX}{X} = \int_0^\infty |f(Y)|^2 (a Y)^{-2\eta}\,\frac{dY}{Y} = a^{-2\eta}\|f\|_\eta^2 \implies \|f(\cdot/a)\|_\eta = a^{-\eta}\|f\|_\eta.$$
+In particular, for $a = d^2$, $\|f(\cdot/d^2)\|_\eta = d^{-2\eta}\|f\|_\eta$. Applying Minkowski's integral inequality to $Q_\lambda(X) = \sum_{d\ge 1} d^{-1} Q_\mu(X/d^2)$ and $Q_\mu(X) = \sum_{d\ge 1}\mu(d) d^{-1} Q_\lambda(X/d^2)$ for any $\eta > 0$ yields:
+$$\|Q_\lambda\|_\eta \le \sum_{d\ge 1}\frac{\|Q_\mu(\cdot/d^2)\|_\eta}{d} = \left(\sum_{d\ge 1} d^{-1-2\eta}\right)\|Q_\mu\|_\eta = \zeta(1 + 2\eta)\,\|Q_\mu\|_\eta,$$
+$$\|Q_\mu\|_\eta \le \sum_{d\ge 1}\frac{|\mu(d)|\,\|Q_\lambda(\cdot/d^2)\|_\eta}{d} = \left(\sum_{d\ge 1}\mu(d)^2 d^{-1-2\eta}\right)\|Q_\lambda\|_\eta = \frac{\zeta(1 + 2\eta)}{\zeta(2 + 4\eta)}\,\|Q_\lambda\|_\eta.$$
+- **Behavior as $\eta \downarrow 0$ and exact operator scope**: Since $\zeta(1 + 2\eta) = \frac{1}{2\eta} + \gamma + O(\eta)$ and $\zeta(2) = \frac{\tau^2}{24}$, the Minkowski series upper bounds diverge like $O(\eta^{-1})$ as $\eta \downarrow 0$:
+  $$\lim_{\eta \to 0^+}\eta\,\zeta(1 + 2\eta) = \frac{1}{2} = 0.5, \qquad \lim_{\eta \to 0^+}\eta\,\frac{\zeta(1 + 2\eta)}{\zeta(2 + 4\eta)} = \frac{1}{2\zeta(2)} = \frac{12}{\tau^2} \in [0.3039635509270133143316383896291829167131 \pm 2.37 \times 10^{-41}].$$
+  Note that divergence of an upper bound obtained from the triangle inequality on absolute values ($\sum_{d\ge 1} d^{-1-2\eta}$ and $\sum_{d\ge 1}\mu(d)^2 d^{-1-2\eta}$) shows by itself only that the absolute-value Minkowski proof breaks down at $\eta = 0$. On the full unweighted Hilbert space $L^2((0, \infty), \frac{dX}{X})$, Mellin Plancherel identifies the forward transfer $f \mapsto \sum_{d\ge 1} d^{-1}f(\cdot/d^2)$ with multiplication by the symbol $m(i b) = \zeta(1 + 2 i b)$ ($z = i b$, $a = 0$), which has a simple pole at $b = 0$ and is therefore unbounded on functions whose Mellin transform does not vanish at $z = 0$. By contrast, for every fixed $\eta > 0$, the transfer is an unconditionally bounded, invertible linear isomorphism on $L^2((0, \infty), X^{-2\eta}\frac{dX}{X})$.
 
-| $\sigma$ | $\zeta(1 + 2\sigma)$ | $\frac{\zeta(1 + 2\sigma)}{\zeta(2 + 4\sigma)}$ | $\sigma\,\zeta(1 + 2\sigma)$ | $\sigma\,\frac{\zeta(1 + 2\sigma)}{\zeta(2 + 4\sigma)}$ |
+| $\eta$ | $\zeta(1 + 2\eta)$ | $\frac{\zeta(1 + 2\eta)}{\zeta(2 + 4\eta)}$ | $\eta\,\zeta(1 + 2\eta)$ | $\eta\,\frac{\zeta(1 + 2\eta)}{\zeta(2 + 4\eta)}$ |
 | :--- | :--- | :--- | :--- | :--- |
 | $1/20$ | `[10.58444846495080982638640079173552303995 +/- 1.55e-39]` | `[7.101067626682364959660319788279339842132 +/- 1.71e-40]` | `[0.5292224232475404913193200395867761519973 +/- 7.77e-41]` | `[0.3550533813341182479830159894139669921066 +/- 8.53e-42]` |
 | $1/10$ | `[5.591582441177750776536563193423143277630 +/- 9.68e-41]` | `[4.042079955408588766460293600513948039645 +/- 3.91e-40]` | `[0.5591582441177750776536563193423143277630 +/- 1.07e-41]` | `[0.4042079955408588766460293600513948039645 +/- 4.01e-41]` |
@@ -158,28 +168,28 @@ $$\|Q_\mu\|_\sigma \le \sum_{d\ge 1}\frac{|\mu(d)|\,\|Q_\lambda(\cdot/d^2)\|_\si
 | $1/2$ | `[1.644934066848226436472415166646025189219 +/- 5.02e-41]` | `[1.519817754635066571658191948145914583565 +/- 3.82e-40]` | `[0.8224670334241132182362075833230125946093 +/- 2.51e-41]` | `[0.7599088773175332858290959740729572917825 +/- 1.91e-40]` |
 | $1$ | `[1.202056903159594285399738161511449990765 +/- 1.38e-41]` | `[1.181564949010256912569399734160454260547 +/- 2.33e-41]` | `[1.202056903159594285399738161511449990765 +/- 1.38e-41]` | `[1.181564949010256912569399734160454260547 +/- 2.33e-41]` |
 
-### 3.3 Grade-Interval Energy Equivalence, Mellin Continuation, and Bridge to `SUBGATE-TC-043A`
+### 3.3 Grade-Interval Energy Equivalence, Mellin Continuation, and Lindemann Scope
 
 **Proposition 3.1 (Equivalence of Grade-Interval Subpower Energy and Weighted Norm Finiteness).** *For $a \in \{\mu, \lambda\}$, the following two conditions are equivalent:*
 1. *(Grade-interval subpower energy)*: $\forall \varepsilon > 0\;\exists C_\varepsilon < \infty\;\forall Y \ge 1,\;\int_Y^{\tau Y}|Q_a(X)|^2\,\frac{dX}{X} \le C_\varepsilon Y^\varepsilon$.
-2. *(Weighted norm finiteness)*: $\forall \sigma \in (0, 5/2),\;\|Q_a\|_\sigma < \infty$.
+2. *(Weighted norm finiteness)*: $\forall \eta \in (0, 5/2),\;\|Q_a\|_\eta < \infty$.
 
 *Proof.*
-- **(1) $\implies$ (2)**: Fix $\sigma \in (0, 5/2)$. On $(0, 1]$, $|Q_a(X)| \le \zeta(3)X^{5/2}$ gives
-  $$\int_0^1 |Q_a(X)|^2 X^{-2\sigma}\,\frac{dX}{X} \le \zeta(3)^2\int_0^1 X^{4-2\sigma}\,dX = \frac{\zeta(3)^2}{5 - 2\sigma} < \infty.$$
-  On $[1, \infty) = \bigcup_{k=0}^\infty [\tau^k, \tau^{k+1})$, apply (1) with $\varepsilon = \sigma > 0$ and $Y = \tau^k \ge 1$. Since $X^{-2\sigma} \le \tau^{-2k\sigma}$ on $[\tau^k, \tau^{k+1})$,
-  $$\sum_{k=0}^\infty \int_{\tau^k}^{\tau^{k+1}}|Q_a(X)|^2 X^{-2\sigma}\,\frac{dX}{X} \le \sum_{k=0}^\infty \tau^{-2k\sigma} C_\sigma \tau^{k\sigma} = \frac{C_\sigma}{1 - \tau^{-\sigma}} < \infty.$$
-  Hence $\|Q_a\|_\sigma^2 \le \frac{\zeta(3)^2}{5 - 2\sigma} + \frac{C_\sigma}{1 - \tau^{-\sigma}} < \infty$.
-- **(2) $\implies$ (1)**: Given $\varepsilon > 0$, without loss of generality take $\varepsilon \in (0, 5)$ (since $Y^\varepsilon$ is increasing in $\varepsilon$ for $Y \ge 1$) and set $\sigma = \varepsilon/2 \in (0, 5/2)$. For any $Y \ge 1$ and $X \in [Y, \tau Y]$, $X / (\tau Y) \le 1 \implies 1 \le (\tau Y)^{2\sigma} X^{-2\sigma} = \tau^\varepsilon Y^\varepsilon X^{-2\sigma}$, so
-  $$\int_Y^{\tau Y}|Q_a(X)|^2\,\frac{dX}{X} \le \tau^\varepsilon Y^\varepsilon \int_Y^{\tau Y}|Q_a(X)|^2 X^{-2\sigma}\,\frac{dX}{X} \le \tau^\varepsilon \|Q_a\|_{\varepsilon/2}^2\,Y^\varepsilon. \qquad \square$$
+- **(1) $\implies$ (2)**: Fix $\eta \in (0, 5/2)$. On $(0, 1]$, $|Q_a(X)| \le \zeta(3)X^{5/2}$ gives
+  $$\int_0^1 |Q_a(X)|^2 X^{-2\eta}\,\frac{dX}{X} \le \zeta(3)^2\int_0^1 X^{4-2\eta}\,dX = \frac{\zeta(3)^2}{5 - 2\eta} < \infty.$$
+  On $[1, \infty) = \bigcup_{k=0}^\infty [\tau^k, \tau^{k+1})$, apply (1) with $\varepsilon = \eta > 0$ and $Y = \tau^k \ge 1$. Since $X^{-2\eta} \le \tau^{-2k\eta}$ on $[\tau^k, \tau^{k+1})$,
+  $$\sum_{k=0}^\infty \int_{\tau^k}^{\tau^{k+1}}|Q_a(X)|^2 X^{-2\eta}\,\frac{dX}{X} \le \sum_{k=0}^\infty \tau^{-2k\eta} C_\eta \tau^{k\eta} = \frac{C_\eta}{1 - \tau^{-\eta}} < \infty.$$
+  Hence $\|Q_a\|_\eta^2 \le \frac{\zeta(3)^2}{5 - 2\eta} + \frac{C_\eta}{1 - \tau^{-\eta}} < \infty$.
+- **(2) $\implies$ (1)**: Given $\varepsilon > 0$, without loss of generality take $\varepsilon \in (0, 5)$ (since $Y^\varepsilon$ is increasing in $\varepsilon$ for $Y \ge 1$) and set $\eta = \varepsilon/2 \in (0, 5/2)$. For any $Y \ge 1$ and $X \in [Y, \tau Y]$, $X / (\tau Y) \le 1 \implies 1 \le (\tau Y)^{2\eta} X^{-2\eta} = \tau^\varepsilon Y^\varepsilon X^{-2\eta}$, so
+  $$\int_Y^{\tau Y}|Q_a(X)|^2\,\frac{dX}{X} \le \tau^\varepsilon Y^\varepsilon \int_Y^{\tau Y}|Q_a(X)|^2 X^{-2\eta}\,\frac{dX}{X} \le \tau^\varepsilon \|Q_a\|_{\varepsilon/2}^2\,Y^\varepsilon. \qquad \square$$
 
-**Analytic Mellin-to-RH Bridge and Connection to `SUBGATE-TC-043A`**:
-- For $\frac{1}{2} < \operatorname{Re} z < \frac{5}{2}$, termwise Mellin integration (justified by $\sum_{n\ge 1} n^{-1/2 - \operatorname{Re} z} < \infty$ and $\int_0^\infty X^{5/2 - z} e^{-X^2/n^2}\frac{dX}{X} = \frac{1}{2}n^{5/2 - z}\Gamma(5/4 - z/2)$) yields:
+**Analytic Mellin-to-RH Bridge, Lindemann Irrationality Scope, and Connection to `SUBGATE-TC-043A`**:
+- For $z = a + i b \in \mathbb{C}$ with $\frac{1}{2} < a < \frac{5}{2}$, termwise Mellin integration (justified by $\sum_{n\ge 1} n^{-1/2 - a} < \infty$ and $\int_0^\infty X^{5/2 - z} e^{-X^2/n^2}\frac{dX}{X} = \frac{1}{2}n^{5/2 - z}\Gamma(5/4 - z/2)$) yields:
   $$\mathcal{M}[Q_\mu](z) := \int_0^\infty Q_\mu(X) X^{-z}\,\frac{dX}{X} = \frac{\Gamma(5/4 - z/2)}{2\,\zeta(1/2 + z)}, \qquad \mathcal{M}[Q_\lambda](z) := \int_0^\infty Q_\lambda(X) X^{-z}\,\frac{dX}{X} = \frac{\Gamma(5/4 - z/2)\,\zeta(1 + 2z)}{2\,\zeta(1/2 + z)}.$$
-- If $\|Q_a\|_\sigma < \infty$ for all $\sigma \in (0, 5/2)$, then for any compact subset $K \subset \{z \in \mathbb{C} : 0 < \operatorname{Re} z < 5/2\}$, splitting $\int_0^\infty = \int_0^1 + \int_1^\infty$ and applying Cauchy–Schwarz on $[1, \infty)$ with $\sigma_0 = \frac{1}{2}\min_{z \in K}\operatorname{Re} z > 0$:
-  $$\left|\int_1^\infty Q_a(X) X^{-z}\,\frac{dX}{X}\right| \le \|Q_a\|_{\sigma_0}\left(\int_1^\infty X^{-2(\operatorname{Re} z - \sigma_0)}\,\frac{dX}{X}\right)^{1/2} = \frac{\|Q_a\|_{\sigma_0}}{\sqrt{2(\operatorname{Re} z - \sigma_0)}} < \infty,$$
-  proving that $\mathcal{M}[Q_a](z)$ extends holomorphically to the entire strip $0 < \operatorname{Re} z < 5/2$. Since $\Gamma(5/4 - z/2)$ is nonvanishing on $\operatorname{Re} z < 5/2$ and $\zeta(1 + 2z)$ is nonvanishing on $\operatorname{Re} z > 0$ ($\operatorname{Re}(1 + 2z) > 1$), holomorphicity of $\mathcal{M}[Q_a](z)$ on $0 < \operatorname{Re} z < 5/2$ forces $\zeta(1/2 + z) \ne 0$ on $0 < \operatorname{Re} z < 1/2$, i.e., $\zeta(s) \ne 0$ in $1/2 < \operatorname{Re} s < 1$ (and by functional equation in $0 < \operatorname{Re} s < 1/2$).
-- **Bridge between auxiliary real dilations and admissible TC grades $K \in \mathbb{A}_{\mathbb{R}}$**: Individual square-dilation shifts $X \mapsto X/d^2$ ($d \ge 2$) and dyadic shifts $X \mapsto X/2$ correspond to logarithmic shifts $\log_\tau(d^2)$ and $\log_\tau 2$, which are transcendental over $\mathbb{Q}$ and are **not** single grades in $\mathbb{A}_{\mathbb{R}} = \overline{\mathbb{Q}} \cap \mathbb{R}$. However, Proposition 3.1 shows that the $\tau$-adic intervals $[\tau^k, \tau^{k+1})$ indexed by rational integers $k \in \mathbb{Z} \subset \mathbb{A}_{\mathbb{R}}$ partition the entire continuum $[1, \infty)$, so the grade-interval subpower energy condition on $[Y, \tau Y]$ ($Y = \tau^K$, $K \in \mathbb{A}_{\mathbb{R}}$) is equivalent to finiteness of the global continuum norm $\|\cdot\|_\sigma$ on $L^2((0, \infty), X^{-2\sigma}\frac{dX}{X})$. The square-dilation and dyadic operators act as bounded linear isomorphisms on this ambient continuum space $L^2((0, \infty), X^{-2\sigma}\frac{dX}{X})$ ($\sigma > 0$), transferring the grade-interval energy bound between $Q_\mu$ and $Q_\lambda$ without ever requiring $\log_\tau 2$ or $\log_\tau(d^2)$ to lie in $\mathbb{A}_{\mathbb{R}}$.
+- If $\|Q_a\|_\eta < \infty$ for all $\eta \in (0, 5/2)$, then for any compact subset $\mathcal{K} \subset \{z = a + i b \in \mathbb{C} : 0 < a < 5/2\}$, splitting $\int_0^\infty = \int_0^1 + \int_1^\infty$ and applying Cauchy–Schwarz on $[1, \infty)$ with $\eta_0 = \frac{1}{2}\min_{z \in \mathcal{K}}\operatorname{Re} z > 0$:
+  $$\left|\int_1^\infty Q_a(X) X^{-z}\,\frac{dX}{X}\right| \le \|Q_a\|_{\eta_0}\left(\int_1^\infty X^{-2(\operatorname{Re} z - \eta_0)}\,\frac{dX}{X}\right)^{1/2} = \frac{\|Q_a\|_{\eta_0}}{\sqrt{2(\operatorname{Re} z - \eta_0)}} < \infty,$$
+  proving that $\mathcal{M}[Q_a](z)$ extends holomorphically to the entire strip $0 < \operatorname{Re} z < 5/2$. Since $\Gamma(5/4 - z/2)$ is nonvanishing on $\operatorname{Re} z < 5/2$ and $\zeta(1 + 2z)$ is nonvanishing on $\operatorname{Re} z > 0$ ($\operatorname{Re}(1 + 2z) > 1$), holomorphicity of $\mathcal{M}[Q_a](z)$ on $0 < \operatorname{Re} z < 5/2$ forces $\zeta(1/2 + z) \ne 0$ on $0 < \operatorname{Re} z < 1/2$, i.e., $\zeta(\rho) \ne 0$ for $\rho = x + i y$ in $1/2 < x < 1$ (and by the functional equation in $0 < x < 1/2$).
+- **Arithmetic Scope of $\log_\tau 2$ and $\log_\tau(d^2)$**: By Lindemann's theorem ($e^{i\tau/2} = -1 \implies \tau = 2\pi$ is transcendental over $\mathbb{Q}$), for every integer $m \ge 2$ the logarithm $\log_\tau m$ is **irrational** ($\log_\tau m \notin \mathbb{Q}$): if $\log_\tau m = p/q$ with integers $p, q \ge 1$, then $\tau^p = m^q \in \mathbb{Z}$, contradicting transcendence of $\tau$. Note, however, that Lindemann's theorem alone does **not** settle whether $\log_\tau 2$ or $\log_\tau(d^2)$ is transcendental over $\mathbb{Q}$ (i.e., whether $\log_\tau 2 \notin \mathbb{A}_{\mathbb{R}}$). Crucially, Proposition 3.1 does **not** need to classify $\log_\tau 2$ or $\log_\tau(d^2)$ relative to $\mathbb{A}_{\mathbb{R}}$: the partition $[1, \infty) = \bigcup_{k=0}^\infty [\tau^k, \tau^{k+1})$ uses only rational integer grades $k \in \mathbb{Z} \subset \mathbb{A}_{\mathbb{R}}$, and the square-dilation and dyadic operators act as bounded linear isomorphisms on the ambient continuum space $L^2((0, \infty), X^{-2\eta}\frac{dX}{X})$ ($\eta > 0$).
 
 ---
 
@@ -191,8 +201,8 @@ Writing every pair $(m, n) \in \mathbb{Z}_{\ge 1}^2$ uniquely as $m = d r$, $n =
 $$\lambda(m)\lambda(n) = \lambda(d r)\lambda(d s) = \lambda(d)^2\lambda(r)\lambda(s) = \lambda(r)\lambda(s) \qquad (\forall d, r, s \ge 1),$$
 with **no squarefree restriction on $d$ and no coprimality restriction $\gcd(d, r s) = 1$**. Therefore:
 $$Q_\lambda(X)^2 = X^5 \sum_{m, n \ge 1}\frac{\lambda(m)\lambda(n)}{(m n)^3}e^{-X^2(m^{-2}+n^{-2})} = \sum_{\substack{r, s \ge 1 \\ \gcd(r, s) = 1}}\frac{\lambda(r)\lambda(s)\,X^5}{(r s)^3}\sum_{d\ge 1} d^{-6} e^{-L^2/d^2}, \qquad L := X\sqrt{r^{-2} + s^{-2}}.$$
-Since $\int_0^\infty t^{-6} e^{-L^2/t^2}\,dt = L^{-5}\int_0^\infty v^{-6}e^{-1/v^2}\,dv = \frac{1}{2}\Gamma(5/2)L^{-5} = \frac{3\sqrt{\pi}}{8}L^{-5}$, the leading Gaussian term for each coprime pair $(r, s)$ is
-$$L^\lambda_{r, s} := \frac{\lambda(r)\lambda(s)\,X^5}{(r s)^3}\cdot \frac{3\sqrt{\pi}}{8}L^{-5} = \frac{3\sqrt{\pi}}{8}\lambda(r)\lambda(s)\frac{(r s)^2}{(r^2 + s^2)^{5/2}},$$
+Since $\int_0^\infty t^{-6} e^{-L^2/t^2}\,dt = L^{-5}\int_0^\infty v^{-6}e^{-1/v^2}\,dv = \frac{1}{2}\Gamma(5/2)L^{-5} = c_0 L^{-5}$ where $c_0 = \frac{3\sqrt{\tau/2}}{8}$, the leading Gaussian term for each coprime pair $(r, s)$ is
+$$L^\lambda_{r, s} := \frac{\lambda(r)\lambda(s)\,X^5}{(r s)^3}\cdot c_0 L^{-5} = c_0\,\lambda(r)\lambda(s)\frac{(r s)^2}{(r^2 + s^2)^{5/2}}, \qquad c_0 = \frac{3\sqrt{\tau/2}}{8},$$
 which is completely independent of $X$.
 
 ### 4.2 Fixed-Order Euler–Maclaurin Bound for $f(v) = v^{-6}e^{-1/v^2}$
@@ -202,9 +212,9 @@ Let $f(v) := v^{-6}e^{-1/v^2}$ for $v > 0$ and $f(0) := 0$. Every derivative $f^
 For any even integer $N \ge 2$, the $N$-th order Euler–Maclaurin summation formula on $[0, \infty)$ with vanished endpoint derivatives gives
 $$\sum_{d\ge 1} g(d) - \int_0^\infty g(t)\,dt = -\frac{1}{N!}\int_0^\infty \widetilde{B}_N(t)\,g^{(N)}(t)\,dt,$$
 where $\widetilde{B}_N(t) = B_N(\{t\})$ is the $N$-th periodic Bernoulli function, whose Fourier expansion
-$$\widetilde{B}_N(t) = (-1)^{N/2 - 1}\frac{2\,N!}{\tau^N}\sum_{j=1}^\infty \frac{\cos(j\tau t)}{j^N} \qquad (\tau = 2\pi)$$
+$$\widetilde{B}_N(t) = (-1)^{N/2 - 1}\frac{2\,N!}{\tau^N}\sum_{j=1}^\infty \frac{\cos(j\tau t)}{j^N}$$
 implies the sharp uniform supremum bound $\sup_{t \in \mathbb{R}}\frac{|\widetilde{B}_N(t)|}{N!} = \frac{2\zeta(N)}{\tau^N}$. Substituting $t = L v$ ($dt = L\,dv$) yields:
-$$\left|\sum_{d\ge 1} d^{-6}e^{-L^2/d^2} - \frac{3\sqrt{\pi}}{8}L^{-5}\right| \le \frac{2\zeta(N)}{\tau^N}\int_0^\infty L^{-6-N}\bigl|f^{(N)}(t/L)\bigr|\,dt = C_N L^{-5-N}, \qquad C_N := \frac{2\zeta(N)}{\tau^N}\int_0^\infty \bigl|f^{(N)}(v)\bigr|\,dv.$$
+$$\left|\sum_{d\ge 1} d^{-6}e^{-L^2/d^2} - c_0 L^{-5}\right| \le \frac{2\zeta(N)}{\tau^N}\int_0^\infty L^{-6-N}\bigl|f^{(N)}(t/L)\bigr|\,dt = C_N L^{-5-N}, \qquad C_N := \frac{2\zeta(N)}{\tau^N}\int_0^\infty \bigl|f^{(N)}(v)\bigr|\,dv.$$
 
 **Exact Symbolic Derivatives and Certified Constants $C_2, C_4$**:
 Using SymPy (`verify_euler_maclaurin_derivatives_and_constants_arb`), the first four derivatives of $f(v) = v^{-6}e^{-1/v^2}$ are:
@@ -215,9 +225,9 @@ $$f^{(3)}(v) = 4(-84v^6 + 96v^4 - 27v^2 + 2)v^{-15}e^{-1/v^2}, \qquad f^{(4)}(v)
   $$v_+ = \sqrt{\frac{15 + \sqrt{57}}{42}} \in [0.7327351635395962094861244517470714998819 \pm 2.00 \times 10^{-40}],$$
   with $f'' > 0$ on $(0, v_-) \cup (v_+, \infty)$, $f'' < 0$ on $(v_-, v_+)$, and $f'(v_-) > 0 > f'(v_+)$, the fundamental theorem of calculus gives
   $$\int_0^\infty |f''(v)|\,dv = f'(v_-) - (f'(v_+) - f'(v_-)) + (-f'(v_+)) = 2\bigl(f'(v_-) - f'(v_+)\bigr),$$
-  and since $\frac{2\zeta(2)}{\tau^2} = \frac{2(\pi^2/6)}{4\pi^2} = \frac{1}{12}$,
+  and since $\frac{2\zeta(2)}{\tau^2} = \frac{2(\tau^2/24)}{\tau^2} = \frac{1}{12}$,
   $$C_2 = \frac{f'(v_-) - f'(v_+)}{6} \in [1.851257667016958056850958359201349291641 \pm 2.00 \times 10^{-39}].$$
-- **Evaluation of $C_4$ ($N = 4$)**: The four positive roots $0 < v_1 < v_2 = 1/\sqrt{6} < v_3 < v_4$ of $f^{(4)}(v) = 0$ satisfy $\int_0^\infty |f^{(4)}(v)|\,dv = 2[f^{(3)}(v_1) - f^{(3)}(v_2) + f^{(3)}(v_3) - f^{(3)}(v_4)]$, and since $\frac{2\zeta(4)}{\tau^4} = \frac{2(\pi^4/90)}{16\pi^4} = \frac{1}{720}$,
+- **Evaluation of $C_4$ ($N = 4$)**: The four positive roots $0 < v_1 < v_2 = 1/\sqrt{6} < v_3 < v_4$ of $f^{(4)}(v) = 0$ satisfy $\int_0^\infty |f^{(4)}(v)|\,dv = 2[f^{(3)}(v_1) - f^{(3)}(v_2) + f^{(3)}(v_3) - f^{(3)}(v_4)]$, and since $\frac{2\zeta(4)}{\tau^4} = \frac{2(\tau^4/1440)}{\tau^4} = \frac{1}{720}$,
   $$C_4 = \frac{1}{720}\int_0^\infty \bigl|f^{(4)}(v)\bigr|\,dv \in [8.752371760035365551239039765015814873069 \pm 4.00 \times 10^{-39}].$$
 
 ### 4.3 Pairwise and Summed Subtransition Error Bounds ($A \le X^{1-\delta}$)
@@ -230,11 +240,11 @@ Summing over $1 \le r, s \le A$ using $(r s)^{(N-1)/2} \le A^{N-1}$ on the $A^2$
 $$\sum_{\substack{1 \le r, s \le A \\ \gcd(r, s) = 1}}\bigl|E^\lambda_{r,s}(X)\bigr| \le C_N 2^{-(N+5)/2} X^{-N}\sum_{r=1}^A \sum_{s=1}^A (r s)^{(N-1)/2} \le C_N 2^{-(N+5)/2}\frac{A^{N+1}}{X^N}.$$
 Setting $A \le X^{1-\delta}$ ($\delta \in (0, 1)$), the exponent of $X$ is
 $$(N + 1)(1 - \delta) - N = 1 - (N + 1)\delta < 0 \Longleftrightarrow (N + 1)\delta > 1.$$
-- For $N = 2$: $(2 + 1)\delta > 1 \iff \delta > 1/3$, controlling $A \le X^{2/3 - \eta}$ (already doubling the $TC\text{-}053R$ exponent $1/3 - \delta$).
-- For $N = 4$: $(4 + 1)\delta > 1 \iff \delta > 1/5$, controlling $A \le X^{4/5 - \eta}$.
+- For $N = 2$: $(2 + 1)\delta > 1 \iff \delta > 1/3$, controlling $A \le X^{2/3 - \varepsilon}$ (already doubling the $TC\text{-}053R$ exponent $1/3 - \delta$).
+- For $N = 4$: $(4 + 1)\delta > 1 \iff \delta > 1/5$, controlling $A \le X^{4/5 - \varepsilon}$.
 - For any fixed $\delta \in (0, 1)$: choosing the even integer $N = 2\lceil 1/(2\delta)\rceil$ gives $(N + 1)\delta \ge 1 + \delta > 1$, so the summed Euler–Maclaurin error vanishes as $O(X^{1 - (N+1)\delta}) \to 0$ throughout $A \le X^{1-\delta}$.
 
-| $L$ | Exact $\sum_{d\ge 1}d^{-6}e^{-L^2/d^2}$ | Gaussian Leading $\frac{3\sqrt{\pi}}{8}L^{-5}$ | Absolute Error | $N = 2$ Bound $C_2 L^{-7}$ | $N = 4$ Bound $C_4 L^{-9}$ |
+| $L$ | Exact $\sum_{d\ge 1}d^{-6}e^{-L^2/d^2}$ | Gaussian Leading $c_0 L^{-5}$ | Absolute Error | $N = 2$ Bound $C_2 L^{-7}$ | $N = 4$ Bound $C_4 L^{-9}$ |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | $1/2$ | `[0.79515495547440055 +/- 6.33e-18]` | `[21.26944621086619232757800980009374219357 +/- 5.94e-40]` | `[20.47429125539179178 +/- 8.60e-18]` | `[236.9609813781706312769226699777727093301 +/- 6.77e-39]` | `[4481.214341138107162234388359688097215011 +/- 1.85e-36]` |
 | $1$ | `[0.3816038498680422 +/- 5.24e-17]` | `[0.6646701940895685102368128062529294435491 +/- 1.90e-41]` | `[0.2830663442215263 +/- 4.22e-17]` | `[1.851257667016958056850958359201349291641 +/- 3.54e-40]` | `[8.752371760035365551239039765015814873069 +/- 3.16e-39]` |
@@ -246,77 +256,176 @@ $$(N + 1)(1 - \delta) - N = 1 - (N + 1)\delta < 0 \Longleftrightarrow (N + 1)\de
 
 ## 5. Exact Poisson Summation Formula at the Transition ($A \asymp X$)
 
-When $r, s \asymp A \asymp X$, the effective scale $L = X\sqrt{r^{-2} + s^{-2}} \asymp 1$ is of order unity, so $A^{N+1}/X^N \asymp_N X$ diverges for every fixed $N$. Instead of truncating Euler–Maclaurin at fixed order $N$, we extend $f(v) = v^{-6}e^{-1/v^2}$ evenly to $\mathbb{R}$ by $f(-v) := f(v)$ ($v \ne 0$) and $f(0) := 0$. Because $\lim_{v \to 0} v^{-m} e^{-1/v^2} = 0$ for all $m \ge 0$, all left and right derivatives vanish at the origin ($f^{(k)}(0^\pm) = 0$ for all $k \ge 0$) and $f \in \mathcal{S}(\mathbb{R})$.
+### 5.1 Non-Schwartz Regularity and Periodized $C^1(\mathbb{R}/\mathbb{Z})$ Justification
 
-By Poisson summation on $\mathbb{Z}$ applied to $F(t) = f(t/L)$ ($F(0) = 0$):
-$$2\sum_{d=1}^\infty f(d/L) = \sum_{d \in \mathbb{Z}} f(d/L) = L\sum_{j \in \mathbb{Z}}\widehat{f}(j L) = L\left[\widehat{f}(0) + 2\sum_{j=1}^\infty \widehat{f}(j L)\right],$$
-where
-$$\widehat{f}(\xi) := \int_{\mathbb{R}} f(v)e^{-i\tau\xi v}\,dv = 2\int_0^\infty v^{-6}e^{-1/v^2}\cos(\tau\xi v)\,dv \qquad (\tau = 2\pi),$$
-and $\widehat{f}(0) = 2\int_0^\infty v^{-6}e^{-1/v^2}\,dv = \frac{3\sqrt{\pi}}{4}$. Dividing by $2 L^6$ yields the exact transition identity:
-$$\boxed{\sum_{d\ge 1} d^{-6}e^{-L^2/d^2} = L^{-5}\left[\frac{3\sqrt{\pi}}{8} + \sum_{j\ge 1}\widehat{f}(j L)\right] \qquad (\forall L > 0).}$$
+When $r, s \asymp A \asymp X$, the effective scale $L = X\sqrt{r^{-2} + s^{-2}} \asymp 1$ is of order unity, so $A^{N+1}/X^N \asymp_N X$ diverges for every fixed $N$. Extend $f(v) = v^{-6}e^{-1/v^2}$ evenly to $\mathbb{R}$ by $f(-v) := f(v)$ ($v \ne 0$) and $f(0) := 0$.
 
-### 5.1 Exact Mellin–Barnes Residue Series and Certified Sign Changes of $\widehat{f}(\xi)$
+- **Correction of the false Schwartz premise**: In `TC-054`, $f$ was described as belonging to the Schwartz space $\mathcal{S}(\mathbb{R})$. That statement is **false**: a function $g \in \mathcal{S}(\mathbb{R})$ must satisfy $\sup_{v \in \mathbb{R}} |v^k g(v)| < \infty$ and $\lim_{|v|\to\infty} v^k g(v) = 0$ for **every** integer $k \ge 0$, whereas for $f(v) = |v|^{-6}e^{-1/v^2}$ we have
+  $$\lim_{|v|\to\infty} v^6 f(v) = \lim_{|v|\to\infty} e^{-1/v^2} = 1 \ne 0, \qquad \lim_{|v|\to\infty} |v|^7 f(v) = +\infty,$$
+  so $f$ has only algebraic decay $O(|v|^{-6})$ at infinity and $f \notin \mathcal{S}(\mathbb{R})$.
+- **Rigorous $C^1(\mathbb{R}/\mathbb{Z})$ periodization proof of Poisson summation ([DLMF 1.8.14](https://dlmf.nist.gov/1.8#E14))**:
+  1. At $v = 0$, $\lim_{v\to 0} v^{-m}e^{-1/v^2} = 0$ for every $m \ge 0$, so $f \in C^\infty(\mathbb{R})$ with $f^{(j)}(0) = 0$ for all $j \ge 0$.
+  2. By induction, $f^{(j)}(v) = P_j(v^{-1})v^{-6-j}e^{-1/v^2}$ where $P_j$ is a polynomial with $P_j(0) \ne 0$, so $f^{(j)}(v) = O(|v|^{-6-j})$ as $|v| \to \infty$, and therefore $f^{(j)} \in L^1(\mathbb{R})$ for every $j \ge 0$.
+  3. For any fixed $L > 0$, consider the $1$-periodic periodization $\mathcal{P}_L(x) := \sum_{n \in \mathbb{Z}} f\!\left(\frac{n + x}{L}\right)$ for $x \in [0, 1]$. Since $f(v) \le |v|^{-6}$ and $|f'(v)| \le 6(|v|^{-7} + |v|^{-9})e^{-1/v^2}$, for $|n| \ge 2$ and $x \in [0, 1]$ we have $|n + x| \ge |n| - 1$, so the series for $\mathcal{P}_L(x)$ and $\mathcal{P}_L'(x) = L^{-1}\sum_{n\in\mathbb{Z}}f'((n+x)/L)$ are dominated uniformly on $x \in [0, 1]$ by constant multiples of $\sum_{|n|\ge 2}(|n|-1)^{-6} < \infty$ and $\sum_{|n|\ge 2}(|n|-1)^{-7} < \infty$.
+  4. By the Weierstrass M-test, $\mathcal{P}_L \in C^1(\mathbb{R}/\mathbb{Z})$, so its Fourier series $\sum_{j \in \mathbb{Z}} c_j e^{i\tau j x}$ with $c_j = \int_0^1 \mathcal{P}_L(x)e^{-i\tau j x}\,dx = L\widehat{f}(j L)$ converges absolutely and pointwise everywhere to $\mathcal{P}_L(x)$ (and also $|\widehat{f}(j L)| \le \frac{C_2}{\zeta(2)L^2 j^2}$ ensures $\sum_{j \in \mathbb{Z}}|\widehat{f}(j L)| < \infty$). Evaluating at $x = 0$ using $f(0) = 0$ and $f(-v) = f(v)$ gives:
+     $$2\sum_{d=1}^\infty f(d/L) = \sum_{d \in \mathbb{Z}} f(d/L) = L\sum_{j \in \mathbb{Z}}\widehat{f}(j L) = L\left[\widehat{f}(0) + 2\sum_{j=1}^\infty \widehat{f}(j L)\right],$$
+     where
+     $$\widehat{f}(\xi) := \int_{\mathbb{R}} f(v)e^{-i\tau\xi v}\,dv = 2\int_0^\infty v^{-6}e^{-1/v^2}\cos(\tau\xi v)\,dv, \qquad \widehat{f}(0) = 2c_0 = \Gamma(5/2) = \frac{3\sqrt{\tau/2}}{4}.$$
+     Dividing by $2 L^6$ yields the exact transition identity:
+     $$\boxed{\sum_{d\ge 1} d^{-6}e^{-L^2/d^2} = L^{-5}\left[c_0 + \sum_{j\ge 1}\widehat{f}(j L)\right], \qquad c_0 = \frac{3\sqrt{\tau/2}}{8} \qquad (\forall L > 0).}$$
 
-Setting $t = v^{-2}$ and $\omega = \tau|\xi| = 2\pi|\xi|$, Mellin inversion of $\cos(\omega t^{-1/2})$ gives
-$$\widehat{f}(\xi) = \int_0^\infty t^{3/2}e^{-t}\cos(\omega t^{-1/2})\,dt = \frac{1}{2\pi i}\int_{c-i\infty}^{c+i\infty}\frac{\pi\,\Gamma\!\left(\frac{5+s}{2}\right)\omega^{-s}}{2\sin(\pi s/2)\Gamma(1-s)}\,ds \qquad (0 < c < 1).$$
-Shifting the contour to $\operatorname{Re} s \to -\infty$ collects two disjoint families of simple poles in $\operatorname{Re} s \le 0$:
-1. Simple poles of $1/\sin(\pi s/2)$ at even non-positive integers $s = -2m$ ($m \ge 0$) with residue $\frac{(-1)^m\Gamma(5/2-m)}{(2m)!}\omega^{2m}$;
-2. Simple poles of $\Gamma(\frac{5+s}{2})$ at odd negative integers $s = -5 - 2k$ ($k \ge 0$) with residue $-\frac{\pi\,\omega^{5+2k}}{k!\,(5+2k)!}$.
-This yields the globally convergent power series
-$$\widehat{f}(\xi) = \sum_{m=0}^\infty \frac{(-1)^m\Gamma(5/2 - m)}{(2m)!}(2\pi\xi)^{2m} - \pi\sum_{k=0}^\infty \frac{(2\pi|\xi|)^{5+2k}}{k!\,(5+2k)!}.$$
-Furthermore, $N$-fold integration by parts gives $|\widehat{f}(\xi)| \le (\tau|\xi|)^{-N}\int_{\mathbb{R}}|f^{(N)}(v)|\,dv = \frac{C_N}{\zeta(N)}|\xi|^{-N}$ for every even $N \ge 2$, so the Fourier tail after $J_0 \ge 1$ modes satisfies
-$$\left|\sum_{j > J_0}\widehat{f}(j L)\right| \le \frac{C_N}{\zeta(N) L^N}\sum_{j = J_0+1}^\infty j^{-N} \le \frac{C_N}{(N - 1)\zeta(N) J_0^{N-1} L^N}.$$
+### 5.2 Mellin–Barnes Residue Series, Contour Remainder Decay, and Monotonic Tail Ratios
 
-| $\xi$ | Certified 256-Bit Arb Enclosure of $\widehat{f}(\xi)$ | Sign |
-| :--- | :--- | :--- |
-| $0$ | `[1.329340388179137020473625612505858887098 +/- 1.63e-40]` | $> 0$ (`True`) |
-| $1/2$ | `[-0.5628546550179851263755109492164491931001 +/- 4.04e-41]` | $< 0$ (`True`) |
-| $1$ | `[-0.3668367826642069184644449070564857828859 +/- 4.03e-41]` | $< 0$ (`True`) |
-| $3/2$ | `[0.2636171831500303372338138695632955698496 +/- 2.39e-41]` | $> 0$ (`True`) |
-| $2$ | `[0.1247126116325928138362162976104693467978 +/- 9.77e-42]` | $> 0$ (`True`) |
+1. **Mellin–Barnes integral and contour shift justification**:
+   For $\xi = 0$, $\widehat{f}(0) = \Gamma(5/2) = \frac{3\sqrt{\tau/2}}{4}$. For $\xi \ne 0$, set $t = v^{-2}$ ($v = t^{-1/2}$, $dv = \frac{1}{2}t^{-3/2}dt$) and $\omega := \tau|\xi| > 0$. Expanding $\cos(\omega t^{-1/2}) = \sum_{m=0}^\infty \frac{(-1)^m \omega^{2m}}{(2m)!} t^{-m}$ is not termwise integrable on $(0, \infty)$ for $m \ge 3$ because of the divergence at $t \to 0^+$. Instead, using the Mellin–Barnes representation of $\cos(\omega t^{-1/2})$ for $s = a + i b$ on the vertical line $a = c \in (0, 1)$ and Fubini's theorem (since $\int_0^\infty t^{3/2 - c/2}e^{-t}\,dt = \Gamma(\frac{5-c}{2}) < \infty$ and $|\sin(\tau s/4)\Gamma(1-s)|^{-1} \ll |b|^{c - 1/2}e^{-\tau|b|/4}$ is integrable in $b \in \mathbb{R}$):
+   $$\widehat{f}(\xi) = \int_0^\infty t^{3/2}e^{-t}\cos(\omega t^{-1/2})\,dt = \frac{1}{i\tau}\int_{c-i\infty}^{c+i\infty}\frac{(\tau/2)\,\Gamma\!\left(\frac{5+s}{2}\right)\omega^{-s}}{2\sin(\tau s/4)\Gamma(1-s)}\,ds \qquad (0 < c < 1).$$
+   By the reflection formula $\Gamma(1-s)\sin(\tau s/4) = \frac{\tau/2}{2\cos(\tau s/4)\Gamma(s)\sin(\tau s/4)} = \frac{\tau/2}{\sin(\tau s/2)\Gamma(s)}$, on the vertical abscissas $s = a_M + i b$ with $a_M = -(2M + 3/2)$ ($M \in \mathbb{Z}_{\ge 1}$, midway between the poles), Stirling's asymptotic formula gives
+   $$\left|\frac{\Gamma\!\left(\frac{5+s}{2}\right)\omega^{-s}}{\sin(\tau s/4)\Gamma(1-s)}\right| \;\ll\; \left(\frac{\omega}{\sqrt{2}\,|s/2|^{3/2}}\right)^{2M+3/2} e^{-\tau|b|/4},$$
+   so the vertical contour integral on $\operatorname{Re} s = a_M$ decays super-exponentially as $M \to \infty$ (`(omega / M^{3/2})^{2M} -> 0`), and the horizontal connecting segments vanish as $|b| \to \infty$. By Cauchy's residue theorem, $\widehat{f}(\xi)$ equals the sum of residues at the two disjoint families of simple poles in $\operatorname{Re} s \le 0$:
+   - Simple poles of $1/\sin(\tau s/4)$ at $s = -2m$ ($m \ge 0$) with residue $\frac{(-1)^m\Gamma(5/2 - m)}{(2m)!}\omega^{2m}$;
+   - Simple poles of $\Gamma(\frac{5+s}{2})$ at $s = -5 - 2m$ ($m \ge 0$), where $\operatorname*{Res}_{s=-5-2m}\Gamma(\frac{5+s}{2}) = \frac{2(-1)^m}{m!}$ and $\sin(\tau(-5-2m)/4) = -(-1)^m$ cancel signs to give the negative residue $-\frac{\tau}{2}\frac{\omega^{5+2m}}{m!\,(5+2m)!}$.
+   Hence, for all $\xi \in \mathbb{R}$ ($\omega = \tau|\xi|$):
+   $$\boxed{\widehat{f}(\xi) = \sum_{m=0}^\infty \frac{(-1)^m\Gamma(5/2 - m)}{(2m)!}\omega^{2m} - \frac{\tau}{2}\sum_{m=0}^\infty \frac{\omega^{5+2m}}{m!\,(5+2m)!}, \qquad \omega = \tau|\xi|.}$$
 
-Because $\widehat{f}(\xi)$ is strictly negative at $\xi = 1/2, 1$ and strictly positive at $\xi = 3/2, 2$, the non-zero Poisson modes cannot be dismissed by a Bochner positivity argument.
+2. **Monotonic tail ratio theorem and certified truncation bounds**:
+   Let $t_{\mathrm{even}}(m) := \frac{(-1)^m\Gamma(5/2-m)}{(2m)!}\omega^{2m}$ and $t_{\mathrm{odd}}(m) := \frac{\tau}{2}\frac{\omega^{5+2m}}{m!\,(5+2m)!}$.
+   - For $m \ge 3$, $\Gamma(5/2 - m) = (-1)^{m-2}\dots$ changes sign at every step while $(-1)^m$ also alternates, so $t_{\mathrm{even}}(m)$ has **constant negative sign** for all $m \ge 3$, with consecutive magnitude ratio (for $m \ge 2$)
+     $$r_{\mathrm{even}}(m) := \left|\frac{t_{\mathrm{even}}(m+1)}{t_{\mathrm{even}}(m)}\right| = \frac{\omega^2}{(m - 3/2)(2m + 1)(2m + 2)}.$$
+     For all $m \ge K \ge 1$, the denominator $(m + 1 - 3/2)(2m + 3)(2m + 4) = (m - 1/2)(2m + 3)(2m + 4)$ is positive and strictly increasing in $m$ (formally proved in Lean 4 theorem `abel_scaling_fourier_ratio_and_unequal_block_algebra`), so for every $m \ge K + 1$:
+     $$r_{\mathrm{even}}(m) \le R_{\mathrm{even}}(K, \omega) := \frac{\omega^2}{(K - 1/2)(2K + 3)(2K + 4)}.$$
+   - For the odd series, $t_{\mathrm{odd}}(m) > 0$ has consecutive magnitude ratio (for $m \ge 0$)
+     $$r_{\mathrm{odd}}(m) := \left|\frac{t_{\mathrm{odd}}(m+1)}{t_{\mathrm{odd}}(m)}\right| = \frac{\omega^2}{(m + 1)(2m + 6)(2m + 7)},$$
+      whose denominator is positive and strictly increasing for $m \ge 0$, so for every $m \ge K + 1$:
+     $$r_{\mathrm{odd}}(m) \le R_{\mathrm{odd}}(K, \omega) := \frac{\omega^2}{(K + 2)(2K + 8)(2K + 9)}.$$
+   - **Certified truncation rule in `evaluate_hat_f_hypergeometric_certified_arb`**:
+     - If $R_{\mathrm{even}}(K, \omega) \le 1/2$ and $R_{\mathrm{odd}}(K, \omega) \le 1/2$ are **both certified via outward-rounded Arb comparison** (`R_even.upper() <= 0.5` and `R_odd.upper() <= 0.5`), then the omitted tail is bounded by the geometric series $\frac{1}{1 - 1/2} = 2$ times the first omitted term:
+       $$\left|\sum_{m = K+1}^\infty t_{\mathrm{even}}(m)\right| \le 2\,\bigl|t_{\mathrm{even}}(K + 1)\bigr|, \qquad \left|\sum_{m = K+1}^\infty t_{\mathrm{odd}}(m)\right| \le 2\,\bigl|t_{\mathrm{odd}}(K + 1)\bigr|.$$
+     - If `strict_K=True` and $1/2 < \max(R_{\mathrm{even}}, R_{\mathrm{odd}}) < 1$ is certified (`upper() < 1`), the exact geometric bound $\frac{|t_{\mathrm{even}}(K+1)|}{1 - R_{\mathrm{even}}(K, \omega)} + \frac{|t_{\mathrm{odd}}(K+1)|}{1 - R_{\mathrm{odd}}(K, \omega)}$ is used; if $\max(R_{\mathrm{even}}, R_{\mathrm{odd}})$ is not certified $< 1$, `strict_K=True` raises `ValueError`.
+     - In default adaptive mode (`strict_K=False`), $K$ is automatically increased until both $R_{\mathrm{even}}(K, \omega) \le 1/2$ and $R_{\mathrm{odd}}(K, \omega) \le 1/2$ and the omitted tail is below $2^{-\text{prec\_bits}}$, with adaptive internal working precision compensating for large-$\omega$ alternating cancellation and pure-Arb radius inflation (`inflate_arb_with_nonneg_bound`, zero `float` conversions).
+
+### 5.3 Reproduction of the `K_terms=1`, $\xi = 4/\tau$ ($\omega = 4$) Counterexample
+
+In `TC-054`, `evaluate_hat_f_hypergeometric_certified_arb` accepted arbitrary `K_terms >= 1` and unconditionally bounded the tail by $2(|t_{\mathrm{even}}(K+1)| + |t_{\mathrm{odd}}(K+1)|)$ without checking whether $R_{\mathrm{even}}(K, \omega) \le 1/2$. At `K_terms = 1` and $\xi = 4/\tau$ ($\omega = \tau\xi = 4$):
+- The even tail ratio at $K = 1$ is
+  $$R_{\mathrm{even}}(1, 4) = \frac{4^2}{(1 - 1/2)\cdot 5 \cdot 6} = \frac{16}{15} = 1.0666666666666666\ldots > 1,$$
+  so the $2\times$ geometric tail hypothesis $R_{\mathrm{even}} \le 1/2$ is violated (in fact $R_{\mathrm{even}} > 1$).
+- The unguarded `TC-054` formula produced:
+  $$\text{old\_mid} = [-42.78140177774550645752327365017146694295 \pm 1.17 \times 10^{-39}],$$
+  $$\text{old\_rad} = [40.08183091968871459730675945023946474865 \pm 3.12 \times 10^{-39}],$$
+  $$\text{old\_upper} = [-2.699570680142662219242023650171466942949 \pm 1.62 \times 10^{-40}].$$
+- However, for every $\xi \in \mathbb{R}$, $|\cos(\tau\xi v)| \le 1$ implies $|\widehat{f}(\xi)| \le \widehat{f}(0) = \Gamma(5/2) \approx 1.32934038817913702047$, so $\widehat{f}(4/\tau) \ge -\Gamma(5/2) \approx -1.32934038817913702047$. The old upper endpoint satisfies
+  $$\text{old\_upper} = -2.6995706801\ldots < -\Gamma(5/2) = -1.3293403881\ldots,$$
+  with certified contradiction gap $-\Gamma(5/2) - \text{old\_upper} = [1.370230291963525198768398037665608055851 \pm 3.24 \times 10^{-40}] > 0$.
+- Meanwhile, the true value certified by both the repaired adaptive evaluator (`K_eff = 200`) and independent `acb.integral` quadrature is
+  $$\widehat{f}(4/\tau) = [-0.7757751802167744117629682956314216290713 \pm 2.04 \times 10^{-41}],$$
+  which lies strictly outside the old `K_terms=1` enclosure. Under the repaired implementation, `strict_K=True` at `K_terms=1, xi=4/tau` raises `ValueError` because $R_{\mathrm{even}}(1, 4) = 16/15 > 1$, while at `K_terms=4, xi=4/tau` ($R_{\mathrm{even}}(4, 4) = \frac{16}{462} = \frac{8}{231} < 1/2$, $R_{\mathrm{odd}}(4, 4) = \frac{16}{1632} = \frac{1}{102} < 1/2$) the strict enclosure `[-1.6049111020..., -0.5122016128...]` rigorously contains the true value $-0.7757751802\ldots$.
+
+| $\xi$ | Repaired 256-Bit Residue Series Enclosure of $\widehat{f}(\xi)$ | Independent `acb.integral` Quadrature Enclosure | $0 \in \Delta_{\text{quad}}$ | Sign |
+| :--- | :--- | :--- | :--- | :--- |
+| $0$ | `[1.329340388179137020473625612505858887098 +/- 1.63e-40]` | `[1.329340388179137020473625612505858887098 +/- 1.63e-40]` | `True` | $> 0$ (`True`) |
+| $1/2$ | `[-0.5628546550179851263755109492164491931001 +/- 4.04e-41]` | `[-0.5628547 +/- 5.69e-8]` | `True` | $< 0$ (`True`) |
+| $4/\tau$ | `[-0.7757751802167744117629682956314216290713 +/- 2.04e-41]` | `[-0.7757752 +/- 3.21e-8]` | `True` | $< 0$ (`True`) |
+| $1$ | `[-0.3668367826642069184644449070564857828859 +/- 4.03e-41]` | `[-0.3668368 +/- 2.93e-8]` | `True` | $< 0$ (`True`) |
+| $3/2$ | `[0.2636171831500303372338138695632955698496 +/- 2.39e-41]` | `[0.2636172 +/- 2.88e-8]` | `True` | $> 0$ (`True`) |
+| $2$ | `[0.1247126116325928138362162976104693467978 +/- 9.77e-42]` | `[0.1247126 +/- 2.36e-8]` | `True` | $> 0$ (`True`) |
+
+Because $\widehat{f}(\xi)$ is strictly negative at $\xi = 1/2, 4/\tau, 1$ and strictly positive at $\xi = 3/2, 2$, the non-zero Poisson modes cannot be dismissed by a Bochner positivity argument.
 
 ---
 
-## 6. Rectangular-Block Decomposition & Transition Proof Attempts (Attacks A & B)
+## 6. Rectangular-Block Decomposition, Unequal-Block Bounds, & Transition Proof Attempts (Attacks A & B)
+
+### 6.1 Repaired Widely Unequal Rectangular-Block Bound
 
 Decomposing $(r, s) \in \mathbb{Z}_{\ge 1}^2$ into dyadic rectangles $[A, 2A) \times [B, 2B)$ with $A = 2^a$, $B = 2^b$ ($a, b \ge 0$) gives the exact partition
 $$Q_\lambda(X)^2 = \sum_{a, b \ge 0} B_{2^a, 2^b}(X), \qquad B_{A, B}(X) := \sum_{\substack{A \le r < 2A,\; B \le s < 2B \\ \gcd(r, s) = 1}}\frac{\lambda(r)\lambda(s)\,X^5}{(r s)^3}\sum_{d\ge 1} d^{-6}e^{-X^2(r^{-2}+s^{-2})/d^2}.$$
-For widely unequal blocks (say $B \ge A$), since $u^5 e^{-u^2} \le (5/(2e))^{5/2} < 1$ for $u = \frac{X}{d}\sqrt{r^{-2}+s^{-2}}$, each term is bounded in absolute value by $\zeta(6)\frac{(r s)^2}{(r^2+s^2)^{5/2}} \le \zeta(6)\frac{r^2}{s^3}$, and summing over $r \in [A, 2A)$ and $s \in [B, 2B)$ yields the unconditional off-diagonal decay bound:
-$$\bigl|B_{A, B}(X)\bigr| \le \zeta(6)\,\frac{\min(A, B)^3}{\max(A, B)^2} = \frac{\pi^6}{945}\,\frac{\min(A, B)^3}{\max(A, B)^2}.$$
 
-### 6.1 Attack A: Coprime Euler-Series, Off-Critical Non-Cancellation, and Separable Gaussian Replacement Theorem
+- **Defect in the old $\zeta(6)$ unequal-block derivation**:
+  In `TC-054`, the pairwise magnitude $\frac{X^5}{(r s)^3}\sum_{d\ge 1}d^{-6}e^{-L^2/d^2}$ ($L = X\sqrt{r^{-2}+s^{-2}}$) was bounded by writing $u = L/d$ and claiming $u^5 e^{-u^2} < 1 \implies \sum_{d\ge 1}d^{-6}e^{-L^2/d^2} \le \zeta(6)L^{-5}$, and then claiming $\sum_{A \le r < 2A} r^2 \sum_{B \le s < 2B} s^{-3} \le A^3 B^{-2}$. Both steps were defective:
+  1. First, $u^5 e^{-u^2} = L^5 d^{-5} e^{-L^2/d^2} < 1$ implies $d^{-6}e^{-L^2/d^2} < L^{-5}d^{-1}$, whose sum over $d \ge 1$ is $L^{-5}\sum_{d\ge 1}d^{-1} = \infty$, **not** $\zeta(6)L^{-5}$! Conversely, for large $L$, $\sum_{d\ge 1} d^{-6}e^{-L^2/d^2} \sim c_0 L^{-5}$, whereas for small $L \to 0^+$, $L^5\sum_{d\ge 1} d^{-6}e^{-L^2/d^2} \sim \zeta(6)L^5 \to 0$, so $L^5\sum_{d\ge 1} d^{-6}e^{-L^2/d^2}$ is bounded by a uniform constant $C_*$, not $\zeta(6)$ on all of $L > 0$.
+  2. Second, $\sum_{A \le r < 2A} r^2 = \frac{(2A-1)2A(4A-1)}{6} = \frac{7}{3}A^3 - \frac{3}{2}A^2 + \frac{1}{6}A < \frac{7}{3}A^3$, which carries the factor $\frac{7}{3} > 1$ (e.g., at $A = 2$, $2^2 + 3^2 = 13 > 8 = 2^3$).
+
+- **Repaired unconditional proof of the unequal-block bound**:
+  1. **Unimodal $d$-sum bound**: For fixed $L > 0$, the continuous profile $\phi_L(t) := t^{-6}e^{-L^2/t^2}$ on $(0, \infty)$ has derivative $\phi_L'(t) = 2 t^{-7}(L^2/t^2 - 3)e^{-L^2/t^2}$, so $\phi_L(t)$ is strictly increasing on $(0, L/\sqrt{3})$ and strictly decreasing on $(L/\sqrt{3}, \infty)$, with unique global maximum at $t_* = L/\sqrt{3}$:
+     $$\max_{t > 0}\phi_L(t) = \phi_L(L/\sqrt{3}) = 27 e^{-3} L^{-6}.$$
+     By the standard unimodal integral comparison $\sum_{d\ge 1}\phi_L(d) \le \int_0^\infty \phi_L(t)\,dt + \max_{t > 0}\phi_L(t)$:
+     $$\sum_{d\ge 1} d^{-6}e^{-L^2/d^2} \le c_0 L^{-5} + 27 e^{-3} L^{-6} \qquad (\forall L > 0).$$
+     For $L \ge 1$, multiplying by $L^5$ and using $L^{-1} \le 1$ gives $L^5\sum_{d\ge 1} d^{-6}e^{-L^2/d^2} \le c_0 + 27 e^{-3}$. For $0 < L \le 1$, since $e^{-L^2/d^2} \le 1$ and $L^5 \le 1$, we have $L^5\sum_{d\ge 1} d^{-6}e^{-L^2/d^2} \le \zeta(6)L^5 \le \zeta(6)$, where $\zeta(6) = \frac{\tau^6}{60480} \in [1.017343061984449139714517929790920527902 \pm 1.83 \times 10^{-40}]$. Therefore, for **all** $L > 0$:
+     $$L^5\sum_{d\ge 1} d^{-6}e^{-L^2/d^2} \le C_* := \max\bigl\{\zeta(6),\; c_0 + 27 e^{-3}\bigr\} = c_0 + 27 e^{-3} \in [2.008921040021894970679058028804597412605 \pm 2.00 \times 10^{-39}].$$
+  2. **Finite block sums over $r$ and $s$**: For integers $A, B \ge 1$ (assuming $B \ge A$ by symmetry, and Using $(r^2 + s^2)^{-5/2} \le s^{-5}$):
+     $$\frac{X^5}{(r s)^3}\sum_{d\ge 1} d^{-6}e^{-L^2/d^2} = \frac{(r s)^2}{(r^2 + s^2)^{5/2}}\,L^5\sum_{d\ge 1} d^{-6}e^{-L^2/d^2} \le C_*\,\frac{r^2}{s^3}.$$
+     Summing over $A \le r < 2A$ gives
+     $$\sum_{r=A}^{2A-1} r^2 = \frac{7}{3}A^3 - \frac{3}{2}A^2 + \frac{1}{6}A < \frac{7}{3}A^3 \qquad (\forall A \ge 1).$$
+     Summing over $B \le s < 2B$: for $B = 1$, $\sum_{s=1}^1 s^{-3} = 1 = B^{-2}$; for $B \ge 2$, isolating $s = B$ and bounding $\sum_{s=B+1}^{2B-1} s^{-3} \le \int_B^\infty u^{-3}\,du = \frac{1}{2 B^2}$ gives (formally proved in Lean 4 theorem `abel_scaling_fourier_ratio_and_unequal_block_algebra`)
+     $$\sum_{s=B}^{2B-1} s^{-3} \le \frac{1}{B^3} + \frac{1}{2 B^2} = \frac{2 + B}{2 B^3} \le \frac{1}{B^2} \qquad (\forall B \ge 2).$$
+     Combining these bounds yields the unconditional unequal-block theorem valid for all integers $A, B \ge 1$ and all $X > 0$:
+     $$\boxed{\bigl|B_{A, B}(X)\bigr| \le \frac{7}{3}C_*\,\frac{\min(A, B)^3}{\max(A, B)^2}, \qquad \frac{7}{3}C_* \in [4.687482426717754931584468733877393962745 \pm 2.00 \times 10^{-39}].}$$
+
+### 6.2 Attack A: Coprime Euler-Series, Off-Critical Non-Cancellation, and Exact Separable Gaussian Decoupling
 
 1. **Bivariate Coprime Dirichlet Series**:
-   For $\operatorname{Re} u > 1$ and $\operatorname{Re} v > 1$, expanding $\mathbf{1}_{\gcd(r,s)=1} = \sum_{e \mid \gcd(r,s)}\mu(e)$ with $r = e m$, $s = e n$ gives
+   For $u, v \in \mathbb{C}$ with $\operatorname{Re} u > 1$ and $\operatorname{Re} v > 1$, expanding $\mathbf{1}_{\gcd(r,s)=1} = \sum_{e \mid \gcd(r,s)}\mu(e)$ with $r = e m$, $s = e n$ gives
    $$\mathcal{D}_\lambda(u, v) := \sum_{\gcd(r,s)=1}\frac{\lambda(r)\lambda(s)}{r^u s^v} = \sum_{e\ge 1}\frac{\mu(e)\lambda(e)^2}{e^{u+v}}\left(\sum_{m\ge 1}\frac{\lambda(m)}{m^u}\right)\left(\sum_{n\ge 1}\frac{\lambda(n)}{n^v}\right) = \frac{\zeta(2u)\,\zeta(2v)}{\zeta(u)\,\zeta(v)\,\zeta(u+v)}.$$
 2. **Boundary Pole at $z = 0$ and Off-Critical Non-Cancellation**:
-   - In 1D Mellin coordinates, $\mathcal{M}[Q_\lambda](z) = \frac{\Gamma(5/4-z/2)\zeta(1+2z)}{2\zeta(1/2+z)}$ has a simple pole at $z = 0$ (from $\zeta(1+2z) \sim \frac{1}{2z}$) with nonvanishing residue
+   - In 1D Mellin coordinates $z = a + i b$, $\mathcal{M}[Q_\lambda](z) = \frac{\Gamma(5/4-z/2)\zeta(1+2z)}{2\zeta(1/2+z)}$ has a simple pole at $z = 0$ (from $\zeta(1+2z) \sim \frac{1}{2z}$) with nonvanishing residue
      $$\operatorname*{Res}_{z=0}\mathcal{M}[Q_\lambda](z) = \frac{\Gamma(5/4)}{4\,\zeta(1/2)} \in [-0.1551682265483492584272379814757961069612 \pm 2.00 \times 10^{-40}] \ne 0.$$
-   - At any hypothetical off-critical conjugate pair $(u, v) = (\rho, \bar{\rho})$ with $\operatorname{Re}\rho = \beta \in (1/2, 1)$, we have $\operatorname{Re}(2\rho) = \operatorname{Re}(2\bar{\rho}) = 2\beta > 1$ and $u + v = 2\beta > 1$. Because $\zeta(w)$ has an absolutely convergent nonvanishing Euler product on $\operatorname{Re} w > 1$ (with $|\zeta(2\rho)| \ge \frac{\zeta(4\beta)}{\zeta(2\beta)} > 0$ and $\zeta(2\beta) > 1$), **neither the numerator $\zeta(2u)\zeta(2v)$ nor the coprimality factor $1/\zeta(u+v)$ can vanish at $(\rho, \bar{\rho})$ to cancel the off-critical poles of $\frac{1}{\zeta(u)\zeta(v)}$**.
-3. **Replacement Theorem (Exact Separable Gaussian Decoupling)**:
-   Instead of expanding $\sum_{d\ge 1} d^{-6}e^{-X^2(r^{-2}+s^{-2})/d^2}$ by Euler–Maclaurin (which couples $r$ and $s$ inside $(r^2+s^2)^{-5/2}$ and blows up at $A, B \asymp X$), we retain the exact Gaussian kernel, which is **multiplicatively separable** in $r$ and $s$:
-   $$e^{-X^2(r^{-2}+s^{-2})/d^2} = e^{-X^2/(d^2 r^2)}\,e^{-X^2/(d^2 s^2)}.$$
-   Substituting $\mathbf{1}_{\gcd(r,s)=1} = \sum_{e \mid \gcd(r,s)}\mu(e)$ with $r = e m$, $s = e n$ ($\lambda(e m)\lambda(e n) = \lambda(m)\lambda(n)$) into $B_{A,B}(X)$ gives the exact decoupled identity:
+   - At any hypothetical off-critical conjugate pair $(u, v) = (\rho, \bar{\rho})$ with $\rho = x + i y$ and $x \in (1/2, 1)$, we have $\operatorname{Re}(2\rho) = \operatorname{Re}(2\bar{\rho}) = 2x > 1$ and $u + v = 2x > 1$. Because $\zeta(w)$ has an absolutely convergent nonvanishing Euler product on $\operatorname{Re} w > 1$ (with $|\zeta(2\rho)| \ge \frac{\zeta(4x)}{\zeta(2x)} > 0$ and $\zeta(2x) > 1$), **neither the numerator $\zeta(2u)\zeta(2v)$ nor the coprimality factor $1/\zeta(u+v)$ can vanish at $(\rho, \bar{\rho})$ to cancel the off-critical poles of $\frac{1}{\zeta(u)\zeta(v)}$**.
+3. **Exact Separable Gaussian Decoupling and Exact Integer Cutoff Semantics**:
+   Retaining the exact Gaussian kernel $e^{-X^2(r^{-2}+s^{-2})/d^2} = e^{-X^2/(d^2 r^2)}\,e^{-X^2/(d^2 s^2)}$ and substituting $\mathbf{1}_{\gcd(r,s)=1} = \sum_{e \mid \gcd(r,s)}\mu(e)$ with $r = e m$, $s = e n$ ($\lambda(e m)\lambda(e n) = \lambda(m)\lambda(n)$) into $B_{A,B}(X)$ gives the exact decoupled identity:
    $$\boxed{B_{A,B}(X) = \sum_{1 \le e < 2\min(A,B)}\frac{\mu(e)}{e}\sum_{d\ge 1}\frac{1}{d}\,U_\lambda\!\left(\frac{X}{d e}; \frac{A}{e}\right)U_\lambda\!\left(\frac{X}{d e}; \frac{B}{e}\right),}$$
-   where $U_\lambda(Y; M) := Y^{5/2}\sum_{M \le m < 2M}\frac{\lambda(m)}{m^3}e^{-Y^2/m^2}$.Similarly, summing over all $r, s \ge 1$ yields the global decoupled identity
-   $$Q_\lambda(X)^2 = \sum_{e\ge 1}\frac{\mu(e)}{e}\sum_{d\ge 1}\frac{1}{d}\,Q_\lambda\!\left(\frac{X}{d e}\right)^2 = \sum_{q\ge 1}\frac{(\mu * 1)(q)}{q}\,Q_\lambda(X/q)^2 = Q_\lambda(X)^2,$$
-   while on each dyadic block $B_{A,B}(X)$ the 1D factor $U_\lambda(Y; M)$ is an **unconstrained** 1D Liouville sum! By Abel summation on $L_\lambda(x) = \sum_{m \le x}\lambda(m) \ll x\exp(-c_0\Phi(x))$ ($\Phi(x) = (\log x)^{3/5}(\log\log x)^{-1/5}$) and the uniform total variation bound $\int_M^{2M}\left|\frac{d}{dt}\bigl(Y^{5/2}t^{-3}e^{-Y^2/t^2}\bigr)\right|dt \ll Y^{5/2}M^{-3}(1 + Y^2/M^2)e^{-Y^2/(4M^2)} \ll M^{-1/2}\min(M/Y, (Y/M)^{5/2})$, we obtain
-   $$\bigl|U_\lambda(Y; M)\bigr| \ll M^{-1/2}\min\!\left(\frac{M}{Y}, \left(\frac{Y}{M}\right)^{5/2}\right)\exp\bigl(-c_1\Phi(M)\bigr)$$
-   uniformly across **all** regimes ($M \ll Y$, $M \asymp Y$, and $M \gg Y$), and summing over $e, d \ge 1$ and $A = 2^a, B = 2^b$ proves:
-   $$\int_Y^{\tau Y}\bigl|Q_\lambda(X)\bigr|^2\,\frac{dX}{X} \;\ll\; Y\exp\!\left(-2 c_1 (\log Y)^{3/5}(\log\log Y)^{-1/5}\right) \;\ll_D\; \frac{Y}{(\log Y)^D} \qquad (\forall D > 0,\;Y \ge 2).$$
+   where for real $M > 0$,
+   $$U_\lambda(Y; M) := Y^{5/2}\sum_{\substack{m \in \mathbb{Z}_{\ge 1} \\ M \le m < 2M}}\frac{\lambda(m)}{m^3}e^{-Y^2/m^2} = Y^{5/2}\sum_{m = \max(1, \lceil M \rceil)}^{\lceil 2M \rceil - 1}\frac{\lambda(m)}{m^3}e^{-Y^2/m^2}.$$
+   - **Removal of ad-hoc `1e-12` cutoff tolerance and reproduction of the $M = 1 + 2^{-42}$, $Y = 1$ counterexample**:
+     In `TC-054`, `evaluate_1d_dyadic_sum_U_lambda_arb` computed the integer range $[M, 2M)$ using `math.ceil(M - 1e-12)` and `math.ceil(2*M - 1e-12)`. For $M = 1 + 2^{-42} = \frac{4398046511105}{4398046511104}$ and $Y = 1$, since $0 < 2^{-42} \approx 2.2737 \times 10^{-13} < 10^{-12}$, the true half-open interval is $[1 + 2^{-42}, 2 + 2^{-41})$, which contains the single integer $\{2\}$ and yields
+     $$U_\lambda(1; 1 + 2^{-42})_{\text{true}} = \frac{\lambda(2)}{2^3}e^{-1/4} = -\frac{1}{8}e^{-1/4} = [-0.09735009788392560853064628337229008091210 \pm 3.47 \times 10^{-42}] < 0,$$
+     whereas subtracting $10^{-12}$ shifted the endpoints below $1$ and $2$, selecting the integer $\{1\}$ and returning
+     $$U_\lambda(1; 1 + 2^{-42})_{\text{old}} = \frac{\lambda(1)}{1^3}e^{-1} = +e^{-1} = [0.3678794411714423215955237701614608674458 \pm 1.12 \times 10^{-41}] > 0,$$
+     an $O(1)$ error of opposite sign ($|\Delta| = [0.4652295390553679301261700535337509483579 \pm 7.67 \times 10^{-42}]$).
+     In `TASK-TC-054R`, all `1e-12` tolerance shifts are removed: rational/integer/float inputs use exact `fractions.Fraction` arithmetic (`_exact_ceil_fraction(M)` and `_exact_ceil_fraction(2*M)`), while `arb` ball inputs that straddle an integer cutoff either enclose the union of all candidate endpoint configurations via `.union(...)` (`on_ambiguous_ball="enclose"`, default) or raise `ValueError` (`on_ambiguous_ball="raise"`).
 
-| $(A, B, X)$ | Direct Block $B_{A,B}(X)$ | Separable Decoupled Formula | $0 \in \Delta$ | Widely Unequal Bound $\zeta(6)\frac{\min(A,B)^3}{\max(A,B)^2}$ | Bound Holds |
+| $(A, B, X)$ | Direct Block $B_{A,B}(X)$ | Separable Decoupled Formula | $0 \in \Delta$ | Repaired Unequal Bound $\frac{7}{3}C_*\frac{\min(A,B)^3}{\max(A,B)^2}$ | Bound Holds |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| $(1, 1, 2)$ | `[0.103693354236 +/- 5.01e-13]` | `[0.103693354236 +/- 5.01e-13]` | `True` | `[1.017343061984449139714517929790920527902 +/- 1.83e-40]` | `True` |
-| $(2, 2, 4)$ | `[0.0735522917142 +/- 5.35e-14]` | `[0.0735522917142 +/- 9.83e-14]` | `True` | `[2.034686123968898279429035859581841055804 +/- 3.66e-40]` | `True` |
-| $(2, 4, 4)$ | `[0.0258021302529 +/- 1.17e-14]` | `[0.0258021302529 +/- 1.88e-14]` | `True` | `[0.5086715309922245698572589648954602639509 +/- 8.75e-42]` | `True` |
-| $(4, 4, 4)$ | `[-0.09965512039735 +/- 1.59e-15]` | `[-0.09965512039735 +/- 2.86e-15]` | `True` | `[4.069372247937796558858071719163682111607 +/- 2.70e-40]` | `True` |
-| $(1, 8, 4)$ | `[-0.0004608160896 +/- 3.95e-14]` | `[-0.0004608160896 +/- 3.95e-14]` | `True` | `[0.01589598534350701780803934265298313324847 +/- 4.11e-42]` | `True` |
-| $(2, 16, 4)$ | `[0.002650623875497 +/- 6.13e-16]` | `[0.002650623875497 +/- 9.34e-16]` | `True` | `[0.03179197068701403561607868530596626649693 +/- 1.80e-42]` | `True` |
+| $(1, 1, 2)$ | `[0.103693354236 +/- 5.01e-13]` | `[0.103693354236 +/- 5.01e-13]` | `True` | `[4.687482426717754931584468733877393962745 +/- 7.00e-41]` | `True` |
+| $(2, 2, 4)$ | `[0.0735522917142 +/- 5.35e-14]` | `[0.0735522917142 +/- 9.83e-14]` | `True` | `[9.374964853435509863168937467754787925490 +/- 1.41e-40]` | `True` |
+| $(2, 4, 4)$ | `[0.0258021302529 +/- 1.17e-14]` | `[0.0258021302529 +/- 1.88e-14]` | `True` | `[2.343741213358877465792234366938696981372 +/- 4.66e-40]` | `True` |
+| $(4, 4, 4)$ | `[-0.09965512039735 +/- 1.59e-15]` | `[-0.09965512039735 +/- 2.86e-15]` | `True` | `[18.74992970687101972633787493550957585098 +/- 2.80e-40]` | `True` |
+| $(1, 8, 4)$ | `[-0.0004608160896 +/- 3.95e-14]` | `[-0.0004608160896 +/- 3.95e-14]` | `True` | `[0.07324191291746492080600732396683428066789 +/- 4.70e-43]` | `True` |
+| $(2, 16, 4)$ | `[0.002650623875497 +/- 6.13e-16]` | `[0.002650623875497 +/- 9.34e-16]` | `True` | `[0.1464838258349298416120146479336685613358 +/- 2.10e-41]` | `True` |
+| $(1, 16, 1)$ | `[-0.00011297588019448 +/- 6.15e-18]` | `[-0.00011297588019448 +/- 6.15e-18]` | `True` | `[0.01831047822936623020150183099170857016697 +/- 2.39e-42]` | `True` |
+| $(1, 16, 16)$ | `[-0.00019611953 +/- 7.99e-12]` | `[-0.00019611953 +/- 7.99e-12]` | `True` | `[0.01831047822936623020150183099170857016697 +/- 2.39e-42]` | `True` |
+| $(4, 32, 8)$ | `[-0.001780445434487 +/- 8.92e-16]` | `[-0.00178044543449 +/- 3.68e-15]` | `True` | `[0.2929676516698596832240292958673371226716 +/- 4.19e-41]` | `True` |
+| $(8, 1, 4)$ | `[-0.0004608160896 +/- 3.95e-14]` | `[-0.0004608160896 +/- 3.95e-14]` | `True` | `[0.07324191291746492080600732396683428066789 +/- 4.70e-43]` | `True` |
 
-### 6.2 Attack B: Dyadic Parity Annihilation and Cross-Scale Correlation
+### 6.3 Repaired Dyadic Abel Scaling, Divisor Collapse Note, and Global Stieltjes Energy Proof
+
+1. **Correction of the dyadic Abel scaling exponent ($M^{1/2}$ vs $M^{-1/2}$) and Mellin pole refutation**:
+   - Let $L_\lambda(t) := \sum_{1 \le m \le t}\lambda(m)$ ($L_\lambda(t) = 0$ for $t < 1$) and $g_Y(t) := Y^{5/2}t^{-3}e^{-Y^2/t^2}$. On the half-open dyadic interval $[M, 2M)$ ($M \ge 16$, so $\log\log M > 1$), Stieltjes integration by parts gives
+     $$U_\lambda(Y; M) = L_\lambda(2M^-)\,g_Y(2M) - L_\lambda(M^-)\,g_Y(M) - \int_M^{2M} L_\lambda(t)\,g_Y'(t)\,dt.$$
+     On $[M, 2M]$, $\sup_{t \in [M, 2M]} g_Y(t) \ll Y^{5/2}M^{-3}e^{-Y^2/(4M^2)} \ll M^{-1/2}\min(M/Y, (Y/M)^{5/2})$ and $\int_M^{2M}|g_Y'(t)|\,dt \ll M^{-1/2}\min(M/Y, (Y/M)^{5/2})$. Multiplying by the Korobov–Vinogradov–Walfisz bound $\sup_{t \in [M, 2M]}|L_\lambda(t)| \ll M\exp(-c\,\Phi(M))$ ($\Phi(t) = (\log t)^{3/5}(\log\log t)^{-1/5}$, derived from the classical Walfisz bound $|M(y)| \ll y\exp(-c'\Phi(y))$ via $L_\lambda(t) = \sum_{d \le \sqrt{t}} M(t/d^2)$) produces $M \cdot M^{-1/2} = M^{1/2}$, not $M^{-1/2}$:
+     $$\boxed{\bigl|U_\lambda(Y; M)\bigr| \;\ll\; M^{1/2}\min\!\left(\frac{M}{Y}, \left(\frac{Y}{M}\right)^{5/2}\right)\exp\bigl(-c\,\Phi(M)\bigr) \qquad (M \ge 16),}$$
+     while on the finite initial range $1 \le M < 16$, $|U_\lambda(Y; M)| \le \frac{7}{2}M^{1/2}\min(M/Y, (Y/M)^{5/2})$.
+   - **Why the old $M^{-1/2}$ exponent is analytically impossible**: If $|U_\lambda(X; 2^j)| \ll 2^{-j/2}\min(2^j/X, (X/2^j)^{5/2})$ held across $j \ge 0$, summing over $j \ge 0$ would imply $|Q_\lambda(X)| = O(X^{-1/2})$ as $X \to \infty$, hence $\int_1^\infty |Q_\lambda(X)|^2\frac{dX}{X} < \infty$ ($\|Q_\lambda\|_0 < \infty$) and absolute convergence of $\mathcal{M}[Q_\lambda](z) = \int_0^\infty Q_\lambda(X)X^{-z}\frac{dX}{X}$ on $-1/2 < \operatorname{Re} z < 5/2$, contradicting the proved simple pole of $\mathcal{M}[Q_\lambda](z) = \frac{\Gamma(5/4-z/2)\zeta(1+2z)}{2\zeta(1/2+z)}$ at $z = 0$ with residue $\frac{\Gamma(5/4)}{4\zeta(1/2)} \approx -0.1551682265 \ne 0$.
+   - **Tautological collapse of the global divisor sum**: Summing the decoupled block identity over all $a, b \ge 0$ and setting $q = d e$ yields
+     $$\sum_{e\ge 1}\frac{\mu(e)}{e}\sum_{d\ge 1}\frac{1}{d}\,Q_\lambda\!\left(\frac{X}{d e}\right)^2 = \sum_{q\ge 1}\frac{\sum_{e\mid q}\mu(e)}{q}\,Q_\lambda\!\left(\frac{X}{q}\right)^2 = Q_\lambda(X)^2,$$
+     because $\sum_{e\mid q}\mu(e) = \mathbf{1}_{q=1}$ vanishes for every $q \ge 2$. Thus the global identity reduces to the $q = 1$ term $Q_\lambda(X)^2 = Q_\lambda(X)^2$ and is not by itself a cancellation mechanism.
+
+2. **Unconditional Global Stieltjes Proof of $|Q_\lambda(X)| \ll \sqrt{X}e^{-c_1\Phi(X)}$ and $E_\lambda(Y) \ll_D Y(\log Y)^{-D}$**:
+   - **Global Stieltjes representation**: Since $L_\lambda(1^-) = 0$ and $|L_\lambda(T)| \le T \implies X^{5/2}|L_\lambda(T)|T^{-3}e^{-X^2/T^2} \le X^{5/2}T^{-2} \to 0$ as $T \to \infty$, Stieltjes integration by parts on $[1, \infty)$ gives the exact identity for all $X > 0$:
+     $$Q_\lambda(X) = -X^{5/2}\int_1^\infty L_\lambda(t)\,\frac{d}{dt}\bigl(t^{-3}e^{-X^2/t^2}\bigr)\,dt, \qquad \frac{d}{dt}\bigl(t^{-3}e^{-X^2/t^2}\bigr) = \bigl(2X^2 t^{-6} - 3 t^{-4}\bigr)e^{-X^2/t^2}.$$
+   - **Exact scaling check**: Substituting $u = X/t$ ($t = X/u$, $dt = -X u^{-2}\,du$) into the unsigned kernel weighted by $t$ yields (formally verified in Lean 4 theorem `abel_scaling_fourier_ratio_and_unequal_block_algebra` and certified in 256-bit Arb):
+     $$\int_0^\infty X^{5/2} t\,\left|\frac{d}{dt}\bigl(t^{-3}e^{-X^2/t^2}\bigr)\right|\,dt = \sqrt{X}\int_0^\infty u\,\bigl|3 - 2u^2\bigr|e^{-u^2}\,du = \left(\frac{1}{2} + 2 e^{-3/2}\right)\sqrt{X},$$
+     where $I_{\mathrm{scale}} := \frac{1}{2} + 2 e^{-3/2} \in [0.9462603202968596578665609415280250426843 \pm 2.00 \times 10^{-40}]$.
+   - **Splitting at $t = \sqrt{X}$ for $X \ge 256$ ($\sqrt{X} \ge 16$)**:
+     1. **Lower range $1 \le t \le \sqrt{X}$**: Here $|L_\lambda(t)| \le t$ and $2X^2/t^2 - 3 \ge 2X - 3 > 0$, so with $w = X^2/t^2 \in [X, X^2]$ ($dw = -2X^2 t^{-3}\,dt$):
+        $$X^{5/2}\int_1^{\sqrt{X}}\bigl|L_\lambda(t)\bigr|\,\left|\frac{d}{dt}\bigl(t^{-3}e^{-X^2/t^2}\bigr)\right|\,dt \le 2 X^{9/2}\int_1^{\sqrt{X}} t^{-5}e^{-X^2/t^2}\,dt = \sqrt{X}\int_X^{X^2} w e^{-w}\,dw \le \sqrt{X}\,(X + 1)e^{-X}.$$
+     2. **Upper range $t \ge \sqrt{X} \ge 16$**: Since $\Phi(t) = (\log t)^{3/5}(\log\log t)^{-1/5}$ is increasing on $[16, \infty)$, $|L_\lambda(t)| \le C_{\mathrm{KV}}\,t\exp(-c_0\Phi(t)) \le C_{\mathrm{KV}}\,t\exp(-c_0\Phi(\sqrt{X}))$, so
+        $$X^{5/2}\int_{\sqrt{X}}^\infty \bigl|L_\lambda(t)\bigr|\,\left|\frac{d}{dt}\bigl(t^{-3}e^{-X^2/t^2}\bigr)\right|\,dt \le C_{\mathrm{KV}}\left(\frac{1}{2} + 2 e^{-3/2}\right)\sqrt{X}\exp\bigl(-c_0\Phi(\sqrt{X})\bigr).$$
+     Since $\Phi(\sqrt{X}) \ge 2^{-3/5}\Phi(X)$ for $X \ge 256$ and $(X+1)e^{-X} \ll e^{-c_1\Phi(X)}$, combining (1) and (2) gives
+     $$\bigl|Q_\lambda(X)\bigr| \;\ll\; \sqrt{X}\exp\bigl(-c_1\Phi(X)\bigr) \qquad (\forall X \ge 256),$$
+     while on the compact interval $2 \le X < 256$, $|Q_\lambda(X)| \le \zeta(3)X^{5/2}$ is bounded by a constant multiple of $\sqrt{X}\exp(-c_1\Phi(X))$. Squaring and integrating against $\frac{dX}{X}$ over $[Y, \tau Y]$ proves:
+     $$\boxed{E_\lambda(Y) = \int_Y^{\tau Y}\bigl|Q_\lambda(X)\bigr|^2\,\frac{dX}{X} \;\ll\; Y\exp\!\left(-2 c_2 (\log Y)^{3/5}(\log\log Y)^{-1/5}\right) \;\ll_D\; \frac{Y}{(\log Y)^D} \qquad (\forall D > 0,\;Y \ge 2).}$$
+
+### 6.4 Attack B: Dyadic Parity Annihilation and Cross-Scale Correlation
 
 Writing every $n \ge 1$ uniquely as $n = 2^a m$ with $a \ge 0$ and $2 \nmid m$, complete multiplicativity $\lambda(2^a m) = (-1)^a\lambda(m)$ gives
 $$Q_\lambda(X) = \sum_{a\ge 0}(-1)^a 2^{-a/2} Q_{\lambda,\mathrm{odd}}(X/2^a), \qquad Q_{\lambda,\mathrm{odd}}(X) := X^{5/2}\sum_{\substack{m\ge 1 \\ 2 \nmid m}}\frac{\lambda(m)}{m^3}e^{-X^2/m^2}.$$
@@ -324,22 +433,25 @@ Hence
 $$Q_{\lambda,\mathrm{odd}}(X) = Q_\lambda(X) + 2^{-1/2}Q_\lambda(X/2), \qquad Q_\lambda(X) = \sum_{j\ge 0}(-1)^j 2^{-j/2}Q_{\lambda,\mathrm{odd}}(X/2^j),$$
 where the inverse series converges absolutely because $2^{-j/2}|Q_{\lambda,\mathrm{odd}}(X/2^j)| \le \zeta(3)X^{5/2} 2^{-3j}$. Squaring $Q_{\lambda,\mathrm{odd}}(X) = Q_\lambda(X) + 2^{-1/2}Q_\lambda(X/2)$ and integrating against $\frac{dX}{X}$ on $[Y, \tau Y]$ yields:
 $$\int_Y^{\tau Y}\bigl|Q_{\lambda,\mathrm{odd}}(X)\bigr|^2\,\frac{dX}{X} = \int_Y^{\tau Y}\bigl|Q_\lambda(X)\bigr|^2\,\frac{dX}{X} + \frac{1}{2}\int_{Y/2}^{\tau Y/2}\bigl|Q_\lambda(X)\bigr|^2\,\frac{dX}{X} + \sqrt{2}\int_Y^{\tau Y}Q_\lambda(X)Q_\lambda(X/2)\,\frac{dX}{X}.$$
-Moreover, for every $\sigma > -1/2$ (where $2^{-1/2-\sigma} < 1$, including $\sigma = 0$), Minkowski's inequality gives the two-sided norm equivalence
-$$(1 - 2^{-1/2-\sigma})\,\|Q_\lambda\|_\sigma \le \|Q_{\lambda,\mathrm{odd}}\|_\sigma \le (1 + 2^{-1/2-\sigma})\,\|Q_\lambda\|_\sigma.$$
-On any hypothetical off-critical mode $X^{\rho - 1/2}$ ($\operatorname{Re}\rho = \beta > 0$), the operator $I + 2^{-1/2}D_2$ acts by multiplication by $1 + 2^{-\rho}$, which satisfies
-$$0 < 1 - 2^{-\beta} \le \bigl|1 + 2^{-\rho}\bigr| \le 1 + 2^{-\beta} < 2,$$
-and therefore never vanishes in $\operatorname{Re}\rho > 0$.
+Moreover, for every $\eta > -1/2$ (where $2^{-1/2-\eta} < 1$, including $\eta = 0$), Minkowski's inequality gives the two-sided norm equivalence
+$$(1 - 2^{-1/2-\eta})\,\|Q_\lambda\|_\eta \le \|Q_{\lambda,\mathrm{odd}}\|_\eta \le (1 + 2^{-1/2-\eta})\,\|Q_\lambda\|_\eta.$$
+On any hypothetical off-critical mode $X^{\rho - 1/2}$ ($\rho = x + i y$ with $x > 0$), the operator $I + 2^{-1/2}D_2$ acts by multiplication by $1 + 2^{-\rho}$, which satisfies
+$$0 < 1 - 2^{-x} \le \bigl|1 + 2^{-\rho}\bigr| \le 1 + 2^{-x} < 2,$$
+and therefore never vanishes in $\operatorname{Re}\rho = x > 0$.
 
 ---
 
 ## 7. Formal Lean 4 Audit (`formal/RiemannScope/LiouvilleSquareDilation.lean`)
 
-The module [`formal/RiemannScope/LiouvilleSquareDilation.lean`](../../formal/RiemannScope/LiouvilleSquareDilation.lean) contains `5` definitions, `5` public theorems, and `1` private helper theorem (`11` total declarations), compiles cleanly under `lake build` with `0` `sorry` and `0` custom `axiom` declarations, and depends only on the standard Lean axioms `[propext, Classical.choice, Quot.sound]`:
+The module [`formal/RiemannScope/LiouvilleSquareDilation.lean`](../../formal/RiemannScope/LiouvilleSquareDilation.lean) contains `10` definitions, `8` public theorems, and `6` private helper theorems (`24` total declarations), compiles cleanly under `lake build` with `0` `sorry` and `0` custom `axiom` declarations, and has its live `#check` and `#print axioms` output captured directly from `lake env lean` in [`data/tc_liouville_square_dilation.json`](../../data/tc_liouville_square_dilation.json):
 
-| Theorem Name | Exact `#check` Signature | `#print axioms` | Mathematical Scope & External Analytic Inputs |
+| Theorem Name | Live `#check` Signature (`lake env lean`) | Live `#print axioms` | Mathematical Scope & External Analytic Inputs |
 | :--- | :--- | :--- | :--- |
-| `liouville_complete_multiplicativity_and_common_factor_cancellation_nat` | `(omega_d omega_r omega_s : ℕ) : (liouvilleSignFromOmega 0 = 1 ∧ liouvilleSignFromOmega 1 = -1) ∧ liouvilleSignFromOmega (omega_d + omega_r) = liouvilleSignFromOmega omega_d * liouvilleSignFromOmega omega_r ∧ liouvilleSignFromOmega omega_d * liouvilleSignFromOmega omega_d = 1 ∧ liouvilleSignFromOmega (omega_d + omega_r) * liouvilleSignFromOmega (omega_d + omega_s) = liouvilleSignFromOmega omega_r * liouvilleSignFromOmega omega_s` | `[propext, Classical.choice, Quot.sound]` | Genuinely arithmetic theorem over `ℕ` and `ℤ`: proves $\lambda(1)=1$, $\lambda(p)=-1$, complete multiplicativity $(-1)^{\Omega_d+\Omega_r} = (-1)^{\Omega_d}(-1)^{\Omega_r}$, unit square $((-1)^{\Omega_d})^2 = 1$, and unconstrained common-factor cancellation $\lambda(d r)\lambda(d s) = \lambda(r)\lambda(s)$. |
-| `prime_power_square_divisor_moebius_liouville_inversion_nat` | `(k : ℕ) : squareDivisorMoebiusSum k = liouvilleSignFromOmega k ∧ squareDivisorInverseLiouvilleSum k = primePowerMoebius k` | `[propext, Classical.choice, Quot.sound]` | Genuinely arithmetic theorem over `ℕ` and `ℤ`: proves by strong induction on the prime-power exponent $k \in \mathbb{N}$ that $\sum_{d^2 \mid p^k}\mu(p^k/d^2) = (-1)^k = \lambda(p^k)$ and $\sum_{0 \le j \le \lfloor k/2\rfloor}\mu(p^j)(-1)^{k-2j} = \mu(p^k)$. Multiplicative extension from prime powers to general integers is proved analytically in §2.1. |
-| `reversible_weighted_dilation_norm_and_grade_interval_equivalence` | `(norm_f_sq d_pow_neg_4sigma norm_f_d2_sq norm_lambda norm_mu zeta_1_2sigma zeta_2_4sigma B_mu B_lam int_0_1 sum_tau_blocks Z3_sq sigma C_sigma tau_pow_neg_sigma : ℝ) ... : norm_f_d2_sq = d_pow_neg_4sigma * norm_f_sq ∧ (norm_mu ≤ B_mu → norm_lambda ≤ zeta_1_2sigma * B_mu) ∧ (norm_lambda ≤ B_lam → norm_mu ≤ zeta_1_2sigma / zeta_2_4sigma * B_lam) ∧ int_0_1 + sum_tau_blocks ≤ Z3_sq / (5 - 2 * sigma) + C_sigma / (1 - tau_pow_neg_sigma)` | `[propext, Classical.choice, Quot.sound]` | Scalar real-inequality lemma: proves the reversible weighted norm implications from explicit real hypotheses and combines the $[0, 1]$ and $[\tau^k, \tau^{k+1})$ geometric-series bounds; Minkowski's integral inequality is proved analytically in §3.2. |
-| `euler_maclaurin_c2_and_subtransition_growing_range_exponent` | `(f_prime_v_minus f_prime_v_plus N delta : ℝ) (h_v_minus_nonneg : 0 ≤ f_prime_v_minus) (h_v_plus_nonpos : f_prime_v_plus ≤ 0) : 1 / 12 * (\|f_prime_v_minus\| + \|f_prime_v_plus - f_prime_v_minus\| + \|(-f_prime_v_plus)\|) = (f_prime_v_minus - f_prime_v_plus) / 6 ∧ (N + 1) * (1 - delta) - N = 1 - (N + 1) * delta ∧ (1 - (N + 1) * delta < 0 ↔ 1 < (N + 1) * delta)` | `[propext, Classical.choice, Quot.sound]` | Scalar real-algebra lemma: proves that for $f'(v_-) \ge 0 \ge f'(v_+)$, $\frac{1}{12}(|f'(v_-)| + |f'(v_+) - f'(v_-)| + |-f'(v_+)|) = \frac{f'(v_-) - f'(v_+)}{6}$, and proves the subtransition growing-range exponent equivalence $(N+1)(1-\delta) - N = 1 - (N+1)\delta < 0 \iff (N+1)\delta > 1$. |
-| `dyadic_parity_energy_and_off_critical_mode_nonvanishing` | `(Q_X Q_half_X sqrt2 two_pow_neg_beta abs_one_plus_two_pow_neg_rho : ℝ) (h_sqrt2 : sqrt2 ^ 2 = 2) (h_sqrt2_ne : sqrt2 ≠ 0) (h_beta_lt_one : two_pow_neg_beta < 1) (h_rev_tri : 1 - two_pow_neg_beta ≤ abs_one_plus_two_pow_neg_rho) : (Q_X + 1 / sqrt2 * Q_half_X) ^ 2 = Q_X ^ 2 + 1 / 2 * Q_half_X ^ 2 + sqrt2 * Q_X * Q_half_X ∧ 0 < 1 - two_pow_neg_beta ∧ 0 < abs_one_plus_two_pow_neg_rho` | `[propext, Classical.choice, Quot.sound]` | Scalar real-algebra lemma: proves the pointwise dyadic parity square expansion $(Q_X + \frac{1}{\sqrt{2}}Q_{X/2})^2 = Q_X^2 + \frac{1}{2}Q_{X/2}^2 + \sqrt{2}Q_X Q_{X/2}$ from $(\sqrt{2})^2 = 2$, and proves $0 < 1 - 2^{-\beta} \le |1 + 2^{-\rho}|$ when $2^{-\beta} < 1$ ($\beta > 0$). |
+| `liouville_complete_multiplicativity_and_common_factor_cancellation_nat` | `∀ (omega_d omega_r omega_s : ℕ), (liouvilleSignFromOmega 0 = 1 ∧ liouvilleSignFromOmega 1 = -1) ∧ liouvilleSignFromOmega (omega_d + omega_r) = liouvilleSignFromOmega omega_d * liouvilleSignFromOmega omega_r ∧ liouvilleSignFromOmega omega_d * liouvilleSignFromOmega omega_d = 1 ∧ liouvilleSignFromOmega (omega_d + omega_r) * liouvilleSignFromOmega (omega_d + omega_s) = liouvilleSignFromOmega omega_r * liouvilleSignFromOmega omega_s` | `[propext, Classical.choice, Quot.sound]` | Exponent-model arithmetic theorem over `ℕ` and `ℤ` for `liouvilleSignFromOmega`. |
+| `prime_power_square_divisor_moebius_liouville_inversion_nat` | `∀ (k : ℕ), squareDivisorMoebiusSum k = liouvilleSignFromOmega k ∧ squareDivisorInverseLiouvilleSum k = primePowerMoebius k` | `[propext, Classical.choice, Quot.sound]` | Exponent-model induction theorem over `ℕ` and `ℤ` for prime-power exponents $k \in \mathbb{N}$. |
+| `actual_omega_factorization_and_liouville_common_factor_cancellation_nat` | `∀ {p m n d r s : ℕ}, p.Prime → ∀ (k : ℕ), m ≠ 0 → n ≠ 0 → d ≠ 0 → r ≠ 0 → s ≠ 0 → (n.factorization.sum fun x e => e) = natOmega n ∧ (natOmega 1 = 0 ∧ natOmega p = 1 ∧ natOmega (p ^ k) = k) ∧ natOmega (m * n) = natOmega m + natOmega n ∧ (liouvilleLambda 1 = 1 ∧ liouvilleLambda p = -1) ∧ liouvilleLambda (m * n) = liouvilleLambda m * liouvilleLambda n ∧ liouvilleLambda d * liouvilleLambda d = 1 ∧ liouvilleLambda (d * r) * liouvilleLambda (d * s) = liouvilleLambda r * liouvilleLambda s ∧ liouvilleArith.IsMultiplicative` | `[propext, Quot.sound, Classical.choice]` | Actual positive-integer arithmetic theorem over `ℕ` and `ℤ` connected to Mathlib's `ArithmeticFunction.cardFactors` and `Nat.factorization`: proves $\Omega(n) = \sum_{p^e \parallel n} e$, $\Omega(p^k) = k$, $\Omega(mn) = \Omega(m)+\Omega(n)$, complete multiplicativity $\lambda(mn)=\lambda(m)\lambda(n)$, $\lambda(d)^2=1$, $\lambda(dr)\lambda(ds)=\lambda(r)\lambda(s)$, and `liouvilleArith.IsMultiplicative` for all $m,n,d,r,s \ge 1$. |
+| `actual_prime_power_and_factored_square_divisor_moebius_liouville_inversion_nat` | `∀ {p n : ℕ}, p.Prime → ∀ (k : ℕ), n ≠ 0 → ∀ (S : ArithmeticFunction ℤ), S.IsMultiplicative → (ArithmeticFunction.moebius (p ^ k) = primePowerMoebius k ∧ liouvilleLambda (p ^ k) = liouvilleSignFromOmega k) ∧ (primePowerActualMoebiusSquareSum p k = liouvilleLambda (p ^ k) ∧ primePowerActualInverseLiouvilleSquareSum p k = ArithmeticFunction.moebius (p ^ k)) ∧ ((liouvilleLambda n = n.factorization.prod fun q e => primePowerActualMoebiusSquareSum q e) ∧ ArithmeticFunction.moebius n = n.factorization.prod fun q e => primePowerActualInverseLiouvilleSquareSum q e) ∧ ((∀ (q e : ℕ), q.Prime → S (q ^ e) = primePowerActualMoebiusSquareSum q e) → S n = liouvilleLambda n) ∧ ((∀ (q e : ℕ), q.Prime → S (q ^ e) = primePowerActualInverseLiouvilleSquareSum q e) → S n = ArithmeticFunction.moebius n)` | `[propext, Classical.choice, Quot.sound]` | Actual positive-integer theorem over `ℕ` and `ℤ` connected to Mathlib's `ArithmeticFunction.moebius`: bridges `ArithmeticFunction.moebius (p^k)` and `liouvilleLambda (p^k)` to the prime-power models, proves the square-divisor convolutions on $p^k$, and extends both convolutions to all factored positive integers $n \ge 1$ via `Nat.factorization.prod` and `ArithmeticFunction.IsMultiplicative.multiplicative_factorization`. |
+| `reversible_weighted_dilation_norm_and_grade_interval_equivalence` | `∀ (norm_f_sq d_pow_neg_4eta norm_f_d2_sq norm_lambda norm_mu zeta_1_2eta zeta_2_4eta B_mu B_lam int_0_1 sum_tau_blocks Z3_sq eta C_eta tau_pow_neg_eta : ℝ), ... → norm_f_d2_sq = d_pow_neg_4eta * norm_f_sq ∧ (norm_mu ≤ B_mu → norm_lambda ≤ zeta_1_2eta * B_mu) ∧ (norm_lambda ≤ B_lam → norm_mu ≤ zeta_1_2eta / zeta_2_4eta * B_lam) ∧ int_0_1 + sum_tau_blocks ≤ Z3_sq / (5 - 2 * eta) + C_eta / (1 - tau_pow_neg_eta)` | `[propext, Classical.choice, Quot.sound]` | Scalar real-inequality lemma in weight variable $\eta$: proves the reversible weighted norm implications from explicit real hypotheses; Minkowski's integral inequality is proved analytically in §3.2. |
+| `euler_maclaurin_c2_and_subtransition_growing_range_exponent` | `∀ (f_prime_v_minus f_prime_v_plus N delta : ℝ), 0 ≤ f_prime_v_minus → f_prime_v_plus ≤ 0 → 1 / 12 * (\|f_prime_v_minus\| + \|f_prime_v_plus - f_prime_v_minus\| + \|(-f_prime_v_plus)\|) = (f_prime_v_minus - f_prime_v_plus) / 6 ∧ (N + 1) * (1 - delta) - N = 1 - (N + 1) * delta ∧ (1 - (N + 1) * delta < 0 ↔ 1 < (N + 1) * delta)` | `[propext, Classical.choice, Quot.sound]` | Scalar real-algebra lemma: proves the piecewise $C_2$ integral reduction and the subtransition growing-range exponent equivalence $(N+1)(1-\delta) - N = 1 - (N+1)\delta < 0 \iff (N+1)\delta > 1$. |
+| `dyadic_parity_energy_and_off_critical_mode_nonvanishing` | `∀ (Q_X Q_half_X sqrt2 two_pow_neg_x abs_one_plus_two_pow_neg_rho : ℝ), sqrt2 ^ 2 = 2 → sqrt2 ≠ 0 → two_pow_neg_x < 1 → 1 - two_pow_neg_x ≤ abs_one_plus_two_pow_neg_rho → (Q_X + 1 / sqrt2 * Q_half_X) ^ 2 = Q_X ^ 2 + 1 / 2 * Q_half_X ^ 2 + sqrt2 * Q_X * Q_half_X ∧ 0 < 1 - two_pow_neg_x ∧ 0 < abs_one_plus_two_pow_neg_rho` | `[propext, Classical.choice, Quot.sound]` | Scalar real-algebra lemma: proves the pointwise dyadic parity square expansion and off-critical mode nonvanishing $0 < 1 - 2^{-x} \le |1 + 2^{-\rho}|$ for $\rho = x + i y$ with $x > 0$. |
+| `abel_scaling_fourier_ratio_and_unequal_block_algebra` | `∀ (e_neg_3_2 K m B : ℝ), 1 ≤ K → K + 1 ≤ m → 2 ≤ B → 1 / 2 * ((2 * (3 / 2) - 1) * e_neg_3_2 - (2 * 0 - 1)) + 1 / 2 * (0 - -(2 * (3 / 2) - 1) * e_neg_3_2) = 1 / 2 + 2 * e_neg_3_2 ∧ (0 < (K - 1 / 2) * (2 * K + 3) * (2 * K + 4) ∧ (K - 1 / 2) * (2 * K + 3) * (2 * K + 4) ≤ (m - 3 / 2) * (2 * m + 1) * (2 * m + 2) ∧ 0 < (K + 2) * (2 * K + 8) * (2 * K + 9) ∧ (K + 2) * (2 * K + 8) * (2 * K + 9) ≤ (m + 1) * (2 * m + 6) * (2 * m + 7)) ∧ 1 / B ^ 3 + 1 / (2 * B ^ 2) ≤ 1 / B ^ 2` | `[propext, Classical.choice, Quot.sound]` | Scalar real-algebra theorem: proves (1) the Abel scaling integral split $\frac{1}{2} + 2e^{-3/2}$, (2) strict positivity and monotonicity of the even/odd Fourier residue series ratio denominators for $m \ge K + 1 \ge 2$, and (3) the unequal-block upper bound $B^{-3} + \frac{1}{2}B^{-2} \le B^{-2}$ for $B \ge 2$. |

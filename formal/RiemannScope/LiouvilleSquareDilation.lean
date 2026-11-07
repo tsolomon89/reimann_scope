@@ -1,61 +1,91 @@
 /-
 RiemannScope.LiouvilleSquareDilation
-TASK-TC-054: Liouville square-dilation transfer (lambda(n) = sum_{d^2 | n} mu(n/d^2) and
-mu(n) = sum_{d^2 | n} mu(d) lambda(n/d^2)), complete multiplicativity common-factor sign
-cancellation lambda(d r) lambda(d s) = lambda(r) lambda(s) on Nat, Euler-Maclaurin subtransition
-exponent algebra 1 - (N + 1) * delta < 0 <-> (N + 1) * delta > 1, C_2 = (f'(v_-) - f'(v_+)) / 6,
-and dyadic parity energy / off-critical mode nonvanishing.
+TASK-TC-054 / TASK-TC-054R:
+1. Actual arithmetic definitions and theorems over `ℕ` and `ℤ` using Mathlib's
+   `ArithmeticFunction.cardFactors` (`Ω`), `Nat.factorization`, and `ArithmeticFunction.moebius` (`μ`):
+   - Connection of `Ω(n)` to prime-factorization multiplicities `(n.factorization.sum fun _ e => e) = natOmega n`;
+   - Additivity `natOmega (m * n) = natOmega m + natOmega n` for positive integers;
+   - Actual Liouville function `liouvilleLambda n = (-1)^{Ω(n)}`, its `ArithmeticFunction ℤ` wrapper
+     `liouvilleArith`, complete multiplicativity `liouvilleLambda (m * n) = liouvilleLambda m * liouvilleLambda n`,
+     unit square `liouvilleLambda d * liouvilleLambda d = 1`, and unconstrained common-factor sign cancellation
+     `liouvilleLambda (d * r) * liouvilleLambda (d * s) = liouvilleLambda r * liouvilleLambda s`;
+   - Connection of `ArithmeticFunction.moebius (p ^ k)` and `liouvilleLambda (p ^ k)` to the prime-power
+     exponent model, actual prime-power square-divisor sums
+     `primePowerActualMoebiusSquareSum p k = liouvilleLambda (p ^ k)` and
+     `primePowerActualInverseLiouvilleSquareSum p k = ArithmeticFunction.moebius (p ^ k)`,
+     factored prime-power product formulas over `n.factorization.prod` for all `n ≠ 0`, and
+     multiplicative uniqueness `ArithmeticFunction.IsMultiplicative.eq_iff_eq_on_prime_powers`.
+2. Prime-power exponent models (`liouville_complete_multiplicativity_and_common_factor_cancellation_nat`
+   and `prime_power_square_divisor_moebius_liouville_inversion_nat`).
+3. Scalar real-algebra and real-inequality lemmas for weighted norm bounds, Euler-Maclaurin `C_2` and
+   subtransition exponents, dyadic parity square expansion, Abel scaling antiderivative combine,
+   Fourier tail ratio denominator monotonicity, and unequal-block sum bounds.
 -/
 
 import Mathlib.NumberTheory.LSeries.RiemannZeta
+import Mathlib.NumberTheory.ArithmeticFunction
+import Mathlib.Data.Nat.Factorization.Basic
 import Mathlib.Tactic
 import RiemannScope.Basic
+
+open scoped ArithmeticFunction
 
 namespace RiemannScope
 
 namespace LiouvilleSquareDilation
 
-/-- Prime-power Möbius value `mu(p^e)` on exponent `e : ℕ`:
+/-- Prime-power Möbius value `mu(p^e)` on exponent `e : ℕ` (exponent model):
     `mu(p^0) = 1`, `mu(p^1) = -1`, and `mu(p^{e+2}) = 0`. -/
 def primePowerMoebius : ℕ → ℤ
   | 0 => 1
   | 1 => (-1 : ℤ)
   | _ + 2 => 0
 
-/-- Liouville sign `lambda(n) = (-1)^{Omega(n)}` as a function of the prime-factor multiplicity
-    count `omega_n = Omega(n) : ℕ` (`omega_1 = 0`, `omega_p = 1`, `omega_{m n} = omega_m + omega_n`). -/
+/-- Liouville sign `(-1)^{omega_n}` as a function of a natural-number exponent `omega_n : ℕ`. -/
 def liouvilleSignFromOmega (omega_n : ℕ) : ℤ :=
   (-1 : ℤ) ^ omega_n
+
+/-- Actual prime-factor multiplicity count `Ω(n) = ArithmeticFunction.cardFactors n` on `ℕ`. -/
+def natOmega (n : ℕ) : ℕ :=
+  ArithmeticFunction.cardFactors n
+
+/-- Actual Liouville function `λ(n) = (-1)^{Ω(n)}` for `n ≥ 1` (`λ(0) = 0`) on `ℕ`. -/
+def liouvilleLambda (n : ℕ) : ℤ :=
+  if n = 0 then 0 else liouvilleSignFromOmega (natOmega n)
+
+/-- `ArithmeticFunction ℤ` bundling of `liouvilleLambda` (`liouvilleLambda 0 = 0`). -/
+def liouvilleArith : ArithmeticFunction ℤ :=
+  ⟨liouvilleLambda, rfl⟩
 
 /-- Finite range sum `sum_{0 <= j < m} f(j)` over `ℕ`. -/
 def finRangeSum (f : ℕ → ℤ) : ℕ → ℤ
   | 0 => 0
   | m + 1 => finRangeSum f m + f m
 
-/-- Recursive square-divisor Möbius sum `sum_{d^2 | p^k} mu(p^k / d^2)` on prime-power exponent `k : ℕ`:
-    strips squares `p^{2j}` (`0 <= 2j <= k`) to sum `mu(p^k) + mu(p^{k-2}) + ...`. -/
+/-- Recursive square-divisor Möbius sum `sum_{d^2 | p^k} mu(p^k / d^2)` on prime-power exponent `k : ℕ`
+    (exponent model). -/
 def squareDivisorMoebiusSum : ℕ → ℤ
   | 0 => primePowerMoebius 0
   | 1 => primePowerMoebius 1
   | k + 2 => primePowerMoebius (k + 2) + squareDivisorMoebiusSum k
 
-/-- Indexed finite-sum representation `sum_{0 <= j <= k/2} mu(d_j) * lambda(p^k / d_j^2)`
-    for the inverse square-divisor convolution `sum_{d^2 | p^k} mu(d) * lambda(p^k / d^2)` on `k : ℕ`. -/
+/-- Indexed finite-sum representation `sum_{0 <= j <= k/2} mu(p^j) * (-1)^{k - 2j}` on exponent `k : ℕ`
+    (exponent model). -/
 def squareDivisorInverseLiouvilleSum (k : ℕ) : ℤ :=
   finRangeSum (fun j => primePowerMoebius j * ((-1 : ℤ) ^ (k - 2 * j))) (k / 2 + 1)
 
-/-- **Theorem 1 (`TASK-TC-054` §2–§4)**: Complete multiplicativity and common-factor sign
-    cancellation for `liouvilleSignFromOmega` on `ℕ`:
-    (1) `liouvilleSignFromOmega 0 = 1` (`lambda(1) = 1`) and `liouvilleSignFromOmega 1 = -1` (`lambda(p) = -1`);
-    (2) Complete multiplicativity: for all `omega_m, omega_n : ℕ`,
-        `liouvilleSignFromOmega (omega_m + omega_n) = liouvilleSignFromOmega omega_m * liouvilleSignFromOmega omega_n`;
-    (3) Unit square law: for every `omega_d : ℕ`,
-        `liouvilleSignFromOmega omega_d * liouvilleSignFromOmega omega_d = 1`;
-    (4) Unconstrained common-factor sign cancellation: for all `omega_d, omega_r, omega_s : ℕ`
-        (`m = d * r`, `n = d * s` with `Omega(d * r) = omega_d + omega_r` and `Omega(d * s) = omega_d + omega_s`),
-        `liouvilleSignFromOmega (omega_d + omega_r) * liouvilleSignFromOmega (omega_d + omega_s) =
-         liouvilleSignFromOmega omega_r * liouvilleSignFromOmega omega_s`,
-        with no squarefree or coprimality restriction on `d`. -/
+/-- Actual prime-power square-divisor Möbius sum `∑_{0 ≤ j ≤ k/2} μ(p^{k - 2j})` evaluated with
+    Mathlib's `ArithmeticFunction.moebius`. -/
+def primePowerActualMoebiusSquareSum (p k : ℕ) : ℤ :=
+  finRangeSum (fun j => ArithmeticFunction.moebius (p ^ (k - 2 * j))) (k / 2 + 1)
+
+/-- Actual prime-power inverse square-divisor sum `∑_{0 ≤ j ≤ k/2} μ(p^j) λ(p^{k - 2j})` evaluated with
+    Mathlib's `ArithmeticFunction.moebius` and `liouvilleLambda`. -/
+def primePowerActualInverseLiouvilleSquareSum (p k : ℕ) : ℤ :=
+  finRangeSum (fun j => ArithmeticFunction.moebius (p ^ j) * liouvilleLambda (p ^ (k - 2 * j))) (k / 2 + 1)
+
+/-- **Theorem 1 (`TASK-TC-054` §2–§4, Exponent Model)**: Complete multiplicativity and common-factor
+    sign cancellation for `liouvilleSignFromOmega` on natural-number exponents `omega_d, omega_r, omega_s : ℕ`. -/
 theorem liouville_complete_multiplicativity_and_common_factor_cancellation_nat
     (omega_d omega_r omega_s : ℕ) :
     (liouvilleSignFromOmega 0 = 1 ∧ liouvilleSignFromOmega 1 = -1) ∧
@@ -112,13 +142,56 @@ private theorem finRangeSum_primePowerMoebius_tail_eq_two
     rw [h_pm, zero_mul, add_zero]
     exact ih
 
-/-- **Theorem 2 (`TASK-TC-054` §3)**: Exact prime-power square-divisor Möbius–Liouville
-    inversion on `ℕ`:
-    For every prime-power exponent `k : ℕ`:
-    (1) `squareDivisorMoebiusSum k = liouvilleSignFromOmega k`
-        (`sum_{d^2 | p^k} mu(p^k / d^2) = (-1)^k = lambda(p^k)`);
-    (2) `squareDivisorInverseLiouvilleSum k = primePowerMoebius k`
-        (`sum_{d^2 | p^k} mu(d) * lambda(p^k / d^2) = mu(p^k)`). -/
+/-- Helper lemma: `natOmega (p ^ k) = k` for any prime `p` and exponent `k : ℕ`. -/
+private theorem cardFactors_prime_pow_aux {p : ℕ} (hp : p.Prime) (k : ℕ) :
+    natOmega (p ^ k) = k := by
+  dsimp [natOmega]
+  induction k with
+  | zero => simp
+  | succ k ih =>
+    rw [pow_succ, ArithmeticFunction.cardFactors_mul (pow_ne_zero k hp.ne_zero) hp.ne_zero]
+    have hp1 : ArithmeticFunction.cardFactors p = 1 :=
+      ArithmeticFunction.cardFactors_eq_one_iff_prime.mpr hp
+    omega
+
+/-- Helper lemma: Mathlib's `ArithmeticFunction.moebius (p ^ k)` agrees with `primePowerMoebius k`
+    for every prime `p` and exponent `k : ℕ`. -/
+private theorem moebius_apply_prime_pow_eq_primePowerMoebius_aux {p : ℕ} (hp : p.Prime) (k : ℕ) :
+    ArithmeticFunction.moebius (p ^ k) = primePowerMoebius k := by
+  rcases k with _ | _ | k'
+  · simp [primePowerMoebius, ArithmeticFunction.moebius_apply_one]
+  · simp [primePowerMoebius, ArithmeticFunction.moebius_apply_prime hp]
+  · rw [ArithmeticFunction.moebius_apply_prime_pow hp (by omega)]
+    simp [primePowerMoebius]
+
+/-- Helper lemma: `liouvilleLambda (p ^ k) = liouvilleSignFromOmega k` for any prime `p` and `k : ℕ`. -/
+private theorem liouvilleLambda_prime_pow_aux {p : ℕ} (hp : p.Prime) (k : ℕ) :
+    liouvilleLambda (p ^ k) = liouvilleSignFromOmega k := by
+  have hne : p ^ k ≠ 0 := pow_ne_zero k hp.ne_zero
+  simp [liouvilleLambda, hne, cardFactors_prime_pow_aux hp k]
+
+/-- Helper congruence lemma for `finRangeSum`. -/
+private theorem finRangeSum_congr_aux {f g : ℕ → ℤ} (m : ℕ) (h : ∀ j < m, f j = g j) :
+    finRangeSum f m = finRangeSum g m := by
+  induction m with
+  | zero => rfl
+  | succ m ih =>
+    dsimp [finRangeSum]
+    rw [ih (fun j hj => h j (by omega)), h m (by omega)]
+
+/-- Helper zero lemma for `finRangeSum`. -/
+private theorem finRangeSum_eq_zero_of_lt_aux {f : ℕ → ℤ} (m : ℕ) (h : ∀ j < m, f j = 0) :
+    finRangeSum f m = 0 := by
+  induction m with
+  | zero => rfl
+  | succ m ih =>
+    dsimp [finRangeSum]
+    rw [ih (fun j hj => h j (by omega)), h m (by omega), add_zero]
+
+/-- **Theorem 2 (`TASK-TC-054` §3, Exponent Model)**: Prime-power exponent model for square-divisor
+    Möbius–Liouville inversion on `k : ℕ`:
+    `squareDivisorMoebiusSum k = liouvilleSignFromOmega k` and
+    `squareDivisorInverseLiouvilleSum k = primePowerMoebius k`. -/
 theorem prime_power_square_divisor_moebius_liouville_inversion_nat :
     ∀ k : ℕ,
       squareDivisorMoebiusSum k = liouvilleSignFromOmega k ∧
@@ -152,54 +225,215 @@ theorem prime_power_square_divisor_moebius_liouville_inversion_nat :
       rw [h_sub1, pow_add]
       norm_num
 
-/-- **Theorem 3 (`TASK-TC-054` §3)**: Reversible weighted `L^2` norm equivalence and
-    grade-interval subpower energy bridge:
-    (1) Dilation norm scaling: if `norm_f_a_sq = a_pow_neg_2sigma * norm_f_sq`, then for `a = d^2`
-        (`a_pow_neg_2sigma = d_pow_neg_4sigma`), `norm_f_d2_sq = d_pow_neg_4sigma * norm_f_sq`;
-    (2) Reversible weighted norm bounds (`sigma > 0`): if `0 <= norm_lambda <= zeta_1_2sigma * norm_mu`
-        and `0 <= norm_mu <= (zeta_1_2sigma / zeta_2_4sigma) * norm_lambda` with
-        `0 < zeta_1_2sigma` and `0 < zeta_2_4sigma`, then `norm_mu <= B_mu` implies
-        `norm_lambda <= zeta_1_2sigma * B_mu`, and `norm_lambda <= B_lam` implies
-        `norm_mu <= (zeta_1_2sigma / zeta_2_4sigma) * B_lam`;
-    (3) Grade-interval energy to weighted norm bound: if `int_0_1 <= Z3_sq / (5 - 2 * sigma)` and
-        `sum_tau_blocks <= C_sigma / (1 - tau_pow_neg_sigma)`, then
-        `int_0_1 + sum_tau_blocks <= Z3_sq / (5 - 2 * sigma) + C_sigma / (1 - tau_pow_neg_sigma)`. -/
+/-- **Theorem 3 (`TASK-TC-054R` §8, Actual Arithmetic on `ℕ`)**:
+    Connects `natOmega` (`ArithmeticFunction.cardFactors`) to prime-factorization multiplicities
+    `n.factorization`, proves additivity `Ω(m n) = Ω(m) + Ω(n)`, and establishes actual Liouville
+    multiplicativity `λ(m n) = λ(m) λ(n)`, unit square `λ(d)^2 = 1`, unconstrained common-factor
+    cancellation `λ(d r) λ(d s) = λ(r) λ(s)` for all positive integers `m, n, d, r, s`, and
+    `liouvilleArith.IsMultiplicative`. -/
+theorem actual_omega_factorization_and_liouville_common_factor_cancellation_nat
+    {p m n d r s : ℕ} (hp : p.Prime) (k : ℕ)
+    (hm : m ≠ 0) (hn : n ≠ 0) (hd : d ≠ 0) (hr : r ≠ 0) (hs : s ≠ 0) :
+    (n.factorization.sum fun _ e => e) = natOmega n ∧
+    (natOmega 1 = 0 ∧ natOmega p = 1 ∧ natOmega (p ^ k) = k) ∧
+    natOmega (m * n) = natOmega m + natOmega n ∧
+    (liouvilleLambda 1 = 1 ∧ liouvilleLambda p = -1) ∧
+    liouvilleLambda (m * n) = liouvilleLambda m * liouvilleLambda n ∧
+    liouvilleLambda d * liouvilleLambda d = 1 ∧
+    liouvilleLambda (d * r) * liouvilleLambda (d * s) = liouvilleLambda r * liouvilleLambda s ∧
+    liouvilleArith.IsMultiplicative := by
+  have h_fact : ∀ x : ℕ, x ≠ 0 → (x.factorization.sum fun _ e => e) = natOmega x := by
+    intro x
+    induction x using Nat.recOnPosPrimePosCoprime with
+    | hp q e hq _ =>
+      intro _
+      rw [Nat.Prime.factorization_pow hq, Finsupp.sum_single_index rfl, cardFactors_prime_pow_aux hq e]
+    | h0 => intro hx; exact absurd rfl hx
+    | h1 => intro _; simp [natOmega]
+    | h a b ha hb _ iha ihb =>
+      intro _
+      have ha0 : a ≠ 0 := by omega
+      have hb0 : b ≠ 0 := by omega
+      rw [Nat.factorization_mul ha0 hb0, Finsupp.sum_add_index' (fun _ => rfl) (fun _ _ _ => rfl)]
+      rw [iha ha0, ihb hb0]
+      exact (ArithmeticFunction.cardFactors_mul ha0 hb0).symm
+  have h_omega_1 : natOmega 1 = 0 := ArithmeticFunction.cardFactors_one
+  have h_omega_p : natOmega p = 1 := ArithmeticFunction.cardFactors_eq_one_iff_prime.mpr hp
+  have h_omega_pk : natOmega (p ^ k) = k := cardFactors_prime_pow_aux hp k
+  have h_omega_mul : ∀ a b : ℕ, a ≠ 0 → b ≠ 0 → natOmega (a * b) = natOmega a + natOmega b := by
+    intro a b ha0 hb0
+    exact ArithmeticFunction.cardFactors_mul ha0 hb0
+  have h_lam_1 : liouvilleLambda 1 = 1 := by decide
+  have h_lam_p : liouvilleLambda p = -1 := by
+    simp [liouvilleLambda, hp.ne_zero, h_omega_p, liouvilleSignFromOmega]
+  have h_lam_mul_gen : ∀ a b : ℕ, a ≠ 0 → b ≠ 0 →
+      liouvilleLambda (a * b) = liouvilleLambda a * liouvilleLambda b := by
+    intro a b ha0 hb0
+    have hab : a * b ≠ 0 := mul_ne_zero ha0 hb0
+    simp [liouvilleLambda, ha0, hb0, hab, h_omega_mul a b ha0 hb0, liouvilleSignFromOmega, pow_add]
+  have h_lam_sq_gen : ∀ a : ℕ, a ≠ 0 → liouvilleLambda a * liouvilleLambda a = 1 := by
+    intro a ha0
+    simp only [liouvilleLambda, ha0, ↓reduceIte, liouvilleSignFromOmega]
+    rw [← pow_add]
+    have h_even : natOmega a + natOmega a = 2 * natOmega a := by omega
+    rw [h_even, pow_mul]
+    norm_num
+  have h_cancel :
+      liouvilleLambda (d * r) * liouvilleLambda (d * s) = liouvilleLambda r * liouvilleLambda s := by
+    rw [h_lam_mul_gen d r hd hr, h_lam_mul_gen d s hd hs]
+    calc
+      (liouvilleLambda d * liouvilleLambda r) * (liouvilleLambda d * liouvilleLambda s) =
+        (liouvilleLambda d * liouvilleLambda d) * (liouvilleLambda r * liouvilleLambda s) := by ring
+      _ = 1 * (liouvilleLambda r * liouvilleLambda s) := by rw [h_lam_sq_gen d hd]
+      _ = liouvilleLambda r * liouvilleLambda s := by ring
+  have h_mult : liouvilleArith.IsMultiplicative := by
+    refine ⟨by decide, ?_⟩
+    intro a b _
+    by_cases ha0 : a = 0
+    · subst ha0; simp [liouvilleArith, liouvilleLambda]
+    · by_cases hb0 : b = 0
+      · subst hb0; simp [liouvilleArith, liouvilleLambda]
+      · exact h_lam_mul_gen a b ha0 hb0
+  exact ⟨h_fact n hn, ⟨h_omega_1, h_omega_p, h_omega_pk⟩, h_omega_mul m n hm hn,
+    ⟨h_lam_1, h_lam_p⟩, h_lam_mul_gen m n hm hn, h_lam_sq_gen d hd, h_cancel, h_mult⟩
+
+/-- **Theorem 4 (`TASK-TC-054R` §8, Actual Möbius & Square-Divisor Sums on Prime Powers and Factored Integers)**:
+    Connects `primePowerMoebius` and `liouvilleSignFromOmega` to Mathlib's `ArithmeticFunction.moebius` (`μ`)
+    and `liouvilleLambda` (`λ`), proves the actual prime-power square-divisor identities
+    `∑_{0 ≤ j ≤ k/2} μ(p^{k - 2j}) = λ(p^k)` and `∑_{0 ≤ j ≤ k/2} μ(p^j) λ(p^{k - 2j}) = μ(p^k)`,
+    proves the factored prime-power product identities for `λ(n)` and `μ(n)` over `n.factorization.prod`
+    for all positive integers `n ≠ 0`, and proves that any multiplicative `S : ArithmeticFunction ℤ`
+    agreeing with these square-divisor sums on prime powers equals `λ(n)` (resp. `μ(n)`) for all `n : ℕ`. -/
+theorem actual_prime_power_and_factored_square_divisor_moebius_liouville_inversion_nat
+    {p n : ℕ} (hp : p.Prime) (k : ℕ) (hn : n ≠ 0)
+    (S : ArithmeticFunction ℤ) (hS : S.IsMultiplicative) :
+    (ArithmeticFunction.moebius (p ^ k) = primePowerMoebius k ∧
+      liouvilleLambda (p ^ k) = liouvilleSignFromOmega k) ∧
+    (primePowerActualMoebiusSquareSum p k = liouvilleLambda (p ^ k) ∧
+      primePowerActualInverseLiouvilleSquareSum p k = ArithmeticFunction.moebius (p ^ k)) ∧
+    (liouvilleLambda n = n.factorization.prod (fun q e => primePowerActualMoebiusSquareSum q e) ∧
+      ArithmeticFunction.moebius n = n.factorization.prod (fun q e => primePowerActualInverseLiouvilleSquareSum q e)) ∧
+    (((∀ q e : ℕ, q.Prime → S (q ^ e) = primePowerActualMoebiusSquareSum q e) → S n = liouvilleLambda n) ∧
+      ((∀ q e : ℕ, q.Prime → S (q ^ e) = primePowerActualInverseLiouvilleSquareSum q e) → S n = ArithmeticFunction.moebius n)) := by
+  have h_fwd_pp : ∀ q e : ℕ, q.Prime → primePowerActualMoebiusSquareSum q e = liouvilleLambda (q ^ e) := by
+    intro q e hq
+    dsimp [primePowerActualMoebiusSquareSum]
+    rw [finRangeSum_congr_aux (e / 2 + 1) (fun j _ => moebius_apply_prime_pow_eq_primePowerMoebius_aux hq (e - 2 * j))]
+    dsimp [finRangeSum]
+    have h_zero : finRangeSum (fun j => primePowerMoebius (e - 2 * j)) (e / 2) = 0 := by
+      apply finRangeSum_eq_zero_of_lt_aux
+      intro j hj
+      obtain ⟨d, hd⟩ : ∃ d, e - 2 * j = d + 2 := ⟨e - 2 * j - 2, by omega⟩
+      rw [hd]
+      rfl
+    rw [h_zero, zero_add, liouvilleLambda_prime_pow_aux hq e]
+    rcases Nat.mod_two_eq_zero_or_one e with h_even | h_odd
+    · have h_rem : e - 2 * (e / 2) = 0 := by omega
+      obtain ⟨m, hm⟩ : ∃ m, e = 2 * m := ⟨e / 2, by omega⟩
+      rw [h_rem, hm]
+      dsimp [primePowerMoebius, liouvilleSignFromOmega]
+      rw [pow_mul]
+      norm_num
+    · have h_rem : e - 2 * (e / 2) = 1 := by omega
+      obtain ⟨m, hm⟩ : ∃ m, e = 2 * m + 1 := ⟨e / 2, by omega⟩
+      rw [h_rem, hm]
+      dsimp [primePowerMoebius, liouvilleSignFromOmega]
+      rw [pow_add, pow_mul]
+      norm_num
+  have h_inv_pp : ∀ q e : ℕ, q.Prime → primePowerActualInverseLiouvilleSquareSum q e = ArithmeticFunction.moebius (q ^ e) := by
+    intro q e hq
+    have h_eq : primePowerActualInverseLiouvilleSquareSum q e = squareDivisorInverseLiouvilleSum e := by
+      dsimp [primePowerActualInverseLiouvilleSquareSum, squareDivisorInverseLiouvilleSum]
+      apply finRangeSum_congr_aux
+      intro j _
+      rw [moebius_apply_prime_pow_eq_primePowerMoebius_aux hq j, liouvilleLambda_prime_pow_aux hq (e - 2 * j)]
+      rfl
+    rw [h_eq, (prime_power_square_divisor_moebius_liouville_inversion_nat e).2,
+      moebius_apply_prime_pow_eq_primePowerMoebius_aux hq e]
+  have h_mult_lam : liouvilleArith.IsMultiplicative := by
+    refine ⟨by decide, ?_⟩
+    intro a b _
+    by_cases ha0 : a = 0
+    · subst ha0; simp [liouvilleArith, liouvilleLambda]
+    · by_cases hb0 : b = 0
+      · subst hb0; simp [liouvilleArith, liouvilleLambda]
+      · have hab : a * b ≠ 0 := mul_ne_zero ha0 hb0
+        simp [liouvilleArith, liouvilleLambda, ha0, hb0, hab, natOmega,
+          ArithmeticFunction.cardFactors_mul ha0 hb0, liouvilleSignFromOmega, pow_add]
+  have h_prod_lam : liouvilleLambda n = n.factorization.prod (fun q e => primePowerActualMoebiusSquareSum q e) := by
+    change liouvilleArith n = _
+    rw [ArithmeticFunction.IsMultiplicative.multiplicative_factorization liouvilleArith h_mult_lam hn]
+    unfold Finsupp.prod
+    apply Finset.prod_congr rfl
+    intro q hq
+    have hq_prime : q.Prime := by
+      rw [Nat.support_factorization] at hq
+      exact Nat.prime_of_mem_primeFactors hq
+    exact (h_fwd_pp q (n.factorization q) hq_prime).symm
+  have h_prod_mu : ArithmeticFunction.moebius n = n.factorization.prod (fun q e => primePowerActualInverseLiouvilleSquareSum q e) := by
+    rw [ArithmeticFunction.IsMultiplicative.multiplicative_factorization ArithmeticFunction.moebius ArithmeticFunction.isMultiplicative_moebius hn]
+    unfold Finsupp.prod
+    apply Finset.prod_congr rfl
+    intro q hq
+    have hq_prime : q.Prime := by
+      rw [Nat.support_factorization] at hq
+      exact Nat.prime_of_mem_primeFactors hq
+    exact (h_inv_pp q (n.factorization q) hq_prime).symm
+  have h_ext_lam : (∀ q e : ℕ, q.Prime → S (q ^ e) = primePowerActualMoebiusSquareSum q e) → S n = liouvilleLambda n := by
+    intro hS_pp
+    have h_eq_fn : S = liouvilleArith := by
+      rw [ArithmeticFunction.IsMultiplicative.eq_iff_eq_on_prime_powers S hS liouvilleArith h_mult_lam]
+      intro q e hq
+      rw [hS_pp q e hq, h_fwd_pp q e hq]
+      rfl
+    exact congrFun (congrArg DFunLike.coe h_eq_fn) n
+  have h_ext_mu : (∀ q e : ℕ, q.Prime → S (q ^ e) = primePowerActualInverseLiouvilleSquareSum q e) → S n = ArithmeticFunction.moebius n := by
+    intro hS_pp
+    have h_eq_fn : S = ArithmeticFunction.moebius := by
+      rw [ArithmeticFunction.IsMultiplicative.eq_iff_eq_on_prime_powers S hS ArithmeticFunction.moebius ArithmeticFunction.isMultiplicative_moebius]
+      intro q e hq
+      rw [hS_pp q e hq, h_inv_pp q e hq]
+    exact congrFun (congrArg DFunLike.coe h_eq_fn) n
+  exact ⟨⟨moebius_apply_prime_pow_eq_primePowerMoebius_aux hp k, liouvilleLambda_prime_pow_aux hp k⟩,
+    ⟨h_fwd_pp p k hp, h_inv_pp p k hp⟩, ⟨h_prod_lam, h_prod_mu⟩, ⟨h_ext_lam, h_ext_mu⟩⟩
+
+/-- **Theorem 5 (`TASK-TC-054` §3, Scalar Real-Inequality Lemma)**:
+    Scalar real-inequality implications for positive-weight norm multipliers (`eta > 0`) and
+    geometric block summation under explicit real hypotheses (Minkowski integral inequality and
+    multiplicative change of variables are proved analytically outside Lean). -/
 theorem reversible_weighted_dilation_norm_and_grade_interval_equivalence
-    (norm_f_sq d_pow_neg_4sigma norm_f_d2_sq
-      norm_lambda norm_mu zeta_1_2sigma zeta_2_4sigma B_mu B_lam
-      int_0_1 sum_tau_blocks Z3_sq sigma C_sigma tau_pow_neg_sigma : ℝ)
-    (h_dil : norm_f_d2_sq = d_pow_neg_4sigma * norm_f_sq)
-    (h_z1_pos : 0 < zeta_1_2sigma)
-    (h_z2_pos : 0 < zeta_2_4sigma)
-    (h_fwd : norm_lambda ≤ zeta_1_2sigma * norm_mu)
-    (h_rev : norm_mu ≤ (zeta_1_2sigma / zeta_2_4sigma) * norm_lambda)
-    (h_01 : int_0_1 ≤ Z3_sq / (5 - 2 * sigma))
-    (h_blocks : sum_tau_blocks ≤ C_sigma / (1 - tau_pow_neg_sigma)) :
-    norm_f_d2_sq = d_pow_neg_4sigma * norm_f_sq ∧
-    (norm_mu ≤ B_mu → norm_lambda ≤ zeta_1_2sigma * B_mu) ∧
-    (norm_lambda ≤ B_lam → norm_mu ≤ (zeta_1_2sigma / zeta_2_4sigma) * B_lam) ∧
-    int_0_1 + sum_tau_blocks ≤ Z3_sq / (5 - 2 * sigma) + C_sigma / (1 - tau_pow_neg_sigma) := by
+    (norm_f_sq d_pow_neg_4eta norm_f_d2_sq
+      norm_lambda norm_mu zeta_1_2eta zeta_2_4eta B_mu B_lam
+      int_0_1 sum_tau_blocks Z3_sq eta C_eta tau_pow_neg_eta : ℝ)
+    (h_dil : norm_f_d2_sq = d_pow_neg_4eta * norm_f_sq)
+    (h_z1_pos : 0 < zeta_1_2eta)
+    (h_z2_pos : 0 < zeta_2_4eta)
+    (h_fwd : norm_lambda ≤ zeta_1_2eta * norm_mu)
+    (h_rev : norm_mu ≤ (zeta_1_2eta / zeta_2_4eta) * norm_lambda)
+    (h_01 : int_0_1 ≤ Z3_sq / (5 - 2 * eta))
+    (h_blocks : sum_tau_blocks ≤ C_eta / (1 - tau_pow_neg_eta)) :
+    norm_f_d2_sq = d_pow_neg_4eta * norm_f_sq ∧
+    (norm_mu ≤ B_mu → norm_lambda ≤ zeta_1_2eta * B_mu) ∧
+    (norm_lambda ≤ B_lam → norm_mu ≤ (zeta_1_2eta / zeta_2_4eta) * B_lam) ∧
+    int_0_1 + sum_tau_blocks ≤ Z3_sq / (5 - 2 * eta) + C_eta / (1 - tau_pow_neg_eta) := by
   refine ⟨h_dil, ?_, ?_, by linarith⟩
   · intro hBmu
-    have h_mul : zeta_1_2sigma * norm_mu ≤ zeta_1_2sigma * B_mu :=
+    have h_mul : zeta_1_2eta * norm_mu ≤ zeta_1_2eta * B_mu :=
       mul_le_mul_of_nonneg_left hBmu (le_of_lt h_z1_pos)
     linarith
   · intro hBlam
-    have h_quot_pos : 0 ≤ zeta_1_2sigma / zeta_2_4sigma :=
+    have h_quot_pos : 0 ≤ zeta_1_2eta / zeta_2_4eta :=
       div_nonneg (le_of_lt h_z1_pos) (le_of_lt h_z2_pos)
     have h_mul :
-        (zeta_1_2sigma / zeta_2_4sigma) * norm_lambda ≤
-          (zeta_1_2sigma / zeta_2_4sigma) * B_lam :=
+        (zeta_1_2eta / zeta_2_4eta) * norm_lambda ≤
+          (zeta_1_2eta / zeta_2_4eta) * B_lam :=
       mul_le_mul_of_nonneg_left hBlam h_quot_pos
     linarith
 
-/-- **Theorem 4 (`TASK-TC-054` §4)**: Euler–Maclaurin `N = 2` inflection-root integral identity
-    `C_2 = (f'(v_-) - f'(v_+)) / 6` and subtransition growing-range exponent algebra `A <= X^{1 - delta}`:
-    (1) On `(0, v_-)`, `(v_-, v_+)`, and `(v_+, infty)` where `I_1 = f'(v_-) >= 0`,
-        `I_2 = f'(v_+) - f'(v_-) <= 0`, and `I_3 = -f'(v_+) >= 0`, the `N = 2` Euler–Maclaurin
-        constant `(1 / 12) * (|I_1| + |I_2| + |I_3|)` equals `(f'(v_-) - f'(v_+)) / 6`;
-    (2) For any `N : ℝ` and `delta : ℝ`, `(N + 1) * (1 - delta) - N = 1 - (N + 1) * delta`,
-        and `1 - (N + 1) * delta < 0 ↔ 1 < (N + 1) * delta`. -/
+/-- **Theorem 6 (`TASK-TC-054` §4, Scalar Real-Algebra Lemma)**:
+    Euler–Maclaurin `N = 2` inflection-root antiderivative combination
+    `C_2 = (f'(v_-) - f'(v_+)) / 6` and subtransition growing-range exponent algebra
+    `(N + 1)(1 - delta) - N = 1 - (N + 1) * delta < 0 ↔ 1 < (N + 1) * delta`. -/
 theorem euler_maclaurin_c2_and_subtransition_growing_range_exponent
     (f_prime_v_minus f_prime_v_plus N delta : ℝ)
     (h_v_minus_nonneg : 0 ≤ f_prime_v_minus)
@@ -220,24 +454,17 @@ theorem euler_maclaurin_c2_and_subtransition_growing_range_exponent
   · refine ⟨by ring, ?_⟩
     constructor <;> intro h <;> linarith
 
-/-- **Theorem 5 (`TASK-TC-054` §6B)**: Dyadic parity energy identity with cross-scale correlation
-    and off-critical mode nonvanishing:
-    (1) Pointwise dyadic parity square identity: for all `Q_X Q_half_X sqrt2 : ℝ` with
-        `sqrt2 ^ 2 = 2`, `(Q_X + (1 / sqrt2) * Q_half_X) ^ 2 = Q_X ^ 2 + (1 / 2) * Q_half_X ^ 2 + sqrt2 * Q_X * Q_half_X`;
-    (2) Off-critical mode nonvanishing under the dyadic parity factor `1 + 2^{-rho}`:
-        if `0 < two_pow_neg_beta` and `two_pow_neg_beta < 1` (`beta = Re(rho) > 0`), and
-        `1 - two_pow_neg_beta <= abs_one_plus_two_pow_neg_rho`, then
-        `0 < abs_one_plus_two_pow_neg_rho` (proving the elementary dyadic factor `1 + 2^{-rho}`
-        cannot annihilate an off-critical mode in `Re(rho) > 0`). -/
+/-- **Theorem 7 (`TASK-TC-054` §6B, Scalar Real-Algebra Lemma)**:
+    Pointwise dyadic parity square identity and off-critical mode lower bound `0 < 1 - 2^{-x} <= |1 + 2^{-rho}|`. -/
 theorem dyadic_parity_energy_and_off_critical_mode_nonvanishing
-    (Q_X Q_half_X sqrt2 two_pow_neg_beta abs_one_plus_two_pow_neg_rho : ℝ)
+    (Q_X Q_half_X sqrt2 two_pow_neg_x abs_one_plus_two_pow_neg_rho : ℝ)
     (h_sqrt2 : sqrt2 ^ 2 = 2)
     (h_sqrt2_ne : sqrt2 ≠ 0)
-    (h_beta_lt_one : two_pow_neg_beta < 1)
-    (h_rev_tri : 1 - two_pow_neg_beta ≤ abs_one_plus_two_pow_neg_rho) :
+    (h_x_lt_one : two_pow_neg_x < 1)
+    (h_rev_tri : 1 - two_pow_neg_x ≤ abs_one_plus_two_pow_neg_rho) :
     (Q_X + (1 / sqrt2) * Q_half_X) ^ 2 =
       Q_X ^ 2 + (1 / 2 : ℝ) * Q_half_X ^ 2 + sqrt2 * Q_X * Q_half_X ∧
-    (0 < 1 - two_pow_neg_beta ∧ 0 < abs_one_plus_two_pow_neg_rho) := by
+    (0 < 1 - two_pow_neg_x ∧ 0 < abs_one_plus_two_pow_neg_rho) := by
   constructor
   · field_simp [h_sqrt2_ne]
     calc
@@ -248,6 +475,64 @@ theorem dyadic_parity_energy_and_off_critical_mode_nonvanishing
         rw [h_sqrt2]
         ring
   · refine ⟨by linarith, by linarith⟩
+
+/-- **Theorem 8 (`TASK-TC-054R` §§2, 4, 6, Scalar Real-Algebra Lemma)**:
+    1. Global Stieltjes variation antiderivative combination:
+       `(1 / 2) * ((2 * (3 / 2) - 1) * e_neg_3_2 - (2 * 0 - 1)) + (1 / 2) * (0 - (-(2 * (3 / 2) - 1) * e_neg_3_2)) = 1 / 2 + 2 * e_neg_3_2`;
+    2. Fourier residue tail denominator monotonicity: for `1 ≤ K` and `K + 1 ≤ m`,
+       `0 < (K - 1 / 2) * (2 * K + 3) * (2 * K + 4) ≤ (m - 3 / 2) * (2 * m + 1) * (2 * m + 2)`;
+    3. Unequal-block `s^{-3}` sum bound algebra: for `2 ≤ B`,
+       `1 / B ^ 3 + 1 / (2 * B ^ 2) ≤ 1 / B ^ 2`. -/
+theorem abel_scaling_fourier_ratio_and_unequal_block_algebra
+    (e_neg_3_2 K m B : ℝ)
+    (hK : 1 ≤ K)
+    (hm : K + 1 ≤ m)
+    (hB : 2 ≤ B) :
+    ((1 / 2 : ℝ) * ((2 * (3 / 2 : ℝ) - 1) * e_neg_3_2 - (2 * 0 - 1)) +
+      (1 / 2 : ℝ) * (0 - (-(2 * (3 / 2 : ℝ) - 1) * e_neg_3_2)) =
+        (1 / 2 : ℝ) + 2 * e_neg_3_2) ∧
+    (0 < (K - 1 / 2) * (2 * K + 3) * (2 * K + 4) ∧
+      (K - 1 / 2) * (2 * K + 3) * (2 * K + 4) ≤ (m - 3 / 2) * (2 * m + 1) * (2 * m + 2) ∧
+      0 < (K + 2) * (2 * K + 8) * (2 * K + 9) ∧
+      (K + 2) * (2 * K + 8) * (2 * K + 9) ≤ (m + 1) * (2 * m + 6) * (2 * m + 7)) ∧
+    (1 / B ^ 3 + 1 / (2 * B ^ 2) ≤ 1 / B ^ 2) := by
+  refine ⟨by ring, ?_, ?_⟩
+  · have h1_pos : 0 < K - 1 / 2 := by linarith
+    have h2_pos : 0 < 2 * K + 3 := by linarith
+    have h3_pos : 0 < 2 * K + 4 := by linarith
+    have h_pos : 0 < (K - 1 / 2) * (2 * K + 3) * (2 * K + 4) :=
+      mul_pos (mul_pos h1_pos h2_pos) h3_pos
+    have h1_le : K - 1 / 2 ≤ m - 3 / 2 := by linarith
+    have h2_le : 2 * K + 3 ≤ 2 * m + 1 := by linarith
+    have h3_le : 2 * K + 4 ≤ 2 * m + 2 := by linarith
+    have h12_le : (K - 1 / 2) * (2 * K + 3) ≤ (m - 3 / 2) * (2 * m + 1) :=
+      mul_le_mul h1_le h2_le (le_of_lt h2_pos) (by linarith)
+    have h123_le :
+        (K - 1 / 2) * (2 * K + 3) * (2 * K + 4) ≤
+          (m - 3 / 2) * (2 * m + 1) * (2 * m + 2) :=
+      mul_le_mul h12_le h3_le (le_of_lt h3_pos) (mul_nonneg (by linarith) (by linarith))
+    have ho1_pos : 0 < K + 2 := by linarith
+    have ho2_pos : 0 < 2 * K + 8 := by linarith
+    have ho3_pos : 0 < 2 * K + 9 := by linarith
+    have ho_pos : 0 < (K + 2) * (2 * K + 8) * (2 * K + 9) :=
+      mul_pos (mul_pos ho1_pos ho2_pos) ho3_pos
+    have ho1_le : K + 2 ≤ m + 1 := by linarith
+    have ho2_le : 2 * K + 8 ≤ 2 * m + 6 := by linarith
+    have ho3_le : 2 * K + 9 ≤ 2 * m + 7 := by linarith
+    have ho12_le : (K + 2) * (2 * K + 8) ≤ (m + 1) * (2 * m + 6) :=
+      mul_le_mul ho1_le ho2_le (le_of_lt ho2_pos) (by linarith)
+    have ho123_le :
+        (K + 2) * (2 * K + 8) * (2 * K + 9) ≤
+          (m + 1) * (2 * m + 6) * (2 * m + 7) :=
+      mul_le_mul ho12_le ho3_le (le_of_lt ho3_pos) (mul_nonneg (by linarith) (by linarith))
+    exact ⟨h_pos, h123_le, ho_pos, ho123_le⟩
+  · have hB_pos : 0 < B := by linarith
+    have h_diff : 1 / B ^ 2 - (1 / B ^ 3 + 1 / (2 * B ^ 2)) = (B - 2) / (2 * B ^ 3) := by
+      field_simp [ne_of_gt hB_pos]
+      ring
+    have h_nonneg : 0 ≤ (B - 2) / (2 * B ^ 3) :=
+      div_nonneg (by linarith) (by positivity)
+    linarith
 
 end LiouvilleSquareDilation
 

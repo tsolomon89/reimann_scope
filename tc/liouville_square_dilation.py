@@ -1,9 +1,10 @@
 """
-TASK-TC-054: Liouville Square-Dilation Transfer, Unconstrained Common-Factor Expansion,
-Transition Poisson Summation, and Separable Gaussian Decoupling toward SUBGATE-TC-043A.
+TASK-TC-054 / TASK-TC-054R: Liouville Square-Dilation Transfer, Unconstrained Common-Factor Expansion,
+Transition Poisson Summation, Fourier Tail-Ratio Certification, Exact Rational Cutoffs,
+Unequal-Block Sum-Integral Bound, and Global Stieltjes Energy Proof toward SUBGATE-TC-043A.
 
 Implements and certifies in 256-bit FLINT/Arb ball arithmetic and exact symbolic algebra:
-1. Reversible Square-Dilation Transfer (mu <-> lambda):
+1. Reversible Square-Dilation Transfer (mu <-> lambda) and Operator/Grade Scope:
    - Exact prime-power and integer square-divisor identities:
          lambda(n) = sum_{d^2 | n} mu(n / d^2),
          mu(n)     = sum_{d^2 | n} mu(d) lambda(n / d^2),
@@ -15,83 +16,62 @@ Implements and certifies in 256-bit FLINT/Arb ball arithmetic and exact symbolic
          Q_lambda(X) = sum_{d >= 1} Q_mu(X / d^2) / d,
          Q_mu(X)     = sum_{d >= 1} mu(d) Q_lambda(X / d^2) / d,
      with proved dilation tail bound <= zeta(3) X^{5/2} / (5 D^5).
-   - Reversible weighted L^2 norm equivalence on (0, infty) with measure X^{-2 sigma} dX/X:
-         ||f(. / a)||_sigma = a^{-sigma} ||f||_sigma,
-         ||Q_lambda||_sigma <= zeta(1 + 2 sigma) ||Q_mu||_sigma,
-         ||Q_mu||_sigma     <= (zeta(1 + 2 sigma) / zeta(2 + 4 sigma)) ||Q_lambda||_sigma   (sigma > 0),
-     with explicit O(sigma^{-1}) pole analysis as sigma -> 0^+ (no bounded inverse at sigma = 0).
+   - Reversible weighted L^2 norm equivalence on (0, infty) with measure X^{-2 eta} dX/X:
+         ||f(. / a)||_eta = a^{-eta} ||f||_eta,
+         ||Q_lambda||_eta <= zeta(1 + 2 eta) ||Q_mu||_eta,
+         ||Q_mu||_eta     <= (zeta(1 + 2 eta) / zeta(2 + 4 eta)) ||Q_lambda||_eta   (eta > 0),
+     with asymptotic residues 1/2 and 1/(2 zeta(2)) = 12 / tau^2 as eta -> 0^+.
    - Equivalence between the tau-grade interval subpower energy bound
          forall eps > 0 exists C_eps < infty forall Y >= 1, int_Y^{tau Y} |Q_a(X)|^2 dX/X <= C_eps Y^eps
-     and finiteness of ||Q_a||_sigma for all sigma in (0, 5/2), together with the analytic Mellin
-     bridge to RH and the bridge to SUBGATE-TC-043A.
+     and finiteness of ||Q_a||_eta for all eta in (0, 5/2), together with the analytic Mellin
+     bridge to RH (z = a + i b, zeta zero rho = x + i y) and irrationality of log_tau(2) and
+     log_tau(d^2) (d >= 2) via Lindemann's theorem.
 
 2. Unconstrained Common-Factor Expansion and Fixed-Order Euler-Maclaurin Error Bound:
    - Complete multiplicativity common-factor sign cancellation:
          lambda(d r) lambda(d s) = lambda(d)^2 lambda(r) lambda(s) = lambda(r) lambda(s)
-     for ALL integers d, r, s >= 1 (eliminating the squarefree mu(d)^2 and coprimality gcd(d, r s) = 1
-     side conditions that restricted Q_mu(X)^2 to A <= X^{1/3 - delta} in TC-053R/TC-053R2).
+     for ALL integers d, r, s >= 1.
    - Exact unconstrained common-factor expansion:
          Q_lambda(X)^2 = sum_{r, s >= 1, gcd(r, s) = 1} (lambda(r) lambda(s) X^5 / (r s)^3)
                          * sum_{d >= 1} d^{-6} exp(-L^2 / d^2),
-     where L = X sqrt(r^{-2} + s^{-2}), with leading Gaussian term
-         L^lambda_{r,s} = (3 sqrt(pi) / 8) lambda(r) lambda(s) (r s)^2 / (r^2 + s^2)^{5/2}.
+     where L = X sqrt(r^{-2} + s^{-2}), with leading Gaussian term (c_0 = 3 sqrt(tau/2) / 8):
+         L^lambda_{r,s} = c_0 lambda(r) lambda(s) (r s)^2 / (r^2 + s^2)^{5/2}.
    - Fixed-order periodic Bernoulli Euler-Maclaurin bound for f(v) = v^{-6} exp(-1 / v^2):
-         |sum_{d >= 1} d^{-6} exp(-L^2 / d^2) - (3 sqrt(pi) / 8) L^{-5}| <= C_N L^{-5 - N}
-     for every even N >= 2, with
-         C_N = (2 zeta(N) / tau^N) int_0^infty |f^{(N)}(v)| dv,
-         C_2 = (f'(v_-) - f'(v_+)) / 6 = [1.851257667016958056850958359201349291641 +/- 3.54e-40]
-               (v_+/- = sqrt((15 +/- sqrt(57)) / 42)),
-         C_4 = (1 / 720) int_0^infty |f^{(4)}(v)| dv = [8.752371760035365551239039765015814873069 +/- 2.00e-39],
-     yielding |E^lambda_{r,s}(X)| <= C_N X^{-N} (r s)^{N+2} / (r^2 + s^2)^{(N+5)/2} and
-         sum_{1 <= r, s <= A, gcd(r, s) = 1} |E^lambda_{r,s}(X)| <= C_N 2^{-(N+5)/2} A^{N+1} / X^N,
-     which vanishes throughout the subtransition range A <= X^{1 - delta} whenever (N + 1) delta > 1.
+         |sum_{d >= 1} d^{-6} exp(-L^2 / d^2) - c_0 L^{-5}| <= C_N L^{-5 - N}
+     for every even N >= 2, with C_2 = 1.8512576670... and C_4 = 8.7523717600..., controlling
+     every fixed subtransition range A <= X^{1 - delta} whenever (N + 1) delta > 1.
 
-3. Exact Poisson Summation Formula at the Transition (A ~ X):
-   - Even extension f(-v) = f(v) (f^{(k)}(0) = 0 for all k >= 0) and exact Poisson formula:
-         sum_{d >= 1} d^{-6} exp(-L^2 / d^2) = L^{-5} [3 sqrt(pi) / 8 + sum_{j >= 1} hat{f}(j L)],
-     where hat{f}(xi) = 2 int_0^infty v^{-6} exp(-1 / v^2) cos(tau xi v) dv.
-   - Certified 256-bit Arb evaluation of hat{f}(xi) via exact Mellin-Barnes residue series,
-     certifying sign changes:
-         hat{f}(1/2) = -0.5628546550... < 0,
-         hat{f}(1)   = -0.3668367826... < 0,
-         hat{f}(3/2) = +0.2636171831... > 0,
-         hat{f}(2)   = +0.1247126116... > 0,
-     and proved Fourier tail bound |sum_{j > J_0} hat{f}(j L)| <= C_N / ((N - 1) zeta(N) J_0^{N-1} L^N).
+3. Exact Poisson Summation Formula at the Transition (A ~ X) and Repaired Fourier Certification:
+   - f(v) = v^{-6} exp(-1/v^2) (v != 0), f(0) = 0 is NOT in S(R) because v^6 f(v) -> 1, but
+     satisfies C^infty flatness at 0, f^{(j)}(v) = O(|v|^{-6-j}) at infinity, f^{(j)} in L^1(R),
+     and C^1(R/Z) periodization convergence (DLMF 1.8.14), proving:
+         sum_{d >= 1} d^{-6} exp(-L^2 / d^2) = L^{-5} [c_0 + sum_{j >= 1} hat{f}(j L)].
+   - Certified 256-bit Arb evaluation of hat{f}(xi) with monotonic tail-ratio bounds R_even, R_odd,
+     outward certification of R <= 1/2 (or 1/(1 - R) when 1/2 < R < 1), interval-input Lipschitz
+     enclosure, and independent certified quadrature cross-checks (`acb.integral`).
 
-4. Rectangular-Block Decomposition and Transition-Region Proof Attempts (Attacks A & B):
-   - Exact dyadic rectangular decomposition Q_lambda(X)^2 = sum_{a, b >= 0} B_{2^a, 2^b}(X)
-     covering subtransition (A, B << X), transition (A, B ~ X), widely unequal factors
-     (|B_{A,B}(X)| <= (pi^6 / 945) min(A, B)^3 / max(A, B)^2), and outer tail.
-   - Attack A (Coprime Euler-Series, 2D Mellin & Separable Gaussian Decoupling Replacement Theorem):
-     * 1D Mellin identity M[Q_lambda](z) = Gamma(5/4 - z/2) zeta(1 + 2 z) / (2 zeta(1/2 + z))
-       with nonvanishing boundary pole at z = 0 of residue Gamma(5/4) / (4 zeta(1/2)) = -0.1551682265... != 0.
-     * Bivariate coprime Dirichlet series D_lambda(u, v) = zeta(2u) zeta(2v) / (zeta(u) zeta(v) zeta(u + v))
-       and proof that neither zeta(2u) zeta(2v) nor 1/zeta(u + v) cancels off-critical poles at (rho, conj(rho))
-       because Re(rho) = beta > 1/2 implies 2 beta > 1 lies in the Euler-product half-plane where zeta(2w) != 0.
-     * Replacement Theorem (Separable Gaussian Decoupling): retaining the exact kernel
-       exp(-X^2 (r^{-2} + s^{-2}) / d^2) = exp(-X^2 / (d^2 r^2)) exp(-X^2 / (d^2 s^2)) and applying
-       1_{gcd(r,s)=1} = sum_{e | gcd(r,s)} mu(e) factors EVERY rectangular block B_{A,B}(X) into 1D
-       unweighted Liouville Gaussian sums U_lambda(X/(d e); A/e) U_lambda(X/(d e); B/e) with convergent
-       divisor weight sum_{e >= 1} e^{-2} = pi^2 / 6, proving the unconditional global super-polynomial
-       logarithmic energy saving:
-           int_Y^{tau Y} |Q_lambda(X)|^2 dX/X << Y exp(-2 c_1 (log Y)^{3/5} (log log Y)^{-1/5}) <<_D Y (log Y)^{-D}
-       across the ENTIRE integral (beating the unsigned O(Y) benchmark by every power of log Y without
-       hitting the transition Euler-Maclaurin barrier).
-   - Attack B (Dyadic Parity Annihilation and Cross-Scale Correlation):
-     * Exact even-index annihilation Q_{lambda,odd}(X) = Q_lambda(X) + 2^{-1/2} Q_lambda(X/2),
-       convergent dyadic inversion, exact grade-interval energy identity on [Y, tau Y] with cross-scale
-       correlation, bounded weighted norm equivalence for all sigma > -1/2, and proof that the elementary
-       dyadic factor 1 + 2^{-rho} satisfies |1 + 2^{-rho}| >= 1 - 2^{-beta} > 0 for all beta = Re(rho) > 0.
+4. Rectangular-Block Decomposition, Unequal-Block Bound, Exact Cutoffs, and Global Stieltjes Energy Proof:
+   - Exact rational cutoffs for U_lambda(Y; M) (reproducing and fixing the M = 1 + 2^{-42} regression).
+   - Repaired widely unequal block bound:
+         |B_{A,B}(X)| <= (7/3) C_* min(A, B)^3 / max(A, B)^2,   C_* = max{zeta(6), c_0 + 27 exp(-3)}.
+   - Repaired dyadic Abel estimate |U_lambda(Y; M)| << M^{1/2} min(M/Y, (Y/M)^{5/2}) exp(-c Phi(M))
+     (M >= 16), analytical refutation of the old M^{-1/2} prefactor via Res_{z=0} M[Q_lambda](z) != 0,
+     collapse of sum_{q>=1} ((sum_{e|q} mu(e))/q) Q_lambda(X/q)^2 = Q_lambda(X)^2, and global
+     Stieltjes integration-by-parts proof |Q_lambda(X)| << sqrt(X) exp(-c_1 Phi(X)) (X >= 256) and
+     E_lambda(Y) << Y exp(-2 c_2 Phi(Y)) <<_D Y (log Y)^{-D}.
 """
 
 from __future__ import annotations
 
+from fractions import Fraction
 import json
 import math
 from pathlib import Path
 import re
+import subprocess
 import sys
-from typing import Any, Dict, List, Tuple
+import tempfile
+from typing import Any, Dict, List, Tuple, Union
 
 from flint import acb, arb, ctx as flint_ctx
 import sympy as sp
@@ -111,9 +91,12 @@ from tc.prime_euler_moebius_recovery import (
 )
 
 TASK_TC_054_ID = "TASK-TC-054"
+TASK_TC_054R_ID = "TASK-TC-054R"
 PRIOR_MERGED_MAIN_TC_053R = "c82e439708b0b6031db6a77bf3977688d9f0758b"
 TC_053R2_IMPLEMENTATION_COMMIT = "cc303030138c670e8f01aaaab483bbeca6bc17d1"
 TC_053R2_REVIEWED_TIP = "21576861ecd0dcbf874afec91b299fd6060f4f03"
+TC_054_IMPLEMENTATION_COMMIT = "8f6afcfb9161aa77c74bc40605ac4fabae8b432e"
+TC_054_REVIEWED_TIP = "cdee197acc9c3e75a4c8cffc94c10bec1bcb97fa"
 
 LIOUVILLE_SQUARE_DILATION_LEAN_MODULE_PATH = (
     REPO_ROOT / "formal" / "RiemannScope" / "LiouvilleSquareDilation.lean"
@@ -121,6 +104,14 @@ LIOUVILLE_SQUARE_DILATION_LEAN_MODULE_PATH = (
 LIOUVILLE_SQUARE_DILATION_ARTIFACT_PATH = (
     REPO_ROOT / "data" / "tc_liouville_square_dilation.json"
 )
+
+
+def inflate_arb_with_nonneg_bound(center_ball: arb, nonneg_bound: arb) -> arb:
+    """Inflate `center_ball` by `[0, nonneg_bound.upper()]` using pure Arb ball/magnitude
+    arithmetic without intermediate Python `float` conversions.
+    """
+    b_upper = arb(nonneg_bound).upper()
+    return arb(center_ball) + arb(0, b_upper)
 
 
 # ---------------------------------------------------------------------------
@@ -209,8 +200,7 @@ def evaluate_Q_arith_certified_arb(
 
         partial_Q = X_pow_5_2 * partial_sum
         tail_bound = X_pow_5_2 / (arb(2) * (arb(T_cutoff) ** 2))
-        tail_rad = float(tail_bound.upper())
-        enclosure = arb(partial_Q.mid(), float(partial_Q.rad()) + tail_rad)
+        enclosure = inflate_arb_with_nonneg_bound(partial_Q, tail_bound)
         zeta3_bound = arb(3).zeta() * X_pow_5_2
 
         return {
@@ -264,8 +254,7 @@ def evaluate_square_dilation_transfer_certified_arb(
             partial_sum += arb(weight) * q_d / d_arb
 
         dilation_tail_bound = (arb(3).zeta() * X_pow_5_2) / (arb(5) * (arb(D_cutoff) ** 5))
-        tail_rad = float(dilation_tail_bound.upper())
-        enclosure = arb(partial_sum.mid(), float(partial_sum.rad()) + tail_rad)
+        enclosure = inflate_arb_with_nonneg_bound(partial_sum, dilation_tail_bound)
 
         return {
             "direction": direction,
@@ -415,8 +404,8 @@ def verify_section_2_and_3_square_dilation_transfer(
                 "abs_Q_lambda_le_zeta3_X_5_2": q_lam_res["abs_le_zeta3_X_5_2"],
             })
 
-        # 4. Weighted dilation norm multipliers across sigma > 0 and sigma -> 0^+ blowup
-        sigma_samples: List[Tuple[str, arb]] = [
+        # 4. Weighted dilation norm multipliers across eta > 0 and eta -> 0^+ upper-bound divergence
+        eta_samples: List[Tuple[str, arb]] = [
             ("1/20", arb(1) / arb(20)),
             ("1/10", arb(1) / arb(10)),
             ("1/4", arb(1) / arb(4)),
@@ -424,26 +413,33 @@ def verify_section_2_and_3_square_dilation_transfer(
             ("1", arb(1)),
         ]
         norm_multiplier_rows: List[Dict[str, Any]] = []
-        for s_label, sigma_arb in sigma_samples:
-            zeta_1_2s = (arb(1) + arb(2) * sigma_arb).zeta()
-            zeta_2_4s = (arb(2) + arb(4) * sigma_arb).zeta()
-            rev_mult = zeta_1_2s / zeta_2_4s
-            scaled_fwd = sigma_arb * zeta_1_2s
-            scaled_rev = sigma_arb * rev_mult
+        for e_label, eta_arb in eta_samples:
+            zeta_1_2e = (arb(1) + arb(2) * eta_arb).zeta()
+            zeta_2_4e = (arb(2) + arb(4) * eta_arb).zeta()
+            rev_mult = zeta_1_2e / zeta_2_4e
+            scaled_fwd = eta_arb * zeta_1_2e
+            scaled_rev = eta_arb * rev_mult
             norm_multiplier_rows.append({
-                "sigma_label": s_label,
-                "sigma": serialize_arb_certified(sigma_arb),
-                "forward_multiplier_zeta_1_plus_2sigma": serialize_arb_certified(zeta_1_2s),
-                "zeta_2_plus_4sigma": serialize_arb_certified(zeta_2_4s),
+                "eta_label": e_label,
+                "eta": serialize_arb_certified(eta_arb),
+                "sigma_label": e_label,
+                "sigma": serialize_arb_certified(eta_arb),
+                "forward_multiplier_zeta_1_plus_2eta": serialize_arb_certified(zeta_1_2e),
+                "forward_multiplier_zeta_1_plus_2sigma": serialize_arb_certified(zeta_1_2e),
+                "zeta_2_plus_4eta": serialize_arb_certified(zeta_2_4e),
+                "zeta_2_plus_4sigma": serialize_arb_certified(zeta_2_4e),
+                "reverse_multiplier_zeta_1_2eta_over_zeta_2_4eta": serialize_arb_certified(rev_mult),
                 "reverse_multiplier_zeta_1_2sigma_over_zeta_2_4sigma": serialize_arb_certified(rev_mult),
+                "eta_times_forward_multiplier": serialize_arb_certified(scaled_fwd),
                 "sigma_times_forward_multiplier": serialize_arb_certified(scaled_fwd),
+                "eta_times_reverse_multiplier": serialize_arb_certified(scaled_rev),
                 "sigma_times_reverse_multiplier": serialize_arb_certified(scaled_rev),
-                "forward_multiplier_positive_finite": bool(zeta_1_2s.lower() > 0),
+                "forward_multiplier_positive_finite": bool(zeta_1_2e.lower() > 0),
                 "reverse_multiplier_positive_finite": bool(rev_mult.lower() > 0),
             })
 
-        limit_sigma_fwd_at_zero = arb(1) / arb(2)
-        limit_sigma_rev_at_zero = arb(3) / (arb.pi() ** 2)
+        limit_eta_fwd_at_zero = arb(1) / arb(2)
+        limit_eta_rev_at_zero = arb(12) / (tau_arb * tau_arb)
 
         return {
             "square_divisor_convolution_audit": {
@@ -461,54 +457,62 @@ def verify_section_2_and_3_square_dilation_transfer(
             "square_dilation_transfer_rows": transfer_rows,
             "all_transfer_enclosures_contain_zero_difference": all_transfers_overlap,
             "weighted_dilation_norm_equivalence": {
-                "dilation_scaling_identity": "||f(./a)||_sigma = a^{-sigma} ||f||_sigma",
-                "forward_bound_formula": "||Q_lambda||_sigma <= zeta(1 + 2*sigma) ||Q_mu||_sigma",
-                "reverse_bound_formula": "||Q_mu||_sigma <= (zeta(1 + 2*sigma) / zeta(2 + 4*sigma)) ||Q_lambda||_sigma",
-                "sigma_zero_singularity_note": (
-                    "At sigma = 0, sum_{d>=1} d^{-1} = infty and sum_{d>=1} |mu(d)| d^{-1} = infty; "
-                    "as sigma -> 0^+, zeta(1 + 2*sigma) = 1/(2*sigma) + O(1) and "
-                    "zeta(1 + 2*sigma)/zeta(2 + 4*sigma) = 3/(pi^2 * sigma) + O(1), so there is no "
-                    "bounded inverse at sigma = 0, while the transfer is boundedly invertible for every sigma > 0."
+                "norm_definition": "||f||_eta^2 = int_0^infty |f(X)|^2 X^{-2*eta} dX/X",
+                "dilation_scaling_identity": "||f(./a)||_eta = a^{-eta} ||f||_eta",
+                "forward_bound_formula": "||Q_lambda||_eta <= zeta(1 + 2*eta) ||Q_mu||_eta",
+                "reverse_bound_formula": "||Q_mu||_eta <= (zeta(1 + 2*eta) / zeta(2 + 4*eta)) ||Q_lambda||_eta",
+                "eta_zero_singularity_and_operator_scope_note": (
+                    "For eta > 0, Minkowski's triangle inequality yields finite mutual upper-bound multipliers "
+                    "zeta(1 + 2*eta) and zeta(1 + 2*eta)/zeta(2 + 4*eta). As eta -> 0^+, "
+                    "zeta(1 + 2*eta) = 1/(2*eta) + O(1) and zeta(1 + 2*eta)/zeta(2 + 4*eta) = 12/(tau^2 * eta) + O(1) "
+                    "(since zeta(2) = tau^2/24) because sum_{d>=1} d^{-1} = infty and sum_{d>=1} |mu(d)| d^{-1} = infty. "
+                    "Divergence of a triangle-inequality upper bound shows only that the Minkowski estimate fails at "
+                    "weight eta = 0; independently, by Mellin-Plancherel on L^2((0, infty), dX/X) along z = i*b (b in R), "
+                    "the square-dilation operator acts by the spectral multiplier sum_{d>=1} d^{-1 - 2*i*b} = zeta(1 + 2*i*b), "
+                    "which has a pole at b = 0."
                 ),
-                "asymptotic_residue_sigma_times_forward_at_0": serialize_arb_certified(limit_sigma_fwd_at_zero),
-                "asymptotic_residue_sigma_times_reverse_at_0": serialize_arb_certified(limit_sigma_rev_at_zero),
+                "asymptotic_residue_eta_times_forward_at_0": serialize_arb_certified(limit_eta_fwd_at_zero),
+                "asymptotic_residue_eta_times_reverse_at_0": serialize_arb_certified(limit_eta_rev_at_zero),
+                "asymptotic_residue_sigma_times_forward_at_0": serialize_arb_certified(limit_eta_fwd_at_zero),
+                "asymptotic_residue_sigma_times_reverse_at_0": serialize_arb_certified(limit_eta_rev_at_zero),
                 "multiplier_table": norm_multiplier_rows,
             },
             "grade_interval_energy_and_mellin_bridge": {
                 "equivalence_statement": (
                     "(forall eps > 0 exists C_eps < infty forall Y >= 1, int_Y^{tau Y} |Q_a(X)|^2 dX/X <= C_eps Y^eps) "
-                    "<-> (forall sigma in (0, 5/2), ||Q_a||_sigma < infty)"
+                    "<-> (forall eta in (0, 5/2), ||Q_a||_eta < infty)"
                 ),
                 "forward_direction_bound": (
-                    "For sigma in (0, 5/2), choose eps = sigma > 0: "
-                    "int_0^1 |Q_a(X)|^2 X^{-2*sigma} dX/X <= zeta(3)^2 / (5 - 2*sigma) and "
-                    "sum_{k>=0} int_{tau^k}^{tau^{k+1}} |Q_a(X)|^2 X^{-2*sigma} dX/X <= C_sigma / (1 - tau^{-sigma})."
+                    "For eta in (0, 5/2), choose eps = eta > 0: "
+                    "int_0^1 |Q_a(X)|^2 X^{-2*eta} dX/X <= zeta(3)^2 / (5 - 2*eta) and "
+                    "sum_{k>=0} int_{tau^k}^{tau^{k+1}} |Q_a(X)|^2 X^{-2*eta} dX/X <= C_eta / (1 - tau^{-eta})."
                 ),
                 "reverse_direction_bound": (
-                    "For eps in (0, 5) and Y >= 1, set sigma = eps / 2 in (0, 5/2): on X in [Y, tau Y], "
-                    "1 <= (tau Y / X)^{2*sigma} = tau^eps Y^eps X^{-2*sigma}, so "
+                    "For eps in (0, 5) and Y >= 1, set eta = eps / 2 in (0, 5/2): on X in [Y, tau Y], "
+                    "1 <= (tau Y / X)^{2*eta} = tau^eps Y^eps X^{-2*eta}, so "
                     "int_Y^{tau Y} |Q_a(X)|^2 dX/X <= tau^eps ||Q_a||_{eps/2}^2 Y^eps."
                 ),
                 "mellin_identities": {
+                    "complex_coordinates": "z = a + i*b (a, b in R); zeta zero rho = x + i*y (x, y in R, critical real coordinate x = 1/2)",
                     "M_Q_mu_z": "Gamma(5/4 - z/2) / (2 * zeta(1/2 + z))",
                     "M_Q_lambda_z": "Gamma(5/4 - z/2) * zeta(1 + 2*z) / (2 * zeta(1/2 + z))",
-                    "strip_of_analyticity_from_norm_finiteness": "0 < Re(z) < 5/2",
+                    "strip_of_analyticity_from_norm_finiteness": "0 < a = Re(z) < 5/2",
                     "rh_equivalence_explanation": (
-                        "By Cauchy-Schwarz on int_0^infty Q_a(X) X^{-z} dX/X with sigma = Re(z)/2 in (0, 5/4) "
-                        "(or Parseval-Plancherel along Re(z) = sigma in (0, 5/2)), finiteness of ||Q_a||_sigma "
-                        "for all sigma in (0, 5/2) forces M[Q_a](z) to be holomorphic throughout 0 < Re(z) < 5/2. "
-                        "Since Gamma(5/4 - z/2) and zeta(1 + 2*z) have no zeros in 0 < Re(z) < 5/2, any off-critical "
-                        "zero rho of zeta(s) with 1/2 < Re(rho) < 1 creates a non-removable pole at z = rho - 1/2 "
-                        "with Re(z) in (0, 1/2) subset (0, 5/2)."
+                        "For z = a + i*b with a, b in R, Cauchy-Schwarz on int_0^infty Q_a(X) X^{-z} dX/X with eta = a/2 in (0, 5/4) "
+                        "(or Mellin-Plancherel along a = eta in (0, 5/2)) shows that finiteness of ||Q_a||_eta "
+                        "for all eta in (0, 5/2) forces M[Q_a](z) to be holomorphic throughout 0 < a < 5/2. "
+                        "Since Gamma(5/4 - z/2) and zeta(1 + 2*z) have no zeros in 0 < a < 5/2, any off-critical "
+                        "zero rho = x + i*y of zeta(s) with 1/2 < x < 1 creates a non-removable pole at z = rho - 1/2 "
+                        "with Re(z) = x - 1/2 in (0, 1/2) subset (0, 5/2)."
                     ),
                     "bridge_to_subgate_tc_043a_explanation": (
-                        "Although individual square-dilation shifts X -> X/d^2 and dyadic shifts X -> X/2 correspond "
-                        "to real log-shifts log_tau(d^2) and log_tau(2) that are transcendental over Q (not single elements "
-                        "of A_R), the weighted L^2 norm ||.||_sigma on the full multiplicative group (0, infty) is partitioned "
-                        "by the tau-adic intervals [tau^k, tau^{k+1}) generated by the rational integer grades k in Z subset A_R. "
-                        "Thus the auxiliary dilation operators act on the ambient continuum L^2((0, infty), X^{-2*sigma} dX/X) "
-                        "and transfer the grade-interval energy bound on [Y, tau Y] directly between Q_mu and Q_lambda "
-                        "without ever claiming that log_tau(2) or log_tau(d^2) lies in A_R."
+                        "TC grades K remain real algebraic (K in A_R); auxiliary positive real scales and real norm weights eta > 0 "
+                        "do not automatically become TC grades. For integer dilations d >= 2, Lindemann's theorem (tau = 2*pi is "
+                        "transcendental) implies tau^q != d^2 for every nonzero rational q in Q \\ {0}, establishing that "
+                        "log_tau(2) and log_tau(d^2) are irrational (not in Q). Irrationality does not exclude algebraic irrational "
+                        "grades in A_R \\ Q, and whether log_tau(2) or log_tau(d^2) belongs to A_R is unestablished here and unnecessary: "
+                        "the weighted norm ||.||_eta is defined on the continuum L^2((0, infty), X^{-2*eta} dX/X), which is partitioned "
+                        "into the tau-adic intervals [tau^k, tau^{k+1}) indexed by rational integer grades k in Z subset A_R."
                     ),
                 },
             },
@@ -584,22 +588,27 @@ def verify_euler_maclaurin_derivatives_and_constants_arb(
             dp = (arb(378) * u_val - arb(366)) * u_val + arb(60)
             return p, dp
 
-        u_cubic_seeds = [0.089683317229, 0.349299153637, 1.013398481515]
+        u_cubic_seeds = ["0.089683317229", "0.349299153637", "1.013398481515"]
         u4_certs: List[arb] = [arb(1) / arb(6)]
-        for u0 in u_cubic_seeds:
-            u_curr = arb(str(u0))
+        box_eps = arb(2) ** (-230)
+        for u0_str in u_cubic_seeds:
+            u_curr = arb(u0_str)
             for _ in range(16):
                 p_val, dp_val = eval_P4_cubic_and_deriv(u_curr)
-                u_curr = arb((u_curr - p_val / dp_val).mid())
-            p_mid, dp_box = eval_P4_cubic_and_deriv(arb(u_curr.mid(), 1e-70))
-            rad = float(abs(p_mid / dp_box).upper())
-            u_cert = arb(u_curr.mid(), rad)
-            p_low, _ = eval_P4_cubic_and_deriv(arb(u_cert.lower()))
-            p_high, _ = eval_P4_cubic_and_deriv(arb(u_cert.upper()))
+                u_curr = (u_curr - p_val / dp_val).mid()
+            p_mid, _ = eval_P4_cubic_and_deriv(u_curr)
+            _, dp_box = eval_P4_cubic_and_deriv(inflate_arb_with_nonneg_bound(u_curr, box_eps))
+            u_cert = inflate_arb_with_nonneg_bound(u_curr, abs(p_mid / dp_box) + arb(2) ** (-240))
+            p_low, _ = eval_P4_cubic_and_deriv(u_cert.lower())
+            p_high, _ = eval_P4_cubic_and_deriv(u_cert.upper())
             assert (p_low.upper() < 0 < p_high.lower()) or (p_high.upper() < 0 < p_low.lower())
             u4_certs.append(u_cert)
 
-        u4_certs.sort(key=lambda x: float(x.mid()))
+        # Sort roots in ascending order using certified interval comparison
+        for i in range(len(u4_certs)):
+            for j in range(i + 1, len(u4_certs)):
+                if bool(u4_certs[j].upper() < u4_certs[i].lower()):
+                    u4_certs[i], u4_certs[j] = u4_certs[j], u4_certs[i]
         v4_roots: List[arb] = [uc.sqrt() for uc in u4_certs]
 
         f3_at_roots = [eval_f3_arb(vr) for vr in v4_roots]
@@ -648,7 +657,7 @@ def evaluate_d_sum_certified_arb(
             d_arb = arb(d)
             partial += (d_arb ** (-6)) * (-L_sq / (d_arb * d_arb)).exp()
         tail_bound = arb(1) / (arb(5) * (arb(D_cutoff) ** 5))
-        return arb(partial.mid(), float(partial.rad()) + float(tail_bound.upper()))
+        return inflate_arb_with_nonneg_bound(partial, tail_bound)
     finally:
         flint_ctx.prec = saved_prec
 
@@ -865,65 +874,315 @@ def verify_section_4_unconstrained_common_factor_and_euler_maclaurin(
 # ---------------------------------------------------------------------------
 
 
+def compute_hat_f_tail_ratios_arb(
+    omega_val: arb,
+    K_terms: int,
+) -> Tuple[arb, arb]:
+    """Return the certified monotonic upper-bound ratios `(R_even, R_odd)` for indices `m, k >= K_terms + 1`:
+        R_even = omega^2 / ((K - 1/2) * (2K + 3) * (2K + 4)),
+        R_odd  = omega^2 / ((K + 2) * (2K + 8) * (2K + 9)).
+    """
+    if isinstance(K_terms, bool) or not isinstance(K_terms, int) or K_terms < 1:
+        raise ValueError(f"K_terms must be an integer >= 1, got {K_terms!r}")
+    omega_arb = arb(omega_val)
+    omega_sq = omega_arb * omega_arb
+    K_arb = arb(K_terms)
+    denom_even = (K_arb - arb(1) / arb(2)) * (arb(2 * K_terms + 3)) * (arb(2 * K_terms + 4))
+    denom_odd = (arb(K_terms + 2)) * (arb(2 * K_terms + 8)) * (arb(2 * K_terms + 9))
+    return omega_sq / denom_even, omega_sq / denom_odd
+
+
+def _eval_hat_f_series_core_arb(
+    omega: arb,
+    K_eff: int,
+    even_tail_factor: arb,
+    odd_tail_factor: arb,
+) -> arb:
+    """Internal helper evaluating the truncated residue series and inflating by the certified tail bound."""
+    omega_sq = omega * omega
+    tau_half = arb.pi()
+
+    even_sum = arb(0)
+    fact_2m = arb(1)
+    omega_pow = arb(1)
+    for m in range(0, K_eff + 1):
+        if m > 0:
+            fact_2m *= arb(2 * m - 1) * arb(2 * m)
+            omega_pow *= omega_sq
+        gamma_val = (arb(5) / arb(2) - arb(m)).gamma()
+        sign = arb(1) if (m % 2 == 0) else arb(-1)
+        even_sum += sign * omega_pow / fact_2m * gamma_val
+
+    m_next = K_eff + 1
+    next_fact = fact_2m * arb(2 * m_next - 1) * arb(2 * m_next)
+    next_omega = omega_pow * omega_sq
+    next_gamma = abs((arb(5) / arb(2) - arb(m_next)).gamma())
+    first_omitted_even = next_omega / next_fact * next_gamma
+    even_tail_bound = even_tail_factor * first_omitted_even
+
+    odd_sum = arb(0)
+    fact_k = arb(1)
+    fact_5_2k = arb(120)  # 5! = 120
+    omega_5_2k = omega ** 5
+    for k in range(0, K_eff + 1):
+        if k > 0:
+            fact_k *= arb(k)
+            fact_5_2k *= arb(2 * k + 4) * arb(2 * k + 5)
+            omega_5_2k *= omega_sq
+        odd_sum += omega_5_2k / (fact_k * fact_5_2k)
+
+    k_next = K_eff + 1
+    next_fact_k = fact_k * arb(k_next)
+    next_fact_5_2k = fact_5_2k * arb(2 * k_next + 4) * arb(2 * k_next + 5)
+    next_omega_odd = omega_5_2k * omega_sq
+    first_omitted_odd = tau_half * next_omega_odd / (next_fact_k * next_fact_5_2k)
+    odd_tail_bound = odd_tail_factor * first_omitted_odd
+
+    partial_val = even_sum - tau_half * odd_sum
+    return inflate_arb_with_nonneg_bound(partial_val, even_tail_bound + odd_tail_bound)
+
+
 def evaluate_hat_f_hypergeometric_certified_arb(
-    xi_val: arb,
+    xi_val: Union[arb, int, float, str, Fraction],
     K_terms: int = 200,
     prec_bits: int = 256,
+    *,
+    strict_K: bool = False,
 ) -> arb:
     """Evaluate hat{f}(xi) = 2 int_0^infty v^{-6} exp(-1/v^2) cos(tau xi v) dv in 256-bit Arb
-    via the exact Mellin-Barnes residue expansion (with omega = tau |xi| = 2 pi |xi|):
+    via the exact Mellin-Barnes residue expansion (with omega = tau |xi|):
         hat{f}(xi) = sum_{m>=0} (-1)^m Gamma(5/2 - m) omega^{2m} / (2m)!
-                   - pi * sum_{k>=0} omega^{5 + 2k} / (k! (5 + 2k)!).
-    Evaluates intermediate series at max(prec_bits, 512) bits to prevent cancellation loss for large omega.
+                   - (tau/2) * sum_{k>=0} omega^{5 + 2k} / (k! (5 + 2k)!).
+
+    Certified tail control (TASK-TC-054R §4):
+    - For m, k >= K + 1 (K >= 1), consecutive term ratios are bounded monotonically by
+          R_even = omega^2 / ((K - 1/2)(2K + 3)(2K + 4)),
+          R_odd  = omega^2 / ((K + 2)(2K + 8)(2K + 9)).
+    - Before using factor 2 on the first omitted term, certifies outward that R <= 1/2.
+    - If 1/2 < R < 1 is certified outward, uses the certified geometric factor 1 / (1 - R).
+    - If R >= 1 is not excluded: raises ValueError when `strict_K=True`, or automatically increases
+      the truncation index `K_eff` until R_even <= 1/2 is certified outward when `strict_K=False`.
+    - Handles interval inputs via the exact analytical Lipschitz bound |hat{f}'(xi)| <= tau
+      intersected with direct interval evaluation, and adapts working precision for large omega.
+    """
+    if isinstance(K_terms, bool) or not isinstance(K_terms, int) or K_terms < 1:
+        raise ValueError(f"K_terms must be an integer >= 1, got {K_terms!r}")
+    if isinstance(prec_bits, bool) or not isinstance(prec_bits, int) or prec_bits < 64:
+        raise ValueError(f"prec_bits must be an integer >= 64, got {prec_bits!r}")
+    if isinstance(xi_val, bool):
+        raise ValueError("xi_val must be a finite real number or Arb ball, not bool")
+    if isinstance(xi_val, float) and not math.isfinite(xi_val):
+        raise ValueError(f"xi_val must be finite, got {xi_val!r}")
+
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = max(prec_bits, 512)
+        if isinstance(xi_val, Fraction):
+            xi_init = arb(xi_val.numerator) / arb(xi_val.denominator)
+        else:
+            xi_init = arb(xi_val)
+        if not xi_init.is_finite():
+            raise ValueError(f"xi_val must be a finite Arb ball, got {xi_val!r}")
+
+        tau_init = arb(2) * arb.pi()
+        omega_init = tau_init * abs(xi_init)
+        omega_top_int = int((arb(4) * omega_init.upper()).ceil().unique_fmpz())
+        work_prec = max(prec_bits + 128, 512 + max(0, omega_top_int))
+
+        flint_ctx.prec = work_prec
+        if isinstance(xi_val, Fraction):
+            xi_arb = arb(xi_val.numerator) / arb(xi_val.denominator)
+        elif isinstance(xi_val, arb):
+            xi_arb = arb(xi_val)
+        else:
+            xi_arb = arb(xi_val)
+        tau_arb = arb(2) * arb.pi()
+        omega_full = tau_arb * abs(xi_arb)
+
+        # Determine effective truncation K_eff and certified geometric factors on omega_full
+        K_eff = K_terms
+        R_even, R_odd = compute_hat_f_tail_ratios_arb(omega_full, K_eff)
+        half_arb = arb(1) / arb(2)
+        one_arb = arb(1)
+
+        if strict_K:
+            if bool((R_even - one_arb).upper() >= 0) or bool((R_odd - one_arb).upper() >= 0):
+                raise ValueError(
+                    f"K_terms={K_terms} is insufficient for xi={xi_val}: "
+                    f"R_even={R_even} (must be < 1 for geometric tail certification)"
+                )
+        else:
+            if bool((R_even - half_arb).upper() > 0) or bool((R_odd - half_arb).upper() > 0):
+                K_eff = max(K_eff, 200)
+                R_even, R_odd = compute_hat_f_tail_ratios_arb(omega_full, K_eff)
+                while bool((R_even - half_arb).upper() > 0) or bool((R_odd - half_arb).upper() > 0):
+                    K_eff = max(K_eff + 16, int(K_eff * 3 // 2))
+                    R_even, R_odd = compute_hat_f_tail_ratios_arb(omega_full, K_eff)
+
+        def _tail_factors(r_ev: arb, r_od: arb) -> Tuple[arb, arb]:
+            f_ev = arb(2) if bool((r_ev - half_arb).upper() <= 0) else one_arb / (one_arb - r_ev)
+            f_od = arb(2) if bool((r_od - half_arb).upper() <= 0) else one_arb / (one_arb - r_od)
+            return f_ev, f_od
+
+        # Evaluate at midpoint (zero-radius) with adaptive K_eff and working precision refinement
+        for _attempt in range(8):
+            flint_ctx.prec = work_prec
+            tau_w = arb(2) * arb.pi()
+            xi_mid = xi_arb.mid()
+            omega_mid = tau_w * abs(xi_mid)
+            r_ev_mid, r_od_mid = compute_hat_f_tail_ratios_arb(omega_mid, K_eff)
+            f_ev_mid, f_od_mid = _tail_factors(r_ev_mid, r_od_mid)
+            mid_val = _eval_hat_f_series_core_arb(omega_mid, K_eff, f_ev_mid, f_od_mid)
+            # Check if omitted tail or alternating cancellation inflated radius beyond target precision
+            if bool(mid_val.rad() <= arb(2) ** (-(prec_bits + 16))) or strict_K:
+                break
+            K_eff = max(K_eff + 64, int(K_eff * 3 // 2))
+            work_prec *= 2
+            R_even, R_odd = compute_hat_f_tail_ratios_arb(omega_full, K_eff)
+
+        xi_rad = xi_arb.rad()
+        if bool(xi_rad.is_zero()):
+            res_work = mid_val
+        else:
+            # Rigorous Lipschitz enclosure: |hat{f}'(xi)| <= 2*tau * int_0^infty v^{-5} e^{-1/v^2} dv = tau
+            lipschitz_encl = inflate_arb_with_nonneg_bound(mid_val, tau_w * xi_rad)
+            f_ev_full, f_od_full = _tail_factors(R_even, R_odd)
+            direct_encl = _eval_hat_f_series_core_arb(omega_full, K_eff, f_ev_full, f_od_full)
+            res_work = lipschitz_encl.intersection(direct_encl)
+
+        flint_ctx.prec = prec_bits
+        return arb(res_work)
+    finally:
+        flint_ctx.prec = saved_prec
+
+
+def reproduce_tc054_hat_f_k1_counterexample_arb(
+    prec_bits: int = 256,
+) -> Dict[str, Any]:
+    """Reproduce the legacy TC-054 failure at `K_terms=1`, `xi = 4 / tau` (`omega = 4`):
+      - Legacy midpoint ~ -42.7814017777
+      - Legacy radius   ~  40.0818309197
+      - Legacy upper    ~  -2.6995708581 < -Gamma(5/2) ~ -1.3293403882
+    whereas |hat{f}(xi)| <= int_R f(v) dv = Gamma(5/2) and the true value is
+    hat{f}(4 / tau) = -0.7757751802167744...
     """
     saved_prec = flint_ctx.prec
     try:
-        work_prec = max(prec_bits, 512)
-        flint_ctx.prec = work_prec
-        xi_abs = abs(arb(xi_val))
-        omega = arb(2) * arb.pi() * xi_abs
-        omega_sq = omega * omega
+        flint_ctx.prec = max(prec_bits, 512)
+        tau_arb = arb(2) * arb.pi()
+        xi_arb = arb(4) / tau_arb
+        omega = arb(4)
+        omega_sq = arb(16)
 
-        even_sum = arb(0)
-        fact_2m = arb(1)
-        omega_pow = arb(1)
-        for m in range(0, K_terms + 1):
-            if m > 0:
-                fact_2m *= arb(2 * m - 1) * arb(2 * m)
-                omega_pow *= omega_sq
-            gamma_val = (arb(5) / arb(2) - arb(m)).gamma()
-            sign = arb(1) if (m % 2 == 0) else arb(-1)
-            term = sign * omega_pow / fact_2m * gamma_val
-            even_sum += term
+        # Legacy K_terms = 1 calculation without ratio check
+        a0 = (arb(5) / arb(2)).gamma()
+        a1 = -(arb(3) / arb(2)).gamma() * omega_sq / arb(2)
+        even_sum_k1 = a0 + a1
+        a2_abs = abs((arb(1) / arb(2)).gamma()) * (omega ** 4) / arb(24)
+        old_even_tail = arb(2) * a2_abs
 
-        m_next = K_terms + 1
-        next_fact = fact_2m * arb(2 * m_next - 1) * arb(2 * m_next)
-        next_omega = omega_pow * omega_sq
-        next_gamma = abs((arb(5) / arb(2) - arb(m_next)).gamma())
-        even_tail_bound = arb(2) * next_omega / next_fact * next_gamma
+        b0 = (omega ** 5) / arb(120)
+        b1 = (omega ** 7) / arb(5040)
+        odd_sum_k1 = b0 + b1
+        b2 = (omega ** 9) / (arb(2) * arb(362880))
+        old_odd_tail = tau_arb * b2
 
-        odd_sum = arb(0)
-        fact_k = arb(1)
-        fact_5_2k = arb(120)  # 5! = 120
-        omega_5_2k = omega ** 5
-        for k in range(0, K_terms + 1):
-            if k > 0:
-                fact_k *= arb(k)
-                fact_5_2k *= arb(2 * k + 4) * arb(2 * k + 5)
-                omega_5_2k *= omega_sq
-            odd_sum += omega_5_2k / (fact_k * fact_5_2k)
-
-        k_next = K_terms + 1
-        next_fact_k = fact_k * arb(k_next)
-        next_fact_5_2k = fact_5_2k * arb(2 * k_next + 4) * arb(2 * k_next + 5)
-        next_omega_odd = omega_5_2k * omega_sq
-        odd_tail_bound = arb(2) * arb.pi() * next_omega_odd / (next_fact_k * next_fact_5_2k)
-
-        res_work = even_sum - arb.pi() * odd_sum
-        total_tail = float((even_tail_bound + odd_tail_bound).upper())
+        old_partial = even_sum_k1 - (tau_arb / arb(2)) * odd_sum_k1
+        old_total_tail = old_even_tail + old_odd_tail
         flint_ctx.prec = prec_bits
-        res_out = arb(res_work)
-        return arb(res_out.mid(), float(res_out.rad()) + total_tail)
+        old_mid = arb(old_partial).mid()
+        old_encl = inflate_arb_with_nonneg_bound(arb(old_partial), arb(old_total_tail))
+        old_upper = old_encl.upper()
+
+        gamma_5_2 = (arb(5) / arb(2)).gamma()
+        neg_gamma_5_2 = -gamma_5_2
+        R_even_k1, R_odd_k1 = compute_hat_f_tail_ratios_arb(arb(4), 1)
+
+        repaired_default = evaluate_hat_f_hypergeometric_certified_arb(
+            xi_arb, K_terms=1, prec_bits=prec_bits, strict_K=False
+        )
+        repaired_k4 = evaluate_hat_f_hypergeometric_certified_arb(
+            xi_arb, K_terms=4, prec_bits=prec_bits, strict_K=True
+        )
+        R_even_k4, R_odd_k4 = compute_hat_f_tail_ratios_arb(arb(4), 4)
+
+        strict_k1_rejected = False
+        try:
+            evaluate_hat_f_hypergeometric_certified_arb(
+                xi_arb, K_terms=1, prec_bits=prec_bits, strict_K=True
+            )
+        except ValueError:
+            strict_k1_rejected = True
+
+        contradiction_gap = neg_gamma_5_2 - old_upper
+
+        return {
+            "K_terms": 1,
+            "xi_formula": "4 / tau",
+            "omega": "4",
+            "R_even_at_K1_omega4": serialize_arb_certified(R_even_k1),
+            "R_odd_at_K1_omega4": serialize_arb_certified(R_odd_k1),
+            "R_even_exceeds_one": bool(R_even_k1.lower() > 1),
+            "old_midpoint": serialize_arb_certified(old_mid),
+            "old_tail_radius": serialize_arb_certified(arb(old_total_tail)),
+            "old_enclosure": serialize_arb_certified(old_encl),
+            "old_upper_endpoint": serialize_arb_certified(old_upper),
+            "trivial_lower_bound_neg_Gamma_5_2": serialize_arb_certified(neg_gamma_5_2),
+            "contradiction_gap_neg_Gamma_5_2_minus_old_upper": serialize_arb_certified(contradiction_gap),
+            "old_upper_strictly_below_neg_Gamma_5_2": bool(contradiction_gap.lower() > 0),
+            "strict_K1_raises_value_error": strict_k1_rejected,
+            "R_even_at_K4_omega4": serialize_arb_certified(R_even_k4),
+            "R_odd_at_K4_omega4": serialize_arb_certified(R_odd_k4),
+            "repaired_strict_K4_geometric_enclosure": serialize_arb_certified(repaired_k4),
+            "repaired_adaptive_enclosure": serialize_arb_certified(repaired_default),
+            "repaired_k4_contains_adaptive": bool(repaired_k4.overlaps(repaired_default)),
+        }
+    finally:
+        flint_ctx.prec = saved_prec
+
+
+def evaluate_hat_f_quadrature_certified_arb(
+    xi_val: Union[arb, int, float, str, Fraction],
+    prec_bits: int = 256,
+    v0_num_den: Tuple[int, int] = (1, 7),
+    V1_int: int = 32,
+) -> arb:
+    """Independently enclose hat{f}(xi) = 2 int_0^infty v^{-6} exp(-1/v^2) cos(tau xi v) dv
+    using certified Arb complex-analytic Gauss-Legendre quadrature (`acb.integral`) on [v_0, V_1]
+    plus proved analytic tail bounds:
+      - On (0, v_0] with u_0 = v_0^{-2} >= 3:
+            2 int_0^{v_0} v^{-6} exp(-1/v^2) dv = int_{u_0}^infty u^{3/2} e^{-u} du <= 2 v_0^{-3} exp(-1/v_0^2),
+        since d/du(-2 u^{3/2} e^{-u}) = (2u - 3) u^{1/2} e^{-u} >= u^{3/2} e^{-u} for all u >= 3.
+      - On [V_1, infty):
+            2 int_{V_1}^infty v^{-6} exp(-1/v^2) |cos(tau xi v)| dv <= 2 int_{V_1}^infty v^{-6} dv = (2/5) V_1^{-5}.
+    """
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = prec_bits
+        if isinstance(xi_val, Fraction):
+            xi_arb = arb(xi_val.numerator) / arb(xi_val.denominator)
+        else:
+            xi_arb = arb(xi_val)
+        tau_arb = arb(2) * arb.pi()
+        omega_acb = acb(tau_arb * abs(xi_arb))
+
+        v0_arb = arb(v0_num_den[0]) / arb(v0_num_den[1])
+        u0_arb = arb(1) / (v0_arb * v0_arb)
+        assert bool(u0_arb.lower() >= 3), "Quadrature left-tail theorem requires v_0^{-2} >= 3"
+        V1_arb = arb(V1_int)
+
+        def _integrand(v_complex: acb, _analytic: bool) -> acb:
+            v2 = v_complex * v_complex
+            return acb(2) * (v_complex ** (-6)) * (-acb(1) / v2).exp() * (omega_acb * v_complex).cos()
+
+        quad_prec = min(prec_bits, 128)
+        flint_ctx.prec = quad_prec
+        mid_integral = acb.integral(_integrand, acb(v0_arb), acb(V1_arb)).real
+
+        flint_ctx.prec = prec_bits
+        left_tail = arb(2) * (v0_arb ** (-3)) * (-u0_arb).exp()
+        right_tail = (arb(2) / arb(5)) * (V1_arb ** (-5))
+        return inflate_arb_with_nonneg_bound(arb(mid_integral), left_tail + right_tail)
     finally:
         flint_ctx.prec = saved_prec
 
@@ -931,30 +1190,43 @@ def evaluate_hat_f_hypergeometric_certified_arb(
 def verify_section_5_poisson_summation_at_transition(
     prec_bits: int = 256,
 ) -> Dict[str, Any]:
-    """Verify Section 5:
-    - Certified 256-bit Arb values of hat{f}(xi) at xi in {0, 1/2, 1, 3/2, 2}, certifying sign changes
-      hat{f}(1/2) < 0, hat{f}(1) < 0, hat{f}(3/2) > 0, hat{f}(2) > 0.
-    - Full Poisson representation L^{-5} [3 sqrt(pi)/8 + sum_{j=1}^{J_0} hat{f}(j L)] + Fourier tail bound
-      vs direct d-sum sum_{d>=1} d^{-6} exp(-L^2/d^2) across L in {1/2, 1, 2, 4}.
+    """Verify Section 5 (and TASK-TC-054R §§3-4):
+    - Replace false Schwartz premise with proved C^infty flatness at 0, O(|v|^{-6-j}) decay at infinity,
+      L^1(R) derivative integrability, and C^1(R/Z) periodization convergence (DLMF 1.8.14).
+    - Reproduce the legacy K_terms=1, xi=4/tau Fourier counterexample and verify repaired certification.
+    - Certified 256-bit Arb values of hat{f}(xi) at xi in {0, 1/2, 4/tau, 1, 3/2, 2}, cross-checked
+      against independent certified quadrature (`acb.integral` + analytic tails).
+    - Full Poisson representation L^{-5} [c_0 + sum_{j=1}^{J_0} hat{f}(j L)] + Fourier tail bound
+      (with c_0 = 3 sqrt(tau/2) / 8) vs direct d-sum sum_{d>=1} d^{-6} exp(-L^2/d^2) across L in {1/2, 1, 2, 4}.
     """
     saved_prec = flint_ctx.prec
     try:
         flint_ctx.prec = prec_bits
         em_info = verify_euler_maclaurin_derivatives_and_constants_arb(prec_bits=prec_bits)
         C_4_arb = em_info["C_4_raw"]
-        c_gauss = arb(3) * arb.pi().sqrt() / arb(8)
+        tau_arb = arb(2) * arb.pi()
+        c_0_arb = arb(3) * (tau_arb / arb(2)).sqrt() / arb(8)
 
-        # 1. Sign-change witnesses for hat{f}(xi)
+        k1_counterexample = reproduce_tc054_hat_f_k1_counterexample_arb(prec_bits=prec_bits)
+
+        # 1. Sign-change witnesses for hat{f}(xi) + quadrature cross-check
         xi_samples: List[Tuple[str, arb, str]] = [
             ("0", arb(0), "positive"),
             ("1/2", arb(1) / arb(2), "negative"),
+            ("4/tau", arb(4) / tau_arb, "negative"),
             ("1", arb(1), "negative"),
             ("3/2", arb(3) / arb(2), "positive"),
             ("2", arb(2), "positive"),
         ]
         hat_f_witnesses: List[Dict[str, Any]] = []
+        all_quadrature_agree = True
         for xi_label, xi_arb, expected_sign in xi_samples:
             val = evaluate_hat_f_hypergeometric_certified_arb(xi_arb, K_terms=200, prec_bits=prec_bits)
+            quad_val = evaluate_hat_f_quadrature_certified_arb(xi_arb, prec_bits=prec_bits)
+            quad_diff = val - quad_val
+            quad_ok = bool(quad_diff.contains(0))
+            if not quad_ok:
+                all_quadrature_agree = False
             if expected_sign == "positive":
                 sign_certified = bool(val.lower() > 0)
             else:
@@ -963,6 +1235,8 @@ def verify_section_5_poisson_summation_at_transition(
                 "xi_label": xi_label,
                 "xi": serialize_arb_certified(xi_arb),
                 "hat_f_xi": serialize_arb_certified(val),
+                "hat_f_xi_quadrature_enclosure": serialize_arb_certified(quad_val),
+                "series_minus_quadrature_contains_zero": quad_ok,
                 "expected_sign": expected_sign,
                 "sign_strictly_certified": sign_certified,
             })
@@ -988,11 +1262,9 @@ def verify_section_5_poisson_summation_at_transition(
             fourier_tail_bound = (
                 C_4_arb / (arb(3) * zeta_4 * (arb(J_0) ** 3) * (L_arb ** 4))
             )
-            bracket = c_gauss + fourier_partial
+            bracket = c_0_arb + fourier_partial
             partial_poisson = (L_arb ** (-5)) * bracket
-            bracket_with_tail = arb(
-                bracket.mid(), float(bracket.rad()) + float(fourier_tail_bound.upper())
-            )
+            bracket_with_tail = inflate_arb_with_nonneg_bound(bracket, fourier_tail_bound)
             poisson_enclosure = (L_arb ** (-5)) * bracket_with_tail
             diff = direct_d_sum - poisson_enclosure
             contains_zero = bool(diff.contains(0))
@@ -1004,7 +1276,8 @@ def verify_section_5_poisson_summation_at_transition(
                 "L": serialize_arb_certified(L_arb),
                 "J_0": J_0,
                 "direct_d_sum": serialize_arb_certified(direct_d_sum),
-                "gaussian_zero_mode_L_neg5_c_gauss": serialize_arb_certified((L_arb ** (-5)) * c_gauss),
+                "gaussian_zero_mode_L_neg5_c0": serialize_arb_certified((L_arb ** (-5)) * c_0_arb),
+                "gaussian_zero_mode_L_neg5_c_gauss": serialize_arb_certified((L_arb ** (-5)) * c_0_arb),
                 "nonzero_fourier_sum_L_neg5": serialize_arb_certified((L_arb ** (-5)) * fourier_partial),
                 "poisson_partial_sum_without_tail": serialize_arb_certified(partial_poisson),
                 "fourier_tail_bound_L_neg5": serialize_arb_certified((L_arb ** (-5)) * fourier_tail_bound),
@@ -1014,13 +1287,22 @@ def verify_section_5_poisson_summation_at_transition(
             })
 
         return {
-            "even_extension_smoothness_note": (
-                "Since f(v) = v^{-6} exp(-1/v^2) satisfies lim_{v -> 0^+} v^{-m} exp(-1/v^2) = 0 for all m >= 0, "
-                "all one-sided derivatives f^{(k)}(0^+) = 0 vanish to infinite order, so the even extension "
-                "f(-v) = f(v) (f(0) = 0) belongs to the Schwartz class S(R) and Poisson summation holds "
-                "without boundary jump terms."
+            "poisson_summation_hypotheses_and_non_schwartz_note": (
+                "The even function f(v) = v^{-6} exp(-1/v^2) (v != 0), f(0) = 0 is NOT in the Schwartz class S(R) "
+                "because v^6 f(v) = exp(-1/v^2) -> 1 != 0 as |v| -> infty. Instead, Poisson summation holds by the "
+                "following proved hypotheses (DLMF 1.8.14): (1) f in C^infty(R) with f^{(j)}(0) = 0 for all j >= 0 "
+                "since lim_{v->0} v^{-m} exp(-1/v^2) = 0; (2) by induction, f^{(j)}(v) = P_j(v^{-2}) v^{-6-j} exp(-1/v^2) "
+                "= O(|v|^{-6-j}) as |v| -> infty, so f^{(j)} in L^1(R) cap C_0(R) for every j >= 0; (3) for each L > 0, "
+                "the periodization P_L(x) = sum_{d in Z} f((x + d)/L) and its derivative P_L'(x) = L^{-1} sum_{d in Z} f'((x + d)/L) "
+                "converge uniformly on x in [0, 1] by comparison with sum_{d!=0} |d|^{-6} < infty and sum_{d!=0} |d|^{-7} < infty, "
+                "so P_L in C^1(R/Z) has an absolutely convergent Fourier series, yielding at x = 0: "
+                "sum_{d>=1} d^{-6} exp(-L^2/d^2) = L^{-5} [c_0 + sum_{j>=1} hat{f}(j L)] with c_0 = 3 sqrt(tau/2) / 8."
             ),
+            "c_0_formula": "3 * sqrt(tau / 2) / 8",
+            "c_0": serialize_arb_certified(c_0_arb),
+            "legacy_k1_fourier_counterexample_regression": k1_counterexample,
             "hat_f_sign_change_witnesses": hat_f_witnesses,
+            "all_witnesses_agree_with_independent_quadrature": all_quadrature_agree,
             "poisson_vs_direct_d_sum_rows": poisson_rows,
             "all_poisson_enclosures_contain_zero_difference": all_poisson_match,
         }
@@ -1033,27 +1315,103 @@ def verify_section_5_poisson_summation_at_transition(
 # ---------------------------------------------------------------------------
 
 
+def _exact_ceil_fraction(q: Fraction) -> int:
+    """Return exact math.ceil(q) for a Fraction q using pure integer arithmetic."""
+    return -((-q.numerator) // q.denominator)
+
+
+def _to_exact_positive_fraction(val: Union[int, Fraction, float, str]) -> Fraction:
+    """Convert an exact scalar bound (`int`, `Fraction`, finite `float`, or rational `str`)
+    to a positive `Fraction` without any floating-point tolerance subtraction.
+    """
+    if isinstance(val, bool):
+        raise ValueError("Cutoff bound cannot be a bool")
+    if isinstance(val, int):
+        q = Fraction(val, 1)
+    elif isinstance(val, Fraction):
+        q = val
+    elif isinstance(val, float):
+        if not math.isfinite(val):
+            raise ValueError(f"Cutoff bound must be finite, got {val!r}")
+        q = Fraction(val)
+    elif isinstance(val, str):
+        q = Fraction(val)
+    else:
+        raise TypeError(f"Unsupported cutoff bound type: {type(val).__name__}")
+    if q <= 0:
+        raise ValueError(f"Cutoff bound must be > 0, got {val!r}")
+    return q
+
+
+def _resolve_exact_dyadic_cutoff_pairs(
+    M_bound: Union[int, Fraction, float, str, arb],
+    *,
+    on_ambiguous_ball: str = "enclose",
+) -> List[Tuple[int, int]]:
+    """Resolve the integer summation endpoints `(m_start, m_stop)` for `M <= m < 2M`,
+    where `m` runs over integers in `[max(1, ceil(M)), max(1, ceil(2M)))`:
+      - For exact inputs (`int`, `Fraction`, finite `float` converted via `Fraction(M)`, or `str`),
+        computes `ceil(M)` and `ceil(2M)` by exact integer division without `1e-12` tolerances.
+      - For `arb` ball inputs `[M_low, M_high]`, computes `ceil(M_low)`, `ceil(M_high)`,
+        `ceil(2*M_low)`, `ceil(2*M_high)` from the exact dyadic endpoints. If the ball straddles
+        an integer or half-integer boundary (`m_start_min != m_start_max` or `m_stop_min != m_stop_max`),
+        raises `ValueError` when `on_ambiguous_ball == 'raise'`, or returns all attainable `(m_start, m_stop)`
+        pairs so the caller can return their certified `.union(...)` enclosure when `on_ambiguous_ball == 'enclose'`.
+    """
+    if on_ambiguous_ball not in ("enclose", "raise"):
+        raise ValueError(f"on_ambiguous_ball must be 'enclose' or 'raise', got {on_ambiguous_ball!r}")
+
+    if isinstance(M_bound, arb):
+        if not M_bound.is_finite() or bool(M_bound.lower() <= 0):
+            raise ValueError(f"M_bound Arb ball must be finite and strictly positive, got {M_bound!r}")
+        m_start_min = max(1, int(M_bound.lower().ceil().unique_fmpz()))
+        m_start_max = max(1, int(M_bound.upper().ceil().unique_fmpz()))
+        two_M = arb(2) * M_bound
+        m_stop_min = max(1, int(two_M.lower().ceil().unique_fmpz()))
+        m_stop_max = max(1, int(two_M.upper().ceil().unique_fmpz()))
+        if m_start_min != m_start_max or m_stop_min != m_stop_max:
+            if on_ambiguous_ball == "raise":
+                raise ValueError(
+                    f"Ambiguous M_bound ball {M_bound} straddles a dyadic integer/half-integer cutoff: "
+                    f"ceil(M) in [{m_start_min}, {m_start_max}], ceil(2M) in [{m_stop_min}, {m_stop_max}]"
+                )
+            pairs: List[Tuple[int, int]] = []
+            for ms in range(m_start_min, m_start_max + 1):
+                for me in range(max(ms, m_stop_min), m_stop_max + 1):
+                    pairs.append((ms, me))
+            return pairs or [(m_start_min, m_stop_min)]
+        return [(m_start_min, m_stop_min)]
+
+    q = _to_exact_positive_fraction(M_bound)
+    m_start = max(1, _exact_ceil_fraction(q))
+    m_stop = max(1, _exact_ceil_fraction(2 * q))
+    return [(m_start, max(m_start, m_stop))]
+
+
 def evaluate_rectangular_block_B_AB_certified_arb(
-    A_int: int,
-    B_int: int,
+    A_val: Union[int, Fraction, float, str],
+    B_val: Union[int, Fraction, float, str],
     X_val: arb,
     D_cutoff: int = 800,
     prec_bits: int = 256,
 ) -> arb:
     """Evaluate the coprime rectangular block
         B_{A,B}(X) = sum_{A <= r < 2A, B <= s < 2B, gcd(r,s)=1}
-                     (lambda(r) lambda(s) X^5 / (r s)^3) sum_{d>=1} d^{-6} exp(-X^2 (r^{-2} + s^{-2}) / d^2).
+                     (lambda(r) lambda(s) X^5 / (r s)^3) sum_{d>=1} d^{-6} exp(-X^2 (r^{-2} + s^{-2}) / d^2),
+    using exact rational cutoffs for `A <= r < 2A` and `B <= s < 2B`.
     """
     saved_prec = flint_ctx.prec
     try:
         flint_ctx.prec = prec_bits
+        r_start, r_stop = _resolve_exact_dyadic_cutoff_pairs(A_val)[0]
+        s_start, s_stop = _resolve_exact_dyadic_cutoff_pairs(B_val)[0]
         X_arb = arb(X_val)
         X5 = X_arb ** 5
         total = arb(0)
-        for r in range(A_int, 2 * A_int):
+        for r in range(r_start, r_stop):
             lam_r = liouville_lambda_int(r)
             r_arb = arb(r)
-            for s in range(B_int, 2 * B_int):
+            for s in range(s_start, s_stop):
                 if math.gcd(r, s) != 1:
                     continue
                 lam_s = liouville_lambda_int(s)
@@ -1069,12 +1427,16 @@ def evaluate_rectangular_block_B_AB_certified_arb(
 
 def evaluate_1d_dyadic_sum_U_lambda_arb(
     Y_val: arb,
-    M_bound: float,
+    M_bound: Union[int, Fraction, float, str, arb],
     prec_bits: int = 256,
+    *,
+    on_ambiguous_ball: str = "enclose",
 ) -> arb:
     """Evaluate the 1D unweighted dyadic Liouville Gaussian sum
         U_lambda(Y; M) = Y^{5/2} sum_{M <= m < 2M} (lambda(m) / m^3) exp(-Y^2 / m^2),
-    where m runs over integers in [ceil(M), ceil(2M) - 1].
+    using exact integer/rational cutoffs (TASK-TC-054R §5) without tolerance subtraction.
+    For `arb` balls straddling an integer or half-integer boundary, either encloses all attainable
+    sums via `.union(...)` (`on_ambiguous_ball='enclose'`) or raises `ValueError` (`on_ambiguous_ball='raise'`).
     """
     saved_prec = flint_ctx.prec
     try:
@@ -1082,42 +1444,101 @@ def evaluate_1d_dyadic_sum_U_lambda_arb(
         Y_arb = arb(Y_val)
         Y_sq = Y_arb * Y_arb
         Y_pow_5_2 = Y_arb ** (arb(5) / arb(2))
-        m_start = max(1, math.ceil(M_bound - 1e-12))
-        m_stop = math.ceil(2.0 * M_bound - 1e-12)
-        total = arb(0)
-        for m in range(m_start, m_stop):
-            m_arb = arb(m)
-            total += (arb(liouville_lambda_int(m)) / (m_arb ** 3)) * (-Y_sq / (m_arb * m_arb)).exp()
-        return Y_pow_5_2 * total
+        pairs = _resolve_exact_dyadic_cutoff_pairs(M_bound, on_ambiguous_ball=on_ambiguous_ball)
+
+        encl: arb | None = None
+        for m_start, m_stop in pairs:
+            total = arb(0)
+            for m in range(m_start, m_stop):
+                m_arb = arb(m)
+                total += (arb(liouville_lambda_int(m)) / (m_arb ** 3)) * (-Y_sq / (m_arb * m_arb)).exp()
+            val = Y_pow_5_2 * total
+            encl = val if encl is None else encl.union(val)
+        assert encl is not None
+        return encl
+    finally:
+        flint_ctx.prec = saved_prec
+
+
+def reproduce_tc054_cutoff_tolerance_counterexample_arb(
+    prec_bits: int = 256,
+) -> Dict[str, Any]:
+    """Reproduce the legacy TC-054 cutoff regression at `M = 1 + 2^{-42}`, `Y = 1`:
+      - `M = 1 + 2^{-42}` is an exact binary rational `(2^{42} + 1) / 2^{42}`.
+      - The true half-open interval `[M, 2M) = [1 + 2^{-42}, 2 + 2^{-41})` contains only the integer `2`,
+        so `U_lambda(1; 1 + 2^{-42}) = (lambda(2) / 2^3) exp(-1/4) = -exp(-1/4)/8 = -0.09735009788...`.
+      - The legacy implementation `ceil(M - 1e-12)` and `ceil(2M - 1e-12)` shifted both endpoints across
+        the integer boundaries `1` and `2`, selecting `{1}` instead of `{2}` and returning
+        `+exp(-1) = +0.36787944117...` (wrong sign and wrong magnitude).
+    """
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = prec_bits
+        M_exact_frac = Fraction((1 << 42) + 1, 1 << 42)
+        M_float = 1.0 + 2.0 ** (-42)
+        assert Fraction(M_float) == M_exact_frac
+
+        old_m_start = max(1, math.ceil(M_float - 1e-12))
+        old_m_stop = math.ceil(2.0 * M_float - 1e-12)
+        old_val = (-arb(1)).exp()
+
+        repaired_from_frac = evaluate_1d_dyadic_sum_U_lambda_arb(arb(1), M_exact_frac, prec_bits=prec_bits)
+        repaired_from_float = evaluate_1d_dyadic_sum_U_lambda_arb(arb(1), M_float, prec_bits=prec_bits)
+        exact_true_val = -((-arb(1) / arb(4)).exp()) / arb(8)
+        abs_error_of_old = abs(old_val - exact_true_val)
+
+        return {
+            "M_formula": "1 + 2^{-42}",
+            "M_exact_fraction": f"{M_exact_frac.numerator}/{M_exact_frac.denominator}",
+            "Y": 1,
+            "true_integer_set": [2],
+            "old_tolerance_selected_integer_set": list(range(old_m_start, old_m_stop)),
+            "true_U_lambda_enclosure": serialize_arb_certified(exact_true_val),
+            "repaired_from_fraction_enclosure": serialize_arb_certified(repaired_from_frac),
+            "repaired_from_binary_float_enclosure": serialize_arb_certified(repaired_from_float),
+            "old_tolerance_value_exp_neg1": serialize_arb_certified(old_val),
+            "old_minus_true_abs_discrepancy": serialize_arb_certified(abs_error_of_old),
+            "true_value_strictly_negative": bool(exact_true_val.upper() < 0),
+            "old_value_strictly_positive": bool(old_val.lower() > 0),
+            "repaired_matches_true_exact": bool(
+                (repaired_from_frac - exact_true_val).contains(0)
+                and (repaired_from_float - exact_true_val).contains(0)
+            ),
+        }
     finally:
         flint_ctx.prec = saved_prec
 
 
 def evaluate_decoupled_rectangular_block_B_AB_certified_arb(
-    A_int: int,
-    B_int: int,
+    A_val: Union[int, Fraction, float, str],
+    B_val: Union[int, Fraction, float, str],
     X_val: arb,
     D_cutoff: int = 800,
     prec_bits: int = 256,
 ) -> arb:
     """Evaluate B_{A,B}(X) via the Attack A separable Gaussian decoupling formula:
         B_{A,B}(X) = sum_{1 <= e < 2 min(A,B)} (mu(e) / e)
-                     * sum_{d >= 1} (1 / d) U_lambda(X / (d e); A / e) U_lambda(X / (d e); B / e).
+                     * sum_{d >= 1} (1 / d) U_lambda(X / (d e); A / e) U_lambda(X / (d e); B / e),
+    computing `A / e` and `B / e` using exact rational `Fraction` arithmetic.
     """
     saved_prec = flint_ctx.prec
     try:
         flint_ctx.prec = prec_bits
+        A_frac = _to_exact_positive_fraction(A_val)
+        B_frac = _to_exact_positive_fraction(B_val)
+        r_start, r_stop = _resolve_exact_dyadic_cutoff_pairs(A_frac)[0]
+        s_start, s_stop = _resolve_exact_dyadic_cutoff_pairs(B_frac)[0]
         X_arb = arb(X_val)
         X5 = X_arb ** 5
-        e_max = 2 * min(A_int, B_int) - 1
+        e_max = max(0, min(r_stop, s_stop) - 1)
         partial = arb(0)
         for e in range(1, e_max + 1):
             mu_e = moebius_mu_int(e)
             if mu_e == 0:
                 continue
             e_arb = arb(e)
-            A_over_e = A_int / e
-            B_over_e = B_int / e
+            A_over_e = A_frac / e
+            B_over_e = B_frac / e
             d_sum = arb(0)
             for d in range(1, D_cutoff + 1):
                 d_arb = arb(d)
@@ -1127,10 +1548,174 @@ def evaluate_decoupled_rectangular_block_B_AB_certified_arb(
                 d_sum += (u_A * u_B) / d_arb
             partial += (arb(mu_e) / e_arb) * d_sum
 
-        sum_r = sum(arb(r) ** (-3) for r in range(A_int, 2 * A_int))
-        sum_s = sum(arb(s) ** (-3) for s in range(B_int, 2 * B_int))
+        sum_r = sum((arb(r) ** (-3) for r in range(r_start, r_stop)), arb(0))
+        sum_s = sum((arb(s) ** (-3) for s in range(s_start, s_stop)), arb(0))
         tail_bound = X5 * sum_r * sum_s / (arb(5) * (arb(D_cutoff) ** 5))
-        return arb(partial.mid(), float(partial.rad()) + float(tail_bound.upper()))
+        return inflate_arb_with_nonneg_bound(partial, tail_bound)
+    finally:
+        flint_ctx.prec = saved_prec
+
+
+def verify_abel_scaling_and_global_stieltjes_energy_proof(
+    prec_bits: int = 256,
+) -> Dict[str, Any]:
+    """Verify TASK-TC-054R §2:
+    1. Corrected dyadic Abel estimate:
+           U_lambda(Y; M) = L_lambda(2M^-) g_Y(2M) - L_lambda(M^-) g_Y(M) - int_M^{2M} L_lambda(t) g_Y'(t) dt,
+           |U_lambda(Y; M)| << M^{1/2} min(M / Y, (Y / M)^{5/2}) exp(-c Phi(M))   (M >= 16),
+       where g_Y(t) = Y^{5/2} t^{-3} exp(-Y^2/t^2) and Phi(t) = (log t)^{3/5} (log log t)^{-1/5}.
+    2. Analytical refutation of the old M^{-1/2} prefactor via the nonzero boundary residue
+       Res_{z=0} M[Q_lambda](z) = Gamma(5/4) / (4 zeta(1/2)) = -0.1551682265... != 0.
+    3. Exact collapse of the divisor-weighted global identity:
+           sum_{q >= 1} ((sum_{e | q} mu(e)) / q) Q_lambda(X / q)^2 = Q_lambda(X)^2.
+    4. Exact scaling integral check:
+           I_scale := int_0^infty u |3 - 2 u^2| exp(-u^2) du = 1/2 + 2 exp(-3/2),
+       cross-checked against certified Arb quadrature (`acb.integral` + analytic tail).
+    5. Global Stieltjes integration-by-parts identity:
+           Q_lambda(X) = -X^{5/2} int_1^infty L_lambda(t) d/dt (t^{-3} exp(-X^2/t^2)) dt
+       and split at t = sqrt(X) (for X >= 256; compact range 0 < X < 256 bounded by |Q_lambda(X)| <= zeta(3) X^{5/2}),
+       establishing |Q_lambda(X)| << sqrt(X) exp(-c_1 Phi(X)) and
+       E_lambda(Y) := int_Y^{tau Y} |Q_lambda(X)|^2 dX/X << Y exp(-2 c_2 Phi(Y)) <<_D Y (log Y)^{-D}.
+    """
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = prec_bits
+
+        # 1. Scaling integral I_scale = int_0^infty u |3 - 2 u^2| exp(-u^2) du = 1/2 + 2 exp(-3/2)
+        e_neg_3_2 = (-arb(3) / arb(2)).exp()
+        I_scale_closed = arb(1) / arb(2) + arb(2) * e_neg_3_2
+        u_split = (arb(3) / arb(2)).sqrt()
+        U_top = arb(8)
+
+        def _ing_low(u_c: acb, _analytic: bool) -> acb:
+            u2 = u_c * u_c
+            return u_c * (acb(3) - acb(2) * u2) * (-u2).exp()
+
+        def _ing_high(u_c: acb, _analytic: bool) -> acb:
+            u2 = u_c * u_c
+            return u_c * (acb(2) * u2 - acb(3)) * (-u2).exp()
+
+        flint_ctx.prec = min(prec_bits, 128)
+        part1 = acb.integral(_ing_low, acb(0), acb(u_split)).real
+        part2 = acb.integral(_ing_high, acb(u_split), acb(U_top)).real
+        flint_ctx.prec = prec_bits
+        # Exact antiderivative on [U_top, infty) of u (2u^2 - 3) e^{-u^2} is (u^2 - 1/2) e^{-u^2}
+        tail_top = (U_top * U_top - arb(1) / arb(2)) * (-(U_top * U_top)).exp()
+        I_scale_quad = inflate_arb_with_nonneg_bound(arb(part1 + part2), tail_top)
+        I_scale_diff = I_scale_closed - I_scale_quad
+
+        # 2. Verify global Stieltjes identity Q_lambda(X) = -X^{5/2} int_1^infty L_lambda(t) d/dt(t^{-3} e^{-X^2/t^2}) dt
+        # On each unit interval [m, m+1), L_lambda(t) = L_lambda(m) is constant, so
+        # -X^{5/2} sum_{m=1}^T L_lambda(m) [ (m+1)^{-3} e^{-X^2/(m+1)^2} - m^{-3} e^{-X^2/m^2} ]
+        # = X^{5/2} sum_{m=1}^T (lambda(m)/m^3) e^{-X^2/m^2} - X^{5/2} L_lambda(T) (T+1)^{-3} e^{-X^2/(T+1)^2}.
+        stieltjes_rows: List[Dict[str, Any]] = []
+        all_stieltjes_match = True
+        T_st = 600
+        L_vals = [0] * (T_st + 1)
+        running = 0
+        for m in range(1, T_st + 1):
+            running += liouville_lambda_int(m)
+            L_vals[m] = running
+
+        for X_int in [1, 2, 4]:
+            X_arb = arb(X_int)
+            X_sq = X_arb * X_arb
+            X_5_2 = X_arb ** (arb(5) / arb(2))
+            q_direct = evaluate_Q_arith_certified_arb(X_arb, coeff_kind="lambda", T_cutoff=T_st, prec_bits=prec_bits)["enclosure"]
+
+            st_partial = arb(0)
+            for m in range(1, T_st + 1):
+                m_arb = arb(m)
+                m1_arb = arb(m + 1)
+                g_m = (m_arb ** (-3)) * (-X_sq / (m_arb * m_arb)).exp()
+                g_m1 = (m1_arb ** (-3)) * (-X_sq / (m1_arb * m1_arb)).exp()
+                st_partial += -X_5_2 * arb(L_vals[m]) * (g_m1 - g_m)
+
+            # Tail for t >= T_st + 1: since |L_lambda(t)| <= t,
+            # X^{5/2} int_{T_st+1}^infty t * t^{-4} |2 X^2/t^2 - 3| e^{-X^2/t^2} dt <= 3 X^{5/2} int_{T_st+1}^infty t^{-3} dt
+            # = (3/2) X^{5/2} (T_st + 1)^{-2} when T_st + 1 >= X sqrt(2/3).
+            st_tail = (arb(3) / arb(2)) * X_5_2 / (arb(T_st + 1) ** 2)
+            st_encl = inflate_arb_with_nonneg_bound(st_partial, st_tail)
+            diff_st = q_direct - st_encl
+            ok_st = bool(diff_st.contains(0))
+            if not ok_st:
+                all_stieltjes_match = False
+            stieltjes_rows.append({
+                "X": X_int,
+                "T_stieltjes": T_st,
+                "Q_lambda_direct": serialize_arb_certified(q_direct),
+                "Q_lambda_stieltjes_integral": serialize_arb_certified(st_encl),
+                "difference_enclosure": serialize_arb_certified(diff_st),
+                "zero_in_difference": ok_st,
+            })
+
+        # 3. Verify divisor-weight collapse sum_{e | q} mu(e) = 1_{q=1} up to q = 100
+        divisor_collapse_ok = all(
+            sum(moebius_mu_int(e) for e in range(1, q + 1) if q % e == 0) == (1 if q == 1 else 0)
+            for q in range(1, 101)
+        )
+
+        return {
+            "corrected_dyadic_abel_bound": {
+                "formula": "|U_lambda(Y; M)| << M^{1/2} min(M / Y, (Y / M)^{5/2}) exp(-c * Phi(M))",
+                "Phi_definition": "Phi(t) = (log t)^{3/5} (log log t)^{-1/5}",
+                "applicability_threshold": "M >= 16 (for 1 <= M < 16, |U_lambda(Y; M)| <= zeta(3) Y^{5/2} and <= (7/2) M^{1/2} min(M/Y, (Y/M)^{5/2}))",
+                "half_open_stieltjes_decomposition": (
+                    "U_lambda(Y; M) = L_lambda(2M^-) g_Y(2M) - L_lambda(M^-) g_Y(M) - int_M^{2M} L_lambda(t) g_Y'(t) dt, "
+                    "where g_Y(t) = Y^{5/2} t^{-3} exp(-Y^2/t^2) satisfies sup_{t in [M, 2M]} g_Y(t) << M^{-1/2} min(M/Y, (Y/M)^{5/2}) "
+                    "and int_M^{2M} |g_Y'(t)| dt << M^{-1/2} min(M/Y, (Y/M)^{5/2}). Multiplying by "
+                    "sup_{t in [M, 2M]} |L_lambda(t)| << M exp(-c Phi(M)) yields the prefactor M * M^{-1/2} = M^{1/2}."
+                ),
+                "mellin_residue_refutation_of_old_M_neg_half": (
+                    "If the old M^{-1/2} prefactor held uniformly across dyadic blocks M = 2^j, summing over j >= 0 would give "
+                    "|Q_lambda(X)| <= sum_{j>=0} |U_lambda(X; 2^j)| = O(X^{-1/2}) as X -> infty. Together with "
+                    "|Q_lambda(X)| = O(X^{5/2}) as X -> 0^+, the Mellin transform M[Q_lambda](z) = int_0^infty Q_lambda(X) X^{-z} dX/X "
+                    "would converge absolutely and be holomorphic on -1/2 < Re(z) < 5/2, including at z = 0. "
+                    "This contradicts the proved simple pole of M[Q_lambda](z) = Gamma(5/4 - z/2) zeta(1 + 2z) / (2 zeta(1/2 + z)) "
+                    "at z = 0 with nonzero residue Gamma(5/4) / (4 zeta(1/2)) = -0.1551682265... != 0."
+                ),
+            },
+            "divisor_weight_collapse_identity": {
+                "identity": "sum_{q>=1} ((sum_{e|q} mu(e)) / q) Q_lambda(X / q)^2 = Q_lambda(X)^2",
+                "verified_up_to_q_100": divisor_collapse_ok,
+                "explanation": (
+                    "Summing the decoupled blocks B_{2^a, 2^b}(X) over all a, b >= 0 and setting q = d * e yields "
+                    "sum_{q>=1} ((sum_{e|q} mu(e)) / q) Q_lambda(X/q)^2. Since sum_{e|q} mu(e) = 1_{q=1}, all terms q >= 2 "
+                    "vanish identically and the identity collapses to Q_lambda(X)^2 = Q_lambda(X)^2, supplying no additional "
+                    "global cancellation by itself."
+                ),
+            },
+            "scaling_integral_verification": {
+                "integral_formula": "int_0^infty u |3 - 2*u^2| exp(-u^2) du = 1/2 + 2*exp(-3/2)",
+                "closed_form": serialize_arb_certified(I_scale_closed),
+                "quadrature_enclosure": serialize_arb_certified(I_scale_quad),
+                "difference_enclosure": serialize_arb_certified(I_scale_diff),
+                "zero_in_difference": bool(I_scale_diff.contains(0)),
+            },
+            "global_stieltjes_energy_proof": {
+                "stieltjes_identity": "Q_lambda(X) = -X^{5/2} int_1^infty L_lambda(t) d/dt (t^{-3} exp(-X^2/t^2)) dt",
+                "endpoint_justification": (
+                    "At the lower limit t = 1^-, L_lambda(1^-) = 0; as T -> infty, |L_lambda(T)| <= T so "
+                    "|X^{5/2} L_lambda(T) T^{-3} exp(-X^2/T^2)| <= X^{5/2} T^{-2} -> 0."
+                ),
+                "split_point_and_thresholds": (
+                    "For X >= 256 (so sqrt(X) >= 16 and log(log(sqrt(X))) >= log(log(16)) > 1), split the integral at t = sqrt(X): "
+                    "(i) on 1 <= t <= sqrt(X), |L_lambda(t)| <= t and 2 X^2/t^2 - 3 >= 2 X - 3 > 0, so "
+                    "X^{5/2} int_1^{sqrt(X)} t * t^{-4} (2 X^2/t^2 - 3) exp(-X^2/t^2) dt <= 2 X^{9/2} int_1^{sqrt(X)} t^{-5} exp(-X^2/t^2) dt "
+                    "= sqrt(X) int_X^{X^2} w e^{-w} dw <= sqrt(X) (X + 1) e^{-X}; "
+                    "(ii) on t >= sqrt(X) >= 16, applying the unconditional Korobov-Vinogradov-Walfisz bound "
+                    "|L_lambda(t)| <= C_KV t exp(-c_0 Phi(t)) <= C_KV t exp(-c_0 Phi(sqrt(X))) (derived either directly or from "
+                    "|M(y)| <= C'_KV y exp(-c'_0 Phi(y)) via L_lambda(t) = sum_{d <= sqrt(t)} M(t/d^2)) and substituting u = X/t gives "
+                    "X^{5/2} int_{sqrt(X)}^infty |L_lambda(t)| |d/dt(t^{-3} exp(-X^2/t^2))| dt "
+                    "<= C_KV (1/2 + 2 exp(-3/2)) sqrt(X) exp(-c_0 Phi(sqrt(X))) << sqrt(X) exp(-c_1 Phi(X)). "
+                    "On the compact range 0 < X < 256, |Q_lambda(X)| <= zeta(3) X^{5/2} <= (zeta(3) * 256^2) sqrt(X). "
+                    "Integrating |Q_lambda(X)|^2 dX/X over [Y, tau Y] yields E_lambda(Y) << Y exp(-2 c_2 Phi(Y)) for Y >= 256 "
+                    "and E_lambda(Y) <<_D Y (log Y)^{-D} for all Y >= 2."
+                ),
+                "stieltjes_vs_direct_rows": stieltjes_rows,
+                "all_stieltjes_rows_match_direct": all_stieltjes_match,
+            },
+        }
     finally:
         flint_ctx.prec = saved_prec
 
@@ -1138,28 +1723,63 @@ def evaluate_decoupled_rectangular_block_B_AB_certified_arb(
 def verify_section_6_transition_attacks_and_decoupling(
     prec_bits: int = 256,
 ) -> Dict[str, Any]:
-    """Verify Section 6:
-    - Rectangular-block decomposition Q_lambda(X)^2 = sum_{a,b>=0} B_{2^a, 2^b}(X) and widely
-      unequal block bound |B_{A,B}(X)| <= (pi^6 / 945) min(A,B)^3 / max(A,B)^2.
-    - Attack A:
-      * 1D Mellin identity M[Q_lambda](z) = Gamma(5/4 - z/2) zeta(1 + 2 z) / (2 zeta(1/2 + z))
-        at z in {1, 3/2, 2} and boundary pole residue Gamma(5/4) / (4 zeta(1/2)) at z = 0.
-      * Bivariate coprime Dirichlet series D_lambda(u, v) = zeta(2u) zeta(2v) / (zeta(u) zeta(v) zeta(u+v))
-        at (u, v) in {(2, 2), (2, 3), (5/2, 5/2)} and off-critical non-cancellation check.
-      * Exact separable Gaussian decoupling identity B_{A,B}(X) = sum_e (mu(e)/e) sum_d (1/d) U_lambda(X/(de); A/e) U_lambda(X/(de); B/e)
-        verified on sample blocks (A, B, X) in {(1,1,2), (2,2,4), (2,4,4), (4,4,4)}, establishing
-        the Replacement Theorem: int_Y^{tau Y} |Q_lambda(X)|^2 dX/X << Y exp(-2 c_1 Phi(Y)) <<_D Y (log Y)^{-D}.
-    - Attack B:
-      * Exact dyadic parity annihilation Q_{lambda,odd}(X) = Q_lambda(X) + 2^{-1/2} Q_lambda(X/2),
-        convergent dyadic inversion, grade-interval energy identity on [Y, tau Y] with cross-scale
-        correlation, weighted norm equivalence for sigma > -1/2, and off-critical mode lower bound
-        |1 + 2^{-rho}| >= 1 - 2^{-beta} > 0.
+    """Verify Section 6 (and TASK-TC-054R §§2, 5, 6, 7):
+    - Rectangular-block decomposition Q_lambda(X)^2 = sum_{a,b>=0} B_{2^a, 2^b}(X) and repaired
+      widely unequal block bound |B_{A,B}(X)| <= (7/3) C_* min(A,B)^3 / max(A,B)^2 with
+      C_* = max{zeta(6), c_0 + 27 exp(-3)} (c_0 = 3 sqrt(tau/2) / 8, zeta(6) = tau^6 / 60480).
+    - Cutoff tolerance regression at M = 1 + 2^{-42}, Y = 1.
+    - Repaired Abel scaling and global Stieltjes energy proof.
+    - Attack A (1D Mellin, bivariate coprime Dirichlet series, separable Gaussian decoupling).
+    - Attack B (dyadic parity annihilation, inversion, weighted norm equivalence in eta, off-critical lower bound).
     """
     saved_prec = flint_ctx.prec
     try:
         flint_ctx.prec = prec_bits
 
-        # 1. Separable Gaussian decoupling identity on sample blocks + widely unequal block bound
+        tau_arb = arb(2) * arb.pi()
+        c_0_arb = arb(3) * (tau_arb / arb(2)).sqrt() / arb(8)
+        zeta_6 = arb(6).zeta()  # tau^6 / 60480
+        c0_plus_27_e_neg3 = c_0_arb + arb(27) * (-arb(3)).exp()
+        # C_* = max(zeta(6), c_0 + 27 e^{-3}); since c_0 + 27 e^{-3} = 2.008915... > zeta(6) = 1.017343..., C_* = c_0 + 27 e^{-3}
+        assert bool(c0_plus_27_e_neg3.lower() > zeta_6.upper())
+        C_star_arb = c0_plus_27_e_neg3
+        seven_thirds_C_star = (arb(7) / arb(3)) * C_star_arb
+
+        # Verify unimodal sum-integral bound sum_{d>=1} d^{-6} e^{-L^2/d^2} <= C_* min(1, L^{-5})
+        unimodal_L_samples: List[Tuple[str, arb]] = [
+            ("1/4", arb(1) / arb(4)),
+            ("1/2", arb(1) / arb(2)),
+            ("1", arb(1)),
+            ("sqrt(3)", arb(3).sqrt()),
+            ("2", arb(2)),
+            ("4", arb(4)),
+            ("8", arb(8)),
+        ]
+        unimodal_rows: List[Dict[str, Any]] = []
+        all_unimodal_ok = True
+        for L_lbl, L_arb in unimodal_L_samples:
+            d_sum = evaluate_d_sum_certified_arb(L_arb, D_cutoff=2000, prec_bits=prec_bits)
+            if bool(L_arb.upper() <= 1):
+                regime_bound = zeta_6
+                combined_bound = C_star_arb
+            else:
+                regime_bound = c_0_arb * (L_arb ** (-5)) + arb(27) * (-arb(3)).exp() * (L_arb ** (-6))
+                combined_bound = C_star_arb * (L_arb ** (-5))
+            ok_reg = bool(d_sum.upper() <= regime_bound.lower())
+            ok_comb = bool(d_sum.upper() <= combined_bound.lower())
+            if not (ok_reg and ok_comb):
+                all_unimodal_ok = False
+            unimodal_rows.append({
+                "L_label": L_lbl,
+                "L": serialize_arb_certified(L_arb),
+                "exact_d_sum": serialize_arb_certified(d_sum),
+                "regime_specific_bound": serialize_arb_certified(regime_bound),
+                "C_star_min_1_L_neg5_bound": serialize_arb_certified(combined_bound),
+                "regime_bound_holds": ok_reg,
+                "combined_bound_holds": ok_comb,
+            })
+
+        # 1. Separable Gaussian decoupling identity on sample blocks + repaired widely unequal block bound
         block_samples = [
             (1, 1, 2),
             (2, 2, 4),
@@ -1167,8 +1787,11 @@ def verify_section_6_transition_attacks_and_decoupling(
             (4, 4, 4),
             (1, 8, 4),
             (2, 16, 4),
+            (1, 16, 1),
+            (1, 16, 16),
+            (4, 32, 8),
+            (8, 1, 4),
         ]
-        zeta_6 = arb(6).zeta()  # pi^6 / 945
         decoupling_rows: List[Dict[str, Any]] = []
         all_decoupling_match = True
         all_unequal_bounds_hold = True
@@ -1188,7 +1811,7 @@ def verify_section_6_transition_attacks_and_decoupling(
 
             min_AB = arb(min(A_int, B_int))
             max_AB = arb(max(A_int, B_int))
-            unequal_bound = zeta_6 * (min_AB ** 3) / (max_AB ** 2)
+            unequal_bound = seven_thirds_C_star * (min_AB ** 3) / (max_AB ** 2)
             unequal_ok = bool(abs(b_direct).upper() <= unequal_bound.lower())
             if not unequal_ok:
                 all_unequal_bounds_hold = False
@@ -1201,9 +1824,13 @@ def verify_section_6_transition_attacks_and_decoupling(
                 "B_AB_separable_decoupled": serialize_arb_certified(b_decoupled),
                 "difference_enclosure": serialize_arb_certified(diff),
                 "zero_in_difference": match_ok,
+                "widely_unequal_bound_7_3_C_star_min3_over_max2": serialize_arb_certified(unequal_bound),
                 "widely_unequal_bound_zeta6_min3_over_max2": serialize_arb_certified(unequal_bound),
                 "widely_unequal_bound_holds": unequal_ok,
             })
+
+        cutoff_regression = reproduce_tc054_cutoff_tolerance_counterexample_arb(prec_bits=prec_bits)
+        abel_and_stieltjes = verify_abel_scaling_and_global_stieltjes_energy_proof(prec_bits=prec_bits)
 
         # 2. Attack A: 1D Mellin formula M[Q_lambda](z) = Gamma(5/4 - z/2) zeta(1 + 2 z) / (2 zeta(1/2 + z))
         # and boundary pole residue at z = 0: Res_{z=0} M[Q_lambda](z) = Gamma(5/4) / (4 zeta(1/2)).
@@ -1224,7 +1851,7 @@ def verify_section_6_transition_attacks_and_decoupling(
             for n in range(1, N_dir + 1):
                 partial_dir += arb(liouville_lambda_int(n)) * (arb(n) ** (-s_dir))
             dir_tail = (arb(N_dir) ** (arb(1) - s_dir)) / (s_dir - arb(1))
-            dir_enclosure = arb(partial_dir.mid(), float(partial_dir.rad()) + float(dir_tail.upper()))
+            dir_enclosure = inflate_arb_with_nonneg_bound(partial_dir, dir_tail)
             diff_mellin = closed_form - (gamma_part * dir_enclosure / arb(2))
             mellin_rows.append({
                 "z_label": z_label,
@@ -1257,7 +1884,7 @@ def verify_section_6_transition_attacks_and_decoupling(
                 if mu_e != 0:
                     partial_e += arb(mu_e) * (arb(e) ** (-(u_arb + v_arb)))
             tail_e = (arb(E_cut) ** (arb(1) - (u_arb + v_arb))) / ((u_arb + v_arb) - arb(1))
-            e_encl = arb(partial_e.mid(), float(partial_e.rad()) + float(tail_e.upper()))
+            e_encl = inflate_arb_with_nonneg_bound(partial_e, tail_e)
             decoupled_uv = e_encl * ((arb(2) * u_arb).zeta() / u_arb.zeta()) * ((arb(2) * v_arb).zeta() / v_arb.zeta())
             diff_uv = closed_uv - decoupled_uv
             bivariate_rows.append({
@@ -1285,10 +1912,7 @@ def verify_section_6_transition_attacks_and_decoupling(
                 m_arb = arb(m)
                 odd_partial += (arb(liouville_lambda_int(m)) / (m_arb ** 3)) * (-X_sq / (m_arb * m_arb)).exp()
             odd_tail = X_pow_5_2 / (arb(2) * (arb(T_odd) ** 2))
-            q_odd_direct = arb(
-                (X_pow_5_2 * odd_partial).mid(),
-                float((X_pow_5_2 * odd_partial).rad()) + float(odd_tail.upper()),
-            )
+            q_odd_direct = inflate_arb_with_nonneg_bound(X_pow_5_2 * odd_partial, odd_tail)
 
             J_inv = 28
             inv_sum = arb(0)
@@ -1304,10 +1928,10 @@ def verify_section_6_transition_attacks_and_decoupling(
                     m_arb = arb(m)
                     part_j += (arb(liouville_lambda_int(m)) / (m_arb ** 3)) * (-X_j_sq / (m_arb * m_arb)).exp()
                 tail_j = X_j_5_2 / (arb(2) * (arb(T_j) ** 2))
-                q_odd_j = arb((X_j_5_2 * part_j).mid(), float((X_j_5_2 * part_j).rad()) + float(tail_j.upper()))
+                q_odd_j = inflate_arb_with_nonneg_bound(X_j_5_2 * part_j, tail_j)
                 inv_sum += sign_j * scale_j * q_odd_j
             inv_tail = (arb(3).zeta() * X_pow_5_2) * (arb(2) ** (-arb(3 * (J_inv + 1)))) / (arb(1) - arb(2) ** (-3))
-            q_inv_encl = arb(inv_sum.mid(), float(inv_sum.rad()) + float(inv_tail.upper()))
+            q_inv_encl = inflate_arb_with_nonneg_bound(inv_sum, inv_tail)
 
             diff_odd = q_odd_comb - q_odd_direct
             diff_inv = q_X - q_inv_encl
@@ -1335,65 +1959,91 @@ def verify_section_6_transition_attacks_and_decoupling(
                 "pointwise_energy_zero_in_difference": bool(diff_sq.contains(0)),
             })
 
-        # Off-critical mode nonvanishing |1 + 2^{-rho}| >= 1 - 2^{-beta} > 0
+        # Off-critical mode nonvanishing |1 + 2^{-rho}| >= 1 - 2^{-x} > 0 (rho = x + i*y)
         off_critical_mode_rows: List[Dict[str, Any]] = []
-        for beta_str in ["11/20", "3/5", "3/4", "9/10"]:
-            num_s, den_s = beta_str.split("/")
-            beta_arb = arb(int(num_s)) / arb(int(den_s))
-            two_neg_beta = arb(2) ** (-beta_arb)
-            lower_bound = arb(1) - two_neg_beta
-            upper_bound = arb(1) + two_neg_beta
+        for x_str in ["11/20", "3/5", "3/4", "9/10"]:
+            num_s, den_s = x_str.split("/")
+            x_arb = arb(int(num_s)) / arb(int(den_s))
+            two_neg_x = arb(2) ** (-x_arb)
+            lower_bound = arb(1) - two_neg_x
+            upper_bound = arb(1) + two_neg_x
             off_critical_mode_rows.append({
-                "beta_label": beta_str,
-                "beta": serialize_arb_certified(beta_arb),
-                "two_pow_neg_beta": serialize_arb_certified(two_neg_beta),
+                "x_label": x_str,
+                "beta_label": x_str,
+                "x": serialize_arb_certified(x_arb),
+                "beta": serialize_arb_certified(x_arb),
+                "two_pow_neg_x": serialize_arb_certified(two_neg_x),
+                "two_pow_neg_beta": serialize_arb_certified(two_neg_x),
+                "lower_bound_1_minus_2_pow_neg_x": serialize_arb_certified(lower_bound),
                 "lower_bound_1_minus_2_pow_neg_beta": serialize_arb_certified(lower_bound),
+                "upper_bound_1_plus_2_pow_neg_x": serialize_arb_certified(upper_bound),
                 "upper_bound_1_plus_2_pow_neg_beta": serialize_arb_certified(upper_bound),
                 "strictly_positive_lower_bound": bool(lower_bound.lower() > 0),
             })
 
         return {
             "rectangular_block_decomposition_and_decoupling": {
+                "old_zeta6_derivation_defect_explanation": (
+                    "The old derivation wrote d^{-6} exp(-L^2/d^2) = d^{-6} * (u^5 e^{-u^2}) * L^{-5} d^5 = d^{-1} u^5 e^{-u^2} L^{-5} "
+                    "(with u = L/d), changing d^{-6} into d^{-1} and invalidating sum_{d>=1} d^{-6} = zeta(6). "
+                    "While the numerical coefficient zeta(6) is not falsified on small samples, the repaired proof establishes "
+                    "the universal bound |B_{A,B}(X)| <= (7/3) C_* min(A,B)^3 / max(A,B)^2 with C_* = max{zeta(6), c_0 + 27 e^{-3}} "
+                    "via the unimodal sum-integral estimate sum_{d>=1} d^{-6} e^{-L^2/d^2} <= c_0 L^{-5} + 27 e^{-3} L^{-6} (L >= 1), "
+                    "<= zeta(6) (L <= 1), sum_{A<=r<2A} r^2 < (7/3) A^3, and sum_{B<=s<2B} s^{-3} <= B^{-2}."
+                ),
+                "zeta_6_tau_formula": "tau^6 / 60480",
+                "zeta_6": serialize_arb_certified(zeta_6),
+                "c_0_plus_27_exp_neg3": serialize_arb_certified(c0_plus_27_e_neg3),
+                "C_star": serialize_arb_certified(C_star_arb),
+                "seven_thirds_C_star": serialize_arb_certified(seven_thirds_C_star),
+                "unimodal_d_sum_bound_rows": unimodal_rows,
+                "all_unimodal_d_sum_bounds_hold": all_unimodal_ok,
+                "cutoff_tolerance_counterexample_regression": cutoff_regression,
                 "decoupling_rows": decoupling_rows,
                 "all_decoupled_blocks_match_direct": all_decoupling_match,
                 "all_widely_unequal_bounds_hold": all_unequal_bounds_hold,
             },
+            "abel_scaling_and_global_stieltjes_energy_proof": abel_and_stieltjes,
             "attack_A_coprime_euler_series_and_separable_gaussian_replacement_theorem": {
                 "mellin_1d_rows": mellin_rows,
                 "residue_at_z_0_Gamma_5_4_over_4_zeta_1_2": serialize_arb_certified(res_z0),
                 "residue_at_z_0_strictly_negative": bool(res_z0.upper() < 0),
                 "bivariate_coprime_dirichlet_rows": bivariate_rows,
                 "off_critical_pole_non_cancellation_theorem": (
-                    "For any hypothetical off-critical zero rho = beta + i*gamma of zeta(s) with 1/2 < beta < 1, "
-                    "at the diagonal pair (u, v) = (rho, conj(rho)) one has Re(2*rho) = Re(2*conj(rho)) = 2*beta > 1 "
-                    "and u + v = 2*beta > 1. Because zeta(w) has an absolutely convergent nonvanishing Euler product "
-                    "on Re(w) > 1 (with |zeta(2*rho)| >= zeta(4*beta)/zeta(2*beta) > 0 and zeta(2*beta) > 1), "
+                    "For any hypothetical off-critical zero rho = x + i*y of zeta(s) with 1/2 < x < 1, "
+                    "at the conjugate pair (u, v) = (rho, conj(rho)) one has Re(2*rho) = Re(2*conj(rho)) = 2*x > 1 "
+                    "and u + v = 2*x > 1. Because zeta(w) has an absolutely convergent nonvanishing Euler product "
+                    "on Re(w) > 1 (with |zeta(2*rho)| >= zeta(4*x)/zeta(2*x) > 0 and zeta(2*x) > 1), "
                     "neither the numerator zeta(2u) zeta(2v) nor the coprimality factor 1/zeta(u+v) can vanish at "
                     "(rho, conj(rho)) to cancel the off-critical poles of 1/(zeta(u) zeta(v))."
                 ),
                 "replacement_theorem_global_super_polynomial_log_saving": {
                     "theorem_statement": (
-                        "For every D > 0, the full grade-interval L^2 energy of Q_lambda(X) satisfies the "
-                        "unconditional global super-polynomial logarithmic saving "
-                        "int_Y^{tau Y} |Q_lambda(X)|^2 dX/X << Y exp(-2 c_1 (log Y)^{3/5} (log log Y)^{-1/5}) "
-                        "<<_D Y (log Y)^{-D} for all Y >= 2 (beating the unsigned O(Y) benchmark by every power of log Y)."
+                        "For X >= 256, |Q_lambda(X)| << sqrt(X) exp(-c_1 Phi(X)) where Phi(t) = (log t)^{3/5} (log log t)^{-1/5}, "
+                        "and for Y >= 256 the grade-interval L^2 energy E_lambda(Y) := int_Y^{tau Y} |Q_lambda(X)|^2 dX/X satisfies "
+                        "E_lambda(Y) << Y exp(-2 c_2 Phi(Y)), hence E_lambda(Y) <<_D Y (log Y)^{-D} for every D > 0 and all Y >= 2 "
+                        "(handling the compact range 2 <= Y < 256 via |Q_lambda(X)| <= zeta(3) X^{5/2})."
                     ),
                     "proof_mechanism": (
-                        "Retaining the exact separable Gaussian kernel exp(-X^2 (r^{-2} + s^{-2}) / d^2) = "
+                        "1. Rectangular-block decoupling: retaining exp(-X^2 (r^{-2} + s^{-2}) / d^2) = "
                         "exp(-X^2 / (d^2 r^2)) exp(-X^2 / (d^2 s^2)) and expanding 1_{gcd(r,s)=1} = sum_{e | gcd(r,s)} mu(e) "
-                        "with r = e m, s = e n decouples every rectangular block B_{A,B}(X) into products of 1D unweighted "
-                        "Liouville Gaussian sums U_lambda(X/(d e); A/e) U_lambda(X/(d e); B/e) weighted by mu(e)/e and 1/d. "
-                        "Crucially, because m and n carry NO coprimality side condition to d*e, partial summation on "
-                        "L_lambda(x) = sum_{m <= x} lambda(m) = O(x exp(-c_0 Phi(x))) (Korobov-Vinogradov-Walfisz) "
-                        "applies with O(1) Gaussian total variation at EVERY scale (including the transition A, B ~ X), "
-                        "while the divisor sums converge absolutely as sum_{e>=1} e^{-2} = pi^2/6 and sum_{d>=1} d^{-2} = pi^2/6."
+                        "with r = e m, s = e n expresses every block B_{A,B}(X) in terms of 1D unweighted sums "
+                        "U_lambda(X/(d e); A/e) U_lambda(X/(d e); B/e) satisfying the corrected Abel bound "
+                        "|U_lambda(Y; M)| << M^{1/2} min(M/Y, (Y/M)^{5/2}) exp(-c Phi(M)) (M >= 16). "
+                        "Summing over all dyadic blocks a, b >= 0 collapses via sum_{e|q} mu(e) = 1_{q=1} to Q_lambda(X)^2. "
+                        "2. Global Stieltjes energy proof: writing Q_lambda(X) = -X^{5/2} int_1^infty L_lambda(t) d/dt(t^{-3} e^{-X^2/t^2}) dt "
+                        "and splitting at t = sqrt(X) (X >= 256) combines Gaussian suppression on [1, sqrt(X)] with the unconditional "
+                        "Korobov-Vinogradov-Walfisz bound L_lambda(t) = O(t exp(-c_0 Phi(t))) and the exact scaling integral "
+                        "int_0^infty u |3 - 2 u^2| e^{-u^2} du = 1/2 + 2 e^{-3/2} on [sqrt(X), infty) to establish "
+                        "|Q_lambda(X)| << sqrt(X) exp(-c_1 Phi(X)) and E_lambda(Y) << Y exp(-2 c_2 Phi(Y)) <<_D Y (log Y)^{-D}."
                     ),
                     "remaining_barrier_to_subgate_tc_043a": (
-                        "While the separable Gaussian decoupling eliminates the transition Euler-Maclaurin barrier "
-                        "and improves the global energy bound from O(Y) to O(Y exp(-2 c_1 (log Y)^{3/5} (log log Y)^{-1/5})), "
-                        "closing SUBGATE-TC-043A requires int_Y^{tau Y} |Q_lambda(X)|^2 dX/X <= C_eps Y^eps (a power saving "
-                        "of exponent nearly 1 over O(Y)), which via Mellin inversion requires a zero-free strip Re(s) > 1 - eta "
-                        "(and ultimately Re(s) > 1/2) for zeta(s)."
+                        "The repaired all-logarithmic upper bound E_lambda(Y) <<_D Y (log Y)^{-D} uses known unconditional "
+                        "Korobov-Vinogradov-Walfisz summatory cancellation and is an upper bound, NOT an asymptotic for E_lambda(Y). "
+                        "It does not establish the subpower target forall eps > 0, E_lambda(Y) <= C_eps Y^eps required to close "
+                        "SUBGATE-TC-043A (a zero-free strip Re(s) > 1 - delta_0 is sufficient to yield a power saving via Mellin "
+                        "contour shifting, while closing SUBGATE-TC-043A across all eps > 0 is equivalent to holomorphy of "
+                        "M[Q_lambda](z) on 0 < Re(z) < 5/2 and hence to RH)."
                     ),
                 },
             },
@@ -1401,9 +2051,9 @@ def verify_section_6_transition_attacks_and_decoupling(
                 "dyadic_parity_rows": dyadic_parity_rows,
                 "all_dyadic_parity_identities_hold": all_dyadic_parity_ok,
                 "weighted_norm_equivalence_formula": (
-                    "(1 - 2^{-1/2 - sigma}) ||Q_lambda||_sigma <= ||Q_{lambda,odd}||_sigma "
-                    "<= (1 + 2^{-1/2 - sigma}) ||Q_lambda||_sigma  for all sigma > -1/2 "
-                    "(including sigma = 0 where 1 - 2^{-1/2} = 0.292893... > 0)."
+                    "(1 - 2^{-1/2 - eta}) ||Q_lambda||_eta <= ||Q_{lambda,odd}||_eta "
+                    "<= (1 + 2^{-1/2 - eta}) ||Q_lambda||_eta  for all eta > -1/2 "
+                    "(including eta = 0 where 1 - 2^{-1/2} = 0.292893... > 0)."
                 ),
                 "off_critical_mode_nonvanishing_rows": off_critical_mode_rows,
             },
@@ -1417,9 +2067,62 @@ def verify_section_6_transition_attacks_and_decoupling(
 # ---------------------------------------------------------------------------
 
 
+def _capture_live_lean_check_and_axioms(public_theorems: List[str]) -> Dict[str, Any]:
+    """Run `lake env lean` on a temporary `.lean` file outside the worktree to capture real
+    `#check` and `#print axioms` compiler output for every public theorem in
+    `RiemannScope.LiouvilleSquareDilation`.
+    """
+    delim = "===TC054R_SPLIT==="
+    lines = ["import RiemannScope.LiouvilleSquareDilation", "open RiemannScope.LiouvilleSquareDilation", ""]
+    for thm in public_theorems:
+        lines.append(f"#check @{thm}")
+        lines.append(f'#eval IO.println "{delim}"')
+        lines.append(f"#print axioms {thm}")
+        lines.append(f'#eval IO.println "{delim}"')
+    script_text = "\n".join(lines) + "\n"
+
+    tmp_file = tempfile.NamedTemporaryFile(
+        mode="w", suffix="_tc054r_audit.lean", encoding="utf-8", delete=False
+    )
+    tmp_path = Path(tmp_file.name)
+    try:
+        tmp_file.write(script_text)
+        tmp_file.close()
+        proc = subprocess.run(
+            ["lake", "env", "lean", str(tmp_path)],
+            cwd=str(REPO_ROOT / "formal"),
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            check=True,
+        )
+        raw_stdout = proc.stdout.strip()
+    finally:
+        if tmp_path.exists():
+            tmp_path.unlink()
+
+    raw_chunks = raw_stdout.split(delim)
+    blocks = [" ".join(line.strip() for line in ch.splitlines() if line.strip()) for ch in raw_chunks]
+
+    per_theorem: Dict[str, Dict[str, str]] = {}
+    for idx, thm in enumerate(public_theorems):
+        check_out = blocks[2 * idx] if 2 * idx < len(blocks) else ""
+        axioms_out = blocks[2 * idx + 1] if (2 * idx + 1) < len(blocks) else ""
+        per_theorem[thm] = {
+            "captured_check_output": check_out,
+            "captured_print_axioms_output": axioms_out,
+        }
+
+    return {
+        "invoked_command": "lake env lean <temp_audit_file.lean>",
+        "exit_code": 0,
+        "per_theorem_captured_output": per_theorem,
+    }
+
+
 def verify_liouville_square_dilation_lean_module() -> Dict[str, Any]:
     """Verify `formal/RiemannScope/LiouvilleSquareDilation.lean` declaration counts,
-    zero `sorry`/`axiom`, and exact `#check` / `#print axioms` outputs.
+    zero `sorry`/`axiom`, and live captured `#check` / `#print axioms` outputs from Lean 4.
     """
     src = LIOUVILLE_SQUARE_DILATION_LEAN_MODULE_PATH.read_text(encoding="utf-8")
     code_lines: List[str] = []
@@ -1466,10 +2169,83 @@ def verify_liouville_square_dilation_lean_module() -> Dict[str, Any]:
     expected_theorems = [
         "liouville_complete_multiplicativity_and_common_factor_cancellation_nat",
         "prime_power_square_divisor_moebius_liouville_inversion_nat",
+        "actual_omega_factorization_and_liouville_common_factor_cancellation_nat",
+        "actual_prime_power_and_factored_square_divisor_moebius_liouville_inversion_nat",
         "reversible_weighted_dilation_norm_and_grade_interval_equivalence",
         "euler_maclaurin_c2_and_subtransition_growing_range_exponent",
         "dyadic_parity_energy_and_off_critical_mode_nonvanishing",
+        "abel_scaling_fourier_ratio_and_unequal_block_algebra",
     ]
+
+    live_lean = _capture_live_lean_check_and_axioms(public_theorems)
+    captured_map = live_lean["per_theorem_captured_output"]
+
+    descriptive_scope_metadata: Dict[str, Tuple[str, str]] = {
+        "liouville_complete_multiplicativity_and_common_factor_cancellation_nat": (
+            "exponent_model_arithmetic_theorem",
+            "Additive-exponent model over ℕ and ℤ (`liouvilleSignFromOmega omega_n := (-1)^omega_n`): proves "
+            "sign values at 0 and 1, exponent additivity to sign multiplicativity, unit square, and common-factor cancellation.",
+        ),
+        "prime_power_square_divisor_moebius_liouville_inversion_nat": (
+            "exponent_model_arithmetic_theorem",
+            "Prime-power exponent model over ℕ and ℤ: proves by strong induction on `k : ℕ` that "
+            "`squareDivisorMoebiusSum k = (-1)^k` and `squareDivisorInverseLiouvilleSum k = primePowerMoebius k`.",
+        ),
+        "actual_omega_factorization_and_liouville_common_factor_cancellation_nat": (
+            "actual_positive_integer_arithmetic_theorem",
+            "Genuinely arithmetic theorem over positive integers `p, m, n, d, r, s : ℕ` using Mathlib's `ArithmeticFunction.cardFactors` "
+            "and `Nat.factorization`: proves `(n.factorization.sum fun _ e => e) = natOmega n`, `natOmega 1 = 0 ∧ natOmega p = 1 ∧ natOmega (p^k) = k`, "
+            "`natOmega (m * n) = natOmega m + natOmega n`, `liouvilleLambda 1 = 1 ∧ liouvilleLambda p = -1`, "
+            "`liouvilleLambda (m * n) = liouvilleLambda m * liouvilleLambda n`, `liouvilleLambda d * liouvilleLambda d = 1`, "
+            "`liouvilleLambda (d * r) * liouvilleLambda (d * s) = liouvilleLambda r * liouvilleLambda s`, and `liouvilleArith.IsMultiplicative`.",
+        ),
+        "actual_prime_power_and_factored_square_divisor_moebius_liouville_inversion_nat": (
+            "actual_prime_power_and_factored_integer_arithmetic_theorem",
+            "Genuinely arithmetic theorem connecting `primePowerMoebius k` to Mathlib's `ArithmeticFunction.moebius (p ^ k)` for prime `p`, "
+            "proving the prime-power square-divisor identities for `ArithmeticFunction.moebius` and `liouvilleLambda`, and proving for all `n != 0` "
+            "the factored square-divisor identities `liouvilleLambda n = n.factorization.prod (fun q e => primePowerActualMoebiusSquareSum q e)` "
+            "and `ArithmeticFunction.moebius n = n.factorization.prod (fun q e => primePowerActualInverseLiouvilleSquareSum q e)` plus equality of "
+            "multiplicative functions agreeing on prime powers (`eq_iff_eq_on_prime_powers`). The remaining formalization step to a flat `Finset.divisors` "
+            "sum is the distributive `Finsupp.prod` square-divisor bijection.",
+        ),
+        "reversible_weighted_dilation_norm_and_grade_interval_equivalence": (
+            "scalar_real_inequality_lemma",
+            "Scalar real-inequality lemma assuming explicit real norm bounds (`norm_lambda <= zeta_1_2eta * norm_mu`, etc.); "
+            "the continuum L^2((0, infty), X^{-2*eta} dX/X) Minkowski integral inequality is proved analytically outside Lean.",
+        ),
+        "euler_maclaurin_c2_and_subtransition_growing_range_exponent": (
+            "scalar_real_algebra_lemma",
+            "Scalar real-algebra lemma proving the three-interval `|f''|` antiderivative combination `(f'(v_-) - f'(v_+)) / 6` "
+            "and the subtransition exponent equivalence `(N + 1)(1 - delta) - N = 1 - (N + 1)*delta < 0 <-> 1 < (N + 1)*delta`.",
+        ),
+        "dyadic_parity_energy_and_off_critical_mode_nonvanishing": (
+            "scalar_real_algebra_lemma",
+            "Scalar real-algebra lemma proving the pointwise square identity `(Q_X + (1/sqrt2)*Q_half_X)^2 = Q_X^2 + (1/2)*Q_half_X^2 + sqrt2*Q_X*Q_half_X` "
+            "from `sqrt2^2 = 2` and positivity `0 < 1 - 2^{-x} <= |1 + 2^{-rho}|` when `2^{-x} < 1`.",
+        ),
+        "abel_scaling_fourier_ratio_and_unequal_block_algebra": (
+            "scalar_real_algebra_and_monotonicity_lemma",
+            "Scalar real-algebra and monotonicity lemma proving: (1) the Abel/Stieltjes scaling antiderivative combination equals `1/2 + 2*e^{-3/2}`, "
+            "(2) monotonic denominator bounds `(K - 1/2)(2K + 3)(2K + 4) <= (m - 3/2)(2m + 1)(2m + 2)` and `(K + 2)(2K + 8)(2K + 9) <= (m + 1)(2m + 6)(2m + 7)` "
+            "for `m >= K + 1 >= 2`, and (3) the unequal-block sum-integral inequality `1/B^3 + 1/(2*B^2) <= 1/B^2` for `B >= 2`.",
+        ),
+    }
+
+    theorems_exact_scope: Dict[str, Any] = {}
+    for thm in public_theorems:
+        cap = captured_map.get(thm, {"captured_check_output": "", "captured_print_axioms_output": ""})
+        classification, desc_note = descriptive_scope_metadata.get(
+            thm, ("theorem", "Formalized theorem in RiemannScope.LiouvilleSquareDilation.")
+        )
+        theorems_exact_scope[thm] = {
+            "declaration_name": f"RiemannScope.LiouvilleSquareDilation.{thm}",
+            "theorem_classification": classification,
+            "captured_check_output": cap["captured_check_output"],
+            "captured_print_axioms_output": cap["captured_print_axioms_output"],
+            "check_signature": cap["captured_check_output"],
+            "print_axioms": cap["captured_print_axioms_output"],
+            "descriptive_scope_metadata_note": desc_note,
+        }
 
     return {
         "module_path": "formal/RiemannScope/LiouvilleSquareDilation.lean",
@@ -1486,90 +2262,8 @@ def verify_liouville_square_dilation_lean_module() -> Dict[str, Any]:
         "sorry_count": len(sorry_tokens),
         "custom_axiom_count": len(axiom_decls),
         "standard_lean_axioms_used": ["propext", "Classical.choice", "Quot.sound"],
-        "theorems_exact_scope": {
-            "liouville_complete_multiplicativity_and_common_factor_cancellation_nat": {
-                "declaration_name": "RiemannScope.LiouvilleSquareDilation.liouville_complete_multiplicativity_and_common_factor_cancellation_nat",
-                "check_signature": (
-                    "(omega_d omega_r omega_s : ℕ) : "
-                    "(liouvilleSignFromOmega 0 = 1 ∧ liouvilleSignFromOmega 1 = -1) ∧ "
-                    "liouvilleSignFromOmega (omega_d + omega_r) = liouvilleSignFromOmega omega_d * liouvilleSignFromOmega omega_r ∧ "
-                    "liouvilleSignFromOmega omega_d * liouvilleSignFromOmega omega_d = 1 ∧ "
-                    "liouvilleSignFromOmega (omega_d + omega_r) * liouvilleSignFromOmega (omega_d + omega_s) = "
-                    "liouvilleSignFromOmega omega_r * liouvilleSignFromOmega omega_s"
-                ),
-                "print_axioms": "depends on axioms: [propext, Classical.choice, Quot.sound]",
-                "scope_note": (
-                    "Genuinely arithmetic theorem over ℕ and ℤ: defines `liouvilleSignFromOmega (omega_n : ℕ) : ℤ := (-1 : ℤ) ^ omega_n` "
-                    "and proves `lambda(1) = 1`, `lambda(p) = -1`, complete multiplicativity `(-1)^(omega_d + omega_r) = (-1)^omega_d * (-1)^omega_r`, "
-                    "unit square `((-1)^omega_d)^2 = 1`, and unconstrained common-factor cancellation "
-                    "`lambda(d r) lambda(d s) = lambda(r) lambda(s)` for all `omega_d, omega_r, omega_s : ℕ` without squarefree or coprimality conditions."
-                ),
-            },
-            "prime_power_square_divisor_moebius_liouville_inversion_nat": {
-                "declaration_name": "RiemannScope.LiouvilleSquareDilation.prime_power_square_divisor_moebius_liouville_inversion_nat",
-                "check_signature": (
-                    "(k : ℕ) : squareDivisorMoebiusSum k = liouvilleSignFromOmega k ∧ "
-                    "squareDivisorInverseLiouvilleSum k = primePowerMoebius k"
-                ),
-                "print_axioms": "depends on axioms: [propext, Classical.choice, Quot.sound]",
-                "scope_note": (
-                    "Genuinely arithmetic theorem over ℕ and ℤ: proves by strong induction on the prime-power exponent `k : ℕ` "
-                    "that `sum_{d^2 | p^k} mu(p^k / d^2) = (-1)^k = lambda(p^k)` (`squareDivisorMoebiusSum k = liouvilleSignFromOmega k`) "
-                    "and that the indexed finite sum `sum_{0 <= j <= k/2} mu(p^j) (-1)^{k - 2j}` equals `mu(p^k)` (`squareDivisorInverseLiouvilleSum k = primePowerMoebius k`). "
-                    "Multiplicative extension from prime powers `p^k` to general positive integers `n = prod p_i^{k_i}` is proved analytically outside Lean."
-                ),
-            },
-            "reversible_weighted_dilation_norm_and_grade_interval_equivalence": {
-                "declaration_name": "RiemannScope.LiouvilleSquareDilation.reversible_weighted_dilation_norm_and_grade_interval_equivalence",
-                "check_signature": (
-                    "(norm_f_sq d_pow_neg_4sigma norm_f_d2_sq norm_lambda norm_mu zeta_1_2sigma zeta_2_4sigma B_mu B_lam "
-                    "int_0_1 sum_tau_blocks Z3_sq sigma C_sigma tau_pow_neg_sigma : ℝ) ... : "
-                    "norm_f_d2_sq = d_pow_neg_4sigma * norm_f_sq ∧ "
-                    "(norm_mu ≤ B_mu → norm_lambda ≤ zeta_1_2sigma * B_mu) ∧ "
-                    "(norm_lambda ≤ B_lam → norm_mu ≤ zeta_1_2sigma / zeta_2_4sigma * B_lam) ∧ "
-                    "int_0_1 + sum_tau_blocks ≤ Z3_sq / (5 - 2 * sigma) + C_sigma / (1 - tau_pow_neg_sigma)"
-                ),
-                "print_axioms": "depends on axioms: [propext, Classical.choice, Quot.sound]",
-                "scope_note": (
-                    "Scalar real-inequality lemma: proves the reversible weighted norm implications from explicit real hypotheses "
-                    "`norm_lambda <= zeta_1_2sigma * norm_mu` and `norm_mu <= (zeta_1_2sigma / zeta_2_4sigma) * norm_lambda` and "
-                    "combines the `[0, 1]` and `[tau^k, tau^{k+1})` geometric-series bounds; the Minkowski integral inequality and "
-                    "change of variables `X = a Y` are proved analytically outside Lean."
-                ),
-            },
-            "euler_maclaurin_c2_and_subtransition_growing_range_exponent": {
-                "declaration_name": "RiemannScope.LiouvilleSquareDilation.euler_maclaurin_c2_and_subtransition_growing_range_exponent",
-                "check_signature": (
-                    "(f_prime_v_minus f_prime_v_plus N delta : ℝ) (h_v_minus_nonneg : 0 ≤ f_prime_v_minus) "
-                    "(h_v_plus_nonpos : f_prime_v_plus ≤ 0) : "
-                    "1 / 12 * (|f_prime_v_minus| + |f_prime_v_plus - f_prime_v_minus| + |(-f_prime_v_plus)|) = "
-                    "(f_prime_v_minus - f_prime_v_plus) / 6 ∧ "
-                    "(N + 1) * (1 - delta) - N = 1 - (N + 1) * delta ∧ (1 - (N + 1) * delta < 0 ↔ 1 < (N + 1) * delta)"
-                ),
-                "print_axioms": "depends on axioms: [propext, Classical.choice, Quot.sound]",
-                "scope_note": (
-                    "Scalar real-algebra lemma: proves that for `f'(v_-) >= 0 >= f'(v_+)`, the three-interval `|f''|` antiderivative "
-                    "combination `(1/12)(|f'(v_-)| + |f'(v_+) - f'(v_-)| + |-f'(v_+)|)` equals `(f'(v_-) - f'(v_+)) / 6`, and proves the "
-                    "subtransition exponent equivalence `(N + 1)(1 - delta) - N = 1 - (N + 1) delta < 0 <-> (N + 1) delta > 1`."
-                ),
-            },
-            "dyadic_parity_energy_and_off_critical_mode_nonvanishing": {
-                "declaration_name": "RiemannScope.LiouvilleSquareDilation.dyadic_parity_energy_and_off_critical_mode_nonvanishing",
-                "check_signature": (
-                    "(Q_X Q_half_X sqrt2 two_pow_neg_beta abs_one_plus_two_pow_neg_rho : ℝ) "
-                    "(h_sqrt2 : sqrt2 ^ 2 = 2) (h_sqrt2_ne : sqrt2 ≠ 0) (h_beta_lt_one : two_pow_neg_beta < 1) "
-                    "(h_rev_tri : 1 - two_pow_neg_beta ≤ abs_one_plus_two_pow_neg_rho) : "
-                    "(Q_X + 1 / sqrt2 * Q_half_X) ^ 2 = Q_X ^ 2 + 1 / 2 * Q_half_X ^ 2 + sqrt2 * Q_X * Q_half_X ∧ "
-                    "0 < 1 - two_pow_neg_beta ∧ 0 < abs_one_plus_two_pow_neg_rho"
-                ),
-                "print_axioms": "depends on axioms: [propext, Classical.choice, Quot.sound]",
-                "scope_note": (
-                    "Scalar real-algebra lemma: proves the pointwise dyadic parity square expansion "
-                    "`(Q_X + (1/sqrt2) Q_half_X)^2 = Q_X^2 + (1/2) Q_half_X^2 + sqrt2 * Q_X * Q_half_X` from `sqrt2^2 = 2`, "
-                    "and proves `0 < 1 - 2^{-beta} <= |1 + 2^{-rho}|` when `2^{-beta} < 1` (`beta > 0`)."
-                ),
-            },
-        },
+        "live_lean_invocation_audit": live_lean,
+        "theorems_exact_scope": theorems_exact_scope,
     }
 
 
@@ -1581,7 +2275,7 @@ def verify_liouville_square_dilation_lean_module() -> Dict[str, Any]:
 def execute_task_tc054_liouville_square_dilation_audit(
     prec_bits: int = 256,
 ) -> Dict[str, Any]:
-    """Execute the full TASK-TC-054 mathematical and numerical audit and return the report dictionary."""
+    """Execute the full TASK-TC-054 / TASK-TC-054R mathematical and numerical audit and return the report dictionary."""
     sec2_3 = verify_section_2_and_3_square_dilation_transfer(prec_bits=prec_bits)
     sec4 = verify_section_4_unconstrained_common_factor_and_euler_maclaurin(prec_bits=prec_bits)
     sec5 = verify_section_5_poisson_summation_at_transition(prec_bits=prec_bits)
@@ -1590,11 +2284,14 @@ def execute_task_tc054_liouville_square_dilation_audit(
 
     report: Dict[str, Any] = {
         "task_id": TASK_TC_054_ID,
+        "repair_task_id": TASK_TC_054R_ID,
         "parent_epic": EPIC_TC_042_ID,
         "prior_merged_main": PRIOR_MERGED_MAIN_TC_053R,
         "tc053r2_implementation_commit": TC_053R2_IMPLEMENTATION_COMMIT,
         "tc053r2_reviewed_tip": TC_053R2_REVIEWED_TIP,
-        "branch": "task/tc-054-liouville-square-dilation-and-transition-cancellation",
+        "tc054_implementation_commit": TC_054_IMPLEMENTATION_COMMIT,
+        "tc054_reviewed_tip": TC_054_REVIEWED_TIP,
+        "branch": "task/tc-054r-abel-poisson-certification-and-arithmetic-scope-repair",
         "subgate_tc043a_status": "OPEN",
         "rh_proved": False,
         "precision_bits": prec_bits,
@@ -1604,25 +2301,24 @@ def execute_task_tc054_liouville_square_dilation_audit(
         "section_6_rectangular_blocks_and_transition_attacks": sec6,
         "section_7_lean_formalization_audit": lean_audit,
         "surviving_unconditional_theorems": [
-            "Reversible square-dilation transfer lambda(n) = sum_{d^2 | n} mu(n/d^2), mu(n) = sum_{d^2 | n} mu(d) lambda(n/d^2), Q_lambda(X) = sum_{d>=1} Q_mu(X/d^2)/d, Q_mu(X) = sum_{d>=1} mu(d) Q_lambda(X/d^2)/d, and weighted L^2 norm equivalence ||Q_lambda||_sigma <= zeta(1+2*sigma) ||Q_mu||_sigma, ||Q_mu||_sigma <= (zeta(1+2*sigma)/zeta(2+4*sigma)) ||Q_lambda||_sigma for all sigma > 0.",
-            "Equivalence between the grade-interval subpower energy bound (forall eps > 0 exists C_eps, int_Y^{tau Y} |Q_a(X)|^2 dX/X <= C_eps Y^eps) and weighted norm finiteness (forall sigma in (0, 5/2), ||Q_a||_sigma < infty) for both a = mu and a = lambda.",
-            "Unconstrained common-factor expansion Q_lambda(X)^2 = sum_{gcd(r,s)=1} (lambda(r) lambda(s) X^5 / (r s)^3) sum_{d>=1} d^{-6} exp(-L^2/d^2) (with lambda(d r) lambda(d s) = lambda(r) lambda(s) for ALL d >= 1) and fixed-order Euler-Maclaurin error bound |E^lambda_{r,s}(X)| <= C_N X^{-N} (r s)^{N+2} / (r^2 + s^2)^{(N+5)/2} (C_2 = 1.8512576670..., C_4 = 8.7523717600...), controlling the entire subtransition range A <= X^{1 - delta} whenever (N + 1) delta > 1.",
-            "Exact Poisson summation formula sum_{d>=1} d^{-6} exp(-L^2/d^2) = L^{-5} [3 sqrt(pi)/8 + sum_{j>=1} hat{f}(j L)] at the transition L ~ 1, with certified sign changes hat{f}(1/2) = -0.562854... < 0, hat{f}(1) = -0.366836... < 0, hat{f}(3/2) = +0.263617... > 0, hat{f}(2) = +0.124712... > 0.",
-            "Replacement Theorem (Separable Gaussian Decoupling in Attack A): retaining the exact kernel exp(-X^2(r^{-2}+s^{-2})/d^2) = exp(-X^2/(d^2 r^2)) exp(-X^2/(d^2 s^2)) and expanding 1_{gcd(r,s)=1} = sum_{e | gcd(r,s)} mu(e) factors every rectangular block B_{A,B}(X) into 1D unweighted Liouville Gaussian sums U_lambda(X/(d e); A/e) U_lambda(X/(d e); B/e) with convergent divisor weight sum_e e^{-2} = pi^2/6, yielding the unconditional global super-polynomial logarithmic energy saving int_Y^{tau Y} |Q_lambda(X)|^2 dX/X << Y exp(-2 c_1 (log Y)^{3/5} (log log Y)^{-1/5}) <<_D Y (log Y)^{-D} across the ENTIRE integral.",
-            "Exact dyadic parity annihilation Q_{lambda,odd}(X) = Q_lambda(X) + 2^{-1/2} Q_lambda(X/2), convergent dyadic inversion, exact grade-interval energy identity on [Y, tau Y] with cross-scale correlation, bounded norm equivalence for all sigma > -1/2, and proof that |1 + 2^{-rho}| >= 1 - 2^{-beta} > 0 on Re(rho) = beta > 0.",
+            "Reversible square-dilation transfer lambda(n) = sum_{d^2 | n} mu(n/d^2), mu(n) = sum_{d^2 | n} mu(d) lambda(n/d^2), Q_lambda(X) = sum_{d>=1} Q_mu(X/d^2)/d, Q_mu(X) = sum_{d>=1} mu(d) Q_lambda(X/d^2)/d, and weighted L^2 norm equivalence ||Q_lambda||_eta <= zeta(1+2*eta) ||Q_mu||_eta, ||Q_mu||_eta <= (zeta(1+2*eta)/zeta(2+4*eta)) ||Q_lambda||_eta for all eta > 0.",
+            "Equivalence between the grade-interval subpower energy bound (forall eps > 0 exists C_eps, int_Y^{tau Y} |Q_a(X)|^2 dX/X <= C_eps Y^eps) and weighted norm finiteness (forall eta in (0, 5/2), ||Q_a||_eta < infty) for both a = mu and a = lambda.",
+            "Unconstrained common-factor expansion Q_lambda(X)^2 = sum_{gcd(r,s)=1} (lambda(r) lambda(s) X^5 / (r s)^3) sum_{d>=1} d^{-6} exp(-L^2/d^2) (with lambda(d r) lambda(d s) = lambda(r) lambda(s) for ALL d >= 1) and fixed-order Euler-Maclaurin error bound |E^lambda_{r,s}(X)| <= C_N X^{-N} (r s)^{N+2} / (r^2 + s^2)^{(N+5)/2} (C_2 = 1.8512576670..., C_4 = 8.7523717600...), controlling every fixed subtransition range A <= X^{1 - delta} whenever (N + 1) delta > 1.",
+            "Exact Poisson summation formula sum_{d>=1} d^{-6} exp(-L^2/d^2) = L^{-5} [c_0 + sum_{j>=1} hat{f}(j L)] (with c_0 = 3 sqrt(tau/2) / 8) established via C^infty flatness at 0, O(|v|^{-6-j}) decay at infinity, and C^1(R/Z) periodization (DLMF 1.8.14), together with repaired Fourier tail-ratio certification (R_even, R_odd <= 1/2 or 1/(1-R)) and certified sign changes hat{f}(1/2) < 0, hat{f}(4/tau) < 0, hat{f}(1) < 0, hat{f}(3/2) > 0, hat{f}(2) > 0.",
+            "Repaired unequal-block bound |B_{A,B}(X)| <= (7/3) C_* min(A,B)^3 / max(A,B)^2 with C_* = max{zeta(6), c_0 + 27 exp(-3)} = 2.0089150316..., repaired dyadic Abel bound |U_lambda(Y; M)| << M^{1/2} min(M/Y, (Y/M)^{5/2}) exp(-c Phi(M)) (M >= 16), and unconditional global Stieltjes energy theorem |Q_lambda(X)| << sqrt(X) exp(-c_1 Phi(X)) (X >= 256) and E_lambda(Y) := int_Y^{tau Y} |Q_lambda(X)|^2 dX/X << Y exp(-2 c_2 Phi(Y)) <<_D Y (log Y)^{-D} via splitting Q_lambda(X) = -X^{5/2} int_1^infty L_lambda(t) d/dt(t^{-3} exp(-X^2/t^2)) dt at t = sqrt(X) with scaling constant int_0^infty u |3 - 2 u^2| exp(-u^2) du = 1/2 + 2 exp(-3/2).",
+            "Exact dyadic parity annihilation Q_{lambda,odd}(X) = Q_lambda(X) + 2^{-1/2} Q_lambda(X/2), convergent dyadic inversion, exact grade-interval energy identity on [Y, tau Y] with cross-scale correlation, bounded norm equivalence for all eta > -1/2, and proof that |1 + 2^{-rho}| >= 1 - 2^{-x} > 0 for rho = x + i*y with x > 0.",
         ],
         "precise_obstruction_to_subgate_tc043a_closure": (
             "1. In Attack A, the bivariate coprime Dirichlet series D_lambda(u, v) = zeta(2u) zeta(2v) / (zeta(u) zeta(v) zeta(u+v)) "
             "has numerator zeta(2u) zeta(2v) and coprimality factor 1/zeta(u+v) evaluated at 2u, 2v, u+v in the Euler-product "
-            "half-plane Re(w) > 1 whenever Re(u) = Re(v) = beta > 1/2, so neither factor can vanish at an off-critical conjugate pair "
-            "(rho, conj(rho)) to cancel the poles of 1/(zeta(u) zeta(v)); moreover M[Q_lambda](z) has a genuine simple pole at z = 0 "
-            "of residue Gamma(5/4)/(4 zeta(1/2)) = -0.1551682265... != 0. While the Separable Gaussian Decoupling Replacement Theorem "
-            "bypasses the transition Euler-Maclaurin barrier and proves the unconditional global energy bound "
-            "int_Y^{tau Y} |Q_lambda(X)|^2 dX/X << Y exp(-2 c_1 (log Y)^{3/5} (log log Y)^{-1/5}) <<_D Y (log Y)^{-D}, "
-            "improving exp(-2 c_1 Phi(Y)) to the power saving Y^{-1 + eps} required by int_Y^{tau Y} |Q_lambda(X)|^2 dX/X <= C_eps Y^eps "
-            "is equivalent via Mellin inversion to a zero-free strip Re(s) > 1 - eta (and ultimately Re(s) > 1/2) for zeta(s). "
-            "2. In Attack B, the dyadic parity operator 1 + 2^{-1/2} D_2 multiplies an off-critical mode X^{rho - 1/2} by "
-            "1 + 2^{-rho}, which satisfies 0 < 1 - 2^{-beta} <= |1 + 2^{-rho}| <= 1 + 2^{-beta} < 2 for all beta = Re(rho) > 0 "
+            "half-plane Re(w) > 1 whenever Re(u) = Re(v) = x > 1/2, so neither factor can vanish at an off-critical conjugate pair "
+            "(rho, conj(rho)) (rho = x + i*y) to cancel the poles of 1/(zeta(u) zeta(v)); moreover M[Q_lambda](z) has a genuine simple pole "
+            "at z = 0 of residue Gamma(5/4)/(4 zeta(1/2)) = -0.1551682265... != 0, and the global divisor sum sum_{q>=1} ((sum_{e|q} mu(e))/q) Q_lambda(X/q)^2 "
+            "collapses to q = 1. While the global Stieltjes integration-by-parts proof establishes E_lambda(Y) << Y exp(-2 c_2 Phi(Y)) <<_D Y (log Y)^{-D} "
+            "from unconditional Korobov-Vinogradov-Walfisz cancellation, this is an upper bound (not an energy asymptotic) and does not establish "
+            "forall eps > 0, E_lambda(Y) <= C_eps Y^eps. "
+            "2. In Attack B, the dyadic parity operator 1 + 2^{-1/2} D_2 multiplies an off-critical mode X^{rho - 1/2} (rho = x + i*y) by "
+            "1 + 2^{-rho}, which satisfies 0 < 1 - 2^{-x} <= |1 + 2^{-rho}| <= 1 + 2^{-x} < 2 for all x > 0 "
             "and therefore is a bounded invertible multiplier that cannot annihilate an off-critical zero."
         ),
     }
