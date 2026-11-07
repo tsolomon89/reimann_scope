@@ -1,25 +1,29 @@
 /-
 RiemannScope.LiouvilleSquareDilation
-TASK-TC-054 / TASK-TC-054R:
+TASK-TC-054 / TASK-TC-054R / TASK-TC-054R2:
 1. Actual arithmetic definitions and theorems over `ℕ` and `ℤ` using Mathlib's
-   `ArithmeticFunction.cardFactors` (`Ω`), `Nat.factorization`, and `ArithmeticFunction.moebius` (`μ`):
+   `ArithmeticFunction.cardFactors` (`Ω`), `Nat.factorization`, `Nat.divisors`, and
+   `ArithmeticFunction.moebius` (`μ`):
    - Connection of `Ω(n)` to prime-factorization multiplicities `(n.factorization.sum fun _ e => e) = natOmega n`;
    - Additivity `natOmega (m * n) = natOmega m + natOmega n` for positive integers;
    - Actual Liouville function `liouvilleLambda n = (-1)^{Ω(n)}`, its `ArithmeticFunction ℤ` wrapper
      `liouvilleArith`, complete multiplicativity `liouvilleLambda (m * n) = liouvilleLambda m * liouvilleLambda n`,
      unit square `liouvilleLambda d * liouvilleLambda d = 1`, and unconstrained common-factor sign cancellation
      `liouvilleLambda (d * r) * liouvilleLambda (d * s) = liouvilleLambda r * liouvilleLambda s`;
-   - Connection of `ArithmeticFunction.moebius (p ^ k)` and `liouvilleLambda (p ^ k)` to the prime-power
-     exponent model, actual prime-power square-divisor sums
-     `primePowerActualMoebiusSquareSum p k = liouvilleLambda (p ^ k)` and
-     `primePowerActualInverseLiouvilleSquareSum p k = ArithmeticFunction.moebius (p ^ k)`,
-     factored prime-power product formulas over `n.factorization.prod` for all `n ≠ 0`, and
-     multiplicative uniqueness `ArithmeticFunction.IsMultiplicative.eq_iff_eq_on_prime_powers`.
+   - Explicit finite square-divisor set `squareDivisors n = (Nat.divisors n).filter (fun d => d ^ 2 ∣ n)` and
+     actual flat square-divisor sums on `ℕ`:
+       `actualFlatMoebiusSquareDivisorSum n = ∑ d ∈ squareDivisors n, μ(n / d^2)` and
+       `actualFlatInverseLiouvilleSquareDivisorSum n = ∑ d ∈ squareDivisors n, μ(d) λ(n / d^2)`,
+     with unconditional proofs of their multiplicativity (`IsMultiplicative`), prime-power evaluation,
+     factored prime-power product formulas over `n.factorization.prod`, and full integer identities
+     `actualFlatMoebiusSquareDivisorSum n = liouvilleLambda n` and
+     `actualFlatInverseLiouvilleSquareDivisorSum n = ArithmeticFunction.moebius n` for all `n ≠ 0`.
 2. Prime-power exponent models (`liouville_complete_multiplicativity_and_common_factor_cancellation_nat`
    and `prime_power_square_divisor_moebius_liouville_inversion_nat`).
-3. Scalar real-algebra and real-inequality lemmas for weighted norm bounds, Euler-Maclaurin `C_2` and
-   subtransition exponents, dyadic parity square expansion, Abel scaling antiderivative combine,
-   Fourier tail ratio denominator monotonicity, and unequal-block sum bounds.
+3. Scalar real-algebra, real-inequality, and finite-sum lemmas for weighted norm bounds, Euler-Maclaurin `C_2`
+   and subtransition exponents, dyadic parity square expansion, Stieltjes endpoint antiderivative algebra,
+   Fourier tail ratio denominator monotonicity, exact dyadic block square sum `∑_{A ≤ r < 2A} r^2`, and
+   unequal-block reciprocal-cube bound algebra.
 -/
 
 import Mathlib.NumberTheory.LSeries.RiemannZeta
@@ -83,6 +87,27 @@ def primePowerActualMoebiusSquareSum (p k : ℕ) : ℤ :=
     Mathlib's `ArithmeticFunction.moebius` and `liouvilleLambda`. -/
 def primePowerActualInverseLiouvilleSquareSum (p k : ℕ) : ℤ :=
   finRangeSum (fun j => ArithmeticFunction.moebius (p ^ j) * liouvilleLambda (p ^ (k - 2 * j))) (k / 2 + 1)
+
+/-- Finite set of positive divisors `d` of `n` whose square divides `n` (`d ^ 2 ∣ n`). -/
+def squareDivisors (n : ℕ) : Finset ℕ :=
+  (Nat.divisors n).filter (fun d => d ^ 2 ∣ n)
+
+/-- Actual flat square-divisor Möbius sum `∑_{d^2 ∣ n} μ(n / d^2)` on `ℕ`. -/
+def actualFlatMoebiusSquareDivisorSum (n : ℕ) : ℤ :=
+  ∑ d ∈ squareDivisors n, ArithmeticFunction.moebius (n / (d ^ 2))
+
+/-- Actual flat inverse Liouville square-divisor sum `∑_{d^2 ∣ n} μ(d) λ(n / d^2)` on `ℕ`. -/
+def actualFlatInverseLiouvilleSquareDivisorSum (n : ℕ) : ℤ :=
+  ∑ d ∈ squareDivisors n, ArithmeticFunction.moebius d * liouvilleLambda (n / (d ^ 2))
+
+/-- `ArithmeticFunction ℤ` wrapper for `actualFlatMoebiusSquareDivisorSum`. -/
+def actualFlatMoebiusSquareArith : ArithmeticFunction ℤ :=
+  ⟨actualFlatMoebiusSquareDivisorSum, by simp [actualFlatMoebiusSquareDivisorSum, squareDivisors]⟩
+
+/-- `ArithmeticFunction ℤ` wrapper for `actualFlatInverseLiouvilleSquareDivisorSum`. -/
+def actualFlatInverseLiouvilleSquareArith : ArithmeticFunction ℤ :=
+  ⟨actualFlatInverseLiouvilleSquareDivisorSum,
+    by simp [actualFlatInverseLiouvilleSquareDivisorSum, squareDivisors]⟩
 
 /-- **Theorem 1 (`TASK-TC-054` §2–§4, Exponent Model)**: Complete multiplicativity and common-factor
     sign cancellation for `liouvilleSignFromOmega` on natural-number exponents `omega_d, omega_r, omega_s : ℕ`. -/
@@ -297,24 +322,138 @@ theorem actual_omega_factorization_and_liouville_common_factor_cancellation_nat
   exact ⟨h_fact n hn, ⟨h_omega_1, h_omega_p, h_omega_pk⟩, h_omega_mul m n hm hn,
     ⟨h_lam_1, h_lam_p⟩, h_lam_mul_gen m n hm hn, h_lam_sq_gen d hd, h_cancel, h_mult⟩
 
-/-- **Theorem 4 (`TASK-TC-054R` §8, Actual Möbius & Square-Divisor Sums on Prime Powers and Factored Integers)**:
+/-- Helper lemma characterizing membership in `squareDivisors n`. -/
+private theorem mem_squareDivisors_iff_aux {n d : ℕ} :
+    d ∈ squareDivisors n ↔ (d ∣ n ∧ n ≠ 0) ∧ d ^ 2 ∣ n := by
+  simp [squareDivisors, Nat.mem_divisors]
+
+/-- Helper lemma: `Finset.sum` over `Finset.range m` equals `finRangeSum f m`. -/
+private theorem sum_range_eq_finRangeSum_aux (f : ℕ → ℤ) (m : ℕ) :
+    (∑ j ∈ Finset.range m, f j) = finRangeSum f m := by
+  induction m with
+  | zero => rfl
+  | succ m ih =>
+    rw [Finset.sum_range_succ, ih]
+    rfl
+
+/-- Helper lemma: explicit characterization of `squareDivisors (p ^ k)` for prime `p`. -/
+private theorem squareDivisors_prime_pow_aux {p : ℕ} (hp : p.Prime) (k : ℕ) :
+    squareDivisors (p ^ k) =
+      (Finset.range (k / 2 + 1)).map ⟨fun j => p ^ j, Nat.pow_right_injective hp.two_le⟩ := by
+  ext d
+  simp only [squareDivisors, Finset.mem_filter, Nat.divisors_prime_pow hp, Finset.mem_map,
+    Finset.mem_range, Function.Embedding.coeFn_mk]
+  constructor
+  · rintro ⟨⟨j, _, rfl⟩, hdvd⟩
+    refine ⟨j, ?_, rfl⟩
+    have hpow : p ^ (2 * j) ∣ p ^ k := by
+      have hsq : (p ^ j) ^ 2 = p ^ (2 * j) := by ring
+      rwa [← hsq]
+    have hle : 2 * j ≤ k := (Nat.pow_dvd_pow_iff_le_right hp.one_lt).mp hpow
+    omega
+  · rintro ⟨j, hj, rfl⟩
+    refine ⟨⟨j, by omega, rfl⟩, ?_⟩
+    have hsq : (p ^ j) ^ 2 = p ^ (2 * j) := by ring
+    rw [hsq]
+    exact Nat.pow_dvd_pow p (by omega)
+
+/-- Helper lemma: `(d₁ * d₂).gcd m = d₁` when `m.Coprime n`, `d₁ ∣ m`, and `d₂ ∣ n`. -/
+private theorem gcd_mul_left_of_coprime_of_dvd_aux {m n d₁ d₂ : ℕ}
+    (cop : m.Coprime n) (hd₁ : d₁ ∣ m) (hd₂ : d₂ ∣ n) :
+    (d₁ * d₂).gcd m = d₁ := by
+  obtain ⟨k₁, rfl⟩ := hd₁
+  rw [Nat.gcd_mul_left]
+  have hcop : d₂.Coprime k₁ :=
+    ((cop.coprime_mul_left).coprime_dvd_right hd₂).symm
+  rw [hcop.gcd_eq_one, mul_one]
+
+/-- Helper lemma: multiplicative factorization of sums over `squareDivisors (m * n)` for coprime `m, n`. -/
+private theorem sum_squareDivisors_mul_of_coprime_aux {m n : ℕ} (cop : m.Coprime n)
+    (F : ℕ → ℕ → ℤ)
+    (hF : ∀ d₁ ∈ squareDivisors m, ∀ d₂ ∈ squareDivisors n,
+      F (m * n) (d₁ * d₂) = F m d₁ * F n d₂) :
+    (∑ d ∈ squareDivisors (m * n), F (m * n) d) =
+      (∑ d₁ ∈ squareDivisors m, F m d₁) * (∑ d₂ ∈ squareDivisors n, F n d₂) := by
+  rw [Finset.sum_mul_sum, ← Finset.sum_product']
+  symm
+  refine Finset.sum_nbij (fun x : ℕ × ℕ => x.1 * x.2) ?_ ?_ ?_ ?_
+  · rintro ⟨d₁, d₂⟩ hmem
+    rw [Finset.mem_product, mem_squareDivisors_iff_aux, mem_squareDivisors_iff_aux] at hmem
+    rcases hmem with ⟨⟨⟨hd₁, hm⟩, hd₁sq⟩, ⟨⟨hd₂, hn⟩, hd₂sq⟩⟩
+    rw [mem_squareDivisors_iff_aux]
+    refine ⟨⟨mul_dvd_mul hd₁ hd₂, mul_ne_zero hm hn⟩, ?_⟩
+    rw [mul_pow]
+    exact mul_dvd_mul hd₁sq hd₂sq
+  · rintro ⟨a₁, a₂⟩ ha ⟨b₁, b₂⟩ hb heq
+    rw [Finset.mem_coe, Finset.mem_product, mem_squareDivisors_iff_aux, mem_squareDivisors_iff_aux] at ha hb
+    rcases ha with ⟨⟨⟨ha₁, _⟩, _⟩, ⟨⟨ha₂, _⟩, _⟩⟩
+    rcases hb with ⟨⟨⟨hb₁, _⟩, _⟩, ⟨⟨hb₂, _⟩, _⟩⟩
+    dsimp at heq
+    have h1 : a₁ = b₁ := by
+      calc
+        a₁ = (a₁ * a₂).gcd m := (gcd_mul_left_of_coprime_of_dvd_aux cop ha₁ ha₂).symm
+        _ = (b₁ * b₂).gcd m := by rw [heq]
+        _ = b₁ := gcd_mul_left_of_coprime_of_dvd_aux cop hb₁ hb₂
+    have h2 : a₂ = b₂ := by
+      have ha_comm : a₂ * a₁ = b₂ * b₁ := by linarith
+      calc
+        a₂ = (a₂ * a₁).gcd n := (gcd_mul_left_of_coprime_of_dvd_aux cop.symm ha₂ ha₁).symm
+        _ = (b₂ * b₁).gcd n := by rw [ha_comm]
+        _ = b₂ := gcd_mul_left_of_coprime_of_dvd_aux cop.symm hb₂ hb₁
+    exact Prod.ext h1 h2
+  · intro d hd
+    rw [Finset.mem_coe, mem_squareDivisors_iff_aux] at hd
+    rcases hd with ⟨⟨hd_dvd, hmn⟩, hd_sq⟩
+    have hm : m ≠ 0 := left_ne_zero_of_mul hmn
+    have hn : n ≠ 0 := right_ne_zero_of_mul hmn
+    refine ⟨(d.gcd m, d.gcd n), ?_, ?_⟩
+    · rw [Finset.mem_coe, Finset.mem_product, mem_squareDivisors_iff_aux, mem_squareDivisors_iff_aux]
+      have hd₁_m : d.gcd m ∣ m := Nat.gcd_dvd_right d m
+      have hd₂_n : d.gcd n ∣ n := Nat.gcd_dvd_right d n
+      have hd₁_d : d.gcd m ∣ d := Nat.gcd_dvd_left d m
+      have hd₂_d : d.gcd n ∣ d := Nat.gcd_dvd_left d n
+      have hd₁_sq_mn : (d.gcd m) ^ 2 ∣ m * n :=
+        dvd_trans (pow_dvd_pow_of_dvd hd₁_d 2) hd_sq
+      have hd₂_sq_nm : (d.gcd n) ^ 2 ∣ n * m := by
+        rw [mul_comm]
+        exact dvd_trans (pow_dvd_pow_of_dvd hd₂_d 2) hd_sq
+      have hcop₁ : ((d.gcd m) ^ 2).Coprime n :=
+        (cop.coprime_dvd_left hd₁_m).pow_left 2
+      have hcop₂ : ((d.gcd n) ^ 2).Coprime m :=
+        (cop.symm.coprime_dvd_left hd₂_n).pow_left 2
+      exact ⟨⟨⟨hd₁_m, hm⟩, hcop₁.dvd_of_dvd_mul_right hd₁_sq_mn⟩,
+        ⟨⟨hd₂_n, hn⟩, hcop₂.dvd_of_dvd_mul_right hd₂_sq_nm⟩⟩
+    · dsimp
+      rw [← cop.gcd_mul d, Nat.gcd_eq_left hd_dvd]
+  · rintro ⟨d₁, d₂⟩ hmem
+    rw [Finset.mem_product] at hmem
+    exact (hF d₁ hmem.1 d₂ hmem.2).symm
+
+/-- **Theorem 4 (`TASK-TC-054R` §8 & `TASK-TC-054R2` §5, Unconditional Flat Square-Divisor Sums on `ℕ`)**:
     Connects `primePowerMoebius` and `liouvilleSignFromOmega` to Mathlib's `ArithmeticFunction.moebius` (`μ`)
     and `liouvilleLambda` (`λ`), proves the actual prime-power square-divisor identities
     `∑_{0 ≤ j ≤ k/2} μ(p^{k - 2j}) = λ(p^k)` and `∑_{0 ≤ j ≤ k/2} μ(p^j) λ(p^{k - 2j}) = μ(p^k)`,
     proves the factored prime-power product identities for `λ(n)` and `μ(n)` over `n.factorization.prod`
-    for all positive integers `n ≠ 0`, and proves that any multiplicative `S : ArithmeticFunction ℤ`
-    agreeing with these square-divisor sums on prime powers equals `λ(n)` (resp. `μ(n)`) for all `n : ℕ`. -/
+    for all positive integers `n ≠ 0`, and unconditionally proves that the explicit flat square-divisor sums
+    `actualFlatMoebiusSquareDivisorSum n = ∑_{d^2 ∣ n} μ(n / d^2)` and
+    `actualFlatInverseLiouvilleSquareDivisorSum n = ∑_{d^2 ∣ n} μ(d) λ(n / d^2)`
+    are multiplicative (`IsMultiplicative`), agree with the prime-power sums on `p ^ k`, and satisfy
+    `actualFlatMoebiusSquareDivisorSum n = liouvilleLambda n` and
+    `actualFlatInverseLiouvilleSquareDivisorSum n = ArithmeticFunction.moebius n` for all `n : ℕ`. -/
 theorem actual_prime_power_and_factored_square_divisor_moebius_liouville_inversion_nat
-    {p n : ℕ} (hp : p.Prime) (k : ℕ) (hn : n ≠ 0)
-    (S : ArithmeticFunction ℤ) (hS : S.IsMultiplicative) :
+    {p n : ℕ} (hp : p.Prime) (k : ℕ) (hn : n ≠ 0) :
     (ArithmeticFunction.moebius (p ^ k) = primePowerMoebius k ∧
       liouvilleLambda (p ^ k) = liouvilleSignFromOmega k) ∧
     (primePowerActualMoebiusSquareSum p k = liouvilleLambda (p ^ k) ∧
       primePowerActualInverseLiouvilleSquareSum p k = ArithmeticFunction.moebius (p ^ k)) ∧
     (liouvilleLambda n = n.factorization.prod (fun q e => primePowerActualMoebiusSquareSum q e) ∧
       ArithmeticFunction.moebius n = n.factorization.prod (fun q e => primePowerActualInverseLiouvilleSquareSum q e)) ∧
-    (((∀ q e : ℕ, q.Prime → S (q ^ e) = primePowerActualMoebiusSquareSum q e) → S n = liouvilleLambda n) ∧
-      ((∀ q e : ℕ, q.Prime → S (q ^ e) = primePowerActualInverseLiouvilleSquareSum q e) → S n = ArithmeticFunction.moebius n)) := by
+    (actualFlatMoebiusSquareArith.IsMultiplicative ∧
+      actualFlatInverseLiouvilleSquareArith.IsMultiplicative ∧
+      actualFlatMoebiusSquareDivisorSum (p ^ k) = primePowerActualMoebiusSquareSum p k ∧
+      actualFlatInverseLiouvilleSquareDivisorSum (p ^ k) = primePowerActualInverseLiouvilleSquareSum p k ∧
+      actualFlatMoebiusSquareDivisorSum n = liouvilleLambda n ∧
+      actualFlatInverseLiouvilleSquareDivisorSum n = ArithmeticFunction.moebius n) := by
   have h_fwd_pp : ∀ q e : ℕ, q.Prime → primePowerActualMoebiusSquareSum q e = liouvilleLambda (q ^ e) := by
     intro q e hq
     dsimp [primePowerActualMoebiusSquareSum]
@@ -379,23 +518,85 @@ theorem actual_prime_power_and_factored_square_divisor_moebius_liouville_inversi
       rw [Nat.support_factorization] at hq
       exact Nat.prime_of_mem_primeFactors hq
     exact (h_inv_pp q (n.factorization q) hq_prime).symm
-  have h_ext_lam : (∀ q e : ℕ, q.Prime → S (q ^ e) = primePowerActualMoebiusSquareSum q e) → S n = liouvilleLambda n := by
-    intro hS_pp
-    have h_eq_fn : S = liouvilleArith := by
-      rw [ArithmeticFunction.IsMultiplicative.eq_iff_eq_on_prime_powers S hS liouvilleArith h_mult_lam]
-      intro q e hq
-      rw [hS_pp q e hq, h_fwd_pp q e hq]
-      rfl
-    exact congrFun (congrArg DFunLike.coe h_eq_fn) n
-  have h_ext_mu : (∀ q e : ℕ, q.Prime → S (q ^ e) = primePowerActualInverseLiouvilleSquareSum q e) → S n = ArithmeticFunction.moebius n := by
-    intro hS_pp
-    have h_eq_fn : S = ArithmeticFunction.moebius := by
-      rw [ArithmeticFunction.IsMultiplicative.eq_iff_eq_on_prime_powers S hS ArithmeticFunction.moebius ArithmeticFunction.isMultiplicative_moebius]
-      intro q e hq
-      rw [hS_pp q e hq, h_inv_pp q e hq]
-    exact congrFun (congrArg DFunLike.coe h_eq_fn) n
+  have h_flat_fwd_mult : actualFlatMoebiusSquareArith.IsMultiplicative := by
+    refine ⟨by decide, ?_⟩
+    intro a b cop
+    change actualFlatMoebiusSquareDivisorSum (a * b) =
+      actualFlatMoebiusSquareDivisorSum a * actualFlatMoebiusSquareDivisorSum b
+    dsimp [actualFlatMoebiusSquareDivisorSum]
+    apply sum_squareDivisors_mul_of_coprime_aux cop (fun m d => ArithmeticFunction.moebius (m / d ^ 2))
+    intro d₁ hd₁ d₂ hd₂
+    rw [mem_squareDivisors_iff_aux] at hd₁ hd₂
+    have h_div : (a * b) / (d₁ * d₂) ^ 2 = (a / d₁ ^ 2) * (b / d₂ ^ 2) := by
+      rw [mul_pow, Nat.div_mul_div_comm hd₁.2 hd₂.2]
+    have h_cop_quot : (a / d₁ ^ 2).Coprime (b / d₂ ^ 2) :=
+      (cop.coprime_dvd_left (Nat.div_dvd_of_dvd hd₁.2)).coprime_dvd_right (Nat.div_dvd_of_dvd hd₂.2)
+    rw [h_div, ArithmeticFunction.isMultiplicative_moebius.2 h_cop_quot]
+  have h_flat_inv_mult : actualFlatInverseLiouvilleSquareArith.IsMultiplicative := by
+    refine ⟨by decide, ?_⟩
+    intro a b cop
+    change actualFlatInverseLiouvilleSquareDivisorSum (a * b) =
+      actualFlatInverseLiouvilleSquareDivisorSum a * actualFlatInverseLiouvilleSquareDivisorSum b
+    dsimp [actualFlatInverseLiouvilleSquareDivisorSum]
+    apply sum_squareDivisors_mul_of_coprime_aux cop
+      (fun m d => ArithmeticFunction.moebius d * liouvilleLambda (m / d ^ 2))
+    intro d₁ hd₁ d₂ hd₂
+    rw [mem_squareDivisors_iff_aux] at hd₁ hd₂
+    have h_div : (a * b) / (d₁ * d₂) ^ 2 = (a / d₁ ^ 2) * (b / d₂ ^ 2) := by
+      rw [mul_pow, Nat.div_mul_div_comm hd₁.2 hd₂.2]
+    have h_cop_d : d₁.Coprime d₂ :=
+      (cop.coprime_dvd_left hd₁.1.1).coprime_dvd_right hd₂.1.1
+    have h_cop_quot : (a / d₁ ^ 2).Coprime (b / d₂ ^ 2) :=
+      (cop.coprime_dvd_left (Nat.div_dvd_of_dvd hd₁.2)).coprime_dvd_right (Nat.div_dvd_of_dvd hd₂.2)
+    have h_mu_mul : ArithmeticFunction.moebius (d₁ * d₂) =
+        ArithmeticFunction.moebius d₁ * ArithmeticFunction.moebius d₂ :=
+      ArithmeticFunction.isMultiplicative_moebius.2 h_cop_d
+    have h_lam_mul : liouvilleLambda ((a / d₁ ^ 2) * (b / d₂ ^ 2)) =
+        liouvilleLambda (a / d₁ ^ 2) * liouvilleLambda (b / d₂ ^ 2) :=
+      h_mult_lam.2 h_cop_quot
+    rw [h_div, h_mu_mul, h_lam_mul]
+    ring
+  have h_flat_fwd_pp : ∀ q e : ℕ, q.Prime →
+      actualFlatMoebiusSquareDivisorSum (q ^ e) = primePowerActualMoebiusSquareSum q e := by
+    intro q e hq
+    dsimp [actualFlatMoebiusSquareDivisorSum, primePowerActualMoebiusSquareSum]
+    rw [squareDivisors_prime_pow_aux hq e, Finset.sum_map, ← sum_range_eq_finRangeSum_aux]
+    apply Finset.sum_congr rfl
+    intro j hj
+    rw [Finset.mem_range] at hj
+    have hsq : (q ^ j) ^ 2 = q ^ (2 * j) := by ring
+    rw [Function.Embedding.coeFn_mk, hsq, Nat.pow_div (by omega) hq.pos]
+  have h_flat_inv_pp : ∀ q e : ℕ, q.Prime →
+      actualFlatInverseLiouvilleSquareDivisorSum (q ^ e) = primePowerActualInverseLiouvilleSquareSum q e := by
+    intro q e hq
+    dsimp [actualFlatInverseLiouvilleSquareDivisorSum, primePowerActualInverseLiouvilleSquareSum]
+    rw [squareDivisors_prime_pow_aux hq e, Finset.sum_map, ← sum_range_eq_finRangeSum_aux]
+    apply Finset.sum_congr rfl
+    intro j hj
+    rw [Finset.mem_range] at hj
+    have hsq : (q ^ j) ^ 2 = q ^ (2 * j) := by ring
+    rw [Function.Embedding.coeFn_mk, hsq, Nat.pow_div (by omega) hq.pos]
+  have h_flat_fwd_eq_fn : actualFlatMoebiusSquareArith = liouvilleArith := by
+    rw [ArithmeticFunction.IsMultiplicative.eq_iff_eq_on_prime_powers
+      actualFlatMoebiusSquareArith h_flat_fwd_mult liouvilleArith h_mult_lam]
+    intro q e hq
+    change actualFlatMoebiusSquareDivisorSum (q ^ e) = liouvilleLambda (q ^ e)
+    rw [h_flat_fwd_pp q e hq, h_fwd_pp q e hq]
+  have h_flat_inv_eq_fn : actualFlatInverseLiouvilleSquareArith = ArithmeticFunction.moebius := by
+    rw [ArithmeticFunction.IsMultiplicative.eq_iff_eq_on_prime_powers
+      actualFlatInverseLiouvilleSquareArith h_flat_inv_mult
+      ArithmeticFunction.moebius ArithmeticFunction.isMultiplicative_moebius]
+    intro q e hq
+    change actualFlatInverseLiouvilleSquareDivisorSum (q ^ e) = ArithmeticFunction.moebius (q ^ e)
+    rw [h_flat_inv_pp q e hq, h_inv_pp q e hq]
+  have h_flat_fwd_n : actualFlatMoebiusSquareDivisorSum n = liouvilleLambda n :=
+    congrFun (congrArg DFunLike.coe h_flat_fwd_eq_fn) n
+  have h_flat_inv_n : actualFlatInverseLiouvilleSquareDivisorSum n = ArithmeticFunction.moebius n :=
+    congrFun (congrArg DFunLike.coe h_flat_inv_eq_fn) n
   exact ⟨⟨moebius_apply_prime_pow_eq_primePowerMoebius_aux hp k, liouvilleLambda_prime_pow_aux hp k⟩,
-    ⟨h_fwd_pp p k hp, h_inv_pp p k hp⟩, ⟨h_prod_lam, h_prod_mu⟩, ⟨h_ext_lam, h_ext_mu⟩⟩
+    ⟨h_fwd_pp p k hp, h_inv_pp p k hp⟩, ⟨h_prod_lam, h_prod_mu⟩,
+    ⟨h_flat_fwd_mult, h_flat_inv_mult, h_flat_fwd_pp p k hp, h_flat_inv_pp p k hp,
+      h_flat_fwd_n, h_flat_inv_n⟩⟩
 
 /-- **Theorem 5 (`TASK-TC-054` §3, Scalar Real-Inequality Lemma)**:
     Scalar real-inequality implications for positive-weight norm multipliers (`eta > 0`) and
@@ -476,18 +677,40 @@ theorem dyadic_parity_energy_and_off_critical_mode_nonvanishing
         ring
   · refine ⟨by linarith, by linarith⟩
 
-/-- **Theorem 8 (`TASK-TC-054R` §§2, 4, 6, Scalar Real-Algebra Lemma)**:
-    1. Global Stieltjes variation antiderivative combination:
+/-- Helper lemma: `6 * ∑_{0 ≤ r < n} r^2 = (n - 1) * n * (2 * n - 1)`. -/
+private theorem sum_range_sq_mul_six_aux (n : ℕ) :
+    6 * (∑ r ∈ Finset.range n, r ^ 2) = (n - 1) * n * (2 * n - 1) := by
+  induction n with
+  | zero => rfl
+  | succ n ih =>
+    rw [Finset.sum_range_succ, mul_add, ih]
+    rcases n with _ | m
+    · rfl
+    · simp only [Nat.add_sub_cancel]
+      have h1 : 2 * (m + 1) - 1 = 2 * m + 1 := by omega
+      have h2 : 2 * (m + 1 + 1) - 1 = 2 * m + 3 := by omega
+      rw [h1, h2]
+      ring
+
+/-- **Theorem 8 (`TASK-TC-054R` §§2, 4, 6 & `TASK-TC-054R2` §5, Endpoint Antiderivative, Denominator Monotonicity,
+    Exact Dyadic Block Square Sum, and Reciprocal-Cube Bound Algebra)**:
+    1. Global Stieltjes variation endpoint antiderivative combination:
        `(1 / 2) * ((2 * (3 / 2) - 1) * e_neg_3_2 - (2 * 0 - 1)) + (1 / 2) * (0 - (-(2 * (3 / 2) - 1) * e_neg_3_2)) = 1 / 2 + 2 * e_neg_3_2`;
     2. Fourier residue tail denominator monotonicity: for `1 ≤ K` and `K + 1 ≤ m`,
-       `0 < (K - 1 / 2) * (2 * K + 3) * (2 * K + 4) ≤ (m - 3 / 2) * (2 * m + 1) * (2 * m + 2)`;
-    3. Unequal-block `s^{-3}` sum bound algebra: for `2 ≤ B`,
+       `0 < (K - 1 / 2) * (2 * K + 3) * (2 * K + 4) ≤ (m - 3 / 2) * (2 * m + 1) * (2 * m + 2)` and
+       `0 < (K + 2) * (2 * K + 8) * (2 * K + 9) ≤ (m + 1) * (2 * m + 6) * (2 * m + 7)`;
+    3. Exact dyadic block square sum on `Finset.Ico A (2 * A)` (`1 ≤ A`) and upper bound:
+       `6 * (∑ r ∈ Finset.Ico A (2 * A), r ^ 2) + (A - 1) * A * (2 * A - 1) = (2 * A - 1) * (2 * A) * (4 * A - 1)`,
+       `6 * (∑ r ∈ Finset.Ico A (2 * A), r ^ 2) + 9 * A ^ 2 = 14 * A ^ 3 + A`, and
+       `3 * (∑ r ∈ Finset.Ico A (2 * A), r ^ 2) < 7 * A ^ 3`;
+    4. Unequal-block `s^{-3}` sum bound algebra: for `2 ≤ B`,
        `1 / B ^ 3 + 1 / (2 * B ^ 2) ≤ 1 / B ^ 2`. -/
 theorem abel_scaling_fourier_ratio_and_unequal_block_algebra
-    (e_neg_3_2 K m B : ℝ)
+    (e_neg_3_2 K m B : ℝ) (A : ℕ)
     (hK : 1 ≤ K)
     (hm : K + 1 ≤ m)
-    (hB : 2 ≤ B) :
+    (hB : 2 ≤ B)
+    (hA : 1 ≤ A) :
     ((1 / 2 : ℝ) * ((2 * (3 / 2 : ℝ) - 1) * e_neg_3_2 - (2 * 0 - 1)) +
       (1 / 2 : ℝ) * (0 - (-(2 * (3 / 2 : ℝ) - 1) * e_neg_3_2)) =
         (1 / 2 : ℝ) + 2 * e_neg_3_2) ∧
@@ -495,8 +718,12 @@ theorem abel_scaling_fourier_ratio_and_unequal_block_algebra
       (K - 1 / 2) * (2 * K + 3) * (2 * K + 4) ≤ (m - 3 / 2) * (2 * m + 1) * (2 * m + 2) ∧
       0 < (K + 2) * (2 * K + 8) * (2 * K + 9) ∧
       (K + 2) * (2 * K + 8) * (2 * K + 9) ≤ (m + 1) * (2 * m + 6) * (2 * m + 7)) ∧
+    (6 * (∑ r ∈ Finset.Ico A (2 * A), r ^ 2) + (A - 1) * A * (2 * A - 1) =
+        (2 * A - 1) * (2 * A) * (4 * A - 1) ∧
+      6 * (∑ r ∈ Finset.Ico A (2 * A), r ^ 2) + 9 * A ^ 2 = 14 * A ^ 3 + A ∧
+      3 * (∑ r ∈ Finset.Ico A (2 * A), r ^ 2) < 7 * A ^ 3) ∧
     (1 / B ^ 3 + 1 / (2 * B ^ 2) ≤ 1 / B ^ 2) := by
-  refine ⟨by ring, ?_, ?_⟩
+  refine ⟨by ring, ?_, ?_, ?_⟩
   · have h1_pos : 0 < K - 1 / 2 := by linarith
     have h2_pos : 0 < 2 * K + 3 := by linarith
     have h3_pos : 0 < 2 * K + 4 := by linarith
@@ -526,6 +753,39 @@ theorem abel_scaling_fourier_ratio_and_unequal_block_algebra
           (m + 1) * (2 * m + 6) * (2 * m + 7) :=
       mul_le_mul ho12_le ho3_le (le_of_lt ho3_pos) (mul_nonneg (by linarith) (by linarith))
     exact ⟨h_pos, h123_le, ho_pos, ho123_le⟩
+  · have hle : A ≤ 2 * A := by omega
+    have hsplit := Finset.sum_range_add_sum_Ico (fun r => r ^ 2) hle
+    have h6_split :
+        6 * (∑ r ∈ Finset.range A, r ^ 2) + 6 * (∑ r ∈ Finset.Ico A (2 * A), r ^ 2) =
+          6 * (∑ r ∈ Finset.range (2 * A), r ^ 2) := by
+      rw [← mul_add, hsplit]
+    have h6A := sum_range_sq_mul_six_aux A
+    have h6_2A := sum_range_sq_mul_six_aux (2 * A)
+    have h4A : 2 * (2 * A) - 1 = 4 * A - 1 := by omega
+    rw [h4A] at h6_2A
+    have h_diff_eq :
+        6 * (∑ r ∈ Finset.Ico A (2 * A), r ^ 2) + (A - 1) * A * (2 * A - 1) =
+          (2 * A - 1) * (2 * A) * (4 * A - 1) := by
+      linarith
+    obtain ⟨d, hd⟩ : ∃ d, A = d + 1 := ⟨A - 1, by omega⟩
+    have h_poly :
+        (2 * A - 1) * (2 * A) * (4 * A - 1) + 9 * A ^ 2 =
+          (A - 1) * A * (2 * A - 1) + (14 * A ^ 3 + A) := by
+      subst hd
+      simp only [Nat.add_sub_cancel]
+      have h1 : 2 * (d + 1) - 1 = 2 * d + 1 := by omega
+      have h2 : 4 * (d + 1) - 1 = 4 * d + 3 := by omega
+      rw [h1, h2]
+      ring
+    have h_expanded :
+        6 * (∑ r ∈ Finset.Ico A (2 * A), r ^ 2) + 9 * A ^ 2 = 14 * A ^ 3 + A := by
+      omega
+    have h_A_le_A2 : A ≤ A ^ 2 := by
+      rw [sq]
+      exact Nat.le_mul_self A
+    have h_strict : 3 * (∑ r ∈ Finset.Ico A (2 * A), r ^ 2) < 7 * A ^ 3 := by
+      omega
+    exact ⟨h_diff_eq, h_expanded, h_strict⟩
   · have hB_pos : 0 < B := by linarith
     have h_diff : 1 / B ^ 2 - (1 / B ^ 3 + 1 / (2 * B ^ 2)) = (B - 2) / (2 * B ^ 3) := by
       field_simp [ne_of_gt hB_pos]

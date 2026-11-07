@@ -21,10 +21,13 @@ from tc.liouville_square_dilation import (
     PRIOR_MERGED_MAIN_TC_053R,
     TASK_TC_054_ID,
     TASK_TC_054R_ID,
+    TASK_TC_054R2_ID,
     TC_053R2_IMPLEMENTATION_COMMIT,
     TC_053R2_REVIEWED_TIP,
     TC_054_IMPLEMENTATION_COMMIT,
     TC_054_REVIEWED_TIP,
+    TC_054R_IMPLEMENTATION_COMMIT,
+    TC_054R_REVIEWED_TIP,
     compute_hat_f_tail_ratios_arb,
     evaluate_1d_dyadic_sum_U_lambda_arb,
     evaluate_Q_arith_certified_arb,
@@ -44,6 +47,7 @@ from tc.liouville_square_dilation import (
     verify_abel_scaling_and_global_stieltjes_energy_proof,
     verify_euler_maclaurin_derivatives_and_constants_arb,
     verify_liouville_square_dilation_lean_module,
+    verify_mellin_contour_and_reflection_identities_arb,
     verify_section_2_and_3_square_dilation_transfer,
     verify_section_4_unconstrained_common_factor_and_euler_maclaurin,
     verify_section_5_poisson_summation_at_transition,
@@ -401,10 +405,10 @@ def test_lean_formalization_and_serialized_artifact_synchronization() -> None:
     assert "import RiemannScope.LiouvilleSquareDilation" in root_lean
 
     lean_info = verify_liouville_square_dilation_lean_module()
-    assert lean_info["definition_count"] == 10
+    assert lean_info["definition_count"] == 15
     assert lean_info["public_theorem_count"] == 8
-    assert lean_info["private_helper_theorem_count"] == 6
-    assert lean_info["total_declaration_count"] == 24
+    assert lean_info["private_helper_theorem_count"] == 12
+    assert lean_info["total_declaration_count"] == 35
     assert lean_info["expected_public_theorems_present"] is True
     assert lean_info["sorry_count"] == 0
     assert lean_info["custom_axiom_count"] == 0
@@ -413,11 +417,14 @@ def test_lean_formalization_and_serialized_artifact_synchronization() -> None:
     artifact = json.loads(LIOUVILLE_SQUARE_DILATION_ARTIFACT_PATH.read_text(encoding="utf-8"))
     assert artifact["task_id"] == TASK_TC_054_ID
     assert artifact["repair_task_id"] == TASK_TC_054R_ID
+    assert artifact["closeout_task_id"] == TASK_TC_054R2_ID
     assert artifact["prior_merged_main"] == PRIOR_MERGED_MAIN_TC_053R
     assert artifact["tc053r2_implementation_commit"] == TC_053R2_IMPLEMENTATION_COMMIT
     assert artifact["tc053r2_reviewed_tip"] == TC_053R2_REVIEWED_TIP
     assert artifact["tc054_implementation_commit"] == TC_054_IMPLEMENTATION_COMMIT
     assert artifact["tc054_reviewed_tip"] == TC_054_REVIEWED_TIP
+    assert artifact["tc054r_implementation_commit"] == TC_054R_IMPLEMENTATION_COMMIT
+    assert artifact["tc054r_reviewed_tip"] == TC_054R_REVIEWED_TIP
     assert artifact["subgate_tc043a_status"] == "OPEN"
     assert artifact["rh_proved"] is False
 
@@ -428,11 +435,139 @@ def test_lean_formalization_and_serialized_artifact_synchronization() -> None:
     for thm_name, cap in per_thm.items():
         assert thm_name in cap["captured_check_output"]
         assert "depends on axioms:" in cap["captured_print_axioms_output"]
+    assert (
+        "actualFlatMoebiusSquareDivisorSum"
+        in per_thm["actual_prime_power_and_factored_square_divisor_moebius_liouville_inversion_nat"][
+            "captured_check_output"
+        ]
+    )
+    assert (
+        "actualFlatInverseLiouvilleSquareDivisorSum"
+        in per_thm["actual_prime_power_and_factored_square_divisor_moebius_liouville_inversion_nat"][
+            "captured_check_output"
+        ]
+    )
+    assert (
+        "Finset.Ico"
+        in per_thm["abel_scaling_fourier_ratio_and_unequal_block_algebra"]["captured_check_output"]
+    )
 
     live_rep = execute_task_tc054_liouville_square_dilation_audit(prec_bits=256)
     arb_check = verify_all_serialized_arb_in_tree(live_rep)
     assert arb_check["all_enclose_original_256bit_arb_ball"] is True
     assert arb_check["failed_paths"] == []
+
+
+def test_section_4_pairwise_spurious_factor_counterexample_regression() -> None:
+    """Verify the r=1, s=1, L=9/5 (X = 9/(5*sqrt(2))) counterexample falsifying the old
+    TC-054 draft factor 1/(2*sqrt(2)) on the pairwise common-factor remainder while
+    satisfying the repaired C_2 bound.
+    """
+    sec4 = verify_section_4_unconstrained_common_factor_and_euler_maclaurin(prec_bits=256)
+    reg = sec4["pairwise_spurious_factor_counterexample_regression"]
+    assert reg["r"] == 1
+    assert reg["s"] == 1
+    assert reg["L_formula"] == "9/5"
+    assert reg["ratio_strictly_exceeds_1_over_2_sqrt2"] is True
+    assert reg["true_pairwise_bound_holds"] is True
+    assert reg["spurious_pairwise_bound_violated"] is True
+    assert float(reg["ratio_abs_error_over_C2_L_neg7"]["lower_dec"]) > 0.403034
+    assert float(reg["spurious_factor_1_over_2_sqrt2"]["upper_dec"]) < 0.353554
+    assert float(reg["ratio_minus_1_over_2_sqrt2"]["lower_dec"]) > 0.04948
+
+
+def test_section_5_mellin_contour_reflection_dlmf_and_even_sign_identities() -> None:
+    """Verify the TASK-TC-054R2 Mellin contour proof identities (lack of exponential decay of
+    1/|sin(tau*z/4)*Gamma(1-z)| on z = 1/2 + i*b, corrected reflection formula, DLMF 5.8.3
+    lower bound, shifted contour a_M = -(2M+3/2) decay, strictly positive even tail signs
+    (-1)^m Gamma(5/2-m) > 0 for m >= 2), and separate series vs quadrature accuracy metadata.
+    """
+    contour_rep = verify_mellin_contour_and_reflection_identities_arb(prec_bits=256)
+    assert (
+        contour_rep["critical_line_constant_product_check"][
+            "all_rows_match_constant_2_over_sqrt_tau"
+        ]
+        is True
+    )
+    assert (
+        contour_rep["corrected_reflection_and_mellin_kernel_identities"][
+            "all_reflection_and_kernel_identities_hold"
+        ]
+        is True
+    )
+    assert (
+        contour_rep["dlmf_5_8_3_gamma_lower_bound_checks"]["all_dlmf_lower_bounds_hold"]
+        is True
+    )
+    assert all(
+        row["abs_sin_tau_z_over_2_equals_cosh_tau_b_over_2_at_b1"]
+        for row in contour_rep["shifted_contour_remainder_bounds"]["rows_at_omega_4"]
+    )
+    assert contour_rep["even_series_term_sign_analysis"]["all_m_ge_2_strictly_positive"] is True
+    assert contour_rep["even_series_term_sign_analysis"]["m3_matches_Gamma_1_2_over_360"] is True
+
+    sec5 = verify_section_5_poisson_summation_at_transition(prec_bits=256)
+    for w in sec5["hat_f_sign_change_witnesses"]:
+        assert isinstance(w["working_prec_bits"], int) and w["working_prec_bits"] >= 256
+        assert isinstance(w["series_truncation_K_eff"], int) and w["series_truncation_K_eff"] >= 2
+        assert "series_truncation_radius" in w
+        assert "series_total_radius" in w
+        assert "quadrature_interval" in w
+        assert "quadrature_right_tail_bound_2_over_5_V1_pow_5" in w
+        assert "quadrature_total_radius" in w
+        assert w["quadrature_contains_series"] is True
+        assert w["series_overlaps_quadrature"] is True
+        assert w["series_minus_quadrature_contains_zero"] is True
+
+
+def test_tc054r2_closeout_report_and_corpus_formula_synchronization() -> None:
+    """Verify docs/reviews/TC_054R2_CLOSEOUT_REPORT.md, compact-range energy coefficient
+    zeta(3)^2*(tau^5-1)/5, and verify that none of the corpus records retain stale TC-054
+    draft formulas.
+    """
+    closeout_path = REPO_ROOT / "docs" / "reviews" / "TC_054R2_CLOSEOUT_REPORT.md"
+    assert closeout_path.exists()
+    closeout_text = closeout_path.read_text(encoding="utf-8")
+    for token in [
+        "TASK-TC-054R2",
+        "27489f195d3313d9ee60773157e3a8240f5bcadd",
+        "f265042ab52cabda29e76859cebace21cfae9239",
+        "actualFlatMoebiusSquareDivisorSum",
+        "actualFlatInverseLiouvilleSquareDivisorSum",
+        "0.4030344210273",
+        "2829.665108928656654314420748974452322268",
+    ]:
+        assert token in closeout_text, f"Missing {token!r} in TC_054R2_CLOSEOUT_REPORT.md"
+
+    abel_proof = verify_abel_scaling_and_global_stieltjes_energy_proof(prec_bits=256)
+    g_stieltjes = abel_proof["global_stieltjes_energy_proof"]
+    coeff = g_stieltjes["compact_range_Y5_coefficient_zeta3_sq_tau5_minus_1_over_5"]
+    assert float(coeff["lower_dec"]) <= 2829.6651089286567 <= float(coeff["upper_dec"])
+    assert "Y >= 256" in g_stieltjes["stretched_exponential_range"]
+    assert "Y >= 2" in g_stieltjes["all_logarithmic_range"]
+
+    # Check that stale TC-054 draft formulas are absent from all updated corpus records
+    stale_tokens = (
+        "d^{-5/2} Q_\\mu(X/d)",
+        "d^{-5/2}Q_\\mu(X/d)",
+        "d^{-5/2} Q_mu(X/d)",
+        "1 + 2^{-(2+z)}",
+        "(1/8)*Q_lambda(X/2)",
+        "\\frac{1}{8}Q_\\lambda(X/2)",
+    )
+    corpus_files = [
+        REPO_ROOT / "RESEARCH_LEDGER.md",
+        REPO_ROOT / "TRANSCENDENTAL_CONTINUATION.md",
+        REPO_ROOT / ".agents" / "corpus_map" / "obligation_register.md",
+        REPO_ROOT / "docs" / "reviews" / "TC_FAITHFUL_TAU_ARITHMETIC_SPECTRAL_REALIZATION.md",
+        REPO_ROOT / "formal" / "RiemannScope" / "README.md",
+        REPO_ROOT / ".agents" / "research" / "queue.json",
+        REPO_ROOT / ".agents" / "research" / "state.json",
+    ]
+    for cpath in corpus_files:
+        ctext = cpath.read_text(encoding="utf-8")
+        for st in stale_tokens:
+            assert st not in ctext, f"Stale TC-054 token {st!r} found in {cpath.name}"
 
 
 def test_tc054_review_and_state_synchronization() -> None:

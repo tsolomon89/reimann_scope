@@ -1,13 +1,16 @@
 {
   "task_id": "TASK-TC-054",
   "repair_task_id": "TASK-TC-054R",
+  "closeout_task_id": "TASK-TC-054R2",
   "parent_epic": "EPIC-TC-042",
   "prior_merged_main": "c82e439708b0b6031db6a77bf3977688d9f0758b",
   "tc053r2_implementation_commit": "cc303030138c670e8f01aaaab483bbeca6bc17d1",
   "tc053r2_reviewed_tip": "21576861ecd0dcbf874afec91b299fd6060f4f03",
   "tc054_implementation_commit": "8f6afcfb9161aa77c74bc40605ac4fabae8b432e",
   "tc054_reviewed_tip": "cdee197acc9c3e75a4c8cffc94c10bec1bcb97fa",
-  "branch": "task/tc-054r-abel-poisson-certification-and-arithmetic-scope-repair",
+  "tc054r_implementation_commit": "27489f195d3313d9ee60773157e3a8240f5bcadd",
+  "tc054r_reviewed_tip": "f265042ab52cabda29e76859cebace21cfae9239",
+  "branch": "task/tc-054r2-contour-proof-arithmetic-bridge-and-report-closeout",
   "subgate_tc043a_status": "OPEN",
   "rh_proved": false,
   "precision_bits": 256,
@@ -1875,6 +1878,101 @@
       }
     ],
     "all_pairwise_bounds_hold": true,
+    "pairwise_spurious_factor_counterexample_regression": {
+      "r": 1,
+      "s": 1,
+      "L_formula": "9/5",
+      "X_formula": "9 / (5 * sqrt(2))",
+      "D_cutoff": 1000,
+      "d_sum_tail_bound_1_over_5_D5": "1 / (5 * 1000^5) = 2e-16",
+      "L": {
+        "mid_float": 1.8,
+        "rad_float_outward": 4.440892098500627e-17,
+        "lower_dec": "1.799999999999999999999999999999999999998e+0",
+        "upper_dec": "1.800000000000000000000000000000000000002e+0",
+        "arb_ball_str": "[1.800000000000000000000000000000000000000 +/- 3e-44]"
+      },
+      "X": {
+        "mid_float": 1.2727922061357855,
+        "rad_float_outward": 6.842558362644571e-17,
+        "lower_dec": "1.272792206135785543921519851788728270711e+0",
+        "upper_dec": "1.272792206135785543921519851788728270714e+0",
+        "arb_ball_str": "[1.272792206135785543921519851788728270713 +/- 2.96e-40]"
+      },
+      "exact_d_sum": {
+        "mid_float": 0.04736290613321183,
+        "rad_float_outward": 2.0227264844808658e-16,
+        "lower_dec": "4.736290613321162446979780068590735371851e-2",
+        "upper_dec": "4.736290613321202446979834178472376087684e-2",
+        "arb_ball_str": "[0.047362906133212 +/- 3.76e-16]"
+      },
+      "gaussian_leading_c0_L_neg5": {
+        "mid_float": 0.035175775314228885,
+        "rad_float_outward": 2.4085345590516314e-18,
+        "lower_dec": "3.517577531422888777947196429305160986791e-2",
+        "upper_dec": "3.517577531422888777947196429305160986794e-2",
+        "arb_ball_str": "[0.03517577531422888777947196429305160986792 +/- 1.19e-42]"
+      },
+      "abs_d_sum_error": {
+        "mid_float": 0.012187130818982936,
+        "rad_float_outward": 2.0052298816868624e-16,
+        "lower_dec": "1.218713081898273669032562959770260559367e-2",
+        "upper_dec": "1.218713081898313669032658428682528926584e-2",
+        "arb_ball_str": "[0.012187130818983 +/- 2.64e-16]"
+      },
+      "C_2_L_neg7": {
+        "mid_float": 0.030238436677239567,
+        "rad_float_outward": 1.3170450696091945e-18,
+        "lower_dec": "3.023843667723956567384842381637961973189e-2",
+        "upper_dec": "3.023843667723956567384842381637961973192e-2",
+        "arb_ball_str": "[0.03023843667723956567384842381637961973190 +/- 3.08e-42]"
+      },
+      "ratio_abs_error_over_C2_L_neg7": {
+        "mid_float": 0.40303442102733356,
+        "rad_float_outward": 6.629461148041988e-15,
+        "lower_dec": "4.030344210273269569601611475817516325180e-1",
+        "upper_dec": "4.030344210273401853592014607740494705480e-1",
+        "arb_ball_str": "[0.4030344210273 +/- 4.02e-14]"
+      },
+      "spurious_factor_1_over_2_sqrt2": {
+        "mid_float": 0.3535533905932738,
+        "rad_float_outward": 2.4168233283632287e-17,
+        "lower_dec": "3.535533905932737622004221810524245196423e-1",
+        "upper_dec": "3.535533905932737622004221810524245196426e-1",
+        "arb_ball_str": "[0.3535533905932737622004221810524245196424 +/- 1.80e-41]"
+      },
+      "ratio_minus_1_over_2_sqrt2": {
+        "mid_float": 0.04948103043405981,
+        "rad_float_outward": 6.616403029028462e-15,
+        "lower_dec": "4.948103043405319475973234908442668865436e-2",
+        "upper_dec": "4.948103043406642315878589716652537512689e-2",
+        "arb_ball_str": "[0.04948103043406 +/- 6.81e-15]"
+      },
+      "ratio_strictly_exceeds_1_over_2_sqrt2": true,
+      "abs_E_lambda_1_1_X": {
+        "mid_float": 0.040708866433018694,
+        "rad_float_outward": 6.704217720092508e-16,
+        "lower_dec": "4.070886643301802319844404600042064043143e-2",
+        "upper_dec": "4.070886643301935932480001621546369168454e-2",
+        "arb_ball_str": "[0.04070886643302 +/- 1.98e-15]"
+      },
+      "true_pairwise_bound_C2_X_neg2_rs4_over_r2_plus_s2_7_2": {
+        "mid_float": 0.10100592978945051,
+        "rad_float_outward": 2.4354020791165068e-18,
+        "lower_dec": "1.010059297894505107100302740960207508285e-1",
+        "upper_dec": "1.010059297894505107100302740960207508288e-1",
+        "arb_ball_str": "[0.1010059297894505107100302740960207508287 +/- 7.19e-42]"
+      },
+      "spurious_pairwise_bound_with_extra_1_over_2_sqrt2": {
+        "mid_float": 0.03571098894708638,
+        "rad_float_outward": 1.6623693837518328e-18,
+        "lower_dec": "3.571098894708638226950151155866800331097e-2",
+        "upper_dec": "3.571098894708638226950151155866800331100e-2",
+        "arb_ball_str": "[0.03571098894708638226950151155866800331098 +/- 2.90e-42]"
+      },
+      "true_pairwise_bound_holds": true,
+      "spurious_pairwise_bound_violated": true
+    },
     "coprime_aggregate_error_rows": [
       {
         "A": 4,
@@ -2000,6 +2098,566 @@
       "upper_dec": "6.646701940895685102368128062529294435492e-1",
       "arb_ball_str": "[0.6646701940895685102368128062529294435491 +/- 1.90e-41]"
     },
+    "mellin_contour_and_reflection_identities": {
+      "critical_line_constant_product_check": {
+        "formula": "1 / |sin(tau * z / 4) * Gamma(1 - z)| = 2 / sqrt(tau)  for z = 1/2 + i*b",
+        "two_over_sqrt_tau": {
+          "mid_float": 0.7978845608028654,
+          "rad_float_outward": 4.984654404555461e-17,
+          "lower_dec": "7.978845608028653558798921198687637369516e-1",
+          "upper_dec": "7.978845608028653558798921198687637369519e-1",
+          "arb_ball_str": "[0.7978845608028653558798921198687637369517 +/- 1.73e-41]"
+        },
+        "rows": [
+          {
+            "b_label": "0",
+            "inv_abs_sin_tau_z_over_4_gamma_1_minus_z": {
+              "mid_float": 0.7978845608028654,
+              "rad_float_outward": 4.984654404555461e-17,
+              "lower_dec": "7.978845608028653558798921198687637369516e-1",
+              "upper_dec": "7.978845608028653558798921198687637369519e-1",
+              "arb_ball_str": "[0.7978845608028653558798921198687637369517 +/- 1.73e-41]"
+            },
+            "two_over_sqrt_tau": {
+              "mid_float": 0.7978845608028654,
+              "rad_float_outward": 4.984654404555461e-17,
+              "lower_dec": "7.978845608028653558798921198687637369516e-1",
+              "upper_dec": "7.978845608028653558798921198687637369519e-1",
+              "arb_ball_str": "[0.7978845608028653558798921198687637369517 +/- 1.73e-41]"
+            },
+            "difference_enclosure": {
+              "mid_float": 0.0,
+              "rad_float_outward": 6.2564781425901025e-77,
+              "lower_dec": "-6.256478142590101762768750617796625795271e-77",
+              "upper_dec": "6.256478142590101762768750617796625795271e-77",
+              "arb_ball_str": "[+/- 6.26e-77]"
+            },
+            "zero_in_difference": true
+          },
+          {
+            "b_label": "1/2",
+            "inv_abs_sin_tau_z_over_4_gamma_1_minus_z": {
+              "mid_float": 0.7978845608028654,
+              "rad_float_outward": 4.984654404555461e-17,
+              "lower_dec": "7.978845608028653558798921198687637369516e-1",
+              "upper_dec": "7.978845608028653558798921198687637369519e-1",
+              "arb_ball_str": "[0.7978845608028653558798921198687637369517 +/- 1.73e-41]"
+            },
+            "two_over_sqrt_tau": {
+              "mid_float": 0.7978845608028654,
+              "rad_float_outward": 4.984654404555461e-17,
+              "lower_dec": "7.978845608028653558798921198687637369516e-1",
+              "upper_dec": "7.978845608028653558798921198687637369519e-1",
+              "arb_ball_str": "[0.7978845608028653558798921198687637369517 +/- 1.73e-41]"
+            },
+            "difference_enclosure": {
+              "mid_float": 8.636168555094445e-78,
+              "rad_float_outward": 1.1756841652945016e-76,
+              "lower_dec": "-1.089322479743556962622018721224559567903e-76",
+              "upper_dec": "1.262045850845445855129745758480567559326e-76",
+              "arb_ball_str": "[+/- 1.27e-76]"
+            },
+            "zero_in_difference": true
+          },
+          {
+            "b_label": "1",
+            "inv_abs_sin_tau_z_over_4_gamma_1_minus_z": {
+              "mid_float": 0.7978845608028654,
+              "rad_float_outward": 4.984654404555461e-17,
+              "lower_dec": "7.978845608028653558798921198687637369516e-1",
+              "upper_dec": "7.978845608028653558798921198687637369519e-1",
+              "arb_ball_str": "[0.7978845608028653558798921198687637369517 +/- 1.73e-41]"
+            },
+            "two_over_sqrt_tau": {
+              "mid_float": 0.7978845608028654,
+              "rad_float_outward": 4.984654404555461e-17,
+              "lower_dec": "7.978845608028653558798921198687637369516e-1",
+              "upper_dec": "7.978845608028653558798921198687637369519e-1",
+              "arb_ball_str": "[0.7978845608028653558798921198687637369517 +/- 1.73e-41]"
+            },
+            "difference_enclosure": {
+              "mid_float": 3.454467422037778e-77,
+              "rad_float_outward": 1.1912862502001151e-76,
+              "lower_dec": "-8.458395079963371512683964080013468056742e-77",
+              "upper_dec": "1.536732992403892721299304557025378771365e-76",
+              "arb_ball_str": "[+/- 1.54e-76]"
+            },
+            "zero_in_difference": true
+          },
+          {
+            "b_label": "2",
+            "inv_abs_sin_tau_z_over_4_gamma_1_minus_z": {
+              "mid_float": 0.7978845608028654,
+              "rad_float_outward": 4.984654404555461e-17,
+              "lower_dec": "7.978845608028653558798921198687637369516e-1",
+              "upper_dec": "7.978845608028653558798921198687637369519e-1",
+              "arb_ball_str": "[0.7978845608028653558798921198687637369517 +/- 1.73e-41]"
+            },
+            "two_over_sqrt_tau": {
+              "mid_float": 0.7978845608028654,
+              "rad_float_outward": 4.984654404555461e-17,
+              "lower_dec": "7.978845608028653558798921198687637369516e-1",
+              "upper_dec": "7.978845608028653558798921198687637369519e-1",
+              "arb_ball_str": "[0.7978845608028653558798921198687637369517 +/- 1.73e-41]"
+            },
+            "difference_enclosure": {
+              "mid_float": 3.454467422037778e-77,
+              "rad_float_outward": 1.3139494307110178e-76,
+              "lower_dec": "-9.685026885072398574961377051596361166885e-77",
+              "upper_dec": "1.659396172914795427527045854183668082379e-76",
+              "arb_ball_str": "[+/- 1.66e-76]"
+            },
+            "zero_in_difference": true
+          },
+          {
+            "b_label": "4",
+            "inv_abs_sin_tau_z_over_4_gamma_1_minus_z": {
+              "mid_float": 0.7978845608028654,
+              "rad_float_outward": 4.984654404555461e-17,
+              "lower_dec": "7.978845608028653558798921198687637369516e-1",
+              "upper_dec": "7.978845608028653558798921198687637369519e-1",
+              "arb_ball_str": "[0.7978845608028653558798921198687637369517 +/- 1.73e-41]"
+            },
+            "two_over_sqrt_tau": {
+              "mid_float": 0.7978845608028654,
+              "rad_float_outward": 4.984654404555461e-17,
+              "lower_dec": "7.978845608028653558798921198687637369516e-1",
+              "upper_dec": "7.978845608028653558798921198687637369519e-1",
+              "arb_ball_str": "[0.7978845608028653558798921198687637369517 +/- 1.73e-41]"
+            },
+            "difference_enclosure": {
+              "mid_float": 4.318084277547222e-77,
+              "rad_float_outward": 1.380817225588389e-76,
+              "lower_dec": "-9.490087978336666162926394258470357948098e-77",
+              "upper_dec": "1.812625653343111078831274612127075751923e-76",
+              "arb_ball_str": "[+/- 1.82e-76]"
+            },
+            "zero_in_difference": true
+          }
+        ],
+        "all_rows_match_constant_2_over_sqrt_tau": true
+      },
+      "corrected_reflection_and_mellin_kernel_identities": {
+        "corrected_reflection_formula": "Gamma(1 - z) * sin(tau * z / 4) = (tau / 2) / (2 * Gamma(z) * cos(tau * z / 4))",
+        "mellin_kernel_formulas": [
+          "M[H](z) = Gamma(z) * cos(tau * z / 4) * Gamma((5 + z) / 2)",
+          "M[H](z) = (tau / 2) * Gamma(z) / Gamma((-3 - z) / 2)",
+          "M[H](z) = (tau / 2)^2 / (sin(tau * z / 2) * Gamma(1 - z) * Gamma((-3 - z) / 2))"
+        ],
+        "rows": [
+          {
+            "z_label": "1/2 + i",
+            "reflection_abs_diff": {
+              "mid_float": 2.2261960143115746e-76,
+              "rad_float_outward": 2.226196014311575e-76,
+              "lower_dec": "0",
+              "upper_dec": "4.452392028623149273144215390842992858397e-76",
+              "arb_ball_str": "[+/- 4.46e-76]"
+            },
+            "mellin_form1_minus_form2_abs": {
+              "mid_float": 3.623888521699756e-76,
+              "rad_float_outward": 3.6238885216997566e-76,
+              "lower_dec": "0",
+              "upper_dec": "7.247777043399512067629290890999875830038e-76",
+              "arb_ball_str": "[+/- 7.25e-76]"
+            },
+            "mellin_form2_minus_form3_abs": {
+              "mid_float": 4.5350239277812625e-76,
+              "rad_float_outward": 4.535023927781263e-76,
+              "lower_dec": "0",
+              "upper_dec": "9.070047855562525023625494592677711557089e-76",
+              "arb_ball_str": "[+/- 9.08e-76]"
+            },
+            "all_identities_contain_zero": true
+          },
+          {
+            "z_label": "3/4 + 2i",
+            "reflection_abs_diff": {
+              "mid_float": 2.2014139888245438e-76,
+              "rad_float_outward": 2.201413988824544e-76,
+              "lower_dec": "0",
+              "upper_dec": "4.402827977649087578629461096442085986522e-76",
+              "arb_ball_str": "[+/- 4.41e-76]"
+            },
+            "mellin_form1_minus_form2_abs": {
+              "mid_float": 4.166826422348161e-76,
+              "rad_float_outward": 4.166826422348162e-76,
+              "lower_dec": "0",
+              "upper_dec": "8.333652844696322180054432264253407005063e-76",
+              "arb_ball_str": "[+/- 8.34e-76]"
+            },
+            "mellin_form2_minus_form3_abs": {
+              "mid_float": 8.104179360159668e-76,
+              "rad_float_outward": 8.104179360159669e-76,
+              "lower_dec": "0",
+              "upper_dec": "1.620835872031933594421964820283399047074e-75",
+              "arb_ball_str": "[+/- 1.63e-75]"
+            },
+            "all_identities_contain_zero": true
+          },
+          {
+            "z_label": "-5/2 + i",
+            "reflection_abs_diff": {
+              "mid_float": 2.0681970211592536e-75,
+              "rad_float_outward": 2.0681970211592539e-75,
+              "lower_dec": "0",
+              "upper_dec": "4.136394042318507263084668757949120618157e-75",
+              "arb_ball_str": "[+/- 4.14e-75]"
+            },
+            "mellin_form1_minus_form2_abs": {
+              "mid_float": 3.9455944503327974e-77,
+              "rad_float_outward": 3.945594450332798e-77,
+              "lower_dec": "0",
+              "upper_dec": "7.891188900665594876372162186168970201738e-77",
+              "arb_ball_str": "[+/- 7.90e-77]"
+            },
+            "mellin_form2_minus_form3_abs": {
+              "mid_float": 6.730254678150674e-77,
+              "rad_float_outward": 6.7302546781506745e-77,
+              "lower_dec": "0",
+              "upper_dec": "1.346050935630134737798610542483510567846e-76",
+              "arb_ball_str": "[+/- 1.35e-76]"
+            },
+            "all_identities_contain_zero": true
+          },
+          {
+            "z_label": "-11/2 + 3i/2",
+            "reflection_abs_diff": {
+              "mid_float": 8.145944965160447e-73,
+              "rad_float_outward": 8.145944965160448e-73,
+              "lower_dec": "0",
+              "upper_dec": "1.629188993032089321297812174591273663129e-72",
+              "arb_ball_str": "[+/- 1.63e-72]"
+            },
+            "mellin_form1_minus_form2_abs": {
+              "mid_float": 4.4543196211622e-79,
+              "rad_float_outward": 4.4543196211622005e-79,
+              "lower_dec": "0",
+              "upper_dec": "8.908639242324399736500981755680971203644e-79",
+              "arb_ball_str": "[+/- 8.91e-79]"
+            },
+            "mellin_form2_minus_form3_abs": {
+              "mid_float": 7.418316318041639e-79,
+              "rad_float_outward": 7.41831631804164e-79,
+              "lower_dec": "0",
+              "upper_dec": "1.483663263608327790090724050285738239166e-78",
+              "arb_ball_str": "[+/- 1.49e-78]"
+            },
+            "all_identities_contain_zero": true
+          }
+        ],
+        "all_reflection_and_kernel_identities_hold": true
+      },
+      "dlmf_5_8_3_gamma_lower_bound_checks": {
+        "formula": "|Gamma(R + i*b)| >= Gamma(R) * exp(-tau * |b| / 4)  for R >= 1/2",
+        "rows": [
+          {
+            "R_label": "1/2",
+            "b": "1",
+            "abs_Gamma_R_plus_ib": {
+              "mid_float": 0.520590963616752,
+              "rad_float_outward": 5.495560374465941e-19,
+              "lower_dec": "5.205909636167519455252029304456600247862e-1",
+              "upper_dec": "5.205909636167519455252029304456600247865e-1",
+              "arb_ball_str": "[0.5205909636167519455252029304456600247863 +/- 1.41e-41]"
+            },
+            "lower_bound_Gamma_R_exp_neg_tau_b_over_4": {
+              "mid_float": 0.3684569556275152,
+              "rad_float_outward": 1.9980677730635274e-18,
+              "lower_dec": "3.684569556275151833709674061245512009107e-1",
+              "upper_dec": "3.684569556275151833709674061245512009110e-1",
+              "arb_ball_str": "[0.3684569556275151833709674061245512009109 +/- 1.65e-41]"
+            },
+            "abs_minus_lower_bound": {
+              "mid_float": 0.15213400798923676,
+              "rad_float_outward": 1.448511735616933e-18,
+              "lower_dec": "1.521340079892367621542355243211088238753e-1",
+              "upper_dec": "1.521340079892367621542355243211088238756e-1",
+              "arb_ball_str": "[0.1521340079892367621542355243211088238754 +/- 3.06e-41]"
+            },
+            "lower_bound_holds": true
+          },
+          {
+            "R_label": "5/4",
+            "b": "2",
+            "abs_Gamma_R_plus_ib": {
+              "mid_float": 0.1839671524308467,
+              "rad_float_outward": 2.8724879864221592e-18,
+              "lower_dec": "1.839671524308466894340820697089225779709e-1",
+              "upper_dec": "1.839671524308466894340820697089225779712e-1",
+              "arb_ball_str": "[0.1839671524308466894340820697089225779711 +/- 4.59e-41]"
+            },
+            "lower_bound_Gamma_R_exp_neg_tau_b_over_4": {
+              "mid_float": 0.03916920255755609,
+              "rad_float_outward": 3.2865543434517106e-18,
+              "lower_dec": "3.916920255755608847285100437795996510244e-2",
+              "upper_dec": "3.916920255755608847285100437795996510247e-2",
+              "arb_ball_str": "[0.03916920255755608847285100437795996510246 +/- 1.24e-42]"
+            },
+            "abs_minus_lower_bound": {
+              "mid_float": 0.1447979498732906,
+              "rad_float_outward": 1.3097936233781098e-17,
+              "lower_dec": "1.447979498732906009612310653309626128684e-1",
+              "upper_dec": "1.447979498732906009612310653309626128687e-1",
+              "arb_ball_str": "[0.1447979498732906009612310653309626128686 +/- 4.64e-42]"
+            },
+            "lower_bound_holds": true
+          },
+          {
+            "R_label": "13/2",
+            "b": "3",
+            "abs_Gamma_R_plus_ib": {
+              "mid_float": 140.11017786038215,
+              "rad_float_outward": 1.1141178946594738e-14,
+              "lower_dec": "1.401101778603821403522890260191346691540e+2",
+              "upper_dec": "1.401101778603821403522890260191346691543e+2",
+              "arb_ball_str": "[140.1101778603821403522890260191346691542 +/- 4.23e-38]"
+            },
+            "lower_bound_Gamma_R_exp_neg_tau_b_over_4": {
+              "mid_float": 2.586157231311239,
+              "rad_float_outward": 2.0001481651101358e-16,
+              "lower_dec": "2.586157231311238890828129586823275123668e+0",
+              "upper_dec": "2.586157231311238890828129586823275123671e+0",
+              "arb_ball_str": "[2.586157231311238890828129586823275123670 +/- 2.68e-40]"
+            },
+            "abs_minus_lower_bound": {
+              "mid_float": 137.5240206290709,
+              "rad_float_outward": 1.1707385572269473e-14,
+              "lower_dec": "1.375240206290709014614608964323113940303e+2",
+              "upper_dec": "1.375240206290709014614608964323113940306e+2",
+              "arb_ball_str": "[137.5240206290709014614608964323113940305 +/- 1.20e-38]"
+            },
+            "lower_bound_holds": true
+          },
+          {
+            "R_label": "21/2",
+            "b": "4",
+            "abs_Gamma_R_plus_ib": {
+              "mid_float": 519838.17369001475,
+              "rad_float_outward": 2.25527075119507e-11,
+              "lower_dec": "5.198381736900147741807487793457166087797e+5",
+              "upper_dec": "5.198381736900147741807487793457166087800e+5",
+              "arb_ball_str": "[519838.1736900147741807487793457166087798 +/- 4.43e-35]"
+            },
+            "lower_bound_Gamma_R_exp_neg_tau_b_over_4": {
+              "mid_float": 2116.332490444149,
+              "rad_float_outward": 2.6802813635974365e-14,
+              "lower_dec": "2.116332490444148762007893992752595779044e+3",
+              "upper_dec": "2.116332490444148762007893992752595779047e+3",
+              "arb_ball_str": "[2116.332490444148762007893992752595779046 +/- 2.68e-37]"
+            },
+            "abs_minus_lower_bound": {
+              "mid_float": 517721.8411995706,
+              "rad_float_outward": 1.067351920509463e-12,
+              "lower_dec": "5.177218411995706254187408853529640130006e+5",
+              "upper_dec": "5.177218411995706254187408853529640130009e+5",
+              "arb_ball_str": "[517721.8411995706254187408853529640130008 +/- 1.46e-36]"
+            },
+            "lower_bound_holds": true
+          }
+        ],
+        "all_dlmf_lower_bounds_hold": true
+      },
+      "shifted_contour_remainder_bounds": {
+        "contour_abscissa_formula": "a_M = -(2M + 3/2)  (M >= 2)",
+        "remainder_bound_formula": "|R_M(omega)| <= 8 * omega^{2M + 3/2} / (Gamma(2M + 5/2) * Gamma(M - 3/4))",
+        "rows_at_omega_4": [
+          {
+            "M": 2,
+            "a_M_formula": "-11/2",
+            "omega": 4,
+            "abs_sin_tau_z_over_2_equals_cosh_tau_b_over_2_at_b1": true,
+            "remainder_upper_bound_8_omega_pow_over_gammas": {
+              "mid_float": 62.7883975743062,
+              "rad_float_outward": 3.1607697357873943e-15,
+              "lower_dec": "6.278839757430619922588168517839683564098e+1",
+              "upper_dec": "6.278839757430619922588168517839683564101e+1",
+              "arb_ball_str": "[62.78839757430619922588168517839683564099 +/- 5.36e-40]"
+            }
+          },
+          {
+            "M": 4,
+            "a_M_formula": "-19/2",
+            "omega": 4,
+            "abs_sin_tau_z_over_2_equals_cosh_tau_b_over_2_at_b1": true,
+            "remainder_upper_bound_8_omega_pow_over_gammas": {
+              "mid_float": 1.4518096631225181,
+              "rad_float_outward": 4.934689359953006e-17,
+              "lower_dec": "1.451809663122518085423295535921750335817e+0",
+              "upper_dec": "1.451809663122518085423295535921750335820e+0",
+              "arb_ball_str": "[1.451809663122518085423295535921750335818 +/- 2.13e-40]"
+            }
+          },
+          {
+            "M": 8,
+            "a_M_formula": "-35/2",
+            "omega": 4,
+            "abs_sin_tau_z_over_2_equals_cosh_tau_b_over_2_at_b1": true,
+            "remainder_upper_bound_8_omega_pow_over_gammas": {
+              "mid_float": 1.5875425976989332e-07,
+              "rad_float_outward": 5.715002812661721e-24,
+              "lower_dec": "1.587542597698933133857786647050929166837e-7",
+              "upper_dec": "1.587542597698933133857786647050929166840e-7",
+              "arb_ball_str": "[1.587542597698933133857786647050929166839e-7 +/- 3.07e-47]"
+            }
+          },
+          {
+            "M": 16,
+            "a_M_formula": "-67/2",
+            "omega": 4,
+            "abs_sin_tau_z_over_2_equals_cosh_tau_b_over_2_at_b1": true,
+            "remainder_upper_bound_8_omega_pow_over_gammas": {
+              "mid_float": 1.3726791297985913e-28,
+              "rad_float_outward": 2.0832289203647683e-45,
+              "lower_dec": "1.372679129798591367789741466888676260199e-28",
+              "upper_dec": "1.372679129798591367789741466888676260202e-28",
+              "arb_ball_str": "[1.372679129798591367789741466888676260201e-28 +/- 8.91e-69]"
+            }
+          },
+          {
+            "M": 32,
+            "a_M_formula": "-131/2",
+            "omega": 4,
+            "abs_sin_tau_z_over_2_equals_cosh_tau_b_over_2_at_b1": true,
+            "remainder_upper_bound_8_omega_pow_over_gammas": {
+              "mid_float": 5.218625070640794e-85,
+              "rad_float_outward": 3.2252246987137146e-101,
+              "lower_dec": "5.218625070640793229620373934835168198235e-85",
+              "upper_dec": "5.218625070640793229620373934835168198238e-85",
+              "arb_ball_str": "[5.218625070640793229620373934835168198237e-85 +/- 5.56e-126]"
+            }
+          }
+        ]
+      },
+      "even_series_term_sign_analysis": {
+        "note": "For m = 0, t_even(0) = Gamma(5/2) > 0; for m = 1, t_even(1) = -Gamma(3/2) omega^2 / 2 < 0; for all integers m >= 2, Gamma(5/2 - m) has sign (-1)^{m-2} = (-1)^m, so (-1)^m Gamma(5/2 - m) = |Gamma(5/2 - m)| > 0 and every even-series term t_even(m) is strictly positive (not alternating). At m = 3, (-1)^3 Gamma(5/2 - 3) omega^6 / 6! = Gamma(1/2) omega^6 / 360 > 0.",
+        "rows": [
+          {
+            "m": 0,
+            "Gamma_5_2_minus_m": {
+              "mid_float": 1.329340388179137,
+              "rad_float_outward": 1.9882475174356647e-18,
+              "lower_dec": "1.329340388179137020473625612505858887097e+0",
+              "upper_dec": "1.329340388179137020473625612505858887100e+0",
+              "arb_ball_str": "[1.329340388179137020473625612505858887098 +/- 1.63e-40]"
+            },
+            "even_series_coeff_at_omega_1": {
+              "mid_float": 1.329340388179137,
+              "rad_float_outward": 1.9882475174356647e-18,
+              "lower_dec": "1.329340388179137020473625612505858887097e+0",
+              "upper_dec": "1.329340388179137020473625612505858887100e+0",
+              "arb_ball_str": "[1.329340388179137020473625612505858887098 +/- 1.63e-40]"
+            },
+            "strictly_positive": true,
+            "strictly_negative": false
+          },
+          {
+            "m": 1,
+            "Gamma_5_2_minus_m": {
+              "mid_float": 0.886226925452758,
+              "rad_float_outward": 3.8332932499129e-17,
+              "lower_dec": "8.862269254527580136490837416705725913986e-1",
+              "upper_dec": "8.862269254527580136490837416705725913989e-1",
+              "arb_ball_str": "[0.8862269254527580136490837416705725913988 +/- 2.53e-41]"
+            },
+            "even_series_coeff_at_omega_1": {
+              "mid_float": -0.443113462726379,
+              "rad_float_outward": 1.91664662495645e-17,
+              "lower_dec": "-4.431134627263790068245418708352862956995e-1",
+              "upper_dec": "-4.431134627263790068245418708352862956992e-1",
+              "arb_ball_str": "[-0.4431134627263790068245418708352862956994 +/- 1.27e-41]"
+            },
+            "strictly_positive": false,
+            "strictly_negative": true
+          },
+          {
+            "m": 2,
+            "Gamma_5_2_minus_m": {
+              "mid_float": 1.772453850905516,
+              "rad_float_outward": 7.6665864998258e-17,
+              "lower_dec": "1.772453850905516027298167483341145182796e+0",
+              "upper_dec": "1.772453850905516027298167483341145182799e+0",
+              "arb_ball_str": "[1.772453850905516027298167483341145182798 +/- 4.51e-40]"
+            },
+            "even_series_coeff_at_omega_1": {
+              "mid_float": 0.07385224378772984,
+              "rad_float_outward": 3.194411041594083e-18,
+              "lower_dec": "7.385224378772983447075697847254771594988e-2",
+              "upper_dec": "7.385224378772983447075697847254771594991e-2",
+              "arb_ball_str": "[0.07385224378772983447075697847254771594990 +/- 2.11e-42]"
+            },
+            "strictly_positive": true,
+            "strictly_negative": false
+          },
+          {
+            "m": 3,
+            "Gamma_5_2_minus_m": {
+              "mid_float": -3.544907701811032,
+              "rad_float_outward": 1.53331729996516e-16,
+              "lower_dec": "-3.544907701811032054596334966682290365597e+0",
+              "upper_dec": "-3.544907701811032054596334966682290365594e+0",
+              "arb_ball_str": "[-3.544907701811032054596334966682290365595 +/- 9.90e-41]"
+            },
+            "even_series_coeff_at_omega_1": {
+              "mid_float": 0.004923482919181989,
+              "rad_float_outward": 9.731250437448506e-20,
+              "lower_dec": "4.923482919181988964717131898169847729992e-3",
+              "upper_dec": "4.923482919181988964717131898169847729995e-3",
+              "arb_ball_str": "[0.004923482919181988964717131898169847729993 +/- 1.93e-43]"
+            },
+            "strictly_positive": true,
+            "strictly_negative": false
+          },
+          {
+            "m": 4,
+            "Gamma_5_2_minus_m": {
+              "mid_float": 2.363271801207355,
+              "rad_float_outward": 1.0222115333101066e-16,
+              "lower_dec": "2.363271801207354703064223311121526910395e+0",
+              "upper_dec": "2.363271801207354703064223311121526910398e+0",
+              "arb_ball_str": "[2.363271801207354703064223311121526910397 +/- 2.68e-40]"
+            },
+            "even_series_coeff_at_omega_1": {
+              "mid_float": 5.861289189502368e-05,
+              "rad_float_outward": 1.100272331077122e-21,
+              "lower_dec": "5.861289189502367815139442735916485392848e-5",
+              "upper_dec": "5.861289189502367815139442735916485392851e-5",
+              "arb_ball_str": "[5.861289189502367815139442735916485392849e-5 +/- 3.93e-46]"
+            },
+            "strictly_positive": true,
+            "strictly_negative": false
+          },
+          {
+            "m": 5,
+            "Gamma_5_2_minus_m": {
+              "mid_float": -0.9453087204829419,
+              "rad_float_outward": 1.8684000839901133e-17,
+              "lower_dec": "-9.453087204829418812256893244486107641588e-1",
+              "upper_dec": "-9.453087204829418812256893244486107641585e-1",
+              "arb_ball_str": "[-0.9453087204829418812256893244486107641587 +/- 6.96e-42]"
+            },
+            "even_series_coeff_at_omega_1": {
+              "mid_float": 2.605017417556608e-07,
+              "rad_float_outward": 1.0638838117097188e-23,
+              "lower_dec": "2.605017417556607917839752327073993507931e-7",
+              "upper_dec": "2.605017417556607917839752327073993507934e-7",
+              "arb_ball_str": "[2.605017417556607917839752327073993507933e-7 +/- 9.38e-48]"
+            },
+            "strictly_positive": true,
+            "strictly_negative": false
+          }
+        ],
+        "all_m_ge_2_strictly_positive": true,
+        "m3_coeff_minus_Gamma_1_2_over_360": {
+          "mid_float": 0.0,
+          "rad_float_outward": 2.338962325885623e-79,
+          "lower_dec": "-2.338962325885622770996744145828899401879e-79",
+          "upper_dec": "2.338962325885622770996744145828899401879e-79",
+          "arb_ball_str": "[+/- 2.34e-79]"
+        },
+        "m3_matches_Gamma_1_2_over_360": true
+      }
+    },
     "legacy_k1_fourier_counterexample_regression": {
       "K_terms": 1,
       "xi_formula": "4 / tau",
@@ -2091,7 +2749,8 @@
         "upper_dec": "-7.757751802167744117629682956314216290711e-1",
         "arb_ball_str": "[-0.7757751802167744117629682956314216290713 +/- 2.04e-41]"
       },
-      "repaired_k4_contains_adaptive": true
+      "repaired_k4_contains_adaptive": true,
+      "repaired_k4_overlaps_adaptive": true
     },
     "hat_f_sign_change_witnesses": [
       {
@@ -2110,6 +2769,60 @@
           "upper_dec": "1.329340388179137020473625612505858887100e+0",
           "arb_ball_str": "[1.329340388179137020473625612505858887098 +/- 1.63e-40]"
         },
+        "working_prec_bits": 512,
+        "series_truncation_K_eff": 200,
+        "series_R_even_at_K_eff": {
+          "mid_float": 0.0,
+          "rad_float_outward": 5e-324,
+          "lower_dec": "0",
+          "upper_dec": "0",
+          "arb_ball_str": "0"
+        },
+        "series_R_odd_at_K_eff": {
+          "mid_float": 0.0,
+          "rad_float_outward": 5e-324,
+          "lower_dec": "0",
+          "upper_dec": "0",
+          "arb_ball_str": "0"
+        },
+        "series_truncation_radius": {
+          "mid_float": 0.0,
+          "rad_float_outward": 5e-324,
+          "lower_dec": "0",
+          "upper_dec": "0",
+          "arb_ball_str": "0"
+        },
+        "series_total_radius": {
+          "mid_float": 1.561590101708837e-154,
+          "rad_float_outward": 5e-324,
+          "lower_dec": "1.561590101708837034301933280138618843552e-154",
+          "upper_dec": "1.561590101708837034301933280138618843555e-154",
+          "arb_ball_str": "[1.561590101708837034301933280138618843553e-154 +/- 5.00e-194]"
+        },
+        "quadrature_v0": "1/7",
+        "quadrature_V1": 32,
+        "quadrature_interval": "[1/7, 32]",
+        "quadrature_left_tail_bound": {
+          "mid_float": 3.596619565067336e-19,
+          "rad_float_outward": 1.2299203400876183e-35,
+          "lower_dec": "3.596619565067336260899858437742987758712e-19",
+          "upper_dec": "3.596619565067336260899858437742987758715e-19",
+          "arb_ball_str": "[3.596619565067336260899858437742987758713e-19 +/- 9.44e-60]"
+        },
+        "quadrature_right_tail_bound_2_over_5_V1_pow_5": {
+          "mid_float": 1.1920928955078126e-08,
+          "rad_float_outward": 6.617444900424223e-25,
+          "lower_dec": "1.192092895507812499999999999999999999998e-8",
+          "upper_dec": "1.192092895507812500000000000000000000002e-8",
+          "arb_ball_str": "[1.192092895507812500000000000000000000000e-8 +/- 3e-52]"
+        },
+        "quadrature_total_radius": {
+          "mid_float": 1.1920928980058143e-08,
+          "rad_float_outward": 5e-324,
+          "lower_dec": "1.192092898005814305406602215953171253203e-8",
+          "upper_dec": "1.192092898005814305406602215953171253206e-8",
+          "arb_ball_str": "[1.192092898005814305406602215953171253204e-8 +/- 3.46e-48]"
+        },
         "hat_f_xi_quadrature_enclosure": {
           "mid_float": 1.3293403762665204,
           "rad_float_outward": 1.1920929043422388e-08,
@@ -2117,6 +2830,9 @@
           "upper_dec": "1.329340388187449268271937223660697095018e+0",
           "arb_ball_str": "[1.3293404 +/- 3.57e-8]"
         },
+        "comparison_mode": "quadrature_encloses_series_and_overlaps",
+        "quadrature_contains_series": true,
+        "series_overlaps_quadrature": true,
         "series_minus_quadrature_contains_zero": true,
         "expected_sign": "positive",
         "sign_strictly_certified": true
@@ -2137,6 +2853,60 @@
           "upper_dec": "-5.628546550179851263755109492164491931000e-1",
           "arb_ball_str": "[-0.5628546550179851263755109492164491931001 +/- 4.04e-41]"
         },
+        "working_prec_bits": 525,
+        "series_truncation_K_eff": 200,
+        "series_R_even_at_K_eff": {
+          "mid_float": 3.0385783147798243e-07,
+          "rad_float_outward": 7.002904739946603e-24,
+          "lower_dec": "3.038578314779824354770205308333898628628e-7",
+          "upper_dec": "3.038578314779824354770205308333898628631e-7",
+          "arb_ball_str": "[3.038578314779824354770205308333898628630e-7 +/- 6.98e-48]"
+        },
+        "series_R_odd_at_K_eff": {
+          "mid_float": 2.927958418917802e-07,
+          "rad_float_outward": 1.4583374968885138e-23,
+          "lower_dec": "2.927958418917801768864666948104930112826e-7",
+          "upper_dec": "2.927958418917801768864666948104930112829e-7",
+          "arb_ball_str": "[2.927958418917801768864666948104930112828e-7 +/- 1.63e-47]"
+        },
+        "series_truncation_radius": {
+          "mid_float": 0.0,
+          "rad_float_outward": 5e-324,
+          "lower_dec": "1.557703442016075442705454428344000072862e-1045",
+          "upper_dec": "1.557703442016075442705454428344000072865e-1045",
+          "arb_ball_str": "[1.557703442016075442705454428344000072863e-1045 +/- 2.23e-1086]"
+        },
+        "series_total_radius": {
+          "mid_float": 5.4142026733862384e-155,
+          "rad_float_outward": 5e-324,
+          "lower_dec": "5.414202673386238414332561414167252781581e-155",
+          "upper_dec": "5.414202673386238414332561414167252781584e-155",
+          "arb_ball_str": "[5.414202673386238414332561414167252781582e-155 +/- 3.29e-195]"
+        },
+        "quadrature_v0": "1/7",
+        "quadrature_V1": 32,
+        "quadrature_interval": "[1/7, 32]",
+        "quadrature_left_tail_bound": {
+          "mid_float": 3.596619565067336e-19,
+          "rad_float_outward": 1.2299203400876183e-35,
+          "lower_dec": "3.596619565067336260899858437742987758712e-19",
+          "upper_dec": "3.596619565067336260899858437742987758715e-19",
+          "arb_ball_str": "[3.596619565067336260899858437742987758713e-19 +/- 9.44e-60]"
+        },
+        "quadrature_right_tail_bound_2_over_5_V1_pow_5": {
+          "mid_float": 1.1920928955078126e-08,
+          "rad_float_outward": 6.617444900424223e-25,
+          "lower_dec": "1.192092895507812499999999999999999999998e-8",
+          "upper_dec": "1.192092895507812500000000000000000000002e-8",
+          "arb_ball_str": "[1.192092895507812500000000000000000000000e-8 +/- 3e-52]"
+        },
+        "quadrature_total_radius": {
+          "mid_float": 1.1920928980058143e-08,
+          "rad_float_outward": 5e-324,
+          "lower_dec": "1.192092898005814305406602215953171253203e-8",
+          "upper_dec": "1.192092898005814305406602215953171253206e-8",
+          "arb_ball_str": "[1.192092898005814305406602215953171253204e-8 +/- 3.46e-48]"
+        },
         "hat_f_xi_quadrature_enclosure": {
           "mid_float": -0.5628546550531311,
           "rad_float_outward": 1.1920928980501365e-08,
@@ -2144,6 +2914,9 @@
           "upper_dec": "-5.628546431322021680312611135045521769690e-1",
           "arb_ball_str": "[-0.5628547 +/- 5.69e-8]"
         },
+        "comparison_mode": "quadrature_encloses_series_and_overlaps",
+        "quadrature_contains_series": true,
+        "series_overlaps_quadrature": true,
         "series_minus_quadrature_contains_zero": true,
         "expected_sign": "negative",
         "sign_strictly_certified": true
@@ -2164,6 +2937,60 @@
           "upper_dec": "-7.757751802167744117629682956314216290711e-1",
           "arb_ball_str": "[-0.7757751802167744117629682956314216290713 +/- 2.04e-41]"
         },
+        "working_prec_bits": 529,
+        "series_truncation_K_eff": 200,
+        "series_R_even_at_K_eff": {
+          "mid_float": 4.925957623094909e-07,
+          "rad_float_outward": 4.785008813388873e-23,
+          "lower_dec": "4.925957623094908979694402209489032262989e-7",
+          "upper_dec": "4.925957623094908979694402209489032262992e-7",
+          "arb_ball_str": "[4.925957623094908979694402209489032262990e-7 +/- 4.74e-47]"
+        },
+        "series_R_odd_at_K_eff": {
+          "mid_float": 4.746627402564793e-07,
+          "rad_float_outward": 1.167225914697088e-23,
+          "lower_dec": "4.746627402564792650701860060880243065295e-7",
+          "upper_dec": "4.746627402564792650701860060880243065298e-7",
+          "arb_ball_str": "[4.746627402564792650701860060880243065296e-7 +/- 3.06e-48]"
+        },
+        "series_truncation_radius": {
+          "mid_float": 0.0,
+          "rad_float_outward": 5e-324,
+          "lower_dec": "2.324622678411157659107853101499275491726e-1003",
+          "upper_dec": "2.324622678411157659107853101499275491729e-1003",
+          "arb_ball_str": "[2.324622678411157659107853101499275491728e-1003 +/- 2.43e-1043]"
+        },
+        "series_total_radius": {
+          "mid_float": 7.625480612925112e-77,
+          "rad_float_outward": 5e-324,
+          "lower_dec": "7.625480612925111556236339653066632615934e-77",
+          "upper_dec": "7.625480612925111556236339653066632615937e-77",
+          "arb_ball_str": "[7.625480612925111556236339653066632615936e-77 +/- 4.92e-117]"
+        },
+        "quadrature_v0": "1/7",
+        "quadrature_V1": 32,
+        "quadrature_interval": "[1/7, 32]",
+        "quadrature_left_tail_bound": {
+          "mid_float": 3.596619565067336e-19,
+          "rad_float_outward": 1.2299203400876183e-35,
+          "lower_dec": "3.596619565067336260899858437742987758712e-19",
+          "upper_dec": "3.596619565067336260899858437742987758715e-19",
+          "arb_ball_str": "[3.596619565067336260899858437742987758713e-19 +/- 9.44e-60]"
+        },
+        "quadrature_right_tail_bound_2_over_5_V1_pow_5": {
+          "mid_float": 1.1920928955078126e-08,
+          "rad_float_outward": 6.617444900424223e-25,
+          "lower_dec": "1.192092895507812499999999999999999999998e-8",
+          "upper_dec": "1.192092895507812500000000000000000000002e-8",
+          "arb_ball_str": "[1.192092895507812500000000000000000000000e-8 +/- 3e-52]"
+        },
+        "quadrature_total_radius": {
+          "mid_float": 1.1920928980058143e-08,
+          "rad_float_outward": 5e-324,
+          "lower_dec": "1.192092898005814305406602215953171253203e-8",
+          "upper_dec": "1.192092898005814305406602215953171253206e-8",
+          "arb_ball_str": "[1.192092898005814305406602215953171253204e-8 +/- 3.46e-48]"
+        },
         "hat_f_xi_quadrature_enclosure": {
           "mid_float": -0.7757751798671448,
           "rad_float_outward": 1.19209290051118e-08,
@@ -2171,6 +2998,9 @@
           "upper_dec": "-7.757751679462158823267510102948429119741e-1",
           "arb_ball_str": "[-0.7757752 +/- 3.21e-8]"
         },
+        "comparison_mode": "quadrature_encloses_series_and_overlaps",
+        "quadrature_contains_series": true,
+        "series_overlaps_quadrature": true,
         "series_minus_quadrature_contains_zero": true,
         "expected_sign": "negative",
         "sign_strictly_certified": true
@@ -2191,6 +3021,60 @@
           "upper_dec": "-3.668367826642069184644449070564857828857e-1",
           "arb_ball_str": "[-0.3668367826642069184644449070564857828859 +/- 4.03e-41]"
         },
+        "working_prec_bits": 538,
+        "series_truncation_K_eff": 200,
+        "series_R_even_at_K_eff": {
+          "mid_float": 1.2154313259119297e-06,
+          "rad_float_outward": 2.801161895978641e-23,
+          "lower_dec": "1.215431325911929741908082123333559451450e-6",
+          "upper_dec": "1.215431325911929741908082123333559451453e-6",
+          "arb_ball_str": "[1.215431325911929741908082123333559451452e-6 +/- 2.80e-47]"
+        },
+        "series_R_odd_at_K_eff": {
+          "mid_float": 1.1711833675671208e-06,
+          "rad_float_outward": 5.833349987554055e-23,
+          "lower_dec": "1.171183367567120707545866779241972045130e-6",
+          "upper_dec": "1.171183367567120707545866779241972045133e-6",
+          "arb_ball_str": "[1.171183367567120707545866779241972045131e-6 +/- 1.36e-46]"
+        },
+        "series_truncation_radius": {
+          "mid_float": 0.0,
+          "rad_float_outward": 5e-324,
+          "lower_dec": "1.608951809296629946776630136891450084600e-924",
+          "upper_dec": "1.608951809296629946776630136891450084603e-924",
+          "arb_ball_str": "[1.608951809296629946776630136891450084602e-924 +/- 8.90e-966]"
+        },
+        "series_total_radius": {
+          "mid_float": 4.202169990462985e-157,
+          "rad_float_outward": 5e-324,
+          "lower_dec": "4.202169990462984955169272459795644298711e-157",
+          "upper_dec": "4.202169990462984955169272459795644298714e-157",
+          "arb_ball_str": "[4.202169990462984955169272459795644298713e-157 +/- 2.73e-197]"
+        },
+        "quadrature_v0": "1/7",
+        "quadrature_V1": 32,
+        "quadrature_interval": "[1/7, 32]",
+        "quadrature_left_tail_bound": {
+          "mid_float": 3.596619565067336e-19,
+          "rad_float_outward": 1.2299203400876183e-35,
+          "lower_dec": "3.596619565067336260899858437742987758712e-19",
+          "upper_dec": "3.596619565067336260899858437742987758715e-19",
+          "arb_ball_str": "[3.596619565067336260899858437742987758713e-19 +/- 9.44e-60]"
+        },
+        "quadrature_right_tail_bound_2_over_5_V1_pow_5": {
+          "mid_float": 1.1920928955078126e-08,
+          "rad_float_outward": 6.617444900424223e-25,
+          "lower_dec": "1.192092895507812499999999999999999999998e-8",
+          "upper_dec": "1.192092895507812500000000000000000000002e-8",
+          "arb_ball_str": "[1.192092895507812500000000000000000000000e-8 +/- 3e-52]"
+        },
+        "quadrature_total_radius": {
+          "mid_float": 1.1920928980058143e-08,
+          "rad_float_outward": 5e-324,
+          "lower_dec": "1.192092898005814305406602215953171253203e-8",
+          "upper_dec": "1.192092898005814305406602215953171253206e-8",
+          "arb_ball_str": "[1.192092898005814305406602215953171253204e-8 +/- 3.46e-48]"
+        },
         "hat_f_xi_quadrature_enclosure": {
           "mid_float": -0.3668367826730297,
           "rad_float_outward": 1.192092898700405e-08,
@@ -2198,6 +3082,9 @@
           "upper_dec": "-3.668367707521007284251318146364993835307e-1",
           "arb_ball_str": "[-0.3668368 +/- 2.93e-8]"
         },
+        "comparison_mode": "quadrature_encloses_series_and_overlaps",
+        "quadrature_contains_series": true,
+        "series_overlaps_quadrature": true,
         "series_minus_quadrature_contains_zero": true,
         "expected_sign": "negative",
         "sign_strictly_certified": true
@@ -2218,6 +3105,60 @@
           "upper_dec": "2.636171831500303372338138695632955698497e-1",
           "arb_ball_str": "[0.2636171831500303372338138695632955698496 +/- 2.39e-41]"
         },
+        "working_prec_bits": 550,
+        "series_truncation_K_eff": 200,
+        "series_R_even_at_K_eff": {
+          "mid_float": 2.734720483301842e-06,
+          "rad_float_outward": 9.579253495066192e-23,
+          "lower_dec": "2.734720483301841919293184777500508765765e-6",
+          "upper_dec": "2.734720483301841919293184777500508765768e-6",
+          "arb_ball_str": "[2.734720483301841919293184777500508765767e-6 +/- 6.28e-47]"
+        },
+        "series_R_odd_at_K_eff": {
+          "mid_float": 2.6351625770260216e-06,
+          "rad_float_outward": 2.7568302890215103e-23,
+          "lower_dec": "2.635162577026021591978200253294437101544e-6",
+          "upper_dec": "2.635162577026021591978200253294437101547e-6",
+          "arb_ball_str": "[2.635162577026021591978200253294437101545e-6 +/- 5.38e-47]"
+        },
+        "series_truncation_radius": {
+          "mid_float": 0.0,
+          "rad_float_outward": 5e-324,
+          "lower_dec": "9.890748910123423821614059603374512788161e-854",
+          "upper_dec": "9.890748910123423821614059603374512788164e-854",
+          "arb_ball_str": "[9.890748910123423821614059603374512788162e-854 +/- 4.39e-894]"
+        },
+        "series_total_radius": {
+          "mid_float": 1.7111453674066108e-159,
+          "rad_float_outward": 5e-324,
+          "lower_dec": "1.711145367406610755639813244690643193637e-159",
+          "upper_dec": "1.711145367406610755639813244690643193640e-159",
+          "arb_ball_str": "[1.711145367406610755639813244690643193638e-159 +/- 4.13e-199]"
+        },
+        "quadrature_v0": "1/7",
+        "quadrature_V1": 32,
+        "quadrature_interval": "[1/7, 32]",
+        "quadrature_left_tail_bound": {
+          "mid_float": 3.596619565067336e-19,
+          "rad_float_outward": 1.2299203400876183e-35,
+          "lower_dec": "3.596619565067336260899858437742987758712e-19",
+          "upper_dec": "3.596619565067336260899858437742987758715e-19",
+          "arb_ball_str": "[3.596619565067336260899858437742987758713e-19 +/- 9.44e-60]"
+        },
+        "quadrature_right_tail_bound_2_over_5_V1_pow_5": {
+          "mid_float": 1.1920928955078126e-08,
+          "rad_float_outward": 6.617444900424223e-25,
+          "lower_dec": "1.192092895507812499999999999999999999998e-8",
+          "upper_dec": "1.192092895507812500000000000000000000002e-8",
+          "arb_ball_str": "[1.192092895507812500000000000000000000000e-8 +/- 3e-52]"
+        },
+        "quadrature_total_radius": {
+          "mid_float": 1.1920928980058143e-08,
+          "rad_float_outward": 5e-324,
+          "lower_dec": "1.192092898005814305406602215953171253203e-8",
+          "upper_dec": "1.192092898005814305406602215953171253206e-8",
+          "arb_ball_str": "[1.192092898005814305406602215953171253204e-8 +/- 3.46e-48]"
+        },
         "hat_f_xi_quadrature_enclosure": {
           "mid_float": 0.2636171831461061,
           "rad_float_outward": 1.1920928997029882e-08,
@@ -2225,6 +3166,9 @@
           "upper_dec": "2.636171950670350674497317281287417998159e-1",
           "arb_ball_str": "[0.2636172 +/- 2.88e-8]"
         },
+        "comparison_mode": "quadrature_encloses_series_and_overlaps",
+        "quadrature_contains_series": true,
+        "series_overlaps_quadrature": true,
         "series_minus_quadrature_contains_zero": true,
         "expected_sign": "positive",
         "sign_strictly_certified": true
@@ -2245,6 +3189,60 @@
           "upper_dec": "1.247126116325928138362162976104693467980e-1",
           "arb_ball_str": "[0.1247126116325928138362162976104693467978 +/- 9.77e-42]"
         },
+        "working_prec_bits": 563,
+        "series_truncation_K_eff": 200,
+        "series_R_even_at_K_eff": {
+          "mid_float": 4.861725303647719e-06,
+          "rad_float_outward": 1.1204647583914564e-22,
+          "lower_dec": "4.861725303647718967632328493334237805806e-6",
+          "upper_dec": "4.861725303647718967632328493334237805809e-6",
+          "arb_ball_str": "[4.861725303647718967632328493334237805808e-6 +/- 1.12e-46]"
+        },
+        "series_R_odd_at_K_eff": {
+          "mid_float": 4.684733470268483e-06,
+          "rad_float_outward": 2.333339995021622e-22,
+          "lower_dec": "4.684733470268482830183467116967888180523e-6",
+          "upper_dec": "4.684733470268482830183467116967888180526e-6",
+          "arb_ball_str": "[4.684733470268482830183467116967888180525e-6 +/- 4.61e-46]"
+        },
+        "series_truncation_radius": {
+          "mid_float": 0.0,
+          "rad_float_outward": 5e-324,
+          "lower_dec": "1.661886245361655068541802293851890625079e-803",
+          "upper_dec": "1.661886245361655068541802293851890625082e-803",
+          "arb_ball_str": "[1.661886245361655068541802293851890625081e-803 +/- 1.95e-843]"
+        },
+        "series_total_radius": {
+          "mid_float": 1.6469137023751385e-162,
+          "rad_float_outward": 5e-324,
+          "lower_dec": "1.646913702375138510368375503386737908735e-162",
+          "upper_dec": "1.646913702375138510368375503386737908738e-162",
+          "arb_ball_str": "[1.646913702375138510368375503386737908737e-162 +/- 4.82e-202]"
+        },
+        "quadrature_v0": "1/7",
+        "quadrature_V1": 32,
+        "quadrature_interval": "[1/7, 32]",
+        "quadrature_left_tail_bound": {
+          "mid_float": 3.596619565067336e-19,
+          "rad_float_outward": 1.2299203400876183e-35,
+          "lower_dec": "3.596619565067336260899858437742987758712e-19",
+          "upper_dec": "3.596619565067336260899858437742987758715e-19",
+          "arb_ball_str": "[3.596619565067336260899858437742987758713e-19 +/- 9.44e-60]"
+        },
+        "quadrature_right_tail_bound_2_over_5_V1_pow_5": {
+          "mid_float": 1.1920928955078126e-08,
+          "rad_float_outward": 6.617444900424223e-25,
+          "lower_dec": "1.192092895507812499999999999999999999998e-8",
+          "upper_dec": "1.192092895507812500000000000000000000002e-8",
+          "arb_ball_str": "[1.192092895507812500000000000000000000000e-8 +/- 3e-52]"
+        },
+        "quadrature_total_radius": {
+          "mid_float": 1.1920928980058143e-08,
+          "rad_float_outward": 5e-324,
+          "lower_dec": "1.192092898005814305406602215953171253203e-8",
+          "upper_dec": "1.192092898005814305406602215953171253206e-8",
+          "arb_ball_str": "[1.192092898005814305406602215953171253204e-8 +/- 3.46e-48]"
+        },
         "hat_f_xi_quadrature_enclosure": {
           "mid_float": 0.12471261163038483,
           "rad_float_outward": 1.1920928981206975e-08,
@@ -2252,6 +3250,9 @@
           "upper_dec": "1.247126235513138098718032696850565073685e-1",
           "arb_ball_str": "[0.1247126 +/- 2.36e-8]"
         },
+        "comparison_mode": "quadrature_encloses_series_and_overlaps",
+        "quadrature_contains_series": true,
+        "series_overlaps_quadrature": true,
         "series_minus_quadrature_contains_zero": true,
         "expected_sign": "positive",
         "sign_strictly_certified": true
@@ -3315,7 +4316,17 @@
       "global_stieltjes_energy_proof": {
         "stieltjes_identity": "Q_lambda(X) = -X^{5/2} int_1^infty L_lambda(t) d/dt (t^{-3} exp(-X^2/t^2)) dt",
         "endpoint_justification": "At the lower limit t = 1^-, L_lambda(1^-) = 0; as T -> infty, |L_lambda(T)| <= T so |X^{5/2} L_lambda(T) T^{-3} exp(-X^2/T^2)| <= X^{5/2} T^{-2} -> 0.",
-        "split_point_and_thresholds": "For X >= 256 (so sqrt(X) >= 16 and log(log(sqrt(X))) >= log(log(16)) > 1), split the integral at t = sqrt(X): (i) on 1 <= t <= sqrt(X), |L_lambda(t)| <= t and 2 X^2/t^2 - 3 >= 2 X - 3 > 0, so X^{5/2} int_1^{sqrt(X)} t * t^{-4} (2 X^2/t^2 - 3) exp(-X^2/t^2) dt <= 2 X^{9/2} int_1^{sqrt(X)} t^{-5} exp(-X^2/t^2) dt = sqrt(X) int_X^{X^2} w e^{-w} dw <= sqrt(X) (X + 1) e^{-X}; (ii) on t >= sqrt(X) >= 16, applying the unconditional Korobov-Vinogradov-Walfisz bound |L_lambda(t)| <= C_KV t exp(-c_0 Phi(t)) <= C_KV t exp(-c_0 Phi(sqrt(X))) (derived either directly or from |M(y)| <= C'_KV y exp(-c'_0 Phi(y)) via L_lambda(t) = sum_{d <= sqrt(t)} M(t/d^2)) and substituting u = X/t gives X^{5/2} int_{sqrt(X)}^infty |L_lambda(t)| |d/dt(t^{-3} exp(-X^2/t^2))| dt <= C_KV (1/2 + 2 exp(-3/2)) sqrt(X) exp(-c_0 Phi(sqrt(X))) << sqrt(X) exp(-c_1 Phi(X)). On the compact range 0 < X < 256, |Q_lambda(X)| <= zeta(3) X^{5/2} <= (zeta(3) * 256^2) sqrt(X). Integrating |Q_lambda(X)|^2 dX/X over [Y, tau Y] yields E_lambda(Y) << Y exp(-2 c_2 Phi(Y)) for Y >= 256 and E_lambda(Y) <<_D Y (log Y)^{-D} for all Y >= 2.",
+        "stretched_exponential_range": "Y >= 256: E_lambda(Y) << Y * exp(-2 * c_2 * Phi(Y))",
+        "compact_range_elementary_bound_formula": "E_lambda(Y) = int_Y^{tau*Y} |Q_lambda(X)|^2 dX/X <= zeta(3)^2 * int_Y^{tau*Y} X^4 dX = (zeta(3)^2 * (tau^5 - 1) / 5) * Y^5",
+        "compact_range_Y5_coefficient_zeta3_sq_tau5_minus_1_over_5": {
+          "mid_float": 2829.6651089286565,
+          "rad_float_outward": 1.1772341430607e-13,
+          "lower_dec": "2.829665108928656654314420748974452322267e+3",
+          "upper_dec": "2.829665108928656654314420748974452322270e+3",
+          "arb_ball_str": "[2829.665108928656654314420748974452322268 +/- 2.09e-37]"
+        },
+        "all_logarithmic_range": "Y >= 2: for every D > 0, combining the stretched-exponential bound on Y >= 256 with the compact-range bound E_lambda(Y) <= (zeta(3)^2 * (tau^5 - 1) / 5) * Y^5 on 2 <= Y < 256 (Note: the raw stretched-exponential formula exp(-2 c Phi(Y)) is NOT asserted for 2 <= Y < 256 because Phi(Y) -> +infty as Y -> e^+ while E_lambda(e) > 0) establishes E_lambda(Y) <<_D Y / (log Y)^D for all Y >= 2.",
+        "split_point_and_thresholds": "For X >= 256 (so sqrt(X) >= 16 and log(log(sqrt(X))) >= log(log(16)) > 1), split the integral at t = sqrt(X): (i) on 1 <= t <= sqrt(X), |L_lambda(t)| <= t and 2 X^2/t^2 - 3 >= 2 X - 3 > 0, so X^{5/2} int_1^{sqrt(X)} t * t^{-4} (2 X^2/t^2 - 3) exp(-X^2/t^2) dt <= 2 X^{9/2} int_1^{sqrt(X)} t^{-5} exp(-X^2/t^2) dt = sqrt(X) int_X^{X^2} w e^{-w} dw <= sqrt(X) (X + 1) e^{-X}; (ii) on t >= sqrt(X) >= 16, applying the unconditional Korobov-Vinogradov-Walfisz bound |L_lambda(t)| <= C_KV t exp(-c_0 Phi(t)) <= C_KV t exp(-c_0 Phi(sqrt(X))) (derived either directly or from |M(y)| <= C'_KV y exp(-c'_0 Phi(y)) via L_lambda(t) = sum_{d <= sqrt(t)} M(t/d^2)) and substituting u = X/t gives X^{5/2} int_{sqrt(X)}^infty |L_lambda(t)| |d/dt(t^{-3} exp(-X^2/t^2))| dt <= C_KV (1/2 + 2 exp(-3/2)) sqrt(X) exp(-c_0 Phi(sqrt(X))) << sqrt(X) exp(-c_1 Phi(X)). Integrating |Q_lambda(X)|^2 dX/X over [Y, tau Y] yields the stretched-exponential bound E_lambda(Y) << Y exp(-2 c_2 Phi(Y)) for Y >= 256; separately, on the compact range 2 <= Y < 256, E_lambda(Y) <= (zeta(3)^2 (tau^5 - 1) / 5) Y^5, extending E_lambda(Y) <<_D Y (log Y)^{-D} to all Y >= 2 for every D > 0.",
         "stieltjes_vs_direct_rows": [
           {
             "X": 1,
@@ -3585,9 +4596,9 @@
       ],
       "off_critical_pole_non_cancellation_theorem": "For any hypothetical off-critical zero rho = x + i*y of zeta(s) with 1/2 < x < 1, at the conjugate pair (u, v) = (rho, conj(rho)) one has Re(2*rho) = Re(2*conj(rho)) = 2*x > 1 and u + v = 2*x > 1. Because zeta(w) has an absolutely convergent nonvanishing Euler product on Re(w) > 1 (with |zeta(2*rho)| >= zeta(4*x)/zeta(2*x) > 0 and zeta(2*x) > 1), neither the numerator zeta(2u) zeta(2v) nor the coprimality factor 1/zeta(u+v) can vanish at (rho, conj(rho)) to cancel the off-critical poles of 1/(zeta(u) zeta(v)).",
       "replacement_theorem_global_super_polynomial_log_saving": {
-        "theorem_statement": "For X >= 256, |Q_lambda(X)| << sqrt(X) exp(-c_1 Phi(X)) where Phi(t) = (log t)^{3/5} (log log t)^{-1/5}, and for Y >= 256 the grade-interval L^2 energy E_lambda(Y) := int_Y^{tau Y} |Q_lambda(X)|^2 dX/X satisfies E_lambda(Y) << Y exp(-2 c_2 Phi(Y)), hence E_lambda(Y) <<_D Y (log Y)^{-D} for every D > 0 and all Y >= 2 (handling the compact range 2 <= Y < 256 via |Q_lambda(X)| <= zeta(3) X^{5/2}).",
-        "proof_mechanism": "1. Rectangular-block decoupling: retaining exp(-X^2 (r^{-2} + s^{-2}) / d^2) = exp(-X^2 / (d^2 r^2)) exp(-X^2 / (d^2 s^2)) and expanding 1_{gcd(r,s)=1} = sum_{e | gcd(r,s)} mu(e) with r = e m, s = e n expresses every block B_{A,B}(X) in terms of 1D unweighted sums U_lambda(X/(d e); A/e) U_lambda(X/(d e); B/e) satisfying the corrected Abel bound |U_lambda(Y; M)| << M^{1/2} min(M/Y, (Y/M)^{5/2}) exp(-c Phi(M)) (M >= 16). Summing over all dyadic blocks a, b >= 0 collapses via sum_{e|q} mu(e) = 1_{q=1} to Q_lambda(X)^2. 2. Global Stieltjes energy proof: writing Q_lambda(X) = -X^{5/2} int_1^infty L_lambda(t) d/dt(t^{-3} e^{-X^2/t^2}) dt and splitting at t = sqrt(X) (X >= 256) combines Gaussian suppression on [1, sqrt(X)] with the unconditional Korobov-Vinogradov-Walfisz bound L_lambda(t) = O(t exp(-c_0 Phi(t))) and the exact scaling integral int_0^infty u |3 - 2 u^2| e^{-u^2} du = 1/2 + 2 e^{-3/2} on [sqrt(X), infty) to establish |Q_lambda(X)| << sqrt(X) exp(-c_1 Phi(X)) and E_lambda(Y) << Y exp(-2 c_2 Phi(Y)) <<_D Y (log Y)^{-D}.",
-        "remaining_barrier_to_subgate_tc_043a": "The repaired all-logarithmic upper bound E_lambda(Y) <<_D Y (log Y)^{-D} uses known unconditional Korobov-Vinogradov-Walfisz summatory cancellation and is an upper bound, NOT an asymptotic for E_lambda(Y). It does not establish the subpower target forall eps > 0, E_lambda(Y) <= C_eps Y^eps required to close SUBGATE-TC-043A (a zero-free strip Re(s) > 1 - delta_0 is sufficient to yield a power saving via Mellin contour shifting, while closing SUBGATE-TC-043A across all eps > 0 is equivalent to holomorphy of M[Q_lambda](z) on 0 < Re(z) < 5/2 and hence to RH)."
+        "theorem_statement": "For X >= 256, |Q_lambda(X)| << sqrt(X) exp(-c_1 Phi(X)) where Phi(t) = (log t)^{3/5} (log log t)^{-1/5}, and for Y >= 256 the grade-interval L^2 energy E_lambda(Y) := int_Y^{tau Y} |Q_lambda(X)|^2 dX/X satisfies the stretched-exponential bound E_lambda(Y) << Y exp(-2 c_2 Phi(Y)). Separately, on the compact range 2 <= Y < 256, the elementary bound |Q_lambda(X)| <= zeta(3) X^{5/2} gives E_lambda(Y) <= (zeta(3)^2 (tau^5 - 1) / 5) Y^5, extending E_lambda(Y) <<_D Y (log Y)^{-D} to all Y >= 2 for every D > 0.",
+        "proof_mechanism": "1. Rectangular-block decoupling: retaining exp(-X^2 (r^{-2} + s^{-2}) / d^2) = exp(-X^2 / (d^2 r^2)) exp(-X^2 / (d^2 s^2)) and expanding 1_{gcd(r,s)=1} = sum_{e | gcd(r,s)} mu(e) with r = e m, s = e n expresses every block B_{A,B}(X) in terms of 1D unweighted sums U_lambda(X/(d e); A/e) U_lambda(X/(d e); B/e) satisfying the corrected Abel bound |U_lambda(Y; M)| << M^{1/2} min(M/Y, (Y/M)^{5/2}) exp(-c Phi(M)) (M >= 16). Summing over all dyadic blocks a, b >= 0 collapses via sum_{e|q} mu(e) = 1_{q=1} to Q_lambda(X)^2. 2. Global Stieltjes energy proof: writing Q_lambda(X) = -X^{5/2} int_1^infty L_lambda(t) d/dt(t^{-3} e^{-X^2/t^2}) dt and splitting at t = sqrt(X) (X >= 256) combines Gaussian suppression on [1, sqrt(X)] with the unconditional Korobov-Vinogradov-Walfisz bound L_lambda(t) = O(t exp(-c_0 Phi(t))) and the exact scaling integral int_0^infty u |3 - 2 u^2| e^{-u^2} du = 1/2 + 2 e^{-3/2} on [sqrt(X), infty) to establish |Q_lambda(X)| << sqrt(X) exp(-c_1 Phi(X)) (X >= 256), E_lambda(Y) << Y exp(-2 c_2 Phi(Y)) (Y >= 256), and (via compact-range control E_lambda(Y) <= (zeta(3)^2 (tau^5 - 1) / 5) Y^5 on 2 <= Y < 256) E_lambda(Y) <<_D Y (log Y)^{-D} for all Y >= 2.",
+        "remaining_barrier_to_subgate_tc_043a": "Three distinct energy regimes must be kept strictly separate: (i) the unconditional all-logarithmic upper bound E_lambda(Y) <<_D Y (log Y)^{-D} (Y >= 2) proved here from Korobov-Vinogradov-Walfisz summatory cancellation (which is an upper bound, NOT an asymptotic for E_lambda(Y)); (ii) a fixed power saving E_lambda(Y) << Y^{1 - eta} for a single eta > 0 (for which a zero-free strip Re(s) > 1 - delta_0 is sufficient via Mellin contour shifting, without claiming necessity); and (iii) the full SUBGATE-TC-043A target forall eps > 0, E_lambda(Y) <= C_eps Y^eps, which is equivalent to finiteness of ||Q_lambda||_eta for all eta in (0, 5/2), holomorphy of M[Q_lambda](z) on 0 < Re(z) < 5/2, and RH."
       }
     },
     "attack_B_dyadic_parity_and_cross_scale_correlation": {
@@ -4094,7 +5105,7 @@
   "section_7_lean_formalization_audit": {
     "module_path": "formal/RiemannScope/LiouvilleSquareDilation.lean",
     "namespace": "RiemannScope.LiouvilleSquareDilation",
-    "definition_count": 10,
+    "definition_count": 15,
     "definitions": [
       "primePowerMoebius",
       "liouvilleSignFromOmega",
@@ -4105,7 +5116,12 @@
       "squareDivisorMoebiusSum",
       "squareDivisorInverseLiouvilleSum",
       "primePowerActualMoebiusSquareSum",
-      "primePowerActualInverseLiouvilleSquareSum"
+      "primePowerActualInverseLiouvilleSquareSum",
+      "squareDivisors",
+      "actualFlatMoebiusSquareDivisorSum",
+      "actualFlatInverseLiouvilleSquareDivisorSum",
+      "actualFlatMoebiusSquareArith",
+      "actualFlatInverseLiouvilleSquareArith"
     ],
     "public_theorem_count": 8,
     "public_theorems": [
@@ -4118,17 +5134,23 @@
       "dyadic_parity_energy_and_off_critical_mode_nonvanishing",
       "abel_scaling_fourier_ratio_and_unequal_block_algebra"
     ],
-    "private_helper_theorem_count": 6,
+    "private_helper_theorem_count": 12,
     "private_helper_theorems": [
       "finRangeSum_primePowerMoebius_tail_eq_two",
       "cardFactors_prime_pow_aux",
       "moebius_apply_prime_pow_eq_primePowerMoebius_aux",
       "liouvilleLambda_prime_pow_aux",
       "finRangeSum_congr_aux",
-      "finRangeSum_eq_zero_of_lt_aux"
+      "finRangeSum_eq_zero_of_lt_aux",
+      "mem_squareDivisors_iff_aux",
+      "sum_range_eq_finRangeSum_aux",
+      "squareDivisors_prime_pow_aux",
+      "gcd_mul_left_of_coprime_of_dvd_aux",
+      "sum_squareDivisors_mul_of_coprime_aux",
+      "sum_range_sq_mul_six_aux"
     ],
-    "total_theorem_count": 14,
-    "total_declaration_count": 24,
+    "total_theorem_count": 20,
+    "total_declaration_count": 35,
     "expected_public_theorems_present": true,
     "sorry_count": 0,
     "custom_axiom_count": 0,
@@ -4154,7 +5176,7 @@
           "captured_print_axioms_output": "'RiemannScope.LiouvilleSquareDilation.actual_omega_factorization_and_liouville_common_factor_cancellation_nat' depends on axioms: [propext, Quot.sound, Classical.choice]"
         },
         "actual_prime_power_and_factored_square_divisor_moebius_liouville_inversion_nat": {
-          "captured_check_output": "@actual_prime_power_and_factored_square_divisor_moebius_liouville_inversion_nat : \u2200 {p n : \u2115}, p.Prime \u2192 \u2200 (k : \u2115), n \u2260 0 \u2192 \u2200 (S : ArithmeticFunction \u2124), S.IsMultiplicative \u2192 (ArithmeticFunction.moebius (p ^ k) = primePowerMoebius k \u2227 liouvilleLambda (p ^ k) = liouvilleSignFromOmega k) \u2227 (primePowerActualMoebiusSquareSum p k = liouvilleLambda (p ^ k) \u2227 primePowerActualInverseLiouvilleSquareSum p k = ArithmeticFunction.moebius (p ^ k)) \u2227 ((liouvilleLambda n = n.factorization.prod fun q e => primePowerActualMoebiusSquareSum q e) \u2227 ArithmeticFunction.moebius n = n.factorization.prod fun q e => primePowerActualInverseLiouvilleSquareSum q e) \u2227 ((\u2200 (q e : \u2115), q.Prime \u2192 S (q ^ e) = primePowerActualMoebiusSquareSum q e) \u2192 S n = liouvilleLambda n) \u2227 ((\u2200 (q e : \u2115), q.Prime \u2192 S (q ^ e) = primePowerActualInverseLiouvilleSquareSum q e) \u2192 S n = ArithmeticFunction.moebius n)",
+          "captured_check_output": "@actual_prime_power_and_factored_square_divisor_moebius_liouville_inversion_nat : \u2200 {p n : \u2115}, p.Prime \u2192 \u2200 (k : \u2115), n \u2260 0 \u2192 (ArithmeticFunction.moebius (p ^ k) = primePowerMoebius k \u2227 liouvilleLambda (p ^ k) = liouvilleSignFromOmega k) \u2227 (primePowerActualMoebiusSquareSum p k = liouvilleLambda (p ^ k) \u2227 primePowerActualInverseLiouvilleSquareSum p k = ArithmeticFunction.moebius (p ^ k)) \u2227 ((liouvilleLambda n = n.factorization.prod fun q e => primePowerActualMoebiusSquareSum q e) \u2227 ArithmeticFunction.moebius n = n.factorization.prod fun q e => primePowerActualInverseLiouvilleSquareSum q e) \u2227 actualFlatMoebiusSquareArith.IsMultiplicative \u2227 actualFlatInverseLiouvilleSquareArith.IsMultiplicative \u2227 actualFlatMoebiusSquareDivisorSum (p ^ k) = primePowerActualMoebiusSquareSum p k \u2227 actualFlatInverseLiouvilleSquareDivisorSum (p ^ k) = primePowerActualInverseLiouvilleSquareSum p k \u2227 actualFlatMoebiusSquareDivisorSum n = liouvilleLambda n \u2227 actualFlatInverseLiouvilleSquareDivisorSum n = ArithmeticFunction.moebius n",
           "captured_print_axioms_output": "'RiemannScope.LiouvilleSquareDilation.actual_prime_power_and_factored_square_divisor_moebius_liouville_inversion_nat' depends on axioms: [propext, Classical.choice, Quot.sound]"
         },
         "reversible_weighted_dilation_norm_and_grade_interval_equivalence": {
@@ -4170,7 +5192,7 @@
           "captured_print_axioms_output": "'RiemannScope.LiouvilleSquareDilation.dyadic_parity_energy_and_off_critical_mode_nonvanishing' depends on axioms: [propext, Classical.choice, Quot.sound]"
         },
         "abel_scaling_fourier_ratio_and_unequal_block_algebra": {
-          "captured_check_output": "abel_scaling_fourier_ratio_and_unequal_block_algebra : \u2200 (e_neg_3_2 K m B : \u211d), 1 \u2264 K \u2192 K + 1 \u2264 m \u2192 2 \u2264 B \u2192 1 / 2 * ((2 * (3 / 2) - 1) * e_neg_3_2 - (2 * 0 - 1)) + 1 / 2 * (0 - -(2 * (3 / 2) - 1) * e_neg_3_2) = 1 / 2 + 2 * e_neg_3_2 \u2227 (0 < (K - 1 / 2) * (2 * K + 3) * (2 * K + 4) \u2227 (K - 1 / 2) * (2 * K + 3) * (2 * K + 4) \u2264 (m - 3 / 2) * (2 * m + 1) * (2 * m + 2) \u2227 0 < (K + 2) * (2 * K + 8) * (2 * K + 9) \u2227 (K + 2) * (2 * K + 8) * (2 * K + 9) \u2264 (m + 1) * (2 * m + 6) * (2 * m + 7)) \u2227 1 / B ^ 3 + 1 / (2 * B ^ 2) \u2264 1 / B ^ 2",
+          "captured_check_output": "abel_scaling_fourier_ratio_and_unequal_block_algebra : \u2200 (e_neg_3_2 K m B : \u211d) (A : \u2115), 1 \u2264 K \u2192 K + 1 \u2264 m \u2192 2 \u2264 B \u2192 1 \u2264 A \u2192 1 / 2 * ((2 * (3 / 2) - 1) * e_neg_3_2 - (2 * 0 - 1)) + 1 / 2 * (0 - -(2 * (3 / 2) - 1) * e_neg_3_2) = 1 / 2 + 2 * e_neg_3_2 \u2227 (0 < (K - 1 / 2) * (2 * K + 3) * (2 * K + 4) \u2227 (K - 1 / 2) * (2 * K + 3) * (2 * K + 4) \u2264 (m - 3 / 2) * (2 * m + 1) * (2 * m + 2) \u2227 0 < (K + 2) * (2 * K + 8) * (2 * K + 9) \u2227 (K + 2) * (2 * K + 8) * (2 * K + 9) \u2264 (m + 1) * (2 * m + 6) * (2 * m + 7)) \u2227 (6 * \u2211 r \u2208 Finset.Ico A (2 * A), r ^ 2 + (A - 1) * A * (2 * A - 1) = (2 * A - 1) * (2 * A) * (4 * A - 1) \u2227 6 * \u2211 r \u2208 Finset.Ico A (2 * A), r ^ 2 + 9 * A ^ 2 = 14 * A ^ 3 + A \u2227 3 * \u2211 r \u2208 Finset.Ico A (2 * A), r ^ 2 < 7 * A ^ 3) \u2227 1 / B ^ 3 + 1 / (2 * B ^ 2) \u2264 1 / B ^ 2",
           "captured_print_axioms_output": "'RiemannScope.LiouvilleSquareDilation.abel_scaling_fourier_ratio_and_unequal_block_algebra' depends on axioms: [propext, Classical.choice, Quot.sound]"
         }
       }
@@ -4205,12 +5227,12 @@
       },
       "actual_prime_power_and_factored_square_divisor_moebius_liouville_inversion_nat": {
         "declaration_name": "RiemannScope.LiouvilleSquareDilation.actual_prime_power_and_factored_square_divisor_moebius_liouville_inversion_nat",
-        "theorem_classification": "actual_prime_power_and_factored_integer_arithmetic_theorem",
-        "captured_check_output": "@actual_prime_power_and_factored_square_divisor_moebius_liouville_inversion_nat : \u2200 {p n : \u2115}, p.Prime \u2192 \u2200 (k : \u2115), n \u2260 0 \u2192 \u2200 (S : ArithmeticFunction \u2124), S.IsMultiplicative \u2192 (ArithmeticFunction.moebius (p ^ k) = primePowerMoebius k \u2227 liouvilleLambda (p ^ k) = liouvilleSignFromOmega k) \u2227 (primePowerActualMoebiusSquareSum p k = liouvilleLambda (p ^ k) \u2227 primePowerActualInverseLiouvilleSquareSum p k = ArithmeticFunction.moebius (p ^ k)) \u2227 ((liouvilleLambda n = n.factorization.prod fun q e => primePowerActualMoebiusSquareSum q e) \u2227 ArithmeticFunction.moebius n = n.factorization.prod fun q e => primePowerActualInverseLiouvilleSquareSum q e) \u2227 ((\u2200 (q e : \u2115), q.Prime \u2192 S (q ^ e) = primePowerActualMoebiusSquareSum q e) \u2192 S n = liouvilleLambda n) \u2227 ((\u2200 (q e : \u2115), q.Prime \u2192 S (q ^ e) = primePowerActualInverseLiouvilleSquareSum q e) \u2192 S n = ArithmeticFunction.moebius n)",
+        "theorem_classification": "actual_flat_square_divisor_integer_arithmetic_theorem",
+        "captured_check_output": "@actual_prime_power_and_factored_square_divisor_moebius_liouville_inversion_nat : \u2200 {p n : \u2115}, p.Prime \u2192 \u2200 (k : \u2115), n \u2260 0 \u2192 (ArithmeticFunction.moebius (p ^ k) = primePowerMoebius k \u2227 liouvilleLambda (p ^ k) = liouvilleSignFromOmega k) \u2227 (primePowerActualMoebiusSquareSum p k = liouvilleLambda (p ^ k) \u2227 primePowerActualInverseLiouvilleSquareSum p k = ArithmeticFunction.moebius (p ^ k)) \u2227 ((liouvilleLambda n = n.factorization.prod fun q e => primePowerActualMoebiusSquareSum q e) \u2227 ArithmeticFunction.moebius n = n.factorization.prod fun q e => primePowerActualInverseLiouvilleSquareSum q e) \u2227 actualFlatMoebiusSquareArith.IsMultiplicative \u2227 actualFlatInverseLiouvilleSquareArith.IsMultiplicative \u2227 actualFlatMoebiusSquareDivisorSum (p ^ k) = primePowerActualMoebiusSquareSum p k \u2227 actualFlatInverseLiouvilleSquareDivisorSum (p ^ k) = primePowerActualInverseLiouvilleSquareSum p k \u2227 actualFlatMoebiusSquareDivisorSum n = liouvilleLambda n \u2227 actualFlatInverseLiouvilleSquareDivisorSum n = ArithmeticFunction.moebius n",
         "captured_print_axioms_output": "'RiemannScope.LiouvilleSquareDilation.actual_prime_power_and_factored_square_divisor_moebius_liouville_inversion_nat' depends on axioms: [propext, Classical.choice, Quot.sound]",
-        "check_signature": "@actual_prime_power_and_factored_square_divisor_moebius_liouville_inversion_nat : \u2200 {p n : \u2115}, p.Prime \u2192 \u2200 (k : \u2115), n \u2260 0 \u2192 \u2200 (S : ArithmeticFunction \u2124), S.IsMultiplicative \u2192 (ArithmeticFunction.moebius (p ^ k) = primePowerMoebius k \u2227 liouvilleLambda (p ^ k) = liouvilleSignFromOmega k) \u2227 (primePowerActualMoebiusSquareSum p k = liouvilleLambda (p ^ k) \u2227 primePowerActualInverseLiouvilleSquareSum p k = ArithmeticFunction.moebius (p ^ k)) \u2227 ((liouvilleLambda n = n.factorization.prod fun q e => primePowerActualMoebiusSquareSum q e) \u2227 ArithmeticFunction.moebius n = n.factorization.prod fun q e => primePowerActualInverseLiouvilleSquareSum q e) \u2227 ((\u2200 (q e : \u2115), q.Prime \u2192 S (q ^ e) = primePowerActualMoebiusSquareSum q e) \u2192 S n = liouvilleLambda n) \u2227 ((\u2200 (q e : \u2115), q.Prime \u2192 S (q ^ e) = primePowerActualInverseLiouvilleSquareSum q e) \u2192 S n = ArithmeticFunction.moebius n)",
+        "check_signature": "@actual_prime_power_and_factored_square_divisor_moebius_liouville_inversion_nat : \u2200 {p n : \u2115}, p.Prime \u2192 \u2200 (k : \u2115), n \u2260 0 \u2192 (ArithmeticFunction.moebius (p ^ k) = primePowerMoebius k \u2227 liouvilleLambda (p ^ k) = liouvilleSignFromOmega k) \u2227 (primePowerActualMoebiusSquareSum p k = liouvilleLambda (p ^ k) \u2227 primePowerActualInverseLiouvilleSquareSum p k = ArithmeticFunction.moebius (p ^ k)) \u2227 ((liouvilleLambda n = n.factorization.prod fun q e => primePowerActualMoebiusSquareSum q e) \u2227 ArithmeticFunction.moebius n = n.factorization.prod fun q e => primePowerActualInverseLiouvilleSquareSum q e) \u2227 actualFlatMoebiusSquareArith.IsMultiplicative \u2227 actualFlatInverseLiouvilleSquareArith.IsMultiplicative \u2227 actualFlatMoebiusSquareDivisorSum (p ^ k) = primePowerActualMoebiusSquareSum p k \u2227 actualFlatInverseLiouvilleSquareDivisorSum (p ^ k) = primePowerActualInverseLiouvilleSquareSum p k \u2227 actualFlatMoebiusSquareDivisorSum n = liouvilleLambda n \u2227 actualFlatInverseLiouvilleSquareDivisorSum n = ArithmeticFunction.moebius n",
         "print_axioms": "'RiemannScope.LiouvilleSquareDilation.actual_prime_power_and_factored_square_divisor_moebius_liouville_inversion_nat' depends on axioms: [propext, Classical.choice, Quot.sound]",
-        "descriptive_scope_metadata_note": "Genuinely arithmetic theorem connecting `primePowerMoebius k` to Mathlib's `ArithmeticFunction.moebius (p ^ k)` for prime `p`, proving the prime-power square-divisor identities for `ArithmeticFunction.moebius` and `liouvilleLambda`, and proving for all `n != 0` the factored square-divisor identities `liouvilleLambda n = n.factorization.prod (fun q e => primePowerActualMoebiusSquareSum q e)` and `ArithmeticFunction.moebius n = n.factorization.prod (fun q e => primePowerActualInverseLiouvilleSquareSum q e)` plus equality of multiplicative functions agreeing on prime powers (`eq_iff_eq_on_prime_powers`). The remaining formalization step to a flat `Finset.divisors` sum is the distributive `Finsupp.prod` square-divisor bijection."
+        "descriptive_scope_metadata_note": "Genuinely arithmetic theorem over positive integers `p, n : \u2115` connecting `primePowerMoebius k` to Mathlib's `ArithmeticFunction.moebius (p ^ k)` for prime `p`, proving the prime-power square-divisor identities for `ArithmeticFunction.moebius` and `liouvilleLambda`, proving the factored square-divisor identities over `n.factorization.prod`, and unconditionally proving that the explicit flat square-divisor sums `actualFlatMoebiusSquareDivisorSum n = \u2211_{d^2 \u2223 n} \u03bc(n / d^2)` and `actualFlatInverseLiouvilleSquareDivisorSum n = \u2211_{d^2 \u2223 n} \u03bc(d) \u03bb(n / d^2)` over `squareDivisors n = (Nat.divisors n).filter (fun d => d ^ 2 \u2223 n)` are multiplicative (`IsMultiplicative`), agree with the prime-power sums on `p ^ k`, and equal `liouvilleLambda n` and `ArithmeticFunction.moebius n` for all `n \u2260 0`."
       },
       "reversible_weighted_dilation_norm_and_grade_interval_equivalence": {
         "declaration_name": "RiemannScope.LiouvilleSquareDilation.reversible_weighted_dilation_norm_and_grade_interval_equivalence",
@@ -4241,12 +5263,12 @@
       },
       "abel_scaling_fourier_ratio_and_unequal_block_algebra": {
         "declaration_name": "RiemannScope.LiouvilleSquareDilation.abel_scaling_fourier_ratio_and_unequal_block_algebra",
-        "theorem_classification": "scalar_real_algebra_and_monotonicity_lemma",
-        "captured_check_output": "abel_scaling_fourier_ratio_and_unequal_block_algebra : \u2200 (e_neg_3_2 K m B : \u211d), 1 \u2264 K \u2192 K + 1 \u2264 m \u2192 2 \u2264 B \u2192 1 / 2 * ((2 * (3 / 2) - 1) * e_neg_3_2 - (2 * 0 - 1)) + 1 / 2 * (0 - -(2 * (3 / 2) - 1) * e_neg_3_2) = 1 / 2 + 2 * e_neg_3_2 \u2227 (0 < (K - 1 / 2) * (2 * K + 3) * (2 * K + 4) \u2227 (K - 1 / 2) * (2 * K + 3) * (2 * K + 4) \u2264 (m - 3 / 2) * (2 * m + 1) * (2 * m + 2) \u2227 0 < (K + 2) * (2 * K + 8) * (2 * K + 9) \u2227 (K + 2) * (2 * K + 8) * (2 * K + 9) \u2264 (m + 1) * (2 * m + 6) * (2 * m + 7)) \u2227 1 / B ^ 3 + 1 / (2 * B ^ 2) \u2264 1 / B ^ 2",
+        "theorem_classification": "endpoint_antiderivative_denominator_monotonicity_and_finite_square_sum_lemma",
+        "captured_check_output": "abel_scaling_fourier_ratio_and_unequal_block_algebra : \u2200 (e_neg_3_2 K m B : \u211d) (A : \u2115), 1 \u2264 K \u2192 K + 1 \u2264 m \u2192 2 \u2264 B \u2192 1 \u2264 A \u2192 1 / 2 * ((2 * (3 / 2) - 1) * e_neg_3_2 - (2 * 0 - 1)) + 1 / 2 * (0 - -(2 * (3 / 2) - 1) * e_neg_3_2) = 1 / 2 + 2 * e_neg_3_2 \u2227 (0 < (K - 1 / 2) * (2 * K + 3) * (2 * K + 4) \u2227 (K - 1 / 2) * (2 * K + 3) * (2 * K + 4) \u2264 (m - 3 / 2) * (2 * m + 1) * (2 * m + 2) \u2227 0 < (K + 2) * (2 * K + 8) * (2 * K + 9) \u2227 (K + 2) * (2 * K + 8) * (2 * K + 9) \u2264 (m + 1) * (2 * m + 6) * (2 * m + 7)) \u2227 (6 * \u2211 r \u2208 Finset.Ico A (2 * A), r ^ 2 + (A - 1) * A * (2 * A - 1) = (2 * A - 1) * (2 * A) * (4 * A - 1) \u2227 6 * \u2211 r \u2208 Finset.Ico A (2 * A), r ^ 2 + 9 * A ^ 2 = 14 * A ^ 3 + A \u2227 3 * \u2211 r \u2208 Finset.Ico A (2 * A), r ^ 2 < 7 * A ^ 3) \u2227 1 / B ^ 3 + 1 / (2 * B ^ 2) \u2264 1 / B ^ 2",
         "captured_print_axioms_output": "'RiemannScope.LiouvilleSquareDilation.abel_scaling_fourier_ratio_and_unequal_block_algebra' depends on axioms: [propext, Classical.choice, Quot.sound]",
-        "check_signature": "abel_scaling_fourier_ratio_and_unequal_block_algebra : \u2200 (e_neg_3_2 K m B : \u211d), 1 \u2264 K \u2192 K + 1 \u2264 m \u2192 2 \u2264 B \u2192 1 / 2 * ((2 * (3 / 2) - 1) * e_neg_3_2 - (2 * 0 - 1)) + 1 / 2 * (0 - -(2 * (3 / 2) - 1) * e_neg_3_2) = 1 / 2 + 2 * e_neg_3_2 \u2227 (0 < (K - 1 / 2) * (2 * K + 3) * (2 * K + 4) \u2227 (K - 1 / 2) * (2 * K + 3) * (2 * K + 4) \u2264 (m - 3 / 2) * (2 * m + 1) * (2 * m + 2) \u2227 0 < (K + 2) * (2 * K + 8) * (2 * K + 9) \u2227 (K + 2) * (2 * K + 8) * (2 * K + 9) \u2264 (m + 1) * (2 * m + 6) * (2 * m + 7)) \u2227 1 / B ^ 3 + 1 / (2 * B ^ 2) \u2264 1 / B ^ 2",
+        "check_signature": "abel_scaling_fourier_ratio_and_unequal_block_algebra : \u2200 (e_neg_3_2 K m B : \u211d) (A : \u2115), 1 \u2264 K \u2192 K + 1 \u2264 m \u2192 2 \u2264 B \u2192 1 \u2264 A \u2192 1 / 2 * ((2 * (3 / 2) - 1) * e_neg_3_2 - (2 * 0 - 1)) + 1 / 2 * (0 - -(2 * (3 / 2) - 1) * e_neg_3_2) = 1 / 2 + 2 * e_neg_3_2 \u2227 (0 < (K - 1 / 2) * (2 * K + 3) * (2 * K + 4) \u2227 (K - 1 / 2) * (2 * K + 3) * (2 * K + 4) \u2264 (m - 3 / 2) * (2 * m + 1) * (2 * m + 2) \u2227 0 < (K + 2) * (2 * K + 8) * (2 * K + 9) \u2227 (K + 2) * (2 * K + 8) * (2 * K + 9) \u2264 (m + 1) * (2 * m + 6) * (2 * m + 7)) \u2227 (6 * \u2211 r \u2208 Finset.Ico A (2 * A), r ^ 2 + (A - 1) * A * (2 * A - 1) = (2 * A - 1) * (2 * A) * (4 * A - 1) \u2227 6 * \u2211 r \u2208 Finset.Ico A (2 * A), r ^ 2 + 9 * A ^ 2 = 14 * A ^ 3 + A \u2227 3 * \u2211 r \u2208 Finset.Ico A (2 * A), r ^ 2 < 7 * A ^ 3) \u2227 1 / B ^ 3 + 1 / (2 * B ^ 2) \u2264 1 / B ^ 2",
         "print_axioms": "'RiemannScope.LiouvilleSquareDilation.abel_scaling_fourier_ratio_and_unequal_block_algebra' depends on axioms: [propext, Classical.choice, Quot.sound]",
-        "descriptive_scope_metadata_note": "Scalar real-algebra and monotonicity lemma proving: (1) the Abel/Stieltjes scaling antiderivative combination equals `1/2 + 2*e^{-3/2}`, (2) monotonic denominator bounds `(K - 1/2)(2K + 3)(2K + 4) <= (m - 3/2)(2m + 1)(2m + 2)` and `(K + 2)(2K + 8)(2K + 9) <= (m + 1)(2m + 6)(2m + 7)` for `m >= K + 1 >= 2`, and (3) the unequal-block sum-integral inequality `1/B^3 + 1/(2*B^2) <= 1/B^2` for `B >= 2`."
+        "descriptive_scope_metadata_note": "Proves: (1) the Stieltjes scaling endpoint antiderivative combination `(1/2)*((2*(3/2)-1)*e^{-3/2} - (2*0-1)) + (1/2)*(0 - (-(2*(3/2)-1)*e^{-3/2})) = 1/2 + 2*e^{-3/2}` (endpoint algebra; analytic integration/change of variables is outside Lean), (2) monotonic denominator bounds `(K - 1/2)(2K + 3)(2K + 4) <= (m - 3/2)(2m + 1)(2m + 2)` and `(K + 2)(2K + 8)(2K + 9) <= (m + 1)(2m + 6)(2m + 7)` for `m >= K + 1 >= 2`, (3) the exact finite square-sum identities `6 * (\u2211_{A <= r < 2A} r^2) + (A - 1)*A*(2A - 1) = (2A - 1)*(2A)*(4A - 1)`, `6 * (\u2211_{A <= r < 2A} r^2) + 9*A^2 = 14*A^3 + A`, and `3 * (\u2211_{A <= r < 2A} r^2) < 7*A^3` for `A >= 1`, and (4) the unequal-block rational inequality `1/B^3 + 1/(2*B^2) <= 1/B^2` for `B >= 2`."
       }
     }
   },
@@ -4254,8 +5276,8 @@
     "Reversible square-dilation transfer lambda(n) = sum_{d^2 | n} mu(n/d^2), mu(n) = sum_{d^2 | n} mu(d) lambda(n/d^2), Q_lambda(X) = sum_{d>=1} Q_mu(X/d^2)/d, Q_mu(X) = sum_{d>=1} mu(d) Q_lambda(X/d^2)/d, and weighted L^2 norm equivalence ||Q_lambda||_eta <= zeta(1+2*eta) ||Q_mu||_eta, ||Q_mu||_eta <= (zeta(1+2*eta)/zeta(2+4*eta)) ||Q_lambda||_eta for all eta > 0.",
     "Equivalence between the grade-interval subpower energy bound (forall eps > 0 exists C_eps, int_Y^{tau Y} |Q_a(X)|^2 dX/X <= C_eps Y^eps) and weighted norm finiteness (forall eta in (0, 5/2), ||Q_a||_eta < infty) for both a = mu and a = lambda.",
     "Unconstrained common-factor expansion Q_lambda(X)^2 = sum_{gcd(r,s)=1} (lambda(r) lambda(s) X^5 / (r s)^3) sum_{d>=1} d^{-6} exp(-L^2/d^2) (with lambda(d r) lambda(d s) = lambda(r) lambda(s) for ALL d >= 1) and fixed-order Euler-Maclaurin error bound |E^lambda_{r,s}(X)| <= C_N X^{-N} (r s)^{N+2} / (r^2 + s^2)^{(N+5)/2} (C_2 = 1.8512576670..., C_4 = 8.7523717600...), controlling every fixed subtransition range A <= X^{1 - delta} whenever (N + 1) delta > 1.",
-    "Exact Poisson summation formula sum_{d>=1} d^{-6} exp(-L^2/d^2) = L^{-5} [c_0 + sum_{j>=1} hat{f}(j L)] (with c_0 = 3 sqrt(tau/2) / 8) established via C^infty flatness at 0, O(|v|^{-6-j}) decay at infinity, and C^1(R/Z) periodization (DLMF 1.8.14), together with repaired Fourier tail-ratio certification (R_even, R_odd <= 1/2 or 1/(1-R)) and certified sign changes hat{f}(1/2) < 0, hat{f}(4/tau) < 0, hat{f}(1) < 0, hat{f}(3/2) > 0, hat{f}(2) > 0.",
-    "Repaired unequal-block bound |B_{A,B}(X)| <= (7/3) C_* min(A,B)^3 / max(A,B)^2 with C_* = max{zeta(6), c_0 + 27 exp(-3)} = 2.0089150316..., repaired dyadic Abel bound |U_lambda(Y; M)| << M^{1/2} min(M/Y, (Y/M)^{5/2}) exp(-c Phi(M)) (M >= 16), and unconditional global Stieltjes energy theorem |Q_lambda(X)| << sqrt(X) exp(-c_1 Phi(X)) (X >= 256) and E_lambda(Y) := int_Y^{tau Y} |Q_lambda(X)|^2 dX/X << Y exp(-2 c_2 Phi(Y)) <<_D Y (log Y)^{-D} via splitting Q_lambda(X) = -X^{5/2} int_1^infty L_lambda(t) d/dt(t^{-3} exp(-X^2/t^2)) dt at t = sqrt(X) with scaling constant int_0^infty u |3 - 2 u^2| exp(-u^2) du = 1/2 + 2 exp(-3/2).",
+    "Exact Poisson summation formula sum_{d>=1} d^{-6} exp(-L^2/d^2) = L^{-5} [c_0 + sum_{j>=1} hat{f}(j L)] (with c_0 = 3 sqrt(tau/2) / 8) established via C^infty flatness at 0, O(|v|^{-6-j}) decay at infinity, and C^1(R/Z) periodization (DLMF 1.8.14), Mellin regularization + contour shifting with |R_M(omega)| <= 8 omega^{2M+3/2} / (Gamma(2M+5/2) Gamma(M-3/4)) -> 0, repaired Fourier tail-ratio certification (R_even, R_odd <= 1/2 or 1/(1-R)), and certified sign changes hat{f}(1/2) < 0, hat{f}(4/tau) < 0, hat{f}(1) < 0, hat{f}(3/2) > 0, hat{f}(2) > 0.",
+    "Repaired unequal-block bound |B_{A,B}(X)| <= (7/3) C_* min(A,B)^3 / max(A,B)^2 with C_* = max{zeta(6), c_0 + 27 exp(-3)} = 2.008921040021894970679058028804597412605..., repaired dyadic Abel bound |U_lambda(Y; M)| << M^{1/2} min(M/Y, (Y/M)^{5/2}) exp(-c Phi(M)) (M >= 16), and unconditional global Stieltjes energy theorem |Q_lambda(X)| << sqrt(X) exp(-c_1 Phi(X)) (X >= 256), E_lambda(Y) := int_Y^{tau Y} |Q_lambda(X)|^2 dX/X << Y exp(-2 c_2 Phi(Y)) (Y >= 256), and E_lambda(Y) <<_D Y (log Y)^{-D} (Y >= 2, via compact-range bound E_lambda(Y) <= (zeta(3)^2 (tau^5 - 1) / 5) Y^5 on 2 <= Y < 256) by splitting Q_lambda(X) = -X^{5/2} int_1^infty L_lambda(t) d/dt(t^{-3} exp(-X^2/t^2)) dt at t = sqrt(X) with scaling constant int_0^infty u |3 - 2 u^2| exp(-u^2) du = 1/2 + 2 exp(-3/2).",
     "Exact dyadic parity annihilation Q_{lambda,odd}(X) = Q_lambda(X) + 2^{-1/2} Q_lambda(X/2), convergent dyadic inversion, exact grade-interval energy identity on [Y, tau Y] with cross-scale correlation, bounded norm equivalence for all eta > -1/2, and proof that |1 + 2^{-rho}| >= 1 - 2^{-x} > 0 for rho = x + i*y with x > 0."
   ],
   "precise_obstruction_to_subgate_tc043a_closure": "1. In Attack A, the bivariate coprime Dirichlet series D_lambda(u, v) = zeta(2u) zeta(2v) / (zeta(u) zeta(v) zeta(u+v)) has numerator zeta(2u) zeta(2v) and coprimality factor 1/zeta(u+v) evaluated at 2u, 2v, u+v in the Euler-product half-plane Re(w) > 1 whenever Re(u) = Re(v) = x > 1/2, so neither factor can vanish at an off-critical conjugate pair (rho, conj(rho)) (rho = x + i*y) to cancel the poles of 1/(zeta(u) zeta(v)); moreover M[Q_lambda](z) has a genuine simple pole at z = 0 of residue Gamma(5/4)/(4 zeta(1/2)) = -0.1551682265... != 0, and the global divisor sum sum_{q>=1} ((sum_{e|q} mu(e))/q) Q_lambda(X/q)^2 collapses to q = 1. While the global Stieltjes integration-by-parts proof establishes E_lambda(Y) << Y exp(-2 c_2 Phi(Y)) <<_D Y (log Y)^{-D} from unconditional Korobov-Vinogradov-Walfisz cancellation, this is an upper bound (not an energy asymptotic) and does not establish forall eps > 0, E_lambda(Y) <= C_eps Y^eps. 2. In Attack B, the dyadic parity operator 1 + 2^{-1/2} D_2 multiplies an off-critical mode X^{rho - 1/2} (rho = x + i*y) by 1 + 2^{-rho}, which satisfies 0 < 1 - 2^{-x} <= |1 + 2^{-rho}| <= 1 + 2^{-x} < 2 for all x > 0 and therefore is a bounded invertible multiplier that cannot annihilate an off-critical zero."
