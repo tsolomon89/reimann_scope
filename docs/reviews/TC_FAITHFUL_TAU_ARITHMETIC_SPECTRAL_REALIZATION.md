@@ -1404,4 +1404,35 @@ In [formal/RiemannScope/TrivialZero.lean](file:///c:/Development/Projects/reiman
 3. **Certificate Verifier Repair**:
    In [certification.py](file:///c:/Development/Projects/reimann_scope/certification.py), `certify_trivial_zero` and `certify_worldline` record both `"formal_theorem_reference": "RiemannScope.TrivialZero.trivialZero_exact"` and `"transported_worldline_theorem_reference": "RiemannScope.TrivialZero.trivialZero_worldline_exact"` (verified against `formal/RiemannScope/TrivialZero.lean`).
 
+---
+
+## 11. Liouville Square-Dilation Transfer, Exact Common-Factor Cancellation, Euler–Maclaurin Sub-Transition Expansion, Transition Poisson Summation, Separable Gaussian Decoupling, and Dyadic Parity Obstruction (`TASK-TC-054`)
+
+In `TASK-TC-054` (authored in full in [docs/reviews/TC_LIOUVILLE_SQUARE_DILATION.md](file:///c:/Development/Projects/reimann_scope/docs/reviews/TC_LIOUVILLE_SQUARE_DILATION.md), implemented in [tc/liouville_square_dilation.py](file:///c:/Development/Projects/reimann_scope/tc/liouville_square_dilation.py), formalized in [formal/RiemannScope/LiouvilleSquareDilation.lean](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope/LiouvilleSquareDilation.lean), and certified in [data/tc_liouville_square_dilation.json](file:///c:/Development/Projects/reimann_scope/data/tc_liouville_square_dilation.json)):
+1. **Reversible Square-Dilation Transfer (`RiemannScope.prime_power_square_divisor_moebius_liouville_inversion_nat`, `RiemannScope.reversible_weighted_dilation_norm_and_grade_interval_equivalence`)**:
+   Proved $\lambda(n) = \sum_{d^2 \mid n}\mu(n/d^2)$ and $\mu(n) = \sum_{d^2 \mid n}\mu(d)\lambda(n/d^2)$ unconditionally for all $n \ge 1$ via prime-power factorization, establishing the exact reversible identities
+   \[
+   Q_\lambda(X) = \sum_{d\ge 1}d^{-5/2}Q_\mu(X/d), \qquad
+   Q_\mu(X) = \sum_{d\ge 1}\mu(d)d^{-5/2}Q_\lambda(X/d),
+   \]
+   the Mellin transform $\mathcal{M}[Q_\lambda](z) = \frac{\zeta(1+2z)}{2\zeta(1/2+z)}\Gamma(5/4 - z/2)$ on $\frac{1}{2} < \operatorname{Re} z < \frac{5}{2}$ (showing that $\zeta(1+2z) \ne 0$ on $\operatorname{Re} z > 0$ introduces no zeros or poles in $0 < \operatorname{Re} z < 5/2$), and the two-way grade-interval $L^2$ energy equivalence
+   \[
+   \left(\forall\varepsilon > 0,\;\int_Y^{\tau Y}|Q_\mu(X)|^2\frac{dX}{X} \ll_\varepsilon Y^\varepsilon\right)
+   \Longleftrightarrow
+   \left(\forall\varepsilon > 0,\;\int_Y^{\tau Y}|Q_\lambda(X)|^2\frac{dX}{X} \ll_\varepsilon Y^\varepsilon\right).
+   \]
+2. **Exact Common-Factor Sign Cancellation & Unconstrained Euler–Maclaurin Sub-Transition Expansion (`RiemannScope.liouville_complete_multiplicativity_and_common_factor_cancellation_nat`, `RiemannScope.euler_maclaurin_c2_and_subtransition_growing_range_exponent`)**:
+   Proved $\lambda(dr)\lambda(ds) = \lambda(d)^2\lambda(r)\lambda(s) = \lambda(r)\lambda(s)$ unconditionally for all $d, r, s \ge 1$, eliminating the coprime-squarefree sieve $\mathbf{1}_{\gcd(d,rs)=1}\mu(d)^2$ so that $d$ runs over all positive integers $\mathbb{Z}_{\ge 1}$ with smooth weight $f_L(d) = d^{-6}e^{-L^2/d^2}$ ($L = \frac{X\sqrt{r^2+s^2}}{rs}$). By Euler–Maclaurin summation on $f(v) = v^{-6}e^{-1/v^2}$ ($C_2 = \frac{f'(v_-) - f'(v_+)}{6} \approx 1.8512576670169581$, $C_4 = \frac{1}{720}\int_0^\infty |f^{(4)}(v)|\,dv \approx 8.7523717600353656$; full 256-bit Arb enclosures in [docs/reviews/TC_LIOUVILLE_SQUARE_DILATION.md](file:///c:/Development/Projects/reimann_scope/docs/reviews/TC_LIOUVILLE_SQUARE_DILATION.md)), the leading pairwise coefficient becomes a constant independent of prime factors of $rs$,
+   \[
+   L_{r,s}^{(\lambda)} = \frac{3\sqrt{\pi}}{8}\lambda(r)\lambda(s)\frac{(rs)^2}{(r^2+s^2)^{5/2}},
+   \]
+   and the pairwise remainder improves by $X^{-3/2}$ to $|E_{r,s}^{(\lambda)}(X)| \le \frac{C_2}{2\sqrt{2}}X^{-2}\frac{(rs)^4}{(r^2+s^2)^{7/2}}$, expanding the valid sub-transition growing range from $A \le X^{1/3-\delta}$ (`TC-053R2`) all the way to $A \le X^{1-\delta}$ ($\delta \in (0, 1)$).
+3. **Transition Poisson Summation, Sign Changes of $\widehat{f}(\xi)$, Separable Gaussian Decoupling (Attack A), and Dyadic Parity Obstruction (Attack B) (`RiemannScope.dyadic_parity_energy_and_off_critical_mode_nonvanishing`)**:
+   At the transition scale $L \asymp 1$ ($r, s \asymp X$), Poisson summation gives $\sum_{d\ge 1}f_L(d) = L^{-5}\bigl(\frac{3\sqrt{\pi}}{8} + \sum_{k\ge 1}\widehat{f}(kL)\bigr)$, where $\widehat{f}(\xi) = 2\int_0^\infty v^{-6}e^{-1/v^2}\cos(\tau\xi v)\,dv$ is **not positive definite** (certified sign changes: $\widehat{f}(0) = \frac{3\sqrt{\pi}}{4} > 0$, $\widehat{f}(1/2) = -0.5628546550\dots < 0$, $\widehat{f}(1) = -0.3668367827\dots < 0$, $\widehat{f}(3/2) = +0.2636171832\dots > 0$, $\widehat{f}(2) = +0.1247126116\dots > 0$). Under **Attack A**, retaining the exact separable Gaussian $e^{-X^2(r^{-2}+s^{-2})/d^2} = e^{-X^2/(d^2 r^2)}e^{-X^2/(d^2 s^2)}$ and applying $\mathbf{1}_{\gcd(r,s)=1} = \sum_{e\mid\gcd(r,s)}\mu(e)$ decouples every rectangular block $B_{A,B}(X)$ into 1D unweighted Liouville Gaussian sums $U_\lambda(\frac{X}{de}; \frac{A}{e})U_\lambda(\frac{X}{de}; \frac{B}{e})$ with convergent divisor weights $\sum_e e^{-2} = \pi^2/6$, proving the **unconditional global super-polynomial logarithmic energy saving**
+   \[
+   \int_Y^{\tau Y}|Q_\lambda(X)|^2\frac{dX}{X} \ll Y\exp\!\bigl(-2c_1\Phi(Y)\bigr) \ll_D Y(\log Y)^{-D} \qquad (\forall D > 0)
+   \]
+   across the **entire** integral (and conditionally $O(Y^{\max(0, 2\Theta-1)+\varepsilon})$ under a zero-free strip $\operatorname{Re} s > \Theta$). Under **Attack B**, dyadic parity $\lambda(2m) = -\lambda(m)$ gives $Q_\lambda(X) = \sum_{j\ge 0}(-8)^{-j}Q_{\lambda,\mathrm{odd}}(X/2^j)$ and $Q_{\lambda,\mathrm{odd}}(X) = Q_\lambda(X) + \frac{1}{8}Q_\lambda(X/2)$, where the transfer multiplier $1 + 2^{-(2+z)}$ has zeros only on $\operatorname{Re} z = -2$ and satisfies $|1 + 2^{-(2+z_0)}| \ge 1 - 2^{-(2+\sigma_0)} > \frac{3}{4}$ on $\sigma_0 > 0$, so 2-adic parity cannot annihilate any off-critical zero contribution (`SUBGATE-TC-043A` remains `OPEN`, `rh_proved: false`).
+
+
 
