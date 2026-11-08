@@ -465,14 +465,14 @@ def verify_section_2_and_3_square_dilation_transfer(
                 "forward_bound_formula": "||Q_lambda||_eta <= zeta(1 + 2*eta) ||Q_mu||_eta",
                 "reverse_bound_formula": "||Q_mu||_eta <= (zeta(1 + 2*eta) / zeta(2 + 4*eta)) ||Q_lambda||_eta",
                 "eta_zero_singularity_and_operator_scope_note": (
-                    "For eta > 0, Minkowski's triangle inequality yields finite mutual upper-bound multipliers "
+                    "For eta > 0, Minkowski's triangle-inequality upper bound yields finite mutual multipliers "
                     "zeta(1 + 2*eta) and zeta(1 + 2*eta)/zeta(2 + 4*eta). As eta -> 0^+, "
                     "zeta(1 + 2*eta) = 1/(2*eta) + O(1) and zeta(1 + 2*eta)/zeta(2 + 4*eta) = 12/(tau^2 * eta) + O(1) "
                     "(since zeta(2) = tau^2/24) because sum_{d>=1} d^{-1} = infty and sum_{d>=1} |mu(d)| d^{-1} = infty. "
-                    "Divergence of a triangle-inequality upper bound shows only that the Minkowski estimate fails at "
-                    "weight eta = 0; independently, by Mellin-Plancherel on L^2((0, infty), dX/X) along z = i*b (b in R), "
-                    "the square-dilation operator acts by the spectral multiplier sum_{d>=1} d^{-1 - 2*i*b} = zeta(1 + 2*i*b), "
-                    "which has a pole at b = 0."
+                    "Positive-weight results (eta > 0) do not establish boundedness of the ordinary boundary series "
+                    "sum_{d>=1} d^{-1} f(./d^2) on the full unweighted space L^2((0, infty), dX/X): by Mellin-Plancherel "
+                    "along z = i*b (b in R), the formal boundary multiplier is zeta(1 + 2*i*b), which has a simple pole at "
+                    "b = 0 and is unbounded as |b| -> infty."
                 ),
                 "asymptotic_residue_eta_times_forward_at_0": serialize_arb_certified(limit_eta_fwd_at_zero),
                 "asymptotic_residue_eta_times_reverse_at_0": serialize_arb_certified(limit_eta_rev_at_zero),
@@ -1328,17 +1328,38 @@ def verify_mellin_contour_and_reflection_identities_arb(
             })
 
         # 5. Check even-series term signs for m in {0, 1, 2, 3, 4, 5} at omega = 1
+        # and verify the corrected intermediate recurrence for m >= 2:
+        #   Gamma(5/2 - m) = (-1)^{m-2} Gamma(1/2) / prod_{j=1}^{m-2} (j - 1/2),
+        # and Res_{z=-2m} Gamma(z) = 1/(2m)! with alternating sign (-1)^m from cos(-m*tau/2) = (-1)^m.
         even_sign_rows: List[Dict[str, Any]] = []
         all_m_ge_2_positive = True
+        all_recurrence_ok = True
+        gamma_1_2 = (arb(1) / arb(2)).gamma()
         for m in range(0, 6):
             gamma_5_2_m = (arb(5) / arb(2) - arb(m)).gamma()
-            sign_m = arb(1) if (m % 2 == 0) else arb(-1)
-            coeff_m = sign_m * gamma_5_2_m / arb(math.factorial(2 * m))
+            res_gamma_neg_2m = arb(1) / arb(math.factorial(2 * m))
+            cos_neg_m_tau_over_2 = arb(1) if (m % 2 == 0) else arb(-1)
+            coeff_m = cos_neg_m_tau_over_2 * gamma_5_2_m * res_gamma_neg_2m
+            if m >= 2:
+                denom_prod = arb(1)
+                for j in range(1, m - 1):
+                    denom_prod *= (arb(j) - arb(1) / arb(2))
+                sign_m_minus_2 = arb(1) if ((m - 2) % 2 == 0) else arb(-1)
+                recurrence_rhs = sign_m_minus_2 * gamma_1_2 / denom_prod
+                rec_diff = gamma_5_2_m - recurrence_rhs
+                rec_ok = bool(rec_diff.contains(0))
+                if not rec_ok:
+                    all_recurrence_ok = False
+            else:
+                rec_ok = True
             if m >= 2 and not bool(coeff_m.lower() > 0):
                 all_m_ge_2_positive = False
             even_sign_rows.append({
                 "m": m,
+                "Res_Gamma_at_neg_2m": f"1/({2 * m})!",
+                "cos_tau_neg_2m_over_4": 1 if (m % 2 == 0) else -1,
                 "Gamma_5_2_minus_m": serialize_arb_certified(gamma_5_2_m),
+                "recurrence_matches_Gamma_1_2_over_rising_half_product": rec_ok,
                 "even_series_coeff_at_omega_1": serialize_arb_certified(coeff_m),
                 "strictly_positive": bool(coeff_m.lower() > 0),
                 "strictly_negative": bool(coeff_m.upper() < 0),
@@ -1361,6 +1382,17 @@ def verify_mellin_contour_and_reflection_identities_arb(
                     "M[H](z) = (tau / 2) * Gamma(z) / Gamma((-3 - z) / 2)",
                     "M[H](z) = (tau / 2)^2 / (sin(tau * z / 2) * Gamma(1 - z) * Gamma((-3 - z) / 2))",
                 ],
+                "vertical_contour_stirling_asymptotic": (
+                    "|M[H](a + i*b)| = (tau/2) |Gamma(a + i*b)| / |Gamma((-3 - a)/2 - i*b/2)| "
+                    "asymp_a |b|^{3a/2 + 3/2} exp(-tau * |b| / 8) for fixed a in R, |b| >= 1"
+                ),
+                "horizontal_strip_dlmf_5_8_3_shift_bound": (
+                    "On z = a +- i*B across the entire strip a in [a_M, c] (c in (0, 1), B >= 1), shifting "
+                    "Gamma(1 - z) = Gamma(2 - z)/(1 - z) (Re(2 - z) = 2 - a > 1 >= 1/2) and "
+                    "Gamma((-3 - z)/2) = Gamma((3 - z)/2) / (((-3 - z)/2)((-1 - z)/2)((1 - z)/2)) "
+                    "(Re((3 - z)/2) = (3 - a)/2 > 1 >= 1/2) places both Gamma factors in Re >= 1/2 throughout "
+                    "a in [a_M, c], yielding |M[H](a +- i*B)| <= C_{M,c} B^4 exp(-tau * B / 8) -> 0 as B -> infty."
+                ),
                 "rows": reflection_rows,
                 "all_reflection_and_kernel_identities_hold": all_reflection_ok,
             },
@@ -1375,14 +1407,24 @@ def verify_mellin_contour_and_reflection_identities_arb(
                 "rows_at_omega_4": remainder_rows,
             },
             "even_series_term_sign_analysis": {
+                "residue_decomposition": (
+                    "Res_{z=-2m} Gamma(z) = (-1)^{2m}/(2m)! = 1/(2m)! > 0; the alternating sign (-1)^m in "
+                    "t_even(m) = (-1)^m Gamma(5/2 - m) omega^{2m} / (2m)! comes from cos(tau*(-2m)/4) = cos(-m*tau/2) = (-1)^m."
+                ),
+                "gamma_5_2_minus_m_recurrence": (
+                    "For m >= 2, Gamma(5/2 - m) = Gamma(1/2) / ((-1/2)(-3/2)...(5/2 - m)) = "
+                    "(-1)^{m-2} Gamma(1/2) / prod_{j=1}^{m-2} (j - 1/2)."
+                ),
                 "note": (
                     "For m = 0, t_even(0) = Gamma(5/2) > 0; for m = 1, t_even(1) = -Gamma(3/2) omega^2 / 2 < 0; "
-                    "for all integers m >= 2, Gamma(5/2 - m) has sign (-1)^{m-2} = (-1)^m, so (-1)^m Gamma(5/2 - m) = "
-                    "|Gamma(5/2 - m)| > 0 and every even-series term t_even(m) is strictly positive (not alternating). "
+                    "for all integers m >= 2, Gamma(5/2 - m) = (-1)^{m-2} Gamma(1/2) / prod_{j=1}^{m-2} (j - 1/2) "
+                    "has sign (-1)^{m-2} = (-1)^m, so (-1)^m Gamma(5/2 - m) = |Gamma(5/2 - m)| > 0 and every "
+                    "even-series term t_even(m) is strictly positive (not alternating). "
                     "At m = 3, (-1)^3 Gamma(5/2 - 3) omega^6 / 6! = Gamma(1/2) omega^6 / 360 > 0."
                 ),
                 "rows": even_sign_rows,
                 "all_m_ge_2_strictly_positive": all_m_ge_2_positive,
+                "all_m_ge_2_recurrences_hold": all_recurrence_ok,
                 "m3_coeff_minus_Gamma_1_2_over_360": serialize_arb_certified(m3_diff),
                 "m3_matches_Gamma_1_2_over_360": bool(m3_diff.contains(0)),
             },

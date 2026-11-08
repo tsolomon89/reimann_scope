@@ -849,7 +849,7 @@
       "dilation_scaling_identity": "||f(./a)||_eta = a^{-eta} ||f||_eta",
       "forward_bound_formula": "||Q_lambda||_eta <= zeta(1 + 2*eta) ||Q_mu||_eta",
       "reverse_bound_formula": "||Q_mu||_eta <= (zeta(1 + 2*eta) / zeta(2 + 4*eta)) ||Q_lambda||_eta",
-      "eta_zero_singularity_and_operator_scope_note": "For eta > 0, Minkowski's triangle inequality yields finite mutual upper-bound multipliers zeta(1 + 2*eta) and zeta(1 + 2*eta)/zeta(2 + 4*eta). As eta -> 0^+, zeta(1 + 2*eta) = 1/(2*eta) + O(1) and zeta(1 + 2*eta)/zeta(2 + 4*eta) = 12/(tau^2 * eta) + O(1) (since zeta(2) = tau^2/24) because sum_{d>=1} d^{-1} = infty and sum_{d>=1} |mu(d)| d^{-1} = infty. Divergence of a triangle-inequality upper bound shows only that the Minkowski estimate fails at weight eta = 0; independently, by Mellin-Plancherel on L^2((0, infty), dX/X) along z = i*b (b in R), the square-dilation operator acts by the spectral multiplier sum_{d>=1} d^{-1 - 2*i*b} = zeta(1 + 2*i*b), which has a pole at b = 0.",
+      "eta_zero_singularity_and_operator_scope_note": "For eta > 0, Minkowski's triangle-inequality upper bound yields finite mutual multipliers zeta(1 + 2*eta) and zeta(1 + 2*eta)/zeta(2 + 4*eta). As eta -> 0^+, zeta(1 + 2*eta) = 1/(2*eta) + O(1) and zeta(1 + 2*eta)/zeta(2 + 4*eta) = 12/(tau^2 * eta) + O(1) (since zeta(2) = tau^2/24) because sum_{d>=1} d^{-1} = infty and sum_{d>=1} |mu(d)| d^{-1} = infty. Positive-weight results (eta > 0) do not establish boundedness of the ordinary boundary series sum_{d>=1} d^{-1} f(./d^2) on the full unweighted space L^2((0, infty), dX/X): by Mellin-Plancherel along z = i*b (b in R), the formal boundary multiplier is zeta(1 + 2*i*b), which has a simple pole at b = 0 and is unbounded as |b| -> infty.",
       "asymptotic_residue_eta_times_forward_at_0": {
         "mid_float": 0.5,
         "rad_float_outward": 5e-324,
@@ -2244,6 +2244,8 @@
           "M[H](z) = (tau / 2) * Gamma(z) / Gamma((-3 - z) / 2)",
           "M[H](z) = (tau / 2)^2 / (sin(tau * z / 2) * Gamma(1 - z) * Gamma((-3 - z) / 2))"
         ],
+        "vertical_contour_stirling_asymptotic": "|M[H](a + i*b)| = (tau/2) |Gamma(a + i*b)| / |Gamma((-3 - a)/2 - i*b/2)| asymp_a |b|^{3a/2 + 3/2} exp(-tau * |b| / 8) for fixed a in R, |b| >= 1",
+        "horizontal_strip_dlmf_5_8_3_shift_bound": "On z = a +- i*B across the entire strip a in [a_M, c] (c in (0, 1), B >= 1), shifting Gamma(1 - z) = Gamma(2 - z)/(1 - z) (Re(2 - z) = 2 - a > 1 >= 1/2) and Gamma((-3 - z)/2) = Gamma((3 - z)/2) / (((-3 - z)/2)((-1 - z)/2)((1 - z)/2)) (Re((3 - z)/2) = (3 - a)/2 > 1 >= 1/2) places both Gamma factors in Re >= 1/2 throughout a in [a_M, c], yielding |M[H](a +- i*B)| <= C_{M,c} B^4 exp(-tau * B / 8) -> 0 as B -> infty.",
         "rows": [
           {
             "z_label": "1/2 + i",
@@ -2530,10 +2532,14 @@
         ]
       },
       "even_series_term_sign_analysis": {
-        "note": "For m = 0, t_even(0) = Gamma(5/2) > 0; for m = 1, t_even(1) = -Gamma(3/2) omega^2 / 2 < 0; for all integers m >= 2, Gamma(5/2 - m) has sign (-1)^{m-2} = (-1)^m, so (-1)^m Gamma(5/2 - m) = |Gamma(5/2 - m)| > 0 and every even-series term t_even(m) is strictly positive (not alternating). At m = 3, (-1)^3 Gamma(5/2 - 3) omega^6 / 6! = Gamma(1/2) omega^6 / 360 > 0.",
+        "residue_decomposition": "Res_{z=-2m} Gamma(z) = (-1)^{2m}/(2m)! = 1/(2m)! > 0; the alternating sign (-1)^m in t_even(m) = (-1)^m Gamma(5/2 - m) omega^{2m} / (2m)! comes from cos(tau*(-2m)/4) = cos(-m*tau/2) = (-1)^m.",
+        "gamma_5_2_minus_m_recurrence": "For m >= 2, Gamma(5/2 - m) = Gamma(1/2) / ((-1/2)(-3/2)...(5/2 - m)) = (-1)^{m-2} Gamma(1/2) / prod_{j=1}^{m-2} (j - 1/2).",
+        "note": "For m = 0, t_even(0) = Gamma(5/2) > 0; for m = 1, t_even(1) = -Gamma(3/2) omega^2 / 2 < 0; for all integers m >= 2, Gamma(5/2 - m) = (-1)^{m-2} Gamma(1/2) / prod_{j=1}^{m-2} (j - 1/2) has sign (-1)^{m-2} = (-1)^m, so (-1)^m Gamma(5/2 - m) = |Gamma(5/2 - m)| > 0 and every even-series term t_even(m) is strictly positive (not alternating). At m = 3, (-1)^3 Gamma(5/2 - 3) omega^6 / 6! = Gamma(1/2) omega^6 / 360 > 0.",
         "rows": [
           {
             "m": 0,
+            "Res_Gamma_at_neg_2m": "1/(0)!",
+            "cos_tau_neg_2m_over_4": 1,
             "Gamma_5_2_minus_m": {
               "mid_float": 1.329340388179137,
               "rad_float_outward": 1.9882475174356647e-18,
@@ -2541,6 +2547,7 @@
               "upper_dec": "1.329340388179137020473625612505858887100e+0",
               "arb_ball_str": "[1.329340388179137020473625612505858887098 +/- 1.63e-40]"
             },
+            "recurrence_matches_Gamma_1_2_over_rising_half_product": true,
             "even_series_coeff_at_omega_1": {
               "mid_float": 1.329340388179137,
               "rad_float_outward": 1.9882475174356647e-18,
@@ -2553,6 +2560,8 @@
           },
           {
             "m": 1,
+            "Res_Gamma_at_neg_2m": "1/(2)!",
+            "cos_tau_neg_2m_over_4": -1,
             "Gamma_5_2_minus_m": {
               "mid_float": 0.886226925452758,
               "rad_float_outward": 3.8332932499129e-17,
@@ -2560,6 +2569,7 @@
               "upper_dec": "8.862269254527580136490837416705725913989e-1",
               "arb_ball_str": "[0.8862269254527580136490837416705725913988 +/- 2.53e-41]"
             },
+            "recurrence_matches_Gamma_1_2_over_rising_half_product": true,
             "even_series_coeff_at_omega_1": {
               "mid_float": -0.443113462726379,
               "rad_float_outward": 1.91664662495645e-17,
@@ -2572,6 +2582,8 @@
           },
           {
             "m": 2,
+            "Res_Gamma_at_neg_2m": "1/(4)!",
+            "cos_tau_neg_2m_over_4": 1,
             "Gamma_5_2_minus_m": {
               "mid_float": 1.772453850905516,
               "rad_float_outward": 7.6665864998258e-17,
@@ -2579,6 +2591,7 @@
               "upper_dec": "1.772453850905516027298167483341145182799e+0",
               "arb_ball_str": "[1.772453850905516027298167483341145182798 +/- 4.51e-40]"
             },
+            "recurrence_matches_Gamma_1_2_over_rising_half_product": true,
             "even_series_coeff_at_omega_1": {
               "mid_float": 0.07385224378772984,
               "rad_float_outward": 3.194411041594083e-18,
@@ -2591,6 +2604,8 @@
           },
           {
             "m": 3,
+            "Res_Gamma_at_neg_2m": "1/(6)!",
+            "cos_tau_neg_2m_over_4": -1,
             "Gamma_5_2_minus_m": {
               "mid_float": -3.544907701811032,
               "rad_float_outward": 1.53331729996516e-16,
@@ -2598,6 +2613,7 @@
               "upper_dec": "-3.544907701811032054596334966682290365594e+0",
               "arb_ball_str": "[-3.544907701811032054596334966682290365595 +/- 9.90e-41]"
             },
+            "recurrence_matches_Gamma_1_2_over_rising_half_product": true,
             "even_series_coeff_at_omega_1": {
               "mid_float": 0.004923482919181989,
               "rad_float_outward": 9.731250437448506e-20,
@@ -2610,6 +2626,8 @@
           },
           {
             "m": 4,
+            "Res_Gamma_at_neg_2m": "1/(8)!",
+            "cos_tau_neg_2m_over_4": 1,
             "Gamma_5_2_minus_m": {
               "mid_float": 2.363271801207355,
               "rad_float_outward": 1.0222115333101066e-16,
@@ -2617,6 +2635,7 @@
               "upper_dec": "2.363271801207354703064223311121526910398e+0",
               "arb_ball_str": "[2.363271801207354703064223311121526910397 +/- 2.68e-40]"
             },
+            "recurrence_matches_Gamma_1_2_over_rising_half_product": true,
             "even_series_coeff_at_omega_1": {
               "mid_float": 5.861289189502368e-05,
               "rad_float_outward": 1.100272331077122e-21,
@@ -2629,6 +2648,8 @@
           },
           {
             "m": 5,
+            "Res_Gamma_at_neg_2m": "1/(10)!",
+            "cos_tau_neg_2m_over_4": -1,
             "Gamma_5_2_minus_m": {
               "mid_float": -0.9453087204829419,
               "rad_float_outward": 1.8684000839901133e-17,
@@ -2636,6 +2657,7 @@
               "upper_dec": "-9.453087204829418812256893244486107641585e-1",
               "arb_ball_str": "[-0.9453087204829418812256893244486107641587 +/- 6.96e-42]"
             },
+            "recurrence_matches_Gamma_1_2_over_rising_half_product": true,
             "even_series_coeff_at_omega_1": {
               "mid_float": 2.605017417556608e-07,
               "rad_float_outward": 1.0638838117097188e-23,
@@ -2648,6 +2670,7 @@
           }
         ],
         "all_m_ge_2_strictly_positive": true,
+        "all_m_ge_2_recurrences_hold": true,
         "m3_coeff_minus_Gamma_1_2_over_360": {
           "mid_float": 0.0,
           "rad_float_outward": 2.338962325885623e-79,
