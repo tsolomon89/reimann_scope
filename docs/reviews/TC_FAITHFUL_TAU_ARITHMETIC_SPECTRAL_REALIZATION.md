@@ -1140,27 +1140,39 @@ In `TASK-TC-053` (branched from the merged `TC-052R2` baseline `c64596727e714259
    $$
    \bigl|E_{r,s}(X)\bigr| \le \frac{X^5}{(rs)^3}\cdot 3\cdot 2^{\omega(rs)}\int_0^\infty \sqrt{t}\,\bigl|\phi_L'(t)\bigr|\,dt.
    $$
-   Differentiating $\phi_L(t) = t^{-6} e^{-L^2 / t^2}$ gives $\phi_L'(t) = 2\bigl(L^2 t^{-9} - 3 t^{-7}\bigr)e^{-L^2 / t^2}$, which changes sign at $t = L / \sqrt{3}$. Substituting $v = L^2 / t^2$ ($t = L v^{-1/2}$, $dt = -\frac{1}{2}L v^{-3/2}\,dv$, where the factor of $2$ in $\phi_L'(t)$ and $\frac{1}{2}$ in $dt$ cancel to $1$) rescales the **absolute derivative integral** to
+   Differentiating $\phi_L(t) = t^{-6} e^{-L^2 / t^2}$ ($L > 0$) gives
    $$
-   \int_0^\infty \sqrt{t}\,\bigl|\phi_L'(t)\bigr|\,dt = L^{-11/2}\,I_{\mathrm{abs}}, \qquad I_{\mathrm{abs}} := \int_0^\infty v^{11/4}\,\bigl|v - 3\bigr|\,e^{-v}\,dv = \int_0^3 (3 - v)v^{11/4} e^{-v}\,dv + \int_3^\infty (v - 3)v^{11/4} e^{-v}\,dv.
+   \phi_L'(t) = 2 t^{-7}\bigl(L^2 / t^2 - 3\bigr)e^{-L^2 / t^2},
    $$
-   Using $\frac{d}{dv}\bigl(v^{15/4} e^{-v}\bigr) = \bigl(\frac{15}{4} - v\bigr)v^{11/4} e^{-v} = (3 - v)v^{11/4} e^{-v} + \frac{3}{4}v^{11/4} e^{-v}$ (`gaussian_symbolic_verified: true`), integration by parts on $[0, 3]$ and $[3, \infty)$ gives
+   which changes sign at $t = L / \sqrt{3}$ ($v = 3$). Under the change of variables
    $$
-   I_{\mathrm{abs}} = 2\cdot 3^{15/4} e^{-3} + \frac{3}{4}\left(\int_3^\infty v^{11/4} e^{-v}\,dv - \int_0^3 v^{11/4} e^{-v}\,dv\right) = \bigl[6.759126424066078899532960393703499341216 \pm 2.00 \times 10^{-39}\bigr]
+   v = \frac{L^2}{t^2}, \qquad t = L v^{-1/2}, \qquad |dt| = \frac{L}{2} v^{-3/2}\,dv,
    $$
-   (`I_abs_direct_vs_ibp_agree: true`). Multiplying by $\frac{X^5}{(rs)^3} L^{-11/2} = \frac{X^5}{(rs)^3}\frac{(rs)^{11/2}}{X^{11/2}(r^2 + s^2)^{11/4}} = X^{-1/2}\frac{(rs)^{5/2}}{(r^2 + s^2)^{11/4}}$ establishes the **proved uniform pairwise inequality** for all coprime squarefree $r, s \ge 1$ and all $X > 0$:
+   the factor of $2$ in $\phi_L'(t)$ and $\frac{1}{2}$ in $|dt|$ cancel to $1$, and the powers of $t$ and $L$ combine as
    $$
-   \boxed{\bigl|E_{r,s}(X)\bigr| \le C\,2^{\omega(rs)}\,X^{-1/2}\,\frac{(rs)^{5/2}}{(r^2 + s^2)^{11/4}},}
+   \sqrt{t}\cdot t^{-7}\cdot \frac{L}{2}v^{-3/2} = \bigl(L^{1/2} v^{-1/4}\bigr)\bigl(L^{-7} v^{7/2}\bigr)\left(\frac{L}{2} v^{-3/2}\right) = \frac{1}{2} L^{-11/2}\,v^{7/4},
    $$
-   with universal justified constant
+   where the exponent of $v$ is $-\frac{1}{4} + \frac{7}{2} - \frac{3}{2} = \frac{7}{4}$ (repairing the erroneous exponent $\frac{11}{4}$ in `TASK-TC-053R`; in the intermediate variable $u = L / t = \sqrt{v}$ with $|dt| = L u^{-2}\,du$, the equivalent integral is $2\int_0^\infty u^{9/2}\,|u^2 - 3|\,e^{-u^2}\,du$). Thus the **exact transformed Stieltjes integral identity** (`stieltjes_substitution_from_original_integrand_symbolic_verified: true`) is
    $$
-   C = C_{\mathrm{pair}}^{\mathrm{sharp}} := 3 I_{\mathrm{abs}} = \bigl[20.27737927219823669859888118111049802365 \pm 2.00 \times 10^{-38}\bigr] < 21
+   \boxed{\int_0^\infty \sqrt{t}\,\bigl|\phi_L'(t)\bigr|\,dt = L^{-11/2}\,J, \qquad J := \int_0^\infty v^{7/4}\,\bigl|v - 3\bigr|\,e^{-v}\,dv = \int_0^3 (3 - v)v^{7/4} e^{-v}\,dv + \int_3^\infty (v - 3)v^{7/4} e^{-v}\,dv.}
    $$
-   (`C_pair_sharp_lt_21_certified: true`) and closed-form upper bound (dropping $-\frac{3}{4}\int_0^3 v^{11/4} e^{-v}\,dv < 0$ and replacing $\int_3^\infty v^{11/4} e^{-v}\,dv$ by $\Gamma(15/4) = \frac{105}{16}\Gamma(3/4)$)
+   Using $\frac{d}{dv}\bigl(-v^{11/4} e^{-v}\bigr) = \bigl(v - \frac{11}{4}\bigr)v^{7/4} e^{-v}$, we have $(v - 3)v^{7/4} e^{-v} = \frac{d}{dv}\bigl(-v^{11/4} e^{-v}\bigr) - \frac{1}{4} v^{7/4} e^{-v}$ (`gaussian_symbolic_verified: true`), so integrating on $[0, 3]$ and $[3, \infty)$ yields the exact incomplete-gamma formula
    $$
-   C_{\mathrm{pair}}^{\mathrm{closed}} := 6\cdot 3^{15/4} e^{-3} + \frac{315}{64}\Gamma\!\left(\frac{3}{4}\right) = \bigl[24.41672357016680253012411397649103735716 \pm 2.00 \times 10^{-38}\bigr] < 25
+   \boxed{J = 2\cdot 3^{11/4} e^{-3} - \frac{1}{4}\Bigl[\Gamma\!\left(\frac{11}{4}\right) - 2\,\gamma\!\left(\frac{11}{4},\, 3\right)\Bigr] = \bigl[2.152085805199425799330038459692797743742 \pm 2.00 \times 10^{-39}\bigr]}
    $$
-   (`C_pair_closed_lt_25_certified: true`). Under simultaneous rescaling $(r, s) \mapsto (\lambda r, \lambda s)$, the factor $\frac{(rs)^{5/2}}{(r^2 + s^2)^{11/4}}$ is homogeneous of degree $5 - 11/2 = -1/2$ (`homogeneous_degree_neg_half_symbolic_verified: true`). Certified in 256-bit Arb across $(r, s) = (2, 3)$ ($X \in \{4, 16, 64, 256\}$) and $(r, s, X) = (29, 31, 30)$, where the replacement bound evaluates to $[0.3995625300165519700235101982261794259293 \pm 2.00 \times 10^{-40}] > |E_{29,31}(30)| = [0.002633650286935197 \pm 3.20 \times 10^{-19}]$ (`all_pairwise_error_bounds_certified: true`).
+   (`I_abs_direct_vs_ibp_agree: true`, cross-checked against both direct $v$-quadrature on $(0, 3) \cup (3, \infty)$, direct $u$-quadrature $2\int_0^\infty u^{9/2}|u^2 - 3|e^{-u^2}\,du$, and the reference value $J \approx 2.1520858051994258$). Multiplying by $\frac{X^5}{(rs)^3} L^{-11/2} = \frac{X^5}{(rs)^3}\frac{(rs)^{11/2}}{X^{11/2}(r^2 + s^2)^{11/4}} = X^{-1/2}\frac{(rs)^{5/2}}{(r^2 + s^2)^{11/4}}$ establishes the **proved uniform pairwise inequality** for all coprime squarefree $r, s \ge 1$ and all $X > 0$:
+   $$
+   \boxed{\bigl|E_{r,s}(X)\bigr| \le (3 J)\,2^{\omega(rs)}\,X^{-1/2}\,\frac{(rs)^{5/2}}{(r^2 + s^2)^{11/4}} \le C\,2^{\omega(rs)}\,X^{-1/2}\,\frac{(rs)^{5/2}}{(r^2 + s^2)^{11/4}},}
+   $$
+   where the constant obtained from this Stieltjes estimate (without claiming global optimality across all possible integration methods) is
+   $$
+   3 J = \bigl[6.456257415598277397990115379078393231226 \pm 2.00 \times 10^{-39}\bigr] < 7 < 8
+   $$
+   (`three_J_lt_8_certified: true`, cross-checked against $3J \approx 6.4562574155982774$). Furthermore, since $\Gamma(11/4) - 2\gamma(11/4, 3) > -\Gamma(11/4)$ and $\Gamma(11/4) = \frac{7}{4}\cdot\frac{3}{4}\Gamma(3/4) = \frac{21}{16}\Gamma(3/4)$, we have the conservative closed-form upper bound
+   $$
+   3 J \le 6\cdot 3^{11/4} e^{-3} + \frac{63}{64}\Gamma\!\left(\frac{3}{4}\right) = \bigl[7.334728145729494680425400563915115544141 \pm 2.00 \times 10^{-39}\bigr] < 8
+   $$
+   (`three_J_closed_lt_8_certified: true`), so $C = 8$ is a convenient proved integer upper bound (`C_pair_convenient_upper_bound: 8`). Under simultaneous rescaling $(r, s) \mapsto (\lambda r, \lambda s)$, the factor $\frac{(rs)^{5/2}}{(r^2 + s^2)^{11/4}}$ is homogeneous of degree $5 - 11/2 = -1/2$ (`homogeneous_degree_neg_half_symbolic_verified: true`). Certified in 256-bit Arb across $(r, s) = (2, 3)$ ($X \in \{4, 16, 64, 256\}$) and $(r, s, X) = (29, 31, 30)$, where the $(3J)$-bound evaluates to $[0.1272195244161310364758966152354706030606 \pm 2.00 \times 10^{-40}] > |E_{29,31}(30)| = [0.002633650286935197 \pm 3.20 \times 10^{-19}]$ (and the $C = 8$ bound evaluates to $0.1576387262\dots > |E_{29,31}(30)|$, `all_pairwise_error_bounds_certified: true`).
 
 6. **Summing Over $1 \le r, s \le A$ (Including Unequal Factors) and Growing-Range Upper-Bound Condition**:
    - **Summed Error over All Coprime Pairs $1 \le r, s \le A$**:
@@ -1267,12 +1279,15 @@ In `TASK-TC-053` (branched from the merged `TC-052R2` baseline `c64596727e714259
      $$
      (`K_rs_at_1_2_strictly_negative: true`; whereas $\frac{\partial^2}{\partial r\partial s}\bigl(\frac{rs}{3\sqrt{r^2+s^2}}\bigr) = K(r, s) > 0$ is the mixed derivative of the *antiderivative* of $K$, not of $K$ itself). Replacing the invalid sign claim with absolute derivative bounds on $[A, 2A]^2$ (where $r, s \ge A \implies r^2 + s^2 \ge \max(2A^2, 2rs)$) gives:
      $$
-     \bigl|K(r, s)\bigr| \le 2^{-5/2} A^{-1}, \qquad \bigl|K_r(r, s)\bigr| = \frac{rs^2|2s^2 - 3r^2|}{(r^2+s^2)^{7/2}} \le \frac{3}{4\sqrt{2}} A^{-2}, \qquad \bigl|K_s(r, s)\bigr| \le \frac{3}{4\sqrt{2}} A^{-2}, \qquad \bigl|K_{rs}(r, s)\bigr| \le \frac{11}{8\sqrt{2}} A^{-3},
+     \bigl|K(r, s)\bigr| \le 2^{-5/2} A^{-1} = \frac{2}{8\sqrt{2}}\,A^{-1}, \qquad \bigl|K_r(r, s)\bigr| = \frac{rs^2|2s^2 - 3r^2|}{(r^2+s^2)^{7/2}} \le \frac{3}{4\sqrt{2}} A^{-2} = \frac{6}{8\sqrt{2}}\,A^{-2}, \qquad \bigl|K_s(r, s)\bigr| \le \frac{3}{4\sqrt{2}} A^{-2} = \frac{6}{8\sqrt{2}}\,A^{-2}, \qquad \bigl|K_{rs}(r, s)\bigr| \le \frac{11}{8\sqrt{2}} A^{-3},
      $$
-     with total 2D Stieltjes variation constant $M_{\mathrm{var}} := 2^{-5/2} + 2\cdot\frac{3}{4\sqrt{2}} + \frac{11}{8\sqrt{2}} = \frac{19}{8\sqrt{2}} = [1.679378605318050370452005359999016468301 \pm 2.00 \times 10^{-39}]$.
+     so the exact component sum for the 2D Stieltjes variation constant (repairing the arithmetic error in `TASK-TC-053R`, `M_var_symbolic_sum_verified: true`, `M_var_components_match_exact_formula: true`) is
+     $$
+     \boxed{M_{\mathrm{var}} := 2^{-5/2} + 2\cdot\frac{3}{4\sqrt{2}} + \frac{11}{8\sqrt{2}} = \frac{2 + 12 + 11}{8\sqrt{2}} = \frac{25}{8\sqrt{2}} = \bigl[2.209708691207961013752638631577653247765 \pm 2.00 \times 10^{-39}\bigr].}
+     $$
    - **Complete Four-Step Uniform Convolution and Korobov–Vinogradov–Walfisz Proof of $|S(A)| \ll A e^{-c\Phi(A)}$**:
      To eliminate the growing coprimality parameter completely before applying Mertens bounds, we execute the four-step uniform convolution proof:
-     1. *Step 1 — Bivariate Dirichlet Convolution $f = (\mu \otimes \mu) * h$ and Absolute Coefficient Bound $\sum_{d,e}|h(d,e)|(de)^{-3/4} < \infty$*:
+     1. *Step 1 — Bivariate Dirichlet Convolution $f = (\mu \otimes \mu) * h$, Repaired Euler-Product Tail Majorant $B(P, \theta)$, and Regenerated $C_{h, \theta}$ Enclosures*:
         Since $\mathcal{D}(s_1, s_2) = \sum_{r,s \ge 1} f(r, s) r^{-s_1} s^{-s_2} = \frac{1}{\zeta(s_1)\zeta(s_2)}\mathcal{H}(s_1, s_2)$ where $\frac{1}{\zeta(s_1)\zeta(s_2)} = \sum_{m, n \ge 1}\mu(m)\mu(n) m^{-s_1} n^{-s_2}$, expanding $\mathcal{H}(s_1, s_2) = \sum_{d, e \ge 1} h(d, e) d^{-s_1} e^{-s_2}$ gives the exact identity $f(r, s) = \sum_{d \mid r,\, e \mid s} h(d, e)\,\mu(r/d)\,\mu(s/e)$. At each prime $p$, the local series
         $$
         \mathcal{H}_p(x, y) = \frac{1 - \frac{p}{p + 1}(x + y)}{(1 - x)(1 - y)} = 1 + \frac{1}{p + 1}\left(\frac{x}{1 - x} + \frac{y}{1 - y}\right) - \frac{p - 1}{p + 1}\frac{xy}{(1 - x)(1 - y)}
@@ -1281,20 +1296,34 @@ In `TASK-TC-053` (branched from the merged `TC-052R2` baseline `c64596727e714259
         $$
         \boxed{h(1, 1) = 1, \qquad h(p^a, 1) = h(1, p^b) = \frac{1}{p + 1} \quad (a, b \ge 1), \qquad h(p^a, p^b) = -\frac{p - 1}{p + 1} \quad (a, b \ge 1),}
         $$
-        verified by exact rational arithmetic across all $40 \times 40 = 1600$ pairs $1 \le r, s \le 40$ (`all_h_convolutions_exact_up_to_40: true`). For every $\theta > 1/2$, the absolute Dirichlet series
+        verified by exact rational arithmetic across all $40 \times 40 = 1600$ pairs $1 \le r, s \le 40$ (`all_h_convolutions_exact_up_to_40: true`). For every $\theta > 1/2$, the absolute Dirichlet series is
         $$
-        C_{h, \theta} := \sum_{d, e \ge 1} \frac{|h(d, e)|}{(de)^\theta} = \prod_p \left(1 + \frac{2}{(p + 1)(p^\theta - 1)} + \frac{p - 1}{(p + 1)(p^\theta - 1)^2}\right)
+        C_{h, \theta} := \sum_{d, e \ge 1} \frac{|h(d, e)|}{(de)^\theta} = \prod_p F_p(\theta), \qquad F_p(\theta) := 1 + \frac{2}{(p + 1)(p^\theta - 1)} + \frac{p - 1}{(p + 1)(p^\theta - 1)^2}.
         $$
-        converges because the $p$-th term is $1 + O\bigl(p^{-\min(1 + \theta, 2\theta)}\bigr)$ with $\min(1 + \theta, 2\theta) > 1$. At $\theta = 3/4$ ($\min(7/4, 3/2) = 3/2 > 1$) and $\theta = 1$ ($\min(2, 2) = 2 > 1$), 256-bit Arb evaluation over $p \le 2000$ with analytic prime-tail bound $\sum_{p > P}\log F_p(\theta) \le \frac{4}{\theta P^\theta}$ certifies
-        $$
-        C_{h, 3/4} := \sum_{d, e \ge 1}\frac{|h(d, e)|}{(de)^{3/4}} = \bigl[9.1 \pm 0.090\bigr] < \infty, \qquad C_{h, 1} := \sum_{d, e \ge 1}\frac{|h(d, e)|}{de} = \bigl[3.61 \pm 6.80 \times 10^{-3}\bigr] < \infty.
-        $$
+        - *Failure of the discarded majorant at $\theta = 3/4, p = 2003$*: In `TASK-TC-053R`, the prime-tail bound omitted the quadratic term $\frac{p-1}{(p+1)(p^\theta - 1)^2} \sim p^{-2\theta} = p^{-3/2}$ (which dominates $\frac{2}{(p+1)(p^\theta - 1)} \sim 2 p^{-(1+\theta)} = 2 p^{-7/4}$ whenever $1/2 < \theta < 1$). At $p = 2003, \theta = 3/4$, 256-bit Arb evaluation (`discarded_majorant_fails_at_2003_certified: true`) gives
+          $$
+          \log F_{2003}(3/4) = \bigl[0.00001456325666387955721403184752881533273340 \pm 2.00 \times 10^{-44}\bigr] > 4(2003)^{-7/4} = \bigl[0.000006669884755011093590413754887978666600517 \pm 2.00 \times 10^{-45}\bigr].
+          $$
+          Thus the discarded `TASK-TC-053R` certificate lacked a valid supporting majorant (we do not claim its numerical endpoints are disproved).
+        - *Proved replacement Euler-tail bound $B(P, \theta)$ for all $\theta > 1/2$ and integers $P \ge 2$*: Fix an integer $P \ge 2$ and $\theta > 1/2$, and set $a := (1 - P^{-\theta})^{-1} > 1$. For every prime $p > P$, we have $p^{-\theta} < P^{-\theta}$, so $p^\theta - 1 = p^\theta(1 - p^{-\theta}) > p^\theta(1 - P^{-\theta}) = a^{-1} p^\theta$, together with $p + 1 > p$ and $\frac{p - 1}{p + 1} < 1$. Therefore
+          $$
+          0 < \log F_p(\theta) \le F_p(\theta) - 1 = \frac{2}{(p + 1)(p^\theta - 1)} + \frac{p - 1}{(p + 1)(p^\theta - 1)^2} \le 2 a\,p^{-1-\theta} + a^2\,p^{-2\theta}.
+          $$
+          Comparing the prime sums with the corresponding sums over all integers $n > P$ and using the decreasing-integrand bound $\sum_{n > P} n^{-\alpha} \le \int_P^\infty x^{-\alpha}\,dx = \frac{P^{1 - \alpha}}{\alpha - 1}$ for $\alpha \in \{1 + \theta, 2\theta\}$ (both $> 1$ since $\theta > 1/2$) establishes
+          $$
+          \boxed{0 \le \sum_{p > P} \log F_p(\theta) \le B(P, \theta) := \frac{2a}{\theta P^\theta} + \frac{a^2}{(2\theta - 1) P^{2\theta - 1}}, \qquad a := \bigl(1 - P^{-\theta}\bigr)^{-1}.}
+          $$
+          At $P = 2000$, this gives $B(2000, 3/4) = \bigl[0.05396838768546253991162240291534870105926 \pm 2.00 \times 10^{-41}\bigr]$ and $B(2000, 1) = \bigl[0.001501000625375218875070351583996100101076 \pm 2.00 \times 10^{-42}\bigr]$ (`multi_cutoff_consistency_P_500_1000_2000_5000_certified: true`, where increasing arithmetic bit precision at a fixed prime cutoff $P$ does not reduce the truncation interval $[0, B(P, \theta)]$). Multiplying the finite product $\prod_{p \le 2000} F_p(\theta)$ by $\exp\bigl([0, B(2000, \theta)]\bigr)$ certifies
+          $$
+          C_{h, 3/4} := \sum_{d, e \ge 1}\frac{|h(d, e)|}{(de)^{3/4}} = \bigl[9.0 \pm 0.528\bigr] < \infty, \qquad C_{h, 1} := \sum_{d, e \ge 1}\frac{|h(d, e)|}{de} = \bigl[3.61 \pm 6.80 \times 10^{-3}\bigr] < \infty
+          $$
+          (with exact 256-bit outward-rounded endpoint enclosures $9.0271284729 < C_{h, 3/4} < 9.5276940167$ and $3.6032064221 < C_{h, 1} < 3.6086189151$ at $P = 2000$, and nested enclosure narrowing across $P \in \{500, 1000, 2000, 5000\}$).
         Substituting $f(r, s) = \sum_{dm = r,\, en = s} h(d, e)\mu(m)\mu(n)$ into $S(A) = \frac{3\sqrt{\pi}}{8\zeta(2)}\sum_{A \le r, s < 2A} f(r, s) K(r, s)$ gives the exact decomposition (certified across all $12$ blocks, `all_direct_vs_h_convolution_enclose_zero: true`):
         $$
         \boxed{S(A) = \frac{3\sqrt{\pi}}{8\zeta(2)}\sum_{1 \le d, e < 2A} h(d, e)\,T_{d, e}(A), \qquad T_{d, e}(A) := \sum_{A/d \le m < 2A/d}\,\sum_{A/e \le n < 2A/e} \mu(m)\,\mu(n)\,K(dm, en).}
         $$
-     2. *Step 2 — Uniform Korobov–Vinogradov–Walfisz Saving on the Main Range $1 \le d, e \le \sqrt{A}$*:
-        In $T_{d, e}(A)$, the arithmetic weights $\mu(m)$ and $\mu(n)$ are the **ordinary unweighted Möbius function** with **no coprimality restriction**. Set $B_1 := A/d \ge \sqrt{A}$, $B_2 := A/e \ge \sqrt{A}$, and define the 1D summatory functions $M_{B_1}(u) := \sum_{B_1 \le m \le u}\mu(m) = M(u) - M(B_1^-)$ and $M_{B_2}(v) := \sum_{B_2 \le n \le v}\mu(n) = M(v) - M(B_2^-)$, which vanish at their lower endpoints $M_{B_1}(B_1^-) = M_{B_2}(B_2^-) = 0$. By the unconditional Korobov (1958)–Vinogradov (1958)–Walfisz (1963, *Weylsche Exponentialsummen in der neueren Zahlentheorie*, Ch. V, §5, Satz 2) theorem for $M(x) = \sum_{m \le x}\mu(m)$, there exist absolute constants $C_{\mathrm{W}} > 0$ and $c_0 > 0$ such that $|M(x)| \le C_{\mathrm{W}}\,x\exp\bigl(-c_0\Phi(x)\bigr)$ for all $x \ge 1$, where $\Phi(x) := (\log x)^{3/5}(\log\log x)^{-1/5}$ (with $\Phi(x) := 0$ for $x < e^e$). Hence for all $u \in [B_1, 2B_1]$ and $v \in [B_2, 2B_2]$ with $B_1, B_2 \ge \sqrt{A}$:
+     2. *Step 2 — Uniform Korobov–Vinogradov–Walfisz Saving on the Main Range $1 \le d, e \le \sqrt{A}$ for $A \ge A_0 := e^{2e}$*:
+        In $T_{d, e}(A)$, the arithmetic weights $\mu(m)$ and $\mu(n)$ are the **ordinary unweighted Möbius function** with **no coprimality restriction**. Fix the explicit large-$A$ threshold $A \ge A_0 := e^{2e} \approx 229.6516640835$, so that for all $1 \le d, e \le \sqrt{A}$, the lower endpoints $B_1 := A/d \ge \sqrt{A} \ge e^e$ and $B_2 := A/e \ge \sqrt{A} \ge e^e$ lie inside $[e^e, \infty)$ where $\log\log x \ge 1$ and $\Phi(x) := (\log x)^{3/5}(\log\log x)^{-1/5} > 0$ is strictly increasing (since $(\log\Phi(x))' = \frac{3\log\log x - 1}{5 x\log x\log\log x} \ge \frac{2}{5 x\log x\log\log x} > 0$). Furthermore, on $x \ge e^e$, the function $x \mapsto (\log x)^{-1/5}(\log\log x)^{-1/5}$ is strictly decreasing, so $\Phi(\sqrt{A}) = 2^{-3/5}(\log A)^{3/5}(\log\log\sqrt{A})^{-1/5} \ge 2^{-3/5}\Phi(A)$. Define the 1D summatory functions $M_{B_1}(u) := \sum_{B_1 \le m \le u}\mu(m) = M(u) - M(B_1^-)$ and $M_{B_2}(v) := \sum_{B_2 \le n \le v}\mu(n) = M(v) - M(B_2^-)$, which vanish at their lower endpoints $M_{B_1}(B_1^-) = M_{B_2}(B_2^-) = 0$. By the unconditional Korobov (1958)–Vinogradov (1958)–Walfisz (1963, *Weylsche Exponentialsummen in der neueren Zahlentheorie*, Ch. V, §5, Satz 2) theorem for $M(x) = \sum_{m \le x}\mu(m)$, there exist absolute constants $C_{\mathrm{W}} > 0$ and $c_0 > 0$ such that $|M(x)| \le C_{\mathrm{W}}\,x\exp\bigl(-c_0\Phi(x)\bigr)$ for all $x \ge e^e$. Hence for all $A \ge e^{2e}$ and all $u \in [B_1, 2B_1]$, $v \in [B_2, 2B_2]$ with $B_1, B_2 \ge \sqrt{A} \ge e^e$:
         $$
         \bigl|M_{B_1}(u)\bigr| \le 4 C_{\mathrm{W}}\,\frac{A}{d}\,e^{-c_1\Phi(A)}, \qquad \bigl|M_{B_2}(v)\bigr| \le 4 C_{\mathrm{W}}\,\frac{A}{e}\,e^{-c_1\Phi(A)} \qquad \bigl(c_1 := 2^{-3/5} c_0 > 0\bigr).
         $$
@@ -1302,13 +1331,13 @@ In `TASK-TC-053` (branched from the merged `TC-052R2` baseline `c64596727e714259
         $$
         T_{d, e}(A) = M_{B_1}(2B_1^-) M_{B_2}(2B_2^-) K(2A, 2A) - M_{B_2}(2B_2^-) d\!\int_{B_1}^{2B_1}\! M_{B_1}(u) K_r(du, 2A)\,du - M_{B_1}(2B_1^-) e\!\int_{B_2}^{2B_2}\! M_{B_2}(v) K_s(2A, ev)\,dv + de\!\int_{B_1}^{2B_1}\!\int_{B_2}^{2B_2}\! M_{B_1}(u) M_{B_2}(v) K_{rs}(du, ev)\,du\,dv.
         $$
-        Substituting the uniform derivative bounds on $[A, 2A]^2$ ($|K| \le 2^{-5/2} A^{-1}$, $d(2B_1 - B_1)|K_r| = A|K_r| \le \frac{3}{4\sqrt{2}} A^{-1}$, $e(2B_2 - B_2)|K_s| = A|K_s| \le \frac{3}{4\sqrt{2}} A^{-1}$, and $de(2B_1 - B_1)(2B_2 - B_2)|K_{rs}| = A^2|K_{rs}| \le \frac{11}{8\sqrt{2}} A^{-1}$) gives
+        Substituting the uniform derivative bounds on $[A, 2A]^2$ ($|K(2A, 2A)| \le 2^{-5/2} A^{-1}$, $d(2B_1 - B_1)\sup|K_r| = A\sup|K_r| \le \frac{3}{4\sqrt{2}} A^{-1}$, $e(2B_2 - B_2)\sup|K_s| = A\sup|K_s| \le \frac{3}{4\sqrt{2}} A^{-1}$, and $de(2B_1 - B_1)(2B_2 - B_2)\sup|K_{rs}| = A^2\sup|K_{rs}| \le \frac{11}{8\sqrt{2}} A^{-1}$, whose coefficients sum to $M_{\mathrm{var}} = \frac{25}{8\sqrt{2}}$) gives
         $$
-        \boxed{\bigl|T_{d, e}(A)\bigr| \le 16 C_{\mathrm{W}}^2\,M_{\mathrm{var}}\,\frac{A}{de}\,e^{-2 c_1\Phi(A)} \qquad \text{uniformly in } 1 \le d, e \le \sqrt{A},}
+        \boxed{\bigl|T_{d, e}(A)\bigr| \le 16 C_{\mathrm{W}}^2\,M_{\mathrm{var}}\,\frac{A}{de}\,e^{-2 c_1\Phi(A)} \qquad \text{uniformly in } 1 \le d, e \le \sqrt{A} \text{ for all } A \ge e^{2e},}
         $$
         and summing over $1 \le d, e \le \sqrt{A}$ yields
         $$
-        \sum_{1 \le d, e \le \sqrt{A}} |h(d, e)|\,\bigl|T_{d, e}(A)\bigr| \le 16 C_{\mathrm{W}}^2\,M_{\mathrm{var}}\,C_{h, 1}\,A\,e^{-2 c_1\Phi(A)}.
+        \sum_{1 \le d, e \le \sqrt{A}} |h(d, e)|\,\bigl|T_{d, e}(A)\bigr| \le 16 C_{\mathrm{W}}^2\,M_{\mathrm{var}}\,C_{h, 1}\,A\,e^{-2 c_1\Phi(A)} \qquad \bigl(16 M_{\mathrm{var}} C_{h, 1} = \bigl[127.0 \pm 0.584\bigr],\; 127.39258475 < 16 M_{\mathrm{var}} C_{h, 1} < 127.58394528\bigr).
         $$
      3. *Step 3 — Tail Range $\max(d, e) > \sqrt{A}$, Empty Intervals, Short Intervals, and Polynomial Tail $O(A^{7/8})$*:
         - *Empty intervals ($d \ge 2A$ or $e \ge 2A$)*: If $d \ge 2A$, then $2A/d \le 1$, so $[A/d, 2A/d) \cap \mathbb{Z} = \emptyset$ and $T_{d, e}(A) = 0$ identically (and symmetrically if $e \ge 2A$).
@@ -1320,13 +1349,17 @@ In `TASK-TC-053` (branched from the merged `TC-052R2` baseline `c64596727e714259
           $$
           \boxed{\sum_{\substack{1 \le d, e < 2A \\ \max(d, e) > \sqrt{A}}} |h(d, e)|\,\bigl|T_{d, e}(A)\bigr| \le \frac{9}{4\sqrt{2}}\,A^{7/8}\sum_{d, e \ge 1}\frac{|h(d, e)|}{(de)^{3/4}} = \frac{9 C_{h, 3/4}}{4\sqrt{2}}\,A^{7/8} = O(A^{7/8}),}
           $$
-          where $\frac{9 C_{h, 3/4}}{4\sqrt{2}} = [14.0 \pm 0.622]$ (`tail_bound_coefficient_9_Ch34_over_4sqrt2_certified`).
-     4. *Step 4 — Assembly of the Unconditional Signed-Block Saving*:
-        Combining Steps 1–3 establishes unconditionally for all $A \ge 1$:
+          where $\frac{9 C_{h, 3/4}}{4\sqrt{2}} = [15.0 \pm 0.638]$ (with exact 256-bit outward-rounded endpoint enclosure $14.3620734065 < \frac{9 C_{h, 3/4}}{4\sqrt{2}} < 15.1584684253$, `tail_bound_coefficient_9_Ch34_over_4sqrt2_certified`).
+     4. *Step 4 — Assembly of the Unconditional Signed-Block Saving and Accurate Scope*:
+        Combining Steps 1–3 establishes unconditionally on the proved large-$A$ domain $A \ge A_0 := e^{2e}$:
         $$
-        \boxed{\bigl|S(A)\bigr| \le \frac{3\sqrt{\pi}}{8\zeta(2)}\left(16 C_{\mathrm{W}}^2 M_{\mathrm{var}} C_{h, 1}\,A\,e^{-2 c_1\Phi(A)} + \frac{9 C_{h, 3/4}}{4\sqrt{2}}\,A^{7/8}\right) \ll A\exp\!\bigl(-c\,(\log A)^{3/5}(\log\log A)^{-1/5}\bigr) \ll_D \frac{A}{(\log A)^D} \quad \forall D > 0}
+        \boxed{\bigl|S(A)\bigr| \le \frac{3\sqrt{\pi}}{8\zeta(2)}\left(16 C_{\mathrm{W}}^2 M_{\mathrm{var}} C_{h, 1}\,A\,e^{-2 c_1\Phi(A)} + \frac{9 C_{h, 3/4}}{4\sqrt{2}}\,A^{7/8}\right) \qquad \forall A \ge e^{2e},}
         $$
-        with $c = 2 c_1 = 2^{2/5} c_0 > 0$. This **rigorously and unconditionally beats both the $O(A)$ unsigned majorant and the positive two-prime stratum $S_{2\text{-prime}}(A) \asymp \frac{A}{\log^2 A}$**, while a fixed power saving $|S(A)| \le C A^{1 - \eta}$ ($\eta > 0$) remains a separate conditional target requiring a zero-free strip $\operatorname{Re} s > 1 - \eta'$ for $\zeta(s)$.
+        with $\Phi(A) = (\log A)^{3/5}(\log\log A)^{-1/5}$ and $c := 2 c_1 = 2^{2/5} c_0 > 0$. On the remaining bounded range $1 \le A < e^{2e}$, the proved non-asymptotic unsigned estimate $|S(A)| \le S_{\mathrm{abs}}(A) \le C_{\mathrm{block}}\,A$ ($C_{\mathrm{block}} < 0.239$) holds directly; enlarging the implied constant to absorb the compact range $[1, e^{2e}]$ yields unconditionally
+        $$
+        \boxed{\bigl|S(A)\bigr| \ll A\exp\!\bigl(-c\,(\log A)^{3/5}(\log\log A)^{-1/5}\bigr) \ll_D \frac{A}{(\log A)^D} \quad (\forall D > 0), \qquad S(A) = o\!\left(\frac{A}{\log^2 A}\right).}
+        $$
+        This **rigorously and unconditionally beats both the $O(A)$ unsigned majorant and the positive two-prime stratum $S_{2\text{-prime}}(A) \asymp \frac{A}{\log^2 A}$**. Regarding power savings: a zero-free strip $\operatorname{Re} s > 1 - \eta'$ for $\zeta(s)$ (giving power-saving cancellation in $M(x) = \sum_{m \le x}\mu(m)$) supplies a *conditional route* to a fixed power saving $|S(A)| \le C A^{1 - \eta}$ ($\eta > 0$) through the present convolution method, whereas claiming that a fixed power saving for this particular weighted block $S(A)$ *necessarily* requires a zero-free strip (or is equivalent to one) would require a separate converse proof. Moreover, controlling the single balanced block $S(A)$ on $A \le X^{1/3 - \delta}$ remains distinct from the full grade-interval $L^2$ energy bound $\int_Y^{\tau Y} |Q(X)|^2 \frac{dX}{X} \le C_\varepsilon Y^\varepsilon$ required to close `SUBGATE-TC-043A` / RH.
 
 5. **Edge-Case Regrouping Regressions and 12-Point Balanced-Block Evaluation Table**:
    All edge-case classes are verified in 256-bit Arb (`edge_cases_verified: true`), with the regrouped $q$-sum computed independently by iterating over $q \in [r_{\min}^2, r_{\max}^2]$ and calling `_evaluate_w_A_q_arb`:
@@ -1367,8 +1400,39 @@ In [formal/RiemannScope/TrivialZero.lean](file:///c:/Development/Projects/reiman
    - `RiemannScope.trivial_zero_slope_scale_invariance_and_grade_energy_criterion` (`'[propext, Classical.choice, Quot.sound]'`): scalar real-algebra lemma in `RiemannScope` proving scale-invariance cancellation `a_K * d_aK = d_0` and `normalizedTrivialZeroSlope sgn_m tau_pow_2m fact_2m a_K d_aK = zeta_2m_plus_1` from explicit real hypotheses `h_chain` and `h_reflection`, the triangle-inequality combination `|G_k - c_k| ≤ (C_1 + C_2) * inv_k_sq`, and the grade-interval product bound `E_Y * W_Y ≤ C_eps * log_tau * (Y_pow_eps * Y_pow_neg_2sigma)` followed by modus ponens;
    - `RiemannScope.common_factor_mobius_split_and_valid_growing_range_exponent` (`'[propext, Classical.choice, Quot.sound]'`): scalar real-algebra lemma in `RiemannScope` that receives `h_mobius : mu_dr_ds = ind_coprime * (mu_d ^ 2) * mu_r * mu_s` as an **explicit premise** over $\mathbb{R}$ and proves the case split `(ind_coprime = 0 → mu_dr_ds = 0) ∧ (ind_coprime = 1 → mu_d ^ 2 = 1 → mu_dr_ds = mu_r * mu_s)`, the algebraic cancellation of `X_pow_5` and `rs_cubed` in `commonFactorPairwiseLeadingTerm`, and the upper-bound exponent equivalence `(1 / 3 - delta) * (3 / 2 + eps) - 1 / 2 < 0 ↔ eps < (3 * delta) / (2 * (1 / 3 - delta))`;
    - `RiemannScope.signed_block_bivariate_euler_nonvanishing_and_parity_regrouping` (`'[propext, Classical.choice, Quot.sound]'`): scalar real-algebra lemma in `RiemannScope` proving the single-prime local bivariate Euler-factor ratio identity, the AM–GM inequality `(2 * sqrt_p) / (p + 1) < 1` and strict positivity `0 < 1 - (p / (p + 1)) * (x_1 + x_2)` for `x_1 + x_2 ≤ 2 / sqrt_p`, prime-square cancellation `-(log_p * (-mu_m) + log_p * mu_m) = 0`, and the parity-stratum linear inequalities from `h_parity_decomp`.
-   - **External Analytic Attribution**: The arithmetic Möbius factorization over $\mathbb{Z}_{\ge 1}$, the Stieltjes derivation of the replacement pairwise bound $|E_{r,s}(X)| \le C\,2^{\omega(rs)}X^{-1/2}\frac{(rs)^{5/2}}{(r^2+s^2)^{11/4}}$ ($C = 3 I_{\mathrm{abs}} < 21$), infinite Euler-product convergence on $\Omega_{\mathcal{H}}$, and the 4-step uniform convolution/Korobov–Vinogradov–Walfisz proof of $|S(A)| \ll A e^{-c\Phi(A)} \ll_D A/(\log A)^D$ are proved analytically and certified in 256-bit Arb outside Lean.
+   - **External Analytic Attribution**: The arithmetic Möbius factorization over $\mathbb{Z}_{\ge 1}$, the Stieltjes derivation of the replacement pairwise bound $|E_{r,s}(X)| \le (3 J)\,2^{\omega(rs)}X^{-1/2}\frac{(rs)^{5/2}}{(r^2+s^2)^{11/4}}$ ($J = \int_0^\infty v^{7/4}|v - 3|e^{-v}\,dv = 2.1520858052\dots$, $3 J = 6.4562574156\dots \le 6\cdot 3^{11/4}e^{-3} + \frac{63}{64}\Gamma(3/4) < 8$, $C = 8$), infinite Euler-product convergence on $\Omega_{\mathcal{H}}$, the proved Euler-product tail majorant $B(P, \theta)$ for $C_{h,3/4}$ and $C_{h,1}$, the variation constant $M_{\mathrm{var}} = \frac{25}{8\sqrt{2}}$, and the 4-step uniform convolution/Korobov–Vinogradov–Walfisz proof of $|S(A)| \ll A e^{-c\Phi(A)} \ll_D A/(\log A)^D$ ($S(A) = o(A/\log^2 A)$) are proved analytically and certified in 256-bit Arb outside Lean.
 3. **Certificate Verifier Repair**:
    In [certification.py](file:///c:/Development/Projects/reimann_scope/certification.py), `certify_trivial_zero` and `certify_worldline` record both `"formal_theorem_reference": "RiemannScope.TrivialZero.trivialZero_exact"` and `"transported_worldline_theorem_reference": "RiemannScope.TrivialZero.trivialZero_worldline_exact"` (verified against `formal/RiemannScope/TrivialZero.lean`).
+
+---
+
+## 11. Liouville Square-Dilation Transfer, Exact Common-Factor Cancellation, Euler–Maclaurin Sub-Transition Expansion, Transition Poisson Summation, Separable Gaussian Decoupling, and Dyadic Parity Obstruction (`TASK-TC-054` / `TASK-TC-054R` / `TASK-TC-054R2`)
+
+In `TASK-TC-054`, `TASK-TC-054R`, and `TASK-TC-054R2` (authored in full in [docs/reviews/TC_LIOUVILLE_SQUARE_DILATION.md](file:///c:/Development/Projects/reimann_scope/docs/reviews/TC_LIOUVILLE_SQUARE_DILATION.md) and [docs/reviews/TC_054R2_CLOSEOUT_REPORT.md](file:///c:/Development/Projects/reimann_scope/docs/reviews/TC_054R2_CLOSEOUT_REPORT.md), implemented in [tc/liouville_square_dilation.py](file:///c:/Development/Projects/reimann_scope/tc/liouville_square_dilation.py), formalized in [formal/RiemannScope/LiouvilleSquareDilation.lean](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope/LiouvilleSquareDilation.lean) (`15 def` + `8` public `theorem`s + `12` private helper `theorem`s = `35` declarations), and certified in [data/tc_liouville_square_dilation.json](file:///c:/Development/Projects/reimann_scope/data/tc_liouville_square_dilation.json)):
+1. **Reversible Square-Dilation Transfer (`RiemannScope.LiouvilleSquareDilation.prime_power_square_divisor_moebius_liouville_inversion_nat`, `RiemannScope.LiouvilleSquareDilation.actual_prime_power_and_factored_square_divisor_moebius_liouville_inversion_nat`, `RiemannScope.LiouvilleSquareDilation.reversible_weighted_dilation_norm_and_grade_interval_equivalence`)**:
+   Proved $\lambda(n) = \sum_{d^2 \mid n}\mu(n/d^2)$ and $\mu(n) = \sum_{d^2 \mid n}\mu(d)\lambda(n/d^2)$ unconditionally for all $n \ge 1$ via prime-power factorization (and connected to Mathlib's `ArithmeticFunction.cardFactors`, `Nat.factorization`, and `ArithmeticFunction.moebius`, including the flat square-divisor sums `actualFlatMoebiusSquareDivisorSum (n : ℕ) = ∑ d ∈ squareDivisors n, ArithmeticFunction.moebius (n / d ^ 2) = liouvilleLambda n` and `actualFlatInverseLiouvilleSquareDivisorSum (n : ℕ) = ∑ d ∈ squareDivisors n, ArithmeticFunction.moebius d * liouvilleLambda (n / d ^ 2) = ArithmeticFunction.moebius n` without any surrogate hypothesis), establishing the exact reversible identities
+   \[
+   Q_\lambda(X) = \sum_{d\ge 1}\frac{Q_\mu(X/d^2)}{d}, \qquad
+   Q_\mu(X) = \sum_{d\ge 1}\frac{\mu(d)\,Q_\lambda(X/d^2)}{d},
+   \]
+   the Mellin transform $\mathcal{M}[Q_\lambda](z) = \frac{\zeta(1+2z)}{2\zeta(1/2+z)}\Gamma(5/4 - z/2)$ on $\frac{1}{2} < \operatorname{Re} z < \frac{5}{2}$ ($z = a + i b$, showing that $\zeta(1+2z) \ne 0$ on $\operatorname{Re} z > 0$ introduces no zeros or poles in $0 < \operatorname{Re} z < 5/2$), and the two-way grade-interval $L^2$ energy equivalence in weight variable $\eta > 0$ ($\|Q_\lambda\|_\eta \le \zeta(1+2\eta)\|Q_\mu\|_\eta$, $\|Q_\mu\|_\eta \le \frac{\zeta(1+2\eta)}{\zeta(2+4\eta)}\|Q_\lambda\|_\eta$, with $\eta\frac{\zeta(1+2\eta)}{\zeta(2+4\eta)} \to \frac{12}{\tau^2}$ as $\eta \downarrow 0$):
+   \[
+   \left(\forall\varepsilon > 0,\;\int_Y^{\tau Y}|Q_\mu(X)|^2\frac{dX}{X} \ll_\varepsilon Y^\varepsilon\right)
+   \Longleftrightarrow
+   \left(\forall\varepsilon > 0,\;\int_Y^{\tau Y}|Q_\lambda(X)|^2\frac{dX}{X} \ll_\varepsilon Y^\varepsilon\right).
+   \]
+2. **Exact Common-Factor Sign Cancellation & Unconstrained Euler–Maclaurin Sub-Transition Expansion (`RiemannScope.LiouvilleSquareDilation.liouville_complete_multiplicativity_and_common_factor_cancellation_nat`, `RiemannScope.LiouvilleSquareDilation.actual_omega_factorization_and_liouville_common_factor_cancellation_nat`, `RiemannScope.LiouvilleSquareDilation.euler_maclaurin_c2_and_subtransition_growing_range_exponent`)**:
+   Proved $\lambda(dr)\lambda(ds) = \lambda(d)^2\lambda(r)\lambda(s) = \lambda(r)\lambda(s)$ unconditionally for all $d, r, s \ge 1$, eliminating the coprime-squarefree sieve $\mathbf{1}_{\gcd(d,rs)=1}\mu(d)^2$ so that $d$ runs over all positive integers $\mathbb{Z}_{\ge 1}$ with smooth weight $f_L(d) = d^{-6}e^{-L^2/d^2}$ ($L = \frac{X\sqrt{r^2+s^2}}{rs}$). By Euler–Maclaurin summation on $f(v) = v^{-6}e^{-1/v^2}$ ($c_0 = \frac{3\sqrt{\tau/2}}{8} \approx 0.6646701940895685$, $C_2 = \frac{f'(v_-) - f'(v_+)}{6} \approx 1.8512576670169581$, $C_4 = \frac{1}{720}\int_0^\infty |f^{(4)}(v)|\,dv \approx 8.7523717600353656$; full 256-bit Arb enclosures in [docs/reviews/TC_LIOUVILLE_SQUARE_DILATION.md](file:///c:/Development/Projects/reimann_scope/docs/reviews/TC_LIOUVILLE_SQUARE_DILATION.md)), the leading pairwise coefficient becomes a constant independent of prime factors of $rs$,
+   \[
+   L_{r,s}^{(\lambda)} = c_0\,\lambda(r)\lambda(s)\frac{(rs)^2}{(r^2+s^2)^{5/2}}, \qquad c_0 = \frac{3\sqrt{\tau/2}}{8},
+   \]
+   and the general pairwise remainder satisfies $|E_{r,s}^{(\lambda)}(X)| \le C_N X^{-N}\frac{(rs)^{N+2}}{(r^2+s^2)^{(N+5)/2}}$ (specializing at $r \sim s \sim A$ to $C_N 2^{-(N+5)/2} X^{-N}(rs)^{(N-1)/2}$, while at $r = s = 1, L = 9/5$ the ratio $|\sum_{d\ge 1}d^{-6}e^{-L^2/d^2} - c_0 L^{-5}| / (C_2 L^{-7}) \approx 0.4030344210 > \frac{1}{2\sqrt{2}} \approx 0.3535533906$ refutes the unproved $1/(2\sqrt{2})$ factor for general $(r,s,X)$), expanding the valid sub-transition growing range from $A \le X^{1/3-\delta}$ (`TC-053R2`) all the way to $A \le X^{1-\delta}$ ($\delta \in (0, 1)$).
+3. **Non-Schwartz Transition Poisson Summation, Certified Sign Changes of $\widehat{f}(\xi)$, Exact Separable Gaussian Decoupling & Global Stieltjes Energy Saving (Attack A), and Dyadic Parity Obstruction (Attack B) (`RiemannScope.LiouvilleSquareDilation.dyadic_parity_energy_and_off_critical_mode_nonvanishing`, `RiemannScope.LiouvilleSquareDilation.abel_scaling_fourier_ratio_and_unequal_block_algebra`)**:
+   At the transition scale $L \asymp 1$ ($r, s \asymp X$), $f(v) = |v|^{-6}e^{-1/v^2}$ ($f(0)=0$) is not in $\mathcal{S}(\mathbb{R})$ (since $v^6 f(v) \to 1$), but its periodization lies in $C^1(\mathbb{R}/\mathbb{Z})$ ([DLMF 1.8.14](https://dlmf.nist.gov/1.8#E14)), giving $\sum_{d\ge 1}f_L(d) = L^{-5}\bigl(c_0 + \sum_{k\ge 1}\widehat{f}(kL)\bigr)$, where $\widehat{f}(\xi) = 2\int_0^\infty v^{-6}e^{-1/v^2}\cos(\tau\xi v)\,dv$ is **not positive definite** (certified sign changes via regularized Mellin–Barnes contour shift $a_M = -(2M+3/2)$, DLMF 5.8.3 lower bound $|\Gamma(R+ib)| \ge \Gamma(R)e^{-\tau|b|/4}$, monotonically ratio-guarded residue series, and independent `acb.integral` quadrature with separate series vs quadrature accuracy reporting: $\widehat{f}(0) = 2c_0 > 0$, $\widehat{f}(1/2) = -0.5628546550\dots < 0$, $\widehat{f}(4/\tau) = -0.7757751802\dots < 0$, $\widehat{f}(1) = -0.3668367827\dots < 0$, $\widehat{f}(3/2) = +0.2636171832\dots > 0$, $\widehat{f}(2) = +0.1247126116\dots > 0$). Widely unequal blocks satisfy $|B_{A,B}(X)| \le \frac{7}{3}C_*\frac{\min(A,B)^3}{\max(A,B)^2}$ ($C_* = \max\{\zeta(6), c_0 + 27 e^{-3}\} \approx 2.0089210400$, using the exact finite square-sum bound $3\sum_{r=A}^{2A-1}r^2 < 7A^3$). Under **Attack A**, retaining the exact separable Gaussian $e^{-X^2(r^{-2}+s^{-2})/d^2} = e^{-X^2/(d^2 r^2)}e^{-X^2/(d^2 s^2)}$ and applying $\mathbf{1}_{\gcd(r,s)=1} = \sum_{e\mid\gcd(r,s)}\mu(e)$ decouples every rectangular block $B_{A,B}(X) = \sum_{d\ge 1}d^{-1}\sum_{e < 2\min(A,B)}\mu(e)e^{-1}U_\lambda(\frac{X}{de}; \frac{A}{e})U_\lambda(\frac{X}{de}; \frac{B}{e})$ into 1D unweighted Liouville Gaussian sums (with exact rational cutoffs and repaired dyadic Abel bound $|U_\lambda(Y; M)| \ll M^{1/2}\min(M/Y, (Y/M)^{5/2})e^{-c\Phi(M)}$ for $M \ge 16$), while global Stieltjes integration by parts on $Q_\lambda(X) = -X^{5/2}\int_1^\infty L_\lambda(t)\frac{d}{dt}(t^{-3}e^{-X^2/t^2})\,dt$ split at $t = \sqrt{X}$ ($X \ge 256$) proves $|Q_\lambda(X)| \ll \sqrt{X}e^{-c_1\Phi(X)}$ and the **unconditional global super-polynomial logarithmic energy saving**
+   \[
+   E_\lambda(Y) = \int_Y^{\tau Y}|Q_\lambda(X)|^2\frac{dX}{X} \ll Y\exp\!\bigl(-2c_2\Phi(Y)\bigr) \quad (Y \ge 256), \qquad E_\lambda(Y) \ll_D Y(\log Y)^{-D} \quad (\forall D > 0,\; Y \ge 2).
+   \]
+   Under **Attack B**, dyadic parity $\lambda(2m) = -\lambda(m)$ gives $Q_{\lambda,\mathrm{odd}}(X) = Q_\lambda(X) + 2^{-1/2}Q_\lambda(X/2)$ and $Q_\lambda(X) = \sum_{j\ge 0}(-1)^j 2^{-j/2}Q_{\lambda,\mathrm{odd}}(X/2^j)$, where on any off-critical mode $X^{\rho-1/2}$ ($\rho = x + i y$ with $x > 0$) the multiplier $1 + 2^{-\rho}$ satisfies $0 < 1 - 2^{-x} \le |1 + 2^{-\rho}| \le 1 + 2^{-x} < 2$, so 2-adic parity cannot annihilate any off-critical zero contribution (`SUBGATE-TC-043A` remains `OPEN`, `rh_proved: false`).
+
 
 

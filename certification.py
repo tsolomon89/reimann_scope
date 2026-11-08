@@ -142,6 +142,7 @@ REQUIRED_FORMAL_SOURCES = [
     "formal/RiemannScope/SubfactorialZeroKernel.lean",
     "formal/RiemannScope/QuartetRemainderConnection.lean",
     "formal/RiemannScope/CanonicalThetaCorrelationBound.lean",
+    "formal/RiemannScope/LiouvilleSquareDilation.lean",
 ]
 
 
