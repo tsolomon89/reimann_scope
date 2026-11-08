@@ -1,6 +1,6 @@
 /-
 RiemannScope.LiouvilleSquareDilation
-TASK-TC-054 / TASK-TC-054R / TASK-TC-054R2:
+TASK-TC-054 / TASK-TC-054R / TASK-TC-054R2 / TASK-TC-055:
 1. Actual arithmetic definitions and theorems over `ℕ` and `ℤ` using Mathlib's
    `ArithmeticFunction.cardFactors` (`Ω`), `Nat.factorization`, `Nat.divisors`, and
    `ArithmeticFunction.moebius` (`μ`):
@@ -17,13 +17,20 @@ TASK-TC-054 / TASK-TC-054R / TASK-TC-054R2:
      with unconditional proofs of their multiplicativity (`IsMultiplicative`), prime-power evaluation,
      factored prime-power product formulas over `n.factorization.prod`, and full integer identities
      `actualFlatMoebiusSquareDivisorSum n = liouvilleLambda n` and
-     `actualFlatInverseLiouvilleSquareDivisorSum n = ArithmeticFunction.moebius n` for all `n ≠ 0`.
+     `actualFlatInverseLiouvilleSquareDivisorSum n = ArithmeticFunction.moebius n` for all `n ≠ 0`;
+   - Actual finite-prime exclusion sieve sum `actualPrimeExclusionSieveSum N_P n = ∑_{d ∣ gcd(n, N_P)} μ(d)^2 λ(n / d)`,
+     proving `μ(d)^2 λ(n / d) = λ(n) μ(d)` for `d ∣ gcd(n, N_P)` and
+     `actualPrimeExclusionSieveSum N_P n = if n.Coprime N_P then liouvilleLambda n else 0` (`TASK-TC-055` §3);
+   - Multiplicative parity controls `primeParityControl p n = (-1)^{v_p(n)}` and `twoAdicParityControl n = (-1)^{v_2(n)}`,
+     proving complete multiplicativity, common-factor cancellation, prime parity flip `a_p(p n) = -a_p(n)`,
+     and exact separation from `liouvilleLambda` and `actualFlatMoebiusSquareDivisorSum` at odd prime `n = 3` (`TASK-TC-055` §7).
 2. Prime-power exponent models (`liouville_complete_multiplicativity_and_common_factor_cancellation_nat`
    and `prime_power_square_divisor_moebius_liouville_inversion_nat`).
 3. Scalar real-algebra, real-inequality, and finite-sum lemmas for weighted norm bounds, Euler-Maclaurin `C_2`
    and subtransition exponents, dyadic parity square expansion, Stieltjes endpoint antiderivative algebra,
-   Fourier tail ratio denominator monotonicity, exact dyadic block square sum `∑_{A ≤ r < 2A} r^2`, and
-   unequal-block reciprocal-cube bound algebra.
+   Fourier tail ratio denominator monotonicity, exact dyadic block square sum `∑_{A ≤ r < 2A} r^2`,
+   unequal-block reciprocal-cube bound algebra, finite near-diagonal kernel bound `(2H + 1) D_E`,
+   opposite-parity prime-semiprime dilation pairing `λ(p m) + λ(q r m) = 0`, and `a_2` control constants (`TASK-TC-055` §§5–7).
 -/
 
 import Mathlib.NumberTheory.LSeries.RiemannZeta
@@ -108,6 +115,27 @@ def actualFlatMoebiusSquareArith : ArithmeticFunction ℤ :=
 def actualFlatInverseLiouvilleSquareArith : ArithmeticFunction ℤ :=
   ⟨actualFlatInverseLiouvilleSquareDivisorSum,
     by simp [actualFlatInverseLiouvilleSquareDivisorSum, squareDivisors]⟩
+
+/-- Single-prime parity control `a_p(n) = (-1)^{v_p(n)}` for `n ≥ 1` (`a_p(0) = 0`) on `ℕ`,
+    using `n.factorization p`. -/
+def primeParityControl (p n : ℕ) : ℤ :=
+  if n = 0 then 0 else (-1 : ℤ) ^ (n.factorization p)
+
+/-- The 2-adic parity control `a_2(n) = (-1)^{v_2(n)}` (`TASK-TC-055` §7) on `ℕ`. -/
+def twoAdicParityControl (n : ℕ) : ℤ :=
+  primeParityControl 2 n
+
+/-- `ArithmeticFunction ℤ` wrapper for `primeParityControl p`. -/
+def primeParityControlArith (p : ℕ) : ArithmeticFunction ℤ :=
+  ⟨primeParityControl p, by simp [primeParityControl]⟩
+
+/-- Actual finite-prime exclusion sieve sum `∑_{d ∣ gcd(n, N_P)} μ(d)^2 λ(n / d)` (`TASK-TC-055` §3) on `ℕ`. -/
+def actualPrimeExclusionSieveSum (N_P n : ℕ) : ℤ :=
+  ∑ d ∈ Nat.divisors (Nat.gcd n N_P), (ArithmeticFunction.moebius d) ^ 2 * liouvilleLambda (n / d)
+
+/-- Auxiliary `ArithmeticFunction ℤ` for `d ↦ μ(d)^2 λ(d)`. -/
+def muSqTimesLambdaArith : ArithmeticFunction ℤ :=
+  ⟨fun d => (ArithmeticFunction.moebius d) ^ 2 * liouvilleLambda d, by simp [liouvilleLambda]⟩
 
 /-- **Theorem 1 (`TASK-TC-054` §2–§4, Exponent Model)**: Complete multiplicativity and common-factor
     sign cancellation for `liouvilleSignFromOmega` on natural-number exponents `omega_d, omega_r, omega_s : ℕ`. -/
@@ -793,6 +821,283 @@ theorem abel_scaling_fourier_ratio_and_unequal_block_algebra
     have h_nonneg : 0 ≤ (B - 2) / (2 * B ^ 3) :=
       div_nonneg (by linarith) (by positivity)
     linarith
+
+/-- Helper lemma: `liouvilleLambda (a * b) = liouvilleLambda a * liouvilleLambda b` for `a ≠ 0`, `b ≠ 0`. -/
+private theorem liouvilleLambda_mul_aux {a b : ℕ} (ha : a ≠ 0) (hb : b ≠ 0) :
+    liouvilleLambda (a * b) = liouvilleLambda a * liouvilleLambda b := by
+  have hab : a * b ≠ 0 := mul_ne_zero ha hb
+  simp [liouvilleLambda, ha, hb, hab, natOmega, ArithmeticFunction.cardFactors_mul ha hb,
+    liouvilleSignFromOmega, pow_add]
+
+/-- Helper lemma: `liouvilleLambda d * liouvilleLambda d = 1` for `d ≠ 0`. -/
+private theorem liouvilleLambda_sq_aux {d : ℕ} (hd : d ≠ 0) :
+    liouvilleLambda d * liouvilleLambda d = 1 := by
+  simp only [liouvilleLambda, hd, ↓reduceIte, liouvilleSignFromOmega]
+  rw [← pow_add]
+  have h_even : natOmega d + natOmega d = 2 * natOmega d := by omega
+  rw [h_even, pow_mul]
+  norm_num
+
+/-- Helper lemma: for `d ∣ n` with `n ≠ 0`, `liouvilleLambda (n / d) = liouvilleLambda n * liouvilleLambda d`. -/
+private theorem liouvilleLambda_div_of_dvd_aux {n d : ℕ} (hn : n ≠ 0) (hdvd : d ∣ n) :
+    liouvilleLambda (n / d) = liouvilleLambda n * liouvilleLambda d := by
+  have hd : d ≠ 0 := ne_zero_of_dvd_ne_zero hn hdvd
+  have hq : n / d ≠ 0 := (Nat.div_ne_zero_iff hd).mpr (Nat.le_of_dvd (Nat.pos_of_ne_zero hn) hdvd)
+  have hmul : d * (n / d) = n := Nat.mul_div_cancel' hdvd
+  have h1 : liouvilleLambda n = liouvilleLambda d * liouvilleLambda (n / d) := by
+    calc
+      liouvilleLambda n = liouvilleLambda (d * (n / d)) := by rw [hmul]
+      _ = liouvilleLambda d * liouvilleLambda (n / d) := liouvilleLambda_mul_aux hd hq
+  calc
+    liouvilleLambda (n / d) = 1 * liouvilleLambda (n / d) := by ring
+    _ = (liouvilleLambda d * liouvilleLambda d) * liouvilleLambda (n / d) := by
+      rw [liouvilleLambda_sq_aux hd]
+    _ = (liouvilleLambda d * liouvilleLambda (n / d)) * liouvilleLambda d := by ring
+    _ = liouvilleLambda n * liouvilleLambda d := by rw [← h1]
+
+/-- Helper lemma: `(ArithmeticFunction.moebius d) ^ 2 * liouvilleLambda d = ArithmeticFunction.moebius d` for all `d : ℕ`. -/
+private theorem moebius_sq_mul_liouvilleLambda_eq_moebius_aux (d : ℕ) :
+    (ArithmeticFunction.moebius d) ^ 2 * liouvilleLambda d = ArithmeticFunction.moebius d := by
+  have h_mult_lam : liouvilleArith.IsMultiplicative := by
+    refine ⟨by decide, ?_⟩
+    intro a b _
+    by_cases ha0 : a = 0
+    · subst ha0; simp [liouvilleArith, liouvilleLambda]
+    · by_cases hb0 : b = 0
+      · subst hb0; simp [liouvilleArith, liouvilleLambda]
+      · exact liouvilleLambda_mul_aux ha0 hb0
+  have h_mult_mu_sq_lam : muSqTimesLambdaArith.IsMultiplicative := by
+    refine ⟨by decide, ?_⟩
+    intro a b cop
+    change (ArithmeticFunction.moebius (a * b)) ^ 2 * liouvilleLambda (a * b) =
+      ((ArithmeticFunction.moebius a) ^ 2 * liouvilleLambda a) *
+        ((ArithmeticFunction.moebius b) ^ 2 * liouvilleLambda b)
+    have hmu : ArithmeticFunction.moebius (a * b) =
+        ArithmeticFunction.moebius a * ArithmeticFunction.moebius b :=
+      ArithmeticFunction.isMultiplicative_moebius.2 cop
+    have hlam : liouvilleLambda (a * b) = liouvilleLambda a * liouvilleLambda b :=
+      h_mult_lam.2 cop
+    rw [hmu, hlam]
+    ring
+  have h_eq_fn : muSqTimesLambdaArith = ArithmeticFunction.moebius := by
+    rw [ArithmeticFunction.IsMultiplicative.eq_iff_eq_on_prime_powers
+      muSqTimesLambdaArith h_mult_mu_sq_lam
+      ArithmeticFunction.moebius ArithmeticFunction.isMultiplicative_moebius]
+    intro q e hq
+    change (ArithmeticFunction.moebius (q ^ e)) ^ 2 * liouvilleLambda (q ^ e) =
+      ArithmeticFunction.moebius (q ^ e)
+    rw [moebius_apply_prime_pow_eq_primePowerMoebius_aux hq e, liouvilleLambda_prime_pow_aux hq e]
+    rcases e with _ | _ | e
+    · decide
+    · decide
+    · dsimp [primePowerMoebius, liouvilleSignFromOmega]
+      ring
+  exact congrFun (congrArg DFunLike.coe h_eq_fn) d
+
+/-- **Theorem 9 (`TASK-TC-055` §3, Actual Finite-Prime Exclusion Sieve Identity on `ℕ`)**:
+    Proves on actual positive integers `n, N_P : ℕ` (`n ≠ 0`, `N_P ≠ 0`) that:
+    1. For every prime `p`, `λ(p n) = -λ(n)` and `λ(p n) + λ(n) = 0`;
+    2. For every divisor `d ∣ gcd(n, N_P)`, `μ(d)^2 λ(n / d) = λ(n) μ(d)`;
+    3. The finite squarefree prime-exclusion sieve sum `actualPrimeExclusionSieveSum N_P n = ∑_{d ∣ gcd(n, N_P)} μ(d)^2 λ(n / d)`
+       equals `λ(n)` if `Nat.Coprime n N_P` and `0` otherwise (`if n.Coprime N_P then liouvilleLambda n else 0`). -/
+theorem actual_finite_prime_exclusion_sieve_identity_nat
+    {p n N_P d : ℕ} (hp : p.Prime) (hn : n ≠ 0) (_hNP : N_P ≠ 0) (hd : d ∣ Nat.gcd n N_P) :
+    (liouvilleLambda (p * n) = -liouvilleLambda n ∧
+      liouvilleLambda (p * n) + liouvilleLambda n = 0) ∧
+    (ArithmeticFunction.moebius d) ^ 2 * liouvilleLambda (n / d) =
+      liouvilleLambda n * ArithmeticFunction.moebius d ∧
+    actualPrimeExclusionSieveSum N_P n =
+      (if n.Coprime N_P then liouvilleLambda n else 0) := by
+  have h_lam_p : liouvilleLambda p = -1 := by
+    have h_op : natOmega p = 1 := ArithmeticFunction.cardFactors_eq_one_iff_prime.mpr hp
+    simp [liouvilleLambda, hp.ne_zero, h_op, liouvilleSignFromOmega]
+  have h_pn : liouvilleLambda (p * n) = -liouvilleLambda n := by
+    rw [liouvilleLambda_mul_aux hp.ne_zero hn, h_lam_p]
+    ring
+  have h_term : ∀ c : ℕ, c ∣ Nat.gcd n N_P →
+      (ArithmeticFunction.moebius c) ^ 2 * liouvilleLambda (n / c) =
+        liouvilleLambda n * ArithmeticFunction.moebius c := by
+    intro c hc
+    have hc_n : c ∣ n := dvd_trans hc (Nat.gcd_dvd_left n N_P)
+    rw [liouvilleLambda_div_of_dvd_aux hn hc_n]
+    calc
+      (ArithmeticFunction.moebius c) ^ 2 * (liouvilleLambda n * liouvilleLambda c) =
+        liouvilleLambda n * ((ArithmeticFunction.moebius c) ^ 2 * liouvilleLambda c) := by ring
+      _ = liouvilleLambda n * ArithmeticFunction.moebius c := by
+        rw [moebius_sq_mul_liouvilleLambda_eq_moebius_aux c]
+  have h_sieve :
+      actualPrimeExclusionSieveSum N_P n =
+        (if n.Coprime N_P then liouvilleLambda n else 0) := by
+    dsimp [actualPrimeExclusionSieveSum]
+    have h_congr :
+        (∑ c ∈ (Nat.gcd n N_P).divisors, (ArithmeticFunction.moebius c) ^ 2 * liouvilleLambda (n / c)) =
+          ∑ c ∈ (Nat.gcd n N_P).divisors, liouvilleLambda n * ArithmeticFunction.moebius c := by
+      apply Finset.sum_congr rfl
+      intro c hc
+      rw [Nat.mem_divisors] at hc
+      exact h_term c hc.1
+    rw [h_congr, ← Finset.mul_sum]
+    have h_mu_sum :
+        (∑ c ∈ (Nat.gcd n N_P).divisors, ArithmeticFunction.moebius c) =
+          if Nat.gcd n N_P = 1 then 1 else 0 := by
+      have h_mul_zeta :
+          (ArithmeticFunction.moebius * (ArithmeticFunction.zeta : ArithmeticFunction ℤ)) (Nat.gcd n N_P) =
+            (1 : ArithmeticFunction ℤ) (Nat.gcd n N_P) := by
+        rw [ArithmeticFunction.moebius_mul_coe_zeta]
+      rw [ArithmeticFunction.coe_mul_zeta_apply, ArithmeticFunction.one_apply] at h_mul_zeta
+      exact h_mul_zeta
+    rw [h_mu_sum]
+    by_cases hcop : n.Coprime N_P
+    · have h1 : Nat.gcd n N_P = 1 := hcop
+      rw [if_pos h1, mul_one, if_pos hcop]
+    · have hne1 : Nat.gcd n N_P ≠ 1 := hcop
+      rw [if_neg hne1, mul_zero, if_neg hcop]
+  exact ⟨⟨h_pn, by linarith⟩, h_term d hd, h_sieve⟩
+
+/-- **Theorem 10 (`TASK-TC-055` §7, Multiplicative Parity Controls vs. Actual Möbius/Liouville Arithmetic on `ℕ`)**:
+    Proves on actual positive integers `p, q, m, n, d, r, s : ℕ` that `primeParityControl p n = (-1)^{v_p(n)}`
+    and `twoAdicParityControl n = (-1)^{v_2(n)}` satisfy:
+    1. `primeParityControl p 1 = 1`, `primeParityControl p p = -1`, and `primeParityControl p q = 1` for prime `q ≠ p`;
+    2. Complete multiplicativity `primeParityControl p (m * n) = primeParityControl p m * primeParityControl p n`;
+    3. Unit square `primeParityControl p d * primeParityControl p d = 1` and unconstrained common-factor
+       cancellation `primeParityControl p (d * r) * primeParityControl p (d * s) = primeParityControl p r * primeParityControl p s`;
+    4. Exact parity flip at `p`: `primeParityControl p (p * n) = -primeParityControl p n` and
+       `primeParityControl p (p * n) + primeParityControl p n = 0`;
+    5. Exact separation from `liouvilleLambda` and `actualFlatMoebiusSquareDivisorSum` at odd prime `n = 3`:
+       `twoAdicParityControl 3 = 1`, `liouvilleLambda 3 = -1`, `actualFlatMoebiusSquareDivisorSum 3 = -1`,
+       and `twoAdicParityControl 3 ≠ actualFlatMoebiusSquareDivisorSum 3`. -/
+theorem prime_parity_control_multiplicative_and_moebius_separation_nat
+    {p q m n d r s : ℕ} (hp : p.Prime) (hq : q.Prime) (hpq : q ≠ p)
+    (hm : m ≠ 0) (hn : n ≠ 0) (hd : d ≠ 0) (hr : r ≠ 0) (hs : s ≠ 0) :
+    (primeParityControl p 1 = 1 ∧ primeParityControl p p = -1 ∧ primeParityControl p q = 1) ∧
+    primeParityControl p (m * n) = primeParityControl p m * primeParityControl p n ∧
+    primeParityControl p d * primeParityControl p d = 1 ∧
+    primeParityControl p (d * r) * primeParityControl p (d * s) =
+      primeParityControl p r * primeParityControl p s ∧
+    (primeParityControl p (p * n) = -primeParityControl p n ∧
+      primeParityControl p (p * n) + primeParityControl p n = 0) ∧
+    (twoAdicParityControl 1 = 1 ∧ twoAdicParityControl 2 = -1 ∧ twoAdicParityControl 3 = 1 ∧
+      liouvilleLambda 3 = -1 ∧ actualFlatMoebiusSquareDivisorSum 3 = -1 ∧
+      twoAdicParityControl 3 ≠ actualFlatMoebiusSquareDivisorSum 3) := by
+  have hp1 : primeParityControl p 1 = 1 := by
+    simp [primeParityControl]
+  have hpp : primeParityControl p p = -1 := by
+    simp [primeParityControl, hp.ne_zero, hp.factorization_self]
+  have hpq_val : primeParityControl p q = 1 := by
+    have h_zero : q.factorization p = 0 := by
+      rw [hq.factorization, Finsupp.single_apply, if_neg hpq]
+    simp [primeParityControl, hq.ne_zero, h_zero]
+  have h_mul_gen : ∀ a b : ℕ, a ≠ 0 → b ≠ 0 →
+      primeParityControl p (a * b) = primeParityControl p a * primeParityControl p b := by
+    intro a b ha hb
+    have hab : a * b ≠ 0 := mul_ne_zero ha hb
+    have hfact : (a * b).factorization p = a.factorization p + b.factorization p := by
+      rw [Nat.factorization_mul ha hb, Finsupp.add_apply]
+    simp [primeParityControl, ha, hb, hab, hfact, pow_add]
+  have h_sq_gen : ∀ a : ℕ, a ≠ 0 → primeParityControl p a * primeParityControl p a = 1 := by
+    intro a ha
+    simp only [primeParityControl, ha, ↓reduceIte]
+    rw [← pow_add]
+    have h_even : a.factorization p + a.factorization p = 2 * (a.factorization p) := by omega
+    rw [h_even, pow_mul]
+    norm_num
+  have h_cancel :
+      primeParityControl p (d * r) * primeParityControl p (d * s) =
+        primeParityControl p r * primeParityControl p s := by
+    rw [h_mul_gen d r hd hr, h_mul_gen d s hd hs]
+    calc
+      (primeParityControl p d * primeParityControl p r) *
+          (primeParityControl p d * primeParityControl p s) =
+        (primeParityControl p d * primeParityControl p d) *
+          (primeParityControl p r * primeParityControl p s) := by ring
+      _ = 1 * (primeParityControl p r * primeParityControl p s) := by rw [h_sq_gen d hd]
+      _ = primeParityControl p r * primeParityControl p s := by ring
+  have h_flip : primeParityControl p (p * n) = -primeParityControl p n := by
+    rw [h_mul_gen p n hp.ne_zero hn, hpp]
+    ring
+  have h_a2_1 : twoAdicParityControl 1 = 1 := by
+    simp [twoAdicParityControl, primeParityControl]
+  have h_a2_2 : twoAdicParityControl 2 = -1 := by
+    have h2 : (2 : ℕ).Prime := Nat.prime_two
+    dsimp [twoAdicParityControl]
+    simp [primeParityControl, h2.factorization_self]
+  have h_a2_3 : twoAdicParityControl 3 = 1 := by
+    have h3 : (3 : ℕ).Prime := Nat.prime_three
+    have h_z : (3 : ℕ).factorization 2 = 0 := by
+      rw [h3.factorization, Finsupp.single_apply]
+      decide
+    dsimp [twoAdicParityControl]
+    simp [primeParityControl, h_z]
+  have h_lam_3 : liouvilleLambda 3 = -1 := by
+    have h3 : (3 : ℕ).Prime := Nat.prime_three
+    have h_o3 : natOmega 3 = 1 := ArithmeticFunction.cardFactors_eq_one_iff_prime.mpr h3
+    simp [liouvilleLambda, h_o3, liouvilleSignFromOmega]
+  have h_flat_3 : actualFlatMoebiusSquareDivisorSum 3 = -1 := by
+    have h_thm4 := (actual_prime_power_and_factored_square_divisor_moebius_liouville_inversion_nat
+      Nat.prime_three 1 (by decide : (3 : ℕ) ≠ 0)).2.2.2.2.2.2.2.1
+    rw [h_thm4, h_lam_3]
+  exact ⟨⟨hp1, hpp, hpq_val⟩, h_mul_gen m n hm hn, h_sq_gen d hd, h_cancel,
+    ⟨h_flip, by linarith⟩, ⟨h_a2_1, h_a2_2, h_a2_3, h_lam_3, h_flat_3, by omega⟩⟩
+
+/-- **Theorem 11 (`TASK-TC-055` §§5–7, Near-Diagonal Kernel Bound, Opposite-Parity Dilation Pairing, and Control Constants)**:
+    1. Finite near-diagonal kernel bound: for any kernel `K : ℕ → ℕ → ℝ` satisfying `∀ m n, 2 * K m n ≤ K m m + K n n`
+       and any `M h : ℕ`,
+       `2 * (∑ m ∈ Finset.range M, K m (m + h)) ≤ (∑ m ∈ Finset.range M, K m m) + (∑ m ∈ Finset.range M, K (m + h) (m + h))`,
+       and if each of the `2 * H + 1` offset diagonals `bandSum j` (`j ∈ Finset.range (2 * H + 1)`) satisfies `bandSum j ≤ D_E`,
+       then `∑ j ∈ Finset.range (2 * H + 1), bandSum j ≤ (2 * (H : ℝ) + 1) * D_E`;
+    2. Opposite-parity prime–semiprime dilation pairing on actual integers: for primes `p, q, r : ℕ` and `m ≠ 0`,
+       `liouvilleLambda (p * m) = -liouvilleLambda m`, `liouvilleLambda (q * r * m) = liouvilleLambda m`,
+       `liouvilleLambda (p * m) + liouvilleLambda (q * r * m) = 0`, and for real kernel values `K_pm, K_qrm : ℝ`,
+       `(liouvilleLambda (p * m) : ℝ) * K_pm + (liouvilleLambda (q * r * m) : ℝ) * K_qrm = (liouvilleLambda m : ℝ) * (K_qrm - K_pm)`;
+    3. Diagonal energy and `a_2` control leading-coefficient algebra:
+       `(3 / 8 : ℝ) * (1 / 8 : ℝ) = 3 / 64`, `(1 / 2 : ℝ) * (1 - 2 / 3) = 1 / 6`, and `(1 / 6 : ℝ) ^ 2 = 1 / 36`. -/
+theorem near_diagonal_kernel_bound_and_opposite_parity_dilation_pairing
+    (K : ℕ → ℕ → ℝ) (bandSum : ℕ → ℝ) (D_E K_pm K_qrm : ℝ)
+    (M h H : ℕ) {p q r m : ℕ}
+    (hK : ∀ a b : ℕ, 2 * K a b ≤ K a a + K b b)
+    (hBand : ∀ j ∈ Finset.range (2 * H + 1), bandSum j ≤ D_E)
+    (hp : p.Prime) (hq : q.Prime) (hr : r.Prime) (hm : m ≠ 0) :
+    (2 * (∑ a ∈ Finset.range M, K a (a + h)) ≤
+        (∑ a ∈ Finset.range M, K a a) + (∑ a ∈ Finset.range M, K (a + h) (a + h)) ∧
+      (∑ j ∈ Finset.range (2 * H + 1), bandSum j) ≤ (2 * (H : ℝ) + 1) * D_E) ∧
+    (liouvilleLambda (p * m) = -liouvilleLambda m ∧
+      liouvilleLambda (q * r * m) = liouvilleLambda m ∧
+      liouvilleLambda (p * m) + liouvilleLambda (q * r * m) = 0 ∧
+      (liouvilleLambda (p * m) : ℝ) * K_pm + (liouvilleLambda (q * r * m) : ℝ) * K_qrm =
+        (liouvilleLambda m : ℝ) * (K_qrm - K_pm)) ∧
+    ((3 / 8 : ℝ) * (1 / 8 : ℝ) = 3 / 64 ∧
+      (1 / 2 : ℝ) * (1 - 2 / 3) = 1 / 6 ∧
+      (1 / 6 : ℝ) ^ 2 = 1 / 36) := by
+  refine ⟨?_, ?_, by norm_num⟩
+  · constructor
+    · rw [Finset.mul_sum, ← Finset.sum_add_distrib]
+      exact Finset.sum_le_sum (fun a _ => hK a (a + h))
+    · calc
+        (∑ j ∈ Finset.range (2 * H + 1), bandSum j) ≤
+          ∑ _ ∈ Finset.range (2 * H + 1), D_E := Finset.sum_le_sum hBand
+        _ = ((2 * H + 1 : ℕ) : ℝ) * D_E := by
+          rw [Finset.sum_const, Finset.card_range, nsmul_eq_mul]
+        _ = (2 * (H : ℝ) + 1) * D_E := by push_cast; ring
+  · have h_lp : liouvilleLambda p = -1 := by
+      have h_op : natOmega p = 1 := ArithmeticFunction.cardFactors_eq_one_iff_prime.mpr hp
+      simp [liouvilleLambda, hp.ne_zero, h_op, liouvilleSignFromOmega]
+    have h_lq : liouvilleLambda q = -1 := by
+      have h_oq : natOmega q = 1 := ArithmeticFunction.cardFactors_eq_one_iff_prime.mpr hq
+      simp [liouvilleLambda, hq.ne_zero, h_oq, liouvilleSignFromOmega]
+    have h_lr : liouvilleLambda r = -1 := by
+      have h_or : natOmega r = 1 := ArithmeticFunction.cardFactors_eq_one_iff_prime.mpr hr
+      simp [liouvilleLambda, hr.ne_zero, h_or, liouvilleSignFromOmega]
+    have h_pm : liouvilleLambda (p * m) = -liouvilleLambda m := by
+      rw [liouvilleLambda_mul_aux hp.ne_zero hm, h_lp]
+      ring
+    have h_qrm : liouvilleLambda (q * r * m) = liouvilleLambda m := by
+      have hqr : q * r ≠ 0 := mul_ne_zero hq.ne_zero hr.ne_zero
+      rw [liouvilleLambda_mul_aux hqr hm, liouvilleLambda_mul_aux hq.ne_zero hr.ne_zero, h_lq, h_lr]
+      ring
+    refine ⟨h_pm, h_qrm, by omega, ?_⟩
+    rw [h_pm, h_qrm]
+    push_cast
+    ring
 
 end LiouvilleSquareDilation
 

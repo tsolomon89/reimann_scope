@@ -22,28 +22,45 @@ from tc.liouville_square_dilation import (
     TASK_TC_054_ID,
     TASK_TC_054R_ID,
     TASK_TC_054R2_ID,
+    TASK_TC_055_ID,
     TC_053R2_IMPLEMENTATION_COMMIT,
     TC_053R2_REVIEWED_TIP,
     TC_054_IMPLEMENTATION_COMMIT,
     TC_054_REVIEWED_TIP,
     TC_054R_IMPLEMENTATION_COMMIT,
     TC_054R_REVIEWED_TIP,
+    TC_054R2_IMPLEMENTATION_COMMIT,
+    TC_054R2_MERGED_MAIN_BASELINE,
+    TC_054R2_REVIEWED_TIP,
+    TC_055_INITIAL_CLOSEOUT_COMMIT,
     compute_hat_f_tail_ratios_arb,
     evaluate_1d_dyadic_sum_U_lambda_arb,
+    evaluate_E_a2_certified_arb,
+    evaluate_Q_1_unweighted_certified_arb,
+    evaluate_Q_a2_certified_arb,
     evaluate_Q_arith_certified_arb,
+    evaluate_Q_lambda_from_prime_excluded_inverse_certified_arb,
+    evaluate_Q_lambda_prime_excluded_direct_certified_arb,
+    evaluate_Q_lambda_prime_excluded_operator_certified_arb,
     evaluate_d_sum_certified_arb,
     evaluate_decoupled_rectangular_block_B_AB_certified_arb,
+    evaluate_energy_kernel_K_Y_certified_arb,
     evaluate_hat_f_hypergeometric_certified_arb,
     evaluate_hat_f_quadrature_certified_arb,
     evaluate_rectangular_block_B_AB_certified_arb,
     evaluate_square_dilation_transfer_certified_arb,
     execute_task_tc054_liouville_square_dilation_audit,
+    execute_task_tc055_simultaneous_tau_compatibility_audit,
+    finite_prime_parity_aS_int,
+    generate_P_smooth_up_to,
     liouville_lambda_int,
     omega_with_multiplicity_int,
+    prime_exclusion_sieve_sum_int,
     reproduce_tc054_cutoff_tolerance_counterexample_arb,
     reproduce_tc054_hat_f_k1_counterexample_arb,
     square_divisor_inverse_liouville_sum_int,
     square_divisor_moebius_sum_int,
+    two_adic_parity_a2_int,
     verify_abel_scaling_and_global_stieltjes_energy_proof,
     verify_euler_maclaurin_derivatives_and_constants_arb,
     verify_liouville_square_dilation_lean_module,
@@ -52,6 +69,11 @@ from tc.liouville_square_dilation import (
     verify_section_4_unconstrained_common_factor_and_euler_maclaurin,
     verify_section_5_poisson_summation_at_transition,
     verify_section_6_transition_attacks_and_decoupling,
+    verify_tc055_coupled_cutoff_and_norm_obstruction,
+    verify_tc055_integrated_energy_kernel_and_near_diagonal_bound,
+    verify_tc055_multiplicative_parity_controls,
+    verify_tc055_opposite_parity_dilation_pairing_and_obstruction,
+    verify_tc055_simultaneous_joint_identities_and_trivial_zero_cancellation,
 )
 from tc.prime_euler_moebius_recovery import moebius_mu_int
 
@@ -64,6 +86,9 @@ EXPECTED_PUBLIC_THEOREM_NAMES = (
     "euler_maclaurin_c2_and_subtransition_growing_range_exponent",
     "dyadic_parity_energy_and_off_critical_mode_nonvanishing",
     "abel_scaling_fourier_ratio_and_unequal_block_algebra",
+    "actual_finite_prime_exclusion_sieve_identity_nat",
+    "prime_parity_control_multiplicative_and_moebius_separation_nat",
+    "near_diagonal_kernel_bound_and_opposite_parity_dilation_pairing",
 )
 
 
@@ -405,10 +430,10 @@ def test_lean_formalization_and_serialized_artifact_synchronization() -> None:
     assert "import RiemannScope.LiouvilleSquareDilation" in root_lean
 
     lean_info = verify_liouville_square_dilation_lean_module()
-    assert lean_info["definition_count"] == 15
-    assert lean_info["public_theorem_count"] == 8
-    assert lean_info["private_helper_theorem_count"] == 12
-    assert lean_info["total_declaration_count"] == 35
+    assert lean_info["definition_count"] == 20
+    assert lean_info["public_theorem_count"] == 11
+    assert lean_info["private_helper_theorem_count"] == 16
+    assert lean_info["total_declaration_count"] == 47
     assert lean_info["expected_public_theorems_present"] is True
     assert lean_info["sorry_count"] == 0
     assert lean_info["custom_axiom_count"] == 0
@@ -418,6 +443,7 @@ def test_lean_formalization_and_serialized_artifact_synchronization() -> None:
     assert artifact["task_id"] == TASK_TC_054_ID
     assert artifact["repair_task_id"] == TASK_TC_054R_ID
     assert artifact["closeout_task_id"] == TASK_TC_054R2_ID
+    assert artifact["simultaneous_compatibility_task_id"] == TASK_TC_055_ID
     assert artifact["prior_merged_main"] == PRIOR_MERGED_MAIN_TC_053R
     assert artifact["tc053r2_implementation_commit"] == TC_053R2_IMPLEMENTATION_COMMIT
     assert artifact["tc053r2_reviewed_tip"] == TC_053R2_REVIEWED_TIP
@@ -425,6 +451,10 @@ def test_lean_formalization_and_serialized_artifact_synchronization() -> None:
     assert artifact["tc054_reviewed_tip"] == TC_054_REVIEWED_TIP
     assert artifact["tc054r_implementation_commit"] == TC_054R_IMPLEMENTATION_COMMIT
     assert artifact["tc054r_reviewed_tip"] == TC_054R_REVIEWED_TIP
+    assert artifact["tc054r2_implementation_commit"] == TC_054R2_IMPLEMENTATION_COMMIT
+    assert artifact["tc054r2_reviewed_tip"] == TC_054R2_REVIEWED_TIP
+    assert artifact["tc054r2_merged_main_baseline"] == TC_054R2_MERGED_MAIN_BASELINE
+    assert artifact["tc055_initial_closeout_commit"] == TC_055_INITIAL_CLOSEOUT_COMMIT
     assert artifact["subgate_tc043a_status"] == "OPEN"
     assert artifact["rh_proved"] is False
 
@@ -692,8 +722,149 @@ def test_tc054_review_and_state_synchronization() -> None:
     assert "data/tc_liouville_square_dilation.json" in state["linked_runs"]["campaign_artifacts"]
 
     queue = json.loads((REPO_ROOT / ".agents" / "research" / "queue.json").read_text(encoding="utf-8"))
-    assert queue["active_task_id"] == "TASK-TC-054"
-    tc054_entries = [t for t in queue["tasks"] if t["task_id"] == "TASK-TC-054"]
-    assert len(tc054_entries) == 1
-    assert tc054_entries[0]["status"] == "OPEN"
-    assert tc054_entries[0]["review_status"] == "AWAITING_INDEPENDENT_REVIEW"
+    assert queue["active_task_id"] in ("TASK-TC-054", "TASK-TC-055")
+    tc055_entries = [t for t in queue["tasks"] if t["task_id"] == "TASK-TC-055"]
+    assert len(tc055_entries) == 1
+    assert tc055_entries[0]["status"] == "OPEN"
+    assert tc055_entries[0]["review_status"] == "AWAITING_INDEPENDENT_REVIEW"
+
+
+def test_tc055_simultaneous_joint_identities_and_trivial_zero_cancellation() -> None:
+    """Verify TASK-TC-055 Section 1 & Section 3:
+    - Dependency chain and grade-scope note (K in A_R = Qbar intersect R, Lindemann irrationality,
+      no claim of log_tau(2) transcendence).
+    - Exact finite-prime exclusion sieve sum sum_{d | gcd(n, N_P)} |mu(d)| lambda(n / d) = 1_{gcd(n, N_P)=1} lambda(n)
+      up to n = 120 for N_P in {2, 6, 30, 210}.
+    - Removable trivial-zero ratio cancellation lim_{z -> -(2m+1/2)} zeta(1+2z)/zeta(1/2+z) = 2 zeta'(-4m)/zeta'(-2m) != 0.
+    - Direct coprime sum vs operator product prod_{p in P}(I + p^{-1/2} S_p) Q_lambda(X) and convergent P-smooth
+      inverse reconstruction Q_lambda(X) = sum_{m in S(P)} (lambda(m)/sqrt(m)) Q_{lambda,P}(X/m).
+    """
+    sec8 = verify_tc055_simultaneous_joint_identities_and_trivial_zero_cancellation(prec_bits=256)
+    assert len(sec8["dependency_chain_to_subgate_tc043a"]) == 4
+    assert "do NOT claim log_tau(2) is transcendental" in sec8["grade_scope_and_auxiliary_dilation_distinction"]
+    assert sec8["sieve_integer_audit_up_to_120"]["all_sieve_sums_match_coprime_indicator_times_lambda"] is True
+    assert sec8["trivial_zero_and_mellin_cancellation_audit"]["all_trivial_zero_ratios_match_and_nonzero"] is True
+    assert sec8["all_prime_exclusion_and_inverse_checks_hold"] is True
+
+    for row in sec8["finite_prime_exclusion_and_inverse_rows"]:
+        assert row["comparison_classification"] == "same_observable_operator_vs_series_consistency_check"
+        assert row["forward_zero_in_difference"] is True
+        assert row["inverse_zero_in_difference"] is True
+
+
+def test_tc055_coupled_cutoff_neumann_majorant_and_off_critical_modes() -> None:
+    """Verify TASK-TC-055 Section 4:
+    - Exact coprime decomposition Q_{lambda,P_u}(w) = w^{5/2} exp(-w^2) + R_{lambda,P_u}(w)
+      with |R_{lambda,P_u}(w)| <= w^{5/2} / (2 u^2) for u in {5, 7, 11, 13}.
+    - Weighted norm Neumann majorant M_Neumann(u, eta) = prod_{p <= u} (1 - p^{-1/2 - eta})^{-1}
+      (uniform as u -> infty iff eta > 1/2).
+    - Off-critical mode multiplier bounds 0 < prod_{p <= u}(1 - p^{-x}) <= |M_u(rho)| <= prod_{p <= u}(1 + p^{-x}).
+    """
+    sec9 = verify_tc055_coupled_cutoff_and_norm_obstruction(prec_bits=256)
+    cop = sec9["coprime_decomposition_and_coupled_cutoff_attempt"]
+    assert cop["all_coprime_tail_bounds_hold"] is True
+    for r in cop["coprime_tail_rows"]:
+        assert r["bound_strictly_certified"] is True
+
+    neum = {r["eta_label"]: r for r in sec9["weighted_norm_neumann_obstruction"]["rows"]}
+    assert neum["1/10"]["uniform_as_u_to_infty"] is False
+    assert neum["1/4"]["uniform_as_u_to_infty"] is False
+    assert neum["1/2"]["uniform_as_u_to_infty"] is False
+    assert neum["3/4"]["uniform_as_u_to_infty"] is True
+    assert neum["1"]["uniform_as_u_to_infty"] is True
+
+    modes = sec9["off_critical_mode_test"]
+    assert modes["all_mode_bounds_hold"] is True
+    for mrow in modes["rows"]:
+        assert mrow["strictly_positive_and_within_bounds"] is True
+
+
+def test_tc055_integrated_energy_kernel_diagonal_asymptotic_and_near_diagonal_band() -> None:
+    """Verify TASK-TC-055 Section 5:
+    - Closed-form antiderivative evaluation of K_Y(m, n) and symmetry/AM-GM inequality
+      2 K_Y(m, n) <= K_Y(m, m) + K_Y(n, n).
+    - Diagonal energy asymptotic D_E(Y) = (3 sqrt(tau) / 64) log tau + R_{D,E}(Y)
+      with |R_{D,E}(Y)| <= C_{D,2} Y^{-2} and |R_{D,E}(Y)| <= C_{D,4} Y^{-4} for all Y > 0.
+    - Near-diagonal band inequality sum_{|m - n| <= H} K_Y(m, n) <= (2 H + 1) D_E(Y).
+    """
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = 256
+        for Y_int in (1, 2, 4):
+            for m_int, n_int in [(1, 2), (2, 5), (3, 7)]:
+                k_mn = evaluate_energy_kernel_K_Y_certified_arb(Y_int, m_int, n_int, prec_bits=256)
+                k_nm = evaluate_energy_kernel_K_Y_certified_arb(Y_int, n_int, m_int, prec_bits=256)
+                k_mm = evaluate_energy_kernel_K_Y_certified_arb(Y_int, m_int, m_int, prec_bits=256)
+                k_nn = evaluate_energy_kernel_K_Y_certified_arb(Y_int, n_int, n_int, prec_bits=256)
+                assert bool((k_mn - k_nm).contains(0))
+                assert bool((k_mm + k_nn - arb(2) * k_mn).lower() > 0)
+    finally:
+        flint_ctx.prec = saved_prec
+
+    sec10 = verify_tc055_integrated_energy_kernel_and_near_diagonal_bound(prec_bits=256)
+    assert sec10["all_diagonal_bounds_hold"] is True
+    assert sec10["all_near_diagonal_bounds_hold"] is True
+    assert (
+        float(sec10["leading_constant_3_sqrt_tau_over_64_log_tau"]["lower_dec"])
+        <= 0.2159472478105098
+        <= float(sec10["leading_constant_3_sqrt_tau_over_64_log_tau"]["upper_dec"])
+    )
+    assert (
+        float(sec10["explicit_N2_error_constant_C_D2"]["lower_dec"])
+        <= 0.07974240995631961
+        <= float(sec10["explicit_N2_error_constant_C_D2"]["upper_dec"])
+    )
+
+
+def test_tc055_opposite_parity_dilation_pairing_and_unmatched_residual() -> None:
+    """Verify TASK-TC-055 Section 6:
+    - Pairwise MVT kernel-difference bound
+      |K_Y(p m, n) - K_Y(q r m, n)| <= 3 (|q r - p| / min(p, q r)) (max(p, q r) / min(p, q r))^3 K_Y(max(p, q r) m, n)
+      across (p, q r) in {(5, 4), (7, 6), (11, 10), (13, 15)}.
+    - Unmatched coprime and divisor-weight multiplicity counts on 1 <= k <= 240.
+    """
+    sec11 = verify_tc055_opposite_parity_dilation_pairing_and_obstruction(prec_bits=256)
+    assert sec11["all_pairwise_mvt_bounds_hold"] is True
+    for r in sec11["pairwise_mvt_rows"]:
+        assert r["mvt_bound_strictly_certified"] is True
+    obs = sec11["unmatched_residual_and_multiplicity_obstruction"]
+    assert obs["unmatched_k_count_with_W_pair_eq_0"] > 0
+    assert obs["k_count_with_W_pair_ne_w_bar"] == 240
+
+
+def test_tc055_multiplicative_parity_controls_a2_and_aS() -> None:
+    """Verify TASK-TC-055 Section 7:
+    - Multiplicative parity controls a_2(n) = (-1)^{v_2(n)} and a_S(n) = (-1)^{sum_{p in S} v_p(n)}:
+      complete multiplicativity, common-factor cancellation, parity flip on p in S, and failure of
+      sum_{d^2 | n} mu(n/d^2) = a_2(n) at n = 3.
+    - Dyadic exclusion identity (I + 2^{-1/2} S_2) Q_{a_2}(X) = Q_1(X) - 2^{-1/2} Q_1(X/2) > 0,
+      unimodal bound |Q_1(X) - sqrt(X)/2| <= (3/e)^{3/2} X^{-1/2}, and certified asymptotics
+      Q_{a_2}(X) ~ sqrt(X)/6 and E_{a_2}(Y) ~ ((tau - 1)/36) Y.
+    """
+    for m in range(1, 35):
+        for n in range(1, 35):
+            assert two_adic_parity_a2_int(m * n) == two_adic_parity_a2_int(m) * two_adic_parity_a2_int(n)
+            assert finite_prime_parity_aS_int(m * n, (2, 3)) == (
+                finite_prime_parity_aS_int(m, (2, 3)) * finite_prime_parity_aS_int(n, (2, 3))
+            )
+        assert two_adic_parity_a2_int(2 * m) == -two_adic_parity_a2_int(m)
+        assert finite_prime_parity_aS_int(3 * m, (2, 3)) == -finite_prime_parity_aS_int(m, (2, 3))
+        assert finite_prime_parity_aS_int(5 * m, (2, 3)) == finite_prime_parity_aS_int(m, (2, 3))
+    assert two_adic_parity_a2_int(3) == 1
+    assert square_divisor_moebius_sum_int(3) == -1
+
+    sec12 = verify_tc055_multiplicative_parity_controls(prec_bits=256)
+    assert sec12["all_q1_bounds_and_dyadic_identities_hold"] is True
+    assert sec12["all_e_a2_positive"] is True
+    q_rows = {r["X"]: r for r in sec12["Q_a2_rows"]}
+    assert abs(float(q_rows[64]["ratio_Q_a2_over_sqrt_X"]["mid_float"]) - (1.0 / 6.0)) < 5e-3
+    assert abs(float(q_rows[64]["scaled_remainder_sqrt_X_times_diff"]["upper_dec"])) < 0.3
+    e_rows = {r["Y"]: r for r in sec12["E_a2_rows"]}
+    tau_minus_1_over_36 = float(sec12["asymptotic_formulas"]["tau_minus_1_over_36"]["lower_dec"])
+    assert (
+        float(e_rows[32]["ratio_E_a2_over_Y"]["lower_dec"])
+        <= tau_minus_1_over_36
+        <= float(e_rows[32]["ratio_E_a2_over_Y"]["upper_dec"])
+    )
+    assert abs(float(e_rows[32]["ratio_E_a2_over_Y"]["mid_float"]) - tau_minus_1_over_36) < 1e-3
+
