@@ -1,6 +1,6 @@
 /-
 RiemannScope.LiouvilleSquareDilation
-TASK-TC-054 / TASK-TC-054R / TASK-TC-054R2 / TASK-TC-055:
+TASK-TC-054 / TASK-TC-054R / TASK-TC-054R2 / TASK-TC-055 / TASK-TC-055R:
 1. Actual arithmetic definitions and theorems over `ℕ` and `ℤ` using Mathlib's
    `ArithmeticFunction.cardFactors` (`Ω`), `Nat.factorization`, `Nat.divisors`, and
    `ArithmeticFunction.moebius` (`μ`):
@@ -29,8 +29,10 @@ TASK-TC-054 / TASK-TC-054R / TASK-TC-054R2 / TASK-TC-055:
 3. Scalar real-algebra, real-inequality, and finite-sum lemmas for weighted norm bounds, Euler-Maclaurin `C_2`
    and subtransition exponents, dyadic parity square expansion, Stieltjes endpoint antiderivative algebra,
    Fourier tail ratio denominator monotonicity, exact dyadic block square sum `∑_{A ≤ r < 2A} r^2`,
-   unequal-block reciprocal-cube bound algebra, finite near-diagonal kernel bound `(2H + 1) D_E`,
-   opposite-parity prime-semiprime dilation pairing `λ(p m) + λ(q r m) = 0`, and `a_2` control constants (`TASK-TC-055` §§5–7).
+   unequal-block reciprocal-cube bound algebra, finite near-diagonal kernel bound `(2H + 1) D_E` (conditional on
+   `hK` and `hBand`), opposite-parity prime-semiprime dilation pairing `λ(p m) + λ(q r m) = 0`, `a_2` and `a_{3,5,7}`
+   control constants, retired TC-055 Lemma 6.1 counterexample inequality, valid replacement kernel ratio enclosure,
+   non-integer cutoff `u = 2.9` counterexample, and finite `T`-truncation / inner-cutoff `⌊T/m⌋` reconstruction (`TASK-TC-055R`).
 -/
 
 import Mathlib.NumberTheory.LSeries.RiemannZeta
@@ -136,6 +138,11 @@ def actualPrimeExclusionSieveSum (N_P n : ℕ) : ℤ :=
 /-- Auxiliary `ArithmeticFunction ℤ` for `d ↦ μ(d)^2 λ(d)`. -/
 def muSqTimesLambdaArith : ArithmeticFunction ℤ :=
   ⟨fun d => (ArithmeticFunction.moebius d) ^ 2 * liouvilleLambda d, by simp [liouvilleLambda]⟩
+
+/-- Pointwise factorized kernel integrand `X4 * g a * g b` (representing `X^4 * g_X(a) * g_X(b)`
+    inside `K_Y(a, b) = ∫_Y^{τ Y} X^4 g_X(a) g_X(b) dX`, where `g_X(u) = u^{-3} exp(-X^2 / u^2)`). -/
+def kernelPointwiseIntegrand (g : ℕ → ℝ) (X4 : ℝ) (a b : ℕ) : ℝ :=
+  X4 * g a * g b
 
 /-- **Theorem 1 (`TASK-TC-054` §2–§4, Exponent Model)**: Complete multiplicativity and common-factor
     sign cancellation for `liouvilleSignFromOmega` on natural-number exponents `omega_d, omega_r, omega_s : ℕ`. -/
@@ -894,9 +901,10 @@ private theorem moebius_sq_mul_liouvilleLambda_eq_moebius_aux (d : ℕ) :
       ring
   exact congrFun (congrArg DFunLike.coe h_eq_fn) d
 
-/-- **Theorem 9 (`TASK-TC-055` §3, Actual Finite-Prime Exclusion Sieve Identity on `ℕ`)**:
-    Proves on actual positive integers `n, N_P : ℕ` (`n ≠ 0`, `N_P ≠ 0`) that:
-    1. For every prime `p`, `λ(p n) = -λ(n)` and `λ(p n) + λ(n) = 0`;
+/-- **Theorem 9 (`TASK-TC-055` §3, Actual Integer Coprimality Sieve Identity on `ℕ`)**:
+    Formal scope: finite integer divisor sieve identity on `ℕ` (does not formalize infinite Dirichlet-series or
+    operator-norm convergence). Proves for any prime `p : ℕ` and positive integers `n N_P d : ℕ` with `d ∣ gcd(n, N_P)` that:
+    1. `liouvilleLambda (p * n) = -liouvilleLambda n` and `liouvilleLambda (p * n) + liouvilleLambda n = 0`;
     2. For every divisor `d ∣ gcd(n, N_P)`, `μ(d)^2 λ(n / d) = λ(n) μ(d)`;
     3. The finite squarefree prime-exclusion sieve sum `actualPrimeExclusionSieveSum N_P n = ∑_{d ∣ gcd(n, N_P)} μ(d)^2 λ(n / d)`
        equals `λ(n)` if `Nat.Coprime n N_P` and `0` otherwise (`if n.Coprime N_P then liouvilleLambda n else 0`). -/
@@ -954,9 +962,10 @@ theorem actual_finite_prime_exclusion_sieve_identity_nat
       rw [if_neg hne1, mul_zero, if_neg hcop]
   exact ⟨⟨h_pn, by linarith⟩, h_term d hd, h_sieve⟩
 
-/-- **Theorem 10 (`TASK-TC-055` §7, Multiplicative Parity Controls vs. Actual Möbius/Liouville Arithmetic on `ℕ`)**:
-    Proves on actual positive integers `p, q, m, n, d, r, s : ℕ` that `primeParityControl p n = (-1)^{v_p(n)}`
-    and `twoAdicParityControl n = (-1)^{v_2(n)}` satisfy:
+/-- **Theorem 10 (`TASK-TC-055` §7, Single-Prime Parity Arithmetic and Concrete Separation on `ℕ`)**:
+    Formal scope: integer arithmetic of `primeParityControl p n = (-1)^{v_p(n)}` and `twoAdicParityControl n = (-1)^{v_2(n)}`
+    on `ℕ` (does not formalize infinite-series asymptotics of `Q_{a_2}(X)` or `E_{a_2}(Y)`).
+    Proves on actual positive integers `p, q, m, n, d, r, s : ℕ` that:
     1. `primeParityControl p 1 = 1`, `primeParityControl p p = -1`, and `primeParityControl p q = 1` for prime `q ≠ p`;
     2. Complete multiplicativity `primeParityControl p (m * n) = primeParityControl p m * primeParityControl p n`;
     3. Unit square `primeParityControl p d * primeParityControl p d = 1` and unconstrained common-factor
@@ -1039,17 +1048,20 @@ theorem prime_parity_control_multiplicative_and_moebius_separation_nat
   exact ⟨⟨hp1, hpp, hpq_val⟩, h_mul_gen m n hm hn, h_sq_gen d hd, h_cancel,
     ⟨h_flip, by linarith⟩, ⟨h_a2_1, h_a2_2, h_a2_3, h_lam_3, h_flat_3, by omega⟩⟩
 
-/-- **Theorem 11 (`TASK-TC-055` §§5–7, Near-Diagonal Kernel Bound, Opposite-Parity Dilation Pairing, and Control Constants)**:
-    1. Finite near-diagonal kernel bound: for any kernel `K : ℕ → ℕ → ℝ` satisfying `∀ m n, 2 * K m n ≤ K m m + K n n`
+/-- **Theorem 11 (`TASK-TC-055` §§5–7, Conditional Finite Band Inequalities, Opposite-Parity Sign Pairing, and Scalar Constants)**:
+    Formal scope: finite sum inequalities conditional on `hK` and `hBand`, integer opposite-parity sign pairing
+    `λ(p m) + λ(q r m) = 0`, and scalar rational constants (does not formalize infinite-series kernel asymptotics
+    or analytic kernel difference bounds).
+    1. Finite near-diagonal sum bound: for any kernel `K : ℕ → ℕ → ℝ` satisfying `hK : ∀ m n, 2 * K m n ≤ K m m + K n n`
        and any `M h : ℕ`,
        `2 * (∑ m ∈ Finset.range M, K m (m + h)) ≤ (∑ m ∈ Finset.range M, K m m) + (∑ m ∈ Finset.range M, K (m + h) (m + h))`,
-       and if each of the `2 * H + 1` offset diagonals `bandSum j` (`j ∈ Finset.range (2 * H + 1)`) satisfies `bandSum j ≤ D_E`,
+       and if each of the `2 * H + 1` offset diagonals `bandSum j` (`j ∈ Finset.range (2 * H + 1)`) satisfies `hBand : bandSum j ≤ D_E`,
        then `∑ j ∈ Finset.range (2 * H + 1), bandSum j ≤ (2 * (H : ℝ) + 1) * D_E`;
-    2. Opposite-parity prime–semiprime dilation pairing on actual integers: for primes `p, q, r : ℕ` and `m ≠ 0`,
+    2. Opposite-parity prime–semiprime dilation sign pairing on actual integers: for primes `p, q, r : ℕ` and `m ≠ 0`,
        `liouvilleLambda (p * m) = -liouvilleLambda m`, `liouvilleLambda (q * r * m) = liouvilleLambda m`,
        `liouvilleLambda (p * m) + liouvilleLambda (q * r * m) = 0`, and for real kernel values `K_pm, K_qrm : ℝ`,
        `(liouvilleLambda (p * m) : ℝ) * K_pm + (liouvilleLambda (q * r * m) : ℝ) * K_qrm = (liouvilleLambda m : ℝ) * (K_qrm - K_pm)`;
-    3. Diagonal energy and `a_2` control leading-coefficient algebra:
+    3. Diagonal energy and `a_2` control leading-coefficient rational algebra:
        `(3 / 8 : ℝ) * (1 / 8 : ℝ) = 3 / 64`, `(1 / 2 : ℝ) * (1 - 2 / 3) = 1 / 6`, and `(1 / 6 : ℝ) ^ 2 = 1 / 36`. -/
 theorem near_diagonal_kernel_bound_and_opposite_parity_dilation_pairing
     (K : ℕ → ℕ → ℝ) (bandSum : ℕ → ℝ) (D_E K_pm K_qrm : ℝ)
@@ -1098,6 +1110,101 @@ theorem near_diagonal_kernel_bound_and_opposite_parity_dilation_pairing
     rw [h_pm, h_qrm]
     push_cast
     ring
+
+/-- **Theorem 12 (`TASK-TC-055R` §§2–7, Pairing Counterexample, Valid Kernel Ratio Replacement, Cutoff Counterexample, and Finite Reconstruction)**:
+    Formal scope:
+    1. Pointwise factorized kernel integrand AM-GM identity and inequality (discharging `hK` pointwise on
+       `kernelPointwiseIntegrand g X4 a b = X4 * g a * g b` for `0 ≤ X4`);
+    2. Exact arithmetic counterexample comparison refuting retired TC-055 Lemma 6.1 at
+       `(Y, p, q, r, m, n) = (33, 11, 2, 5, 1, 11)`:
+       `(3 : ℝ) * ((11 - 10 : ℝ) / 10) * ((11 : ℝ) / 10) ^ 3 = 3993 / 10000`,
+       `(33 : ℝ) ^ 2 * ((1 : ℝ) / 10 ^ 2 - (1 : ℝ) / 11 ^ 2) = 189 / 100`,
+       `1 + (189 : ℝ) / 100 = 2890 / 1000`, `1 - (1331 : ℝ) / 2890 = 1559 / 2890`,
+       `(3993 : ℝ) / 10000 < 1559 / 2890`, and if `0 < K_11` and `K_10 < (1331 / 2890) * K_11` then
+       `((3993 : ℝ) / 10000) * K_11 < K_11 - K_10`;
+    3. Valid replacement two-sided kernel ratio enclosure implication: if `0 ≤ K_b`, `L_low * K_b ≤ K_a`, and
+       `K_a ≤ L_high * K_b`, then `|K_a - K_b| ≤ max |L_low - 1| |L_high - 1| * K_b`;
+    4. Non-integer cutoff counterexample at `u = 2.9` (`29 / 10`) and repaired parity-control constants:
+       `1 / (2 * (29 / 10)^2) = 50 / 841 < 1 / 3^3 + 1 / 4^3 + 1 / 5^3 < 1 / (2 * 2^2) = 1 / 8`,
+       `(2 : ℝ) * (3 / 2 : ℝ) ^ 3 = 27 / 4 < 3 ^ 3`, and for `S = {3, 5, 7}`,
+       `((3 - 1 : ℝ) / (3 + 1)) * ((5 - 1 : ℝ) / (5 + 1)) * ((7 - 1 : ℝ) / (7 + 1)) = 1 / 4`,
+       `(1 / 2 : ℝ) * (1 / 4 : ℝ) = 1 / 8`, `(1 / 8 : ℝ) ^ 2 = 1 / 64`;
+    5. Finite `T`-truncation / `m`-dependent inner-cutoff `⌊T/m⌋` reconstruction, tail energy, and `L^2` transfer algebra:
+       `m * r ≤ T ↔ r ≤ T / m` (`0 < m`),
+       `(liouvilleLambda (m * r) : ℝ) * w (m * r) = (liouvilleLambda m : ℝ) * ((liouvilleLambda r : ℝ) * w (m * r))`,
+       `((1 : ℝ) / (2 * T_real ^ 2)) ^ 2 * ((tau5 - 1) * Y5 / 5) = (tau5 - 1) * Y5 / (20 * T_real ^ 4)`, and
+       `v_full ^ 2 ≤ 2 * v_T ^ 2 + 2 * (v_full - v_T) ^ 2 ∧ v_T ^ 2 ≤ 2 * v_full ^ 2 + 2 * (v_full - v_T) ^ 2`. -/
+theorem pairing_counterexample_replacement_and_finite_reconstruction_tc055r
+    (g w : ℕ → ℝ) (X4 K_10 K_11 K_a K_b L_low L_high T_real tau5 Y5 v_full v_T : ℝ)
+    (a b m r T : ℕ)
+    (hX4 : 0 ≤ X4)
+    (hK11_pos : 0 < K_11) (hK10_lt : K_10 < (1331 / 2890 : ℝ) * K_11)
+    (hKb_nonneg : 0 ≤ K_b) (hKa_low : L_low * K_b ≤ K_a) (hKa_high : K_a ≤ L_high * K_b)
+    (hm_pos : 0 < m) (hr_ne : r ≠ 0) (_hT_ne : T_real ≠ 0) :
+    (kernelPointwiseIntegrand g X4 a a + kernelPointwiseIntegrand g X4 b b -
+        2 * kernelPointwiseIntegrand g X4 a b = X4 * (g a - g b) ^ 2 ∧
+      2 * kernelPointwiseIntegrand g X4 a b ≤
+        kernelPointwiseIntegrand g X4 a a + kernelPointwiseIntegrand g X4 b b) ∧
+    ((3 : ℝ) * ((11 - 10 : ℝ) / 10) * ((11 : ℝ) / 10) ^ 3 = 3993 / 10000 ∧
+      (33 : ℝ) ^ 2 * ((1 : ℝ) / 10 ^ 2 - (1 : ℝ) / 11 ^ 2) = 189 / 100 ∧
+      1 + (189 : ℝ) / 100 = 2890 / 1000 ∧
+      1 - (1331 : ℝ) / 2890 = 1559 / 2890 ∧
+      (3993 : ℝ) / 10000 < 1559 / 2890 ∧
+      ((3993 : ℝ) / 10000) * K_11 < K_11 - K_10) ∧
+    |K_a - K_b| ≤ max |L_low - 1| |L_high - 1| * K_b ∧
+    ((1 : ℝ) / (2 * (29 / 10 : ℝ) ^ 2) = 50 / 841 ∧
+      (1 : ℝ) / (2 * (29 / 10 : ℝ) ^ 2) <
+        (1 : ℝ) / 3 ^ 3 + (1 : ℝ) / 4 ^ 3 + (1 : ℝ) / 5 ^ 3 ∧
+      (1 : ℝ) / 3 ^ 3 + (1 : ℝ) / 4 ^ 3 + (1 : ℝ) / 5 ^ 3 < 1 / (2 * (2 : ℝ) ^ 2) ∧
+      (2 : ℝ) * (3 / 2 : ℝ) ^ 3 = 27 / 4 ∧
+      (27 / 4 : ℝ) < 3 ^ 3 ∧
+      ((3 - 1 : ℝ) / (3 + 1)) * ((5 - 1 : ℝ) / (5 + 1)) * ((7 - 1 : ℝ) / (7 + 1)) = 1 / 4 ∧
+      (1 / 2 : ℝ) * (1 / 4 : ℝ) = 1 / 8 ∧
+      (1 / 8 : ℝ) ^ 2 = 1 / 64) ∧
+    ((m * r ≤ T ↔ r ≤ T / m) ∧
+      (liouvilleLambda (m * r) : ℝ) * w (m * r) =
+        (liouvilleLambda m : ℝ) * ((liouvilleLambda r : ℝ) * w (m * r)) ∧
+      ((1 : ℝ) / (2 * T_real ^ 2)) ^ 2 * ((tau5 - 1) * Y5 / 5) =
+        (tau5 - 1) * Y5 / (20 * T_real ^ 4) ∧
+      v_full ^ 2 ≤ 2 * v_T ^ 2 + 2 * (v_full - v_T) ^ 2 ∧
+      v_T ^ 2 ≤ 2 * v_full ^ 2 + 2 * (v_full - v_T) ^ 2) := by
+  refine ⟨?_, ?_, ?_, ?_, ?_⟩
+  · have h_id :
+        kernelPointwiseIntegrand g X4 a a + kernelPointwiseIntegrand g X4 b b -
+          2 * kernelPointwiseIntegrand g X4 a b = X4 * (g a - g b) ^ 2 := by
+      dsimp [kernelPointwiseIntegrand]
+      ring
+    have h_nonneg : 0 ≤ X4 * (g a - g b) ^ 2 := mul_nonneg hX4 (sq_nonneg _)
+    exact ⟨h_id, by linarith⟩
+  · refine ⟨by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, ?_⟩
+    linarith
+  · rw [abs_le]
+    have h_max_l : -(max |L_low - 1| |L_high - 1|) ≤ L_low - 1 := by
+      have h1 : -(L_low - 1) ≤ |L_low - 1| := neg_le_abs (L_low - 1)
+      have h2 : |L_low - 1| ≤ max |L_low - 1| |L_high - 1| := le_max_left _ _
+      linarith
+    have h_max_r : L_high - 1 ≤ max |L_low - 1| |L_high - 1| :=
+      le_trans (le_abs_self (L_high - 1)) (le_max_right _ _)
+    constructor
+    · have h_mul_l :
+          -(max |L_low - 1| |L_high - 1| * K_b) ≤ (L_low - 1) * K_b := by
+        have h_tmp := mul_le_mul_of_nonneg_right h_max_l hKb_nonneg
+        linarith
+      linarith
+    · have h_mul_r :
+          (L_high - 1) * K_b ≤ max |L_low - 1| |L_high - 1| * K_b :=
+        mul_le_mul_of_nonneg_right h_max_r hKb_nonneg
+      linarith
+  · refine ⟨by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num, by norm_num⟩
+  · refine ⟨?_, ?_, ?_, ?_, ?_⟩
+    · rw [mul_comm, Nat.le_div_iff_mul_le hm_pos]
+    · have hm_ne : m ≠ 0 := Nat.pos_iff_ne_zero.mp hm_pos
+      rw [liouvilleLambda_mul_aux hm_ne hr_ne]
+      push_cast
+      ring
+    · ring
+    · nlinarith [sq_nonneg (v_full - 2 * v_T)]
+    · nlinarith [sq_nonneg (v_T - 2 * v_full)]
 
 end LiouvilleSquareDilation
 

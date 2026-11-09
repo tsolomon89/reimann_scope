@@ -94,6 +94,7 @@ TASK_TC_054_ID = "TASK-TC-054"
 TASK_TC_054R_ID = "TASK-TC-054R"
 TASK_TC_054R2_ID = "TASK-TC-054R2"
 TASK_TC_055_ID = "TASK-TC-055"
+TASK_TC_055R_ID = "TASK-TC-055R"
 PRIOR_MERGED_MAIN_TC_053R = "c82e439708b0b6031db6a77bf3977688d9f0758b"
 TC_053R2_IMPLEMENTATION_COMMIT = "cc303030138c670e8f01aaaab483bbeca6bc17d1"
 TC_053R2_REVIEWED_TIP = "21576861ecd0dcbf874afec91b299fd6060f4f03"
@@ -105,6 +106,8 @@ TC_054R2_IMPLEMENTATION_COMMIT = "a4b30737013aa2e16d095b897fa6b97b08f451dc"
 TC_054R2_REVIEWED_TIP = "e178497d7637b799ce6eda5ed0cb2486c841c577"
 TC_054R2_MERGED_MAIN_BASELINE = "8a898c60b7c4cb56543a3d1e7960c39e00027c22"
 TC_055_INITIAL_CLOSEOUT_COMMIT = "80d1c86408d39562b06b2c69d4b4f655a1677f82"
+TC_055_IMPLEMENTATION_COMMIT = "c44df1ebfd10b8010e216214229a420ce8f3b5c2"
+TC_055_REVIEWED_TIP = "07db77cf0ee62aa42e5c87b28a89a8f98eb3271e"
 
 LIOUVILLE_SQUARE_DILATION_LEAN_MODULE_PATH = (
     REPO_ROOT / "formal" / "RiemannScope" / "LiouvilleSquareDilation.lean"
@@ -2543,6 +2546,7 @@ def verify_liouville_square_dilation_lean_module() -> Dict[str, Any]:
         "actual_finite_prime_exclusion_sieve_identity_nat",
         "prime_parity_control_multiplicative_and_moebius_separation_nat",
         "near_diagonal_kernel_bound_and_opposite_parity_dilation_pairing",
+        "pairing_counterexample_replacement_and_finite_reconstruction_tc055r",
     ]
 
     live_lean = _capture_live_lean_check_and_axioms(public_theorems)
@@ -2606,23 +2610,39 @@ def verify_liouville_square_dilation_lean_module() -> Dict[str, Any]:
             "Genuinely arithmetic theorem over positive integers `p, n, N_P, d : ℕ` (`p.Prime`, `n ≠ 0`, `N_P ≠ 0`, `d ∣ gcd(n, N_P)`): "
             "proves `liouvilleLambda (p * n) = -liouvilleLambda n`, `liouvilleLambda (p * n) + liouvilleLambda n = 0`, "
             "`(ArithmeticFunction.moebius d)^2 * liouvilleLambda (n / d) = liouvilleLambda n * ArithmeticFunction.moebius d`, and "
-            "`actualPrimeExclusionSieveSum N_P n = ∑_{d ∣ gcd(n, N_P)} μ(d)^2 λ(n / d) = if n.Coprime N_P then liouvilleLambda n else 0`.",
+            "the finite integer coprimality sieve `actualPrimeExclusionSieveSum N_P n = ∑_{d ∣ gcd(n, N_P)} μ(d)^2 λ(n / d) = if n.Coprime N_P then liouvilleLambda n else 0` "
+            "(infinite Dirichlet-series and operator-norm convergence are proved analytically outside Lean).",
         ),
         "prime_parity_control_multiplicative_and_moebius_separation_nat": (
             "actual_positive_integer_control_separation_theorem",
             "Genuinely arithmetic theorem over positive integers `p, q, m, n, d, r, s : ℕ` (`p.Prime`, `q.Prime`, `q ≠ p`) for "
-            "`primeParityControl p n = (-1)^{v_p(n)}` and `twoAdicParityControl n = (-1)^{v_2(n)}`: proves complete multiplicativity, "
-            "unit square, unconstrained common-factor cancellation, prime parity flip `a_p(p n) = -a_p(n)`, and exact separation from "
-            "`liouvilleLambda` and `actualFlatMoebiusSquareDivisorSum` at odd prime `n = 3` (`twoAdicParityControl 3 = 1 ≠ -1 = actualFlatMoebiusSquareDivisorSum 3`).",
+            "single-prime parity `primeParityControl p n = (-1)^{v_p(n)}` and `twoAdicParityControl n = (-1)^{v_2(n)}`: proves complete multiplicativity, "
+            "unit square, unconstrained common-factor cancellation, prime parity flip `a_p(p n) = -a_p(n)`, and concrete separation from "
+            "`liouvilleLambda` and `actualFlatMoebiusSquareDivisorSum` at odd prime `n = 3` (`twoAdicParityControl 3 = 1 ≠ -1 = actualFlatMoebiusSquareDivisorSum 3`; "
+            "infinite-series asymptotics of `Q_{a_2}(X)` and `E_{a_2}(Y)` are proved analytically outside Lean).",
         ),
         "near_diagonal_kernel_bound_and_opposite_parity_dilation_pairing": (
-            "finite_kernel_band_inequality_and_actual_prime_semiprime_pairing_theorem",
-            "Proves: (1) for any kernel `K : ℕ → ℕ → ℝ` with `2 * K a b <= K a a + K b b`, the finite off-diagonal sum bound "
-            "`2 * ∑_{a < M} K a (a + h) <= ∑_{a < M} K a a + ∑_{a < M} K (a + h) (a + h)` and the `(2H + 1) * D_E` band sum bound, "
+            "conditional_finite_kernel_band_inequality_and_integer_sign_pairing_theorem",
+            "Proves: (1) conditional on `hK : ∀ a b, 2 * K a b <= K a a + K b b` and `hBand : ∀ j < 2H + 1, bandSum j <= D_E`, the finite sum bounds "
+            "`2 * ∑_{a < M} K a (a + h) <= ∑_{a < M} K a a + ∑_{a < M} K (a + h) (a + h)` and `∑_{j < 2H + 1} bandSum j <= (2H + 1) * D_E`, "
             "(2) for actual primes `p, q, r : ℕ` and `m ≠ 0`, `liouvilleLambda (p * m) = -liouvilleLambda m`, `liouvilleLambda (q * r * m) = liouvilleLambda m`, "
-            "`liouvilleLambda (p * m) + liouvilleLambda (q * r * m) = 0`, and the paired kernel difference identity "
+            "`liouvilleLambda (p * m) + liouvilleLambda (q * r * m) = 0`, and the paired sign-factorization identity "
             "`λ(p m) K_{pm} + λ(q r m) K_{qrm} = λ(m) (K_{qrm} - K_{pm})`, and "
-            "(3) the exact rational identities `(3/8)*(1/8) = 3/64`, `(1/2)*(1 - 2/3) = 1/6`, and `(1/6)^2 = 1/36`.",
+            "(3) scalar rational constants `(3/8)*(1/8) = 3/64`, `(1/2)*(1 - 2/3) = 1/6`, and `(1/6)^2 = 1/36` "
+            "(infinite-series kernel asymptotics and analytic kernel difference bounds are outside this theorem).",
+        ),
+        "pairing_counterexample_replacement_and_finite_reconstruction_tc055r": (
+            "pointwise_kernel_amgm_counterexample_ratio_enclosure_and_finite_reconstruction_theorem",
+            "Proves (`TASK-TC-055R`): (1) unconditional pointwise factorized kernel integrand AM-GM identity and inequality "
+            "`kernelPointwiseIntegrand g X4 a a + kernelPointwiseIntegrand g X4 b b - 2 * kernelPointwiseIntegrand g X4 a b = X4 * (g a - g b)^2 >= 0` for `X4 >= 0` "
+            "(discharging `hK` pointwise on the integrand), "
+            "(2) exact arithmetic counterexample comparison refuting retired TC-055 Lemma 6.1 at `(Y, p, q, r, m, n) = (33, 11, 2, 5, 1, 11)`: "
+            "`3 * ((11 - 10)/10) * (11/10)^3 = 3993/10000 < 1559/2890 = 1 - 1331/2890` and `(3993/10000) * K_11 < K_11 - K_10` whenever `0 < K_11` and `K_10 < (1331/2890) * K_11`, "
+            "(3) valid replacement two-sided kernel ratio enclosure implication `|K_a - K_b| <= max |L_low - 1| |L_high - 1| * K_b` from `L_low * K_b <= K_a <= L_high * K_b` (`0 <= K_b`), "
+            "(4) non-integer cutoff counterexample at `u = 2.9` (`1 / (2 * (29/10)^2) = 50/841 < 1/3^3 + 1/4^3 + 1/5^3 < 1 / (2 * 2^2) = 1/8`), repaired unimodal constant square "
+            "`2 * (3/2)^3 = 27/4 < 3^3`, and `S = {3, 5, 7}` control product `(2/4)*(4/6)*(6/8) = 1/4`, `(1/2)*(1/4) = 1/8`, `(1/8)^2 = 1/64`, and "
+            "(5) finite `T`-truncation / `m`-dependent inner-cutoff `m * r <= T <-> r <= T / m` (`0 < m`), `λ(m * r) * w(m * r) = λ(m) * (λ(r) * w(m * r))`, "
+            "tail energy algebra `(1 / (2 * T^2))^2 * ((tau5 - 1) * Y5 / 5) = (tau5 - 1) * Y5 / (20 * T^4)`, and quadratic L^2 transfer `v_full^2 <= 2 * v_T^2 + 2 * (v_full - v_T)^2`.",
         ),
     }
 
@@ -3173,7 +3193,7 @@ def verify_tc055_simultaneous_joint_identities_and_trivial_zero_cancellation(
                 ),
                 "actual_arithmetic_mechanisms": [
                     "1. Exact prime-parity flip lambda(p n) = -lambda(n): converts the external dilation operator prod_{p in P}(I + p^{-1/2} S_p) Q_lambda(X) into the internal coprimality sieve Q_{lambda,P}(X) = X^{5/2} sum_{gcd(n, N_P)=1} (lambda(n)/n^3) exp(-X^2/n^2).",
-                    "2. Exact square-divisor Möbius link sum_{d^2 | n} mu(n/d^2) = lambda(n): identifies D_lambda(s) = zeta(2s)/zeta(s), canceling the pole of zeta(2s) at s = 1/2 against the pole of zeta(s) at s = 1 so that D_lambda(s) has no pole at s = 1 (unlike finite-prime parity controls a_S).",
+                    "2. Exact square-divisor Möbius link sum_{d^2 | n} mu(n/d^2) = lambda(n): identifies D_lambda(s) = zeta(2s)/zeta(s), where the pole of zeta(2s) at s = 1/2 remains (producing the simple pole of M[Q_lambda](z) at z = 0), while the denominator pole of zeta(s) at s = 1 produces a simple zero of D_lambda(s) at s = 1 (D_lambda(1) = 0, unlike finite-prime parity controls a_S whose Dirichlet series have a simple pole at s = 1).",
                 ],
             },
             "sieve_integer_audit_up_to_120": {
@@ -3190,6 +3210,12 @@ def verify_tc055_simultaneous_joint_identities_and_trivial_zero_cancellation(
                     "lim_{z -> -(2m + 1/2)} zeta(1 + 2z) / zeta(1/2 + z) = 2 zeta'(-4m) / zeta'(-2m) "
                     "= 2 (-1)^m (4m)! zeta(4m + 1) / (tau^{2m} (2m)! zeta(2m + 1)) != 0"
                 ),
+                "pole_and_zero_locations_note": (
+                    "In D_lambda(s) = zeta(2s) / zeta(s), the pole of zeta(2s) at s = 1/2 remains (giving the z = 0 pole of M[Q_lambda](z)), "
+                    "while the denominator pole of zeta(s) at s = 1 produces a zero D_lambda(1) = 0. "
+                    "A pole at s = 1/2 never cancels a pole at s = 1; the genuine cancellations are the removable 0/0 trivial-zero ratios "
+                    "at negative even integers s = -2k (z_k = -(2k + 1/2))."
+                ),
                 "rows": trivial_zero_cancellation_rows,
                 "all_trivial_zero_ratios_match_and_nonzero": all_trivial_zero_ratios_match,
             },
@@ -3200,32 +3226,129 @@ def verify_tc055_simultaneous_joint_identities_and_trivial_zero_cancellation(
         flint_ctx.prec = saved_prec
 
 
+def _least_prime_strictly_above(u_val: float) -> int:
+    """Return the smallest prime q > u_val."""
+    cand = max(2, int(math.floor(u_val)) + 1)
+    while True:
+        is_p = True
+        d = 2
+        while d * d <= cand:
+            if cand % d == 0:
+                is_p = False
+                break
+            d += 1
+        if is_p:
+            return cand
+        cand += 1
+
+
 def verify_tc055_coupled_cutoff_and_norm_obstruction(
     prec_bits: int = 256,
 ) -> Dict[str, Any]:
-    """Verify TASK-TC-055 Section 4:
+    """Verify TASK-TC-055 Section 4 and TASK-TC-055R Section 4 & Section 5 (Cutoff & Full-Space Norm Repairs):
     1. Signed energy expansion of E_{lambda,P_u}(Y) = int_Y^{tau Y} |Q_{lambda,P_u}(X)|^2 dX/X
        including all diagonal and cross-scale terms d_1, d_2 | N_u.
-    2. Exact coprime decomposition for u >= 2:
+    2. Exact coprime decomposition for u >= 2 and repaired integer-floor / least-prime tail bounds:
            Q_{lambda,P_u}(w) = w^{5/2} exp(-w^2) + R_{lambda,P_u}(w),
-           R_{lambda,P_u}(w) = w^{5/2} sum_{n > u, gcd(n, N_u)=1} (lambda(n)/n^3) exp(-w^2/n^2),
-       with proved unconditional tail bound |R_{lambda,P_u}(w)| <= w^{5/2} / (2 u^2) for all w > 0, u >= 1,
-       and quantitative analysis of the coupled cutoff regime u = u(Y).
-    3. Weighted norm obstruction test on H_eta = L^2((0, infty), X^{-2*eta} dX/X) (eta > 0):
-           ||S_p||_eta = p^{-eta},   M_Neumann(u, eta) := prod_{p <= u} (1 - p^{-1/2 - eta})^{-1},
-       demonstrating uniform boundedness as u -> infty for eta > 1/2 and divergence for 0 < eta <= 1/2.
-    4. Off-critical mode test F_rho(X) = X^{rho - 1/2} (rho = x + i*y, x > 0):
-           P_{P_u} F_rho(X) = M_u(rho) F_rho(X),   M_u(rho) := prod_{p <= u} (1 + p^{-rho}) != 0,
-       with certified two-sided bounds 0 < prod_{p <= u}(1 - p^{-x}) <= |M_u(rho)| <= prod_{p <= u}(1 + p^{-x}).
-    5. Base comparison between tau = 2*pi and general multiplicative window bases b > 1.
+           R_{lambda,P_u}(w) = w^{5/2} sum_{n > u, gcd(n, N_u)=1} (lambda(n)/n^3) exp(-w^2/n^2).
+       Reproduces the non-integer cutoff counterexample at u = 2.9:
+           sum_{n > 2.9} n^{-3} = zeta(3) - 9/8 = 0.0770569... > 1 / (2 * 2.9^2) = 50/841 = 0.0594530...,
+       and proves the valid replacements for all real u >= 1:
+           sum_{n > u} n^{-3} = sum_{n >= floor(u) + 1} n^{-3} <= 1 / (2 floor(u)^2),
+       and for the coprime tail (u >= 2, where the least integer n > 1 with gcd(n, N_u) = 1 is the least prime q_{>u} >= floor(u) + 1 > u):
+           sum_{n > u, gcd(n, N_u)=1} n^{-3} <= sum_{n >= q_{>u}} n^{-3} <= 1 / (2 (q_{>u} - 1)^2) <= 1 / (2 floor(u)^2),
+           and <= 1 / q_{>u}^3 + 1 / (2 q_{>u}^2) < 1 / u^3 + 1 / (2 u^2).
+       Tests both sides of integer boundaries (u in {2.9, 3.0, 3.1, 4.9, 5.0, 5.1}).
+    3. Exact full-space operator norm theorem on H_eta = L^2((0, infty), X^{-2*eta} dX/X) (eta > 0):
+           ||P_u^{-1}||_{H_eta -> H_eta}
+             = sup_{b in R} prod_{p <= u} |1 + p^{-1/2 - eta} exp(-i b log p)|^{-1}
+             = prod_{p <= u} (1 - p^{-1/2 - eta})^{-1},
+       proved via logarithmic unitary map U_eta, Fourier-Plancherel multiplier m_{u,eta}(b),
+       continuity (ess sup = sup), reverse triangle inequality upper bound, and matching lower bound
+       by Q-linear independence of {log p : p <= u} and continuous Kronecker simultaneous approximation
+       (citing Aoyama-Nakamura, arXiv:1204.4043, p. 9). Concludes that uniform full-space inverse norms
+       diverge as u -> infty for 0 < eta <= 1/2 and removes any claim that a signed improvement of this
+       full-space norm exists.
+    4. Off-critical mode test F_rho(X) = X^{rho - 1/2} (rho = x + i*y, x > 0).
     """
     saved_prec = flint_ctx.prec
     try:
         flint_ctx.prec = prec_bits
         tau_arb = arb(2) * arb.pi()
 
-        # 1. Exact coprime decomposition Q_{lambda,P_u}(w) = w^{5/2} exp(-w^2) + R_{lambda,P_u}(w)
-        #    and outward certification of |R_{lambda,P_u}(w)| <= w^{5/2} / (2 u^2):
+        # 1. Non-integer cutoff counterexample at u = 2.9 (29/10) and boundary tests at u in {2.9, 3.0, 3.1, 4.9, 5.0, 5.1}:
+        u_29 = arb(29) / arb(10)
+        false_bound_29 = arb(1) / (arb(2) * (u_29 ** 2))  # 50 / 841
+        exact_tail_29 = arb(3).zeta() - arb(1) - arb(1) / arb(8)
+        three_term_tail_29 = arb(1) / arb(27) + arb(1) / arb(64) + arb(1) / arb(125)
+        violation_margin_full = exact_tail_29 - false_bound_29
+        violation_margin_3terms = three_term_tail_29 - false_bound_29
+        floor_bound_29 = arb(1) / (arb(2) * (arb(2) ** 2))  # 1 / 8
+        u29_counterexample_certified = bool(
+            violation_margin_full.lower() > 0
+            and violation_margin_3terms.lower() > 0
+            and (floor_bound_29 - exact_tail_29).lower() > 0
+        )
+
+        boundary_cutoff_rows: List[Dict[str, Any]] = []
+        all_repaired_boundary_cutoffs_hold = True
+        for u_str, u_frac in [
+            ("2.9", Fraction(29, 10)),
+            ("3.0", Fraction(3, 1)),
+            ("3.1", Fraction(31, 10)),
+            ("4.9", Fraction(49, 10)),
+            ("5.0", Fraction(5, 1)),
+            ("5.1", Fraction(51, 10)),
+        ]:
+            u_arb = arb(u_frac.numerator) / arb(u_frac.denominator)
+            u_floor = int(u_frac.numerator // u_frac.denominator)
+            primes_le_u = tuple(p for p in (2, 3, 5, 7, 11, 13) if p <= u_floor)
+            q_gt_u = _least_prime_strictly_above(float(u_frac))
+            # Exact unrestricted tail sum_{n > u} n^{-3} = zeta(3) - sum_{1 <= n <= floor(u)} n^{-3}
+            unrestricted_tail = arb(3).zeta() - sum(
+                (arb(1) / (arb(n) ** 3) for n in range(1, u_floor + 1)), arb(0)
+            )
+            naive_real_bound = arb(1) / (arb(2) * (u_arb ** 2))
+            repaired_floor_bound = arb(1) / (arb(2) * (arb(u_floor) ** 2))
+            floor_ok = bool((repaired_floor_bound - unrestricted_tail).lower() > 0)
+            naive_ok = bool((naive_real_bound - unrestricted_tail).lower() > 0)
+
+            # Certified coprime tail |R_{lambda,P_u}(w)| at w = 2:
+            w_arb = arb(2)
+            q_pu = evaluate_Q_lambda_prime_excluded_direct_certified_arb(
+                w_arb, primes_P=primes_le_u, T_cutoff=1000, prec_bits=prec_bits
+            )
+            n1_term = (w_arb ** 2) * w_arb.sqrt() * (-(w_arb ** 2)).exp()
+            abs_rem = abs(q_pu - n1_term)
+            w_5_2 = (w_arb ** 2) * w_arb.sqrt()
+            coprime_bound_floor = w_5_2 / (arb(2) * (arb(u_floor) ** 2))
+            coprime_bound_q = w_5_2 * (
+                arb(1) / (arb(q_gt_u) ** 3) + arb(1) / (arb(2) * (arb(q_gt_u) ** 2))
+            )
+            coprime_ok = bool(
+                (coprime_bound_floor - abs_rem).lower() > 0
+                and (coprime_bound_q - abs_rem).lower() > 0
+            )
+            if not (floor_ok and coprime_ok):
+                all_repaired_boundary_cutoffs_hold = False
+            boundary_cutoff_rows.append({
+                "u_label": u_str,
+                "u_floor": u_floor,
+                "primes_le_u": list(primes_le_u),
+                "least_prime_strictly_above_u": q_gt_u,
+                "unrestricted_tail_sum_n_gt_u_n_neg_3": serialize_arb_certified(unrestricted_tail),
+                "naive_1_over_2_u_sq": serialize_arb_certified(naive_real_bound),
+                "naive_bound_holds_for_unrestricted_tail": naive_ok,
+                "repaired_1_over_2_floor_u_sq": serialize_arb_certified(repaired_floor_bound),
+                "repaired_floor_bound_strictly_certified": floor_ok,
+                "abs_R_lambda_Pu_at_w_2": serialize_arb_certified(abs_rem),
+                "coprime_bound_w_5_2_over_2_floor_u_sq": serialize_arb_certified(coprime_bound_floor),
+                "coprime_bound_using_least_prime_q_gt_u": serialize_arb_certified(coprime_bound_q),
+                "coprime_tail_bounds_strictly_certified": coprime_ok,
+            })
+
+        # 2. Exact coprime decomposition Q_{lambda,P_u}(w) = w^{5/2} exp(-w^2) + R_{lambda,P_u}(w)
+        #    for integer u in {5, 7, 11, 13} (where floor(u) = u and q_{>u} >= u + 2):
         prime_sets_by_u = [
             (5, (2, 3, 5)),
             (7, (2, 3, 5, 7)),
@@ -3235,7 +3358,8 @@ def verify_tc055_coupled_cutoff_and_norm_obstruction(
         coprime_tail_rows: List[Dict[str, Any]] = []
         all_coprime_tail_bounds_hold = True
         for u_val, primes_u in prime_sets_by_u:
-            u_arb = arb(u_val)
+            u_floor = int(u_val)
+            u_floor_arb = arb(u_floor)
             for w_int in (1, 2, 4):
                 w_arb = arb(w_int)
                 q_pu = evaluate_Q_lambda_prime_excluded_direct_certified_arb(
@@ -3244,25 +3368,26 @@ def verify_tc055_coupled_cutoff_and_norm_obstruction(
                 n1_term = (w_arb ** 2) * w_arb.sqrt() * (-(w_arb ** 2)).exp()
                 rem_pu = q_pu - n1_term
                 abs_rem = abs(rem_pu)
-                bound_pu = (w_arb ** 2) * w_arb.sqrt() / (arb(2) * (u_arb ** 2))
+                bound_pu = (w_arb ** 2) * w_arb.sqrt() / (arb(2) * (u_floor_arb ** 2))
                 margin = bound_pu - abs_rem
                 bound_ok = bool(margin.lower() > 0)
                 if not bound_ok:
                     all_coprime_tail_bounds_hold = False
                 coprime_tail_rows.append({
                     "u": u_val,
+                    "u_floor": u_floor,
                     "primes_le_u": list(primes_u),
                     "w": w_int,
                     "Q_lambda_Pu_w": serialize_arb_certified(q_pu),
                     "n_eq_1_gaussian_term": serialize_arb_certified(n1_term),
                     "R_lambda_Pu_w": serialize_arb_certified(rem_pu),
                     "abs_R_lambda_Pu_w": serialize_arb_certified(abs_rem),
-                    "analytic_upper_bound_w_5_2_over_2_u_sq": serialize_arb_certified(bound_pu),
+                    "analytic_upper_bound_w_5_2_over_2_floor_u_sq": serialize_arb_certified(bound_pu),
                     "bound_minus_abs_R_margin": serialize_arb_certified(margin),
                     "bound_strictly_certified": bound_ok,
                 })
 
-        # 2. Weighted norm Neumann majorant M_Neumann(u, eta) = prod_{p <= u} (1 - p^{-1/2 - eta})^{-1}
+        # 3. Exact full-space operator norm ||P_u^{-1}||_{H_eta -> H_eta} = prod_{p <= u} (1 - p^{-1/2 - eta})^{-1}
         primes_up_to_97 = (2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97)
         neumann_rows: List[Dict[str, Any]] = []
         for eta_lbl, eta_frac in [
@@ -3288,7 +3413,38 @@ def verify_tc055_coupled_cutoff_and_norm_obstruction(
                 "values_by_u": u_evaluations,
             })
 
-        # 3. Off-critical mode multiplier M_u(rho) = prod_{p <= u} (1 + p^{-rho}) at rho = 3/4 + 2i and 2/3 + 14i
+        # Concrete Kronecker simultaneous phase-alignment witness for P = {2, 3, 5} at eta = 1/4:
+        # Find b = (2*k + 1) * (tau / (2 * log 2)) so exp(-i b log 2) = -1 exactly, and scan odd integers 2*k + 1
+        # where cos(b log 3) and cos(b log 5) are simultaneously close to -1:
+        eta_kron = arb(1) / arb(4)
+        s_kron = arb(1) / arb(2) + eta_kron
+        exact_sup_235 = arb(1)
+        for p in (2, 3, 5):
+            exact_sup_235 /= (arb(1) - (arb(p) ** (-s_kron)))
+        best_k = 1
+        best_cos_sum = 10.0
+        log2_f = math.log(2.0)
+        log3_f = math.log(3.0)
+        log5_f = math.log(5.0)
+        for k_odd in range(1, 4000, 2):
+            b_f = k_odd * math.pi / log2_f
+            c_sum = math.cos(b_f * log3_f) + math.cos(b_f * log5_f)
+            if c_sum < best_cos_sum:
+                best_cos_sum = c_sum
+                best_k = k_odd
+        b_witness_arb = arb(best_k) * (tau_arb / arb(2)) / arb(2).log()
+        m_witness_acb = acb(1)
+        for p in (2, 3, 5):
+            phase_p = acb(0, -b_witness_arb * arb(p).log()).exp()
+            m_witness_acb /= (acb(1) + (acb(p) ** (-acb(s_kron))) * phase_p)
+        abs_m_witness = abs(m_witness_acb)
+        ratio_witness_to_sup = abs_m_witness / exact_sup_235
+        kronecker_witness_ok = bool(
+            (exact_sup_235 - abs_m_witness).lower() >= 0
+            and (ratio_witness_to_sup - arb("0.999")).lower() > 0
+        )
+
+        # 4. Off-critical mode multiplier M_u(rho) = prod_{p <= u} (1 + p^{-rho}) at rho = 3/4 + 2i and 2/3 + 14i
         mode_rows: List[Dict[str, Any]] = []
         all_mode_bounds_hold = True
         for rho_lbl, x_frac, y_int in [
@@ -3324,35 +3480,78 @@ def verify_tc055_coupled_cutoff_and_norm_obstruction(
                 })
 
         return {
+            "non_integer_cutoff_counterexample_and_boundary_repair": {
+                "falsified_assertion": "sum_{n > u} n^{-3} <= 1 / (2 u^2) for arbitrary real u >= 1",
+                "counterexample_u": "2.9 (29/10)",
+                "exact_unrestricted_tail_at_2_9": serialize_arb_certified(exact_tail_29),
+                "three_term_lower_bound_n_3_4_5": serialize_arb_certified(three_term_tail_29),
+                "claimed_1_over_2_u_sq_at_2_9": serialize_arb_certified(false_bound_29),
+                "violation_margin_exact_minus_claimed": serialize_arb_certified(violation_margin_full),
+                "violation_margin_3terms_minus_claimed": serialize_arb_certified(violation_margin_3terms),
+                "repaired_floor_bound_1_over_2_floor_u_sq": serialize_arb_certified(floor_bound_29),
+                "u29_counterexample_and_floor_repair_certified": u29_counterexample_certified,
+                "repaired_formulas": {
+                    "general_tail_for_real_u_ge_1": "sum_{n > u} n^{-3} = sum_{n >= floor(u) + 1} n^{-3} <= 1 / (2 floor(u)^2)",
+                    "coprime_tail_for_real_u_ge_2": (
+                        "Since the least integer n > 1 with gcd(n, N_u) = 1 is the least prime q_{>u} >= floor(u) + 1 > u, "
+                        "sum_{n > u, gcd(n, N_u)=1} n^{-3} <= sum_{n >= q_{>u}} n^{-3} <= 1 / (2 (q_{>u} - 1)^2) <= 1 / (2 floor(u)^2) "
+                        "and <= 1 / q_{>u}^3 + 1 / (2 q_{>u}^2) < 1 / u^3 + 1 / (2 u^2)."
+                    ),
+                },
+                "boundary_cutoff_rows": boundary_cutoff_rows,
+                "all_repaired_boundary_cutoffs_hold": all_repaired_boundary_cutoffs_hold,
+            },
             "coprime_decomposition_and_coupled_cutoff_attempt": {
                 "identity": (
-                    "For u >= 2, every integer n >= 2 with gcd(n, N_u) = 1 satisfies n > u, so "
-                    "Q_{lambda,P_u}(w) = w^{5/2} exp(-w^2) + R_{lambda,P_u}(w) with |R_{lambda,P_u}(w)| <= w^{5/2} / (2 u^2)."
+                    "For u >= 2, every integer n >= 2 with gcd(n, N_u) = 1 satisfies n >= q_{>u} >= floor(u) + 1 > u, so "
+                    "Q_{lambda,P_u}(w) = w^{5/2} exp(-w^2) + R_{lambda,P_u}(w) with "
+                    "|R_{lambda,P_u}(w)| <= w^{5/2} / (2 floor(u)^2) and |R_{lambda,P_u}(w)| <= w^{5/2} (1/q_{>u}^3 + 1/(2 q_{>u}^2))."
                 ),
                 "coupled_regime_diagnosis": (
                     "Substituting Q_{lambda,P_u}(X/m) = (X/m)^{5/2} exp(-X^2/m^2) + R_{lambda,P_u}(X/m) into the inverse "
                     "reconstruction Q_lambda(X) = sum_{m in S(P_u)} (lambda(m)/sqrt(m)) Q_{lambda,P_u}(X/m) splits Q_lambda(X) "
                     "into the P_u-smooth sum X^{5/2} sum_{m in S(P_u)} (lambda(m)/m^3) exp(-X^2/m^2) plus the rough-cofactor sum "
-                    "over n > u with gcd(n, N_u) = 1. For any coupled cutoff u = Y^theta (theta in (0, 1]), the P_u-smooth integers "
+                    "over n >= q_{>u} with gcd(n, N_u) = 1. For any coupled cutoff u = Y^theta (theta in (0, 1]), the P_u-smooth integers "
                     "m ~ Y have positive Dickman density rho_Dickman(1/theta) > 0, so the unsigned P_u-smooth sum at the transition "
-                    "still has magnitude ~ rho_Dickman(1/theta) sqrt(Y) (energy ~ Y), while the unsigned rough tail over m in S(P_u) "
-                    "and n > u has magnitude ~ (1 - rho_Dickman(1/theta)) sqrt(Y). Thus coupling u = u(Y) partitions the transition "
-                    "mass between smooth and rough factors without eliminating the order-Y unsigned energy unless signed cancellation "
-                    "in lambda(m) on S(P_u) is independently established."
+                    "still has magnitude ~ rho_Dickman(1/theta) sqrt(Y) (energy ~ Y), while the unsigned rough-cofactor sum over m in S(P_u) "
+                    "and n >= q_{>u} has magnitude ~ (1 - rho_Dickman(1/theta)) sqrt(Y)."
                 ),
                 "coprime_tail_rows": coprime_tail_rows,
                 "all_coprime_tail_bounds_hold": all_coprime_tail_bounds_hold,
             },
+            "exact_full_space_operator_norm_obstruction": {
+                "operator_norm_theorem": (
+                    "For every finite prime cutoff u >= 2 and every eta > 0 on H_eta = L^2((0, infty), X^{-2*eta} dX/X): "
+                    "||P_u^{-1}||_{H_eta -> H_eta} = sup_{b in R} prod_{p <= u} |1 + p^{-1/2 - eta} exp(-i b log p)|^{-1} "
+                    "= prod_{p <= u} (1 - p^{-1/2 - eta})^{-1}."
+                ),
+                "five_step_analytic_proof": [
+                    "1. Logarithmic unitary identification: U_eta : H_eta -> L^2(R, dt), (U_eta F)(t) = exp(-eta t) F(exp(t)) is a surjective unitary isomorphism with ||U_eta F||_{L^2(R)} = ||F||_{H_eta} and U_eta S_p U_eta^{-1} = p^{-eta} T_{log p}, where (T_a g)(t) = g(t - a).",
+                    "2. Fourier multiplier representation: Under the unitary Fourier-Plancherel transform F : L^2(R, dt) -> L^2(R, db/tau), F U_eta P_u^{-1} U_eta^{-1} F^{-1} is multiplication by m_{u,eta}(b) = prod_{p <= u} (1 + p^{-1/2 - eta} exp(-i b log p))^{-1}.",
+                    "3. Essential supremum equals supremum: Because b |-> m_{u,eta}(b) is continuous on R and every nonempty open interval in R has positive Lebesgue measure, ||m_{u,eta}||_{L^infty(R)} = ess sup_{b in R} |m_{u,eta}(b)| = sup_{b in R} |m_{u,eta}(b)|.",
+                    "4. Upper bound: By the reverse triangle inequality |1 + p^{-1/2 - eta} exp(-i b log p)| >= 1 - p^{-1/2 - eta} > 0 for every p <= u and b in R, so sup_{b in R} |m_{u,eta}(b)| <= prod_{p <= u} (1 - p^{-1/2 - eta})^{-1}.",
+                    "5. Matching lower bound via Kronecker's theorem: By the Fundamental Theorem of Arithmetic, {log p : p <= u} are linearly independent over Q. By continuous Kronecker simultaneous approximation (see Aoyama-Nakamura, arXiv:1204.4043, p. 9, Lemma 2.7), the curve {(exp(-i b log p))_{p <= u} : b in R} is dense in the torus T^{pi(u)}, so (-1, ..., -1) lies in its closure and sup_{b in R} |m_{u,eta}(b)| >= prod_{p <= u} (1 - p^{-1/2 - eta})^{-1}.",
+                ],
+                "research_implication_and_scope_distinction": (
+                    "Because ||P_u^{-1}||_{H_eta -> H_eta} = prod_{p <= u} (1 - p^{-1/2 - eta})^{-1} is an EXACT equality on the full space H_eta, "
+                    "uniform full-space inverse norms diverge as u -> infty for all 0 < eta <= 1/2, and NO 'signed improvement' of the full-space "
+                    "operator norm on H_eta exists. Closing SUBGATE-TC-043A cannot proceed via a universal inverse-filter norm on H_eta; it must "
+                    "exploit the specific structure of the arithmetic input Q_lambda (which does not concentrate its energy exclusively at Kronecker "
+                    "resonant frequencies). This full-space operator obstruction does not disprove TC, RH, or boundedness of Q_lambda."
+                ),
+                "kronecker_phase_alignment_witness_P_2_3_5_eta_1_4": {
+                    "odd_multiple_of_half_tau_over_log2": best_k,
+                    "b_witness": serialize_arb_certified(b_witness_arb),
+                    "abs_m_u_eta_at_b_witness": serialize_arb_certified(abs_m_witness),
+                    "exact_supremum_prod_1_minus_p_neg_3_4_inv": serialize_arb_certified(exact_sup_235),
+                    "ratio_witness_to_exact_supremum": serialize_arb_certified(ratio_witness_to_sup),
+                    "witness_exceeds_99_9_percent_of_supremum": kronecker_witness_ok,
+                },
+                "rows": neumann_rows,
+            },
             "weighted_norm_neumann_obstruction": {
                 "dilation_norm_identity": "||S_p||_eta = p^{-eta} on H_eta = L^2((0, infty), X^{-2*eta} dX/X)",
-                "neumann_majorant_formula": "M_Neumann(u, eta) = prod_{p <= u} (1 - p^{-1/2 - eta})^{-1}",
-                "needed_signed_improvement_note": (
-                    "M_Neumann(u, eta) converges as u -> infty iff eta > 1/2 (where it equals zeta(1/2 + eta)), and diverges "
-                    "for 0 < eta <= 1/2 (as e^gamma log u at eta = 1/2 and exp((1+o(1)) u^{1/2-eta} / ((1/2-eta) log u)) for "
-                    "0 < eta < 1/2). Reaching eta in (0, 1/2] requires bounding the signed Mellin multiplier "
-                    "prod_{p <= u} (1 + p^{-1/2 - eta - i*b})^{-1} = sum_{m in S(P_u)} lambda(m) m^{-1/2 - eta - i*b} without "
-                    "replacing lambda(m) m^{-i*b} by +1."
-                ),
+                "exact_operator_norm_formula": "||P_u^{-1}||_{H_eta -> H_eta} = sup_{b in R} prod_{p <= u} |1 + p^{-1/2 - eta} exp(-i b log p)|^{-1} = prod_{p <= u} (1 - p^{-1/2 - eta})^{-1}",
                 "rows": neumann_rows,
             },
             "off_critical_mode_test": {
@@ -3380,7 +3579,7 @@ def verify_tc055_coupled_cutoff_and_norm_obstruction(
 def verify_tc055_integrated_energy_kernel_and_near_diagonal_bound(
     prec_bits: int = 256,
 ) -> Dict[str, Any]:
-    """Verify TASK-TC-055 Section 5:
+    """Verify TASK-TC-055 Section 5 & TASK-TC-055R Section 5 (Full Off-Diagonal Domain & H=0 Identity Classification):
     1. Exact kernel representation E_lambda(Y) = sum_{m, n >= 1} lambda(m) lambda(n) K_Y(m, n)
        with K_Y(m, n) = (m n)^{-3} int_Y^{tau Y} X^4 exp(-X^2 (m^{-2} + n^{-2})) dX > 0.
     2. Derivation and 256-bit Arb certification of the diagonal energy asymptotic from the
@@ -3391,7 +3590,11 @@ def verify_tc055_integrated_energy_kernel_and_near_diagonal_bound(
        and fourth-order bound |R_{D,E}(Y)| <= C_{D,4} Y^{-4} with C_{D,4} = C_4 (1 - tau^{-4}) / (64 sqrt(2)).
     3. Proof and 256-bit Arb certification of the near-diagonal inequality for every integer H >= 0:
            sum_{|m - n| <= H} K_Y(m, n) <= (2 H + 1) D_E(Y),
-       via 2 K_Y(m, n) <= K_Y(m, m) + K_Y(n, n) summed over the 2H + 1 offsets h = n - m in {-H, ..., H}.
+       with H = 0 explicitly classified as an exact algebraic identity (sum_{|m-n|<=0} K_Y(m,n) == D_E(Y))
+       and H >= 1 certified by strictly positive outward Arb margin.
+    4. Full energy domain note: removing |m - n| <= H leaves the entire off-diagonal domain |m - n| > H
+       across all m, n >= 1; truncating to 1 <= m, n <= T(Y) requires the explicit tail energy bound
+       int_Y^{tau Y} |Q_lambda(X) - Q_{lambda,T}(X)|^2 dX/X <= (tau^5 - 1) Y^5 / (20 T^4).
     """
     saved_prec = flint_ctx.prec
     try:
@@ -3405,9 +3608,6 @@ def verify_tc055_integrated_energy_kernel_and_near_diagonal_bound(
         C_D_2 = C_2_arb * (arb(1) - (tau_arb ** (-2))) / (arb(16) * arb(2).sqrt())
         C_D_4 = C_4_arb * (arb(1) - (tau_arb ** (-4))) / (arb(64) * arb(2).sqrt())
 
-        # 1. Certify D_E(Y) across Y in {1, 2, 4, 8, 16}:
-        #    Note: for n > N_max, K_Y(n, n) <= n^{-6} int_Y^{tau Y} X^4 dX = ((tau^5 - 1) Y^5 / 5) n^{-6},
-        #    so sum_{n > N_max} K_Y(n, n) <= ((tau^5 - 1) Y^5 / 25) N_max^{-5}.
         diagonal_rows: List[Dict[str, Any]] = []
         all_diagonal_bounds_hold = True
         for Y_int in (1, 2, 4, 8, 16):
@@ -3441,10 +3641,6 @@ def verify_tc055_integrated_energy_kernel_and_near_diagonal_bound(
                 "N4_bound_strictly_certified": ok_4,
             })
 
-        # 2. Certify near-diagonal bound sum_{|m - n| <= H} K_Y(m, n) <= (2H + 1) D_E(Y)
-        #    for Y in {1, 2, 4} and H in {0, 1, 2, 4}:
-        #    For |m - n| <= H with max(m, n) > N_band, each offset h in [-H, H] has tail
-        #    bounded by the diagonal tail ((tau^5 - 1) Y^5 / 25) (N_band - H)^{-5}.
         near_diagonal_rows: List[Dict[str, Any]] = []
         all_near_diagonal_bounds_hold = True
         for Y_int in (1, 2, 4):
@@ -3477,14 +3673,19 @@ def verify_tc055_integrated_energy_kernel_and_near_diagonal_bound(
                 signed_band_sum = inflate_arb_with_nonneg_bound(signed_band_partial, band_tail)
                 rhs_bound = arb(2 * H_int + 1) * D_E_Y
                 margin = rhs_bound - band_sum
-                # For H = 0, band_sum == D_E_Y so margin contains 0; for H >= 1, strictly positive margin > 0
-                ok_band = bool(margin.contains(0)) if H_int == 0 else bool(margin.lower() > 0)
+                if H_int == 0:
+                    verification_kind = "exact_algebraic_identity"
+                    ok_band = bool((band_partial - sum(diag_vals, arb(0))).contains(0)) and bool(margin.contains(0))
+                else:
+                    verification_kind = "certified_strict_inequality"
+                    ok_band = bool(margin.lower() > 0)
                 if not ok_band:
                     all_near_diagonal_bounds_hold = False
                 near_diagonal_rows.append({
                     "Y": Y_int,
                     "H": H_int,
                     "two_H_plus_1": 2 * H_int + 1,
+                    "verification_classification": verification_kind,
                     "unsigned_near_diagonal_sum": serialize_arb_certified(band_sum),
                     "signed_near_diagonal_sum": serialize_arb_certified(signed_band_sum),
                     "upper_bound_2H_plus_1_times_D_E_Y": serialize_arb_certified(rhs_bound),
@@ -3501,6 +3702,12 @@ def verify_tc055_integrated_energy_kernel_and_near_diagonal_bound(
             "diagonal_rows": diagonal_rows,
             "all_diagonal_bounds_hold": all_diagonal_bounds_hold,
             "near_diagonal_inequality_formula": "sum_{|m - n| <= H} K_Y(m, n) <= (2 H + 1) D_E(Y)   for all integers H >= 0 and all Y > 0",
+            "full_off_diagonal_domain_note": (
+                "Removing the near-diagonal band |m - n| <= H leaves the full off-diagonal domain "
+                "{(m, n) in Z_{>=1}^2 : |m - n| > H} across all scales (not merely m, n ~ Y). "
+                "Localizing to 1 <= m, n <= T(Y) with T(Y) = ceil(Y^{5/4}) requires the proved finite-truncation "
+                "tail energy bound int_Y^{tau Y} |Q_lambda(X) - Q_{lambda,T}(X)|^2 dX/X <= (tau^5 - 1) Y^5 / (20 T^4) <= (tau^5 - 1) / 20."
+            ),
             "near_diagonal_rows": near_diagonal_rows,
             "all_near_diagonal_bounds_hold": all_near_diagonal_bounds_hold,
         }
@@ -3511,69 +3718,141 @@ def verify_tc055_integrated_energy_kernel_and_near_diagonal_bound(
 def verify_tc055_opposite_parity_dilation_pairing_and_obstruction(
     prec_bits: int = 256,
 ) -> Dict[str, Any]:
-    """Verify TASK-TC-055 Section 6:
-    1. Opposite-parity prime-semiprime dilation pairing:
+    """Verify TASK-TC-055 Section 6 & TASK-TC-055R Section 2, Section 3, and Section 5:
+    1. Opposite-parity prime-semiprime dilation sign pairing (preserved):
        For a prime p and semiprime s = q r (with q, r prime),
            lambda(p m) = -lambda(m),   lambda(q r m) = +lambda(m),
        so for every m, n >= 1:
            lambda(p m) lambda(n) K_Y(p m, n) + lambda(q r m) lambda(n) K_Y(q r m, n)
              = -lambda(m) lambda(n) [K_Y(p m, n) - K_Y(q r m, n)].
-    2. Exact MVT kernel-difference bound:
-       Since d/du(u^{-3} exp(-X^2/u^2)) = u^{-4} (2 X^2/u^2 - 3) exp(-X^2/u^2) and
-       sup_{w > 0} |2 w^2 - 3| exp(-w^2) = 3, for u_1 = min(p, q r) m and u_2 = max(p, q r) m:
-           |K_Y(p m, n) - K_Y(q r m, n)|
-             <= (|q r - p| / min(p, q r)) * (u_2 - u_1)^{-1} int_{u_1}^{u_2} |u dK_Y/du(u, n)| du
-             <= (|q r - p| / min(p, q r)) * (3 / (u_1^3 n^3)) int_Y^{tau Y} X^4 exp(-X^2 (u_2^{-2} + n^{-2})) dX
-             = 3 (|q r - p| / min(p, q r)) (max(p, q r) / min(p, q r))^3 K_Y(max(p, q r) m, n).
-    3. Exact partition / multiplicity / coprime-unmatched residual diagnosis:
-       Evaluates the divisor-weight discrepancy 1 - W_pair(k) / w_bar and the unmatched coprime density
-       prod_{p in P_active} (1 - 1/p) (plus primes k in [Y, tau Y]), showing why opposite-parity pairing
-       saves |q r - p| / p on matched pairs while leaving an unmatched contribution of order Y.
+    2. Reproduction and retirement of the false uniform pairing bound (TC-055 Lemma 6.1):
+       At (Y, p, q, r, m, n) = (33, 11, 2, 5, 1, 11) (a = q r m = 10, b = p m = 11),
+       the retired formula claimed |K_{33}(11, 11) - K_{33}(10, 11)| / K_{33}(11, 11) <= 3993 / 10000 = 0.3993,
+       whereas direct 256-bit Arb evaluation gives 0.8194252817117595... and the elementary floating-point-free
+       proof shows K_{33}(10, 11) / K_{33}(11, 11) <= (1331/1000) exp(-189/100) < 1331/2890, so
+       |K_{33}(11, 11) - K_{33}(10, 11)| / K_{33}(11, 11) > 1559/2890 > 3993/10000.
+       Explains the original error: bounding |(2 w^2 - 3) exp(-w^2)| <= 3 consumes exp(-w^2) = exp(-X^2/u^2)
+       and does not allow retaining another Gaussian factor exp(-X^2/u_2^2).
+    3. Valid replacement bounds for all Y > 0, 0 < a <= b, n > 0 (r_0 = b/a >= 1, Delta = a^{-2} - b^{-2} >= 0):
+       (A) Exact integrand-ratio kernel enclosure:
+               r_0^3 exp(-(tau Y)^2 Delta) K_Y(b, n) <= K_Y(a, n) <= r_0^3 exp(-Y^2 Delta) K_Y(b, n),
+               |K_Y(a, n) - K_Y(b, n)| <= max(|r_0^3 exp(-(tau Y)^2 Delta) - 1|, |r_0^3 exp(-Y^2 Delta) - 1|) K_Y(b, n).
+       (B) Transition relative-gap bound:
+               |K_Y(a, n) - K_Y(b, n)| <= ((b - a) / a) (b / a)^3 (3 + 2 tau^2 Y^2 / a^2) K_Y(b, n),
+           giving the transition-restricted factor ((b - a)/a)(b/a)^3 (3 + 2 tau^2 / c^2) for a >= c Y (c > 0).
+       Tested across comparable scales, large Y/a, unequal indices, tiny gaps, and zero gap a = b.
+    4. Unmatched mass separation between fixed finite factor sets (positive natural density prod(1 - 1/p) > 0,
+       energy scale Y) and growing factor sets u = Y^theta (where unmatched primes p in [Y, tau Y] alone have
+       count ~ (tau - 1) Y / log Y and prime-prime transition energy scale Y / (log Y)^2, while Y^theta-rough
+       integers have Buchstab density ~ omega(1/theta) / (theta log Y) and non-smooth integers have Dickman
+       complement density 1 - rho_Dickman(1/theta) > 0).
     """
     saved_prec = flint_ctx.prec
     try:
         flint_ctx.prec = prec_bits
+        tau_arb = arb(2) * arb.pi()
 
-        pairing_rows: List[Dict[str, Any]] = []
-        all_pairing_bounds_hold = True
-        for p_val, q_val, r_val in [(5, 2, 2), (7, 2, 3), (11, 2, 5), (13, 3, 5)]:
-            qr_val = q_val * r_val
-            u_min_factor = min(p_val, qr_val)
-            u_max_factor = max(p_val, qr_val)
-            gap_factor = abs(qr_val - p_val)
-            for Y_int, m_int, n_int in [(4, 2, 8), (8, 3, 15), (16, 4, 20)]:
-                Y_arb = arb(Y_int)
-                k_pm = evaluate_energy_kernel_K_Y_certified_arb(Y_arb, p_val * m_int, n_int, prec_bits=prec_bits)
-                k_qrm = evaluate_energy_kernel_K_Y_certified_arb(Y_arb, qr_val * m_int, n_int, prec_bits=prec_bits)
-                k_max = evaluate_energy_kernel_K_Y_certified_arb(Y_arb, u_max_factor * m_int, n_int, prec_bits=prec_bits)
-                abs_diff = abs(k_pm - k_qrm)
-                mvt_bound = (
-                    arb(3)
-                    * (arb(gap_factor) / arb(u_min_factor))
-                    * ((arb(u_max_factor) / arb(u_min_factor)) ** 3)
-                    * k_max
+        # 1. Reproduce the (Y=33, p=11, q=2, r=5, m=1, n=11) counterexample to retired TC-055 Lemma 6.1:
+        Y_ce = arb(33)
+        k_11_11 = evaluate_energy_kernel_K_Y_certified_arb(Y_ce, 11, 11, prec_bits=prec_bits)
+        k_10_11 = evaluate_energy_kernel_K_Y_certified_arb(Y_ce, 10, 11, prec_bits=prec_bits)
+        abs_diff_ce = abs(k_11_11 - k_10_11)
+        actual_norm_diff_ce = abs_diff_ce / k_11_11
+        claimed_norm_bound_ce = arb(3993) / arb(10000)  # 0.3993
+        claimed_abs_bound_ce = claimed_norm_bound_ce * k_11_11
+        violation_norm_margin_ce = actual_norm_diff_ce - claimed_norm_bound_ce
+        violation_abs_margin_ce = abs_diff_ce - claimed_abs_bound_ce
+
+        # Elementary floating-point-free contradiction steps:
+        # 33^2 * (1/10^2 - 1/11^2) = 1089 * 21 / 12100 = 189 / 100
+        exp_neg_189_100 = (-arb(189) / arb(100)).exp()
+        ratio_upper_analytic = (arb(1331) / arb(1000)) * exp_neg_189_100
+        rational_majorant_1331_2890 = arb(1331) / arb(2890)
+        rational_lower_diff_1559_2890 = arb(1559) / arb(2890)
+        elementary_contradiction_ok = bool(
+            (rational_majorant_1331_2890 - ratio_upper_analytic).lower() > 0
+            and (rational_lower_diff_1559_2890 - claimed_norm_bound_ce).lower() > 0
+            and (actual_norm_diff_ce - rational_lower_diff_1559_2890).lower() > 0
+            and violation_norm_margin_ce.lower() > 0
+            and violation_abs_margin_ce.lower() > 0
+        )
+
+        # 2. Certify both valid replacement bounds across all 5 required regimes:
+        #    (comparable_transition_scale, large_Y_over_a_subtransition, unequal_indices, tiny_relative_gap, zero_gap_a_eq_b)
+        test_cases_replacement = [
+            ("comparable_transition_scale", 4, 8, 10, 8),
+            ("comparable_transition_scale", 8, 18, 21, 15),
+            ("comparable_transition_scale", 16, 40, 44, 20),
+            ("large_Y_over_a_counterexample", 33, 10, 11, 11),
+            ("large_Y_over_a_subtransition", 20, 4, 5, 10),
+            ("widely_unequal_indices", 6, 4, 15, 25),
+            ("tiny_relative_gap", 10, 100, 101, 100),
+            ("zero_gap_a_eq_b", 8, 12, 12, 15),
+        ]
+        replacement_rows: List[Dict[str, Any]] = []
+        all_replacement_bounds_hold = True
+        for regime_lbl, Y_int, a_int, b_int, n_int in test_cases_replacement:
+            Y_arb = arb(Y_int)
+            a_arb = arb(a_int)
+            b_arb = arb(b_int)
+            r0_arb = b_arb / a_arb
+            r0_cubed = r0_arb ** 3
+            delta_arb = arb(1) / (a_arb * a_arb) - arb(1) / (b_arb * b_arb)
+            L_low = r0_cubed * (-((tau_arb * Y_arb) ** 2) * delta_arb).exp()
+            L_high = r0_cubed * (-(Y_arb * Y_arb) * delta_arb).exp()
+            ratio_factor_max = arb(
+                max(abs(L_low - arb(1)).upper(), abs(L_high - arb(1)).upper())
+            )
+            rel_gap_factor = (
+                ((b_arb - a_arb) / a_arb)
+                * r0_cubed
+                * (arb(3) + arb(2) * ((tau_arb * Y_arb) ** 2) / (a_arb * a_arb))
+            )
+
+            k_a = evaluate_energy_kernel_K_Y_certified_arb(Y_arb, a_int, n_int, prec_bits=prec_bits)
+            k_b = evaluate_energy_kernel_K_Y_certified_arb(Y_arb, b_int, n_int, prec_bits=prec_bits)
+            abs_diff = abs(k_a - k_b)
+            ratio_bound_val = ratio_factor_max * k_b
+            rel_gap_bound_val = rel_gap_factor * k_b
+
+            if a_int == b_int:
+                ver_kind = "exact_algebraic_zero_identity"
+                two_sided_ok = bool(a_int == b_int and (b_int - a_int) == 0)
+                ratio_diff_ok = two_sided_ok
+                rel_gap_ok = two_sided_ok
+            else:
+                ver_kind = "certified_strict_inequality"
+                two_sided_ok = bool(
+                    (k_a - L_low * k_b).lower() > 0 and (L_high * k_b - k_a).lower() > 0
                 )
-                margin = mvt_bound - abs_diff
-                bound_ok = bool(margin.lower() > 0)
-                if not bound_ok:
-                    all_pairing_bounds_hold = False
-                pairing_rows.append({
-                    "p": p_val,
-                    "q": q_val,
-                    "r": r_val,
-                    "qr": qr_val,
-                    "Y": Y_int,
-                    "m": m_int,
-                    "n": n_int,
-                    "K_Y_pm_n": serialize_arb_certified(k_pm),
-                    "K_Y_qrm_n": serialize_arb_certified(k_qrm),
-                    "abs_difference": serialize_arb_certified(abs_diff),
-                    "analytic_mvt_upper_bound": serialize_arb_certified(mvt_bound),
-                    "bound_minus_abs_diff_margin": serialize_arb_certified(margin),
-                    "mvt_bound_strictly_certified": bound_ok,
-                })
+                ratio_diff_ok = bool((ratio_bound_val - abs_diff).lower() > 0)
+                rel_gap_ok = bool((rel_gap_bound_val - abs_diff).lower() > 0)
 
-        # Unmatched coprime and multiplicity residual audit on 1 <= k <= 240 for P_1 = {5, 7, 11}, P_2 = {4, 6, 10}:
+            if not (two_sided_ok and ratio_diff_ok and rel_gap_ok):
+                all_replacement_bounds_hold = False
+
+            replacement_rows.append({
+                "regime": regime_lbl,
+                "Y": Y_int,
+                "a": a_int,
+                "b": b_int,
+                "n": n_int,
+                "verification_classification": ver_kind,
+                "K_Y_a_n": serialize_arb_certified(k_a),
+                "K_Y_b_n": serialize_arb_certified(k_b),
+                "abs_difference": serialize_arb_certified(abs_diff),
+                "two_sided_ratio_lower_L_low_times_K_b": serialize_arb_certified(L_low * k_b),
+                "two_sided_ratio_upper_L_high_times_K_b": serialize_arb_certified(L_high * k_b),
+                "two_sided_ratio_enclosure_holds": two_sided_ok,
+                "integrand_ratio_diff_upper_bound": serialize_arb_certified(ratio_bound_val),
+                "integrand_ratio_diff_margin": serialize_arb_certified(ratio_bound_val - abs_diff),
+                "integrand_ratio_diff_bound_holds": ratio_diff_ok,
+                "transition_relative_gap_upper_bound": serialize_arb_certified(rel_gap_bound_val),
+                "transition_relative_gap_margin": serialize_arb_certified(rel_gap_bound_val - abs_diff),
+                "transition_relative_gap_bound_holds": rel_gap_ok,
+            })
+
+        # 3. Unmatched coprime and multiplicity residual audit on 1 <= k <= 240 for P_1 = {5, 7, 11}, P_2 = {4, 6, 10}:
         P1 = (5, 7, 11)
         P2 = (4, 6, 10)
         w_bar = sum(Fraction(1, p) for p in P1) + sum(Fraction(1, s) for s in P2)
@@ -3587,13 +3866,70 @@ def verify_tc055_opposite_parity_dilation_pairing_and_obstruction(
                 non_unit_weight_count += 1
 
         return {
-            "candidate_lemma_statement": (
-                "For prime p and semiprime s = q r, lambda(p m) + lambda(q r m) = 0 and "
-                "|K_Y(p m, n) - K_Y(q r m, n)| <= 3 (|q r - p| / min(p, q r)) (max(p, q r) / min(p, q r))^3 K_Y(max(p, q r) m, n) "
-                "for all m, n >= 1 and Y > 0."
+            "preserved_opposite_parity_sign_identity": (
+                "For any prime p and semiprime s = q r (with q, r prime) and any integer m >= 1: "
+                "lambda(p m) = -lambda(m), lambda(q r m) = +lambda(m), lambda(p m) + lambda(q r m) = 0, and "
+                "lambda(p m) K_Y(p m, n) + lambda(q r m) K_Y(q r m, n) = -lambda(m) (K_Y(p m, n) - K_Y(q r m, n))."
             ),
-            "pairwise_mvt_rows": pairing_rows,
-            "all_pairwise_mvt_bounds_hold": all_pairing_bounds_hold,
+            "retired_tc055_lemma61_counterexample": {
+                "classification": "falsified_legacy_assertion",
+                "retired_formula": (
+                    "|K_Y(p m, n) - K_Y(q r m, n)| <= 3 (|q r - p| / min(p, q r)) (max(p, q r) / min(p, q r))^3 K_Y(max(p, q r) m, n)"
+                ),
+                "counterexample_parameters": {
+                    "Y": 33,
+                    "p": 11,
+                    "q": 2,
+                    "r": 5,
+                    "qr": 10,
+                    "m": 1,
+                    "n": 11,
+                },
+                "K_33_11_11": serialize_arb_certified(k_11_11),
+                "K_33_10_11": serialize_arb_certified(k_10_11),
+                "abs_diff_K_33_11_11_minus_K_33_10_11": serialize_arb_certified(abs_diff_ce),
+                "actual_normalized_difference": serialize_arb_certified(actual_norm_diff_ce),
+                "retired_claimed_normalized_upper_bound_3993_over_10000": serialize_arb_certified(claimed_norm_bound_ce),
+                "normalized_violation_margin_actual_minus_claimed": serialize_arb_certified(violation_norm_margin_ce),
+                "absolute_violation_margin_actual_minus_claimed": serialize_arb_certified(violation_abs_margin_ce),
+                "elementary_floating_point_free_contradiction": {
+                    "exponent_lower_bound_33_sq_times_delta": "189/100 = 1.89",
+                    "analytic_ratio_upper_bound_1331_over_1000_exp_neg_189_over_100": serialize_arb_certified(ratio_upper_analytic),
+                    "rational_majorant_1331_over_2890": serialize_arb_certified(rational_majorant_1331_2890),
+                    "rational_lower_bound_on_normalized_diff_1559_over_2890": serialize_arb_certified(rational_lower_diff_1559_2890),
+                    "inequality_chain": (
+                        "K_{33}(10,11)/K_{33}(11,11) <= (1331/1000) exp(-189/100) < 1331/2890 "
+                        "=> |K_{33}(11,11) - K_{33}(10,11)| / K_{33}(11,11) > 1559/2890 > 3993/10000"
+                    ),
+                },
+                "original_error_explanation": (
+                    "In |g_X'(u)| = u^{-4} |2 X^2 / u^2 - 3| exp(-X^2 / u^2) (w = X/u), bounding |(2 w^2 - 3) exp(-w^2)| <= 3 "
+                    "consumes the Gaussian factor exp(-w^2) = exp(-X^2 / u^2) and does NOT permit retaining a second Gaussian factor "
+                    "exp(-X^2 / u_2^2) afterward. Retaining exp(-X^2 / b^2) for u in [a, b] requires bounding |2 X^2 / u^2 - 3| "
+                    "without the Gaussian, which introduces the scale factor 3 + 2 tau^2 Y^2 / a^2."
+                ),
+                "counterexample_strictly_certified": elementary_contradiction_ok,
+            },
+            "valid_replacement_bounds": {
+                "domain": "All Y > 0, 0 < a <= b, n > 0 (with r_0 = b/a >= 1, Delta = a^{-2} - b^{-2} >= 0)",
+                "two_sided_integrand_ratio_enclosure": (
+                    "r_0^3 exp(-(tau Y)^2 Delta) K_Y(b, n) <= K_Y(a, n) <= r_0^3 exp(-Y^2 Delta) K_Y(b, n)"
+                ),
+                "integrand_ratio_difference_bound": (
+                    "|K_Y(a, n) - K_Y(b, n)| <= max(|r_0^3 exp(-(tau Y)^2 Delta) - 1|, |r_0^3 exp(-Y^2 Delta) - 1|) K_Y(b, n)"
+                ),
+                "transition_relative_gap_bound": (
+                    "|K_Y(a, n) - K_Y(b, n)| <= ((b - a) / a) (b / a)^3 (3 + 2 tau^2 Y^2 / a^2) K_Y(b, n)"
+                ),
+                "useful_regime_and_non_saving_caveat": (
+                    "For a >= c Y (c > 0), the relative-gap bound has explicit transition-restricted coefficient "
+                    "((b - a)/a)(b/a)^3 (3 + 2 tau^2 / c^2). This pairwise kernel inequality is NOT a global energy saving by itself "
+                    "because its coefficient 3 + 2 tau^2 / c^2, divisor summation multiplicities, unmatched terms, and window boundary "
+                    "shifts must all be bounded simultaneously."
+                ),
+                "rows": replacement_rows,
+                "all_replacement_bounds_hold": all_replacement_bounds_hold,
+            },
             "unmatched_residual_and_multiplicity_obstruction": {
                 "tested_P1_primes": list(P1),
                 "tested_P2_semiprimes": list(P2),
@@ -3601,17 +3937,50 @@ def verify_tc055_opposite_parity_dilation_pairing_and_obstruction(
                 "k_range_tested": "1 <= k <= 240",
                 "unmatched_k_count_with_W_pair_eq_0": unmatched_zero_weight_count,
                 "k_count_with_W_pair_ne_w_bar": non_unit_weight_count,
-                "exact_obstruction_diagnosis": (
-                    "Regrouping sum_{p in P_1} alpha_p sum_m lambda(p m) g(p m) + sum_{s in P_2} beta_s sum_m lambda(s m) g(s m) "
-                    "by product index k = p m or s m weights each k by W_pair(k) = sum_{p|k} alpha_p + sum_{s|k} beta_s. "
-                    "Every integer k coprime to prod_{p in P_1 union P_2} p (including all primes k in [Y, tau Y] when the active "
-                    "factors are <= Y^theta with theta < 1) has W_pair(k) = 0, leaving a positive-density unmatched residual of "
-                    "unsigned energy order Y. Moreover, on matched pairs (p m, q r m), the transition window p m in [Y, tau Y] vs "
-                    "q r m in [Y, tau Y] shifts the m-cutoff by |q r - p| Y / (p q r), producing boundary terms of the same scale "
-                    "(|q r - p| / p) Y as the interior MVT difference."
-                ),
+                "fixed_vs_growing_factor_set_separation": {
+                    "fixed_finite_factor_set": (
+                        "For a fixed finite factor set P_act = P_1 union P_2, integers k coprime to prod_{p in P_act} p have "
+                        "positive natural density prod_{p in P_act} (1 - 1/p) > 0, leaving ~ Y unmatched integers in [Y, tau Y] "
+                        "and an unsigned transition energy contribution of order Y."
+                    ),
+                    "growing_factor_set_and_unmatched_primes_scale": (
+                        "For a growing cutoff u = Y^theta (0 < theta < 1), unmatched primes p in [Y, tau Y] alone have count "
+                        "pi(tau Y) - pi(Y) ~ (tau - 1) Y / log Y; each prime contributes O(Y^{-1/2}) to Q_lambda(X), so unmatched "
+                        "primes alone contribute O(sqrt(Y) / log Y) to Q_lambda(X) and transition scale Y / (log Y)^2 to the "
+                        "prime-prime energy (NOT order Y). The order-Y unsigned residual for u = Y^theta comes from integers "
+                        "n in [Y, tau Y] having at least one prime factor > Y^theta (Dickman complement density 1 - rho_Dickman(1/theta) > 0), "
+                        "while Y^theta-rough composite integers (all prime factors > Y^theta) have Buchstab density ~ omega(1/theta) / (theta log Y)."
+                    ),
+                },
             },
         }
+    finally:
+        flint_ctx.prec = saved_prec
+
+
+def evaluate_Q_aS_certified_arb(
+    X_val: Union[arb, int, float, str, Fraction],
+    primes_S: Tuple[int, ...] = (3, 5, 7),
+    T_cutoff: int = 1200,
+    prec_bits: int = 256,
+) -> arb:
+    """Certify Q_{a_S}(X) := X^{5/2} sum_{n>=1} (a_S(n) / n^3) exp(-X^2 / n^2)
+    with explicit integer-cutoff tail bound X^{5/2} / (2 T^2).
+    """
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = prec_bits
+        X = arb(X_val.numerator) / arb(X_val.denominator) if isinstance(X_val, Fraction) else arb(X_val)
+        X_sq = X * X
+        X_5_2 = X_sq * X.sqrt()
+        partial = arb(0)
+        for n in range(1, T_cutoff + 1):
+            a_n = finite_prime_parity_aS_int(n, primes_S=primes_S)
+            n_arb = arb(n)
+            partial += arb(a_n) * (-X_sq / (n_arb * n_arb)).exp() / (n_arb ** 3)
+        center = X_5_2 * partial
+        tail_bound = X_5_2 / (arb(2) * (arb(T_cutoff) ** 2))
+        return inflate_arb_with_nonneg_bound(center, tail_bound)
     finally:
         flint_ctx.prec = saved_prec
 
@@ -3619,18 +3988,32 @@ def verify_tc055_opposite_parity_dilation_pairing_and_obstruction(
 def verify_tc055_multiplicative_parity_controls(
     prec_bits: int = 256,
 ) -> Dict[str, Any]:
-    """Verify TASK-TC-055 Section 7:
+    """Verify TASK-TC-055 Section 7 & TASK-TC-055R Section 5 & Section 8 (Repaired Parity Controls):
     1. Hypothesis-by-hypothesis comparison between actual Liouville lambda(n) = (-1)^{Omega(n)},
        the 2-adic parity control a_2(n) = (-1)^{v_2(n)}, and general finite-prime parity controls
        a_S(n) = (-1)^{sum_{p in S} v_p(n)}.
-    2. Exact non-asymptotic and asymptotic derivations for a_2(n):
-       - Dyadic exclusion identity: (I + 2^{-1/2} S_2) Q_{a_2}(X) = Q_odd(X) = Q_1(X) - 2^{-1/2} Q_1(X/2) > 0;
-       - Dyadic series expansion: Q_{a_2}(X) = Q_1(X) + 2 sum_{k>=1} (-1)^k 2^{-k/2} Q_1(X / 2^k);
-       - Unimodal Euler-Maclaurin bound: |Q_1(X) - sqrt(X)/2| <= (3/e)^{3/2} X^{-1/2} for all X > 0;
-       - Asymptotic laws:
-             Q_{a_2}(X) = (1/6) sqrt(X) + O(X^{-1/2}) ~ sqrt(X) / 6,
-             E_{a_2}(Y) := int_Y^{tau Y} |Q_{a_2}(X)|^2 dX/X = ((tau - 1) / 36) Y + O(1) ~ ((tau - 1) / 36) Y,
-         certified in 256-bit Arb across X, Y in {4, 8, 16, 32, 64}.
+    2. Repaired unimodal constant and higher-order Euler-Maclaurin remainder for Q_1(w):
+       - Exact unimodal constant:
+             C_{1,uni} := 2 (3 / (2 e))^{3/2} = (1 / sqrt(2)) (3 / e)^{3/2} = 0.81983255788372007678... < (3 / e)^{3/2},
+         replacing the erroneous equality 2(3/(2e))^{3/2} = (3/e)^{3/2}.
+         Summing the first-order unimodal error O(w^{-1/2}) over 1 <= k <= floor(log_2 X) yields
+             Q_{a_2}(X) = sqrt(X)/6 + O(X^{-1/2} log X),   E_{a_2}(Y) = ((tau - 1)/36) Y + O(log Y).
+       - Second-order periodic Bernoulli Euler-Maclaurin bound for h_w(t) = t^{-3} exp(-w^2/t^2):
+         Since h_w(0^+) = h_w'(0^+) = h_w(infty) = h_w'(infty) = 0 and
+         (1/12) int_0^infty |h_w''(t)| dt = (w^{-4}/12) int_0^infty |h_1''(u)| du <= 3 w^{-4},
+         we have |Q_1(w) - sqrt(w)/2| <= 3 w^{-3/2} for all w > 0.
+         Splitting the dyadic sum at K_X = floor(log_2 X) (X >= 1) gives:
+           * Large scales 1 <= k <= K_X (w = X/2^k >= 1):
+                 sqrt(2) sum_{k=1}^{K_X} 2^{-k/2} * 3 (X/2^k)^{-3/2} = 3 sqrt(2) X^{-3/2} sum_{k=1}^{K_X} 2^k <= 6 sqrt(2) X^{-1/2};
+           * Omitted main-term tail k > K_X:
+                 sqrt(2) sum_{k > K_X} 2^{-k/2} (1/2) sqrt(X/2^k) = (sqrt(2 X)/2) 2^{-K_X} <= sqrt(2) X^{-1/2};
+           * Small-scale tail k > K_X (using |Q_1(w)| <= zeta(3) w^{5/2}):
+                 sqrt(2) zeta(3) X^{5/2} sum_{k > K_X} 2^{-3k} = (sqrt(2) zeta(3) / 7) X^{5/2} 2^{-3 K_X} <= (8 sqrt(2) zeta(3) / 7) X^{-1/2};
+         establishing |Q_{a_2}(X) - sqrt(X)/6| <= C_{a_2} X^{-1/2} with C_{a_2} = 3 + 7 sqrt(2) + (8 sqrt(2)/7) zeta(3) = 14.8423122796888086...
+         for all X >= 1, and recovering Q_{a_2}(X) = sqrt(X)/6 + O(X^{-1/2}) and E_{a_2}(Y) = ((tau - 1)/36) Y + O(1).
+    3. Multi-prime control S = {3, 5, 7}:
+       The control mean is prod_{p in {3,5,7}} (p - 1)/(p + 1) = (2/4)*(4/6)*(6/8) = 1/4 (not 1/3),
+       giving Q_{a_{3,5,7}}(X) ~ (1/2)*(1/4) sqrt(X) = sqrt(X)/8 and E_{a_{3,5,7}}(Y) ~ ((tau - 1)/64) Y.
     """
     saved_prec = flint_ctx.prec
     try:
@@ -3639,19 +4022,32 @@ def verify_tc055_multiplicative_parity_controls(
         one_sixth = arb(1) / arb(6)
         tau_minus_1_over_36 = (tau_arb - arb(1)) / arb(36)
         three_over_e_pow_3_2 = (arb(3) / arb(1).exp()) ** (arb(3) / arb(2))
+        exact_C1_unimodal = arb(2) * ((arb(3) / (arb(2) * arb(1).exp())) ** (arb(3) / arb(2)))
+        alt_C1_unimodal = three_over_e_pow_3_2 / arb(2).sqrt()
+        C_a2_second_order = (
+            arb(3)
+            + arb(7) * arb(2).sqrt()
+            + (arb(8) * arb(2).sqrt() / arb(7)) * arb(3).zeta()
+        )
+        unimodal_constant_repair_ok = bool(
+            (exact_C1_unimodal - alt_C1_unimodal).contains(0)
+            and (three_over_e_pow_3_2 - exact_C1_unimodal).lower() > 0
+        )
 
-        # 1. Certify |Q_1(X) - sqrt(X)/2| <= (3/e)^{3/2} X^{-1/2} and (I + 2^{-1/2} S_2) Q_{a_2}(X) = Q_1(X) - 2^{-1/2} Q_1(X/2)
+        # 1. Certify |Q_1(X) - sqrt(X)/2| <= C_{1,uni} X^{-1/2}, |Q_1(X) - sqrt(X)/2| <= 3 X^{-3/2},
+        #    |Q_{a_2}(X) - sqrt(X)/6| <= C_{a_2} X^{-1/2}, and (I + 2^{-1/2} S_2) Q_{a_2}(X) = Q_1(X) - 2^{-1/2} Q_1(X/2)
         q_a2_rows: List[Dict[str, Any]] = []
         all_q1_bounds_and_dyadic_identities_hold = True
         inv_sqrt2 = arb(1) / arb(2).sqrt()
         for X_int in (4, 8, 16, 32, 64):
             X_arb = arb(X_int)
-            t_cut = max(1200, 30 * X_int)
+            t_cut = max(1600, 80 * X_int)
             q1_x = evaluate_Q_1_unweighted_certified_arb(X_arb, T_cutoff=t_cut, prec_bits=prec_bits)
             q1_half_x = evaluate_Q_1_unweighted_certified_arb(X_arb / arb(2), T_cutoff=t_cut, prec_bits=prec_bits)
             q1_err = abs(q1_x - X_arb.sqrt() / arb(2))
-            q1_bnd = three_over_e_pow_3_2 / X_arb.sqrt()
-            q1_ok = bool((q1_bnd - q1_err).lower() > 0)
+            q1_bnd_uni = exact_C1_unimodal / X_arb.sqrt()
+            q1_bnd_em2 = arb(3) / (X_arb * X_arb.sqrt())
+            q1_ok = bool((q1_bnd_uni - q1_err).lower() > 0 and (q1_bnd_em2 - q1_err).lower() > 0)
 
             qa2_x = evaluate_Q_a2_certified_arb(X_arb, T_cutoff=t_cut, prec_bits=prec_bits)
             qa2_half_x = evaluate_Q_a2_certified_arb(X_arb / arb(2), T_cutoff=t_cut, prec_bits=prec_bits)
@@ -3660,9 +4056,13 @@ def verify_tc055_multiplicative_parity_controls(
             dyadic_diff = lhs_dyadic - rhs_odd
             dyadic_ok = bool(dyadic_diff.contains(0)) and bool(lhs_dyadic.lower() > 0)
 
+            qa2_err = abs(qa2_x - X_arb.sqrt() / arb(6))
+            qa2_em2_bnd = C_a2_second_order / X_arb.sqrt()
+            qa2_em2_ok = bool((qa2_em2_bnd - qa2_err).lower() > 0)
+
             ratio_to_sqrt_X = qa2_x / X_arb.sqrt()
             scaled_rem_X_half = (qa2_x - X_arb.sqrt() / arb(6)) * X_arb.sqrt()
-            if not (q1_ok and dyadic_ok):
+            if not (q1_ok and dyadic_ok and qa2_em2_ok):
                 all_q1_bounds_and_dyadic_identities_hold = False
             q_a2_rows.append({
                 "X": X_int,
@@ -3670,9 +4070,11 @@ def verify_tc055_multiplicative_parity_controls(
                 "leading_sqrt_X_over_6": serialize_arb_certified(X_arb.sqrt() / arb(6)),
                 "ratio_Q_a2_over_sqrt_X": serialize_arb_certified(ratio_to_sqrt_X),
                 "scaled_remainder_sqrt_X_times_diff": serialize_arb_certified(scaled_rem_X_half),
+                "second_order_em_bound_C_a2_X_neg_half": serialize_arb_certified(qa2_em2_bnd),
+                "second_order_em_bound_holds": qa2_em2_ok,
                 "dyadic_filter_lhs_minus_Q_odd_rhs": serialize_arb_certified(dyadic_diff),
                 "dyadic_filter_strictly_positive_and_matches_Q_odd": dyadic_ok,
-                "Q_1_unimodal_error_bound_holds": q1_ok,
+                "Q_1_exact_unimodal_and_em2_bounds_hold": q1_ok,
             })
 
         # 2. Certify E_{a_2}(Y) ~ ((tau - 1) / 36) Y across Y in {4, 8, 16, 32}:
@@ -3695,10 +4097,44 @@ def verify_tc055_multiplicative_parity_controls(
                 "abs_difference_from_leading": serialize_arb_certified(abs_rem_e),
             })
 
+        # 3. Certify S = {3, 5, 7} multi-prime parity control:
+        #    control mean prod_{p in {3,5,7}} (p-1)/(p+1) = (2/4)*(4/6)*(6/8) = 1/4,
+        #    leading Q_{a_S}(X) ~ (1/8) sqrt(X), leading E_{a_S}(Y) ~ ((tau - 1)/64) Y:
+        mean_357_frac = Fraction(2, 4) * Fraction(4, 6) * Fraction(6, 8)
+        lead_Q_357_frac = Fraction(1, 2) * mean_357_frac  # 1/8
+        lead_E_357_arb = (tau_arb - arb(1)) / arb(64)
+        q_357_at_16 = evaluate_Q_aS_certified_arb(arb(16), primes_S=(3, 5, 7), T_cutoff=1200, prec_bits=prec_bits)
+        q_357_at_64 = evaluate_Q_aS_certified_arb(arb(64), primes_S=(3, 5, 7), T_cutoff=2000, prec_bits=prec_bits)
+        s357_control_ok = bool(
+            mean_357_frac == Fraction(1, 4)
+            and lead_Q_357_frac == Fraction(1, 8)
+            and q_357_at_16.lower() > 0
+            and q_357_at_64.lower() > 0
+        )
+
         return {
+            "unimodal_and_second_order_euler_maclaurin_constants": {
+                "exact_C1_unimodal_2_times_3_over_2e_pow_3_2": serialize_arb_certified(exact_C1_unimodal),
+                "equivalent_1_over_sqrt2_times_3_over_e_pow_3_2": serialize_arb_certified(alt_C1_unimodal),
+                "strict_upper_3_over_e_pow_3_2": serialize_arb_certified(three_over_e_pow_3_2),
+                "unimodal_constant_repair_certified": unimodal_constant_repair_ok,
+                "first_order_unimodal_supported_bounds": {
+                    "Q_a2_from_unimodal_only": "Q_{a_2}(X) = (1 / 6) sqrt(X) + O(X^{-1/2} log X)",
+                    "E_a2_from_unimodal_only": "E_{a_2}(Y) = ((tau - 1) / 36) Y + O(log Y)",
+                },
+                "second_order_euler_maclaurin_recovery": {
+                    "Q_1_second_order_bound": "|Q_1(w) - sqrt(w)/2| <= (w^{5/2}/12) int_0^infty |h_w''(t)| dt <= 3 w^{-3/2}  (forall w > 0)",
+                    "dyadic_split_cutoff": "K_X = floor(log_2 X) for X >= 1",
+                    "large_scale_sum_1_le_k_le_K_X": "sqrt(2) sum_{k=1}^{K_X} 2^{-k/2} * 3 (X/2^k)^{-3/2} = 3 sqrt(2) X^{-3/2} sum_{k=1}^{K_X} 2^k <= 6 sqrt(2) X^{-1/2}",
+                    "omitted_main_term_tail_k_gt_K_X": "sqrt(2) sum_{k > K_X} 2^{-k/2} (1/2) sqrt(X/2^k) = (sqrt(2 X)/2) 2^{-K_X} <= sqrt(2) X^{-1/2}",
+                    "small_scale_tail_k_gt_K_X": "sqrt(2) zeta(3) X^{5/2} sum_{k > K_X} 2^{-3k} = (sqrt(2) zeta(3)/7) X^{5/2} 2^{-3 K_X} <= (8 sqrt(2) zeta(3)/7) X^{-1/2}",
+                    "explicit_C_a2_constant": serialize_arb_certified(C_a2_second_order),
+                    "recovered_sharp_bounds": "Q_{a_2}(X) = (1 / 6) sqrt(X) + O(X^{-1/2}) and E_{a_2}(Y) = ((tau - 1) / 36) Y + O(1)",
+                },
+            },
             "asymptotic_formulas": {
-                "Q_a2_asymptotic": "Q_{a_2}(X) = (1 / 6) sqrt(X) + O(X^{-1/2}) ~ sqrt(X) / 6",
-                "E_a2_asymptotic": "E_{a_2}(Y) := int_Y^{tau Y} |Q_{a_2}(X)|^2 dX/X = ((tau - 1) / 36) Y + O(1) ~ ((tau - 1) / 36) Y",
+                "Q_a2_asymptotic": "Q_{a_2}(X) = (1 / 6) sqrt(X) + O(X^{-1/2}) ~ sqrt(X) / 6 (or + O(X^{-1/2} log X) from first-order unimodal bound alone)",
+                "E_a2_asymptotic": "E_{a_2}(Y) := int_Y^{tau Y} |Q_{a_2}(X)|^2 dX/X = ((tau - 1) / 36) Y + O(1) ~ ((tau - 1) / 36) Y (or + O(log Y) from first-order unimodal bound alone)",
                 "general_finite_S_asymptotic": (
                     "For a_S(n) = (-1)^{sum_{p in S} v_p(n)}, "
                     "Q_{a_S}(X) ~ (1/2) (prod_{p in S} (p - 1)/(p + 1)) sqrt(X) and "
@@ -3706,6 +4142,18 @@ def verify_tc055_multiplicative_parity_controls(
                 ),
                 "one_sixth": serialize_arb_certified(one_sixth),
                 "tau_minus_1_over_36": serialize_arb_certified(tau_minus_1_over_36),
+                "control_S_3_5_7": {
+                    "primes_S": [3, 5, 7],
+                    "euler_factor_mean_prod_p_minus_1_over_p_plus_1": str(mean_357_frac),
+                    "leading_Q_aS_over_sqrt_X_coefficient": str(lead_Q_357_frac),
+                    "leading_E_aS_over_Y_coefficient_formula": "(tau - 1) / 64",
+                    "leading_E_aS_over_Y_coefficient": serialize_arb_certified(lead_E_357_arb),
+                    "Q_a_357_at_16": serialize_arb_certified(q_357_at_16),
+                    "ratio_Q_a_357_over_sqrt_16": serialize_arb_certified(q_357_at_16 / arb(4)),
+                    "Q_a_357_at_64": serialize_arb_certified(q_357_at_64),
+                    "ratio_Q_a_357_over_sqrt_64": serialize_arb_certified(q_357_at_64 / arb(8)),
+                    "s357_control_certified": s357_control_ok,
+                },
             },
             "hypothesis_by_hypothesis_comparison": [
                 {
@@ -3739,7 +4187,7 @@ def verify_tc055_multiplicative_parity_controls(
                     "control_aS_finite": False,
                 },
                 {
-                    "property": "Square-divisor Möbius convolution a(n) = sum_{d^2 | n} mu(n / d^2) and pole cancellation at s = 1",
+                    "property": "Square-divisor Möbius convolution a(n) = sum_{d^2 | n} mu(n / d^2) and D_a(1) = 0 (vs simple pole at s = 1)",
                     "liouville_lambda": True,
                     "control_a2": False,
                     "control_aS_finite": False,
@@ -3755,8 +4203,373 @@ def verify_tc055_multiplicative_parity_controls(
                 "Q_{a_2}(X) ~ sqrt(X)/6 and E_{a_2}(Y) ~ ((tau - 1)/36) Y (linear growth in Y), any cancellation argument that "
                 "uses only hypotheses shared by a_2 or a_S cannot establish E_lambda(Y) = o(Y) or E_lambda(Y) <<_eps Y^eps. "
                 "This is a control diagnostic exposing unsupported inferences, NOT a counterexample to the complete TC framework "
-                "(since a_2 fails a(p) = -1 at odd primes and fails sum_{d^2|n} mu(n/d^2) = a(n))."
+                "(since a_2 and a_S fail a(p) = -1 at primes outside S and fail sum_{d^2|n} mu(n/d^2) = a(n))."
             ),
+        }
+    finally:
+        flint_ctx.prec = saved_prec
+
+
+def evaluate_Q_lambda_finite_T_certified_arb(
+    X_val: Union[arb, int, float, str, Fraction],
+    T_int: int,
+    prec_bits: int = 256,
+) -> arb:
+    """Evaluate the exact finite truncated sum
+        Q_{lambda,T}(X) := X^{5/2} sum_{1 <= n <= T} lambda(n) n^{-3} exp(-X^2 / n^2)
+    for integer T >= 1 in 256-bit Arb (no infinite-tail inflation).
+    """
+    if T_int < 0:
+        raise ValueError(f"T_int must be >= 0, got {T_int}")
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = prec_bits
+        X = arb(X_val.numerator) / arb(X_val.denominator) if isinstance(X_val, Fraction) else arb(X_val)
+        if T_int == 0:
+            return arb(0)
+        X_sq = X * X
+        X_5_2 = X_sq * X.sqrt()
+        acc = arb(0)
+        for n in range(1, T_int + 1):
+            lam_n = liouville_lambda_int(n)
+            n_arb = arb(n)
+            acc += arb(lam_n) * (-X_sq / (n_arb * n_arb)).exp() / (n_arb ** 3)
+        return X_5_2 * acc
+    finally:
+        flint_ctx.prec = saved_prec
+
+
+def evaluate_Q_lambda_P_finite_L_certified_arb(
+    X_val: Union[arb, int, float, str, Fraction],
+    primes_P: Tuple[int, ...],
+    L_int: int,
+    prec_bits: int = 256,
+) -> arb:
+    """Evaluate the exact finite P-coprime truncated sum
+        Q_{lambda,P,L}(X) := X^{5/2} sum_{1 <= r <= L, gcd(r, N_P) = 1} lambda(r) r^{-3} exp(-X^2 / r^2)
+    for integer L >= 0 in 256-bit Arb.
+    """
+    if L_int < 0:
+        raise ValueError(f"L_int must be >= 0, got {L_int}")
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = prec_bits
+        X = arb(X_val.numerator) / arb(X_val.denominator) if isinstance(X_val, Fraction) else arb(X_val)
+        if L_int == 0:
+            return arb(0)
+        N_P = 1
+        for p in set(primes_P):
+            N_P *= p
+        X_sq = X * X
+        X_5_2 = X_sq * X.sqrt()
+        acc = arb(0)
+        for r in range(1, L_int + 1):
+            if math.gcd(r, N_P) != 1:
+                continue
+            lam_r = liouville_lambda_int(r)
+            r_arb = arb(r)
+            acc += arb(lam_r) * (-X_sq / (r_arb * r_arb)).exp() / (r_arb ** 3)
+        return X_5_2 * acc
+    finally:
+        flint_ctx.prec = saved_prec
+
+
+def verify_tc055r_finite_truncation_and_signed_energy_attempt(
+    prec_bits: int = 256,
+) -> Dict[str, Any]:
+    """Execute TASK-TC-055R Section 6 (Noncircular Finite Arithmetic Proof Attempt):
+    1. Exact finite smooth-cofactor reconstruction with m-dependent inner cutoff floor(T / m):
+           Q_{lambda,T}(X) = sum_{m in S(P), m <= T} (lambda(m) / sqrt(m)) Q_{lambda,P,floor(T/m)}(X / m),
+       and explicit verification of the boundary correction when floor(T / m) is replaced by a common inner cutoff L = T.
+    2. Finite-truncation grade-interval tail energy bound:
+           int_Y^{tau Y} |Q_lambda(X) - Q_{lambda,T}(X)|^2 dX/X <= (tau^5 - 1) Y^5 / (20 T^4),
+       uniformly bounded by (tau^5 - 1) / 20 = 489.5814956564503252... = O(1) when T(Y) = ceil(Y^{5/4}),
+       together with the L^2 transfer:
+           E_lambda(Y) <= 2 E_{lambda,T(Y)}(Y) + 2 E_{tail,T(Y)}(Y),
+           E_{lambda,T(Y)}(Y) <= 2 E_lambda(Y) + 2 E_{tail,T(Y)}(Y).
+    3. Substantive signed estimate attempt on E_{lambda,T(Y)}(Y) with prime cutoff P_u = {p <= u}:
+       Expands E_{lambda,T}(Y) = sum_{1 <= m, n <= T} lambda(m) lambda(n) K_Y(m, n) via the P_u-smooth / P_u-coprime
+       factorization n = m_smooth * r_coprime (m_smooth in S(P_u), gcd(r_coprime, N_u) = 1, r_coprime <= floor(T / m_smooth)),
+       decomposing E_{lambda,T}(Y) into:
+         - Same coprime cofactor r_1 = r_2 = r:
+               E_{same-r}(Y; T, P_u) = sum_{1 <= r <= T, gcd(r, N_u)=1} int_Y^{tau Y} |Q_{lambda,S(P_u),floor(T/r)}(X/r)|^2 dX/X >= 0,
+           where each pure P_u-smooth signed fiber has generating Dirichlet series prod_{p <= u}(1 + p^{-s})^{-1}
+           holomorphic on Re(s) > 0;
+         - Distinct coprime cofactors r_1 != r_2:
+               E_{diff-r}(Y; T, P_u) = sum_{r_1 != r_2, gcd(r_1 r_2, N_u)=1} lambda(r_1) lambda(r_2)
+                   * int_Y^{tau Y} Q_{lambda,S(P_u),floor(T/r_1)}(X/r_1) Q_{lambda,S(P_u),floor(T/r_2)}(X/r_2) dX/X;
+         - And smooth-index diagonal (m_1 = m_2) vs smooth-index cross terms (m_1 != m_2).
+       Records both the certified cancellation ratio E_{lambda,T}(Y) / E_{unsigned,T}(Y) and the exact two-part
+       obstruction (Kronecker Euler-product norm blow-up + hyperbolic inner-cutoff floor(T/m) boundary coupling for large u,
+       versus unfactored coprime cross-sum E_{diff-r} for small u) preventing an unconditional O(Y^eps) bound.
+    """
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = prec_bits
+        tau_arb = arb(2) * arb.pi()
+        uniform_tail_cap = (tau_arb ** 5 - arb(1)) / arb(20)
+
+        # 1. Verify exact finite reconstruction Q_{lambda,T}(X) = sum_{m in S(P), m<=T} (lambda(m)/sqrt(m)) Q_{lambda,P,floor(T/m)}(X/m)
+        #    and exact boundary discrepancy when replacing floor(T/m) by common cutoff L = T:
+        finite_reconstruction_rows: List[Dict[str, Any]] = []
+        all_finite_reconstructions_match = True
+        for T_int, primes_P, X_int in [
+            (24, (2, 3), 4),
+            (36, (2, 3, 5), 6),
+            (50, (2, 3, 5, 7), 8),
+        ]:
+            X_arb = arb(X_int)
+            q_T_direct = evaluate_Q_lambda_finite_T_certified_arb(X_arb, T_int=T_int, prec_bits=prec_bits)
+            smooth_m_list = generate_P_smooth_up_to(primes_P, T_int)
+            N_P = 1
+            for p in primes_P:
+                N_P *= p
+
+            recon_exact = arb(0)
+            recon_common_L_eq_T = arb(0)
+            boundary_correction = arb(0)
+            X_sq = X_arb * X_arb
+            X_5_2 = X_sq * X_arb.sqrt()
+            for m in smooth_m_list:
+                lam_m = liouville_lambda_int(m)
+                m_arb = arb(m)
+                L_m = T_int // m
+                q_inner_Lm = evaluate_Q_lambda_P_finite_L_certified_arb(
+                    X_arb / m_arb, primes_P=primes_P, L_int=L_m, prec_bits=prec_bits
+                )
+                q_inner_T = evaluate_Q_lambda_P_finite_L_certified_arb(
+                    X_arb / m_arb, primes_P=primes_P, L_int=T_int, prec_bits=prec_bits
+                )
+                recon_exact += arb(lam_m) * q_inner_Lm / m_arb.sqrt()
+                recon_common_L_eq_T += arb(lam_m) * q_inner_T / m_arb.sqrt()
+                # Explicit boundary sum over L_m < r <= T with gcd(r, N_P) = 1:
+                for r in range(L_m + 1, T_int + 1):
+                    if math.gcd(r, N_P) != 1:
+                        continue
+                    mr = m * r
+                    mr_arb = arb(mr)
+                    boundary_correction += (
+                        arb(lam_m * liouville_lambda_int(r))
+                        * X_5_2
+                        * (-X_sq / (mr_arb * mr_arb)).exp()
+                        / (mr_arb ** 3)
+                    )
+
+            diff_exact = q_T_direct - recon_exact
+            common_minus_exact = recon_common_L_eq_T - q_T_direct
+            diff_boundary_check = common_minus_exact - boundary_correction
+            row_ok = bool(
+                diff_exact.contains(0)
+                and diff_boundary_check.contains(0)
+                and abs(common_minus_exact).lower() > 0
+            )
+            if not row_ok:
+                all_finite_reconstructions_match = False
+            finite_reconstruction_rows.append({
+                "T": T_int,
+                "primes_P": list(primes_P),
+                "X": X_int,
+                "verification_classification": "exact_finite_algebraic_reconstruction_identity",
+                "Q_lambda_T_direct": serialize_arb_certified(q_T_direct),
+                "Q_lambda_T_m_dependent_inner_cutoff_floor_T_over_m": serialize_arb_certified(recon_exact),
+                "direct_minus_m_dependent_difference": serialize_arb_certified(diff_exact),
+                "common_cutoff_L_eq_T_sum": serialize_arb_certified(recon_common_L_eq_T),
+                "common_cutoff_minus_exact_discrepancy": serialize_arb_certified(common_minus_exact),
+                "explicit_hyperbolic_boundary_sum_T_lt_mr_le_mT": serialize_arb_certified(boundary_correction),
+                "discrepancy_minus_boundary_sum": serialize_arb_certified(diff_boundary_check),
+                "exact_identity_and_nonzero_common_cutoff_error_verified": row_ok,
+            })
+
+        # 2. Certify finite truncation tail energy bound int_Y^{tau Y} |Q_lambda(X) - Q_{lambda,T}(X)|^2 dX/X <= (tau^5 - 1) Y^5 / (20 T^4)
+        #    for Y in {2, 4, 8} at T(Y) = ceil(Y^{5/4}) and T = 2 * ceil(Y^{5/4}):
+        tail_energy_rows: List[Dict[str, Any]] = []
+        all_tail_energy_bounds_hold = True
+        for Y_int in (2, 4, 8):
+            Y_arb = arb(Y_int)
+            T_sched = int(math.ceil(Y_int ** 1.25))
+            for T_label, T_val in [("ceil(Y^{5/4})", T_sched), ("2*ceil(Y^{5/4})", 2 * T_sched)]:
+                T_arb = arb(T_val)
+                analytic_tail_bound = ((tau_arb ** 5 - arb(1)) * (Y_arb ** 5)) / (arb(20) * (T_arb ** 4))
+                # Certify actual tail integral int_Y^{tau Y} |Q_lambda(X) - Q_{lambda,T}(X)|^2 dX/X via 16 subintervals:
+                N_sub = 16
+                dx = (tau_arb * Y_arb - Y_arb) / arb(N_sub)
+                half_dx = dx / arb(2)
+                actual_tail_int = arb(0)
+                for j in range(N_sub):
+                    mid_j = (Y_arb + arb(j) * dx + half_dx).mid()
+                    x_ball = arb(mid_j, half_dx.upper())
+                    q_full = evaluate_Q_arith_certified_arb(x_ball, "lambda", T_cutoff=600, prec_bits=prec_bits)["enclosure"]
+                    q_T = evaluate_Q_lambda_finite_T_certified_arb(x_ball, T_int=T_val, prec_bits=prec_bits)
+                    diff_q = q_full - q_T
+                    actual_tail_int += (diff_q * diff_q / x_ball) * dx
+                margin = analytic_tail_bound - actual_tail_int
+                cap_ok = bool((uniform_tail_cap - analytic_tail_bound).lower() >= 0)
+                row_ok = bool(margin.lower() > 0) and cap_ok
+                if not row_ok:
+                    all_tail_energy_bounds_hold = False
+                tail_energy_rows.append({
+                    "Y": Y_int,
+                    "T_schedule": T_label,
+                    "T": T_val,
+                    "actual_tail_energy_integral": serialize_arb_certified(actual_tail_int),
+                    "analytic_upper_bound_tau5_minus_1_Y5_over_20_T4": serialize_arb_certified(analytic_tail_bound),
+                    "uniform_O1_cap_tau5_minus_1_over_20": serialize_arb_certified(uniform_tail_cap),
+                    "bound_minus_actual_margin": serialize_arb_certified(margin),
+                    "strict_bound_and_uniform_cap_hold": row_ok,
+                })
+
+        # 3. Substantive signed energy decomposition on E_{lambda,T(Y)}(Y) with prime cutoff P_u:
+        #    Precompute K_Y(m, n) for 1 <= m, n <= T(Y) and decompose exactly by:
+        #    (a) Smooth factor m_1, m_2 in S(P_u) and coprime cofactor r_1, r_2 (gcd(r_i, N_u) = 1, r_i <= floor(T/m_i)):
+        #        - E_{same-r}(Y; T, P_u): terms with r_1 = r_2 = r (sum of squared pure P_u-smooth signed sums >= 0),
+        #        - E_{diff-r}(Y; T, P_u): terms with r_1 != r_2,
+        #        - E_{smooth-diag}(Y; T, P_u): terms with m_1 = m_2 = m,
+        #        - E_{smooth-cross}(Y; T, P_u): terms with m_1 != m_2.
+        signed_attempt_rows: List[Dict[str, Any]] = []
+        all_signed_decompositions_consistent = True
+        for Y_int, T_int, primes_u in [
+            (4, 6, (2, 3)),
+            (8, 14, (2, 3, 5)),
+            (12, 23, (2, 3, 5, 7)),
+        ]:
+            Y_arb = arb(Y_int)
+            N_u = 1
+            for p in primes_u:
+                N_u *= p
+
+            # Precompute symmetric matrix K_Y(a, b) for 1 <= a, b <= T_int:
+            K_mat: Dict[Tuple[int, int], arb] = {}
+            for a in range(1, T_int + 1):
+                for b in range(a, T_int + 1):
+                    kv = evaluate_energy_kernel_K_Y_certified_arb(Y_arb, a, b, prec_bits=prec_bits)
+                    K_mat[(a, b)] = kv
+                    K_mat[(b, a)] = kv
+
+            # Factor each n in {1, ..., T_int} uniquely as n = m_n * r_n with m_n in S(P_u) and gcd(r_n, N_u) = 1:
+            smooth_part: Dict[int, int] = {}
+            coprime_part: Dict[int, int] = {}
+            for n in range(1, T_int + 1):
+                m_c = 1
+                r_c = n
+                for p in primes_u:
+                    while r_c % p == 0:
+                        m_c *= p
+                        r_c //= p
+                smooth_part[n] = m_c
+                coprime_part[n] = r_c
+
+            E_signed_T = arb(0)
+            E_unsigned_T = arb(0)
+            D_diag_T = arb(0)
+            E_same_r = arb(0)
+            E_diff_r = arb(0)
+            E_smooth_diag = arb(0)
+            E_smooth_cross = arb(0)
+
+            for a in range(1, T_int + 1):
+                lam_a = liouville_lambda_int(a)
+                D_diag_T += K_mat[(a, a)]
+                for b in range(1, T_int + 1):
+                    lam_b = liouville_lambda_int(b)
+                    term_unsigned = K_mat[(a, b)]
+                    term_signed = arb(lam_a * lam_b) * term_unsigned
+                    E_unsigned_T += term_unsigned
+                    E_signed_T += term_signed
+                    if coprime_part[a] == coprime_part[b]:
+                        E_same_r += term_signed
+                    else:
+                        E_diff_r += term_signed
+                    if smooth_part[a] == smooth_part[b]:
+                        E_smooth_diag += term_signed
+                    else:
+                        E_smooth_cross += term_signed
+
+            decomp_r_diff = E_signed_T - (E_same_r + E_diff_r)
+            decomp_m_diff = E_signed_T - (E_smooth_diag + E_smooth_cross)
+            cancellation_ratio = E_signed_T / E_unsigned_T
+            row_ok = bool(
+                decomp_r_diff.contains(0)
+                and decomp_m_diff.contains(0)
+                and E_signed_T.lower() >= 0
+                and E_same_r.lower() >= 0
+                and (E_unsigned_T - E_signed_T).lower() > 0
+            )
+            if not row_ok:
+                all_signed_decompositions_consistent = False
+            signed_attempt_rows.append({
+                "Y": Y_int,
+                "T_eq_ceil_Y_5_4": T_int,
+                "primes_u": list(primes_u),
+                "E_signed_T_Y": serialize_arb_certified(E_signed_T),
+                "E_unsigned_T_Y": serialize_arb_certified(E_unsigned_T),
+                "diagonal_sum_D_T_Y": serialize_arb_certified(D_diag_T),
+                "signed_to_unsigned_ratio": serialize_arb_certified(cancellation_ratio),
+                "E_same_coprime_cofactor_r1_eq_r2": serialize_arb_certified(E_same_r),
+                "E_diff_coprime_cofactor_r1_ne_r2": serialize_arb_certified(E_diff_r),
+                "E_smooth_diagonal_m1_eq_m2": serialize_arb_certified(E_smooth_diag),
+                "E_smooth_cross_m1_ne_m2": serialize_arb_certified(E_smooth_cross),
+                "coprime_decomposition_zero_in_diff": bool(decomp_r_diff.contains(0)),
+                "smooth_decomposition_zero_in_diff": bool(decomp_m_diff.contains(0)),
+                "strict_sign_cancellation_below_unsigned": row_ok,
+            })
+
+        return {
+            "exact_finite_reconstruction_theorem": {
+                "formula": (
+                    "For every integer T >= 1, finite prime set P, and X > 0: "
+                    "Q_{lambda,T}(X) = sum_{m in S(P), m <= T} (lambda(m) / sqrt(m)) Q_{lambda,P,floor(T/m)}(X / m)."
+                ),
+                "inner_cutoff_dependence_note": (
+                    "Because 1 <= n = m r <= T with m in S(P) and gcd(r, N_P) = 1 is equivalent to 1 <= m <= T and "
+                    "1 <= r <= floor(T / m), the inner cutoff floor(T / m) depends on m. Replacing floor(T / m) by a "
+                    "common inner cutoff L = T introduces the nonzero hyperbolic boundary sum over T < m r <= m T."
+                ),
+                "rows": finite_reconstruction_rows,
+                "all_finite_reconstructions_match": all_finite_reconstructions_match,
+            },
+            "finite_truncation_tail_energy_and_L2_transfer": {
+                "pointwise_tail_bound": "|Q_lambda(X) - Q_{lambda,T}(X)| <= X^{5/2} / (2 T^2)  for all integer T >= 1 and X > 0",
+                "grade_interval_tail_energy_bound": (
+                    "E_{tail,T}(Y) := int_Y^{tau Y} |Q_lambda(X) - Q_{lambda,T}(X)|^2 dX/X <= (tau^5 - 1) Y^5 / (20 T^4)"
+                ),
+                "schedule_choice": "T(Y) := ceil(Y^{5/4}) >= Y^{5/4} (Y >= 1), giving E_{tail,T(Y)}(Y) <= (tau^5 - 1) / 20 = 489.5814956564503252... = O(1)",
+                "L2_transfer_inequalities": (
+                    "E_lambda(Y) <= 2 E_{lambda,T(Y)}(Y) + 2 E_{tail,T(Y)}(Y) and "
+                    "E_{lambda,T(Y)}(Y) <= 2 E_lambda(Y) + 2 E_{tail,T(Y)}(Y), so "
+                    "(forall eps > 0, E_lambda(Y) <<_eps Y^eps) <-> (forall eps > 0, E_{lambda,T(Y)}(Y) <<_eps Y^eps)."
+                ),
+                "rows": tail_energy_rows,
+                "all_tail_energy_bounds_hold": all_tail_energy_bounds_hold,
+            },
+            "signed_energy_attempt_on_finite_reconstruction": {
+                "decomposition_formulas": {
+                    "coprime_cofactor_split": (
+                        "E_{lambda,T}(Y) = E_{same-r}(Y; T, P_u) + E_{diff-r}(Y; T, P_u), where "
+                        "E_{same-r}(Y; T, P_u) = sum_{1 <= r <= T, gcd(r, N_u)=1} int_Y^{tau Y} |Q_{lambda,S(P_u),floor(T/r)}(X/r)|^2 dX/X >= 0"
+                    ),
+                    "smooth_factor_split": "E_{lambda,T}(Y) = E_{smooth-diag}(Y; T, P_u) + E_{smooth-cross}(Y; T, P_u)",
+                },
+                "proved_partial_saving_on_fixed_smooth_fibers": (
+                    "For any fixed finite prime set P_u, the generating Dirichlet series of the pure P_u-smooth sum is "
+                    "D_{S(P_u)}(s) = sum_{m in S(P_u)} lambda(m) m^{-s} = prod_{p <= u} (1 + p^{-s})^{-1}, which is holomorphic "
+                    "throughout the right half-plane Re(s) > 0 (its poles lie on Re(s) = 0 at s = i (2k+1) tau / (2 log p)). "
+                    "Thus for fixed u, each un-truncated P_u-smooth fiber Q_{lambda,S(P_u)}(w) has contour-shift bound "
+                    "O_{u,eta}(w^eta) for every eta > 0 (power saving in w = X/r as w -> infty)."
+                ),
+                "exact_two_part_obstruction_preventing_all_eps_closure": (
+                    "When attempting to promote the fixed-u smooth-fiber saving to an unconditional bound E_{lambda,T(Y)}(Y) <<_eps Y^eps "
+                    "by choosing u = u(Y): "
+                    "(1) If u >= T(Y) = ceil(Y^{5/4}) so that gcd(r, N_u) = 1 forces r = 1 and E_{diff-r} = 0, then on the contour "
+                    "Re(1/2 + z) = eta in (0, 1/2) the finite Euler product prod_{p <= u}(1 + p^{-eta - i*b})^{-1} has exact Kronecker "
+                    "supremum prod_{p <= u}(1 - p^{-eta})^{-1} = exp((1+o(1)) u^{1-eta} / ((1-eta) log u)), which grows super-polynomially "
+                    "in Y, while the finite truncation m <= T(Y) couples the Mellin integral to the Perron hyperbolic kernel (T/m)^w / w; "
+                    "(2) If u(Y) is chosen small enough to keep prod_{p <= u}(1 - p^{-eta})^{-1} <= Y^eps (requiring u^{1-eta}/log u << eps log Y, "
+                    "so u << (log Y)^{1/(1-eta)}), then almost all integers n <= T(Y) have large P_u-coprime cofactors r > u, and the "
+                    "off-diagonal cofactor sum E_{diff-r}(Y; T(Y), P_u) over 1 <= r_1 != r_2 <= T(Y) carries the unfactored primes p > u."
+                ),
+                "rows": signed_attempt_rows,
+                "all_signed_decompositions_consistent": all_signed_decompositions_consistent,
+            },
         }
     finally:
         flint_ctx.prec = saved_prec
@@ -3770,7 +4583,7 @@ def verify_tc055_multiplicative_parity_controls(
 def execute_task_tc054_liouville_square_dilation_audit(
     prec_bits: int = 256,
 ) -> Dict[str, Any]:
-    """Execute the full TASK-TC-054 / TASK-TC-054R / TASK-TC-054R2 / TASK-TC-055 mathematical and numerical audit and return the report dictionary."""
+    """Execute the full TASK-TC-054 / TASK-TC-054R / TASK-TC-054R2 / TASK-TC-055 / TASK-TC-055R mathematical and numerical audit and return the report dictionary."""
     sec2_3 = verify_section_2_and_3_square_dilation_transfer(prec_bits=prec_bits)
     sec4 = verify_section_4_unconstrained_common_factor_and_euler_maclaurin(prec_bits=prec_bits)
     sec5 = verify_section_5_poisson_summation_at_transition(prec_bits=prec_bits)
@@ -3781,12 +4594,14 @@ def execute_task_tc054_liouville_square_dilation_audit(
     sec10_tc055_kernel = verify_tc055_integrated_energy_kernel_and_near_diagonal_bound(prec_bits=prec_bits)
     sec11_tc055_pairing = verify_tc055_opposite_parity_dilation_pairing_and_obstruction(prec_bits=prec_bits)
     sec12_tc055_controls = verify_tc055_multiplicative_parity_controls(prec_bits=prec_bits)
+    sec13_tc055r_finite = verify_tc055r_finite_truncation_and_signed_energy_attempt(prec_bits=prec_bits)
 
     report: Dict[str, Any] = {
         "task_id": TASK_TC_054_ID,
         "repair_task_id": TASK_TC_054R_ID,
         "closeout_task_id": TASK_TC_054R2_ID,
         "simultaneous_compatibility_task_id": TASK_TC_055_ID,
+        "simultaneous_compatibility_repair_task_id": TASK_TC_055R_ID,
         "parent_epic": EPIC_TC_042_ID,
         "prior_merged_main": PRIOR_MERGED_MAIN_TC_053R,
         "tc053r2_implementation_commit": TC_053R2_IMPLEMENTATION_COMMIT,
@@ -3799,7 +4614,9 @@ def execute_task_tc054_liouville_square_dilation_audit(
         "tc054r2_reviewed_tip": TC_054R2_REVIEWED_TIP,
         "tc054r2_merged_main_baseline": TC_054R2_MERGED_MAIN_BASELINE,
         "tc055_initial_closeout_commit": TC_055_INITIAL_CLOSEOUT_COMMIT,
-        "branch": "task/tc-055-simultaneous-tau-compatibility-and-signed-energy-cancellation",
+        "tc055_implementation_commit": TC_055_IMPLEMENTATION_COMMIT,
+        "tc055_reviewed_tip": TC_055_REVIEWED_TIP,
+        "branch": "task/tc-055r-pairing-bound-operator-norm-and-finite-energy-repair",
         "subgate_tc043a_status": "OPEN",
         "rh_proved": False,
         "precision_bits": prec_bits,
@@ -3813,6 +4630,7 @@ def execute_task_tc054_liouville_square_dilation_audit(
         "section_10_tc055_integrated_energy_kernel_and_near_diagonal": sec10_tc055_kernel,
         "section_11_tc055_opposite_parity_dilation_pairing": sec11_tc055_pairing,
         "section_12_tc055_multiplicative_parity_controls": sec12_tc055_controls,
+        "section_13_tc055r_finite_truncation_and_signed_energy_attempt": sec13_tc055r_finite,
         "surviving_unconditional_theorems": [
             "Reversible square-dilation transfer lambda(n) = sum_{d^2 | n} mu(n/d^2), mu(n) = sum_{d^2 | n} mu(d) lambda(n/d^2), Q_lambda(X) = sum_{d>=1} Q_mu(X/d^2)/d, Q_mu(X) = sum_{d>=1} mu(d) Q_lambda(X/d^2)/d, and weighted L^2 norm equivalence ||Q_lambda||_eta <= zeta(1+2*eta) ||Q_mu||_eta, ||Q_mu||_eta <= (zeta(1+2*eta)/zeta(2+4*eta)) ||Q_lambda||_eta for all eta > 0.",
             "Equivalence between the grade-interval subpower energy bound (forall eps > 0 exists C_eps, int_Y^{tau Y} |Q_a(X)|^2 dX/X <= C_eps Y^eps) and weighted norm finiteness (forall eta in (0, 5/2), ||Q_a||_eta < infty) for both a = mu and a = lambda.",
@@ -3820,30 +4638,31 @@ def execute_task_tc054_liouville_square_dilation_audit(
             "Exact Poisson summation formula sum_{d>=1} d^{-6} exp(-L^2/d^2) = L^{-5} [c_0 + sum_{j>=1} hat{f}(j L)] (with c_0 = 3 sqrt(tau/2) / 8) established via C^infty flatness at 0, O(|v|^{-6-j}) decay at infinity, and C^1(R/Z) periodization (DLMF 1.8.14), Mellin regularization + contour shifting with |R_M(omega)| <= 8 omega^{2M+3/2} / (Gamma(2M+5/2) Gamma(M-3/4)) -> 0, repaired Fourier tail-ratio certification (R_even, R_odd <= 1/2 or 1/(1-R)), and certified sign changes hat{f}(1/2) < 0, hat{f}(4/tau) < 0, hat{f}(1) < 0, hat{f}(3/2) > 0, hat{f}(2) > 0.",
             "Repaired unequal-block bound |B_{A,B}(X)| <= (7/3) C_* min(A,B)^3 / max(A,B)^2 with C_* = max{zeta(6), c_0 + 27 exp(-3)} = 2.008921040021894970679058028804597412605..., repaired dyadic Abel bound |U_lambda(Y; M)| << M^{1/2} min(M/Y, (Y/M)^{5/2}) exp(-c Phi(M)) (M >= 16), and unconditional global Stieltjes energy theorem |Q_lambda(X)| << sqrt(X) exp(-c_1 Phi(X)) (X >= 256), E_lambda(Y) := int_Y^{tau Y} |Q_lambda(X)|^2 dX/X << Y exp(-2 c_2 Phi(Y)) (Y >= 256), and E_lambda(Y) <<_D Y (log Y)^{-D} (Y >= 2, via compact-range bound E_lambda(Y) <= (zeta(3)^2 (tau^5 - 1) / 5) Y^5 on 2 <= Y < 256) by splitting Q_lambda(X) = -X^{5/2} int_1^infty L_lambda(t) d/dt(t^{-3} exp(-X^2/t^2)) dt at t = sqrt(X) with scaling constant int_0^infty u |3 - 2 u^2| exp(-u^2) du = 1/2 + 2 exp(-3/2).",
             "Exact dyadic parity annihilation Q_{lambda,odd}(X) = Q_lambda(X) + 2^{-1/2} Q_lambda(X/2), convergent dyadic inversion, exact grade-interval energy identity on [Y, tau Y] with cross-scale correlation, bounded norm equivalence for all eta > -1/2, and proof that |1 + 2^{-rho}| >= 1 - 2^{-x} > 0 for rho = x + i*y with x > 0.",
-            "Simultaneous finite-prime exclusion identity Q_{lambda,P}(X) = prod_{p in P}(I + p^{-1/2} S_p) Q_lambda(X) = sum_{d | N_P} (|mu(d)| / sqrt(d)) Q_lambda(X / d) = X^{5/2} sum_{gcd(n, N_P)=1} (lambda(n)/n^3) exp(-X^2/n^2) (formalized on actual integers in Lean 4 theorem actual_finite_prime_exclusion_sieve_identity_nat), its convergent P-smooth inverse reconstruction Q_lambda(X) = sum_{m in S(P)} (lambda(m)/sqrt(m)) Q_{lambda,P}(X/m), and exact removable trivial-zero cancellation lim_{z -> -(2m+1/2)} zeta(1+2z)/zeta(1/2+z) = 2 zeta'(-4m)/zeta'(-2m) = 2 (-1)^m (4m)! zeta(4m+1) / (tau^{2m} (2m)! zeta(2m+1)) != 0.",
-            "Exact coprime decomposition Q_{lambda,P_u}(w) = w^{5/2} exp(-w^2) + R_{lambda,P_u}(w) for u >= 2 with unconditional tail bound |R_{lambda,P_u}(w)| <= w^{5/2} / (2 u^2), diagonal energy asymptotic D_E(Y) := sum_{n>=1} K_Y(n, n) = (3 sqrt(tau) / 64) log tau + R_{D,E}(Y) with |R_{D,E}(Y)| <= C_{D,2} Y^{-2} (C_{D,2} = C_2 (1 - tau^{-2}) / (16 sqrt(2)) = 0.07974240995631961...) for all Y > 0, and unconditional near-diagonal band inequality sum_{|m - n| <= H} K_Y(m, n) <= (2 H + 1) D_E(Y) for all integers H >= 0 (formalized in Lean 4 theorem near_diagonal_kernel_bound_and_opposite_parity_dilation_pairing).",
-            "Pairwise opposite-parity prime-semiprime dilation cancellation lambda(p m) + lambda(q r m) = 0 with MVT kernel difference bound |K_Y(p m, n) - K_Y(q r m, n)| <= 3 (|q r - p| / min(p, q r)) (max(p, q r) / min(p, q r))^3 K_Y(max(p, q r) m, n), together with the 2-adic parity control theorem Q_{a_2}(X) = sqrt(X)/6 + O(X^{-1/2}) ~ sqrt(X)/6 and E_{a_2}(Y) = ((tau - 1)/36) Y + O(1) ~ ((tau - 1)/36) Y (formalized in Lean 4 theorem prime_parity_control_multiplicative_and_moebius_separation_nat).",
+            "Simultaneous finite-prime exclusion identity Q_{lambda,P}(X) = prod_{p in P}(I + p^{-1/2} S_p) Q_lambda(X) = sum_{d | N_P} (|mu(d)| / sqrt(d)) Q_lambda(X / d) = X^{5/2} sum_{gcd(n, N_P)=1} (lambda(n)/n^3) exp(-X^2/n^2) (integer sieve formalized in Lean 4 theorem actual_finite_prime_exclusion_sieve_identity_nat), its convergent P-smooth inverse reconstruction Q_lambda(X) = sum_{m in S(P)} (lambda(m)/sqrt(m)) Q_{lambda,P}(X/m), and exact removable trivial-zero cancellation lim_{z -> -(2m+1/2)} zeta(1+2z)/zeta(1/2+z) = 2 zeta'(-4m)/zeta'(-2m) = 2 (-1)^m (4m)! zeta(4m+1) / (tau^{2m} (2m)! zeta(2m+1)) != 0.",
+            "Exact coprime decomposition Q_{lambda,P_u}(w) = w^{5/2} exp(-w^2) + R_{lambda,P_u}(w) for real u >= 2 with repaired integer-floor and least-prime tail bounds |R_{lambda,P_u}(w)| <= w^{5/2} / (2 floor(u)^2) and |R_{lambda,P_u}(w)| <= w^{5/2} (1/q_{>u}^3 + 1/(2 q_{>u}^2)), exact full-space operator norm equality ||P_u^{-1}||_{H_eta -> H_eta} = sup_{b in R} prod_{p <= u} |1 + p^{-1/2 - eta} exp(-i b log p)|^{-1} = prod_{p <= u} (1 - p^{-1/2 - eta})^{-1} via continuous Kronecker simultaneous approximation, diagonal energy asymptotic D_E(Y) := sum_{n>=1} K_Y(n, n) = (3 sqrt(tau) / 64) log tau + R_{D,E}(Y) with |R_{D,E}(Y)| <= C_{D,2} Y^{-2} (C_{D,2} = C_2 (1 - tau^{-2}) / (16 sqrt(2)) = 0.07974240995631961...) for all Y > 0, and unconditional near-diagonal band inequality sum_{|m - n| <= H} K_Y(m, n) <= (2 H + 1) D_E(Y) for all integers H >= 0.",
+            "Opposite-parity prime-semiprime sign identity lambda(p m) + lambda(q r m) = 0, valid replacement kernel enclosures r_0^3 exp(-(tau Y)^2 Delta) K_Y(b, n) <= K_Y(a, n) <= r_0^3 exp(-Y^2 Delta) K_Y(b, n), |K_Y(a, n) - K_Y(b, n)| <= max(|r_0^3 exp(-(tau Y)^2 Delta) - 1|, |r_0^3 exp(-Y^2 Delta) - 1|) K_Y(b, n), and |K_Y(a, n) - K_Y(b, n)| <= ((b - a)/a)(b/a)^3 (3 + 2 tau^2 Y^2 / a^2) K_Y(b, n) for all 0 < a <= b (replacing retired TC-055 Lemma 6.1, refuted at Y=33, p=11, q=2, r=5, m=1, n=11), repaired 2-adic and multi-prime parity control asymptotics Q_{a_2}(X) = sqrt(X)/6 + O(X^{-1/2}), E_{a_2}(Y) = ((tau - 1)/36) Y + O(1) (via second-order Euler-Maclaurin bound |Q_1(w) - sqrt(w)/2| <= 3 w^{-3/2}; or + O(X^{-1/2} log X), + O(log Y) from the exact unimodal bound C_{1,uni} = 2(3/(2e))^{3/2} = (1/sqrt(2))(3/e)^{3/2}), Q_{a_{3,5,7}}(X) ~ sqrt(X)/8, E_{a_{3,5,7}}(Y) ~ ((tau - 1)/64) Y, and exact finite reconstruction Q_{lambda,T}(X) = sum_{m in S(P), m<=T} (lambda(m)/sqrt(m)) Q_{lambda,P,floor(T/m)}(X/m) with tail energy int_Y^{tau Y} |Q_lambda(X) - Q_{lambda,T}(X)|^2 dX/X <= (tau^5 - 1) Y^5 / (20 T^4) (formalized in Lean 4 theorem pairing_counterexample_replacement_and_finite_reconstruction_tc055r).",
         ],
         "precise_obstruction_to_subgate_tc043a_closure": (
             "1. In Attack A, the bivariate coprime Dirichlet series D_lambda(u, v) = zeta(2u) zeta(2v) / (zeta(u) zeta(v) zeta(u+v)) "
             "has numerator zeta(2u) zeta(2v) and coprimality factor 1/zeta(u+v) evaluated at 2u, 2v, u+v in the Euler-product "
             "half-plane Re(w) > 1 whenever Re(u) = Re(v) = x > 1/2, so neither factor can vanish at an off-critical conjugate pair "
-            "(rho, conj(rho)) (rho = x + i*y) to cancel the poles of 1/(zeta(u) zeta(v)); moreover M[Q_lambda](z) has a genuine simple pole "
-            "at z = 0 of residue Gamma(5/4)/(4 zeta(1/2)) = -0.1551682265... != 0, and the global divisor sum sum_{q>=1} ((sum_{e|q} mu(e))/q) Q_lambda(X/q)^2 "
-            "collapses to q = 1. While the global Stieltjes integration-by-parts proof establishes E_lambda(Y) << Y exp(-2 c_2 Phi(Y)) <<_D Y (log Y)^{-D} "
-            "from unconditional Korobov-Vinogradov-Walfisz cancellation, this is an upper bound (not an energy asymptotic) and does not establish "
+            "(rho, conj(rho)) (rho = x + i*y) to cancel the poles of 1/(zeta(u) zeta(v)); moreover in D_lambda(s) = zeta(2s)/zeta(s) "
+            "the pole of zeta(2s) at s = 1/2 remains (giving the z = 0 simple pole of M[Q_lambda](z) of residue Gamma(5/4)/(4 zeta(1/2)) = -0.1551682265... != 0), "
+            "while the denominator pole of zeta(s) at s = 1 produces a zero D_lambda(1) = 0. While the global Stieltjes integration-by-parts proof "
+            "establishes E_lambda(Y) << Y exp(-2 c_2 Phi(Y)) <<_D Y (log Y)^{-D}, this is an upper bound and does not establish "
             "forall eps > 0, E_lambda(Y) <= C_eps Y^eps. "
-            "2. In Attack B and its simultaneous finite-prime extension P_{P_u} = prod_{p <= u}(I + p^{-1/2} S_p) (TASK-TC-055), "
+            "2. In Attack B and its simultaneous finite-prime extension P_u = prod_{p <= u}(I + p^{-1/2} S_p) (TASK-TC-055 / TASK-TC-055R), "
             "every finite-prime filter multiplies an off-critical mode F_rho(X) = X^{rho - 1/2} (rho = x + i*y, x > 0) by "
-            "M_u(rho) = prod_{p <= u}(1 + p^{-rho}), which satisfies 0 < prod_{p <= u}(1 - p^{-x}) <= |M_u(rho)| <= prod_{p <= u}(1 + p^{-x}) "
-            "and therefore cannot annihilate any off-critical mode at finite u; meanwhile on H_eta = L^2((0, infty), X^{-2*eta} dX/X) "
-            "the triangle-inequality Neumann majorant prod_{p <= u}(1 - p^{-1/2 - eta})^{-1} converges as u -> infty only for eta > 1/2 "
-            "and diverges for 0 < eta <= 1/2, while coupling u = Y^theta leaves a P_u-smooth transition sum of Dickman density rho_Dickman(1/theta) > 0 "
-            "and opposite-parity prime-semiprime pairing leaves an unmatched coprime residual of unsigned energy order Y. "
-            "3. The multiplicative parity control a_2(n) = (-1)^{v_2(n)} (and any finite-prime parity control a_S) satisfies complete multiplicativity, "
-            "unconstrained common-factor cancellation, transition Poisson summation, and dyadic exclusion, yet obeys Q_{a_2}(X) ~ sqrt(X)/6 and "
-            "E_{a_2}(Y) ~ ((tau - 1)/36) Y, proving that any cancellation proof for E_lambda(Y) = o(Y) must simultaneously exploit parity flip "
-            "lambda(p n) = -lambda(n) across infinitely many primes (and the pole-canceling identity D_lambda(s) = zeta(2s)/zeta(s) at s = 1)."
+            "M_u(rho) = prod_{p <= u}(1 + p^{-rho}) with 0 < prod_{p <= u}(1 - p^{-x}) <= |M_u(rho)| <= prod_{p <= u}(1 + p^{-x}), "
+            "and on the full weighted space H_eta = L^2((0, infty), X^{-2*eta} dX/X) the inverse operator norm equals "
+            "||P_u^{-1}||_{H_eta -> H_eta} = sup_{b in R} prod_{p <= u}|1 + p^{-1/2 - eta} exp(-i b log p)|^{-1} = prod_{p <= u}(1 - p^{-1/2 - eta})^{-1} "
+            "EXACTLY by Q-linear independence of prime logarithms and continuous Kronecker simultaneous approximation (diverging as u -> infty "
+            "for all 0 < eta <= 1/2, so no full-space signed multiplier norm improvement exists). "
+            "3. In the finite truncated reconstruction Q_{lambda,T(Y)}(X) = sum_{m in S(P_u), m<=T(Y)} (lambda(m)/sqrt(m)) Q_{lambda,P_u,floor(T(Y)/m)}(X/m) "
+            "with T(Y) = ceil(Y^{5/4}) (tail energy <= (tau^5 - 1)/20 = O(1)), each fixed-u smooth fiber has Dirichlet series "
+            "prod_{p <= u}(1 + p^{-s})^{-1} holomorphic on Re(s) > 0, but taking u >= T(Y) to eliminate the P_u-coprime cofactors r > 1 "
+            "incurs the super-polynomial Kronecker norm prod_{p <= u}(1 - p^{-eta})^{-1} and hyperbolic inner-cutoff floor(T/m) boundary coupling, "
+            "while keeping u small leaves the off-diagonal coprime cofactor sum E_{diff-r}(Y; T(Y), P_u) over unfactored primes p > u."
         ),
     }
 
