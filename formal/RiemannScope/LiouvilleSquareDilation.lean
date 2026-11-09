@@ -1,6 +1,6 @@
 /-
 RiemannScope.LiouvilleSquareDilation
-TASK-TC-054 / TASK-TC-054R / TASK-TC-054R2 / TASK-TC-055 / TASK-TC-055R:
+TASK-TC-054 / TASK-TC-054R / TASK-TC-054R2 / TASK-TC-055 / TASK-TC-055R / TASK-TC-055R2:
 1. Actual arithmetic definitions and theorems over `ℕ` and `ℤ` using Mathlib's
    `ArithmeticFunction.cardFactors` (`Ω`), `Nat.factorization`, `Nat.divisors`, and
    `ArithmeticFunction.moebius` (`μ`):
@@ -23,7 +23,12 @@ TASK-TC-054 / TASK-TC-054R / TASK-TC-054R2 / TASK-TC-055 / TASK-TC-055R:
      `actualPrimeExclusionSieveSum N_P n = if n.Coprime N_P then liouvilleLambda n else 0` (`TASK-TC-055` §3);
    - Multiplicative parity controls `primeParityControl p n = (-1)^{v_p(n)}` and `twoAdicParityControl n = (-1)^{v_2(n)}`,
      proving complete multiplicativity, common-factor cancellation, prime parity flip `a_p(p n) = -a_p(n)`,
-     and exact separation from `liouvilleLambda` and `actualFlatMoebiusSquareDivisorSum` at odd prime `n = 3` (`TASK-TC-055` §7).
+     and exact separation from `liouvilleLambda` and `actualFlatMoebiusSquareDivisorSum` at odd prime `n = 3` (`TASK-TC-055` §7);
+   - Full finite `P`-smooth / `P`-coprime factorization existence & uniqueness (`n = m * r`), finite cutoff indexing
+     bijection for `1 ≤ n ≤ T` with inner cutoff `r ≤ ⌊T/m⌋`, arbitrary-weight reindexed Liouville sum and coprime-outer
+     regrouping, exact uncoupled-cutoff (`r ≤ T`) excess sum with vanishing (`P = ∅`, `T ≤ 1`, `(P = {2}, T = 2)`) and
+     nonvanishing (`(P = {2}, T = 3)`) witnesses, finite Gaussian observable `Q_{λ,T}(X)` reconstruction, and exact
+     pointwise weighted cofactor square expansion with `1/r` and `λ(r)λ(s)/√(rs)` (`TASK-TC-055R2` §§2–3).
 2. Prime-power exponent models (`liouville_complete_multiplicativity_and_common_factor_cancellation_nat`
    and `prime_power_square_divisor_moebius_liouville_inversion_nat`).
 3. Scalar real-algebra, real-inequality, and finite-sum lemmas for weighted norm bounds, Euler-Maclaurin `C_2`
@@ -32,7 +37,7 @@ TASK-TC-054 / TASK-TC-054R / TASK-TC-054R2 / TASK-TC-055 / TASK-TC-055R:
    unequal-block reciprocal-cube bound algebra, finite near-diagonal kernel bound `(2H + 1) D_E` (conditional on
    `hK` and `hBand`), opposite-parity prime-semiprime dilation pairing `λ(p m) + λ(q r m) = 0`, `a_2` and `a_{3,5,7}`
    control constants, retired TC-055 Lemma 6.1 counterexample inequality, valid replacement kernel ratio enclosure,
-   non-integer cutoff `u = 2.9` counterexample, and finite `T`-truncation / inner-cutoff `⌊T/m⌋` reconstruction (`TASK-TC-055R`).
+   non-integer cutoff `u = 2.9` counterexample, and cutoff/scalar truncation algebra (`TASK-TC-055R`).
 -/
 
 import Mathlib.NumberTheory.LSeries.RiemannZeta
@@ -1111,8 +1116,10 @@ theorem near_diagonal_kernel_bound_and_opposite_parity_dilation_pairing
     push_cast
     ring
 
-/-- **Theorem 12 (`TASK-TC-055R` §§2–7, Pairing Counterexample, Valid Kernel Ratio Replacement, Cutoff Counterexample, and Finite Reconstruction)**:
-    Formal scope:
+/-- **Theorem 12 (`TASK-TC-055R` §§2–7, Pairing Counterexample, Valid Kernel Ratio Replacement, Cutoff Counterexample, and Scalar Truncation Algebra)**:
+    Formal scope (cutoff arithmetic, termwise multiplicativity, and scalar inequalities; see Theorems 13–16
+    below for the full smooth/coprime factorization bijection, arbitrary-weight finite-sum reconstruction,
+    uncoupled-cutoff excess formula, finite Gaussian observable reconstruction, and weighted cofactor square):
     1. Pointwise factorized kernel integrand AM-GM identity and inequality (discharging `hK` pointwise on
        `kernelPointwiseIntegrand g X4 a b = X4 * g a * g b` for `0 ≤ X4`);
     2. Exact arithmetic counterexample comparison refuting retired TC-055 Lemma 6.1 at
@@ -1129,11 +1136,9 @@ theorem near_diagonal_kernel_bound_and_opposite_parity_dilation_pairing
        `(2 : ℝ) * (3 / 2 : ℝ) ^ 3 = 27 / 4 < 3 ^ 3`, and for `S = {3, 5, 7}`,
        `((3 - 1 : ℝ) / (3 + 1)) * ((5 - 1 : ℝ) / (5 + 1)) * ((7 - 1 : ℝ) / (7 + 1)) = 1 / 4`,
        `(1 / 2 : ℝ) * (1 / 4 : ℝ) = 1 / 8`, `(1 / 8 : ℝ) ^ 2 = 1 / 64`;
-    5. Finite `T`-truncation / `m`-dependent inner-cutoff `⌊T/m⌋` reconstruction, tail energy, and `L^2` transfer algebra:
-       `m * r ≤ T ↔ r ≤ T / m` (`0 < m`),
-       `(liouvilleLambda (m * r) : ℝ) * w (m * r) = (liouvilleLambda m : ℝ) * ((liouvilleLambda r : ℝ) * w (m * r))`,
-       `((1 : ℝ) / (2 * T_real ^ 2)) ^ 2 * ((tau5 - 1) * Y5 / 5) = (tau5 - 1) * Y5 / (20 * T_real ^ 4)`, and
-       `v_full ^ 2 ≤ 2 * v_T ^ 2 + 2 * (v_full - v_T) ^ 2 ∧ v_T ^ 2 ≤ 2 * v_full ^ 2 + 2 * (v_full - v_T) ^ 2`. -/
+    5. Pointwise cutoff equivalence `m * r ≤ T ↔ r ≤ T / m` (`0 < m`), termwise Liouville multiplicativity,
+       truncation tail energy scalar identity `((1 : ℝ) / (2 * T_real ^ 2)) ^ 2 * ((tau5 - 1) * Y5 / 5) = (tau5 - 1) * Y5 / (20 * T_real ^ 4)`,
+       and two-sided scalar square transfer `v_full ^ 2 ≤ 2 * v_T ^ 2 + 2 * (v_full - v_T) ^ 2 ∧ v_T ^ 2 ≤ 2 * v_full ^ 2 + 2 * (v_full - v_T) ^ 2`. -/
 theorem pairing_counterexample_replacement_and_finite_reconstruction_tc055r
     (g w : ℕ → ℝ) (X4 K_10 K_11 K_a K_b L_low L_high T_real tau5 Y5 v_full v_T : ℝ)
     (a b m r T : ℕ)
@@ -1205,6 +1210,779 @@ theorem pairing_counterexample_replacement_and_finite_reconstruction_tc055r
     · ring
     · nlinarith [sq_nonneg (v_full - 2 * v_T)]
     · nlinarith [sq_nonneg (v_T - 2 * v_full)]
+
+/-! ### `TASK-TC-055R2` Section 3: Full Finite Smooth/Coprime Factorization Bijection, Reindexed Liouville Reconstruction, Uncoupled-Cutoff Excess Formula, and Weighted Cofactor Square Expansion -/
+
+/-- Product modulus `N_P := ∏_{p ∈ P} p` of a finite prime set `P : Finset ℕ` (`N_∅ = 1`). -/
+def primeProductModulus (P : Finset ℕ) : ℕ :=
+  ∏ p ∈ P, p
+
+/-- Predicate `m ∈ S(P)`: `m` is a positive integer all of whose prime divisors belong to `P`. -/
+def isPSmooth (P : Finset ℕ) (m : ℕ) : Prop :=
+  0 < m ∧ ∀ p : ℕ, p.Prime → p ∣ m → p ∈ P
+
+/-- Constructive decidability instance for `isPSmooth P m` via `m.primeFactors`. -/
+instance instDecidableIsPSmooth (P : Finset ℕ) (m : ℕ) : Decidable (isPSmooth P m) :=
+  decidable_of_iff (0 < m ∧ ∀ p ∈ m.primeFactors, p ∈ P)
+    ⟨fun ⟨hm, hpf⟩ =>
+      ⟨hm, fun p hp hdvd => hpf p (Nat.mem_primeFactors.mpr ⟨hp, hdvd, Nat.pos_iff_ne_zero.mp hm⟩)⟩,
+     fun ⟨hm, hall⟩ =>
+      ⟨hm, fun p hp => hall p (Nat.prime_of_mem_primeFactors hp) (Nat.dvd_of_mem_primeFactors hp)⟩⟩
+
+/-- Canonical `P`-smooth factor `m = ∏_{p ∣ n, p ∈ P} p^{v_p(n)}` of `n : ℕ`. -/
+def pSmoothPart (P : Finset ℕ) (n : ℕ) : ℕ :=
+  ∏ p ∈ n.primeFactors.filter (· ∈ P), p ^ (n.factorization p)
+
+/-- Canonical `P`-coprime factor `r = ∏_{p ∣ n, p ∉ P} p^{v_p(n)}` of `n : ℕ`. -/
+def pCoprimePart (P : Finset ℕ) (n : ℕ) : ℕ :=
+  ∏ p ∈ n.primeFactors.filter (· ∉ P), p ^ (n.factorization p)
+
+/-- Finite `P`-smooth index set `{1 ≤ m ≤ L : m ∈ S(P)}` (`= ∅` for `L = 0`). -/
+def smoothCutoffFinset (P : Finset ℕ) (L : ℕ) : Finset ℕ :=
+  (Finset.Icc 1 L).filter (fun m => isPSmooth P m)
+
+/-- Finite `P`-coprime index set `{1 ≤ r ≤ L : gcd(r, N_P) = 1}` (`= ∅` for `L = 0`). -/
+def coprimeCutoffFinset (P : Finset ℕ) (L : ℕ) : Finset ℕ :=
+  (Finset.Icc 1 L).filter (fun r => Nat.Coprime r (primeProductModulus P))
+
+/-- Coupled finite pair index set `{(m, r) : m ∈ smoothCutoffFinset P T, r ∈ coprimeCutoffFinset P (T / m)}`. -/
+def smoothCoprimePairsUpTo (P : Finset ℕ) (T : ℕ) : Finset (ℕ × ℕ) :=
+  (smoothCutoffFinset P T).biUnion (fun m =>
+    (coprimeCutoffFinset P (T / m)).image (fun r => (m, r)))
+
+/-- Uncoupled-cutoff excess index set `{⌊T/m⌋ + 1 ≤ r ≤ T : gcd(r, N_P) = 1}` when `r ≤ T` replaces `r ≤ ⌊T/m⌋`. -/
+def excessCoprimeFinset (P : Finset ℕ) (m T : ℕ) : Finset ℕ :=
+  (Finset.Icc (T / m + 1) T).filter (fun r => Nat.Coprime r (primeProductModulus P))
+
+/-- Actual finite `T`-truncated Liouville Gaussian observable
+    `Q_{λ,T}(X) := X^{5/2} ∑_{1 ≤ n ≤ T} λ(n) n^{-3} exp(-X^2 / n^2)` (`Q_{λ,0}(X) = 0`). -/
+noncomputable def finiteQLambda (T : ℕ) (X : ℝ) : ℝ :=
+  X ^ (5 / 2 : ℝ) *
+    ∑ n ∈ Finset.Icc 1 T,
+      (liouvilleLambda n : ℝ) * ((n : ℝ) ^ 3)⁻¹ * Real.exp (-(X ^ 2) / (n : ℝ) ^ 2)
+
+/-- Actual finite `P`-coprime Liouville Gaussian observable
+    `Q_{λ,P,L}(w) := w^{5/2} ∑_{1 ≤ r ≤ L, gcd(r, N_P) = 1} λ(r) r^{-3} exp(-w^2 / r^2)`. -/
+noncomputable def finiteQLambdaCoprime (P : Finset ℕ) (L : ℕ) (w : ℝ) : ℝ :=
+  w ^ (5 / 2 : ℝ) *
+    ∑ r ∈ coprimeCutoffFinset P L,
+      (liouvilleLambda r : ℝ) * ((r : ℝ) ^ 3)⁻¹ * Real.exp (-(w ^ 2) / (r : ℝ) ^ 2)
+
+/-- Actual finite `P`-smooth-only Liouville Gaussian observable
+    `Q_{λ,S(P),L}(w) := w^{5/2} ∑_{m ≤ L, m ∈ S(P)} λ(m) m^{-3} exp(-w^2 / m^2)`. -/
+noncomputable def finiteQLambdaSmooth (P : Finset ℕ) (L : ℕ) (w : ℝ) : ℝ :=
+  w ^ (5 / 2 : ℝ) *
+    ∑ m ∈ smoothCutoffFinset P L,
+      (liouvilleLambda m : ℝ) * ((m : ℝ) ^ 3)⁻¹ * Real.exp (-(w ^ 2) / (m : ℝ) ^ 2)
+
+/-- Weighted `r`-cofactor fiber `F_r(X) := (λ(r) / √r) · Q_{λ,S(P),⌊T/r⌋}(X / r)`. -/
+noncomputable def cofactorFiberF (P : Finset ℕ) (T r : ℕ) (X : ℝ) : ℝ :=
+  ((liouvilleLambda r : ℝ) / Real.sqrt (r : ℝ)) *
+    finiteQLambdaSmooth P (T / r) (X / (r : ℝ))
+
+/-- Helper: `pSmoothPart P n * pCoprimePart P n = n` for all `n > 0`. -/
+private theorem pSmoothPart_mul_pCoprimePart_aux (P : Finset ℕ) {n : ℕ} (hn : 0 < n) :
+    pSmoothPart P n * pCoprimePart P n = n := by
+  have hn_ne : n ≠ 0 := Nat.pos_iff_ne_zero.mp hn
+  dsimp [pSmoothPart, pCoprimePart]
+  rw [Finset.prod_filter_mul_prod_filter_not n.primeFactors (· ∈ P) (fun p => p ^ (n.factorization p))]
+  calc
+    ∏ p ∈ n.primeFactors, p ^ (n.factorization p)
+      = n.factorization.prod (fun p k => p ^ k) := by
+          rw [Finsupp.prod, Nat.support_factorization]
+    _ = n := Nat.factorization_prod_pow_eq_self hn_ne
+
+/-- Helper: if a prime `q` divides a `Finset` product `∏ x ∈ s, g x`, it divides some factor `g x`. -/
+private theorem prime_dvd_finset_prod_aux {α : Type*} [DecidableEq α] {q : ℕ} (hq : q.Prime)
+    (s : Finset α) (g : α → ℕ) (hdvd : q ∣ ∏ x ∈ s, g x) : ∃ x ∈ s, q ∣ g x := by
+  induction' s using Finset.induction_on with a s ha ih
+  · rw [Finset.prod_empty] at hdvd
+    exact False.elim (hq.not_dvd_one hdvd)
+  · rw [Finset.prod_insert ha] at hdvd
+    rcases hq.dvd_mul.mp hdvd with hqa | hqs
+    · exact ⟨a, Finset.mem_insert_self a s, hqa⟩
+    · obtain ⟨x, hx, hqx⟩ := ih hqs
+      exact ⟨x, Finset.mem_insert_of_mem hx, hqx⟩
+
+/-- Helper: `isPSmooth P (pSmoothPart P n)` for all `n : ℕ`. -/
+private theorem isPSmooth_pSmoothPart_aux (P : Finset ℕ) (n : ℕ) :
+    isPSmooth P (pSmoothPart P n) := by
+  refine ⟨?_, ?_⟩
+  · apply Finset.prod_pos
+    intro p hp
+    have hp_mem : p ∈ n.primeFactors := (Finset.mem_filter.mp hp).1
+    exact pow_pos (Nat.prime_of_mem_primeFactors hp_mem).pos _
+  · intro q hq hdvd
+    rw [pSmoothPart] at hdvd
+    obtain ⟨p, hp, hq_dvd_pow⟩ := prime_dvd_finset_prod_aux hq _ _ hdvd
+    have hp_mem : p ∈ n.primeFactors := (Finset.mem_filter.mp hp).1
+    have hp_in_P : p ∈ P := (Finset.mem_filter.mp hp).2
+    have hp_prime : p.Prime := Nat.prime_of_mem_primeFactors hp_mem
+    have hq_dvd_p : q ∣ p := hq.dvd_of_dvd_pow hq_dvd_pow
+    have hqp : q = p := (Nat.dvd_prime hp_prime).mp hq_dvd_p |>.resolve_left hq.ne_one
+    rwa [hqp]
+
+/-- Helper: every prime dividing `pCoprimePart P n` lies outside `P`. -/
+private theorem prime_dvd_pCoprimePart_not_mem_aux (P : Finset ℕ) (n : ℕ) {q : ℕ}
+    (hq : q.Prime) (hdvd : q ∣ pCoprimePart P n) : q ∉ P := by
+  rw [pCoprimePart] at hdvd
+  obtain ⟨p, hp, hq_dvd_pow⟩ := prime_dvd_finset_prod_aux hq _ _ hdvd
+  have hp_mem : p ∈ n.primeFactors := (Finset.mem_filter.mp hp).1
+  have hp_not_P : p ∉ P := (Finset.mem_filter.mp hp).2
+  have hp_prime : p.Prime := Nat.prime_of_mem_primeFactors hp_mem
+  have hq_dvd_p : q ∣ p := hq.dvd_of_dvd_pow hq_dvd_pow
+  have hqp : q = p := (Nat.dvd_prime hp_prime).mp hq_dvd_p |>.resolve_left hq.ne_one
+  rwa [hqp]
+
+/-- Helper: `Nat.Coprime (pCoprimePart P n) (primeProductModulus P)` whenever all elements of `P` are prime. -/
+private theorem coprime_pCoprimePart_aux {P : Finset ℕ} (hP : ∀ p ∈ P, p.Prime) (n : ℕ) :
+    Nat.Coprime (pCoprimePart P n) (primeProductModulus P) := by
+  rw [Nat.coprime_iff_gcd_eq_one]
+  by_contra h_ne
+  obtain ⟨q, hq_prime, hq_dvd_gcd⟩ := Nat.exists_prime_and_dvd h_ne
+  have hq_dvd_cop : q ∣ pCoprimePart P n := dvd_trans hq_dvd_gcd (Nat.gcd_dvd_left _ _)
+  have hq_dvd_mod : q ∣ primeProductModulus P := dvd_trans hq_dvd_gcd (Nat.gcd_dvd_right _ _)
+  have hq_not_P : q ∉ P := prime_dvd_pCoprimePart_not_mem_aux P n hq_prime hq_dvd_cop
+  rw [primeProductModulus] at hq_dvd_mod
+  obtain ⟨p, hp_in_P, hq_dvd_p⟩ := prime_dvd_finset_prod_aux hq_prime _ _ hq_dvd_mod
+  have hp_prime : p.Prime := hP p hp_in_P
+  have hqp : q = p := (Nat.dvd_prime hp_prime).mp hq_dvd_p |>.resolve_left hq_prime.ne_one
+  exact hq_not_P (hqp ▸ hp_in_P)
+
+/-- Helper: if `isPSmooth P m` and `Nat.Coprime r (primeProductModulus P)`, then `Nat.Coprime m r`. -/
+private theorem coprime_of_isPSmooth_of_coprime_modulus_aux {P : Finset ℕ} {m r : ℕ}
+    (hm : isPSmooth P m) (hr : Nat.Coprime r (primeProductModulus P)) :
+    Nat.Coprime m r := by
+  rw [Nat.coprime_iff_gcd_eq_one]
+  by_contra h_ne
+  obtain ⟨q, hq_prime, hq_dvd_gcd⟩ := Nat.exists_prime_and_dvd h_ne
+  have hq_dvd_m : q ∣ m := dvd_trans hq_dvd_gcd (Nat.gcd_dvd_left _ _)
+  have hq_dvd_r : q ∣ r := dvd_trans hq_dvd_gcd (Nat.gcd_dvd_right _ _)
+  have hq_in_P : q ∈ P := hm.2 q hq_prime hq_dvd_m
+  have hq_dvd_mod : q ∣ primeProductModulus P := Finset.dvd_prod_of_mem (fun x => x) hq_in_P
+  have hq_dvd_one : q ∣ 1 := by
+    rw [← hr.gcd_eq_one]
+    exact Nat.dvd_gcd hq_dvd_r hq_dvd_mod
+  exact hq_prime.not_dvd_one hq_dvd_one
+
+/-- **Theorem 13 (`TASK-TC-055R2` §3a, Existence and Uniqueness of Smooth/Coprime Positive Factorization)**:
+    For every finite set of primes `P : Finset ℕ` (`∀ p ∈ P, p.Prime`, including `P = ∅` where `N_∅ = 1`)
+    and every positive integer `n > 0`:
+    1. Canonical decomposition: `pSmoothPart P n * pCoprimePart P n = n`, `isPSmooth P (pSmoothPart P n)`,
+       `Nat.Coprime (pCoprimePart P n) (primeProductModulus P)`, and `0 < pCoprimePart P n`;
+    2. Uniqueness: any pair `(m, r)` satisfying `m * r = n`, `isPSmooth P m`, and
+       `Nat.Coprime r (primeProductModulus P)` equals `(pSmoothPart P n, pCoprimePart P n)`;
+    3. Exact `∃!` formulation on `ℕ × ℕ`. -/
+theorem smooth_coprime_positive_factorization_exists_unique_nat
+    {P : Finset ℕ} (hP : ∀ p ∈ P, p.Prime) {n : ℕ} (hn : 0 < n) :
+    (pSmoothPart P n * pCoprimePart P n = n ∧
+      isPSmooth P (pSmoothPart P n) ∧
+      Nat.Coprime (pCoprimePart P n) (primeProductModulus P) ∧
+      0 < pCoprimePart P n) ∧
+    (∀ m r : ℕ,
+      m * r = n → isPSmooth P m → Nat.Coprime r (primeProductModulus P) →
+        m = pSmoothPart P n ∧ r = pCoprimePart P n) ∧
+    (∃! mr : ℕ × ℕ,
+      mr.1 * mr.2 = n ∧ isPSmooth P mr.1 ∧ Nat.Coprime mr.2 (primeProductModulus P)) := by
+  have h_mul : pSmoothPart P n * pCoprimePart P n = n := pSmoothPart_mul_pCoprimePart_aux P hn
+  have h_sm : isPSmooth P (pSmoothPart P n) := isPSmooth_pSmoothPart_aux P n
+  have h_cop : Nat.Coprime (pCoprimePart P n) (primeProductModulus P) := coprime_pCoprimePart_aux hP n
+  have h_rpos : 0 < pCoprimePart P n := by
+    by_contra h_not_pos
+    have hr0 : pCoprimePart P n = 0 := Nat.eq_zero_of_not_pos h_not_pos
+    rw [hr0, mul_zero] at h_mul
+    omega
+  have h_uniq :
+      ∀ m r : ℕ,
+        m * r = n → isPSmooth P m → Nat.Coprime r (primeProductModulus P) →
+          m = pSmoothPart P n ∧ r = pCoprimePart P n := by
+    intro m r hmr hm_sm hr_cop
+    have h_eq_prod : m * r = pSmoothPart P n * pCoprimePart P n := hmr.trans h_mul.symm
+    have h_cop_m_r0 : Nat.Coprime m (pCoprimePart P n) :=
+      coprime_of_isPSmooth_of_coprime_modulus_aux hm_sm h_cop
+    have h_cop_m0_r : Nat.Coprime (pSmoothPart P n) r :=
+      coprime_of_isPSmooth_of_coprime_modulus_aux h_sm hr_cop
+    have hm_dvd_m0 : m ∣ pSmoothPart P n := by
+      apply h_cop_m_r0.dvd_of_dvd_mul_right
+      exact ⟨r, by rw [← h_eq_prod]⟩
+    have hm0_dvd_m : pSmoothPart P n ∣ m := by
+      apply h_cop_m0_r.dvd_of_dvd_mul_right
+      exact ⟨pCoprimePart P n, h_eq_prod⟩
+    have hm_eq : m = pSmoothPart P n := Nat.dvd_antisymm hm_dvd_m0 hm0_dvd_m
+    have hr_eq : r = pCoprimePart P n := by
+      rw [hm_eq] at h_eq_prod
+      exact Nat.eq_of_mul_eq_mul_left h_sm.1 h_eq_prod
+    exact ⟨hm_eq, hr_eq⟩
+  refine ⟨⟨h_mul, h_sm, h_cop, h_rpos⟩, h_uniq, ?_⟩
+  refine ⟨(pSmoothPart P n, pCoprimePart P n), ⟨h_mul, h_sm, h_cop⟩, ?_⟩
+  rintro ⟨m, r⟩ ⟨hmr, hm_sm, hr_cop⟩
+  obtain ⟨hm_eq, hr_eq⟩ := h_uniq m r hmr hm_sm hr_cop
+  exact Prod.ext hm_eq hr_eq
+
+/-- Helper: characterization of membership in `smoothCoprimePairsUpTo P T`. -/
+private theorem mem_smoothCoprimePairsUpTo_iff_aux (P : Finset ℕ) (T m r : ℕ) :
+    (m, r) ∈ smoothCoprimePairsUpTo P T ↔
+      isPSmooth P m ∧ Nat.Coprime r (primeProductModulus P) ∧ 1 ≤ m * r ∧ m * r ≤ T := by
+  simp only [smoothCoprimePairsUpTo, Finset.mem_biUnion, Finset.mem_image, Prod.mk.injEq,
+    smoothCutoffFinset, coprimeCutoffFinset, Finset.mem_filter, Finset.mem_Icc]
+  constructor
+  · rintro ⟨m', ⟨⟨_, _⟩, hm'_sm⟩, r', ⟨⟨hr'1, hr'div⟩, hr'_cop⟩, rfl, rfl⟩
+    have hm_pos : 0 < m' := hm'_sm.1
+    have hmr_le : m' * r' ≤ T := by
+      rw [mul_comm]
+      exact (Nat.le_div_iff_mul_le hm_pos).mp hr'div
+    have hmr_ge : 1 ≤ m' * r' := Nat.mul_pos hm_pos (by omega)
+    exact ⟨hm'_sm, hr'_cop, hmr_ge, hmr_le⟩
+  · rintro ⟨hm_sm, hr_cop, hmr_ge, hmr_le⟩
+    have hm_pos : 0 < m := hm_sm.1
+    have hr_pos : 0 < r := by
+      by_contra h0
+      have hr0 : r = 0 := Nat.eq_zero_of_not_pos h0
+      rw [hr0, mul_zero] at hmr_ge
+      omega
+    have hm_le_mr : m ≤ m * r := Nat.le_mul_of_pos_right m hr_pos
+    have hm_le_T : m ≤ T := le_trans hm_le_mr hmr_le
+    have hr_le_div : r ≤ T / m := (Nat.le_div_iff_mul_le hm_pos).mpr (by rw [mul_comm]; exact hmr_le)
+    exact ⟨m, ⟨⟨hm_pos, hm_le_T⟩, hm_sm⟩, r, ⟨⟨hr_pos, hr_le_div⟩, hr_cop⟩, rfl, rfl⟩
+
+/-- Helper: `isPSmooth ∅ m ↔ m = 1`. -/
+private theorem isPSmooth_empty_iff_aux (m : ℕ) :
+    isPSmooth ∅ m ↔ m = 1 := by
+  constructor
+  · rintro ⟨_, hall⟩
+    by_contra hm_ne1
+    obtain ⟨p, hp_prime, hp_dvd⟩ := Nat.exists_prime_and_dvd hm_ne1
+    exact Finset.not_mem_empty p (hall p hp_prime hp_dvd)
+  · rintro rfl
+    exact ⟨by omega, fun p hp hdvd => False.elim (hp.not_dvd_one hdvd)⟩
+
+/-- **Theorem 14 (`TASK-TC-055R2` §3b, Finite Cutoff Indexing Bijection and Degenerate Boundary Cases)**:
+    For every finite set of primes `P : Finset ℕ` (`∀ p ∈ P, p.Prime`) and every cutoff `T : ℕ`:
+    1. Inner-cutoff equivalence `m * r ≤ T ↔ r ≤ T / m` (`0 < m`) and range-filter equivalence
+       `(Finset.range (T + 1)).filter (isPSmooth P) = smoothCutoffFinset P T`;
+    2. Exact membership characterization of `smoothCoprimePairsUpTo P T` and mutual two-sided inverse
+       bijection between `Finset.Icc 1 T` and `smoothCoprimePairsUpTo P T` via
+       `n ↦ (pSmoothPart P n, pCoprimePart P n)` and `(m, r) ↦ m * r`, with equal cardinalities;
+    3. Explicit boundary and degenerate evaluations for `T = 0` (empty sets), `T = 1` (singletons),
+       and `P = ∅` (`primeProductModulus ∅ = 1`, `coprimeCutoffFinset ∅ T = Finset.Icc 1 T`,
+       `smoothCutoffFinset ∅ T = if 1 ≤ T then {1} else ∅`). -/
+theorem finite_smooth_coprime_cutoff_indexing_bijection_nat
+    {P : Finset ℕ} (hP : ∀ p ∈ P, p.Prime) (T : ℕ) :
+    ((∀ {m r : ℕ}, 0 < m → (m * r ≤ T ↔ r ≤ T / m)) ∧
+      (Finset.range (T + 1)).filter (fun m => isPSmooth P m) = smoothCutoffFinset P T) ∧
+    ((∀ m r : ℕ,
+        (m, r) ∈ smoothCoprimePairsUpTo P T ↔
+          isPSmooth P m ∧ Nat.Coprime r (primeProductModulus P) ∧ 1 ≤ m * r ∧ m * r ≤ T) ∧
+      (∀ n ∈ Finset.Icc 1 T,
+        (pSmoothPart P n, pCoprimePart P n) ∈ smoothCoprimePairsUpTo P T ∧
+          pSmoothPart P n * pCoprimePart P n = n) ∧
+      (∀ mr ∈ smoothCoprimePairsUpTo P T,
+        mr.1 * mr.2 ∈ Finset.Icc 1 T ∧
+          (pSmoothPart P (mr.1 * mr.2), pCoprimePart P (mr.1 * mr.2)) = mr) ∧
+      (smoothCoprimePairsUpTo P T).card = (Finset.Icc 1 T).card) ∧
+    ((smoothCutoffFinset P 0 = ∅ ∧ coprimeCutoffFinset P 0 = ∅ ∧ smoothCoprimePairsUpTo P 0 = ∅) ∧
+      (smoothCutoffFinset P 1 = {1} ∧ coprimeCutoffFinset P 1 = {1} ∧ smoothCoprimePairsUpTo P 1 = {(1, 1)}) ∧
+      (primeProductModulus ∅ = 1 ∧
+        coprimeCutoffFinset ∅ T = Finset.Icc 1 T ∧
+        smoothCutoffFinset ∅ T = (if 1 ≤ T then {1} else ∅))) := by
+  refine ⟨⟨?_, ?_⟩, ⟨?_, ?_, ?_, ?_⟩, ⟨?_, ?_, ?_⟩⟩
+  · intro m r hm
+    rw [mul_comm, Nat.le_div_iff_mul_le hm]
+  · ext m
+    simp only [smoothCutoffFinset, Finset.mem_filter, Finset.mem_range, Finset.mem_Icc]
+    constructor
+    · rintro ⟨hm_lt, hm_sm⟩
+      exact ⟨⟨hm_sm.1, by omega⟩, hm_sm⟩
+    · rintro ⟨⟨_, hm_le⟩, hm_sm⟩
+      exact ⟨by omega, hm_sm⟩
+  · exact mem_smoothCoprimePairsUpTo_iff_aux P T
+  · intro n hn
+    rw [Finset.mem_Icc] at hn
+    have hn_pos : 0 < n := by omega
+    obtain ⟨⟨h_mul, h_sm, h_cop, _⟩, _, _⟩ :=
+      smooth_coprime_positive_factorization_exists_unique_nat hP hn_pos
+    rw [mem_smoothCoprimePairsUpTo_iff_aux]
+    exact ⟨⟨h_sm, h_cop, h_mul.symm ▸ hn.1, h_mul.symm ▸ hn.2⟩, h_mul⟩
+  · rintro ⟨m, r⟩ hmr
+    rw [mem_smoothCoprimePairsUpTo_iff_aux] at hmr
+    rcases hmr with ⟨hm_sm, hr_cop, hmr_ge, hmr_le⟩
+    have hmr_pos : 0 < m * r := by omega
+    obtain ⟨_, h_uniq, _⟩ := smooth_coprime_positive_factorization_exists_unique_nat hP hmr_pos
+    obtain ⟨hm_eq, hr_eq⟩ := h_uniq m r rfl hm_sm hr_cop
+    exact ⟨Finset.mem_Icc.mpr ⟨hmr_ge, hmr_le⟩, Prod.ext hm_eq.symm hr_eq.symm⟩
+  · apply Finset.card_bij (fun mr _ => mr.1 * mr.2)
+    · rintro ⟨m, r⟩ hmr
+      rw [mem_smoothCoprimePairsUpTo_iff_aux] at hmr
+      exact Finset.mem_Icc.mpr ⟨hmr.2.2.1, hmr.2.2.2⟩
+    · rintro ⟨m1, r1⟩ h1 ⟨m2, r2⟩ h2 h_eq
+      rw [mem_smoothCoprimePairsUpTo_iff_aux] at h1 h2
+      have h_pos : 0 < m1 * r1 := by omega
+      obtain ⟨_, h_uniq, _⟩ := smooth_coprime_positive_factorization_exists_unique_nat hP h_pos
+      obtain ⟨hm1, hr1⟩ := h_uniq m1 r1 rfl h1.1 h1.2.1
+      obtain ⟨hm2, hr2⟩ := h_uniq m2 r2 h_eq.symm h2.1 h2.2.1
+      exact Prod.ext (hm1.trans hm2.symm) (hr1.trans hr2.symm)
+    · intro n hn
+      rw [Finset.mem_Icc] at hn
+      have hn_pos : 0 < n := by omega
+      obtain ⟨⟨h_mul, h_sm, h_cop, _⟩, _, _⟩ :=
+        smooth_coprime_positive_factorization_exists_unique_nat hP hn_pos
+      refine ⟨(pSmoothPart P n, pCoprimePart P n), ?_, h_mul⟩
+      rw [mem_smoothCoprimePairsUpTo_iff_aux]
+      exact ⟨h_sm, h_cop, h_mul.symm ▸ hn.1, h_mul.symm ▸ hn.2⟩
+  · simp [smoothCutoffFinset, coprimeCutoffFinset, smoothCoprimePairsUpTo]
+  · have h1_sm : isPSmooth P 1 := ⟨by omega, fun p hp hdvd => False.elim (hp.not_dvd_one hdvd)⟩
+    have h1_cop : Nat.Coprime 1 (primeProductModulus P) := Nat.coprime_one_left _
+    have hs1 : smoothCutoffFinset P 1 = {1} := by
+      ext m
+      simp only [smoothCutoffFinset, Finset.mem_filter, Finset.mem_Icc, Finset.mem_singleton]
+      constructor
+      · rintro ⟨⟨hm1, hmle1⟩, _⟩; omega
+      · rintro rfl; exact ⟨⟨by omega, by omega⟩, h1_sm⟩
+    have hc1 : coprimeCutoffFinset P 1 = {1} := by
+      ext r
+      simp only [coprimeCutoffFinset, Finset.mem_filter, Finset.mem_Icc, Finset.mem_singleton]
+      constructor
+      · rintro ⟨⟨hr1, hrle1⟩, _⟩; omega
+      · rintro rfl; exact ⟨⟨by omega, by omega⟩, h1_cop⟩
+    refine ⟨hs1, hc1, ?_⟩
+    simp [smoothCoprimePairsUpTo, hs1, hc1]
+  · have hmod : primeProductModulus ∅ = 1 := rfl
+    refine ⟨hmod, ?_, ?_⟩
+    · ext r
+      simp [coprimeCutoffFinset, hmod]
+    · ext m
+      by_cases hT : 1 ≤ T
+      · simp [smoothCutoffFinset, hT, isPSmooth_empty_iff_aux]
+        omega
+      · simp [smoothCutoffFinset, hT]
+        omega
+
+/-- Helper: general reindexed finite sum over `Finset.Icc 1 T` into smooth-outer / coprime-inner nested sums. -/
+private theorem sum_Icc_eq_smooth_outer_coprime_inner_aux
+    {P : Finset ℕ} (hP : ∀ p ∈ P, p.Prime) (T : ℕ) (F : ℕ → ℝ) :
+    ∑ n ∈ Finset.Icc 1 T, F n =
+      ∑ m ∈ smoothCutoffFinset P T,
+        ∑ r ∈ coprimeCutoffFinset P (T / m), F (m * r) := by
+  have h_bij :
+      ∑ mr ∈ smoothCoprimePairsUpTo P T, F (mr.1 * mr.2) =
+        ∑ n ∈ Finset.Icc 1 T, F n := by
+    apply Finset.sum_bij (fun mr _ => mr.1 * mr.2)
+    · rintro ⟨m, r⟩ hmr
+      rw [mem_smoothCoprimePairsUpTo_iff_aux] at hmr
+      exact Finset.mem_Icc.mpr ⟨hmr.2.2.1, hmr.2.2.2⟩
+    · rintro ⟨m1, r1⟩ h1 ⟨m2, r2⟩ h2 h_eq
+      rw [mem_smoothCoprimePairsUpTo_iff_aux] at h1 h2
+      have h_pos : 0 < m1 * r1 := by omega
+      obtain ⟨_, h_uniq, _⟩ := smooth_coprime_positive_factorization_exists_unique_nat hP h_pos
+      obtain ⟨hm1, hr1⟩ := h_uniq m1 r1 rfl h1.1 h1.2.1
+      obtain ⟨hm2, hr2⟩ := h_uniq m2 r2 h_eq.symm h2.1 h2.2.1
+      exact Prod.ext (hm1.trans hm2.symm) (hr1.trans hr2.symm)
+    · intro n hn
+      rw [Finset.mem_Icc] at hn
+      have hn_pos : 0 < n := by omega
+      obtain ⟨⟨h_mul, h_sm, h_cop, _⟩, _, _⟩ :=
+        smooth_coprime_positive_factorization_exists_unique_nat hP hn_pos
+      refine ⟨(pSmoothPart P n, pCoprimePart P n), ?_, h_mul⟩
+      rw [mem_smoothCoprimePairsUpTo_iff_aux]
+      exact ⟨h_sm, h_cop, h_mul.symm ▸ hn.1, h_mul.symm ▸ hn.2⟩
+    · intros; rfl
+  rw [← h_bij, smoothCoprimePairsUpTo, Finset.sum_biUnion]
+  · apply Finset.sum_congr rfl
+    intro m _
+    rw [Finset.sum_image]
+    intro r1 _ r2 _ h_eq
+    exact (Prod.mk.inj h_eq).2
+  · intro m1 _ m2 _ hne
+    dsimp [Function.onFun]
+    rw [Finset.disjoint_left]
+    intro x hx1 hx2
+    rw [Finset.mem_image] at hx1 hx2
+    rcases hx1 with ⟨r1, _, rfl⟩
+    rcases hx2 with ⟨r2, _, h_eq⟩
+    exact hne (Prod.mk.inj h_eq).1.symm
+
+/-- Helper: general reindexed finite sum over `Finset.Icc 1 T` into coprime-outer / smooth-inner nested sums. -/
+private theorem sum_Icc_eq_coprime_outer_smooth_inner_aux
+    {P : Finset ℕ} (hP : ∀ p ∈ P, p.Prime) (T : ℕ) (F : ℕ → ℝ) :
+    ∑ n ∈ Finset.Icc 1 T, F n =
+      ∑ r ∈ coprimeCutoffFinset P T,
+        ∑ m ∈ smoothCutoffFinset P (T / r), F (m * r) := by
+  rw [sum_Icc_eq_smooth_outer_coprime_inner_aux hP T F]
+  let S_mr := (smoothCutoffFinset P T).sigma (fun m => coprimeCutoffFinset P (T / m))
+  let S_rm := (coprimeCutoffFinset P T).sigma (fun r => smoothCutoffFinset P (T / r))
+  rw [Finset.sum_sigma' (smoothCutoffFinset P T) (fun m => coprimeCutoffFinset P (T / m))
+        (fun m r => F (m * r)),
+      Finset.sum_sigma' (coprimeCutoffFinset P T) (fun r => smoothCutoffFinset P (T / r))
+        (fun r m => F (m * r))]
+  apply Finset.sum_bij (fun x _ => ⟨x.2, x.1⟩)
+  · rintro ⟨m, r⟩ hmr
+    simp only [S_mr, S_rm, Finset.mem_sigma, smoothCutoffFinset, coprimeCutoffFinset,
+      Finset.mem_filter, Finset.mem_Icc] at hmr ⊢
+    rcases hmr with ⟨⟨⟨hm1, _⟩, hm_sm⟩, ⟨⟨hr1, hr_div⟩, hr_cop⟩⟩
+    have hmr_le : m * r ≤ T := by
+      rw [mul_comm]
+      exact (Nat.le_div_iff_mul_le (by omega)).mp hr_div
+    have hr_le_T : r ≤ T := le_trans (Nat.le_mul_of_pos_left r (by omega)) hmr_le
+    have hm_le_div : m ≤ T / r := (Nat.le_div_iff_mul_le (by omega)).mpr hmr_le
+    exact ⟨⟨⟨hr1, hr_le_T⟩, hr_cop⟩, ⟨⟨hm1, hm_le_div⟩, hm_sm⟩⟩
+  · rintro ⟨m1, r1⟩ _ ⟨m2, r2⟩ _ h_eq
+    cases h_eq
+    rfl
+  · rintro ⟨r, m⟩ hrm
+    simp only [S_mr, S_rm, Finset.mem_sigma, smoothCutoffFinset, coprimeCutoffFinset,
+      Finset.mem_filter, Finset.mem_Icc] at hrm ⊢
+    rcases hrm with ⟨⟨⟨hr1, _⟩, hr_cop⟩, ⟨⟨hm1, hm_div⟩, hm_sm⟩⟩
+    have hmr_le : m * r ≤ T := (Nat.le_div_iff_mul_le (by omega)).mp hm_div
+    have hm_le_T : m ≤ T := le_trans (Nat.le_mul_of_pos_right m (by omega)) hmr_le
+    have hr_le_div : r ≤ T / m := (Nat.le_div_iff_mul_le (by omega)).mpr (by rw [mul_comm]; exact hmr_le)
+    exact ⟨⟨m, r⟩, ⟨⟨⟨hm1, hm_le_T⟩, hm_sm⟩, ⟨⟨hr1, hr_le_div⟩, hr_cop⟩⟩, rfl⟩
+  · intros; rfl
+
+/-- **Theorem 15 (`TASK-TC-055R2` §3c, Arbitrary-Weight Reindexed Liouville Sum, Cofactor Regrouping, and Exact Uncoupled-Cutoff Excess)**:
+    For every finite set of primes `P : Finset ℕ` (`∀ p ∈ P, p.Prime`), every `T : ℕ` (including `T = 0` and `T = 1`),
+    and every real weight `w : ℕ → ℝ`:
+    1. Smooth-outer / coprime-inner Liouville reconstruction:
+       `∑_{1 ≤ n ≤ T} λ(n) w(n) = ∑_{m ≤ T, m ∈ S(P)} ∑_{1 ≤ r ≤ ⌊T/m⌋, gcd(r, N_P) = 1} λ(m) λ(r) w(m r)`;
+    2. Regrouped coprime-outer / smooth-inner Liouville reconstruction:
+       `∑_{1 ≤ n ≤ T} λ(n) w(n) = ∑_{1 ≤ r ≤ T, gcd(r, N_P) = 1} ∑_{m ≤ ⌊T/r⌋, m ∈ S(P)} λ(r) λ(m) w(m r)`;
+    3. Exact uncoupled-cutoff excess sum when `r ≤ T` replaces `r ≤ ⌊T/m⌋`:
+       `(∑_{m ≤ T, m ∈ S(P)} ∑_{1 ≤ r ≤ T, gcd(r, N_P) = 1} λ(m) λ(r) w(m r)) - (∑_{1 ≤ n ≤ T} λ(n) w(n))`
+       `= ∑_{m ≤ T, m ∈ S(P)} ∑_{r ∈ excessCoprimeFinset P m T} λ(m) λ(r) w(m r)`;
+    4. Vanishing vs. nonvanishing excess witnesses:
+       - For `P = ∅` (any `T`), for `T ≤ 1` (any `P`), and even at `(P = {2}, T = 2)`, the excess sum is identically `0`
+         (refuting any universal strict-inequality claim);
+       - At `(P = {2}, T = 3)`, the excess sum equals `w 6` (strictly nonzero whenever `w 6 ≠ 0`). -/
+theorem finite_liouville_reindexed_sum_and_excess_cutoff_identity_nat
+    {P : Finset ℕ} (hP : ∀ p ∈ P, p.Prime) (T : ℕ) (w : ℕ → ℝ) :
+    (∑ n ∈ Finset.Icc 1 T, (liouvilleLambda n : ℝ) * w n =
+      ∑ m ∈ smoothCutoffFinset P T,
+        ∑ r ∈ coprimeCutoffFinset P (T / m),
+          (liouvilleLambda m : ℝ) * (liouvilleLambda r : ℝ) * w (m * r)) ∧
+    (∑ n ∈ Finset.Icc 1 T, (liouvilleLambda n : ℝ) * w n =
+      ∑ r ∈ coprimeCutoffFinset P T,
+        ∑ m ∈ smoothCutoffFinset P (T / r),
+          (liouvilleLambda r : ℝ) * (liouvilleLambda m : ℝ) * w (m * r)) ∧
+    ((∑ m ∈ smoothCutoffFinset P T,
+        ∑ r ∈ coprimeCutoffFinset P T,
+          (liouvilleLambda m : ℝ) * (liouvilleLambda r : ℝ) * w (m * r)) -
+      (∑ n ∈ Finset.Icc 1 T, (liouvilleLambda n : ℝ) * w n) =
+      ∑ m ∈ smoothCutoffFinset P T,
+        ∑ r ∈ excessCoprimeFinset P m T,
+          (liouvilleLambda m : ℝ) * (liouvilleLambda r : ℝ) * w (m * r)) ∧
+    ((∑ m ∈ smoothCutoffFinset ∅ T,
+        ∑ r ∈ excessCoprimeFinset ∅ m T,
+          (liouvilleLambda m : ℝ) * (liouvilleLambda r : ℝ) * w (m * r) = 0) ∧
+      (T ≤ 1 →
+        ∑ m ∈ smoothCutoffFinset P T,
+          ∑ r ∈ excessCoprimeFinset P m T,
+            (liouvilleLambda m : ℝ) * (liouvilleLambda r : ℝ) * w (m * r) = 0) ∧
+      (∑ m ∈ smoothCutoffFinset {2} 2,
+        ∑ r ∈ excessCoprimeFinset {2} m 2,
+          (liouvilleLambda m : ℝ) * (liouvilleLambda r : ℝ) * w (m * r) = 0) ∧
+      (∑ m ∈ smoothCutoffFinset {2} 3,
+        ∑ r ∈ excessCoprimeFinset {2} m 3,
+          (liouvilleLambda m : ℝ) * (liouvilleLambda r : ℝ) * w (m * r) = w 6)) := by
+  have h_sm_out :
+      ∑ n ∈ Finset.Icc 1 T, (liouvilleLambda n : ℝ) * w n =
+        ∑ m ∈ smoothCutoffFinset P T,
+          ∑ r ∈ coprimeCutoffFinset P (T / m),
+            (liouvilleLambda m : ℝ) * (liouvilleLambda r : ℝ) * w (m * r) := by
+    rw [sum_Icc_eq_smooth_outer_coprime_inner_aux hP T (fun n => (liouvilleLambda n : ℝ) * w n)]
+    apply Finset.sum_congr rfl
+    intro m hm
+    have hm_ne : m ≠ 0 := by
+      have hm_mem := (Finset.mem_filter.mp hm).1
+      rw [Finset.mem_Icc] at hm_mem
+      omega
+    apply Finset.sum_congr rfl
+    intro r hr
+    have hr_ne : r ≠ 0 := by
+      have hr_mem := (Finset.mem_filter.mp hr).1
+      rw [Finset.mem_Icc] at hr_mem
+      omega
+    rw [liouvilleLambda_mul_aux hm_ne hr_ne]
+    push_cast
+    ring
+  have h_cop_out :
+      ∑ n ∈ Finset.Icc 1 T, (liouvilleLambda n : ℝ) * w n =
+        ∑ r ∈ coprimeCutoffFinset P T,
+          ∑ m ∈ smoothCutoffFinset P (T / r),
+            (liouvilleLambda r : ℝ) * (liouvilleLambda m : ℝ) * w (m * r) := by
+    rw [sum_Icc_eq_coprime_outer_smooth_inner_aux hP T (fun n => (liouvilleLambda n : ℝ) * w n)]
+    apply Finset.sum_congr rfl
+    intro r hr
+    have hr_ne : r ≠ 0 := by
+      have hr_mem := (Finset.mem_filter.mp hr).1
+      rw [Finset.mem_Icc] at hr_mem
+      omega
+    apply Finset.sum_congr rfl
+    intro m hm
+    have hm_ne : m ≠ 0 := by
+      have hm_mem := (Finset.mem_filter.mp hm).1
+      rw [Finset.mem_Icc] at hm_mem
+      omega
+    rw [liouvilleLambda_mul_aux hm_ne hr_ne]
+    push_cast
+    ring
+  refine ⟨h_sm_out, h_cop_out, ?_, ⟨?_, ?_, ?_, ?_⟩⟩
+  · rw [h_sm_out, ← Finset.sum_sub_distrib]
+    apply Finset.sum_congr rfl
+    intro m hm
+    have hm_mem := (Finset.mem_filter.mp hm).1
+    rw [Finset.mem_Icc] at hm_mem
+    have h_div_le : T / m ≤ T := Nat.div_le_self T m
+    have h_union :
+        coprimeCutoffFinset P T =
+          coprimeCutoffFinset P (T / m) ∪ excessCoprimeFinset P m T := by
+      ext r
+      simp only [coprimeCutoffFinset, excessCoprimeFinset, Finset.mem_union, Finset.mem_filter,
+        Finset.mem_Icc]
+      constructor
+      · rintro ⟨⟨hr1, hrT⟩, hcop⟩
+        by_cases hr_le : r ≤ T / m
+        · exact Or.inl ⟨⟨hr1, hr_le⟩, hcop⟩
+        · exact Or.inr ⟨⟨by omega, hrT⟩, hcop⟩
+      · rintro (⟨⟨hr1, hr_le⟩, hcop⟩ | ⟨⟨hr_gt, hrT⟩, hcop⟩)
+        · exact ⟨⟨hr1, le_trans hr_le h_div_le⟩, hcop⟩
+        · exact ⟨⟨le_trans (Nat.le_add_left 1 (T / m)) hr_gt, hrT⟩, hcop⟩
+    have h_disj : Disjoint (coprimeCutoffFinset P (T / m)) (excessCoprimeFinset P m T) := by
+      rw [Finset.disjoint_left]
+      intro r hr1 hr2
+      simp only [coprimeCutoffFinset, excessCoprimeFinset, Finset.mem_filter, Finset.mem_Icc] at hr1 hr2
+      omega
+    rw [h_union, Finset.sum_union h_disj]
+    ring
+  · apply Finset.sum_eq_zero
+    intro m hm
+    simp only [smoothCutoffFinset, Finset.mem_filter, isPSmooth_empty_iff_aux] at hm
+    rcases hm with ⟨_, rfl⟩
+    have hex_empty : excessCoprimeFinset ∅ 1 T = ∅ := by
+      ext r
+      simp [excessCoprimeFinset]
+    rw [hex_empty, Finset.sum_empty]
+  · intro hT_le1
+    apply Finset.sum_eq_zero
+    intro m hm
+    have hm_mem := (Finset.mem_filter.mp hm).1
+    rw [Finset.mem_Icc] at hm_mem
+    have hm_eq1 : m = 1 := by omega
+    have hT_eq1 : T = 1 := by omega
+    subst hm_eq1; subst hT_eq1
+    have hex_empty : excessCoprimeFinset P 1 1 = ∅ := by
+      ext r
+      simp [excessCoprimeFinset]
+    rw [hex_empty, Finset.sum_empty]
+  · have hs2 : smoothCutoffFinset {2} 2 = {1, 2} := by decide
+    have hex1 : excessCoprimeFinset {2} 1 2 = ∅ := by decide
+    have hex2 : excessCoprimeFinset {2} 2 2 = ∅ := by decide
+    rw [hs2, Finset.sum_pair (by decide), hex1, hex2, Finset.sum_empty, Finset.sum_empty, add_zero]
+  · have hs3 : smoothCutoffFinset {2} 3 = {1, 2} := by decide
+    have hex1 : excessCoprimeFinset {2} 1 3 = ∅ := by decide
+    have hex2 : excessCoprimeFinset {2} 2 3 = {3} := by decide
+    have hl2 : liouvilleLambda 2 = -1 := by
+      have ho2 : natOmega 2 = 1 := ArithmeticFunction.cardFactors_eq_one_iff_prime.mpr Nat.prime_two
+      simp [liouvilleLambda, ho2, liouvilleSignFromOmega]
+    have hl3 : liouvilleLambda 3 = -1 := by
+      have ho3 : natOmega 3 = 1 := ArithmeticFunction.cardFactors_eq_one_iff_prime.mpr Nat.prime_three
+      simp [liouvilleLambda, ho3, liouvilleSignFromOmega]
+    rw [hs3, Finset.sum_pair (by decide), hex1, hex2, Finset.sum_empty, Finset.sum_singleton,
+      zero_add, hl2, hl3]
+    norm_num
+
+/-- Helper: elementary `X^{5/2}` and `(n : ℝ)^{-3}` Gaussian scaling identity for `0 ≤ X` and `0 < a`, `0 < b`. -/
+private theorem gaussian_term_scaling_aux {X : ℝ} (hX : 0 ≤ X) {a b : ℕ} (ha : 0 < a) :
+    ((1 : ℝ) / Real.sqrt (a : ℝ)) *
+        ((X / (a : ℝ)) ^ (5 / 2 : ℝ) *
+          (((b : ℝ) ^ 3)⁻¹ * Real.exp (-((X / (a : ℝ)) ^ 2) / (b : ℝ) ^ 2))) =
+      X ^ (5 / 2 : ℝ) *
+        ((((a * b : ℕ) : ℝ) ^ 3)⁻¹ * Real.exp (-(X ^ 2) / ((a * b : ℕ) : ℝ) ^ 2)) := by
+  have ha_real_pos : (0 : ℝ) < (a : ℝ) := Nat.cast_pos.mpr ha
+  have ha_real_nonneg : (0 : ℝ) ≤ (a : ℝ) := le_of_lt ha_real_pos
+  have ha_ne : (a : ℝ) ≠ 0 := ne_of_gt ha_real_pos
+  have hsqrt_ne : Real.sqrt (a : ℝ) ≠ 0 := ne_of_gt (Real.sqrt_pos.mpr ha_real_pos)
+  have hrpow_div : (X / (a : ℝ)) ^ (5 / 2 : ℝ) = X ^ (5 / 2 : ℝ) / (a : ℝ) ^ (5 / 2 : ℝ) :=
+    Real.div_rpow hX ha_real_nonneg (5 / 2 : ℝ)
+  have hsqrt_mul_rpow : Real.sqrt (a : ℝ) * (a : ℝ) ^ (5 / 2 : ℝ) = (a : ℝ) ^ 3 := by
+    rw [Real.sqrt_eq_rpow, ← Real.rpow_add ha_real_pos]
+    have hexp : (1 / 2 : ℝ) + (5 / 2 : ℝ) = ((3 : ℕ) : ℝ) := by norm_num
+    rw [hexp, Real.rpow_natCast]
+  have hexp_arg : -((X / (a : ℝ)) ^ 2) / (b : ℝ) ^ 2 = -(X ^ 2) / ((a * b : ℕ) : ℝ) ^ 2 := by
+    push_cast
+    by_cases hb : (b : ℝ) = 0
+    · simp [hb]
+    · field_simp [ha_ne, hb]; left; ring
+  rw [hrpow_div, hexp_arg]
+  push_cast
+  have hrpow_ne : (a : ℝ) ^ (5 / 2 : ℝ) ≠ 0 := ne_of_gt (Real.rpow_pos_of_pos ha_real_pos _)
+  by_cases hb : (b : ℝ) = 0
+  · simp [hb]
+  · calc
+      (1 / Real.sqrt (a : ℝ)) *
+          (X ^ (5 / 2 : ℝ) / (a : ℝ) ^ (5 / 2 : ℝ) *
+            (((b : ℝ) ^ 3)⁻¹ * Real.exp (-(X ^ 2) / ((a : ℝ) * (b : ℝ)) ^ 2)))
+        = X ^ (5 / 2 : ℝ) *
+            (((Real.sqrt (a : ℝ) * (a : ℝ) ^ (5 / 2 : ℝ)) * (b : ℝ) ^ 3)⁻¹ *
+              Real.exp (-(X ^ 2) / ((a : ℝ) * (b : ℝ)) ^ 2)) := by
+            field_simp [hsqrt_ne, hrpow_ne, hb]; left; ring
+      _ = X ^ (5 / 2 : ℝ) *
+            ((((a : ℝ) * (b : ℝ)) ^ 3)⁻¹ *
+              Real.exp (-(X ^ 2) / ((a : ℝ) * (b : ℝ)) ^ 2)) := by
+            rw [hsqrt_mul_rpow]
+            ring
+
+/-- **Theorem 16 (`TASK-TC-055R2` §2 & §3c, Finite Gaussian Observable Reconstruction and Weighted Cofactor Pointwise Square Expansion)**:
+    For every finite set of primes `P : Finset ℕ` (`∀ p ∈ P, p.Prime`), every `T : ℕ`, and every `X : ℝ` with `0 ≤ X`:
+    1. Smooth-outer reconstruction of `finiteQLambda T X`:
+       `Q_{λ,T}(X) = ∑_{m ≤ T, m ∈ S(P)} (λ(m) / √m) · Q_{λ,P,⌊T/m⌋}(X / m)`;
+    2. Regrouped coprime-outer `F_r(X)` reconstruction:
+       `Q_{λ,T}(X) = ∑_{1 ≤ r ≤ T, gcd(r, N_P) = 1} cofactorFiberF P T r X`,
+       where `cofactorFiberF P T r X = (λ(r) / √r) · Q_{λ,S(P),⌊T/r⌋}(X / r)`;
+    3. Exact pointwise weighted cofactor square decomposition (with `1 / r` diagonal weight and
+       `λ(r) λ(s) / √(r s)` ordered off-diagonal weight):
+       `Q_{λ,T}(X)^2 = (∑_{1 ≤ r ≤ T, gcd(r, N_P) = 1} (1 / r) · Q_{λ,S(P),⌊T/r⌋}(X / r)^2)`
+       `  + ∑_{1 ≤ r ≤ T, gcd(r, N_P) = 1} ∑_{s ∈ coprimeCutoffFinset P T \ {r}}`
+       `      (λ(r) λ(s) / √(r s)) · Q_{λ,S(P),⌊T/r⌋}(X / r) · Q_{λ,S(P),⌊T/s⌋}(X / s)`;
+    4. Degenerate conventions: `finiteQLambda 0 X = 0` and `finiteQLambdaCoprime ∅ T X = finiteQLambda T X`.
+    *(Note: Integrating identity (3) against `dX / X` over `[Y, τ Y]` yields `E_{λ,T}(Y) = E_{same-r} + E_{diff-r}`
+    by finite linearity of the Riemann/Bochner integral, derived analytically in the review.)* -/
+theorem finite_gaussian_observable_reconstruction_and_weighted_cofactor_square
+    {P : Finset ℕ} (hP : ∀ p ∈ P, p.Prime) (T : ℕ) {X : ℝ} (hX : 0 ≤ X) :
+    (finiteQLambda T X =
+      ∑ m ∈ smoothCutoffFinset P T,
+        ((liouvilleLambda m : ℝ) / Real.sqrt (m : ℝ)) *
+          finiteQLambdaCoprime P (T / m) (X / (m : ℝ))) ∧
+    (finiteQLambda T X =
+      ∑ r ∈ coprimeCutoffFinset P T, cofactorFiberF P T r X) ∧
+    ((finiteQLambda T X) ^ 2 =
+      (∑ r ∈ coprimeCutoffFinset P T,
+        (1 / (r : ℝ)) * (finiteQLambdaSmooth P (T / r) (X / (r : ℝ))) ^ 2) +
+      (∑ r ∈ coprimeCutoffFinset P T,
+        ∑ s ∈ (coprimeCutoffFinset P T).erase r,
+          ((liouvilleLambda r : ℝ) * (liouvilleLambda s : ℝ) / Real.sqrt ((r * s : ℕ) : ℝ)) *
+            finiteQLambdaSmooth P (T / r) (X / (r : ℝ)) *
+            finiteQLambdaSmooth P (T / s) (X / (s : ℝ)))) ∧
+    (finiteQLambda 0 X = 0 ∧ finiteQLambdaCoprime ∅ T X = finiteQLambda T X) := by
+  let w_gauss : ℕ → ℝ := fun n =>
+    X ^ (5 / 2 : ℝ) * (((n : ℝ) ^ 3)⁻¹ * Real.exp (-(X ^ 2) / (n : ℝ) ^ 2))
+  have h_fQ_eq : finiteQLambda T X = ∑ n ∈ Finset.Icc 1 T, (liouvilleLambda n : ℝ) * w_gauss n := by
+    dsimp [finiteQLambda, w_gauss]
+    rw [Finset.mul_sum]
+    apply Finset.sum_congr rfl
+    intro n _
+    ring
+  obtain ⟨h_sm_w, h_cop_w, _, _⟩ :=
+    finite_liouville_reindexed_sum_and_excess_cutoff_identity_nat hP T w_gauss
+  have h_part1 :
+      finiteQLambda T X =
+        ∑ m ∈ smoothCutoffFinset P T,
+          ((liouvilleLambda m : ℝ) / Real.sqrt (m : ℝ)) *
+            finiteQLambdaCoprime P (T / m) (X / (m : ℝ)) := by
+    rw [h_fQ_eq, h_sm_w]
+    apply Finset.sum_congr rfl
+    intro m hm
+    have hm_pos : 0 < m := ((Finset.mem_filter.mp hm).2).1
+    dsimp [finiteQLambdaCoprime]
+    rw [← mul_assoc, Finset.mul_sum]
+    apply Finset.sum_congr rfl
+    intro r _
+    have h_sc := gaussian_term_scaling_aux (b := r) hX hm_pos
+    dsimp [w_gauss]
+    calc
+      (liouvilleLambda m : ℝ) * (liouvilleLambda r : ℝ) *
+          (X ^ (5 / 2 : ℝ) * ((((m * r : ℕ) : ℝ) ^ 3)⁻¹ *
+            Real.exp (-(X ^ 2) / ((m * r : ℕ) : ℝ) ^ 2)))
+        = (liouvilleLambda m : ℝ) * (liouvilleLambda r : ℝ) *
+            (((1 : ℝ) / Real.sqrt (m : ℝ)) *
+              ((X / (m : ℝ)) ^ (5 / 2 : ℝ) *
+                (((r : ℝ) ^ 3)⁻¹ * Real.exp (-((X / (m : ℝ)) ^ 2) / (r : ℝ) ^ 2)))) := by
+            rw [← h_sc]
+      _ = (liouvilleLambda m : ℝ) / Real.sqrt (m : ℝ) *
+            (X / (m : ℝ)) ^ (5 / 2 : ℝ) *
+              ((liouvilleLambda r : ℝ) * ((r : ℝ) ^ 3)⁻¹ *
+                Real.exp (-((X / (m : ℝ)) ^ 2) / (r : ℝ) ^ 2)) := by ring
+  have h_part2 :
+      finiteQLambda T X = ∑ r ∈ coprimeCutoffFinset P T, cofactorFiberF P T r X := by
+    rw [h_fQ_eq, h_cop_w]
+    apply Finset.sum_congr rfl
+    intro r hr
+    have hr_mem := (Finset.mem_filter.mp hr).1
+    rw [Finset.mem_Icc] at hr_mem
+    have hr_pos : 0 < r := by omega
+    dsimp [cofactorFiberF, finiteQLambdaSmooth]
+    rw [← mul_assoc, Finset.mul_sum]
+    apply Finset.sum_congr rfl
+    intro m _
+    have h_sc := gaussian_term_scaling_aux (b := m) hX hr_pos
+    have h_mr_comm : m * r = r * m := mul_comm m r
+    dsimp [w_gauss]
+    calc
+      (liouvilleLambda r : ℝ) * (liouvilleLambda m : ℝ) *
+          (X ^ (5 / 2 : ℝ) * ((((m * r : ℕ) : ℝ) ^ 3)⁻¹ *
+            Real.exp (-(X ^ 2) / ((m * r : ℕ) : ℝ) ^ 2)))
+        = (liouvilleLambda r : ℝ) * (liouvilleLambda m : ℝ) *
+            (X ^ (5 / 2 : ℝ) * ((((r * m : ℕ) : ℝ) ^ 3)⁻¹ *
+              Real.exp (-(X ^ 2) / ((r * m : ℕ) : ℝ) ^ 2))) := by
+            rw [h_mr_comm]
+      _ = (liouvilleLambda r : ℝ) * (liouvilleLambda m : ℝ) *
+            (((1 : ℝ) / Real.sqrt (r : ℝ)) *
+              ((X / (r : ℝ)) ^ (5 / 2 : ℝ) *
+                (((m : ℝ) ^ 3)⁻¹ * Real.exp (-((X / (r : ℝ)) ^ 2) / (m : ℝ) ^ 2)))) := by
+            rw [← h_sc]
+      _ = (liouvilleLambda r : ℝ) / Real.sqrt (r : ℝ) *
+            (X / (r : ℝ)) ^ (5 / 2 : ℝ) *
+              ((liouvilleLambda m : ℝ) * ((m : ℝ) ^ 3)⁻¹ *
+                Real.exp (-((X / (r : ℝ)) ^ 2) / (m : ℝ) ^ 2)) := by ring
+  refine ⟨h_part1, h_part2, ?_, ?_⟩
+  · rw [h_part2, sq, Finset.sum_mul_sum]
+    have h_split :
+        (∑ r ∈ coprimeCutoffFinset P T, ∑ s ∈ coprimeCutoffFinset P T,
+            cofactorFiberF P T r X * cofactorFiberF P T s X) =
+          (∑ r ∈ coprimeCutoffFinset P T, cofactorFiberF P T r X * cofactorFiberF P T r X) +
+            ∑ r ∈ coprimeCutoffFinset P T, ∑ s ∈ (coprimeCutoffFinset P T).erase r,
+              cofactorFiberF P T r X * cofactorFiberF P T s X := by
+      rw [← Finset.sum_add_distrib]
+      apply Finset.sum_congr rfl
+      intro r hr
+      exact (Finset.add_sum_erase (coprimeCutoffFinset P T)
+        (fun s => cofactorFiberF P T r X * cofactorFiberF P T s X) hr).symm
+    rw [h_split]
+    congr 1
+    · apply Finset.sum_congr rfl
+      intro r hr
+      have hr_mem := (Finset.mem_filter.mp hr).1
+      rw [Finset.mem_Icc] at hr_mem
+      have hr_ne : r ≠ 0 := by omega
+      have hr_nonneg : (0 : ℝ) ≤ (r : ℝ) := Nat.cast_nonneg r
+      have h_lam_sq : ((liouvilleLambda r : ℝ)) ^ 2 = 1 := by
+        have h_int := liouvilleLambda_sq_aux hr_ne
+        have h_cast : (liouvilleLambda r : ℝ) * (liouvilleLambda r : ℝ) = 1 := by exact_mod_cast h_int
+        rw [sq, h_cast]
+      have h_sqrt_sq : (Real.sqrt (r : ℝ)) ^ 2 = (r : ℝ) := Real.sq_sqrt hr_nonneg
+      dsimp [cofactorFiberF]
+      calc
+        (liouvilleLambda r : ℝ) / Real.sqrt (r : ℝ) * finiteQLambdaSmooth P (T / r) (X / (r : ℝ)) *
+            ((liouvilleLambda r : ℝ) / Real.sqrt (r : ℝ) * finiteQLambdaSmooth P (T / r) (X / (r : ℝ)))
+          = (((liouvilleLambda r : ℝ)) ^ 2 / (Real.sqrt (r : ℝ)) ^ 2) *
+              (finiteQLambdaSmooth P (T / r) (X / (r : ℝ))) ^ 2 := by ring
+        _ = (1 / (r : ℝ)) * (finiteQLambdaSmooth P (T / r) (X / (r : ℝ))) ^ 2 := by
+              rw [h_lam_sq, h_sqrt_sq]
+    · apply Finset.sum_congr rfl
+      intro r _
+      apply Finset.sum_congr rfl
+      intro s _
+      have hr_nonneg : (0 : ℝ) ≤ (r : ℝ) := Nat.cast_nonneg r
+      have h_sqrt_mul : Real.sqrt ((r * s : ℕ) : ℝ) = Real.sqrt (r : ℝ) * Real.sqrt (s : ℝ) := by
+        push_cast
+        exact Real.sqrt_mul hr_nonneg (s : ℝ)
+      dsimp [cofactorFiberF]
+      rw [h_sqrt_mul]
+      ring
+  · constructor
+    · simp [finiteQLambda]
+    · have hc_empty : coprimeCutoffFinset ∅ T = Finset.Icc 1 T := by
+        ext r
+        simp [coprimeCutoffFinset, primeProductModulus]
+      simp [finiteQLambdaCoprime, finiteQLambda, hc_empty]
 
 end LiouvilleSquareDilation
 

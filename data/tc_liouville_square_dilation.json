@@ -4,6 +4,7 @@
   "closeout_task_id": "TASK-TC-054R2",
   "simultaneous_compatibility_task_id": "TASK-TC-055",
   "simultaneous_compatibility_repair_task_id": "TASK-TC-055R",
+  "simultaneous_compatibility_closeout_task_id": "TASK-TC-055R2",
   "parent_epic": "EPIC-TC-042",
   "prior_merged_main": "c82e439708b0b6031db6a77bf3977688d9f0758b",
   "tc053r2_implementation_commit": "cc303030138c670e8f01aaaab483bbeca6bc17d1",
@@ -18,7 +19,9 @@
   "tc055_initial_closeout_commit": "80d1c86408d39562b06b2c69d4b4f655a1677f82",
   "tc055_implementation_commit": "c44df1ebfd10b8010e216214229a420ce8f3b5c2",
   "tc055_reviewed_tip": "07db77cf0ee62aa42e5c87b28a89a8f98eb3271e",
-  "branch": "task/tc-055r-pairing-bound-operator-norm-and-finite-energy-repair",
+  "tc055r_implementation_commit": "35b55405708ae7480263afc93e422b5626b1e134",
+  "tc055r_reviewed_tip": "c6a685542c2dd584293b463272c4d95152907b3e",
+  "branch": "task/tc-055r2-weighted-energy-finite-reconstruction-and-closeout",
   "subgate_tc043a_status": "OPEN",
   "rh_proved": false,
   "precision_bits": 256,
@@ -5136,7 +5139,7 @@
   "section_7_lean_formalization_audit": {
     "module_path": "formal/RiemannScope/LiouvilleSquareDilation.lean",
     "namespace": "RiemannScope.LiouvilleSquareDilation",
-    "definition_count": 21,
+    "definition_count": 33,
     "definitions": [
       "primePowerMoebius",
       "liouvilleSignFromOmega",
@@ -5158,9 +5161,21 @@
       "primeParityControlArith",
       "actualPrimeExclusionSieveSum",
       "muSqTimesLambdaArith",
-      "kernelPointwiseIntegrand"
+      "kernelPointwiseIntegrand",
+      "primeProductModulus",
+      "isPSmooth",
+      "pSmoothPart",
+      "pCoprimePart",
+      "smoothCutoffFinset",
+      "coprimeCutoffFinset",
+      "smoothCoprimePairsUpTo",
+      "excessCoprimeFinset",
+      "finiteQLambda",
+      "finiteQLambdaCoprime",
+      "finiteQLambdaSmooth",
+      "cofactorFiberF"
     ],
-    "public_theorem_count": 12,
+    "public_theorem_count": 16,
     "public_theorems": [
       "liouville_complete_multiplicativity_and_common_factor_cancellation_nat",
       "prime_power_square_divisor_moebius_liouville_inversion_nat",
@@ -5173,9 +5188,13 @@
       "actual_finite_prime_exclusion_sieve_identity_nat",
       "prime_parity_control_multiplicative_and_moebius_separation_nat",
       "near_diagonal_kernel_bound_and_opposite_parity_dilation_pairing",
-      "pairing_counterexample_replacement_and_finite_reconstruction_tc055r"
+      "pairing_counterexample_replacement_and_finite_reconstruction_tc055r",
+      "smooth_coprime_positive_factorization_exists_unique_nat",
+      "finite_smooth_coprime_cutoff_indexing_bijection_nat",
+      "finite_liouville_reindexed_sum_and_excess_cutoff_identity_nat",
+      "finite_gaussian_observable_reconstruction_and_weighted_cofactor_square"
     ],
-    "private_helper_theorem_count": 16,
+    "private_helper_theorem_count": 27,
     "private_helper_theorems": [
       "finRangeSum_primePowerMoebius_tail_eq_two",
       "cardFactors_prime_pow_aux",
@@ -5192,10 +5211,21 @@
       "liouvilleLambda_mul_aux",
       "liouvilleLambda_sq_aux",
       "liouvilleLambda_div_of_dvd_aux",
-      "moebius_sq_mul_liouvilleLambda_eq_moebius_aux"
+      "moebius_sq_mul_liouvilleLambda_eq_moebius_aux",
+      "pSmoothPart_mul_pCoprimePart_aux",
+      "prime_dvd_finset_prod_aux",
+      "isPSmooth_pSmoothPart_aux",
+      "prime_dvd_pCoprimePart_not_mem_aux",
+      "coprime_pCoprimePart_aux",
+      "coprime_of_isPSmooth_of_coprime_modulus_aux",
+      "mem_smoothCoprimePairsUpTo_iff_aux",
+      "isPSmooth_empty_iff_aux",
+      "sum_Icc_eq_smooth_outer_coprime_inner_aux",
+      "sum_Icc_eq_coprime_outer_smooth_inner_aux",
+      "gaussian_term_scaling_aux"
     ],
-    "total_theorem_count": 28,
-    "total_declaration_count": 49,
+    "total_theorem_count": 43,
+    "total_declaration_count": 76,
     "expected_public_theorems_present": true,
     "sorry_count": 0,
     "custom_axiom_count": 0,
@@ -5255,6 +5285,22 @@
         "pairing_counterexample_replacement_and_finite_reconstruction_tc055r": {
           "captured_check_output": "pairing_counterexample_replacement_and_finite_reconstruction_tc055r : \u2200 (g w : \u2115 \u2192 \u211d) (X4 K_10 K_11 K_a K_b L_low L_high T_real tau5 Y5 v_full v_T : \u211d) (a b m r T : \u2115), 0 \u2264 X4 \u2192 0 < K_11 \u2192 K_10 < 1331 / 2890 * K_11 \u2192 0 \u2264 K_b \u2192 L_low * K_b \u2264 K_a \u2192 K_a \u2264 L_high * K_b \u2192 0 < m \u2192 r \u2260 0 \u2192 T_real \u2260 0 \u2192 (kernelPointwiseIntegrand g X4 a a + kernelPointwiseIntegrand g X4 b b - 2 * kernelPointwiseIntegrand g X4 a b = X4 * (g a - g b) ^ 2 \u2227 2 * kernelPointwiseIntegrand g X4 a b \u2264 kernelPointwiseIntegrand g X4 a a + kernelPointwiseIntegrand g X4 b b) \u2227 (3 * ((11 - 10) / 10) * (11 / 10) ^ 3 = 3993 / 10000 \u2227 33 ^ 2 * (1 / 10 ^ 2 - 1 / 11 ^ 2) = 189 / 100 \u2227 1 + 189 / 100 = 2890 / 1000 \u2227 1 - 1331 / 2890 = 1559 / 2890 \u2227 3993 / 10000 < 1559 / 2890 \u2227 3993 / 10000 * K_11 < K_11 - K_10) \u2227 |K_a - K_b| \u2264 max |L_low - 1| |L_high - 1| * K_b \u2227 (1 / (2 * (29 / 10) ^ 2) = 50 / 841 \u2227 1 / (2 * (29 / 10) ^ 2) < 1 / 3 ^ 3 + 1 / 4 ^ 3 + 1 / 5 ^ 3 \u2227 1 / 3 ^ 3 + 1 / 4 ^ 3 + 1 / 5 ^ 3 < 1 / (2 * 2 ^ 2) \u2227 2 * (3 / 2) ^ 3 = 27 / 4 \u2227 27 / 4 < 3 ^ 3 \u2227 (3 - 1) / (3 + 1) * ((5 - 1) / (5 + 1)) * ((7 - 1) / (7 + 1)) = 1 / 4 \u2227 1 / 2 * (1 / 4) = 1 / 8 \u2227 (1 / 8) ^ 2 = 1 / 64) \u2227 (m * r \u2264 T \u2194 r \u2264 T / m) \u2227 \u2191(liouvilleLambda (m * r)) * w (m * r) = \u2191(liouvilleLambda m) * (\u2191(liouvilleLambda r) * w (m * r)) \u2227 (1 / (2 * T_real ^ 2)) ^ 2 * ((tau5 - 1) * Y5 / 5) = (tau5 - 1) * Y5 / (20 * T_real ^ 4) \u2227 v_full ^ 2 \u2264 2 * v_T ^ 2 + 2 * (v_full - v_T) ^ 2 \u2227 v_T ^ 2 \u2264 2 * v_full ^ 2 + 2 * (v_full - v_T) ^ 2",
           "captured_print_axioms_output": "'RiemannScope.LiouvilleSquareDilation.pairing_counterexample_replacement_and_finite_reconstruction_tc055r' depends on axioms: [propext, Classical.choice, Quot.sound]"
+        },
+        "smooth_coprime_positive_factorization_exists_unique_nat": {
+          "captured_check_output": "@smooth_coprime_positive_factorization_exists_unique_nat : \u2200 {P : Finset \u2115}, (\u2200 p \u2208 P, p.Prime) \u2192 \u2200 {n : \u2115}, 0 < n \u2192 (pSmoothPart P n * pCoprimePart P n = n \u2227 isPSmooth P (pSmoothPart P n) \u2227 (pCoprimePart P n).Coprime (primeProductModulus P) \u2227 0 < pCoprimePart P n) \u2227 (\u2200 (m r : \u2115), m * r = n \u2192 isPSmooth P m \u2192 r.Coprime (primeProductModulus P) \u2192 m = pSmoothPart P n \u2227 r = pCoprimePart P n) \u2227 \u2203! mr, mr.1 * mr.2 = n \u2227 isPSmooth P mr.1 \u2227 mr.2.Coprime (primeProductModulus P)",
+          "captured_print_axioms_output": "'RiemannScope.LiouvilleSquareDilation.smooth_coprime_positive_factorization_exists_unique_nat' depends on axioms: [propext, Quot.sound, Classical.choice]"
+        },
+        "finite_smooth_coprime_cutoff_indexing_bijection_nat": {
+          "captured_check_output": "@finite_smooth_coprime_cutoff_indexing_bijection_nat : \u2200 {P : Finset \u2115}, (\u2200 p \u2208 P, p.Prime) \u2192 \u2200 (T : \u2115), ((\u2200 {m r : \u2115}, 0 < m \u2192 (m * r \u2264 T \u2194 r \u2264 T / m)) \u2227 Finset.filter (fun m => isPSmooth P m) (Finset.range (T + 1)) = smoothCutoffFinset P T) \u2227 ((\u2200 (m r : \u2115), (m, r) \u2208 smoothCoprimePairsUpTo P T \u2194 isPSmooth P m \u2227 r.Coprime (primeProductModulus P) \u2227 1 \u2264 m * r \u2227 m * r \u2264 T) \u2227 (\u2200 n \u2208 Finset.Icc 1 T, (pSmoothPart P n, pCoprimePart P n) \u2208 smoothCoprimePairsUpTo P T \u2227 pSmoothPart P n * pCoprimePart P n = n) \u2227 (\u2200 mr \u2208 smoothCoprimePairsUpTo P T, mr.1 * mr.2 \u2208 Finset.Icc 1 T \u2227 (pSmoothPart P (mr.1 * mr.2), pCoprimePart P (mr.1 * mr.2)) = mr) \u2227 (smoothCoprimePairsUpTo P T).card = (Finset.Icc 1 T).card) \u2227 (smoothCutoffFinset P 0 = \u2205 \u2227 coprimeCutoffFinset P 0 = \u2205 \u2227 smoothCoprimePairsUpTo P 0 = \u2205) \u2227 (smoothCutoffFinset P 1 = {1} \u2227 coprimeCutoffFinset P 1 = {1} \u2227 smoothCoprimePairsUpTo P 1 = {(1, 1)}) \u2227 primeProductModulus \u2205 = 1 \u2227 coprimeCutoffFinset \u2205 T = Finset.Icc 1 T \u2227 smoothCutoffFinset \u2205 T = if 1 \u2264 T then {1} else \u2205",
+          "captured_print_axioms_output": "'RiemannScope.LiouvilleSquareDilation.finite_smooth_coprime_cutoff_indexing_bijection_nat' depends on axioms: [propext, Quot.sound, Classical.choice]"
+        },
+        "finite_liouville_reindexed_sum_and_excess_cutoff_identity_nat": {
+          "captured_check_output": "@finite_liouville_reindexed_sum_and_excess_cutoff_identity_nat : \u2200 {P : Finset \u2115}, (\u2200 p \u2208 P, p.Prime) \u2192 \u2200 (T : \u2115) (w : \u2115 \u2192 \u211d), \u2211 n \u2208 Finset.Icc 1 T, \u2191(liouvilleLambda n) * w n = \u2211 m \u2208 smoothCutoffFinset P T, \u2211 r \u2208 coprimeCutoffFinset P (T / m), \u2191(liouvilleLambda m) * \u2191(liouvilleLambda r) * w (m * r) \u2227 \u2211 n \u2208 Finset.Icc 1 T, \u2191(liouvilleLambda n) * w n = \u2211 r \u2208 coprimeCutoffFinset P T, \u2211 m \u2208 smoothCutoffFinset P (T / r), \u2191(liouvilleLambda r) * \u2191(liouvilleLambda m) * w (m * r) \u2227 \u2211 m \u2208 smoothCutoffFinset P T, \u2211 r \u2208 coprimeCutoffFinset P T, \u2191(liouvilleLambda m) * \u2191(liouvilleLambda r) * w (m * r) - \u2211 n \u2208 Finset.Icc 1 T, \u2191(liouvilleLambda n) * w n = \u2211 m \u2208 smoothCutoffFinset P T, \u2211 r \u2208 excessCoprimeFinset P m T, \u2191(liouvilleLambda m) * \u2191(liouvilleLambda r) * w (m * r) \u2227 \u2211 m \u2208 smoothCutoffFinset \u2205 T, \u2211 r \u2208 excessCoprimeFinset \u2205 m T, \u2191(liouvilleLambda m) * \u2191(liouvilleLambda r) * w (m * r) = 0 \u2227 (T \u2264 1 \u2192 \u2211 m \u2208 smoothCutoffFinset P T, \u2211 r \u2208 excessCoprimeFinset P m T, \u2191(liouvilleLambda m) * \u2191(liouvilleLambda r) * w (m * r) = 0) \u2227 \u2211 m \u2208 smoothCutoffFinset {2} 2, \u2211 r \u2208 excessCoprimeFinset {2} m 2, \u2191(liouvilleLambda m) * \u2191(liouvilleLambda r) * w (m * r) = 0 \u2227 \u2211 m \u2208 smoothCutoffFinset {2} 3, \u2211 r \u2208 excessCoprimeFinset {2} m 3, \u2191(liouvilleLambda m) * \u2191(liouvilleLambda r) * w (m * r) = w 6",
+          "captured_print_axioms_output": "'RiemannScope.LiouvilleSquareDilation.finite_liouville_reindexed_sum_and_excess_cutoff_identity_nat' depends on axioms: [propext, Quot.sound, Classical.choice]"
+        },
+        "finite_gaussian_observable_reconstruction_and_weighted_cofactor_square": {
+          "captured_check_output": "@finite_gaussian_observable_reconstruction_and_weighted_cofactor_square : \u2200 {P : Finset \u2115}, (\u2200 p \u2208 P, p.Prime) \u2192 \u2200 (T : \u2115) {X : \u211d}, 0 \u2264 X \u2192 finiteQLambda T X = \u2211 m \u2208 smoothCutoffFinset P T, \u2191(liouvilleLambda m) / \u221a\u2191m * finiteQLambdaCoprime P (T / m) (X / \u2191m) \u2227 finiteQLambda T X = \u2211 r \u2208 coprimeCutoffFinset P T, cofactorFiberF P T r X \u2227 finiteQLambda T X ^ 2 = \u2211 r \u2208 coprimeCutoffFinset P T, 1 / \u2191r * finiteQLambdaSmooth P (T / r) (X / \u2191r) ^ 2 + \u2211 r \u2208 coprimeCutoffFinset P T, \u2211 s \u2208 (coprimeCutoffFinset P T).erase r, \u2191(liouvilleLambda r) * \u2191(liouvilleLambda s) / \u221a\u2191(r * s) * finiteQLambdaSmooth P (T / r) (X / \u2191r) * finiteQLambdaSmooth P (T / s) (X / \u2191s) \u2227 finiteQLambda 0 X = 0 \u2227 finiteQLambdaCoprime \u2205 T X = finiteQLambda T X",
+          "captured_print_axioms_output": "'RiemannScope.LiouvilleSquareDilation.finite_gaussian_observable_reconstruction_and_weighted_cofactor_square' depends on axioms: [propext, Quot.sound, Classical.choice]"
         }
       }
     },
@@ -5360,12 +5406,48 @@
       },
       "pairing_counterexample_replacement_and_finite_reconstruction_tc055r": {
         "declaration_name": "RiemannScope.LiouvilleSquareDilation.pairing_counterexample_replacement_and_finite_reconstruction_tc055r",
-        "theorem_classification": "pointwise_kernel_amgm_counterexample_ratio_enclosure_and_finite_reconstruction_theorem",
+        "theorem_classification": "pointwise_kernel_amgm_counterexample_ratio_enclosure_and_scalar_truncation_algebra_theorem",
         "captured_check_output": "pairing_counterexample_replacement_and_finite_reconstruction_tc055r : \u2200 (g w : \u2115 \u2192 \u211d) (X4 K_10 K_11 K_a K_b L_low L_high T_real tau5 Y5 v_full v_T : \u211d) (a b m r T : \u2115), 0 \u2264 X4 \u2192 0 < K_11 \u2192 K_10 < 1331 / 2890 * K_11 \u2192 0 \u2264 K_b \u2192 L_low * K_b \u2264 K_a \u2192 K_a \u2264 L_high * K_b \u2192 0 < m \u2192 r \u2260 0 \u2192 T_real \u2260 0 \u2192 (kernelPointwiseIntegrand g X4 a a + kernelPointwiseIntegrand g X4 b b - 2 * kernelPointwiseIntegrand g X4 a b = X4 * (g a - g b) ^ 2 \u2227 2 * kernelPointwiseIntegrand g X4 a b \u2264 kernelPointwiseIntegrand g X4 a a + kernelPointwiseIntegrand g X4 b b) \u2227 (3 * ((11 - 10) / 10) * (11 / 10) ^ 3 = 3993 / 10000 \u2227 33 ^ 2 * (1 / 10 ^ 2 - 1 / 11 ^ 2) = 189 / 100 \u2227 1 + 189 / 100 = 2890 / 1000 \u2227 1 - 1331 / 2890 = 1559 / 2890 \u2227 3993 / 10000 < 1559 / 2890 \u2227 3993 / 10000 * K_11 < K_11 - K_10) \u2227 |K_a - K_b| \u2264 max |L_low - 1| |L_high - 1| * K_b \u2227 (1 / (2 * (29 / 10) ^ 2) = 50 / 841 \u2227 1 / (2 * (29 / 10) ^ 2) < 1 / 3 ^ 3 + 1 / 4 ^ 3 + 1 / 5 ^ 3 \u2227 1 / 3 ^ 3 + 1 / 4 ^ 3 + 1 / 5 ^ 3 < 1 / (2 * 2 ^ 2) \u2227 2 * (3 / 2) ^ 3 = 27 / 4 \u2227 27 / 4 < 3 ^ 3 \u2227 (3 - 1) / (3 + 1) * ((5 - 1) / (5 + 1)) * ((7 - 1) / (7 + 1)) = 1 / 4 \u2227 1 / 2 * (1 / 4) = 1 / 8 \u2227 (1 / 8) ^ 2 = 1 / 64) \u2227 (m * r \u2264 T \u2194 r \u2264 T / m) \u2227 \u2191(liouvilleLambda (m * r)) * w (m * r) = \u2191(liouvilleLambda m) * (\u2191(liouvilleLambda r) * w (m * r)) \u2227 (1 / (2 * T_real ^ 2)) ^ 2 * ((tau5 - 1) * Y5 / 5) = (tau5 - 1) * Y5 / (20 * T_real ^ 4) \u2227 v_full ^ 2 \u2264 2 * v_T ^ 2 + 2 * (v_full - v_T) ^ 2 \u2227 v_T ^ 2 \u2264 2 * v_full ^ 2 + 2 * (v_full - v_T) ^ 2",
         "captured_print_axioms_output": "'RiemannScope.LiouvilleSquareDilation.pairing_counterexample_replacement_and_finite_reconstruction_tc055r' depends on axioms: [propext, Classical.choice, Quot.sound]",
         "check_signature": "pairing_counterexample_replacement_and_finite_reconstruction_tc055r : \u2200 (g w : \u2115 \u2192 \u211d) (X4 K_10 K_11 K_a K_b L_low L_high T_real tau5 Y5 v_full v_T : \u211d) (a b m r T : \u2115), 0 \u2264 X4 \u2192 0 < K_11 \u2192 K_10 < 1331 / 2890 * K_11 \u2192 0 \u2264 K_b \u2192 L_low * K_b \u2264 K_a \u2192 K_a \u2264 L_high * K_b \u2192 0 < m \u2192 r \u2260 0 \u2192 T_real \u2260 0 \u2192 (kernelPointwiseIntegrand g X4 a a + kernelPointwiseIntegrand g X4 b b - 2 * kernelPointwiseIntegrand g X4 a b = X4 * (g a - g b) ^ 2 \u2227 2 * kernelPointwiseIntegrand g X4 a b \u2264 kernelPointwiseIntegrand g X4 a a + kernelPointwiseIntegrand g X4 b b) \u2227 (3 * ((11 - 10) / 10) * (11 / 10) ^ 3 = 3993 / 10000 \u2227 33 ^ 2 * (1 / 10 ^ 2 - 1 / 11 ^ 2) = 189 / 100 \u2227 1 + 189 / 100 = 2890 / 1000 \u2227 1 - 1331 / 2890 = 1559 / 2890 \u2227 3993 / 10000 < 1559 / 2890 \u2227 3993 / 10000 * K_11 < K_11 - K_10) \u2227 |K_a - K_b| \u2264 max |L_low - 1| |L_high - 1| * K_b \u2227 (1 / (2 * (29 / 10) ^ 2) = 50 / 841 \u2227 1 / (2 * (29 / 10) ^ 2) < 1 / 3 ^ 3 + 1 / 4 ^ 3 + 1 / 5 ^ 3 \u2227 1 / 3 ^ 3 + 1 / 4 ^ 3 + 1 / 5 ^ 3 < 1 / (2 * 2 ^ 2) \u2227 2 * (3 / 2) ^ 3 = 27 / 4 \u2227 27 / 4 < 3 ^ 3 \u2227 (3 - 1) / (3 + 1) * ((5 - 1) / (5 + 1)) * ((7 - 1) / (7 + 1)) = 1 / 4 \u2227 1 / 2 * (1 / 4) = 1 / 8 \u2227 (1 / 8) ^ 2 = 1 / 64) \u2227 (m * r \u2264 T \u2194 r \u2264 T / m) \u2227 \u2191(liouvilleLambda (m * r)) * w (m * r) = \u2191(liouvilleLambda m) * (\u2191(liouvilleLambda r) * w (m * r)) \u2227 (1 / (2 * T_real ^ 2)) ^ 2 * ((tau5 - 1) * Y5 / 5) = (tau5 - 1) * Y5 / (20 * T_real ^ 4) \u2227 v_full ^ 2 \u2264 2 * v_T ^ 2 + 2 * (v_full - v_T) ^ 2 \u2227 v_T ^ 2 \u2264 2 * v_full ^ 2 + 2 * (v_full - v_T) ^ 2",
         "print_axioms": "'RiemannScope.LiouvilleSquareDilation.pairing_counterexample_replacement_and_finite_reconstruction_tc055r' depends on axioms: [propext, Classical.choice, Quot.sound]",
-        "descriptive_scope_metadata_note": "Proves (`TASK-TC-055R`): (1) unconditional pointwise factorized kernel integrand AM-GM identity and inequality `kernelPointwiseIntegrand g X4 a a + kernelPointwiseIntegrand g X4 b b - 2 * kernelPointwiseIntegrand g X4 a b = X4 * (g a - g b)^2 >= 0` for `X4 >= 0` (discharging `hK` pointwise on the integrand), (2) exact arithmetic counterexample comparison refuting retired TC-055 Lemma 6.1 at `(Y, p, q, r, m, n) = (33, 11, 2, 5, 1, 11)`: `3 * ((11 - 10)/10) * (11/10)^3 = 3993/10000 < 1559/2890 = 1 - 1331/2890` and `(3993/10000) * K_11 < K_11 - K_10` whenever `0 < K_11` and `K_10 < (1331/2890) * K_11`, (3) valid replacement two-sided kernel ratio enclosure implication `|K_a - K_b| <= max |L_low - 1| |L_high - 1| * K_b` from `L_low * K_b <= K_a <= L_high * K_b` (`0 <= K_b`), (4) non-integer cutoff counterexample at `u = 2.9` (`1 / (2 * (29/10)^2) = 50/841 < 1/3^3 + 1/4^3 + 1/5^3 < 1 / (2 * 2^2) = 1/8`), repaired unimodal constant square `2 * (3/2)^3 = 27/4 < 3^3`, and `S = {3, 5, 7}` control product `(2/4)*(4/6)*(6/8) = 1/4`, `(1/2)*(1/4) = 1/8`, `(1/8)^2 = 1/64`, and (5) finite `T`-truncation / `m`-dependent inner-cutoff `m * r <= T <-> r <= T / m` (`0 < m`), `\u03bb(m * r) * w(m * r) = \u03bb(m) * (\u03bb(r) * w(m * r))`, tail energy algebra `(1 / (2 * T^2))^2 * ((tau5 - 1) * Y5 / 5) = (tau5 - 1) * Y5 / (20 * T^4)`, and quadratic L^2 transfer `v_full^2 <= 2 * v_T^2 + 2 * (v_full - v_T)^2`."
+        "descriptive_scope_metadata_note": "Proves (`TASK-TC-055R`, scoped to cutoff arithmetic, termwise multiplicativity, and scalar inequalities; see Theorems 13-16 below for the full smooth/coprime factorization bijection and finite-sum reconstruction): (1) unconditional pointwise factorized kernel integrand AM-GM identity and inequality `kernelPointwiseIntegrand g X4 a a + kernelPointwiseIntegrand g X4 b b - 2 * kernelPointwiseIntegrand g X4 a b = X4 * (g a - g b)^2 >= 0` for `X4 >= 0`, (2) exact arithmetic counterexample comparison refuting retired TC-055 Lemma 6.1 at `(Y, p, q, r, m, n) = (33, 11, 2, 5, 1, 11)` (conditional on `0 < K_11` and `K_10 < (1331/2890) * K_11`), (3) valid replacement two-sided kernel ratio enclosure implication `|K_a - K_b| <= max |L_low - 1| |L_high - 1| * K_b` (conditional on `0 <= K_b` and `L_low * K_b <= K_a <= L_high * K_b`), (4) non-integer cutoff counterexample at `u = 2.9` (`50/841 < 1/3^3 + 1/4^3 + 1/5^3 < 1/8`), repaired unimodal constant square `2 * (3/2)^3 = 27/4 < 3^3`, and `S = {3, 5, 7}` scalar product `(2/4)*(4/6)*(6/8) = 1/4`, and (5) pointwise cutoff equivalence `m * r <= T <-> r <= T / m` (`0 < m`), termwise Liouville multiplicativity `\u03bb(m * r) * w(m * r) = \u03bb(m) * (\u03bb(r) * w(m * r))`, scalar tail energy algebra, and two-sided scalar quadratic L^2 transfer `v_full^2 <= 2 * v_T^2 + 2 * (v_full - v_T)^2 \u2227 v_T^2 <= 2 * v_full^2 + 2 * (v_full - v_T)^2`."
+      },
+      "smooth_coprime_positive_factorization_exists_unique_nat": {
+        "declaration_name": "RiemannScope.LiouvilleSquareDilation.smooth_coprime_positive_factorization_exists_unique_nat",
+        "theorem_classification": "actual_positive_integer_smooth_coprime_factorization_theorem",
+        "captured_check_output": "@smooth_coprime_positive_factorization_exists_unique_nat : \u2200 {P : Finset \u2115}, (\u2200 p \u2208 P, p.Prime) \u2192 \u2200 {n : \u2115}, 0 < n \u2192 (pSmoothPart P n * pCoprimePart P n = n \u2227 isPSmooth P (pSmoothPart P n) \u2227 (pCoprimePart P n).Coprime (primeProductModulus P) \u2227 0 < pCoprimePart P n) \u2227 (\u2200 (m r : \u2115), m * r = n \u2192 isPSmooth P m \u2192 r.Coprime (primeProductModulus P) \u2192 m = pSmoothPart P n \u2227 r = pCoprimePart P n) \u2227 \u2203! mr, mr.1 * mr.2 = n \u2227 isPSmooth P mr.1 \u2227 mr.2.Coprime (primeProductModulus P)",
+        "captured_print_axioms_output": "'RiemannScope.LiouvilleSquareDilation.smooth_coprime_positive_factorization_exists_unique_nat' depends on axioms: [propext, Quot.sound, Classical.choice]",
+        "check_signature": "@smooth_coprime_positive_factorization_exists_unique_nat : \u2200 {P : Finset \u2115}, (\u2200 p \u2208 P, p.Prime) \u2192 \u2200 {n : \u2115}, 0 < n \u2192 (pSmoothPart P n * pCoprimePart P n = n \u2227 isPSmooth P (pSmoothPart P n) \u2227 (pCoprimePart P n).Coprime (primeProductModulus P) \u2227 0 < pCoprimePart P n) \u2227 (\u2200 (m r : \u2115), m * r = n \u2192 isPSmooth P m \u2192 r.Coprime (primeProductModulus P) \u2192 m = pSmoothPart P n \u2227 r = pCoprimePart P n) \u2227 \u2203! mr, mr.1 * mr.2 = n \u2227 isPSmooth P mr.1 \u2227 mr.2.Coprime (primeProductModulus P)",
+        "print_axioms": "'RiemannScope.LiouvilleSquareDilation.smooth_coprime_positive_factorization_exists_unique_nat' depends on axioms: [propext, Quot.sound, Classical.choice]",
+        "descriptive_scope_metadata_note": "Unconditional arithmetic theorem (`TASK-TC-055R2` \u00a73a) over `\u2115` for any finite prime set `P : Finset \u2115` (`\u2200 p \u2208 P, p.Prime`, including `P = \u2205`) and `n > 0`: proves `pSmoothPart P n * pCoprimePart P n = n`, `isPSmooth P (pSmoothPart P n)`, `Nat.Coprime (pCoprimePart P n) (primeProductModulus P)`, `0 < pCoprimePart P n`, and `\u2203! mr : \u2115 \u00d7 \u2115, mr.1 * mr.2 = n \u2227 isPSmooth P mr.1 \u2227 Nat.Coprime mr.2 (primeProductModulus P)` without assuming factorization as a hypothesis."
+      },
+      "finite_smooth_coprime_cutoff_indexing_bijection_nat": {
+        "declaration_name": "RiemannScope.LiouvilleSquareDilation.finite_smooth_coprime_cutoff_indexing_bijection_nat",
+        "theorem_classification": "actual_finite_cutoff_indexing_bijection_and_boundary_theorem",
+        "captured_check_output": "@finite_smooth_coprime_cutoff_indexing_bijection_nat : \u2200 {P : Finset \u2115}, (\u2200 p \u2208 P, p.Prime) \u2192 \u2200 (T : \u2115), ((\u2200 {m r : \u2115}, 0 < m \u2192 (m * r \u2264 T \u2194 r \u2264 T / m)) \u2227 Finset.filter (fun m => isPSmooth P m) (Finset.range (T + 1)) = smoothCutoffFinset P T) \u2227 ((\u2200 (m r : \u2115), (m, r) \u2208 smoothCoprimePairsUpTo P T \u2194 isPSmooth P m \u2227 r.Coprime (primeProductModulus P) \u2227 1 \u2264 m * r \u2227 m * r \u2264 T) \u2227 (\u2200 n \u2208 Finset.Icc 1 T, (pSmoothPart P n, pCoprimePart P n) \u2208 smoothCoprimePairsUpTo P T \u2227 pSmoothPart P n * pCoprimePart P n = n) \u2227 (\u2200 mr \u2208 smoothCoprimePairsUpTo P T, mr.1 * mr.2 \u2208 Finset.Icc 1 T \u2227 (pSmoothPart P (mr.1 * mr.2), pCoprimePart P (mr.1 * mr.2)) = mr) \u2227 (smoothCoprimePairsUpTo P T).card = (Finset.Icc 1 T).card) \u2227 (smoothCutoffFinset P 0 = \u2205 \u2227 coprimeCutoffFinset P 0 = \u2205 \u2227 smoothCoprimePairsUpTo P 0 = \u2205) \u2227 (smoothCutoffFinset P 1 = {1} \u2227 coprimeCutoffFinset P 1 = {1} \u2227 smoothCoprimePairsUpTo P 1 = {(1, 1)}) \u2227 primeProductModulus \u2205 = 1 \u2227 coprimeCutoffFinset \u2205 T = Finset.Icc 1 T \u2227 smoothCutoffFinset \u2205 T = if 1 \u2264 T then {1} else \u2205",
+        "captured_print_axioms_output": "'RiemannScope.LiouvilleSquareDilation.finite_smooth_coprime_cutoff_indexing_bijection_nat' depends on axioms: [propext, Quot.sound, Classical.choice]",
+        "check_signature": "@finite_smooth_coprime_cutoff_indexing_bijection_nat : \u2200 {P : Finset \u2115}, (\u2200 p \u2208 P, p.Prime) \u2192 \u2200 (T : \u2115), ((\u2200 {m r : \u2115}, 0 < m \u2192 (m * r \u2264 T \u2194 r \u2264 T / m)) \u2227 Finset.filter (fun m => isPSmooth P m) (Finset.range (T + 1)) = smoothCutoffFinset P T) \u2227 ((\u2200 (m r : \u2115), (m, r) \u2208 smoothCoprimePairsUpTo P T \u2194 isPSmooth P m \u2227 r.Coprime (primeProductModulus P) \u2227 1 \u2264 m * r \u2227 m * r \u2264 T) \u2227 (\u2200 n \u2208 Finset.Icc 1 T, (pSmoothPart P n, pCoprimePart P n) \u2208 smoothCoprimePairsUpTo P T \u2227 pSmoothPart P n * pCoprimePart P n = n) \u2227 (\u2200 mr \u2208 smoothCoprimePairsUpTo P T, mr.1 * mr.2 \u2208 Finset.Icc 1 T \u2227 (pSmoothPart P (mr.1 * mr.2), pCoprimePart P (mr.1 * mr.2)) = mr) \u2227 (smoothCoprimePairsUpTo P T).card = (Finset.Icc 1 T).card) \u2227 (smoothCutoffFinset P 0 = \u2205 \u2227 coprimeCutoffFinset P 0 = \u2205 \u2227 smoothCoprimePairsUpTo P 0 = \u2205) \u2227 (smoothCutoffFinset P 1 = {1} \u2227 coprimeCutoffFinset P 1 = {1} \u2227 smoothCoprimePairsUpTo P 1 = {(1, 1)}) \u2227 primeProductModulus \u2205 = 1 \u2227 coprimeCutoffFinset \u2205 T = Finset.Icc 1 T \u2227 smoothCutoffFinset \u2205 T = if 1 \u2264 T then {1} else \u2205",
+        "print_axioms": "'RiemannScope.LiouvilleSquareDilation.finite_smooth_coprime_cutoff_indexing_bijection_nat' depends on axioms: [propext, Quot.sound, Classical.choice]",
+        "descriptive_scope_metadata_note": "Unconditional finite indexing bijection (`TASK-TC-055R2` \u00a73b) for `1 \u2264 n \u2264 T` (`T : \u2115`, `\u2200 p \u2208 P, p.Prime`): proves `m * r \u2264 T \u2194 r \u2264 T / m` (`0 < m`), characterizes membership in `smoothCoprimePairsUpTo P T`, establishes mutual two-sided inverse maps `n \u21a6 (pSmoothPart P n, pCoprimePart P n)` and `(m, r) \u21a6 m * r` between `Finset.Icc 1 T` and `smoothCoprimePairsUpTo P T` with equal cardinalities, and evaluates boundary/degenerate cases `T = 0`, `T = 1`, and `P = \u2205`."
+      },
+      "finite_liouville_reindexed_sum_and_excess_cutoff_identity_nat": {
+        "declaration_name": "RiemannScope.LiouvilleSquareDilation.finite_liouville_reindexed_sum_and_excess_cutoff_identity_nat",
+        "theorem_classification": "actual_reindexed_finite_liouville_sum_and_uncoupled_excess_theorem",
+        "captured_check_output": "@finite_liouville_reindexed_sum_and_excess_cutoff_identity_nat : \u2200 {P : Finset \u2115}, (\u2200 p \u2208 P, p.Prime) \u2192 \u2200 (T : \u2115) (w : \u2115 \u2192 \u211d), \u2211 n \u2208 Finset.Icc 1 T, \u2191(liouvilleLambda n) * w n = \u2211 m \u2208 smoothCutoffFinset P T, \u2211 r \u2208 coprimeCutoffFinset P (T / m), \u2191(liouvilleLambda m) * \u2191(liouvilleLambda r) * w (m * r) \u2227 \u2211 n \u2208 Finset.Icc 1 T, \u2191(liouvilleLambda n) * w n = \u2211 r \u2208 coprimeCutoffFinset P T, \u2211 m \u2208 smoothCutoffFinset P (T / r), \u2191(liouvilleLambda r) * \u2191(liouvilleLambda m) * w (m * r) \u2227 \u2211 m \u2208 smoothCutoffFinset P T, \u2211 r \u2208 coprimeCutoffFinset P T, \u2191(liouvilleLambda m) * \u2191(liouvilleLambda r) * w (m * r) - \u2211 n \u2208 Finset.Icc 1 T, \u2191(liouvilleLambda n) * w n = \u2211 m \u2208 smoothCutoffFinset P T, \u2211 r \u2208 excessCoprimeFinset P m T, \u2191(liouvilleLambda m) * \u2191(liouvilleLambda r) * w (m * r) \u2227 \u2211 m \u2208 smoothCutoffFinset \u2205 T, \u2211 r \u2208 excessCoprimeFinset \u2205 m T, \u2191(liouvilleLambda m) * \u2191(liouvilleLambda r) * w (m * r) = 0 \u2227 (T \u2264 1 \u2192 \u2211 m \u2208 smoothCutoffFinset P T, \u2211 r \u2208 excessCoprimeFinset P m T, \u2191(liouvilleLambda m) * \u2191(liouvilleLambda r) * w (m * r) = 0) \u2227 \u2211 m \u2208 smoothCutoffFinset {2} 2, \u2211 r \u2208 excessCoprimeFinset {2} m 2, \u2191(liouvilleLambda m) * \u2191(liouvilleLambda r) * w (m * r) = 0 \u2227 \u2211 m \u2208 smoothCutoffFinset {2} 3, \u2211 r \u2208 excessCoprimeFinset {2} m 3, \u2191(liouvilleLambda m) * \u2191(liouvilleLambda r) * w (m * r) = w 6",
+        "captured_print_axioms_output": "'RiemannScope.LiouvilleSquareDilation.finite_liouville_reindexed_sum_and_excess_cutoff_identity_nat' depends on axioms: [propext, Quot.sound, Classical.choice]",
+        "check_signature": "@finite_liouville_reindexed_sum_and_excess_cutoff_identity_nat : \u2200 {P : Finset \u2115}, (\u2200 p \u2208 P, p.Prime) \u2192 \u2200 (T : \u2115) (w : \u2115 \u2192 \u211d), \u2211 n \u2208 Finset.Icc 1 T, \u2191(liouvilleLambda n) * w n = \u2211 m \u2208 smoothCutoffFinset P T, \u2211 r \u2208 coprimeCutoffFinset P (T / m), \u2191(liouvilleLambda m) * \u2191(liouvilleLambda r) * w (m * r) \u2227 \u2211 n \u2208 Finset.Icc 1 T, \u2191(liouvilleLambda n) * w n = \u2211 r \u2208 coprimeCutoffFinset P T, \u2211 m \u2208 smoothCutoffFinset P (T / r), \u2191(liouvilleLambda r) * \u2191(liouvilleLambda m) * w (m * r) \u2227 \u2211 m \u2208 smoothCutoffFinset P T, \u2211 r \u2208 coprimeCutoffFinset P T, \u2191(liouvilleLambda m) * \u2191(liouvilleLambda r) * w (m * r) - \u2211 n \u2208 Finset.Icc 1 T, \u2191(liouvilleLambda n) * w n = \u2211 m \u2208 smoothCutoffFinset P T, \u2211 r \u2208 excessCoprimeFinset P m T, \u2191(liouvilleLambda m) * \u2191(liouvilleLambda r) * w (m * r) \u2227 \u2211 m \u2208 smoothCutoffFinset \u2205 T, \u2211 r \u2208 excessCoprimeFinset \u2205 m T, \u2191(liouvilleLambda m) * \u2191(liouvilleLambda r) * w (m * r) = 0 \u2227 (T \u2264 1 \u2192 \u2211 m \u2208 smoothCutoffFinset P T, \u2211 r \u2208 excessCoprimeFinset P m T, \u2191(liouvilleLambda m) * \u2191(liouvilleLambda r) * w (m * r) = 0) \u2227 \u2211 m \u2208 smoothCutoffFinset {2} 2, \u2211 r \u2208 excessCoprimeFinset {2} m 2, \u2191(liouvilleLambda m) * \u2191(liouvilleLambda r) * w (m * r) = 0 \u2227 \u2211 m \u2208 smoothCutoffFinset {2} 3, \u2211 r \u2208 excessCoprimeFinset {2} m 3, \u2191(liouvilleLambda m) * \u2191(liouvilleLambda r) * w (m * r) = w 6",
+        "print_axioms": "'RiemannScope.LiouvilleSquareDilation.finite_liouville_reindexed_sum_and_excess_cutoff_identity_nat' depends on axioms: [propext, Quot.sound, Classical.choice]",
+        "descriptive_scope_metadata_note": "Unconditional finite-sum reconstruction theorem (`TASK-TC-055R2` \u00a73c) for arbitrary weight `w : \u2115 \u2192 \u211d`, `T : \u2115`, and finite prime set `P`: proves both smooth-outer (`\u2211_{m \u2264 T, m \u2208 S(P)} \u2211_{1 \u2264 r \u2264 \u230aT/m\u230b, gcd(r, N_P)=1} \u03bb(m) \u03bb(r) w(m r)`) and coprime-outer (`\u2211_{1 \u2264 r \u2264 T, gcd(r, N_P)=1} \u2211_{m \u2264 \u230aT/r\u230b, m \u2208 S(P)} \u03bb(r) \u03bb(m) w(m r)`) identities for `\u2211_{1 \u2264 n \u2264 T} \u03bb(n) w(n)`, proves the exact excess sum `\u2211_{m \u2208 S(P), m \u2264 T} \u2211_{r \u2208 excessCoprimeFinset P m T} \u03bb(m) \u03bb(r) w(m r)` when `r \u2264 T` replaces `r \u2264 \u230aT/m\u230b`, and proves vanishing of the excess at `P = \u2205`, `T \u2264 1`, and `(P = {2}, T = 2)` alongside nonvanishing `= w 6` at `(P = {2}, T = 3)`."
+      },
+      "finite_gaussian_observable_reconstruction_and_weighted_cofactor_square": {
+        "declaration_name": "RiemannScope.LiouvilleSquareDilation.finite_gaussian_observable_reconstruction_and_weighted_cofactor_square",
+        "theorem_classification": "actual_finite_gaussian_reconstruction_and_pointwise_weighted_cofactor_square_theorem",
+        "captured_check_output": "@finite_gaussian_observable_reconstruction_and_weighted_cofactor_square : \u2200 {P : Finset \u2115}, (\u2200 p \u2208 P, p.Prime) \u2192 \u2200 (T : \u2115) {X : \u211d}, 0 \u2264 X \u2192 finiteQLambda T X = \u2211 m \u2208 smoothCutoffFinset P T, \u2191(liouvilleLambda m) / \u221a\u2191m * finiteQLambdaCoprime P (T / m) (X / \u2191m) \u2227 finiteQLambda T X = \u2211 r \u2208 coprimeCutoffFinset P T, cofactorFiberF P T r X \u2227 finiteQLambda T X ^ 2 = \u2211 r \u2208 coprimeCutoffFinset P T, 1 / \u2191r * finiteQLambdaSmooth P (T / r) (X / \u2191r) ^ 2 + \u2211 r \u2208 coprimeCutoffFinset P T, \u2211 s \u2208 (coprimeCutoffFinset P T).erase r, \u2191(liouvilleLambda r) * \u2191(liouvilleLambda s) / \u221a\u2191(r * s) * finiteQLambdaSmooth P (T / r) (X / \u2191r) * finiteQLambdaSmooth P (T / s) (X / \u2191s) \u2227 finiteQLambda 0 X = 0 \u2227 finiteQLambdaCoprime \u2205 T X = finiteQLambda T X",
+        "captured_print_axioms_output": "'RiemannScope.LiouvilleSquareDilation.finite_gaussian_observable_reconstruction_and_weighted_cofactor_square' depends on axioms: [propext, Quot.sound, Classical.choice]",
+        "check_signature": "@finite_gaussian_observable_reconstruction_and_weighted_cofactor_square : \u2200 {P : Finset \u2115}, (\u2200 p \u2208 P, p.Prime) \u2192 \u2200 (T : \u2115) {X : \u211d}, 0 \u2264 X \u2192 finiteQLambda T X = \u2211 m \u2208 smoothCutoffFinset P T, \u2191(liouvilleLambda m) / \u221a\u2191m * finiteQLambdaCoprime P (T / m) (X / \u2191m) \u2227 finiteQLambda T X = \u2211 r \u2208 coprimeCutoffFinset P T, cofactorFiberF P T r X \u2227 finiteQLambda T X ^ 2 = \u2211 r \u2208 coprimeCutoffFinset P T, 1 / \u2191r * finiteQLambdaSmooth P (T / r) (X / \u2191r) ^ 2 + \u2211 r \u2208 coprimeCutoffFinset P T, \u2211 s \u2208 (coprimeCutoffFinset P T).erase r, \u2191(liouvilleLambda r) * \u2191(liouvilleLambda s) / \u221a\u2191(r * s) * finiteQLambdaSmooth P (T / r) (X / \u2191r) * finiteQLambdaSmooth P (T / s) (X / \u2191s) \u2227 finiteQLambda 0 X = 0 \u2227 finiteQLambdaCoprime \u2205 T X = finiteQLambda T X",
+        "print_axioms": "'RiemannScope.LiouvilleSquareDilation.finite_gaussian_observable_reconstruction_and_weighted_cofactor_square' depends on axioms: [propext, Quot.sound, Classical.choice]",
+        "descriptive_scope_metadata_note": "Unconditional finite Gaussian observable reconstruction theorem (`TASK-TC-055R2` \u00a72 & \u00a73c) for `0 \u2264 X`, `T : \u2115`, and finite prime set `P`: discharges the `X^{5/2}` and `(m r)^{-3}` scaling identity to prove `finiteQLambda T X = \u2211_{m \u2208 S(P), m \u2264 T} (\u03bb(m)/\u221am) finiteQLambdaCoprime P (T/m) (X/m)`, `finiteQLambda T X = \u2211_{1 \u2264 r \u2264 T, gcd(r, N_P)=1} cofactorFiberF P T r X` (`cofactorFiberF = (\u03bb(r)/\u221ar) finiteQLambdaSmooth P (T/r) (X/r)`), and the exact pointwise weighted square expansion `(finiteQLambda T X)^2 = \u2211_r (1/r) Q_{\u03bb,S(P),\u230aT/r\u230b}(X/r)^2 + \u2211_r \u2211_{s \u2260 r} (\u03bb(r)\u03bb(s)/\u221a(r s)) Q_{\u03bb,S(P),\u230aT/r\u230b}(X/r) Q_{\u03bb,S(P),\u230aT/s\u230b}(X/s)`, plus `finiteQLambda 0 X = 0` and `finiteQLambdaCoprime \u2205 T X = finiteQLambda T X` (the `[Y, \u03c4 Y]` integral decomposition follows analytically outside Lean by finite linearity of the integral)."
       }
     }
   },
@@ -6212,7 +6294,77 @@
       "u29_counterexample_and_floor_repair_certified": true,
       "repaired_formulas": {
         "general_tail_for_real_u_ge_1": "sum_{n > u} n^{-3} = sum_{n >= floor(u) + 1} n^{-3} <= 1 / (2 floor(u)^2)",
-        "coprime_tail_for_real_u_ge_2": "Since the least integer n > 1 with gcd(n, N_u) = 1 is the least prime q_{>u} >= floor(u) + 1 > u, sum_{n > u, gcd(n, N_u)=1} n^{-3} <= sum_{n >= q_{>u}} n^{-3} <= 1 / (2 (q_{>u} - 1)^2) <= 1 / (2 floor(u)^2) and <= 1 / q_{>u}^3 + 1 / (2 q_{>u}^2) < 1 / u^3 + 1 / (2 u^2)."
+        "coprime_shifted_integral_bound_u_ge_2": "sum_{n > u, gcd(n, N_u)=1} n^{-3} <= sum_{n >= q_{>u}} n^{-3} <= 1 / (2 (q_{>u} - 1)^2) <= 1 / (2 floor(u)^2)",
+        "coprime_first_term_split_bound_u_ge_2": "sum_{n > u, gcd(n, N_u)=1} n^{-3} <= 1 / q_{>u}^3 + 1 / (2 q_{>u}^2) < 1 / u^3 + 1 / (2 u^2)"
+      },
+      "ambiguous_boundary_arb_ball_handling": {
+        "tested_u_ball": "[3 - 2^{-100}, 3 + 2^{-100}] (midpoint = 3)",
+        "discrete_decision_rejected_without_midpoint_classification": true,
+        "union_floor_bound_enclosure": {
+          "mid_float": 0.09027777777777778,
+          "rad_float_outward": 0.03472222236450762,
+          "lower_dec": "5.555555541327016221152411566840277777776e-2",
+          "upper_dec": "1.250000001422853933440314398871527777779e-1",
+          "arb_ball_str": "[+/- 0.126]"
+        },
+        "union_enclosure_covers_1_over_8_and_1_over_18": true,
+        "tested_Y_ball": "[16 - 2^{-100}, 16 + 2^{-100}] (midpoint = 16)",
+        "discrete_schedule_decision_rejected": true
+      },
+      "schedule_T_Y_exact_power_predicate_audit": {
+        "T_Y_definition": "T(Y) := ceil(Y^{5/4}) characterized for Y >= 1 by (T - 1)^4 < Y^5 <= T^4 (in particular T(1) = 1)",
+        "M_Y_companion_convention": "M(Y) := ceil(max(2, Y^{5/4})) = max(2, T(Y)) (M(1) = 2 != T(1) = 1)",
+        "rows": [
+          {
+            "Y_label": "1",
+            "T_Y_ceil_Y_5_4": 1,
+            "M_Y_ceil_max_2_Y_5_4": 2,
+            "exact_power_predicate_and_arb_point_match": true
+          },
+          {
+            "Y_label": "1 + 2^{-100}",
+            "T_Y_ceil_Y_5_4": 2,
+            "M_Y_ceil_max_2_Y_5_4": 2,
+            "exact_power_predicate_and_arb_point_match": true
+          },
+          {
+            "Y_label": "16 - 2^{-100}",
+            "T_Y_ceil_Y_5_4": 32,
+            "M_Y_ceil_max_2_Y_5_4": 32,
+            "exact_power_predicate_and_arb_point_match": true
+          },
+          {
+            "Y_label": "16",
+            "T_Y_ceil_Y_5_4": 32,
+            "M_Y_ceil_max_2_Y_5_4": 32,
+            "exact_power_predicate_and_arb_point_match": true
+          },
+          {
+            "Y_label": "16 + 2^{-100}",
+            "T_Y_ceil_Y_5_4": 33,
+            "M_Y_ceil_max_2_Y_5_4": 33,
+            "exact_power_predicate_and_arb_point_match": true
+          },
+          {
+            "Y_label": "81 - 2^{-100}",
+            "T_Y_ceil_Y_5_4": 243,
+            "M_Y_ceil_max_2_Y_5_4": 243,
+            "exact_power_predicate_and_arb_point_match": true
+          },
+          {
+            "Y_label": "81",
+            "T_Y_ceil_Y_5_4": 243,
+            "M_Y_ceil_max_2_Y_5_4": 243,
+            "exact_power_predicate_and_arb_point_match": true
+          },
+          {
+            "Y_label": "81 + 2^{-100}",
+            "T_Y_ceil_Y_5_4": 244,
+            "M_Y_ceil_max_2_Y_5_4": 244,
+            "exact_power_predicate_and_arb_point_match": true
+          }
+        ],
+        "all_schedule_boundaries_exact": true
       },
       "boundary_cutoff_rows": [
         {
@@ -6222,6 +6374,7 @@
             2
           ],
           "least_prime_strictly_above_u": 3,
+          "exact_fraction_and_256bit_arb_agree": true,
           "unrestricted_tail_sum_n_gt_u_n_neg_3": {
             "mid_float": 0.07705690315959429,
             "rad_float_outward": 6.752241127462513e-18,
@@ -6259,6 +6412,20 @@
             "upper_dec": "7.071067811865475244008443621048490392850e-1",
             "arb_ball_str": "[0.7071067811865475244008443621048490392848 +/- 3.60e-41]"
           },
+          "coprime_bound_w_5_2_over_2_q_minus_1_sq": {
+            "mid_float": 0.7071067811865476,
+            "rad_float_outward": 4.8336466567264573e-17,
+            "lower_dec": "7.071067811865475244008443621048490392847e-1",
+            "upper_dec": "7.071067811865475244008443621048490392850e-1",
+            "arb_ball_str": "[0.7071067811865475244008443621048490392848 +/- 3.60e-41]"
+          },
+          "coprime_bound_w_5_2_times_q_neg_3_plus_1_over_2_q_sq": {
+            "mid_float": 0.523782800878924,
+            "rad_float_outward": 5.4657826771483454e-17,
+            "lower_dec": "5.237828008789240921487736015591474365071e-1",
+            "upper_dec": "5.237828008789240921487736015591474365074e-1",
+            "arb_ball_str": "[0.5237828008789240921487736015591474365073 +/- 1.42e-41]"
+          },
           "coprime_bound_using_least_prime_q_gt_u": {
             "mid_float": 0.523782800878924,
             "rad_float_outward": 5.4657826771483454e-17,
@@ -6276,6 +6443,7 @@
             3
           ],
           "least_prime_strictly_above_u": 5,
+          "exact_fraction_and_256bit_arb_agree": true,
           "unrestricted_tail_sum_n_gt_u_n_neg_3": {
             "mid_float": 0.04001986612255725,
             "rad_float_outward": 1.8693157876759442e-18,
@@ -6313,6 +6481,20 @@
             "upper_dec": "3.142696805273544552892641609354884619045e-1",
             "arb_ball_str": "[0.3142696805273544552892641609354884619044 +/- 2.85e-41]"
           },
+          "coprime_bound_w_5_2_over_2_q_minus_1_sq": {
+            "mid_float": 0.1767766952966369,
+            "rad_float_outward": 1.2084116641816143e-17,
+            "lower_dec": "1.767766952966368811002110905262122598211e-1",
+            "upper_dec": "1.767766952966368811002110905262122598214e-1",
+            "arb_ball_str": "[0.1767766952966368811002110905262122598212 +/- 8.99e-42]"
+          },
+          "coprime_bound_w_5_2_times_q_neg_3_plus_1_over_2_q_sq": {
+            "mid_float": 0.15839191898578664,
+            "rad_float_outward": 6.0480214632351175e-18,
+            "lower_dec": "1.583919189857866454657891371114861847997e-1",
+            "upper_dec": "1.583919189857866454657891371114861848000e-1",
+            "arb_ball_str": "[0.1583919189857866454657891371114861847998 +/- 3.26e-42]"
+          },
           "coprime_bound_using_least_prime_q_gt_u": {
             "mid_float": 0.15839191898578664,
             "rad_float_outward": 6.0480214632351175e-18,
@@ -6330,6 +6512,7 @@
             3
           ],
           "least_prime_strictly_above_u": 5,
+          "exact_fraction_and_256bit_arb_agree": true,
           "unrestricted_tail_sum_n_gt_u_n_neg_3": {
             "mid_float": 0.04001986612255725,
             "rad_float_outward": 1.8693157876759442e-18,
@@ -6367,6 +6550,20 @@
             "upper_dec": "3.142696805273544552892641609354884619045e-1",
             "arb_ball_str": "[0.3142696805273544552892641609354884619044 +/- 2.85e-41]"
           },
+          "coprime_bound_w_5_2_over_2_q_minus_1_sq": {
+            "mid_float": 0.1767766952966369,
+            "rad_float_outward": 1.2084116641816143e-17,
+            "lower_dec": "1.767766952966368811002110905262122598211e-1",
+            "upper_dec": "1.767766952966368811002110905262122598214e-1",
+            "arb_ball_str": "[0.1767766952966368811002110905262122598212 +/- 8.99e-42]"
+          },
+          "coprime_bound_w_5_2_times_q_neg_3_plus_1_over_2_q_sq": {
+            "mid_float": 0.15839191898578664,
+            "rad_float_outward": 6.0480214632351175e-18,
+            "lower_dec": "1.583919189857866454657891371114861847997e-1",
+            "upper_dec": "1.583919189857866454657891371114861848000e-1",
+            "arb_ball_str": "[0.1583919189857866454657891371114861847998 +/- 3.26e-42]"
+          },
           "coprime_bound_using_least_prime_q_gt_u": {
             "mid_float": 0.15839191898578664,
             "rad_float_outward": 6.0480214632351175e-18,
@@ -6384,6 +6581,7 @@
             3
           ],
           "least_prime_strictly_above_u": 5,
+          "exact_fraction_and_256bit_arb_agree": true,
           "unrestricted_tail_sum_n_gt_u_n_neg_3": {
             "mid_float": 0.024394866122557247,
             "rad_float_outward": 1.6001311642776706e-18,
@@ -6421,6 +6619,20 @@
             "upper_dec": "1.767766952966368811002110905262122598214e-1",
             "arb_ball_str": "[0.1767766952966368811002110905262122598212 +/- 8.99e-42]"
           },
+          "coprime_bound_w_5_2_over_2_q_minus_1_sq": {
+            "mid_float": 0.1767766952966369,
+            "rad_float_outward": 1.2084116641816143e-17,
+            "lower_dec": "1.767766952966368811002110905262122598211e-1",
+            "upper_dec": "1.767766952966368811002110905262122598214e-1",
+            "arb_ball_str": "[0.1767766952966368811002110905262122598212 +/- 8.99e-42]"
+          },
+          "coprime_bound_w_5_2_times_q_neg_3_plus_1_over_2_q_sq": {
+            "mid_float": 0.15839191898578664,
+            "rad_float_outward": 6.0480214632351175e-18,
+            "lower_dec": "1.583919189857866454657891371114861847997e-1",
+            "upper_dec": "1.583919189857866454657891371114861848000e-1",
+            "arb_ball_str": "[0.1583919189857866454657891371114861847998 +/- 3.26e-42]"
+          },
           "coprime_bound_using_least_prime_q_gt_u": {
             "mid_float": 0.15839191898578664,
             "rad_float_outward": 6.0480214632351175e-18,
@@ -6439,6 +6651,7 @@
             5
           ],
           "least_prime_strictly_above_u": 7,
+          "exact_fraction_and_256bit_arb_agree": true,
           "unrestricted_tail_sum_n_gt_u_n_neg_3": {
             "mid_float": 0.01639486612255725,
             "rad_float_outward": 1.7027823339821706e-18,
@@ -6476,6 +6689,20 @@
             "upper_dec": "1.131370849898476039041350979367758462857e-1",
             "arb_ball_str": "[0.1131370849898476039041350979367758462856 +/- 2.63e-41]"
           },
+          "coprime_bound_w_5_2_over_2_q_minus_1_sq": {
+            "mid_float": 0.07856742013183861,
+            "rad_float_outward": 5.423116454159627e-18,
+            "lower_dec": "7.856742013183861382231604023387211547608e-2",
+            "upper_dec": "7.856742013183861382231604023387211547611e-2",
+            "arb_ball_str": "[0.07856742013183861382231604023387211547609 +/- 2.89e-42]"
+          },
+          "coprime_bound_w_5_2_times_q_neg_3_plus_1_over_2_q_sq": {
+            "mid_float": 0.07421528898750936,
+            "rad_float_outward": 4.839490427093346e-18,
+            "lower_dec": "7.421528898750936116160465608097540937099e-2",
+            "upper_dec": "7.421528898750936116160465608097540937102e-2",
+            "arb_ball_str": "[0.07421528898750936116160465608097540937100 +/- 3.19e-42]"
+          },
           "coprime_bound_using_least_prime_q_gt_u": {
             "mid_float": 0.07421528898750936,
             "rad_float_outward": 4.839490427093346e-18,
@@ -6494,6 +6721,7 @@
             5
           ],
           "least_prime_strictly_above_u": 7,
+          "exact_fraction_and_256bit_arb_agree": true,
           "unrestricted_tail_sum_n_gt_u_n_neg_3": {
             "mid_float": 0.01639486612255725,
             "rad_float_outward": 1.7027823339821706e-18,
@@ -6531,6 +6759,435 @@
             "upper_dec": "1.131370849898476039041350979367758462857e-1",
             "arb_ball_str": "[0.1131370849898476039041350979367758462856 +/- 2.63e-41]"
           },
+          "coprime_bound_w_5_2_over_2_q_minus_1_sq": {
+            "mid_float": 0.07856742013183861,
+            "rad_float_outward": 5.423116454159627e-18,
+            "lower_dec": "7.856742013183861382231604023387211547608e-2",
+            "upper_dec": "7.856742013183861382231604023387211547611e-2",
+            "arb_ball_str": "[0.07856742013183861382231604023387211547609 +/- 2.89e-42]"
+          },
+          "coprime_bound_w_5_2_times_q_neg_3_plus_1_over_2_q_sq": {
+            "mid_float": 0.07421528898750936,
+            "rad_float_outward": 4.839490427093346e-18,
+            "lower_dec": "7.421528898750936116160465608097540937099e-2",
+            "upper_dec": "7.421528898750936116160465608097540937102e-2",
+            "arb_ball_str": "[0.07421528898750936116160465608097540937100 +/- 3.19e-42]"
+          },
+          "coprime_bound_using_least_prime_q_gt_u": {
+            "mid_float": 0.07421528898750936,
+            "rad_float_outward": 4.839490427093346e-18,
+            "lower_dec": "7.421528898750936116160465608097540937099e-2",
+            "upper_dec": "7.421528898750936116160465608097540937102e-2",
+            "arb_ball_str": "[0.07421528898750936116160465608097540937100 +/- 3.19e-42]"
+          },
+          "coprime_tail_bounds_strictly_certified": true
+        },
+        {
+          "u_label": "3 - 2^{-100}",
+          "u_floor": 2,
+          "primes_le_u": [
+            2
+          ],
+          "least_prime_strictly_above_u": 3,
+          "exact_fraction_and_256bit_arb_agree": true,
+          "unrestricted_tail_sum_n_gt_u_n_neg_3": {
+            "mid_float": 0.07705690315959429,
+            "rad_float_outward": 6.752241127462513e-18,
+            "lower_dec": "7.705690315959428539973816151144999076497e-2",
+            "upper_dec": "7.705690315959428539973816151144999076500e-2",
+            "arb_ball_str": "[0.07705690315959428539973816151144999076499 +/- 3.71e-42]"
+          },
+          "naive_1_over_2_u_sq": {
+            "mid_float": 0.05555555555555555,
+            "rad_float_outward": 3.08395284618102e-18,
+            "lower_dec": "5.555555555555555555555555555558477262610e-2",
+            "upper_dec": "5.555555555555555555555555555558477262613e-2",
+            "arb_ball_str": "[0.05555555555555555555555555555558477262612 +/- 7.04e-43]"
+          },
+          "naive_bound_holds_for_unrestricted_tail": false,
+          "repaired_1_over_2_floor_u_sq": {
+            "mid_float": 0.125,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "1.249999999999999999999999999999999999999e-1",
+            "upper_dec": "1.250000000000000000000000000000000000001e-1",
+            "arb_ball_str": "0.1250000000000000000000000000000000000000"
+          },
+          "repaired_floor_bound_strictly_certified": true,
+          "abs_R_lambda_Pu_at_w_2": {
+            "mid_float": 0.1878299435327556,
+            "rad_float_outward": 2.828427135173317e-06,
+            "lower_dec": "1.878271151056204155363618625626191173910e-1",
+            "upper_dec": "1.878327719598907572187843030616864239098e-1",
+            "arb_ball_str": "[0.18783 +/- 2.89e-6]"
+          },
+          "coprime_bound_w_5_2_over_2_floor_u_sq": {
+            "mid_float": 0.7071067811865476,
+            "rad_float_outward": 4.8336466567264573e-17,
+            "lower_dec": "7.071067811865475244008443621048490392847e-1",
+            "upper_dec": "7.071067811865475244008443621048490392850e-1",
+            "arb_ball_str": "[0.7071067811865475244008443621048490392848 +/- 3.60e-41]"
+          },
+          "coprime_bound_w_5_2_over_2_q_minus_1_sq": {
+            "mid_float": 0.7071067811865476,
+            "rad_float_outward": 4.8336466567264573e-17,
+            "lower_dec": "7.071067811865475244008443621048490392847e-1",
+            "upper_dec": "7.071067811865475244008443621048490392850e-1",
+            "arb_ball_str": "[0.7071067811865475244008443621048490392848 +/- 3.60e-41]"
+          },
+          "coprime_bound_w_5_2_times_q_neg_3_plus_1_over_2_q_sq": {
+            "mid_float": 0.523782800878924,
+            "rad_float_outward": 5.4657826771483454e-17,
+            "lower_dec": "5.237828008789240921487736015591474365071e-1",
+            "upper_dec": "5.237828008789240921487736015591474365074e-1",
+            "arb_ball_str": "[0.5237828008789240921487736015591474365073 +/- 1.42e-41]"
+          },
+          "coprime_bound_using_least_prime_q_gt_u": {
+            "mid_float": 0.523782800878924,
+            "rad_float_outward": 5.4657826771483454e-17,
+            "lower_dec": "5.237828008789240921487736015591474365071e-1",
+            "upper_dec": "5.237828008789240921487736015591474365074e-1",
+            "arb_ball_str": "[0.5237828008789240921487736015591474365073 +/- 1.42e-41]"
+          },
+          "coprime_tail_bounds_strictly_certified": true
+        },
+        {
+          "u_label": "3",
+          "u_floor": 3,
+          "primes_le_u": [
+            2,
+            3
+          ],
+          "least_prime_strictly_above_u": 5,
+          "exact_fraction_and_256bit_arb_agree": true,
+          "unrestricted_tail_sum_n_gt_u_n_neg_3": {
+            "mid_float": 0.04001986612255725,
+            "rad_float_outward": 1.8693157876759442e-18,
+            "lower_dec": "4.001986612255724836270112447441295372793e-2",
+            "upper_dec": "4.001986612255724836270112447441295372796e-2",
+            "arb_ball_str": "[0.04001986612255724836270112447441295372795 +/- 7.45e-43]"
+          },
+          "naive_1_over_2_u_sq": {
+            "mid_float": 0.05555555555555555,
+            "rad_float_outward": 3.0839528461809906e-18,
+            "lower_dec": "5.555555555555555555555555555555555555554e-2",
+            "upper_dec": "5.555555555555555555555555555555555555557e-2",
+            "arb_ball_str": "[0.05555555555555555555555555555555555555556 +/- 4.45e-42]"
+          },
+          "naive_bound_holds_for_unrestricted_tail": true,
+          "repaired_1_over_2_floor_u_sq": {
+            "mid_float": 0.05555555555555555,
+            "rad_float_outward": 3.0839528461809906e-18,
+            "lower_dec": "5.555555555555555555555555555555555555554e-2",
+            "upper_dec": "5.555555555555555555555555555555555555557e-2",
+            "arb_ball_str": "[0.05555555555555555555555555555555555555556 +/- 4.45e-42]"
+          },
+          "repaired_floor_bound_strictly_certified": true,
+          "abs_R_lambda_Pu_at_w_2": {
+            "mid_float": 0.06311603740625352,
+            "rad_float_outward": 2.828427138728954e-06,
+            "lower_dec": "6.311320897911478781928851177405724557224e-2",
+            "upper_dec": "6.311886583339223492906855327498326333350e-2",
+            "arb_ball_str": "[0.06312 +/- 6.80e-6]"
+          },
+          "coprime_bound_w_5_2_over_2_floor_u_sq": {
+            "mid_float": 0.31426968052735443,
+            "rad_float_outward": 2.1692465816638507e-17,
+            "lower_dec": "3.142696805273544552892641609354884619042e-1",
+            "upper_dec": "3.142696805273544552892641609354884619045e-1",
+            "arb_ball_str": "[0.3142696805273544552892641609354884619044 +/- 2.85e-41]"
+          },
+          "coprime_bound_w_5_2_over_2_q_minus_1_sq": {
+            "mid_float": 0.1767766952966369,
+            "rad_float_outward": 1.2084116641816143e-17,
+            "lower_dec": "1.767766952966368811002110905262122598211e-1",
+            "upper_dec": "1.767766952966368811002110905262122598214e-1",
+            "arb_ball_str": "[0.1767766952966368811002110905262122598212 +/- 8.99e-42]"
+          },
+          "coprime_bound_w_5_2_times_q_neg_3_plus_1_over_2_q_sq": {
+            "mid_float": 0.15839191898578664,
+            "rad_float_outward": 6.0480214632351175e-18,
+            "lower_dec": "1.583919189857866454657891371114861847997e-1",
+            "upper_dec": "1.583919189857866454657891371114861848000e-1",
+            "arb_ball_str": "[0.1583919189857866454657891371114861847998 +/- 3.26e-42]"
+          },
+          "coprime_bound_using_least_prime_q_gt_u": {
+            "mid_float": 0.15839191898578664,
+            "rad_float_outward": 6.0480214632351175e-18,
+            "lower_dec": "1.583919189857866454657891371114861847997e-1",
+            "upper_dec": "1.583919189857866454657891371114861848000e-1",
+            "arb_ball_str": "[0.1583919189857866454657891371114861847998 +/- 3.26e-42]"
+          },
+          "coprime_tail_bounds_strictly_certified": true
+        },
+        {
+          "u_label": "3 + 2^{-100}",
+          "u_floor": 3,
+          "primes_le_u": [
+            2,
+            3
+          ],
+          "least_prime_strictly_above_u": 5,
+          "exact_fraction_and_256bit_arb_agree": true,
+          "unrestricted_tail_sum_n_gt_u_n_neg_3": {
+            "mid_float": 0.04001986612255725,
+            "rad_float_outward": 1.8693157876759442e-18,
+            "lower_dec": "4.001986612255724836270112447441295372793e-2",
+            "upper_dec": "4.001986612255724836270112447441295372796e-2",
+            "arb_ball_str": "[0.04001986612255724836270112447441295372795 +/- 7.45e-43]"
+          },
+          "naive_1_over_2_u_sq": {
+            "mid_float": 0.05555555555555555,
+            "rad_float_outward": 3.0839528461809617e-18,
+            "lower_dec": "5.555555555555555555555555555552633848498e-2",
+            "upper_dec": "5.555555555555555555555555555552633848501e-2",
+            "arb_ball_str": "[0.05555555555555555555555555555552633848499 +/- 1.82e-42]"
+          },
+          "naive_bound_holds_for_unrestricted_tail": true,
+          "repaired_1_over_2_floor_u_sq": {
+            "mid_float": 0.05555555555555555,
+            "rad_float_outward": 3.0839528461809906e-18,
+            "lower_dec": "5.555555555555555555555555555555555555554e-2",
+            "upper_dec": "5.555555555555555555555555555555555555557e-2",
+            "arb_ball_str": "[0.05555555555555555555555555555555555555556 +/- 4.45e-42]"
+          },
+          "repaired_floor_bound_strictly_certified": true,
+          "abs_R_lambda_Pu_at_w_2": {
+            "mid_float": 0.06311603740625352,
+            "rad_float_outward": 2.828427138728954e-06,
+            "lower_dec": "6.311320897911478781928851177405724557224e-2",
+            "upper_dec": "6.311886583339223492906855327498326333350e-2",
+            "arb_ball_str": "[0.06312 +/- 6.80e-6]"
+          },
+          "coprime_bound_w_5_2_over_2_floor_u_sq": {
+            "mid_float": 0.31426968052735443,
+            "rad_float_outward": 2.1692465816638507e-17,
+            "lower_dec": "3.142696805273544552892641609354884619042e-1",
+            "upper_dec": "3.142696805273544552892641609354884619045e-1",
+            "arb_ball_str": "[0.3142696805273544552892641609354884619044 +/- 2.85e-41]"
+          },
+          "coprime_bound_w_5_2_over_2_q_minus_1_sq": {
+            "mid_float": 0.1767766952966369,
+            "rad_float_outward": 1.2084116641816143e-17,
+            "lower_dec": "1.767766952966368811002110905262122598211e-1",
+            "upper_dec": "1.767766952966368811002110905262122598214e-1",
+            "arb_ball_str": "[0.1767766952966368811002110905262122598212 +/- 8.99e-42]"
+          },
+          "coprime_bound_w_5_2_times_q_neg_3_plus_1_over_2_q_sq": {
+            "mid_float": 0.15839191898578664,
+            "rad_float_outward": 6.0480214632351175e-18,
+            "lower_dec": "1.583919189857866454657891371114861847997e-1",
+            "upper_dec": "1.583919189857866454657891371114861848000e-1",
+            "arb_ball_str": "[0.1583919189857866454657891371114861847998 +/- 3.26e-42]"
+          },
+          "coprime_bound_using_least_prime_q_gt_u": {
+            "mid_float": 0.15839191898578664,
+            "rad_float_outward": 6.0480214632351175e-18,
+            "lower_dec": "1.583919189857866454657891371114861847997e-1",
+            "upper_dec": "1.583919189857866454657891371114861848000e-1",
+            "arb_ball_str": "[0.1583919189857866454657891371114861847998 +/- 3.26e-42]"
+          },
+          "coprime_tail_bounds_strictly_certified": true
+        },
+        {
+          "u_label": "5 - 2^{-100}",
+          "u_floor": 4,
+          "primes_le_u": [
+            2,
+            3
+          ],
+          "least_prime_strictly_above_u": 5,
+          "exact_fraction_and_256bit_arb_agree": true,
+          "unrestricted_tail_sum_n_gt_u_n_neg_3": {
+            "mid_float": 0.024394866122557247,
+            "rad_float_outward": 1.6001311642776706e-18,
+            "lower_dec": "2.439486612255724836270112447441295372793e-2",
+            "upper_dec": "2.439486612255724836270112447441295372796e-2",
+            "arb_ball_str": "[0.02439486612255724836270112447441295372795 +/- 7.45e-43]"
+          },
+          "naive_1_over_2_u_sq": {
+            "mid_float": 0.02,
+            "rad_float_outward": 4.1633363423442743e-19,
+            "lower_dec": "2.000000000000000000000000000000631088723e-2",
+            "upper_dec": "2.000000000000000000000000000000631088726e-2",
+            "arb_ball_str": "[0.02000000000000000000000000000000631088724 +/- 1.77e-42]"
+          },
+          "naive_bound_holds_for_unrestricted_tail": false,
+          "repaired_1_over_2_floor_u_sq": {
+            "mid_float": 0.03125,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "3.124999999999999999999999999999999999999e-2",
+            "upper_dec": "3.125000000000000000000000000000000000001e-2",
+            "arb_ball_str": "0.03125000000000000000000000000000000000000"
+          },
+          "repaired_floor_bound_strictly_certified": true,
+          "abs_R_lambda_Pu_at_w_2": {
+            "mid_float": 0.06311603740625352,
+            "rad_float_outward": 2.828427138728954e-06,
+            "lower_dec": "6.311320897911478781928851177405724557224e-2",
+            "upper_dec": "6.311886583339223492906855327498326333350e-2",
+            "arb_ball_str": "[0.06312 +/- 6.80e-6]"
+          },
+          "coprime_bound_w_5_2_over_2_floor_u_sq": {
+            "mid_float": 0.1767766952966369,
+            "rad_float_outward": 1.2084116641816143e-17,
+            "lower_dec": "1.767766952966368811002110905262122598211e-1",
+            "upper_dec": "1.767766952966368811002110905262122598214e-1",
+            "arb_ball_str": "[0.1767766952966368811002110905262122598212 +/- 8.99e-42]"
+          },
+          "coprime_bound_w_5_2_over_2_q_minus_1_sq": {
+            "mid_float": 0.1767766952966369,
+            "rad_float_outward": 1.2084116641816143e-17,
+            "lower_dec": "1.767766952966368811002110905262122598211e-1",
+            "upper_dec": "1.767766952966368811002110905262122598214e-1",
+            "arb_ball_str": "[0.1767766952966368811002110905262122598212 +/- 8.99e-42]"
+          },
+          "coprime_bound_w_5_2_times_q_neg_3_plus_1_over_2_q_sq": {
+            "mid_float": 0.15839191898578664,
+            "rad_float_outward": 6.0480214632351175e-18,
+            "lower_dec": "1.583919189857866454657891371114861847997e-1",
+            "upper_dec": "1.583919189857866454657891371114861848000e-1",
+            "arb_ball_str": "[0.1583919189857866454657891371114861847998 +/- 3.26e-42]"
+          },
+          "coprime_bound_using_least_prime_q_gt_u": {
+            "mid_float": 0.15839191898578664,
+            "rad_float_outward": 6.0480214632351175e-18,
+            "lower_dec": "1.583919189857866454657891371114861847997e-1",
+            "upper_dec": "1.583919189857866454657891371114861848000e-1",
+            "arb_ball_str": "[0.1583919189857866454657891371114861847998 +/- 3.26e-42]"
+          },
+          "coprime_tail_bounds_strictly_certified": true
+        },
+        {
+          "u_label": "5",
+          "u_floor": 5,
+          "primes_le_u": [
+            2,
+            3,
+            5
+          ],
+          "least_prime_strictly_above_u": 7,
+          "exact_fraction_and_256bit_arb_agree": true,
+          "unrestricted_tail_sum_n_gt_u_n_neg_3": {
+            "mid_float": 0.01639486612255725,
+            "rad_float_outward": 1.7027823339821706e-18,
+            "lower_dec": "1.639486612255724836270112447441295372793e-2",
+            "upper_dec": "1.639486612255724836270112447441295372796e-2",
+            "arb_ball_str": "[0.01639486612255724836270112447441295372795 +/- 7.45e-43]"
+          },
+          "naive_1_over_2_u_sq": {
+            "mid_float": 0.02,
+            "rad_float_outward": 4.1633363423443374e-19,
+            "lower_dec": "1.999999999999999999999999999999999999998e-2",
+            "upper_dec": "2.000000000000000000000000000000000000002e-2",
+            "arb_ball_str": "[0.02000000000000000000000000000000000000000 +/- 3e-46]"
+          },
+          "naive_bound_holds_for_unrestricted_tail": true,
+          "repaired_1_over_2_floor_u_sq": {
+            "mid_float": 0.02,
+            "rad_float_outward": 4.1633363423443374e-19,
+            "lower_dec": "1.999999999999999999999999999999999999998e-2",
+            "upper_dec": "2.000000000000000000000000000000000000002e-2",
+            "arb_ball_str": "[0.02000000000000000000000000000000000000000 +/- 3e-46]"
+          },
+          "repaired_floor_bound_strictly_certified": true,
+          "abs_R_lambda_Pu_at_w_2": {
+            "mid_float": 0.02512020163227101,
+            "rad_float_outward": 2.828427135171579e-06,
+            "lower_dec": "2.511737320513584147293671526863559270549e-2",
+            "upper_dec": "2.512303005940618315535915576770289922408e-2",
+            "arb_ball_str": "[0.02512 +/- 3.04e-6]"
+          },
+          "coprime_bound_w_5_2_over_2_floor_u_sq": {
+            "mid_float": 0.1131370849898476,
+            "rad_float_outward": 1.6276080153239696e-18,
+            "lower_dec": "1.131370849898476039041350979367758462854e-1",
+            "upper_dec": "1.131370849898476039041350979367758462857e-1",
+            "arb_ball_str": "[0.1131370849898476039041350979367758462856 +/- 2.63e-41]"
+          },
+          "coprime_bound_w_5_2_over_2_q_minus_1_sq": {
+            "mid_float": 0.07856742013183861,
+            "rad_float_outward": 5.423116454159627e-18,
+            "lower_dec": "7.856742013183861382231604023387211547608e-2",
+            "upper_dec": "7.856742013183861382231604023387211547611e-2",
+            "arb_ball_str": "[0.07856742013183861382231604023387211547609 +/- 2.89e-42]"
+          },
+          "coprime_bound_w_5_2_times_q_neg_3_plus_1_over_2_q_sq": {
+            "mid_float": 0.07421528898750936,
+            "rad_float_outward": 4.839490427093346e-18,
+            "lower_dec": "7.421528898750936116160465608097540937099e-2",
+            "upper_dec": "7.421528898750936116160465608097540937102e-2",
+            "arb_ball_str": "[0.07421528898750936116160465608097540937100 +/- 3.19e-42]"
+          },
+          "coprime_bound_using_least_prime_q_gt_u": {
+            "mid_float": 0.07421528898750936,
+            "rad_float_outward": 4.839490427093346e-18,
+            "lower_dec": "7.421528898750936116160465608097540937099e-2",
+            "upper_dec": "7.421528898750936116160465608097540937102e-2",
+            "arb_ball_str": "[0.07421528898750936116160465608097540937100 +/- 3.19e-42]"
+          },
+          "coprime_tail_bounds_strictly_certified": true
+        },
+        {
+          "u_label": "5 + 2^{-100}",
+          "u_floor": 5,
+          "primes_le_u": [
+            2,
+            3,
+            5
+          ],
+          "least_prime_strictly_above_u": 7,
+          "exact_fraction_and_256bit_arb_agree": true,
+          "unrestricted_tail_sum_n_gt_u_n_neg_3": {
+            "mid_float": 0.01639486612255725,
+            "rad_float_outward": 1.7027823339821706e-18,
+            "lower_dec": "1.639486612255724836270112447441295372793e-2",
+            "upper_dec": "1.639486612255724836270112447441295372796e-2",
+            "arb_ball_str": "[0.01639486612255724836270112447441295372795 +/- 7.45e-43]"
+          },
+          "naive_1_over_2_u_sq": {
+            "mid_float": 0.02,
+            "rad_float_outward": 4.1633363423444004e-19,
+            "lower_dec": "1.999999999999999999999999999999368911274e-2",
+            "upper_dec": "1.999999999999999999999999999999368911277e-2",
+            "arb_ball_str": "[0.01999999999999999999999999999999368911276 +/- 1.77e-42]"
+          },
+          "naive_bound_holds_for_unrestricted_tail": true,
+          "repaired_1_over_2_floor_u_sq": {
+            "mid_float": 0.02,
+            "rad_float_outward": 4.1633363423443374e-19,
+            "lower_dec": "1.999999999999999999999999999999999999998e-2",
+            "upper_dec": "2.000000000000000000000000000000000000002e-2",
+            "arb_ball_str": "[0.02000000000000000000000000000000000000000 +/- 3e-46]"
+          },
+          "repaired_floor_bound_strictly_certified": true,
+          "abs_R_lambda_Pu_at_w_2": {
+            "mid_float": 0.02512020163227101,
+            "rad_float_outward": 2.828427135171579e-06,
+            "lower_dec": "2.511737320513584147293671526863559270549e-2",
+            "upper_dec": "2.512303005940618315535915576770289922408e-2",
+            "arb_ball_str": "[0.02512 +/- 3.04e-6]"
+          },
+          "coprime_bound_w_5_2_over_2_floor_u_sq": {
+            "mid_float": 0.1131370849898476,
+            "rad_float_outward": 1.6276080153239696e-18,
+            "lower_dec": "1.131370849898476039041350979367758462854e-1",
+            "upper_dec": "1.131370849898476039041350979367758462857e-1",
+            "arb_ball_str": "[0.1131370849898476039041350979367758462856 +/- 2.63e-41]"
+          },
+          "coprime_bound_w_5_2_over_2_q_minus_1_sq": {
+            "mid_float": 0.07856742013183861,
+            "rad_float_outward": 5.423116454159627e-18,
+            "lower_dec": "7.856742013183861382231604023387211547608e-2",
+            "upper_dec": "7.856742013183861382231604023387211547611e-2",
+            "arb_ball_str": "[0.07856742013183861382231604023387211547609 +/- 2.89e-42]"
+          },
+          "coprime_bound_w_5_2_times_q_neg_3_plus_1_over_2_q_sq": {
+            "mid_float": 0.07421528898750936,
+            "rad_float_outward": 4.839490427093346e-18,
+            "lower_dec": "7.421528898750936116160465608097540937099e-2",
+            "upper_dec": "7.421528898750936116160465608097540937102e-2",
+            "arb_ball_str": "[0.07421528898750936116160465608097540937100 +/- 3.19e-42]"
+          },
           "coprime_bound_using_least_prime_q_gt_u": {
             "mid_float": 0.07421528898750936,
             "rad_float_outward": 4.839490427093346e-18,
@@ -6544,8 +7201,8 @@
       "all_repaired_boundary_cutoffs_hold": true
     },
     "coprime_decomposition_and_coupled_cutoff_attempt": {
-      "identity": "For u >= 2, every integer n >= 2 with gcd(n, N_u) = 1 satisfies n >= q_{>u} >= floor(u) + 1 > u, so Q_{lambda,P_u}(w) = w^{5/2} exp(-w^2) + R_{lambda,P_u}(w) with |R_{lambda,P_u}(w)| <= w^{5/2} / (2 floor(u)^2) and |R_{lambda,P_u}(w)| <= w^{5/2} (1/q_{>u}^3 + 1/(2 q_{>u}^2)).",
-      "coupled_regime_diagnosis": "Substituting Q_{lambda,P_u}(X/m) = (X/m)^{5/2} exp(-X^2/m^2) + R_{lambda,P_u}(X/m) into the inverse reconstruction Q_lambda(X) = sum_{m in S(P_u)} (lambda(m)/sqrt(m)) Q_{lambda,P_u}(X/m) splits Q_lambda(X) into the P_u-smooth sum X^{5/2} sum_{m in S(P_u)} (lambda(m)/m^3) exp(-X^2/m^2) plus the rough-cofactor sum over n >= q_{>u} with gcd(n, N_u) = 1. For any coupled cutoff u = Y^theta (theta in (0, 1]), the P_u-smooth integers m ~ Y have positive Dickman density rho_Dickman(1/theta) > 0, so the unsigned P_u-smooth sum at the transition still has magnitude ~ rho_Dickman(1/theta) sqrt(Y) (energy ~ Y), while the unsigned rough-cofactor sum over m in S(P_u) and n >= q_{>u} has magnitude ~ (1 - rho_Dickman(1/theta)) sqrt(Y).",
+      "identity": "For u >= 2, every integer n >= 2 with gcd(n, N_u) = 1 satisfies n >= q_{>u} >= floor(u) + 1 > u, so Q_{lambda,P_u}(w) = w^{5/2} exp(-w^2) + R_{lambda,P_u}(w) with |R_{lambda,P_u}(w)| <= w^{5/2} / (2 (q_{>u} - 1)^2) <= w^{5/2} / (2 floor(u)^2) and |R_{lambda,P_u}(w)| <= w^{5/2} (1/q_{>u}^3 + 1/(2 q_{>u}^2)).",
+      "coupled_regime_diagnosis": "Substituting Q_{lambda,P_u}(X/m) = (X/m)^{5/2} exp(-X^2/m^2) + R_{lambda,P_u}(X/m) into the inverse reconstruction Q_lambda(X) = sum_{m in S(P_u)} (lambda(m)/sqrt(m)) Q_{lambda,P_u}(X/m) splits Q_lambda(X) into the P_u-smooth sum X^{5/2} sum_{m in S(P_u)} (lambda(m)/m^3) exp(-X^2/m^2) plus the nonsmooth sum (integers n = m r >= 2 with m in S(P_u) and P_u-rough cofactor r >= q_{>u}, gcd(r, N_u) = 1, i.e., integers having AT LEAST ONE prime factor > u; this strictly contains the P_u-rough integers m = 1, r >= q_{>u} whose prime factors ALL exceed u). For any coupled cutoff u = Y^theta (theta in (0, 1)), P_u-smooth integers n ~ Y have Dickman density rho_Dickman(1/theta) > 0, nonsmooth integers n ~ Y have Dickman-complement density 1 - rho_Dickman(1/theta) > 0 (carrying the order-Y unsigned residual via mixed smooth-rough composites), whereas P_u-rough integers n ~ Y (gcd(n, N_u) = 1) have Buchstab density ~ omega_Buchstab(1/theta) / (theta log Y).",
       "coprime_tail_rows": [
         {
           "u": 5,
@@ -7215,7 +7872,10 @@
       ],
       "research_implication_and_scope_distinction": "Because ||P_u^{-1}||_{H_eta -> H_eta} = prod_{p <= u} (1 - p^{-1/2 - eta})^{-1} is an EXACT equality on the full space H_eta, uniform full-space inverse norms diverge as u -> infty for all 0 < eta <= 1/2, and NO 'signed improvement' of the full-space operator norm on H_eta exists. Closing SUBGATE-TC-043A cannot proceed via a universal inverse-filter norm on H_eta; it must exploit the specific structure of the arithmetic input Q_lambda (which does not concentrate its energy exclusively at Kronecker resonant frequencies). This full-space operator obstruction does not disprove TC, RH, or boundedness of Q_lambda.",
       "kronecker_phase_alignment_witness_P_2_3_5_eta_1_4": {
+        "odd_harmonic_index_k_odd": 2513,
         "odd_multiple_of_half_tau_over_log2": 2513,
+        "b_witness_formula": "2513 * tau / (2 * log 2)",
+        "indexing_convention_note": "k_odd = 2513 is already the odd harmonic integer in range(1, 4000, 2), so b_* = 2513 * tau / (2 * log 2) (NOT (2 * 2513 + 1) * tau / (2 * log 2)).",
         "b_witness": {
           "mid_float": 11389.821036411739,
           "rad_float_outward": 4.888845538728125e-13,
@@ -8604,7 +9264,7 @@
       "two_sided_integrand_ratio_enclosure": "r_0^3 exp(-(tau Y)^2 Delta) K_Y(b, n) <= K_Y(a, n) <= r_0^3 exp(-Y^2 Delta) K_Y(b, n)",
       "integrand_ratio_difference_bound": "|K_Y(a, n) - K_Y(b, n)| <= max(|r_0^3 exp(-(tau Y)^2 Delta) - 1|, |r_0^3 exp(-Y^2 Delta) - 1|) K_Y(b, n)",
       "transition_relative_gap_bound": "|K_Y(a, n) - K_Y(b, n)| <= ((b - a) / a) (b / a)^3 (3 + 2 tau^2 Y^2 / a^2) K_Y(b, n)",
-      "useful_regime_and_non_saving_caveat": "For a >= c Y (c > 0), the relative-gap bound has explicit transition-restricted coefficient ((b - a)/a)(b/a)^3 (3 + 2 tau^2 / c^2). This pairwise kernel inequality is NOT a global energy saving by itself because its coefficient 3 + 2 tau^2 / c^2, divisor summation multiplicities, unmatched terms, and window boundary shifts must all be bounded simultaneously.",
+      "useful_regime_and_non_saving_caveat": "For a >= c Y (c > 0), the relative-gap bound has explicit transition-restricted coefficient ((b - a)/a)(b/a)^3 (3 + 2 tau^2 / c^2), retaining the full (b/a)^3 factor. A uniform O((b - a)/a) K_Y(b, n) statement holds ONLY when BOTH a >= c Y AND the ratio 1 <= b / a <= R is bounded (small/bounded-gap regime: coeff <= R^3 (3 + 2 tau^2 / c^2)). This pairwise kernel inequality is NOT a global energy saving by itself because its coefficient, divisor summation multiplicities, unmatched terms, and window boundary shifts must all be bounded simultaneously.",
       "rows": [
         {
           "regime": "comparable_transition_scale",
@@ -8612,6 +9272,7 @@
           "a": 8,
           "b": 10,
           "n": 8,
+          "b_over_a_cubed": "125/64",
           "verification_classification": "certified_strict_inequality",
           "K_Y_a_n": {
             "mid_float": 0.014137465468123623,
@@ -8686,6 +9347,7 @@
           "a": 18,
           "b": 21,
           "n": 15,
+          "b_over_a_cubed": "343/216",
           "verification_classification": "certified_strict_inequality",
           "K_Y_a_n": {
             "mid_float": 0.0066239844617106535,
@@ -8760,6 +9422,7 @@
           "a": 40,
           "b": 44,
           "n": 20,
+          "b_over_a_cubed": "1331/1000",
           "verification_classification": "certified_strict_inequality",
           "K_Y_a_n": {
             "mid_float": 0.0021431676774004557,
@@ -8834,6 +9497,7 @@
           "a": 10,
           "b": 11,
           "n": 11,
+          "b_over_a_cubed": "1331/1000",
           "verification_classification": "certified_strict_inequality",
           "K_Y_a_n": {
             "mid_float": 1.8320301849022058e-09,
@@ -8908,6 +9572,7 @@
           "a": 4,
           "b": 5,
           "n": 10,
+          "b_over_a_cubed": "125/64",
           "verification_classification": "certified_strict_inequality",
           "K_Y_a_n": {
             "mid_float": 2.3081601256208185e-13,
@@ -8982,6 +9647,7 @@
           "a": 4,
           "b": 15,
           "n": 25,
+          "b_over_a_cubed": "3375/64",
           "verification_classification": "certified_strict_inequality",
           "K_Y_a_n": {
             "mid_float": 0.0002968647387985534,
@@ -9056,6 +9722,7 @@
           "a": 100,
           "b": 101,
           "n": 100,
+          "b_over_a_cubed": "1030301/1000000",
           "verification_classification": "certified_strict_inequality",
           "K_Y_a_n": {
             "mid_float": 0.00011305966901591233,
@@ -9130,6 +9797,7 @@
           "a": 12,
           "b": 12,
           "n": 15,
+          "b_over_a_cubed": "1",
           "verification_classification": "exact_algebraic_zero_identity",
           "K_Y_a_n": {
             "mid_float": 0.007557463151225775,
@@ -9212,13 +9880,37 @@
         6,
         10
       ],
+      "lcm_modulus_N": 4620,
+      "prime_divisors_of_N": [
+        2,
+        3,
+        5,
+        7,
+        11
+      ],
+      "natural_coprime_density_prod_1_minus_1_over_p": "16/77",
+      "periodic_zero_pairing_weight_natural_density_mod_4620": "32/77",
       "mean_divisor_weight_w_bar": "4391/4620",
       "k_range_tested": "1 <= k <= 240",
+      "finite_sample_coprime_to_N_count_1_to_240": 50,
+      "finite_sample_coprime_to_N_frequency_unreduced": "50/240",
+      "finite_sample_coprime_to_N_frequency_reduced": "5/24",
       "unmatched_k_count_with_W_pair_eq_0": 101,
+      "finite_sample_zero_pairing_weight_frequency_1_to_240": "101/240",
       "k_count_with_W_pair_ne_w_bar": 240,
+      "density_and_class_separation_verified": true,
+      "integer_class_definitions_and_partition_audit_P_2_3_5_up_to_120": {
+        "P_smooth_definition": "S(P) = {n >= 1 : every prime factor p | n belongs to P}",
+        "P_rough_definition": "{n >= 1 : gcd(n, N_P) = 1, i.e., every prime factor p | n lies outside P}",
+        "nonsmooth_definition": "Z_{>=1} \\ S(P) = {n >= 1 : at least one prime factor p | n lies outside P}",
+        "P_smooth_count_1_to_120": 36,
+        "P_rough_count_1_to_120": 32,
+        "nonsmooth_count_1_to_120": 84,
+        "mixed_smooth_rough_composite_count_1_to_120": 53
+      },
       "fixed_vs_growing_factor_set_separation": {
-        "fixed_finite_factor_set": "For a fixed finite factor set P_act = P_1 union P_2, integers k coprime to prod_{p in P_act} p have positive natural density prod_{p in P_act} (1 - 1/p) > 0, leaving ~ Y unmatched integers in [Y, tau Y] and an unsigned transition energy contribution of order Y.",
-        "growing_factor_set_and_unmatched_primes_scale": "For a growing cutoff u = Y^theta (0 < theta < 1), unmatched primes p in [Y, tau Y] alone have count pi(tau Y) - pi(Y) ~ (tau - 1) Y / log Y; each prime contributes O(Y^{-1/2}) to Q_lambda(X), so unmatched primes alone contribute O(sqrt(Y) / log Y) to Q_lambda(X) and transition scale Y / (log Y)^2 to the prime-prime energy (NOT order Y). The order-Y unsigned residual for u = Y^theta comes from integers n in [Y, tau Y] having at least one prime factor > Y^theta (Dickman complement density 1 - rho_Dickman(1/theta) > 0), while Y^theta-rough composite integers (all prime factors > Y^theta) have Buchstab density ~ omega(1/theta) / (theta log Y)."
+        "fixed_finite_factor_set": "For P_1 = {5, 7, 11}, P_2 = {4, 6, 10}, N = lcm(5, 7, 11, 4, 6, 10) = 4620 has prime divisors {2, 3, 5, 7, 11} and natural coprime density prod_{p | 4620}(1 - 1/p) = 16/77 (50/240 = 5/24 on 1 <= k <= 240), whereas the zero-pairing-weight set {k : W_pair(k) = 0} (neither divisible by 5, 7, 11 nor by 4, 6) has periodic natural density (8/12) * (48/77) = 32/77 mod 4620 and finite sample frequency 101/240 on 1 <= k <= 240.",
+        "growing_factor_set_and_unmatched_primes_scale": "For a growing cutoff u = Y^theta (0 < theta < 1), the three integer classes have distinct densities: (i) Y^theta-smooth integers have Dickman density rho_Dickman(1/theta) in (0, 1); (ii) Y^theta-rough integers (every prime factor > Y^theta) have Buchstab density ~ omega_Buchstab(1/theta) / (theta log Y) (decaying as 1/log Y, NOT positive constant density); in particular, unmatched primes p in [Y, tau Y] have count pi(tau Y) - pi(Y) ~ (tau - 1) Y / log Y and prime-prime transition sum scale Y / (log Y)^2 (which is a restricted positive sub-sum, NOT a lower bound for the total signed energy E_lambda(Y) because prime-composite and composite-composite cross terms carry opposite signs); (iii) nonsmooth integers (at least one prime factor > Y^theta, comprising Y^theta-rough integers > 1 together with mixed smooth-rough composites n = m r with m > 1 smooth and r > 1 rough) have positive Dickman complement density 1 - rho_Dickman(1/theta) > 0, accounting for the order-Y unsigned residual."
       }
     }
   },
@@ -9251,25 +9943,50 @@
         "E_a2_from_unimodal_only": "E_{a_2}(Y) = ((tau - 1) / 36) Y + O(log Y)"
       },
       "second_order_euler_maclaurin_recovery": {
+        "exact_dyadic_identity": "Q_{a_2}(X) = Q_1(X) + 2 sum_{k >= 1} (-1)^k 2^{-k/2} Q_1(X / 2^k)",
         "Q_1_second_order_bound": "|Q_1(w) - sqrt(w)/2| <= (w^{5/2}/12) int_0^infty |h_w''(t)| dt <= 3 w^{-3/2}  (forall w > 0)",
-        "dyadic_split_cutoff": "K_X = floor(log_2 X) for X >= 1",
-        "large_scale_sum_1_le_k_le_K_X": "sqrt(2) sum_{k=1}^{K_X} 2^{-k/2} * 3 (X/2^k)^{-3/2} = 3 sqrt(2) X^{-3/2} sum_{k=1}^{K_X} 2^k <= 6 sqrt(2) X^{-1/2}",
-        "omitted_main_term_tail_k_gt_K_X": "sqrt(2) sum_{k > K_X} 2^{-k/2} (1/2) sqrt(X/2^k) = (sqrt(2 X)/2) 2^{-K_X} <= sqrt(2) X^{-1/2}",
-        "small_scale_tail_k_gt_K_X": "sqrt(2) zeta(3) X^{5/2} sum_{k > K_X} 2^{-3k} = (sqrt(2) zeta(3)/7) X^{5/2} 2^{-3 K_X} <= (8 sqrt(2) zeta(3)/7) X^{-1/2}",
+        "dyadic_split_cutoff": "L = floor(log_2 X) >= 0 for all X >= 1 (including L = 0 on 1 <= X < 2, where sum_{k=1}^L is empty = 0)",
+        "k_eq_0_error": "|Q_1(X) - sqrt(X)/2| <= 3 X^{-3/2} <= 3 X^{-1/2}  (X >= 1)",
+        "large_scale_sum_1_le_k_le_L": "2 sum_{k=1}^L 2^{-k/2} * 3 (X/2^k)^{-3/2} = 6 X^{-3/2} sum_{k=1}^L 2^k = 6 X^{-3/2} (2^{L+1} - 2) <= 12 X^{-1/2}",
+        "omitted_main_term_tail_k_gt_L": "2 sum_{k > L} 2^{-k/2} (1/2) sqrt(X/2^k) = sqrt(X) 2^{-L} <= 2 X^{-1/2}",
+        "small_scale_tail_k_gt_L": "2 zeta(3) X^{5/2} sum_{k > L} 8^{-k} = (2 zeta(3) / 7) X^{5/2} 8^{-L} <= (16 zeta(3) / 7) X^{-1/2}",
+        "component_constants": {
+          "c_k0": "3",
+          "c_large_scale_1_le_k_le_L": "12",
+          "c_omitted_main_tail_k_gt_L": "2",
+          "c_small_scale_tail_k_gt_L_formula": "(16 / 7) * zeta(3)",
+          "c_small_scale_tail_k_gt_L": {
+            "mid_float": 2.7475586357933586,
+            "rad_float_outward": 2.057576410842269e-16,
+            "lower_dec": "2.747558635793358366627972940597599978890e+0",
+            "upper_dec": "2.747558635793358366627972940597599978893e+0",
+            "arb_ball_str": "[2.747558635793358366627972940597599978891 +/- 3.98e-40]"
+          }
+        },
+        "explicit_C_a2_formula": "17 + (16 / 7) * zeta(3)",
         "explicit_C_a2_constant": {
-          "mid_float": 14.842312279688809,
-          "rad_float_outward": 1.1029001447570361e-16,
-          "lower_dec": "1.484231227968880861907095700769835025023e+1",
-          "upper_dec": "1.484231227968880861907095700769835025026e+1",
-          "arb_ball_str": "[14.84231227968880861907095700769835025024 +/- 4.79e-39]"
+          "mid_float": 19.747558635793357,
+          "rad_float_outward": 1.1265099884659612e-15,
+          "lower_dec": "1.974755863579335836662797294059759997888e+1",
+          "upper_dec": "1.974755863579335836662797294059759997891e+1",
+          "arb_ball_str": "[19.74755863579335836662797294059759997889 +/- 1.40e-39]"
+        },
+        "audit_note_on_retired_14_84231228_derivation": "The prior TC-055R derivation obtained 3 + 7*sqrt(2) + (8*sqrt(2)/7)*zeta(3) = 14.8423122796888... by erroneously substituting sqrt(2) for the coefficient 2 in Q_{a_2}(X) = Q_1(X) + 2 sum_{k>=1} (-1)^k 2^{-k/2} Q_1(X/2^k). The audit invalidates that derivation and replaces it with the proved constant C_{a_2} = 17 + (16/7)*zeta(3) = 19.74755863579336...; it does not establish that the smaller numerical bound is false.",
+        "derived_energy_remainder_formula": "For Y >= 1, writing Q_{a_2}(X) = sqrt(X)/6 + rho_2(X) with |rho_2(X)| <= C_{a_2} X^{-1/2} gives | |Q_{a_2}(X)|^2 - X/36 | <= (C_{a_2}/3) + C_{a_2}^2 X^{-1}, hence |E_{a_2}(Y) - ((tau - 1)/36) Y| <= (C_{a_2} log tau)/3 + C_{a_2}^2 (1 - tau^{-1}) Y^{-1} <= C_{E,a_2} = O(1).",
+        "explicit_C_E_a2_uniform_O1_cap_for_Y_ge_1": {
+          "mid_float": 339.9989057768068,
+          "rad_float_outward": 2.4307680421421742e-14,
+          "lower_dec": "3.399989057768068180181010280796024761157e+2",
+          "upper_dec": "3.399989057768068180181010280796024761160e+2",
+          "arb_ball_str": "[339.9989057768068180181010280796024761158 +/- 1.72e-38]"
         },
         "recovered_sharp_bounds": "Q_{a_2}(X) = (1 / 6) sqrt(X) + O(X^{-1/2}) and E_{a_2}(Y) = ((tau - 1) / 36) Y + O(1)"
       }
     },
     "asymptotic_formulas": {
-      "Q_a2_asymptotic": "Q_{a_2}(X) = (1 / 6) sqrt(X) + O(X^{-1/2}) ~ sqrt(X) / 6 (or + O(X^{-1/2} log X) from first-order unimodal bound alone)",
-      "E_a2_asymptotic": "E_{a_2}(Y) := int_Y^{tau Y} |Q_{a_2}(X)|^2 dX/X = ((tau - 1) / 36) Y + O(1) ~ ((tau - 1) / 36) Y (or + O(log Y) from first-order unimodal bound alone)",
-      "general_finite_S_asymptotic": "For a_S(n) = (-1)^{sum_{p in S} v_p(n)}, Q_{a_S}(X) ~ (1/2) (prod_{p in S} (p - 1)/(p + 1)) sqrt(X) and E_{a_S}(Y) ~ ((tau - 1) / 4) (prod_{p in S} (p - 1)/(p + 1))^2 Y.",
+      "Q_a2_asymptotic": "Q_{a_2}(X) = (1 / 6) sqrt(X) + O(X^{-1/2}) ~ sqrt(X) / 6 (for X >= 1, with |Q_{a_2}(X) - sqrt(X)/6| <= C_{a_2} X^{-1/2})",
+      "E_a2_asymptotic": "E_{a_2}(Y) := int_Y^{tau Y} |Q_{a_2}(X)|^2 dX/X = ((tau - 1) / 36) Y + O(1) ~ ((tau - 1) / 36) Y (for Y >= 1)",
+      "general_finite_S_asymptotic": "For a_S(n) = (-1)^{sum_{p in S} v_p(n)}, the Euler-factor mean is prod_{p in S} (p - 1)/(p + 1), giving leading asymptotics Q_{a_S}(X) ~ (1/2) (prod_{p in S} (p - 1)/(p + 1)) sqrt(X) and E_{a_S}(Y) ~ ((tau - 1) / 4) (prod_{p in S} (p - 1)/(p + 1))^2 Y (quantitative O(X^{-1/2}) and O(1) error bounds are proved here for S = {2}; multi-prime O(X^{-1/2})/O(1) remainders are not claimed).",
       "one_sixth": {
         "mid_float": 0.16666666666666666,
         "rad_float_outward": 9.251858538542972e-18,
@@ -9292,7 +10009,10 @@
         ],
         "euler_factor_mean_prod_p_minus_1_over_p_plus_1": "1/4",
         "leading_Q_aS_over_sqrt_X_coefficient": "1/8",
+        "leading_Q_aS_asymptotic_statement": "Q_{a_{3,5,7}}(X) ~ sqrt(X) / 8",
         "leading_E_aS_over_Y_coefficient_formula": "(tau - 1) / 64",
+        "leading_E_aS_asymptotic_statement": "E_{a_{3,5,7}}(Y) ~ ((tau - 1) / 64) Y",
+        "remainder_scope_note": "Preserves mean 1/4 and leading asymptotics Q_{a_S}(X) ~ sqrt(X)/8, E_{a_S}(Y) ~ ((tau - 1)/64) Y; does NOT claim unproved multi-prime O(X^{-1/2}) or O(1) error terms.",
         "leading_E_aS_over_Y_coefficient": {
           "mid_float": 0.08254977042468103,
           "rad_float_outward": 3.8270212473354795e-18,
@@ -9371,7 +10091,164 @@
     ],
     "Q_a2_rows": [
       {
+        "X": 1,
+        "L_eq_floor_log2_X": 0,
+        "Q_a2_X": {
+          "mid_float": 0.32538406938362135,
+          "rad_float_outward": 1.953125004132452e-07,
+          "lower_dec": "3.253838740711209416532191007166368017086e-1",
+          "upper_dec": "3.253842646961217317767412659480434903991e-1",
+          "arb_ball_str": "[0.325384 +/- 2.65e-7]"
+        },
+        "Q_a2_dyadic_series_coeff_2": {
+          "mid_float": 0.32538396514340034,
+          "rad_float_outward": 2.734350848023498e-07,
+          "lower_dec": "3.253836917083155535218191369583058066793e-1",
+          "upper_dec": "3.253842385784851467272654270433979936074e-1",
+          "arb_ball_str": "[0.325384 +/- 3.09e-7]"
+        },
+        "direct_minus_dyadic_coeff_2_consistency": {
+          "mid_float": 1.0424022098659044e-07,
+          "rad_float_outward": 4.6874758563575375e-07,
+          "lower_dec": "-3.645073646491632561763893773613511702681e-7",
+          "upper_dec": "5.729878066223441319790523538531721451619e-7",
+          "arb_ball_str": "[+/- 5.73e-7]"
+        },
+        "erroneous_sqrt2_dyadic_series_discrepancy": {
+          "mid_float": 0.06194210913881569,
+          "rad_float_outward": 4.458660107791014e-07,
+          "lower_dec": "6.194166327280491200610652799360906381526e-2",
+          "upper_dec": "6.194255500482646935153992148690377969664e-2",
+          "arb_ball_str": "[0.061942 +/- 5.56e-7]"
+        },
+        "dyadic_coeff_2_verified_and_sqrt2_refuted": true,
+        "leading_sqrt_X_over_6": {
+          "mid_float": 0.16666666666666666,
+          "rad_float_outward": 9.251858538542972e-18,
+          "lower_dec": "1.666666666666666666666666666666666666665e-1",
+          "upper_dec": "1.666666666666666666666666666666666666668e-1",
+          "arb_ball_str": "[0.1666666666666666666666666666666666666667 +/- 3.34e-41]"
+        },
+        "ratio_Q_a2_over_sqrt_X": {
+          "mid_float": 0.32538406938362135,
+          "rad_float_outward": 1.953125006352898e-07,
+          "lower_dec": "3.253838740711207196086141756853287169823e-1",
+          "upper_dec": "3.253842646961219538213461909793515751254e-1",
+          "arb_ball_str": "[0.325384 +/- 2.65e-7]"
+        },
+        "scaled_remainder_sqrt_X_times_diff": {
+          "mid_float": 0.15871740271695467,
+          "rad_float_outward": 1.9531250128356052e-07,
+          "lower_dec": "1.587172074044533868081327339247377961366e-1",
+          "upper_dec": "1.587175980294559532884942994066091626378e-1",
+          "arb_ball_str": "[0.158717 +/- 5.99e-7]"
+        },
+        "second_order_em_bound_C_a2_X_neg_half": {
+          "mid_float": 19.747558635793357,
+          "rad_float_outward": 1.1265099884659612e-15,
+          "lower_dec": "1.974755863579335836662797294059759997888e+1",
+          "upper_dec": "1.974755863579335836662797294059759997891e+1",
+          "arb_ball_str": "[19.74755863579335836662797294059759997889 +/- 1.40e-39]"
+        },
+        "second_order_em_bound_margin": {
+          "mid_float": 19.588841233076405,
+          "rad_float_outward": 1.9531250215545198e-07,
+          "lower_dec": "1.958884103776390263538408356622229890097e+1",
+          "upper_dec": "1.958884142838890475777523528164155409804e+1",
+          "arb_ball_str": "[19.588841 +/- 4.29e-7]"
+        },
+        "second_order_em_bound_holds": true,
+        "dyadic_filter_lhs_minus_Q_odd_rhs": {
+          "mid_float": 9.777158271322907e-08,
+          "rad_float_outward": 4.3945312677706744e-07,
+          "lower_dec": "-3.416815440638383106273399123393401000783e-7",
+          "upper_dec": "5.372247094902964536446812173880234863478e-7",
+          "arb_ball_str": "[+/- 5.38e-7]"
+        },
+        "dyadic_filter_strictly_positive_and_matches_Q_odd": true,
+        "Q_1_exact_unimodal_and_em2_bounds_hold": true
+      },
+      {
+        "X": 2,
+        "L_eq_floor_log2_X": 1,
+        "Q_a2_X": {
+          "mid_float": 0.08274537996667228,
+          "rad_float_outward": 1.1048543484596985e-06,
+          "lower_dec": "8.274427511232382776318315741138906762487e-2",
+          "upper_dec": "8.274648482102073749222524788694830224404e-2",
+          "arb_ball_str": "[0.08275 +/- 5.73e-6]"
+        },
+        "Q_a2_dyadic_series_coeff_2": {
+          "mid_float": 0.08274479029534665,
+          "rad_float_outward": 1.5467824106059433e-06,
+          "lower_dec": "8.274324351293604259116743476044711213863e-2",
+          "upper_dec": "8.274633707775724197053402447056349855224e-2",
+          "arb_ball_str": "[0.08274 +/- 6.34e-6]"
+        },
+        "direct_minus_dyadic_coeff_2_consistency": {
+          "mid_float": 5.896713256403469e-07,
+          "rad_float_outward": 2.6516367590545546e-06,
+          "lower_dec": "-2.061965433414207350867059174430927332278e-6",
+          "upper_dec": "3.241308084694901057813126501190105382569e-6",
+          "arb_ball_str": "[+/- 3.25e-6]"
+        },
+        "erroneous_sqrt2_dyadic_series_discrepancy": {
+          "mid_float": 0.17857765309827173,
+          "rad_float_outward": 2.522199032748749e-06,
+          "lower_dec": "1.785751308992389782020337281661654423592e-1",
+          "upper_dec": "1.785801752973044572741356080310965489269e-1",
+          "arb_ball_str": "[0.17858 +/- 4.87e-6]"
+        },
+        "dyadic_coeff_2_verified_and_sqrt2_refuted": true,
+        "leading_sqrt_X_over_6": {
+          "mid_float": 0.23570226039551584,
+          "rad_float_outward": 2.391561554664421e-18,
+          "lower_dec": "2.357022603955158414669481207016163464281e-1",
+          "upper_dec": "2.357022603955158414669481207016163464284e-1",
+          "arb_ball_str": "[0.2357022603955158414669481207016163464283 +/- 2.14e-41]"
+        },
+        "ratio_Q_a2_over_sqrt_X": {
+          "mid_float": 0.058509819296887144,
+          "rad_float_outward": 7.814669515937568e-07,
+          "lower_dec": "5.850903782993555068969726562499999999999e-2",
+          "upper_dec": "5.851060076383873820304870605468750000001e-2",
+          "arb_ball_str": "[0.058510 +/- 9.63e-7]"
+        },
+        "scaled_remainder_sqrt_X_times_diff": {
+          "mid_float": -0.21631369476075038,
+          "rad_float_outward": 1.56250001738284e-06,
+          "lower_dec": "-2.163152572607677630037610441648457507269e-1",
+          "upper_dec": "-2.163121322607330203061533183061573962344e-1",
+          "arb_ball_str": "[-0.21631 +/- 5.26e-6]"
+        },
+        "second_order_em_bound_C_a2_X_neg_half": {
+          "mid_float": 13.96363262324845,
+          "rad_float_outward": 5.218567030601124e-16,
+          "lower_dec": "1.396363262324845119227349009401289736808e+1",
+          "upper_dec": "1.396363262324845119227349009401289736811e+1",
+          "arb_ball_str": "[13.96363262324845119227349009401289736810 +/- 7.05e-40]"
+        },
+        "second_order_em_bound_margin": {
+          "mid_float": 13.810675742819608,
+          "rad_float_outward": 1.1048543562294828e-06,
+          "lower_dec": "1.381067463796525207314236752972081137804e+1",
+          "upper_dec": "1.381067684767396319372612482220008803517e+1",
+          "arb_ball_str": "[13.81068 +/- 5.37e-6]"
+        },
+        "second_order_em_bound_holds": true,
+        "dyadic_filter_lhs_minus_Q_odd_rhs": {
+          "mid_float": 5.530791880950738e-07,
+          "rad_float_outward": 2.485922291128873e-06,
+          "lower_dec": "-1.932843103033798777831919828132671286861e-6",
+          "upper_dec": "3.039001479223946282073653897567707131110e-6",
+          "arb_ball_str": "[+/- 3.04e-6]"
+        },
+        "dyadic_filter_strictly_positive_and_matches_Q_odd": true,
+        "Q_1_exact_unimodal_and_em2_bounds_hold": true
+      },
+      {
         "X": 4,
+        "L_eq_floor_log2_X": 2,
         "Q_a2_X": {
           "mid_float": 0.4534516321490811,
           "rad_float_outward": 6.250000012646517e-06,
@@ -9379,6 +10256,28 @@
           "upper_dec": "4.534578821490937207021235080280249281663e-1",
           "arb_ball_str": "[0.45345 +/- 7.89e-6]"
         },
+        "Q_a2_dyadic_series_coeff_2": {
+          "mid_float": 0.4534482964736461,
+          "rad_float_outward": 8.749922699294268e-06,
+          "lower_dec": "4.534395465509468009960206229555283940227e-1",
+          "upper_dec": "4.534570463963453618608715016710435307417e-1",
+          "arb_ball_str": "[0.4534 +/- 5.71e-5]"
+        },
+        "direct_minus_dyadic_coeff_2_consistency": {
+          "mid_float": 3.335675434997297e-06,
+          "rad_float_outward": 1.4999922726133265e-05,
+          "lower_dec": "-1.166424729113596617248305175006314670842e-5",
+          "upper_dec": "1.833559816113056081808707621395662868224e-5",
+          "arb_ball_str": "[+/- 1.84e-5]"
+        },
+        "erroneous_sqrt2_dyadic_series_discrepancy": {
+          "mid_float": 0.16054474786810174,
+          "rad_float_outward": 1.4267712330718722e-05,
+          "lower_dec": "1.605304801557710260826824899022184176005e-1",
+          "upper_dec": "1.605590155804324394271206776802144808332e-1",
+          "arb_ball_str": "[0.1605 +/- 5.91e-5]"
+        },
+        "dyadic_coeff_2_verified_and_sqrt2_refuted": true,
         "leading_sqrt_X_over_6": {
           "mid_float": 0.3333333333333333,
           "rad_float_outward": 1.8503717077085944e-17,
@@ -9401,11 +10300,18 @@
           "arb_ball_str": "[0.2402 +/- 4.91e-5]"
         },
         "second_order_em_bound_C_a2_X_neg_half": {
-          "mid_float": 7.421156139844404,
-          "rad_float_outward": 5.514500723785181e-17,
-          "lower_dec": "7.421156139844404309535478503849175125121e+0",
-          "upper_dec": "7.421156139844404309535478503849175125124e+0",
-          "arb_ball_str": "[7.421156139844404309535478503849175125122 +/- 3.95e-40]"
+          "mid_float": 9.873779317896679,
+          "rad_float_outward": 5.632549942329806e-16,
+          "lower_dec": "9.873779317896679183313986470298799989444e+0",
+          "upper_dec": "9.873779317896679183313986470298799989447e+0",
+          "arb_ball_str": "[9.873779317896679183313986470298799989446 +/- 3.02e-40]"
+        },
+        "second_order_em_bound_margin": {
+          "mid_float": 9.753661019080932,
+          "rad_float_outward": 6.250000034158197e-06,
+          "lower_dec": "9.753654769080897479663123492598532260883e+0",
+          "upper_dec": "9.753667269080965396179978386014698566428e+0",
+          "arb_ball_str": "[9.75366 +/- 7.27e-6]"
         },
         "second_order_em_bound_holds": true,
         "dyadic_filter_lhs_minus_Q_odd_rhs": {
@@ -9420,6 +10326,7 @@
       },
       {
         "X": 8,
+        "L_eq_floor_log2_X": 3,
         "Q_a2_X": {
           "mid_float": 0.3852804080484546,
           "rad_float_outward": 3.535533915057224e-05,
@@ -9427,6 +10334,28 @@
           "upper_dec": "3.853157633876051645632567070228844016952e-1",
           "arb_ball_str": "[0.3853 +/- 5.50e-5]"
         },
+        "Q_a2_dyadic_series_coeff_2": {
+          "mid_float": 0.3852615388293379,
+          "rad_float_outward": 4.9497037139206055e-05,
+          "lower_dec": "3.852120417921987165427759854229394455458e-1",
+          "upper_dec": "3.853110358664770966825068561466638107805e-1",
+          "arb_ball_str": "[0.3853 +/- 8.80e-5]"
+        },
+        "direct_minus_dyadic_coeff_2_consistency": {
+          "mid_float": 1.8869219116702286e-05,
+          "rad_float_outward": 8.485237628974575e-05,
+          "lower_dec": "-6.598315717304344859704434167491689776871e-5",
+          "upper_dec": "1.037215954064480204807215999449561491065e-4",
+          "arb_ball_str": "[+/- 1.04e-4]"
+        },
+        "erroneous_sqrt2_dyadic_series_discrepancy": {
+          "mid_float": 0.3013312373980394,
+          "rad_float_outward": 8.07103689339807e-05,
+          "lower_dec": "3.012505270291054280799411418760247031799e-1",
+          "upper_dec": "3.014119477669733847117580654943413535708e-1",
+          "arb_ball_str": "[0.301 +/- 4.12e-4]"
+        },
+        "dyadic_coeff_2_verified_and_sqrt2_refuted": true,
         "leading_sqrt_X_over_6": {
           "mid_float": 0.4714045207910317,
           "rad_float_outward": 4.783123109328842e-18,
@@ -9449,11 +10378,18 @@
           "arb_ball_str": "[-0.244 +/- 5.05e-4]"
         },
         "second_order_em_bound_C_a2_X_neg_half": {
-          "mid_float": 5.247549830728161,
-          "rad_float_outward": 2.904775638157271e-16,
-          "lower_dec": "5.247549830728160878258259778306673553649e+0",
-          "upper_dec": "5.247549830728160878258259778306673553652e+0",
-          "arb_ball_str": "[5.247549830728160878258259778306673553650 +/- 1.04e-40]"
+          "mid_float": 6.981816311624225,
+          "rad_float_outward": 2.609283515300562e-16,
+          "lower_dec": "6.981816311624225596136745047006448684048e+0",
+          "upper_dec": "6.981816311624225596136745047006448684051e+0",
+          "arb_ball_str": "[6.981816311624225596136745047006448684050 +/- 3.52e-40]"
+        },
+        "second_order_em_bound_margin": {
+          "mid_float": 6.895692198881648,
+          "rad_float_outward": 3.535533932119211e-05,
+          "lower_dec": "6.895656843542327436180176193363595815250e+0",
+          "upper_dec": "6.895727554220969608022687936670709462714e+0",
+          "arb_ball_str": "[6.8957 +/- 4.32e-5]"
         },
         "second_order_em_bound_holds": true,
         "dyadic_filter_lhs_minus_Q_odd_rhs": {
@@ -9468,6 +10404,7 @@
       },
       {
         "X": 16,
+        "L_eq_floor_log2_X": 4,
         "Q_a2_X": {
           "mid_float": 0.7275212578453379,
           "rad_float_outward": 0.00020000000040457154,
@@ -9475,6 +10412,28 @@
           "upper_dec": "7.277212578457425145655142125411490432803e-1",
           "arb_ball_str": "[0.728 +/- 6.79e-4]"
         },
+        "Q_a2_dyadic_series_coeff_2": {
+          "mid_float": 0.7274145221891385,
+          "rad_float_outward": 0.0002799975263769956,
+          "lower_dec": "7.271345246627614949734664342375471795360e-1",
+          "upper_dec": "7.276945197155154426486945531340315545363e-1",
+          "arb_ball_str": "[0.727 +/- 6.95e-4]"
+        },
+        "direct_minus_dyadic_coeff_2_consistency": {
+          "mid_float": 0.0001067356561995025,
+          "rad_float_outward": 0.0004799975272362645,
+          "lower_dec": "-3.732618710367619207640016722892495372641e-4",
+          "upper_dec": "5.867331834357669429342424225593832752362e-4",
+          "arb_ball_str": "[+/- 5.87e-4]"
+        },
+        "erroneous_sqrt2_dyadic_series_discrepancy": {
+          "mid_float": 0.3725663706936668,
+          "rad_float_outward": 0.0004565667950373753,
+          "lower_dec": "3.721098038986294797483712445165967743986e-1",
+          "upper_dec": "3.730229374887042014721661816503858368989e-1",
+          "arb_ball_str": "[0.373 +/- 8.91e-4]"
+        },
+        "dyadic_coeff_2_verified_and_sqrt2_refuted": true,
         "leading_sqrt_X_over_6": {
           "mid_float": 0.6666666666666666,
           "rad_float_outward": 3.700743415417189e-17,
@@ -9497,11 +10456,18 @@
           "arb_ball_str": "[0.24 +/- 4.22e-3]"
         },
         "second_order_em_bound_C_a2_X_neg_half": {
-          "mid_float": 3.710578069922202,
-          "rad_float_outward": 2.7572503618925904e-17,
-          "lower_dec": "3.710578069922202154767739251924587562560e+0",
-          "upper_dec": "3.710578069922202154767739251924587562563e+0",
-          "arb_ball_str": "[3.710578069922202154767739251924587562561 +/- 1.98e-40]"
+          "mid_float": 4.936889658948339,
+          "rad_float_outward": 2.816274971164903e-16,
+          "lower_dec": "4.936889658948339591656993235149399994721e+0",
+          "upper_dec": "4.936889658948339591656993235149399994724e+0",
+          "arb_ball_str": "[4.936889658948339591656993235149399994723 +/- 1.51e-40]"
+        },
+        "second_order_em_bound_margin": {
+          "mid_float": 4.876035067769668,
+          "rad_float_outward": 0.00020000000108695467,
+          "lower_dec": "4.875835067768581622731815993096481338811e+0",
+          "upper_dec": "4.876235067770754951271172582413803116158e+0",
+          "arb_ball_str": "[4.876 +/- 2.36e-4]"
         },
         "second_order_em_bound_holds": true,
         "dyadic_filter_lhs_minus_Q_odd_rhs": {
@@ -9516,6 +10482,7 @@
       },
       {
         "X": 32,
+        "L_eq_floor_log2_X": 5,
         "Q_a2_X": {
           "mid_float": 0.8995837637855432,
           "rad_float_outward": 0.00044194173869986094,
@@ -9523,6 +10490,28 @@
           "upper_dec": "9.000257055242430276394406866843391009122e-1",
           "arb_ball_str": "[0.900 +/- 8.59e-4]"
         },
+        "Q_a2_dyadic_series_coeff_2": {
+          "mid_float": 0.8993485700045185,
+          "rad_float_outward": 0.0006187178623804808,
+          "lower_dec": "8.987298521421381197574370316621354769455e-1",
+          "upper_dec": "8.999672878668989911380045823213151644458e-1",
+          "arb_ball_str": "[0.90 +/- 1.28e-3]"
+        },
+        "direct_minus_dyadic_coeff_2_consistency": {
+          "mid_float": 0.0002351937810246474,
+          "rad_float_outward": 0.0010606596024445027,
+          "lower_dec": "-8.254658214198551154000858606699111898279e-4",
+          "upper_dec": "1.295853383469149934663047379076182560174e-3",
+          "arb_ball_str": "[+/- 1.30e-3]"
+        },
+        "erroneous_sqrt2_dyadic_series_discrepancy": {
+          "mid_float": 0.5646494523806215,
+          "rad_float_outward": 0.0010088830749737131,
+          "lower_dec": "5.636405693056477620800467004952024381003e-1",
+          "upper_dec": "5.656583354555951818426580896553586881006e-1",
+          "arb_ball_str": "[0.56 +/- 5.66e-3]"
+        },
+        "dyadic_coeff_2_verified_and_sqrt2_refuted": true,
         "leading_sqrt_X_over_6": {
           "mid_float": 0.9428090415820634,
           "rad_float_outward": 9.566246218657684e-18,
@@ -9545,11 +10534,18 @@
           "arb_ball_str": "[-0.24 +/- 7.02e-3]"
         },
         "second_order_em_bound_C_a2_X_neg_half": {
-          "mid_float": 2.6237749153640806,
-          "rad_float_outward": 1.4523878190786354e-16,
-          "lower_dec": "2.623774915364080439129129889153336776824e+0",
-          "upper_dec": "2.623774915364080439129129889153336776827e+0",
-          "arb_ball_str": "[2.623774915364080439129129889153336776825 +/- 5.17e-41]"
+          "mid_float": 3.4909081558121127,
+          "rad_float_outward": 1.304641757650281e-16,
+          "lower_dec": "3.490908155812112798068372523503224342023e+0",
+          "upper_dec": "3.490908155812112798068372523503224342026e+0",
+          "arb_ball_str": "[3.490908155812112798068372523503224342025 +/- 1.76e-40]"
+        },
+        "second_order_em_bound_margin": {
+          "mid_float": 3.4476828780155926,
+          "rad_float_outward": 0.00044194174006411286,
+          "lower_dec": "3.447240936275528568223184537157404209566e+0",
+          "upper_dec": "3.448124819755656701892680119737970615819e+0",
+          "arb_ball_str": "[3.448 +/- 7.60e-4]"
         },
         "second_order_em_bound_holds": true,
         "dyadic_filter_lhs_minus_Q_odd_rhs": {
@@ -9564,6 +10560,7 @@
       },
       {
         "X": 64,
+        "L_eq_floor_log2_X": 6,
         "Q_a2_X": {
           "mid_float": 1.3635857448064372,
           "rad_float_outward": 0.0006250000014916068,
@@ -9571,6 +10568,28 @@
           "upper_dec": "1.364210744807928774721028507462878090973e+0",
           "arb_ball_str": "[1.36 +/- 4.22e-3]"
         },
+        "Q_a2_dyadic_series_coeff_2": {
+          "mid_float": 1.363252342822062,
+          "rad_float_outward": 0.0008749999724387281,
+          "lower_dec": "1.362377342849623251880750305340790033910e+0",
+          "upper_dec": "1.364127342794500596995696670697235346413e+0",
+          "arb_ball_str": "[1.36 +/- 4.13e-3]"
+        },
+        "direct_minus_dyadic_coeff_2_consistency": {
+          "mid_float": 0.000333401984375279,
+          "rad_float_outward": 0.0014999999748397388,
+          "lower_dec": "-1.166597990464459598256296092633622628144e-3",
+          "upper_dec": "1.833401959215017542051130360003096121859e-3",
+          "arb_ball_str": "[+/- 1.84e-3]"
+        },
+        "erroneous_sqrt2_dyadic_series_discrepancy": {
+          "mid_float": 0.7717690983087142,
+          "rad_float_outward": 0.001426776678272291,
+          "lower_dec": "7.703423216304419181500908447908069726735e-1",
+          "upper_dec": "7.731958749869864984606739594148304101738e-1",
+          "arb_ball_str": "[0.77 +/- 3.20e-3]"
+        },
+        "dyadic_coeff_2_verified_and_sqrt2_refuted": true,
         "leading_sqrt_X_over_6": {
           "mid_float": 1.3333333333333333,
           "rad_float_outward": 7.401486830834378e-17,
@@ -9593,11 +10612,18 @@
           "arb_ball_str": "[0.24 +/- 7.02e-3]"
         },
         "second_order_em_bound_C_a2_X_neg_half": {
-          "mid_float": 1.855289034961101,
-          "rad_float_outward": 1.3786251809462952e-17,
-          "lower_dec": "1.855289034961101077383869625962293781279e+0",
-          "upper_dec": "1.855289034961101077383869625962293781282e+0",
-          "arb_ball_str": "[1.855289034961101077383869625962293781281 +/- 4.02e-40]"
+          "mid_float": 2.4684448294741697,
+          "rad_float_outward": 1.4081374855824515e-16,
+          "lower_dec": "2.468444829474169795828496617574699997360e+0",
+          "upper_dec": "2.468444829474169795828496617574699997363e+0",
+          "arb_ball_str": "[2.468444829474169795828496617574699997361 +/- 4.25e-40]"
+        },
+        "second_order_em_bound_margin": {
+          "mid_float": 2.438192418001066,
+          "rad_float_outward": 0.0006250000042202494,
+          "lower_dec": "2.437567417996845870335482658731410122534e+0",
+          "upper_dec": "2.438817418005285981167935432779261685037e+0",
+          "arb_ball_str": "[2.438 +/- 8.18e-4]"
         },
         "second_order_em_bound_holds": true,
         "dyadic_filter_lhs_minus_Q_odd_rhs": {
@@ -9613,6 +10639,52 @@
     ],
     "all_q1_bounds_and_dyadic_identities_hold": true,
     "E_a2_rows": [
+      {
+        "Y": 1,
+        "E_a2_Y": {
+          "mid_float": 0.19743123131309886,
+          "rad_float_outward": 0.12056247540749611,
+          "lower_dec": "7.686875590560277307452826055064000808302e-2",
+          "upper_dec": "3.179937067205949624818768933631400080832e-1",
+          "arb_ball_str": "[+/- 0.318]"
+        },
+        "leading_tau_minus_1_over_36_times_Y": {
+          "mid_float": 0.14675514742165519,
+          "rad_float_outward": 5.532218056127556e-18,
+          "lower_dec": "1.467551474216551799145912990710834935664e-1",
+          "upper_dec": "1.467551474216551799145912990710834935667e-1",
+          "arb_ball_str": "[0.1467551474216551799145912990710834935665 +/- 9.42e-42]"
+        },
+        "ratio_E_a2_over_Y": {
+          "mid_float": 0.19743123131309886,
+          "rad_float_outward": 0.12056247552391143,
+          "lower_dec": "7.686875578918745124759344609751500808302e-2",
+          "upper_dec": "3.179937068370102843088117078162650080832e-1",
+          "arb_ball_str": "[+/- 0.318]"
+        },
+        "abs_difference_from_leading": {
+          "mid_float": 0.050676083891443686,
+          "rad_float_outward": 0.12056247552391143,
+          "lower_dec": "-6.988639163246772866699785297356848548349e-2",
+          "upper_dec": "1.712385594153551043942204087451815145167e-1",
+          "arb_ball_str": "[+/- 0.172]"
+        },
+        "derived_pointwise_to_energy_remainder_bound": {
+          "mid_float": 339.9989057768068,
+          "rad_float_outward": 2.4307680421421742e-14,
+          "lower_dec": "3.399989057768068180181010280796024761157e+2",
+          "upper_dec": "3.399989057768068180181010280796024761160e+2",
+          "arb_ball_str": "[339.9989057768068180181010280796024761158 +/- 1.72e-38]"
+        },
+        "derived_energy_remainder_margin": {
+          "mid_float": 339.9482296929154,
+          "rad_float_outward": 0.12056247575675813,
+          "lower_dec": "3.398276672171586322700529380419510446012e+2",
+          "upper_dec": "3.400687921686721163904218955614822946015e+2",
+          "arb_ball_str": "[3.40e+2 +/- 0.173]"
+        },
+        "derived_energy_remainder_bound_holds": true
+      },
       {
         "Y": 4,
         "E_a2_Y": {
@@ -9642,7 +10714,22 @@
           "lower_dec": "-3.630596656781648952851994143472654541027e-1",
           "upper_dec": "4.943771812635446231474177731527345458976e-1",
           "arb_ball_str": "[+/- 0.495]"
-        }
+        },
+        "derived_pointwise_to_energy_remainder_bound": {
+          "mid_float": 94.07312272777631,
+          "rad_float_outward": 4.7651493753041625e-15,
+          "lower_dec": "9.407312272777631300353927712100691624324e+1",
+          "upper_dec": "9.407312272777631300353927712100691624327e+1",
+          "arb_ball_str": "[94.07312272777631300353927712100691624326 +/- 1.47e-39]"
+        },
+        "derived_energy_remainder_margin": {
+          "mid_float": 94.00746396998362,
+          "rad_float_outward": 0.4287184244021822,
+          "lower_dec": "9.357874554558144580577638083222918169735e+1",
+          "upper_dec": "9.443618239438580047343995505097918169738e+1",
+          "arb_ball_str": "[9.4e+1 +/- 0.437]"
+        },
+        "derived_energy_remainder_bound_holds": true
       },
       {
         "Y": 8,
@@ -9673,7 +10760,22 @@
           "lower_dec": "-7.757919341358820650335517952590193539809e-1",
           "upper_dec": "7.796718884226401593927177359909806460194e-1",
           "arb_ball_str": "[+/- 0.780]"
-        }
+        },
+        "derived_pointwise_to_energy_remainder_bound": {
+          "mid_float": 53.08549221960456,
+          "rad_float_outward": 1.5080608676178991e-15,
+          "lower_dec": "5.308549221960456216777898529457432293115e+1",
+          "upper_dec": "5.308549221960456216777898529457432293118e+1",
+          "arb_ball_str": "[53.08549221960456216777898529457432293117 +/- 4.57e-39]"
+        },
+        "derived_energy_remainder_margin": {
+          "mid_float": 53.08355224246118,
+          "rad_float_outward": 0.7777319131419085,
+          "lower_dec": "5.230582032931927685915531052733334228513e+1",
+          "upper_dec": "5.386128415560308938204349412108334228516e+1",
+          "arb_ball_str": "[5.3e+1 +/- 0.862]"
+        },
+        "derived_energy_remainder_bound_holds": true
       },
       {
         "Y": 16,
@@ -9704,7 +10806,22 @@
           "lower_dec": "-1.566767261569146248230443170784344436899e+0",
           "upper_dec": "1.764283927883263496032252141715655563104e+0",
           "arb_ball_str": "[+/- 1.77]"
-        }
+        },
+        "derived_pointwise_to_energy_remainder_bound": {
+          "mid_float": 32.59167696551869,
+          "rad_float_outward": 1.204833862252325e-16,
+          "lower_dec": "3.259167696551868674989883938135802627510e+1",
+          "upper_dec": "3.259167696551868674989883938135802627513e+1",
+          "arb_ball_str": "[32.59167696551868674989883938135802627512 +/- 1.12e-39]"
+        },
+        "derived_energy_remainder_margin": {
+          "mid_float": 32.49291863236163,
+          "rad_float_outward": 1.6655255984514965,
+          "lower_dec": "3.082739303391013295540467317714237071200e+1",
+          "upper_dec": "3.415844423081312329659119661464237071203e+1",
+          "arb_ball_str": "[3e+1 +/- 4.16]"
+        },
+        "derived_energy_remainder_bound_holds": true
       },
       {
         "Y": 32,
@@ -9735,17 +10852,480 @@
           "lower_dec": "-3.511925541184848750483439441568043717767e+0",
           "upper_dec": "3.532280847109848057377888683431956282236e+0",
           "arb_ball_str": "[+/- 3.54]"
-        }
+        },
+        "derived_pointwise_to_energy_remainder_bound": {
+          "mid_float": 22.34476933847575,
+          "rad_float_outward": 9.347555131467983e-16,
+          "lower_dec": "2.234476933847574904095876642474987794708e+1",
+          "upper_dec": "2.234476933847574904095876642474987794711e+1",
+          "arb_ball_str": "[22.34476933847574904095876642474987794710 +/- 4.40e-39]"
+        },
+        "derived_energy_remainder_margin": {
+          "mid_float": 22.33459168551325,
+          "rad_float_outward": 3.522103197872639,
+          "lower_dec": "1.881248848764061068511896367881792166485e+1",
+          "upper_dec": "2.585669488338588808990411992881792166488e+1",
+          "arb_ball_str": "[2e+1 +/- 5.86]"
+        },
+        "derived_energy_remainder_bound_holds": true
       }
     ],
     "all_e_a2_positive": true,
+    "all_e_a2_remainder_bounds_hold": true,
     "scope_note": "Because a_2(n) = (-1)^{v_2(n)} (and any finite-prime parity control a_S) satisfies complete multiplicativity, common-factor cancellation, transition Poisson summation, and finite-prime exclusion for P subset S, yet has Q_{a_2}(X) ~ sqrt(X)/6 and E_{a_2}(Y) ~ ((tau - 1)/36) Y (linear growth in Y), any cancellation argument that uses only hypotheses shared by a_2 or a_S cannot establish E_lambda(Y) = o(Y) or E_lambda(Y) <<_eps Y^eps. This is a control diagnostic exposing unsupported inferences, NOT a counterexample to the complete TC framework (since a_2 and a_S fail a(p) = -1 at primes outside S and fail sum_{d^2|n} mu(n/d^2) = a(n))."
   },
   "section_13_tc055r_finite_truncation_and_signed_energy_attempt": {
     "exact_finite_reconstruction_theorem": {
-      "formula": "For every integer T >= 1, finite prime set P, and X > 0: Q_{lambda,T}(X) = sum_{m in S(P), m <= T} (lambda(m) / sqrt(m)) Q_{lambda,P,floor(T/m)}(X / m).",
-      "inner_cutoff_dependence_note": "Because 1 <= n = m r <= T with m in S(P) and gcd(r, N_P) = 1 is equivalent to 1 <= m <= T and 1 <= r <= floor(T / m), the inner cutoff floor(T / m) depends on m. Replacing floor(T / m) by a common inner cutoff L = T introduces the nonzero hyperbolic boundary sum over T < m r <= m T.",
+      "smooth_outer_formula": "For every integer T >= 0, finite prime set P, and X > 0: Q_{lambda,T}(X) = sum_{m in S(P), m <= T} (lambda(m) / sqrt(m)) Q_{lambda,P,floor(T/m)}(X / m).",
+      "coprime_outer_weighted_cofactor_formula": "For every integer T >= 0, finite prime set P, and X > 0: Q_{lambda,T}(X) = sum_{1 <= r <= T, gcd(r, N_P)=1} F_r(X), where F_r(X) = (lambda(r) / sqrt(r)) Q_{lambda,S(P),floor(T/r)}(X / r) and Q_{lambda,S(P),L}(w) = w^{5/2} sum_{m <= L, m in S(P)} lambda(m) m^{-3} exp(-w^2 / m^2) (derived from X^{5/2} (m r)^{-3} = r^{-1/2} (X / r)^{5/2} m^{-3}).",
+      "formula": "For every integer T >= 0, finite prime set P, and X > 0: Q_{lambda,T}(X) = sum_{m in S(P), m <= T} (lambda(m) / sqrt(m)) Q_{lambda,P,floor(T/m)}(X / m) = sum_{1 <= r <= T, gcd(r, N_P)=1} (lambda(r) / sqrt(r)) Q_{lambda,S(P),floor(T/r)}(X / r).",
+      "inner_cutoff_dependence_and_exact_excess_note": "Because 1 <= n = m r <= T with m in S(P) and gcd(r, N_P) = 1 is equivalent to 1 <= m <= T and 1 <= r <= floor(T / m), replacing r <= floor(T / m) by an uncoupled cutoff r <= T adds the exact excess sum sum_{m in S(P), m <= T} sum_{floor(T/m) < r <= T, gcd(r, N_P)=1} lambda(m) lambda(r) w(m r) (formalized in Lean 4 theorem finite_liouville_reindexed_sum_and_excess_cutoff_identity_nat). This excess is NOT universally nonzero: it vanishes identically when P = empty, T <= 1, or (P = {2}, T = 2), and can also vanish by sign cancellation (e.g. T = 5, P = {2}, w = 1), whereas for the Gaussian observable at (P = {2}, T = 3) and (24, {2,3}), (36, {2,3,5}), (50, {2,3,5,7}) it is certified strictly nonzero.",
+      "uncoupled_cutoff_cancellation_witness_T5_P2_unit_weight": {
+        "T": 5,
+        "primes_P": [
+          2
+        ],
+        "weight": "w(n) = 1",
+        "excess_pairs": [
+          {
+            "m": 2,
+            "r": 3,
+            "mr": 6,
+            "lambda_mr": 1
+          },
+          {
+            "m": 2,
+            "r": 5,
+            "mr": 10,
+            "lambda_mr": 1
+          },
+          {
+            "m": 4,
+            "r": 3,
+            "mr": 12,
+            "lambda_mr": -1
+          },
+          {
+            "m": 4,
+            "r": 5,
+            "mr": 20,
+            "lambda_mr": -1
+          }
+        ],
+        "excess_sum_value": 0,
+        "nonempty_excess_index_set_cancels_to_zero": true
+      },
       "rows": [
+        {
+          "T": 0,
+          "primes_P": [
+            2,
+            3
+          ],
+          "X": 4,
+          "excess_index_pair_count": 0,
+          "expected_nonzero_excess": false,
+          "verification_classification": "numerical_enclosure_consistency_check_exact_equality_proved_in_lean",
+          "Q_lambda_T_direct": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "Q_lambda_T_m_dependent_inner_cutoff_floor_T_over_m": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "Q_lambda_T_r_regrouped_weighted_cofactor_sum": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "direct_minus_m_dependent_difference": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "direct_minus_r_regrouped_difference": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "pointwise_sq_minus_weighted_same_plus_diff_r": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "common_cutoff_L_eq_T_sum": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "common_cutoff_minus_exact_discrepancy": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "explicit_hyperbolic_boundary_sum_T_lt_mr_le_mT": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "discrepancy_minus_boundary_sum": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "exact_identity_and_excess_regime_verified": true,
+          "exact_identity_and_nonzero_common_cutoff_error_verified": true
+        },
+        {
+          "T": 1,
+          "primes_P": [
+            2,
+            3
+          ],
+          "X": 4,
+          "excess_index_pair_count": 0,
+          "expected_nonzero_excess": false,
+          "verification_classification": "numerical_enclosure_consistency_check_exact_equality_proved_in_lean",
+          "Q_lambda_T_direct": {
+            "mid_float": 3.6011255910162917e-06,
+            "rad_float_outward": 6.220678796345378e-23,
+            "lower_dec": "3.601125591016291664440805729924070132413e-6",
+            "upper_dec": "3.601125591016291664440805729924070132416e-6",
+            "arb_ball_str": "[3.601125591016291664440805729924070132414e-6 +/- 1.06e-46]"
+          },
+          "Q_lambda_T_m_dependent_inner_cutoff_floor_T_over_m": {
+            "mid_float": 3.6011255910162917e-06,
+            "rad_float_outward": 6.220678796345378e-23,
+            "lower_dec": "3.601125591016291664440805729924070132413e-6",
+            "upper_dec": "3.601125591016291664440805729924070132416e-6",
+            "arb_ball_str": "[3.601125591016291664440805729924070132414e-6 +/- 1.06e-46]"
+          },
+          "Q_lambda_T_r_regrouped_weighted_cofactor_sum": {
+            "mid_float": 3.6011255910162917e-06,
+            "rad_float_outward": 6.220678796345378e-23,
+            "lower_dec": "3.601125591016291664440805729924070132413e-6",
+            "upper_dec": "3.601125591016291664440805729924070132416e-6",
+            "arb_ball_str": "[3.601125591016291664440805729924070132414e-6 +/- 1.06e-46]"
+          },
+          "direct_minus_m_dependent_difference": {
+            "mid_float": 0.0,
+            "rad_float_outward": 6.614611625193755e-83,
+            "lower_dec": "-6.614611625193753792251717370305419199320e-83",
+            "upper_dec": "6.614611625193753792251717370305419199320e-83",
+            "arb_ball_str": "[+/- 6.62e-83]"
+          },
+          "direct_minus_r_regrouped_difference": {
+            "mid_float": 0.0,
+            "rad_float_outward": 6.614611625193755e-83,
+            "lower_dec": "-6.614611625193753792251717370305419199320e-83",
+            "upper_dec": "6.614611625193753792251717370305419199320e-83",
+            "arb_ball_str": "[+/- 6.62e-83]"
+          },
+          "pointwise_sq_minus_weighted_same_plus_diff_r": {
+            "mid_float": 0.0,
+            "rad_float_outward": 7.27746530226393e-88,
+            "lower_dec": "-7.277465302263929157634242594319326539078e-88",
+            "upper_dec": "7.277465302263929157634242594319326539078e-88",
+            "arb_ball_str": "[+/- 7.28e-88]"
+          },
+          "common_cutoff_L_eq_T_sum": {
+            "mid_float": 3.6011255910162917e-06,
+            "rad_float_outward": 6.220678796345378e-23,
+            "lower_dec": "3.601125591016291664440805729924070132413e-6",
+            "upper_dec": "3.601125591016291664440805729924070132416e-6",
+            "arb_ball_str": "[3.601125591016291664440805729924070132414e-6 +/- 1.06e-46]"
+          },
+          "common_cutoff_minus_exact_discrepancy": {
+            "mid_float": 0.0,
+            "rad_float_outward": 6.614611625193755e-83,
+            "lower_dec": "-6.614611625193753792251717370305419199320e-83",
+            "upper_dec": "6.614611625193753792251717370305419199320e-83",
+            "arb_ball_str": "[+/- 6.62e-83]"
+          },
+          "explicit_hyperbolic_boundary_sum_T_lt_mr_le_mT": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "discrepancy_minus_boundary_sum": {
+            "mid_float": 0.0,
+            "rad_float_outward": 6.614611625193755e-83,
+            "lower_dec": "-6.614611625193753792251717370305419199320e-83",
+            "upper_dec": "6.614611625193753792251717370305419199320e-83",
+            "arb_ball_str": "[+/- 6.62e-83]"
+          },
+          "exact_identity_and_excess_regime_verified": true,
+          "exact_identity_and_nonzero_common_cutoff_error_verified": true
+        },
+        {
+          "T": 6,
+          "primes_P": [],
+          "X": 4,
+          "excess_index_pair_count": 0,
+          "expected_nonzero_excess": false,
+          "verification_classification": "numerical_enclosure_consistency_check_exact_equality_proved_in_lean",
+          "Q_lambda_T_direct": {
+            "mid_float": -0.12962848474213742,
+            "rad_float_outward": 7.653104449304809e-19,
+            "lower_dec": "-1.296284847421374238788720122642987061827e-1",
+            "upper_dec": "-1.296284847421374238788720122642987061824e-1",
+            "arb_ball_str": "[-0.1296284847421374238788720122642987061826 +/- 3.20e-43]"
+          },
+          "Q_lambda_T_m_dependent_inner_cutoff_floor_T_over_m": {
+            "mid_float": -0.12962848474213742,
+            "rad_float_outward": 7.653104449304809e-19,
+            "lower_dec": "-1.296284847421374238788720122642987061827e-1",
+            "upper_dec": "-1.296284847421374238788720122642987061824e-1",
+            "arb_ball_str": "[-0.1296284847421374238788720122642987061826 +/- 3.20e-43]"
+          },
+          "Q_lambda_T_r_regrouped_weighted_cofactor_sum": {
+            "mid_float": -0.12962848474213742,
+            "rad_float_outward": 7.653104449304809e-19,
+            "lower_dec": "-1.296284847421374238788720122642987061827e-1",
+            "upper_dec": "-1.296284847421374238788720122642987061824e-1",
+            "arb_ball_str": "[-0.1296284847421374238788720122642987061826 +/- 3.20e-43]"
+          },
+          "direct_minus_m_dependent_difference": {
+            "mid_float": 0.0,
+            "rad_float_outward": 4.1673919870742955e-77,
+            "lower_dec": "-4.167391987074294737098466517871478923735e-77",
+            "upper_dec": "4.167391987074294737098466517871478923735e-77",
+            "arb_ball_str": "[+/- 4.17e-77]"
+          },
+          "direct_minus_r_regrouped_difference": {
+            "mid_float": -1.727233711018889e-77,
+            "rad_float_outward": 1.0443723030307602e-76,
+            "lower_dec": "-1.217095674132648912698984524108643352123e-76",
+            "upper_dec": "8.716489319288711276835304495966273692768e-77",
+            "arb_ball_str": "[+/- 1.22e-76]"
+          },
+          "pointwise_sq_minus_weighted_same_plus_diff_r": {
+            "mid_float": -2.1590421387736112e-78,
+            "rad_float_outward": 1.1889834954600242e-76,
+            "lower_dec": "-1.210573916847760114578815820054513400860e-76",
+            "upper_dec": "1.167393074072287891451884060740511403004e-76",
+            "arb_ball_str": "[+/- 1.22e-76]"
+          },
+          "common_cutoff_L_eq_T_sum": {
+            "mid_float": -0.12962848474213742,
+            "rad_float_outward": 7.653104449304809e-19,
+            "lower_dec": "-1.296284847421374238788720122642987061827e-1",
+            "upper_dec": "-1.296284847421374238788720122642987061824e-1",
+            "arb_ball_str": "[-0.1296284847421374238788720122642987061826 +/- 3.20e-43]"
+          },
+          "common_cutoff_minus_exact_discrepancy": {
+            "mid_float": 0.0,
+            "rad_float_outward": 4.1673919870742955e-77,
+            "lower_dec": "-4.167391987074294737098466517871478923735e-77",
+            "upper_dec": "4.167391987074294737098466517871478923735e-77",
+            "arb_ball_str": "[+/- 4.17e-77]"
+          },
+          "explicit_hyperbolic_boundary_sum_T_lt_mr_le_mT": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "discrepancy_minus_boundary_sum": {
+            "mid_float": 0.0,
+            "rad_float_outward": 4.1673919870742955e-77,
+            "lower_dec": "-4.167391987074294737098466517871478923735e-77",
+            "upper_dec": "4.167391987074294737098466517871478923735e-77",
+            "arb_ball_str": "[+/- 4.17e-77]"
+          },
+          "exact_identity_and_excess_regime_verified": true,
+          "exact_identity_and_nonzero_common_cutoff_error_verified": true
+        },
+        {
+          "T": 2,
+          "primes_P": [
+            2
+          ],
+          "X": 4,
+          "excess_index_pair_count": 0,
+          "expected_nonzero_excess": false,
+          "verification_classification": "numerical_enclosure_consistency_check_exact_equality_proved_in_lean",
+          "Q_lambda_T_direct": {
+            "mid_float": -0.0732589544293457,
+            "rad_float_outward": 5.8722628741074595e-18,
+            "lower_dec": "-7.325895442934570488320764428723504477753e-2",
+            "upper_dec": "-7.325895442934570488320764428723504477750e-2",
+            "arb_ball_str": "[-0.07325895442934570488320764428723504477752 +/- 4.15e-42]"
+          },
+          "Q_lambda_T_m_dependent_inner_cutoff_floor_T_over_m": {
+            "mid_float": -0.0732589544293457,
+            "rad_float_outward": 5.8722628741074595e-18,
+            "lower_dec": "-7.325895442934570488320764428723504477753e-2",
+            "upper_dec": "-7.325895442934570488320764428723504477750e-2",
+            "arb_ball_str": "[-0.07325895442934570488320764428723504477752 +/- 4.15e-42]"
+          },
+          "Q_lambda_T_r_regrouped_weighted_cofactor_sum": {
+            "mid_float": -0.0732589544293457,
+            "rad_float_outward": 5.8722628741074595e-18,
+            "lower_dec": "-7.325895442934570488320764428723504477753e-2",
+            "upper_dec": "-7.325895442934570488320764428723504477750e-2",
+            "arb_ball_str": "[-0.07325895442934570488320764428723504477752 +/- 4.15e-42]"
+          },
+          "direct_minus_m_dependent_difference": {
+            "mid_float": -1.0795210693868056e-78,
+            "rad_float_outward": 7.959065344653395e-78,
+            "lower_dec": "-9.038586414040199850141747596363328100683e-78",
+            "upper_dec": "6.879544275266588693795159630663228207904e-78",
+            "arb_ball_str": "[+/- 9.04e-78]"
+          },
+          "direct_minus_r_regrouped_difference": {
+            "mid_float": 0.0,
+            "rad_float_outward": 4.326584246361302e-78,
+            "lower_dec": "-4.326584246361301263794614352913547080365e-78",
+            "upper_dec": "4.326584246361301263794614352913547080365e-78",
+            "arb_ball_str": "[+/- 4.33e-78]"
+          },
+          "pointwise_sq_minus_weighted_same_plus_diff_r": {
+            "mid_float": 0.0,
+            "rad_float_outward": 7.688622117485992e-79,
+            "lower_dec": "-7.688622117485991263182826165903553406299e-79",
+            "upper_dec": "7.688622117485991263182826165903553406299e-79",
+            "arb_ball_str": "[+/- 7.69e-79]"
+          },
+          "common_cutoff_L_eq_T_sum": {
+            "mid_float": -0.0732589544293457,
+            "rad_float_outward": 5.8722628741074595e-18,
+            "lower_dec": "-7.325895442934570488320764428723504477753e-2",
+            "upper_dec": "-7.325895442934570488320764428723504477750e-2",
+            "arb_ball_str": "[-0.07325895442934570488320764428723504477752 +/- 4.15e-42]"
+          },
+          "common_cutoff_minus_exact_discrepancy": {
+            "mid_float": 1.0795210693868056e-78,
+            "rad_float_outward": 7.959065344653395e-78,
+            "lower_dec": "-6.879544275266588693795159630663228207904e-78",
+            "upper_dec": "9.038586414040199850141747596363328100683e-78",
+            "arb_ball_str": "[+/- 9.04e-78]"
+          },
+          "explicit_hyperbolic_boundary_sum_T_lt_mr_le_mT": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "discrepancy_minus_boundary_sum": {
+            "mid_float": 1.0795210693868056e-78,
+            "rad_float_outward": 7.959065344653395e-78,
+            "lower_dec": "-6.879544275266588693795159630663228207904e-78",
+            "upper_dec": "9.038586414040199850141747596363328100683e-78",
+            "arb_ball_str": "[+/- 9.04e-78]"
+          },
+          "exact_identity_and_excess_regime_verified": true,
+          "exact_identity_and_nonzero_common_cutoff_error_verified": true
+        },
+        {
+          "T": 3,
+          "primes_P": [
+            2
+          ],
+          "X": 4,
+          "excess_index_pair_count": 1,
+          "expected_nonzero_excess": true,
+          "verification_classification": "numerical_enclosure_consistency_check_exact_equality_proved_in_lean",
+          "Q_lambda_T_direct": {
+            "mid_float": -0.27357103194764626,
+            "rad_float_outward": 1.902628312187173e-17,
+            "lower_dec": "-2.735710319476462402817325929788977409231e-1",
+            "upper_dec": "-2.735710319476462402817325929788977409228e-1",
+            "arb_ball_str": "[-0.2735710319476462402817325929788977409230 +/- 6.25e-42]"
+          },
+          "Q_lambda_T_m_dependent_inner_cutoff_floor_T_over_m": {
+            "mid_float": -0.27357103194764626,
+            "rad_float_outward": 1.902628312187173e-17,
+            "lower_dec": "-2.735710319476462402817325929788977409231e-1",
+            "upper_dec": "-2.735710319476462402817325929788977409228e-1",
+            "arb_ball_str": "[-0.2735710319476462402817325929788977409230 +/- 6.25e-42]"
+          },
+          "Q_lambda_T_r_regrouped_weighted_cofactor_sum": {
+            "mid_float": -0.27357103194764626,
+            "rad_float_outward": 1.902628312187173e-17,
+            "lower_dec": "-2.735710319476462402817325929788977409231e-1",
+            "upper_dec": "-2.735710319476462402817325929788977409228e-1",
+            "arb_ball_str": "[-0.2735710319476462402817325929788977409230 +/- 6.25e-42]"
+          },
+          "direct_minus_m_dependent_difference": {
+            "mid_float": -4.3180842775472223e-78,
+            "rad_float_outward": 2.9732191358571766e-77,
+            "lower_dec": "-3.405027563611898456039479930148866221277e-77",
+            "upper_dec": "2.541410708102453993500844743868826264166e-77",
+            "arb_ball_str": "[+/- 3.41e-77]"
+          },
+          "direct_minus_r_regrouped_difference": {
+            "mid_float": -8.636168555094445e-78,
+            "rad_float_outward": 4.922012978261537e-77,
+            "lower_dec": "-5.785629833770980645804748752161719422626e-77",
+            "upper_dec": "4.058396122752091720727478379601639508403e-77",
+            "arb_ball_str": "[+/- 5.79e-77]"
+          },
+          "pointwise_sq_minus_weighted_same_plus_diff_r": {
+            "mid_float": 4.3180842775472223e-78,
+            "rad_float_outward": 2.865626498951086e-77,
+            "lower_dec": "-2.433818071196363455230459357798320339667e-77",
+            "upper_dec": "3.297434926705807917769094544078360296778e-77",
+            "arb_ball_str": "[+/- 3.30e-77]"
+          },
+          "common_cutoff_L_eq_T_sum": {
+            "mid_float": -0.17858134477283816,
+            "rad_float_outward": 3.53074848547463e-18,
+            "lower_dec": "-1.785813447728381540222480775520526323892e-1",
+            "upper_dec": "-1.785813447728381540222480775520526323889e-1",
+            "arb_ball_str": "[-0.1785813447728381540222480775520526323890 +/- 4.60e-41]"
+          },
+          "common_cutoff_minus_exact_discrepancy": {
+            "mid_float": 0.09498968717480809,
+            "rad_float_outward": 1.6177468285826427e-18,
+            "lower_dec": "9.498968717480808625948451542684510853393e-2",
+            "upper_dec": "9.498968717480808625948451542684510853396e-2",
+            "arb_ball_str": "[0.09498968717480808625948451542684510853395 +/- 2.23e-42]"
+          },
+          "explicit_hyperbolic_boundary_sum_T_lt_mr_le_mT": {
+            "mid_float": 0.09498968717480809,
+            "rad_float_outward": 1.6177468285826427e-18,
+            "lower_dec": "9.498968717480808625948451542684510853393e-2",
+            "upper_dec": "9.498968717480808625948451542684510853396e-2",
+            "arb_ball_str": "[0.09498968717480808625948451542684510853395 +/- 2.23e-42]"
+          },
+          "discrepancy_minus_boundary_sum": {
+            "mid_float": 0.0,
+            "rad_float_outward": 3.048042565923771e-77,
+            "lower_dec": "-3.048042565923770494735988476201061274138e-77",
+            "upper_dec": "3.048042565923770494735988476201061274138e-77",
+            "arb_ball_str": "[+/- 3.05e-77]"
+          },
+          "exact_identity_and_excess_regime_verified": true,
+          "exact_identity_and_nonzero_common_cutoff_error_verified": true
+        },
         {
           "T": 24,
           "primes_P": [
@@ -9753,7 +11333,9 @@
             3
           ],
           "X": 4,
-          "verification_classification": "exact_finite_algebraic_reconstruction_identity",
+          "excess_index_pair_count": 64,
+          "expected_nonzero_excess": true,
+          "verification_classification": "numerical_enclosure_consistency_check_exact_equality_proved_in_lean",
           "Q_lambda_T_direct": {
             "mid_float": -0.2200313782404072,
             "rad_float_outward": 8.241706290796e-18,
@@ -9768,12 +11350,33 @@
             "upper_dec": "-2.200313782404071855941861945713673976762e-1",
             "arb_ball_str": "[-0.2200313782404071855941861945713673976763 +/- 3.69e-41]"
           },
+          "Q_lambda_T_r_regrouped_weighted_cofactor_sum": {
+            "mid_float": -0.2200313782404072,
+            "rad_float_outward": 8.241706290796e-18,
+            "lower_dec": "-2.200313782404071855941861945713673976765e-1",
+            "upper_dec": "-2.200313782404071855941861945713673976762e-1",
+            "arb_ball_str": "[-0.2200313782404071855941861945713673976763 +/- 3.69e-41]"
+          },
           "direct_minus_m_dependent_difference": {
             "mid_float": -4.3180842775472223e-78,
             "rad_float_outward": 1.8427453614591773e-76,
             "lower_dec": "-1.885926204234649179781813933013530051516e-76",
             "upper_dec": "1.799564518683704733527950414385526055805e-76",
             "arb_ball_str": "[+/- 1.89e-76]"
+          },
+          "direct_minus_r_regrouped_difference": {
+            "mid_float": 1.0795210693868056e-77,
+            "rad_float_outward": 1.277231554965205e-76,
+            "lower_dec": "-1.169279448026524345329225261154001838143e-76",
+            "upper_dec": "1.385183661903885460963884057724011827421e-76",
+            "arb_ball_str": "[+/- 1.39e-76]"
+          },
+          "pointwise_sq_minus_weighted_same_plus_diff_r": {
+            "mid_float": 5.397605346934028e-78,
+            "rad_float_outward": 7.092996408262303e-77,
+            "lower_dec": "-6.553235873568898510340280986061393575489e-77",
+            "upper_dec": "7.632756942955704088513574968911443521879e-77",
+            "arb_ball_str": "[+/- 7.64e-77]"
           },
           "common_cutoff_L_eq_T_sum": {
             "mid_float": -0.21829939433622766,
@@ -9803,6 +11406,7 @@
             "upper_dec": "2.184895347831001147815699697222568006569e-76",
             "arb_ball_str": "[+/- 2.29e-76]"
           },
+          "exact_identity_and_excess_regime_verified": true,
           "exact_identity_and_nonzero_common_cutoff_error_verified": true
         },
         {
@@ -9813,7 +11417,9 @@
             5
           ],
           "X": 6,
-          "verification_classification": "exact_finite_algebraic_reconstruction_identity",
+          "excess_index_pair_count": 144,
+          "expected_nonzero_excess": true,
+          "verification_classification": "numerical_enclosure_consistency_check_exact_equality_proved_in_lean",
           "Q_lambda_T_direct": {
             "mid_float": -0.10603162851040697,
             "rad_float_outward": 6.483654811550498e-18,
@@ -9828,12 +11434,33 @@
             "upper_dec": "-1.060316285104069629730482408507830043532e-1",
             "arb_ball_str": "[-0.1060316285104069629730482408507830043533 +/- 3.91e-42]"
           },
+          "Q_lambda_T_r_regrouped_weighted_cofactor_sum": {
+            "mid_float": -0.10603162851040697,
+            "rad_float_outward": 6.483654811550498e-18,
+            "lower_dec": "-1.060316285104069629730482408507830043535e-1",
+            "upper_dec": "-1.060316285104069629730482408507830043532e-1",
+            "arb_ball_str": "[-0.1060316285104069629730482408507830043533 +/- 3.91e-42]"
+          },
           "direct_minus_m_dependent_difference": {
             "mid_float": -3.2385632081604167e-78,
             "rad_float_outward": 2.1597522597857513e-76,
             "lower_dec": "-2.192137891867355206685130808054788331080e-76",
             "upper_dec": "2.127366627704146871994733169083785334297e-76",
             "arb_ball_str": "[+/- 2.20e-76]"
+          },
+          "direct_minus_r_regrouped_difference": {
+            "mid_float": 1.4033773902028473e-77,
+            "rad_float_outward": 1.4531298855389233e-76,
+            "lower_dec": "-1.312792146518638261314157944166107847477e-76",
+            "upper_dec": "1.593467624559207711639214379707120833538e-76",
+            "arb_ball_str": "[+/- 1.60e-76]"
+          },
+          "pointwise_sq_minus_weighted_same_plus_diff_r": {
+            "mid_float": -7.82652775305434e-78,
+            "rad_float_outward": 6.654517672431995e-77,
+            "lower_dec": "-7.437170447737428651100545704907256697261e-77",
+            "upper_dec": "5.871864897126560562749269429774684274996e-77",
+            "arb_ball_str": "[+/- 7.44e-77]"
           },
           "common_cutoff_L_eq_T_sum": {
             "mid_float": -0.1027157567027591,
@@ -9863,6 +11490,7 @@
             "upper_dec": "2.870458230074986000554154332003315716766e-76",
             "arb_ball_str": "[+/- 2.98e-76]"
           },
+          "exact_identity_and_excess_regime_verified": true,
           "exact_identity_and_nonzero_common_cutoff_error_verified": true
         },
         {
@@ -9874,7 +11502,9 @@
             7
           ],
           "X": 8,
-          "verification_classification": "exact_finite_algebraic_reconstruction_identity",
+          "excess_index_pair_count": 322,
+          "expected_nonzero_excess": true,
+          "verification_classification": "numerical_enclosure_consistency_check_exact_equality_proved_in_lean",
           "Q_lambda_T_direct": {
             "mid_float": -0.14672798064096212,
             "rad_float_outward": 1.3307446225470231e-17,
@@ -9889,12 +11519,33 @@
             "upper_dec": "-1.467279806409621378663143658817344428948e-1",
             "arb_ball_str": "[-0.1467279806409621378663143658817344428950 +/- 4.49e-41]"
           },
+          "Q_lambda_T_r_regrouped_weighted_cofactor_sum": {
+            "mid_float": -0.14672798064096212,
+            "rad_float_outward": 1.3307446225470231e-17,
+            "lower_dec": "-1.467279806409621378663143658817344428951e-1",
+            "upper_dec": "-1.467279806409621378663143658817344428948e-1",
+            "arb_ball_str": "[-0.1467279806409621378663143658817344428950 +/- 4.49e-41]"
+          },
           "direct_minus_m_dependent_difference": {
             "mid_float": -6.477126416320833e-78,
             "rad_float_outward": 3.627970056145349e-76,
             "lower_dec": "-3.692741320308556694910437886621951828288e-76",
             "upper_dec": "3.563198791982140025529642608679945834721e-76",
             "arb_ball_str": "[+/- 3.70e-76]"
+          },
+          "direct_minus_r_regrouped_difference": {
+            "mid_float": 1.94313792489625e-77,
+            "rad_float_outward": 1.9928741230649978e-76,
+            "lower_dec": "-1.798560330575372515712585408526049111985e-76",
+            "upper_dec": "2.187187915554622523854971242352067092685e-76",
+            "arb_ball_str": "[+/- 2.19e-76]"
+          },
+          "pointwise_sq_minus_weighted_same_plus_diff_r": {
+            "mid_float": -1.8891618714269098e-78,
+            "rad_float_outward": 8.019695771290358e-77,
+            "lower_dec": "-8.208611958433047091323127862766145472933e-77",
+            "upper_dec": "7.830779584147665138962474968768627991697e-77",
+            "arb_ball_str": "[+/- 8.21e-77]"
           },
           "common_cutoff_L_eq_T_sum": {
             "mid_float": -0.14112720364358763,
@@ -9924,6 +11575,7 @@
             "upper_dec": "5.302737816632016115756157918494992423499e-76",
             "arb_ball_str": "[+/- 5.31e-76]"
           },
+          "exact_identity_and_excess_regime_verified": true,
           "exact_identity_and_nonzero_common_cutoff_error_verified": true
         }
       ],
@@ -9931,14 +11583,86 @@
     },
     "finite_truncation_tail_energy_and_L2_transfer": {
       "pointwise_tail_bound": "|Q_lambda(X) - Q_{lambda,T}(X)| <= X^{5/2} / (2 T^2)  for all integer T >= 1 and X > 0",
-      "grade_interval_tail_energy_bound": "E_{tail,T}(Y) := int_Y^{tau Y} |Q_lambda(X) - Q_{lambda,T}(X)|^2 dX/X <= (tau^5 - 1) Y^5 / (20 T^4)",
-      "schedule_choice": "T(Y) := ceil(Y^{5/4}) >= Y^{5/4} (Y >= 1), giving E_{tail,T(Y)}(Y) <= (tau^5 - 1) / 20 = 489.5814956564503252... = O(1)",
-      "L2_transfer_inequalities": "E_lambda(Y) <= 2 E_{lambda,T(Y)}(Y) + 2 E_{tail,T(Y)}(Y) and E_{lambda,T(Y)}(Y) <= 2 E_lambda(Y) + 2 E_{tail,T(Y)}(Y), so (forall eps > 0, E_lambda(Y) <<_eps Y^eps) <-> (forall eps > 0, E_{lambda,T(Y)}(Y) <<_eps Y^eps).",
+      "grade_interval_tail_energy_bound": "R_tail(Y, T) := int_Y^{tau Y} |Q_lambda(X) - Q_{lambda,T}(X)|^2 dX/X <= (tau^5 - 1) Y^5 / (20 T^4)",
+      "schedule_choice": "T(Y) := ceil(Y^{5/4}) >= Y^{5/4} (Y >= 1, resolved via exact predicate (T-1)^4 < Y^5 <= T^4 with T(1) = 1), giving R_tail(Y, T(Y)) <= (tau^5 - 1) / 20 = 489.5814956564503252... = O(1)",
+      "L2_transfer_inequalities": "E_lambda(Y) <= 2 E_{lambda,T(Y)}(Y) + 2 R_tail(Y, T(Y)) and E_{lambda,T(Y)}(Y) <= 2 E_lambda(Y) + 2 R_tail(Y, T(Y)), so (forall eps > 0, E_lambda(Y) <<_eps Y^eps) <-> (forall eps > 0, E_{lambda,T(Y)}(Y) <<_eps Y^eps).",
+      "surviving_joint_energy_target": "For every eps > 0, there exists C_eps < infty such that for every Y >= 1, 0 <= E_{lambda,T(Y)}(Y) = sum_{1 <= m, n <= T(Y)} lambda(m) lambda(n) K_Y(m, n) = E_{same-r}(Y; T(Y), P) + E_{diff-r}(Y; T(Y), P) <= C_eps Y^eps.",
       "rows": [
+        {
+          "Y": 1,
+          "T_schedule": "ceil(Y^{5/4})",
+          "T": 1,
+          "exact_predicate_holds": true,
+          "actual_tail_energy_integral": {
+            "mid_float": 0.15315496896735956,
+            "rad_float_outward": 0.6551749538630248,
+            "lower_dec": "-5.020199848956651623040121524448938156269e-1",
+            "upper_dec": "8.083299228303842609137612850551061843734e-1",
+            "arb_ball_str": "[+/- 0.809]"
+          },
+          "analytic_upper_bound_tau5_minus_1_Y5_over_20_T4": {
+            "mid_float": 489.58149565645033,
+            "rad_float_outward": 3.8588484108653854e-15,
+            "lower_dec": "4.895814956564503252203860960694969703683e+2",
+            "upper_dec": "4.895814956564503252203860960694969703686e+2",
+            "arb_ball_str": "[489.5814956564503252203860960694969703685 +/- 1.89e-38]"
+          },
+          "uniform_O1_cap_tau5_minus_1_over_20": {
+            "mid_float": 489.58149565645033,
+            "rad_float_outward": 3.8588484108653854e-15,
+            "lower_dec": "4.895814956564503252203860960694969703683e+2",
+            "upper_dec": "4.895814956564503252203860960694969703686e+2",
+            "arb_ball_str": "[489.5814956564503252203860960694969703685 +/- 1.89e-38]"
+          },
+          "bound_minus_actual_margin": {
+            "mid_float": 489.42834068748294,
+            "rad_float_outward": 0.6551749557256918,
+            "lower_dec": "4.887731657317572958102413777531918641840e+2",
+            "upper_dec": "4.900835156432086355319210652531918641843e+2",
+            "arb_ball_str": "[4.9e+2 +/- 1.23]"
+          },
+          "strict_bound_and_uniform_cap_hold": true
+        },
+        {
+          "Y": 1,
+          "T_schedule": "2*ceil(Y^{5/4})",
+          "T": 2,
+          "exact_predicate_holds": true,
+          "actual_tail_energy_integral": {
+            "mid_float": 0.025130364483149144,
+            "rad_float_outward": 0.4541383595205844,
+            "lower_dec": "-4.290079950374352004709417644452394951564e-1",
+            "upper_dec": "4.792687240037334892568414386797605048439e-1",
+            "arb_ball_str": "[+/- 0.480]"
+          },
+          "analytic_upper_bound_tau5_minus_1_Y5_over_20_T4": {
+            "mid_float": 30.598843478528146,
+            "rad_float_outward": 2.411780256790866e-16,
+            "lower_dec": "3.059884347852814532627413100434356064802e+1",
+            "upper_dec": "3.059884347852814532627413100434356064805e+1",
+            "arb_ball_str": "[30.59884347852814532627413100434356064803 +/- 7.08e-41]"
+          },
+          "uniform_O1_cap_tau5_minus_1_over_20": {
+            "mid_float": 489.58149565645033,
+            "rad_float_outward": 3.8588484108653854e-15,
+            "lower_dec": "4.895814956564503252203860960694969703683e+2",
+            "upper_dec": "4.895814956564503252203860960694969703686e+2",
+            "arb_ball_str": "[489.5814956564503252203860960694969703685 +/- 1.89e-38]"
+          },
+          "bound_minus_actual_margin": {
+            "mid_float": 30.573713114044995,
+            "rad_float_outward": 0.4541383604519078,
+            "lower_dec": "3.011957475359308926240181105003880014317e+1",
+            "upper_dec": "3.102785147449690310136055128441380014320e+1",
+            "arb_ball_str": "[3.1e+1 +/- 0.881]"
+          },
+          "strict_bound_and_uniform_cap_hold": true
+        },
         {
           "Y": 2,
           "T_schedule": "ceil(Y^{5/4})",
           "T": 3,
+          "exact_predicate_holds": true,
           "actual_tail_energy_integral": {
             "mid_float": 0.017567046164098373,
             "rad_float_outward": 0.6685175690799953,
@@ -9973,6 +11697,7 @@
           "Y": 2,
           "T_schedule": "2*ceil(Y^{5/4})",
           "T": 6,
+          "exact_predicate_holds": true,
           "actual_tail_energy_integral": {
             "mid_float": 0.04362955267327256,
             "rad_float_outward": 0.7682540491223336,
@@ -10007,6 +11732,7 @@
           "Y": 4,
           "T_schedule": "ceil(Y^{5/4})",
           "T": 6,
+          "exact_predicate_holds": true,
           "actual_tail_energy_integral": {
             "mid_float": 0.06351025330203075,
             "rad_float_outward": 1.0550951901823284,
@@ -10041,6 +11767,7 @@
           "Y": 4,
           "T_schedule": "2*ceil(Y^{5/4})",
           "T": 12,
+          "exact_predicate_holds": true,
           "actual_tail_energy_integral": {
             "mid_float": 0.004179894245216853,
             "rad_float_outward": 0.9856291534379126,
@@ -10075,6 +11802,7 @@
           "Y": 8,
           "T_schedule": "ceil(Y^{5/4})",
           "T": 14,
+          "exact_predicate_holds": true,
           "actual_tail_energy_integral": {
             "mid_float": 0.021871679121898843,
             "rad_float_outward": 1.5938233584165575,
@@ -10109,6 +11837,7 @@
           "Y": 8,
           "T_schedule": "2*ceil(Y^{5/4})",
           "T": 28,
+          "exact_predicate_holds": true,
           "actual_tail_energy_integral": {
             "mid_float": 0.020623793267682954,
             "rad_float_outward": 1.9507192559540274,
@@ -10144,11 +11873,74 @@
     },
     "signed_energy_attempt_on_finite_reconstruction": {
       "decomposition_formulas": {
-        "coprime_cofactor_split": "E_{lambda,T}(Y) = E_{same-r}(Y; T, P_u) + E_{diff-r}(Y; T, P_u), where E_{same-r}(Y; T, P_u) = sum_{1 <= r <= T, gcd(r, N_u)=1} int_Y^{tau Y} |Q_{lambda,S(P_u),floor(T/r)}(X/r)|^2 dX/X >= 0",
-        "smooth_factor_split": "E_{lambda,T}(Y) = E_{smooth-diag}(Y; T, P_u) + E_{smooth-cross}(Y; T, P_u)"
+        "coprime_cofactor_split": "E_{lambda,T}(Y) = E_{same-r}(Y; T, P_u) + E_{diff-r}(Y; T, P_u) (observables real, Y >= 1), where E_{same-r}(Y; T, P_u) = sum_{1 <= r <= T, gcd(r, N_u)=1} (1 / r) int_Y^{tau Y} |Q_{lambda,S(P_u),floor(T/r)}(X / r)|^2 dX/X >= 0, and E_{diff-r}(Y; T, P_u) = sum_{r != s, 1 <= r, s <= T, gcd(r s, N_u)=1} (lambda(r) lambda(s) / sqrt(r s)) int_Y^{tau Y} Q_{lambda,S(P_u),floor(T/r)}(X / r) Q_{lambda,S(P_u),floor(T/s)}(X / s) dX/X = 2 sum_{1 <= r < s <= T, gcd(r s, N_u)=1} (lambda(r) lambda(s) / sqrt(r s)) int_Y^{tau Y} Q_{lambda,S(P_u),floor(T/r)}(X / r) Q_{lambda,S(P_u),floor(T/s)}(X / s) dX/X (ordered pairs r != s carry weight lambda(r)lambda(s)/sqrt(rs); unordered pairs r < s carry factor 2).",
+        "smooth_factor_split": "E_{lambda,T}(Y) = E_{smooth-diag}(Y; T, P_u) + E_{smooth-cross}(Y; T, P_u)",
+        "formal_vs_analytic_status": "Pointwise weighted cofactor decomposition |Q_{lambda,T}(X)|^2 = same-r + diff-r is formally proved in Lean 4 theorem finite_gaussian_observable_reconstruction_and_weighted_cofactor_square; its integrated identity on [Y, tau Y] follows analytically by finite linearity of the Riemann/Lebesgue integral."
       },
-      "proved_partial_saving_on_fixed_smooth_fibers": "For any fixed finite prime set P_u, the generating Dirichlet series of the pure P_u-smooth sum is D_{S(P_u)}(s) = sum_{m in S(P_u)} lambda(m) m^{-s} = prod_{p <= u} (1 + p^{-s})^{-1}, which is holomorphic throughout the right half-plane Re(s) > 0 (its poles lie on Re(s) = 0 at s = i (2k+1) tau / (2 log p)). Thus for fixed u, each un-truncated P_u-smooth fiber Q_{lambda,S(P_u)}(w) has contour-shift bound O_{u,eta}(w^eta) for every eta > 0 (power saving in w = X/r as w -> infty).",
-      "exact_two_part_obstruction_preventing_all_eps_closure": "When attempting to promote the fixed-u smooth-fiber saving to an unconditional bound E_{lambda,T(Y)}(Y) <<_eps Y^eps by choosing u = u(Y): (1) If u >= T(Y) = ceil(Y^{5/4}) so that gcd(r, N_u) = 1 forces r = 1 and E_{diff-r} = 0, then on the contour Re(1/2 + z) = eta in (0, 1/2) the finite Euler product prod_{p <= u}(1 + p^{-eta - i*b})^{-1} has exact Kronecker supremum prod_{p <= u}(1 - p^{-eta})^{-1} = exp((1+o(1)) u^{1-eta} / ((1-eta) log u)), which grows super-polynomially in Y, while the finite truncation m <= T(Y) couples the Mellin integral to the Perron hyperbolic kernel (T/m)^w / w; (2) If u(Y) is chosen small enough to keep prod_{p <= u}(1 - p^{-eta})^{-1} <= Y^eps (requiring u^{1-eta}/log u << eps log Y, so u << (log Y)^{1/(1-eta)}), then almost all integers n <= T(Y) have large P_u-coprime cofactors r > u, and the off-diagonal cofactor sum E_{diff-r}(Y; T(Y), P_u) over 1 <= r_1 != r_2 <= T(Y) carries the unfactored primes p > u.",
+      "weighted_cofactor_regression_Y4_T6_P_2_3": {
+        "Y": 4,
+        "T": 6,
+        "primes_P": [
+          2,
+          3
+        ],
+        "coprime_cofactors_r": [
+          1,
+          5
+        ],
+        "weighted_E_same_r_kernel_grouping": {
+          "mid_float": 0.04878927689438566,
+          "rad_float_outward": 2.815811421925032e-18,
+          "lower_dec": "4.878927689438566504682432312715229376033e-2",
+          "upper_dec": "4.878927689438566504682432312715229376036e-2",
+          "arb_ball_str": "[0.04878927689438566504682432312715229376034 +/- 1.21e-42]"
+        },
+        "weighted_E_same_r_independent_fiber_quadrature": {
+          "mid_float": 0.04878927689438566,
+          "rad_float_outward": 2.815811421925032e-18,
+          "lower_dec": "4.878927689438566504682432312715229376033e-2",
+          "upper_dec": "4.878927689438566504682432312715229376036e-2",
+          "arb_ball_str": "[0.04878927689438566504682432312715229376034 +/- 1.21e-42]"
+        },
+        "kernel_minus_independent_fiber_consistency": {
+          "mid_float": -1.0949845738030023e-78,
+          "rad_float_outward": 4.571098821786853e-78,
+          "lower_dec": "-5.666083395589854786412728605373621979370e-78",
+          "upper_dec": "3.476114247983850114275007139970034392202e-78",
+          "arb_ball_str": "[+/- 5.67e-78]"
+        },
+        "erroneous_unweighted_E_same_r_omitting_1_over_r": {
+          "mid_float": 0.12092688156546584,
+          "rad_float_outward": 3.6113455189205795e-18,
+          "lower_dec": "1.209268815654658371618758542627537258711e-1",
+          "upper_dec": "1.209268815654658371618758542627537258714e-1",
+          "arb_ball_str": "[0.1209268815654658371618758542627537258713 +/- 4.43e-41]"
+        },
+        "unweighted_minus_weighted_discrepancy": {
+          "mid_float": 0.07213760467108017,
+          "rad_float_outward": 5.1173696306161795e-19,
+          "lower_dec": "7.213760467108017211505153113560143211090e-2",
+          "upper_dec": "7.213760467108017211505153113560143211093e-2",
+          "arb_ball_str": "[0.07213760467108017211505153113560143211091 +/- 4.59e-42]"
+        },
+        "weighted_E_diff_r_ordered_independent_fiber": {
+          "mid_float": -0.04418064358166291,
+          "rad_float_outward": 1.807932358204797e-18,
+          "lower_dec": "-4.418064358166290908242957009073668046374e-2",
+          "upper_dec": "-4.418064358166290908242957009073668046371e-2",
+          "arb_ball_str": "[-0.04418064358166290908242957009073668046372 +/- 4.86e-42]"
+        },
+        "erroneous_unweighted_E_diff_r_omitting_1_over_sqrt_rs": {
+          "mid_float": -0.09879092233828804,
+          "rad_float_outward": 6.1449795912808e-18,
+          "lower_dec": "-9.879092233828804585072442756377431406784e-2",
+          "upper_dec": "-9.879092233828804585072442756377431406781e-2",
+          "arb_ball_str": "[-0.09879092233828804585072442756377431406783 +/- 2.98e-42]"
+        },
+        "omitted_weight_strictly_detected": true
+      },
+      "proved_partial_saving_on_fixed_smooth_fibers": "For any fixed finite prime set P_u, the generating Dirichlet series of the pure P_u-smooth sum is D_{S(P_u)}(s) = sum_{m in S(P_u)} lambda(m) m^{-s} = prod_{p <= u} (1 + p^{-s})^{-1}, which is holomorphic throughout the right half-plane Re(s) > 0 (its poles lie on Re(s) = 0 at s = i (2k+1) tau / (2 log p)). Thus for fixed u, each un-truncated P_u-smooth fiber Q_{lambda,S(P_u)}(w) has contour-shift bound O_{u,eta}(w^eta) for every eta > 0 (power saving in w = X/r as w -> infty, with ineffective/u-dependent constant).",
+      "exact_two_part_obstruction_preventing_all_eps_closure": "When attempting to promote the fixed-u smooth-fiber saving to an unconditional bound E_{lambda,T(Y)}(Y) <<_eps Y^eps by choosing u = u(Y) (while preserving the combined signed sum E_{same-r} + E_{diff-r}): (1) If u >= T(Y) = ceil(Y^{5/4}) so that gcd(r, N_u) = 1 forces r = 1 and E_{diff-r} = 0, then on the contour Re(1/2 + z) = eta in (0, 1/2) the finite Euler product prod_{p <= u}(1 + p^{-eta - i*b})^{-1} has exact Kronecker supremum prod_{p <= u}(1 - p^{-eta})^{-1} = exp((1+o(1)) u^{1-eta} / ((1-eta) log u)), which grows super-polynomially in Y, while the finite truncation m <= T(Y) couples the Mellin integral to the Perron hyperbolic kernel (T/m)^w / w; (2) If u(Y) is chosen small enough to keep prod_{p <= u}(1 - p^{-eta})^{-1} <= Y^eps (requiring u^{1-eta}/log u << eps log Y, so u << (log Y)^{1/(1-eta)}), then almost all integers n <= T(Y) have large P_u-coprime cofactors r > u, and the combined sum E_{same-r}(Y; T(Y), P_u) + E_{diff-r}(Y; T(Y), P_u) retains the unfactored primes p > u across distinct cofactors.",
       "rows": [
         {
           "Y": 4,
@@ -10157,6 +11949,7 @@
             2,
             3
           ],
+          "comparison_classification": "kernel_partition_and_independent_fiber_quadrature_consistency_check",
           "E_signed_T_Y": {
             "mid_float": 0.004608633312722756,
             "rad_float_outward": 2.869350901878105e-19,
@@ -10192,12 +11985,54 @@
             "upper_dec": "4.878927689438566504682432312715229376036e-2",
             "arb_ball_str": "[0.04878927689438566504682432312715229376034 +/- 1.21e-42]"
           },
+          "E_same_r_independent_weighted_fiber_quadrature": {
+            "mid_float": 0.04878927689438566,
+            "rad_float_outward": 2.815811421925032e-18,
+            "lower_dec": "4.878927689438566504682432312715229376033e-2",
+            "upper_dec": "4.878927689438566504682432312715229376036e-2",
+            "arb_ball_str": "[0.04878927689438566504682432312715229376034 +/- 1.21e-42]"
+          },
+          "E_same_r_erroneous_unweighted_fiber": {
+            "mid_float": 0.12092688156546584,
+            "rad_float_outward": 3.6113455189205795e-18,
+            "lower_dec": "1.209268815654658371618758542627537258711e-1",
+            "upper_dec": "1.209268815654658371618758542627537258714e-1",
+            "arb_ball_str": "[0.1209268815654658371618758542627537258713 +/- 4.43e-41]"
+          },
+          "E_same_r_kernel_minus_independent_fiber": {
+            "mid_float": -1.0949845738030023e-78,
+            "rad_float_outward": 4.571098821786853e-78,
+            "lower_dec": "-5.666083395589854786412728605373621979370e-78",
+            "upper_dec": "3.476114247983850114275007139970034392202e-78",
+            "arb_ball_str": "[+/- 5.67e-78]"
+          },
           "E_diff_coprime_cofactor_r1_ne_r2": {
             "mid_float": -0.04418064358166291,
             "rad_float_outward": 1.807932358204797e-18,
             "lower_dec": "-4.418064358166290908242957009073668046374e-2",
             "upper_dec": "-4.418064358166290908242957009073668046371e-2",
             "arb_ball_str": "[-0.04418064358166290908242957009073668046372 +/- 4.86e-42]"
+          },
+          "E_diff_r_independent_weighted_fiber_ordered": {
+            "mid_float": -0.04418064358166291,
+            "rad_float_outward": 1.807932358204797e-18,
+            "lower_dec": "-4.418064358166290908242957009073668046374e-2",
+            "upper_dec": "-4.418064358166290908242957009073668046371e-2",
+            "arb_ball_str": "[-0.04418064358166290908242957009073668046372 +/- 4.86e-42]"
+          },
+          "E_diff_r_independent_weighted_fiber_unordered_times_2": {
+            "mid_float": -0.04418064358166291,
+            "rad_float_outward": 1.807932358204797e-18,
+            "lower_dec": "-4.418064358166290908242957009073668046374e-2",
+            "upper_dec": "-4.418064358166290908242957009073668046371e-2",
+            "arb_ball_str": "[-0.04418064358166290908242957009073668046372 +/- 4.86e-42]"
+          },
+          "E_diff_r_kernel_minus_independent_fiber": {
+            "mid_float": 4.0394014265798497e-79,
+            "rad_float_outward": 1.872294895613441e-78,
+            "lower_dec": "-1.468354752955455787900261982743148901631e-78",
+            "upper_dec": "2.276235038271425723028803847907129556070e-78",
+            "arb_ball_str": "[+/- 2.28e-78]"
           },
           "E_smooth_diagonal_m1_eq_m2": {
             "mid_float": 0.06011105163757077,
@@ -10215,6 +12050,7 @@
           },
           "coprime_decomposition_zero_in_diff": true,
           "smooth_decomposition_zero_in_diff": true,
+          "independent_weighted_fiber_consistency_holds": true,
           "strict_sign_cancellation_below_unsigned": true
         },
         {
@@ -10225,6 +12061,7 @@
             3,
             5
           ],
+          "comparison_classification": "kernel_partition_and_independent_fiber_quadrature_consistency_check",
           "E_signed_T_Y": {
             "mid_float": 0.016280644236178577,
             "rad_float_outward": 1.14638474407536e-18,
@@ -10260,12 +12097,54 @@
             "upper_dec": "2.536677420434105493102096192954450773957e-2",
             "arb_ball_str": "[0.02536677420434105493102096192954450773955 +/- 7.11e-43]"
           },
+          "E_same_r_independent_weighted_fiber_quadrature": {
+            "mid_float": 0.025366774204341056,
+            "rad_float_outward": 1.2170833100538125e-18,
+            "lower_dec": "2.536677420434105493102096192954450773954e-2",
+            "upper_dec": "2.536677420434105493102096192954450773957e-2",
+            "arb_ball_str": "[0.02536677420434105493102096192954450773955 +/- 7.11e-43]"
+          },
+          "E_same_r_erroneous_unweighted_fiber": {
+            "mid_float": 0.24567503274717542,
+            "rad_float_outward": 8.295591867461851e-18,
+            "lower_dec": "2.456750327471754119823489485876734463289e-1",
+            "upper_dec": "2.456750327471754119823489485876734463292e-1",
+            "arb_ball_str": "[0.2456750327471754119823489485876734463290 +/- 3.28e-41]"
+          },
+          "E_same_r_kernel_minus_independent_fiber": {
+            "mid_float": -1.5248931247908134e-78,
+            "rad_float_outward": 7.130118740476813e-78,
+            "lower_dec": "-8.655011865267625962919995002968865456746e-78",
+            "upper_dec": "5.605225615685999068068276138108562382689e-78",
+            "arb_ball_str": "[+/- 8.66e-78]"
+          },
           "E_diff_coprime_cofactor_r1_ne_r2": {
             "mid_float": -0.009086129968162479,
             "rad_float_outward": 7.069856597845249e-20,
             "lower_dec": "-9.086129968162479016236413499066460126710e-3",
             "upper_dec": "-9.086129968162479016236413499066460126707e-3",
             "arb_ball_str": "[-0.009086129968162479016236413499066460126709 +/- 3.36e-43]"
+          },
+          "E_diff_r_independent_weighted_fiber_ordered": {
+            "mid_float": -0.009086129968162479,
+            "rad_float_outward": 7.069856597845249e-20,
+            "lower_dec": "-9.086129968162479016236413499066460126710e-3",
+            "upper_dec": "-9.086129968162479016236413499066460126707e-3",
+            "arb_ball_str": "[-0.009086129968162479016236413499066460126709 +/- 3.36e-43]"
+          },
+          "E_diff_r_independent_weighted_fiber_unordered_times_2": {
+            "mid_float": -0.009086129968162479,
+            "rad_float_outward": 7.069856597845249e-20,
+            "lower_dec": "-9.086129968162479016236413499066460126710e-3",
+            "upper_dec": "-9.086129968162479016236413499066460126707e-3",
+            "arb_ball_str": "[-0.009086129968162479016236413499066460126709 +/- 3.36e-43]"
+          },
+          "E_diff_r_kernel_minus_independent_fiber": {
+            "mid_float": 4.972855401242383e-79,
+            "rad_float_outward": 8.582932168652642e-78,
+            "lower_dec": "-8.085646628528402438128506451673617444356e-78",
+            "upper_dec": "9.080217708776879017735025312249394972994e-78",
+            "arb_ball_str": "[+/- 9.09e-78]"
           },
           "E_smooth_diagonal_m1_eq_m2": {
             "mid_float": 0.11117957133448877,
@@ -10283,6 +12162,7 @@
           },
           "coprime_decomposition_zero_in_diff": true,
           "smooth_decomposition_zero_in_diff": true,
+          "independent_weighted_fiber_consistency_holds": true,
           "strict_sign_cancellation_below_unsigned": true
         },
         {
@@ -10294,6 +12174,7 @@
             5,
             7
           ],
+          "comparison_classification": "kernel_partition_and_independent_fiber_quadrature_consistency_check",
           "E_signed_T_Y": {
             "mid_float": 0.020087616778184776,
             "rad_float_outward": 1.7330573891260256e-18,
@@ -10329,12 +12210,54 @@
             "upper_dec": "4.604404794761902815621552489743255339505e-2",
             "arb_ball_str": "[0.04604404794761902815621552489743255339503 +/- 2.20e-42]"
           },
+          "E_same_r_independent_weighted_fiber_quadrature": {
+            "mid_float": 0.04604404794761903,
+            "rad_float_outward": 1.3698296285912346e-18,
+            "lower_dec": "4.604404794761902815621552489743255339502e-2",
+            "upper_dec": "4.604404794761902815621552489743255339505e-2",
+            "arb_ball_str": "[0.04604404794761902815621552489743255339503 +/- 2.20e-42]"
+          },
+          "E_same_r_erroneous_unweighted_fiber": {
+            "mid_float": 0.45417551507269077,
+            "rad_float_outward": 3.998548566404142e-18,
+            "lower_dec": "4.541755150726907759323984400802225565659e-1",
+            "upper_dec": "4.541755150726907759323984400802225565662e-1",
+            "arb_ball_str": "[0.4541755150726907759323984400802225565660 +/- 9.24e-42]"
+          },
+          "E_same_r_kernel_minus_independent_fiber": {
+            "mid_float": -1.939226255869796e-77,
+            "rad_float_outward": 4.5502203748537115e-77,
+            "lower_dec": "-6.489446630723506865762562689318188818499e-77",
+            "upper_dec": "2.610994118983914693449254017262773356334e-77",
+            "arb_ball_str": "[+/- 6.49e-77]"
+          },
           "E_diff_coprime_cofactor_r1_ne_r2": {
             "mid_float": -0.02595643116943425,
             "rad_float_outward": 3.6655993423635446e-19,
             "lower_dec": "-2.595643116943425027805840326862158897647e-2",
             "upper_dec": "-2.595643116943425027805840326862158897644e-2",
             "arb_ball_str": "[-0.02595643116943425027805840326862158897645 +/- 4.93e-42]"
+          },
+          "E_diff_r_independent_weighted_fiber_ordered": {
+            "mid_float": -0.02595643116943425,
+            "rad_float_outward": 3.6655993423635446e-19,
+            "lower_dec": "-2.595643116943425027805840326862158897647e-2",
+            "upper_dec": "-2.595643116943425027805840326862158897644e-2",
+            "arb_ball_str": "[-0.02595643116943425027805840326862158897645 +/- 4.93e-42]"
+          },
+          "E_diff_r_independent_weighted_fiber_unordered_times_2": {
+            "mid_float": -0.02595643116943425,
+            "rad_float_outward": 3.6655993423635446e-19,
+            "lower_dec": "-2.595643116943425027805840326862158897647e-2",
+            "upper_dec": "-2.595643116943425027805840326862158897644e-2",
+            "arb_ball_str": "[-0.02595643116943425027805840326862158897645 +/- 4.93e-42]"
+          },
+          "E_diff_r_kernel_minus_independent_fiber": {
+            "mid_float": 1.6912589711838734e-77,
+            "rad_float_outward": 4.817498629052301e-77,
+            "lower_dec": "-3.126239657868426537844506555385780534746e-77",
+            "upper_dec": "6.508757600236173317258586206141391939886e-77",
+            "arb_ball_str": "[+/- 6.51e-77]"
           },
           "E_smooth_diagonal_m1_eq_m2": {
             "mid_float": 0.1718523305860788,
@@ -10352,11 +12275,40 @@
           },
           "coprime_decomposition_zero_in_diff": true,
           "smooth_decomposition_zero_in_diff": true,
+          "independent_weighted_fiber_consistency_holds": true,
           "strict_sign_cancellation_below_unsigned": true
         }
       ],
       "all_signed_decompositions_consistent": true
     }
+  },
+  "claim_classification_map": {
+    "unconditional_finite_arithmetic_theorems_proved_in_lean": [
+      "smooth_coprime_positive_factorization_exists_unique_nat: unique positive factorization n = m * r with m P-smooth (in S(P)) and gcd(r, N_P) = 1 for arbitrary Finset P of primes (including empty P).",
+      "finite_smooth_coprime_cutoff_indexing_bijection_nat: finite cutoff bijection {1 <= n <= T} <-> {(m, r) : m in S(P), m <= T, 1 <= r <= floor(T/m), gcd(r, N_P) = 1}, handling T = 0, T = 1, P = empty, and empty inner sums.",
+      "finite_liouville_reindexed_sum_and_excess_cutoff_identity_nat: arbitrary-weight reindexed finite Liouville sum sum_{1<=n<=T} lambda(n) w(n) = sum_{m<=T, m in S(P)} sum_{1<=r<=floor(T/m), gcd(r, N_P)=1} lambda(m) lambda(r) w(m r) = sum_{1<=r<=T, gcd(r, N_P)=1} sum_{m<=floor(T/r), m in S(P)} lambda(r) lambda(m) w(m r), plus exact uncoupled excess identity when r <= T replaces r <= floor(T/m) (vanishing at P = empty, T <= 1, and (P = {2}, T = 2), and equal to w(6) at (P = {2}, T = 3)).",
+      "finite_gaussian_observable_reconstruction_and_weighted_cofactor_square: instantiation to the finite Gaussian observable proving Q_{lambda,T}(X) = sum_{m<=T, m in S(P)} (lambda(m)/sqrt(m)) Q_{lambda,P,floor(T/m)}(X/m) = sum_{1<=r<=T, gcd(r, N_P)=1} (lambda(r)/sqrt(r)) Q_{lambda,S(P),floor(T/r)}(X/r) and pointwise weighted square decomposition (Q_{lambda,T}(X))^2 = sum_{r} (1/r) (Q_{lambda,S(P),floor(T/r)}(X/r))^2 + sum_{r != s} (lambda(r)lambda(s)/sqrt(r s)) Q_{lambda,S(P),floor(T/r)}(X/r) Q_{lambda,S(P),floor(T/s)}(X/s).",
+      "actual_omega_factorization_and_liouville_common_factor_cancellation_nat, actual_prime_power_and_factored_square_divisor_moebius_liouville_inversion_nat, actual_finite_prime_exclusion_sieve_identity_nat, prime_parity_control_multiplicative_and_moebius_separation_nat: actual positive-integer M\u00f6bius-Liouville square-divisor inversions, finite-prime sieve, and parity control separation.",
+      "abel_scaling_fourier_ratio_and_unequal_block_algebra, near_diagonal_kernel_bound_and_opposite_parity_dilation_pairing, pairing_counterexample_replacement_and_finite_reconstruction_tc055r: finite square-sum algebra, Fourier ratio denominator monotonicity, rational counterexample 3993/10000 < 1559/2890, and scalar kernel-ratio implications from explicit kernel-ratio hypotheses."
+    ],
+    "universal_analytic_proofs_supplied_in_review": [
+      "Reversible weighted L^2 norm equivalence between Q_mu and Q_lambda on H_eta (eta > 0) and equivalence with grade-interval subpower energy.",
+      "Non-Schwartz C^1(R/Z) Poisson summation formula for sum_{d>=1} d^{-6} exp(-L^2/d^2), Mellin regularization + DLMF 5.8.3 contour shift, and global Stieltjes bound E_lambda(Y) <<_D Y / (log Y)^D (Y >= 2).",
+      "Exact full-space inverse operator norm ||P_u^{-1}||_{H_eta -> H_eta} = prod_{p <= u} (1 - p^{-1/2 - eta})^{-1} via Q-linear independence of prime logarithms and continuous Kronecker simultaneous approximation.",
+      "Floor-guarded tail bound sum_{n > u} n^{-3} <= 1 / (2 floor(u)^2) (u >= 1), least-prime coprime tail bounds (u >= 2), diagonal asymptotic D_E(Y), near-diagonal band inequality, two-sided integrand-ratio and transition relative-gap kernel bounds (with full (b/a)^3 factor), explicit C_{a_2} = 17 + (16/7)*zeta(3) remainder proof for Q_{a_2}(X) and E_{a_2}(Y), leading asymptotics for a_S (S = {3,5,7}), truncation tail energy bound R_tail(Y, T) <= (tau^5 - 1) Y^5 / (20 T^4) with two-sided L^2 transfer, and integrated weighted cofactor decomposition E_{lambda,T}(Y) = E_{same-r} + E_{diff-r}."
+    ],
+    "certified_evaluations_at_specified_inputs": [
+      "256-bit Arb enclosures of Fourier sign-change witnesses hat{f}(xi) at xi in {0, 1/2, 4/tau, 1, 3/2, 2} and legacy K_terms=1 refutation.",
+      "256-bit Arb certifications of non-integer cutoff counterexample u = 2.9, exact dyadic rational boundary cutoffs u = 3 +- 2^{-100} and u = 5 +- 2^{-100}, Kronecker phase-alignment witness b_* = 2513 * tau / (2 * log 2), and retired pairing counterexample at (Y=33, p=11, q=2, r=5, m=1, n=11) with K_{33}(11,11) = 1.01455519480741885677e-8... and K_{33}(10,11) = 1.83203018490220578045e-9....",
+      "256-bit Arb certifications of C_{a_2} = 17 + (16/7)*zeta(3) across X in {1, 2, 4, 8, 16, 32, 64}, derived E_{a_2}(Y) remainder bounds across Y in {1, 4, 8, 16, 32}, nonzero Gaussian uncoupled-cutoff excess witnesses, and weighted vs erroneous unweighted same-cofactor energy at (Y=4, T=6, P={2,3}) (0.048789276894385665... vs 0.120926881565465837...)."
+    ],
+    "algebraic_and_numerical_consistency_checks": [
+      "Interval-overlap / zero-in-residual checks comparing direct coprime sums against operator products P_P Q_lambda(X), direct Q_{a_2}(X) against its coefficient-2 dyadic expansion, finite reconstructions against direct Q_{lambda,T}(X), and kernel-matrix cofactor grouping against independent `acb.integral` smooth-fiber quadrature (exact equality rests on the proved Lean/analytic identities, not on interval overlap)."
+    ],
+    "conditional_implications_and_unresolved_estimates": [
+      "Conditional equivalence: SUBGATE-TC-043A <-> (forall eps > 0 exists C_eps < infty forall Y >= 1, 0 <= E_{lambda,T(Y)}(Y) = E_{same-r} + E_{diff-r} <= C_eps Y^eps) <-> RH.",
+      "Unresolved target estimate: proving forall eps > 0 exists C_eps < infty forall Y >= 1, E_{lambda,T(Y)}(Y) <= C_eps Y^eps uniformly in Y without discarding cross-cofactor cancellation (SUBGATE-TC-043A remains OPEN; rh_proved remains false)."
+    ]
   },
   "surviving_unconditional_theorems": [
     "Reversible square-dilation transfer lambda(n) = sum_{d^2 | n} mu(n/d^2), mu(n) = sum_{d^2 | n} mu(d) lambda(n/d^2), Q_lambda(X) = sum_{d>=1} Q_mu(X/d^2)/d, Q_mu(X) = sum_{d>=1} mu(d) Q_lambda(X/d^2)/d, and weighted L^2 norm equivalence ||Q_lambda||_eta <= zeta(1+2*eta) ||Q_mu||_eta, ||Q_mu||_eta <= (zeta(1+2*eta)/zeta(2+4*eta)) ||Q_lambda||_eta for all eta > 0.",
@@ -10366,8 +12318,18 @@
     "Repaired unequal-block bound |B_{A,B}(X)| <= (7/3) C_* min(A,B)^3 / max(A,B)^2 with C_* = max{zeta(6), c_0 + 27 exp(-3)} = 2.008921040021894970679058028804597412605..., repaired dyadic Abel bound |U_lambda(Y; M)| << M^{1/2} min(M/Y, (Y/M)^{5/2}) exp(-c Phi(M)) (M >= 16), and unconditional global Stieltjes energy theorem |Q_lambda(X)| << sqrt(X) exp(-c_1 Phi(X)) (X >= 256), E_lambda(Y) := int_Y^{tau Y} |Q_lambda(X)|^2 dX/X << Y exp(-2 c_2 Phi(Y)) (Y >= 256), and E_lambda(Y) <<_D Y (log Y)^{-D} (Y >= 2, via compact-range bound E_lambda(Y) <= (zeta(3)^2 (tau^5 - 1) / 5) Y^5 on 2 <= Y < 256) by splitting Q_lambda(X) = -X^{5/2} int_1^infty L_lambda(t) d/dt(t^{-3} exp(-X^2/t^2)) dt at t = sqrt(X) with scaling constant int_0^infty u |3 - 2 u^2| exp(-u^2) du = 1/2 + 2 exp(-3/2).",
     "Exact dyadic parity annihilation Q_{lambda,odd}(X) = Q_lambda(X) + 2^{-1/2} Q_lambda(X/2), convergent dyadic inversion, exact grade-interval energy identity on [Y, tau Y] with cross-scale correlation, bounded norm equivalence for all eta > -1/2, and proof that |1 + 2^{-rho}| >= 1 - 2^{-x} > 0 for rho = x + i*y with x > 0.",
     "Simultaneous finite-prime exclusion identity Q_{lambda,P}(X) = prod_{p in P}(I + p^{-1/2} S_p) Q_lambda(X) = sum_{d | N_P} (|mu(d)| / sqrt(d)) Q_lambda(X / d) = X^{5/2} sum_{gcd(n, N_P)=1} (lambda(n)/n^3) exp(-X^2/n^2) (integer sieve formalized in Lean 4 theorem actual_finite_prime_exclusion_sieve_identity_nat), its convergent P-smooth inverse reconstruction Q_lambda(X) = sum_{m in S(P)} (lambda(m)/sqrt(m)) Q_{lambda,P}(X/m), and exact removable trivial-zero cancellation lim_{z -> -(2m+1/2)} zeta(1+2z)/zeta(1/2+z) = 2 zeta'(-4m)/zeta'(-2m) = 2 (-1)^m (4m)! zeta(4m+1) / (tau^{2m} (2m)! zeta(2m+1)) != 0.",
-    "Exact coprime decomposition Q_{lambda,P_u}(w) = w^{5/2} exp(-w^2) + R_{lambda,P_u}(w) for real u >= 2 with repaired integer-floor and least-prime tail bounds |R_{lambda,P_u}(w)| <= w^{5/2} / (2 floor(u)^2) and |R_{lambda,P_u}(w)| <= w^{5/2} (1/q_{>u}^3 + 1/(2 q_{>u}^2)), exact full-space operator norm equality ||P_u^{-1}||_{H_eta -> H_eta} = sup_{b in R} prod_{p <= u} |1 + p^{-1/2 - eta} exp(-i b log p)|^{-1} = prod_{p <= u} (1 - p^{-1/2 - eta})^{-1} via continuous Kronecker simultaneous approximation, diagonal energy asymptotic D_E(Y) := sum_{n>=1} K_Y(n, n) = (3 sqrt(tau) / 64) log tau + R_{D,E}(Y) with |R_{D,E}(Y)| <= C_{D,2} Y^{-2} (C_{D,2} = C_2 (1 - tau^{-2}) / (16 sqrt(2)) = 0.07974240995631961...) for all Y > 0, and unconditional near-diagonal band inequality sum_{|m - n| <= H} K_Y(m, n) <= (2 H + 1) D_E(Y) for all integers H >= 0.",
-    "Opposite-parity prime-semiprime sign identity lambda(p m) + lambda(q r m) = 0, valid replacement kernel enclosures r_0^3 exp(-(tau Y)^2 Delta) K_Y(b, n) <= K_Y(a, n) <= r_0^3 exp(-Y^2 Delta) K_Y(b, n), |K_Y(a, n) - K_Y(b, n)| <= max(|r_0^3 exp(-(tau Y)^2 Delta) - 1|, |r_0^3 exp(-Y^2 Delta) - 1|) K_Y(b, n), and |K_Y(a, n) - K_Y(b, n)| <= ((b - a)/a)(b/a)^3 (3 + 2 tau^2 Y^2 / a^2) K_Y(b, n) for all 0 < a <= b (replacing retired TC-055 Lemma 6.1, refuted at Y=33, p=11, q=2, r=5, m=1, n=11), repaired 2-adic and multi-prime parity control asymptotics Q_{a_2}(X) = sqrt(X)/6 + O(X^{-1/2}), E_{a_2}(Y) = ((tau - 1)/36) Y + O(1) (via second-order Euler-Maclaurin bound |Q_1(w) - sqrt(w)/2| <= 3 w^{-3/2}; or + O(X^{-1/2} log X), + O(log Y) from the exact unimodal bound C_{1,uni} = 2(3/(2e))^{3/2} = (1/sqrt(2))(3/e)^{3/2}), Q_{a_{3,5,7}}(X) ~ sqrt(X)/8, E_{a_{3,5,7}}(Y) ~ ((tau - 1)/64) Y, and exact finite reconstruction Q_{lambda,T}(X) = sum_{m in S(P), m<=T} (lambda(m)/sqrt(m)) Q_{lambda,P,floor(T/m)}(X/m) with tail energy int_Y^{tau Y} |Q_lambda(X) - Q_{lambda,T}(X)|^2 dX/X <= (tau^5 - 1) Y^5 / (20 T^4) (formalized in Lean 4 theorem pairing_counterexample_replacement_and_finite_reconstruction_tc055r)."
+    "Exact coprime decomposition Q_{lambda,P_u}(w) = w^{5/2} exp(-w^2) + R_{lambda,P_u}(w) for real u >= 2 with exact rational/dyadic-endpoint floor and least-prime tail bounds |R_{lambda,P_u}(w)| <= w^{5/2} / (2 floor(u)^2), |R_{lambda,P_u}(w)| <= w^{5/2} / (2 (q_{>u} - 1)^2), and |R_{lambda,P_u}(w)| <= w^{5/2} (1/q_{>u}^3 + 1/(2 q_{>u}^2)), exact full-space operator norm equality ||P_u^{-1}||_{H_eta -> H_eta} = sup_{b in R} prod_{p <= u} |1 + p^{-1/2 - eta} exp(-i b log p)|^{-1} = prod_{p <= u} (1 - p^{-1/2 - eta})^{-1} via continuous Kronecker simultaneous approximation (witness b_* = 2513 * tau / (2 * log 2)), diagonal energy asymptotic D_E(Y) := sum_{n>=1} K_Y(n, n) = (3 sqrt(tau) / 64) log tau + R_{D,E}(Y) with |R_{D,E}(Y)| <= C_{D,2} Y^{-2} (C_{D,2} = C_2 (1 - tau^{-2}) / (16 sqrt(2)) = 0.07974240995631961...) for all Y > 0, and unconditional near-diagonal band inequality sum_{|m - n| <= H} K_Y(m, n) <= (2 H + 1) D_E(Y) for all integers H >= 0 (retaining the full complementary off-diagonal domain |m - n| > H).",
+    "Opposite-parity prime-semiprime sign identity lambda(p m) + lambda(q r m) = 0, valid replacement kernel enclosures r_0^3 exp(-(tau Y)^2 Delta) K_Y(b, n) <= K_Y(a, n) <= r_0^3 exp(-Y^2 Delta) K_Y(b, n), |K_Y(a, n) - K_Y(b, n)| <= max(|r_0^3 exp(-(tau Y)^2 Delta) - 1|, |r_0^3 exp(-Y^2 Delta) - 1|) K_Y(b, n), and |K_Y(a, n) - K_Y(b, n)| <= ((b - a)/a)(b/a)^3 (3 + 2 tau^2 Y^2 / a^2) K_Y(b, n) for all 0 < a <= b (uniform O((b-a)/a) when both a >= c Y and 1 <= b/a <= R), repaired 2-adic parity control constant C_{a_2} = 17 + (16/7) zeta(3) = 19.74755863579336... giving Q_{a_2}(X) = sqrt(X)/6 + O(X^{-1/2}) (X >= 1) and E_{a_2}(Y) = ((tau - 1)/36) Y + O(1) (Y >= 1), leading asymptotics Q_{a_{3,5,7}}(X) ~ sqrt(X)/8 and E_{a_{3,5,7}}(Y) ~ ((tau - 1)/64) Y (mean 1/4), and full Lean-formalized finite smooth-coprime factorization bijection, arbitrary-weight reindexed Liouville sum, exact uncoupled-cutoff excess identity, Gaussian observable reconstruction, and weighted cofactor energy decomposition E_{lambda,T}(Y) = E_{same-r} + E_{diff-r} with 1/r and lambda(r)lambda(s)/sqrt(rs) weights and two-sided L^2 tail transfer at exact T(Y) = ceil(Y^{5/4})."
   ],
-  "precise_obstruction_to_subgate_tc043a_closure": "1. In Attack A, the bivariate coprime Dirichlet series D_lambda(u, v) = zeta(2u) zeta(2v) / (zeta(u) zeta(v) zeta(u+v)) has numerator zeta(2u) zeta(2v) and coprimality factor 1/zeta(u+v) evaluated at 2u, 2v, u+v in the Euler-product half-plane Re(w) > 1 whenever Re(u) = Re(v) = x > 1/2, so neither factor can vanish at an off-critical conjugate pair (rho, conj(rho)) (rho = x + i*y) to cancel the poles of 1/(zeta(u) zeta(v)); moreover in D_lambda(s) = zeta(2s)/zeta(s) the pole of zeta(2s) at s = 1/2 remains (giving the z = 0 simple pole of M[Q_lambda](z) of residue Gamma(5/4)/(4 zeta(1/2)) = -0.1551682265... != 0), while the denominator pole of zeta(s) at s = 1 produces a zero D_lambda(1) = 0. While the global Stieltjes integration-by-parts proof establishes E_lambda(Y) << Y exp(-2 c_2 Phi(Y)) <<_D Y (log Y)^{-D}, this is an upper bound and does not establish forall eps > 0, E_lambda(Y) <= C_eps Y^eps. 2. In Attack B and its simultaneous finite-prime extension P_u = prod_{p <= u}(I + p^{-1/2} S_p) (TASK-TC-055 / TASK-TC-055R), every finite-prime filter multiplies an off-critical mode F_rho(X) = X^{rho - 1/2} (rho = x + i*y, x > 0) by M_u(rho) = prod_{p <= u}(1 + p^{-rho}) with 0 < prod_{p <= u}(1 - p^{-x}) <= |M_u(rho)| <= prod_{p <= u}(1 + p^{-x}), and on the full weighted space H_eta = L^2((0, infty), X^{-2*eta} dX/X) the inverse operator norm equals ||P_u^{-1}||_{H_eta -> H_eta} = sup_{b in R} prod_{p <= u}|1 + p^{-1/2 - eta} exp(-i b log p)|^{-1} = prod_{p <= u}(1 - p^{-1/2 - eta})^{-1} EXACTLY by Q-linear independence of prime logarithms and continuous Kronecker simultaneous approximation (diverging as u -> infty for all 0 < eta <= 1/2, so no full-space signed multiplier norm improvement exists). 3. In the finite truncated reconstruction Q_{lambda,T(Y)}(X) = sum_{m in S(P_u), m<=T(Y)} (lambda(m)/sqrt(m)) Q_{lambda,P_u,floor(T(Y)/m)}(X/m) with T(Y) = ceil(Y^{5/4}) (tail energy <= (tau^5 - 1)/20 = O(1)), each fixed-u smooth fiber has Dirichlet series prod_{p <= u}(1 + p^{-s})^{-1} holomorphic on Re(s) > 0, but taking u >= T(Y) to eliminate the P_u-coprime cofactors r > 1 incurs the super-polynomial Kronecker norm prod_{p <= u}(1 - p^{-eta})^{-1} and hyperbolic inner-cutoff floor(T/m) boundary coupling, while keeping u small leaves the off-diagonal coprime cofactor sum E_{diff-r}(Y; T(Y), P_u) over unfactored primes p > u."
+  "precise_obstruction_to_subgate_tc043a_closure": "1. In Attack A, the bivariate coprime Dirichlet series D_lambda(u, v) = zeta(2u) zeta(2v) / (zeta(u) zeta(v) zeta(u+v)) has numerator zeta(2u) zeta(2v) and coprimality factor 1/zeta(u+v) evaluated at 2u, 2v, u+v in the Euler-product half-plane Re(w) > 1 whenever Re(u) = Re(v) = x > 1/2, so neither factor can vanish at an off-critical conjugate pair (rho, conj(rho)) (rho = x + i*y) to cancel the poles of 1/(zeta(u) zeta(v)); moreover in D_lambda(s) = zeta(2s)/zeta(s) the pole of zeta(2s) at s = 1/2 remains (giving the z = 0 simple pole of M[Q_lambda](z) of residue Gamma(5/4)/(4 zeta(1/2)) = -0.1551682265... != 0), while the denominator pole of zeta(s) at s = 1 produces a zero D_lambda(1) = 0. While the global Stieltjes integration-by-parts proof establishes E_lambda(Y) << Y exp(-2 c_2 Phi(Y)) <<_D Y (log Y)^{-D}, this is an upper bound and does not establish forall eps > 0, E_lambda(Y) <= C_eps Y^eps. 2. In Attack B and its simultaneous finite-prime extension P_u = prod_{p <= u}(I + p^{-1/2} S_p) (TASK-TC-055 / TASK-TC-055R / TASK-TC-055R2), every finite-prime filter multiplies an off-critical mode F_rho(X) = X^{rho - 1/2} (rho = x + i*y, x > 0) by M_u(rho) = prod_{p <= u}(1 + p^{-rho}) with 0 < prod_{p <= u}(1 - p^{-x}) <= |M_u(rho)| <= prod_{p <= u}(1 + p^{-x}), and on the full weighted space H_eta = L^2((0, infty), X^{-2*eta} dX/X) the inverse operator norm equals ||P_u^{-1}||_{H_eta -> H_eta} = sup_{b in R} prod_{p <= u}|1 + p^{-1/2 - eta} exp(-i b log p)|^{-1} = prod_{p <= u}(1 - p^{-1/2 - eta})^{-1} EXACTLY by Q-linear independence of prime logarithms and continuous Kronecker simultaneous approximation (diverging as u -> infty for all 0 < eta <= 1/2, so no full-space signed multiplier norm improvement exists). 3. Under the proved two-sided L^2 truncation transfer at exact T(Y) = ceil(Y^{5/4}) (R_tail(Y, T(Y)) <= (tau^5 - 1)/20 = O(1)), SUBGATE-TC-043A is equivalent to the finite joint-energy target: forall eps > 0 exists C_eps < infty forall Y >= 1, 0 <= E_{lambda,T(Y)}(Y) = E_{same-r}(Y; T(Y), P_u) + E_{diff-r}(Y; T(Y), P_u) <= C_eps Y^eps (retaining the signed cross-cofactor sum with weights 1/r and lambda(r)lambda(s)/sqrt(rs)). Taking u >= T(Y) eliminates E_{diff-r} (forcing r = 1) but incurs the super-polynomial Kronecker Euler-product norm prod_{p <= u}(1 - p^{-eta})^{-1} and hyperbolic inner-cutoff floor(T/m) boundary coupling, while keeping u small leaves the combined signed sum E_{same-r} + E_{diff-r} over unfactored primes p > u unresolved.",
+  "section_14_tc055r2_review_displayed_enclosures_audit": {
+    "review_path": "C:\\Development\\Projects\\reimann_scope\\docs\\reviews\\TC_055_SIMULTANEOUS_TAU_COMPATIBILITY.md",
+    "total_displayed_intervals_found": 54,
+    "tagged_and_checked_count": 54,
+    "untagged_count": 0,
+    "failed_count": 0,
+    "untagged_intervals": [],
+    "failed_intervals": [],
+    "all_displayed_intervals_contain_generated_enclosures": true
+  }
 }
