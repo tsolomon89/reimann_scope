@@ -52,6 +52,7 @@ from tc.prime_chain_contraction import (
     evaluate_smooth_cutoff_surge_I_kappa_arb,
     exact_M_companion_cutoff,
     exact_T_cutoff_ceil_Y_5_4,
+    exact_U0_cutoff_ceil_2_Y_5_8,
     primes_up_to,
     validate_adjoin_prime,
     validate_prime_set_tuple,
@@ -511,3 +512,102 @@ def test_lean_tc056_theorems_present_and_zero_sorry_or_axiom() -> None:
     )
     for thm_name in expected_theorems:
         assert f"theorem {thm_name}" in code_only, f"Missing Lean theorem {thm_name}"
+
+
+# ---------------------------------------------------------------------------
+# 7. TASK-TC-056R Regression Tests (Grade Scope, U0 Cutoff, Theorem 8.E, Claims)
+# ---------------------------------------------------------------------------
+
+
+def test_tc056r_rational_vs_algebraic_grade_scope_and_no_overclaim(tc056_artifact: dict) -> None:
+    review_text = TC_056_REVIEW_DOC_PATH.read_text(encoding="utf-8")
+    # The unsupported algebraic-grade overclaim must not appear in the review document:
+    assert "cannot solve $p^k = \\tau^K$ by Lindemann" not in review_text
+    assert "cannot solve $p^k = \\tau^K$ by Lindemann\u2013Weierstrass / Gelfond\u2013Schneider" not in review_text
+    assert "irrational" in review_text
+    assert "does **not** determine whether $K = \\frac{k \\log p}{\\log \\tau}$ is algebraic irrational" in review_text
+
+    grade_audit = tc056_artifact["section_1_and_2_baseline_and_cleanup"][
+        "rational_vs_algebraic_grade_scope_audit"
+    ]
+    assert grade_audit["verified"] is True
+    assert "PROVED_IRRATIONAL_BY_LINDEMANN" in grade_audit["rational_exclusion_status"]
+    assert "OPEN_UNESTABLISHED" in grade_audit["algebraic_irrational_vs_transcendental_status"]
+    assert grade_audit["any_tc056_theorem_depends_on_algebraic_grade_exclusion"] is False
+
+    polylog_audit = tc056_artifact["section_1_and_2_baseline_and_cleanup"][
+        "admissible_polylogarithmic_scale_correction"
+    ]
+    assert polylog_audit["unsigned_majorant_budget_scope_only"] is True
+    assert "unsigned Euler-product majorant" in polylog_audit["admissible_and_necessary_scale"]
+
+
+def test_tc056r_exact_U0_cutoff_boundaries_and_empty_prime_bands(tc056_artifact: dict) -> None:
+    eps = Fraction(1, 1 << 100)
+    assert exact_U0_cutoff_ceil_2_Y_5_8(1) == 2
+    assert exact_U0_cutoff_ceil_2_Y_5_8(Fraction(1, 1) + eps) == 3
+    assert exact_U0_cutoff_ceil_2_Y_5_8(2) == 4
+    # Exact eighth-power boundary at Y = 256 = 2^8 -> 2 * 256^{5/8} = 2 * 32 = 64:
+    assert exact_U0_cutoff_ceil_2_Y_5_8(Fraction(256, 1) - eps) == 64
+    assert exact_U0_cutoff_ceil_2_Y_5_8(256) == 64
+    assert exact_U0_cutoff_ceil_2_Y_5_8(Fraction(256, 1) + eps) == 65
+    assert exact_U0_cutoff_ceil_2_Y_5_8(128) == 42
+
+    for Y_sample in (1, 2, 4, 6, 16, 81, 128, 256):
+        u0_val = exact_U0_cutoff_ceil_2_Y_5_8(Y_sample)
+        t_val = exact_T_cutoff_ceil_Y_5_4(Y_sample)
+        assert u0_val * u0_val > t_val
+
+    # Empty prime bands at Y = 1 (U0 = 2, T = 1) and Y = 2 (U0 = 4, T = 3):
+    assert [p for p in primes_up_to(exact_T_cutoff_ceil_Y_5_4(1)) if p >= exact_U0_cutoff_ceil_2_Y_5_8(1)] == []
+    assert [p for p in primes_up_to(exact_T_cutoff_ceil_Y_5_4(2)) if p >= exact_U0_cutoff_ceil_2_Y_5_8(2)] == []
+
+    with pytest.raises(TypeError):
+        exact_U0_cutoff_ceil_2_Y_5_8(4.0)  # type: ignore[arg-type]
+    with pytest.raises(TypeError):
+        exact_U0_cutoff_ceil_2_Y_5_8(False)  # type: ignore[arg-type]
+    with pytest.raises(ValueError):
+        exact_U0_cutoff_ceil_2_Y_5_8(Fraction(99, 100))
+
+    sched = tc056_artifact["section_1_and_2_baseline_and_cleanup"]["schedule_T_vs_M_boundary_audit"]
+    assert sched["all_boundary_checks_pass"] is True
+
+
+def test_tc056r_theorem_8E_mellin_sign_step_B_truncation_and_claim_separation(
+    tc056_artifact: dict,
+) -> None:
+    sec8 = tc056_artifact["section_8_mixed_prime_block_attempt"]
+    thm_8c = sec8["theorem_8C_refutation_of_localized_single_block_subpower_conjecture"]
+    thm_8e = sec8["theorem_8E_conditional_moving_cutoff_buchstab_asymptotic"]
+
+    # Unconditional vs conditional separation:
+    assert thm_8c["requires_rh"] is False
+    assert "does NOT use RH" in thm_8c["contradiction_vs_unconditional_block_asymptotic_scope"]
+    assert thm_8e["is_conditional_on_rh"] is True
+    assert thm_8e["verified"] is True
+    assert thm_8e["F_at_half_exact_zero"] == 0
+
+    # Outward-rounded endpoint checks on Mellin derivative, log moment, norm coefficient, and Step F cap:
+    fp_low, _, _ = _parse_arb_ball_str_to_fractions(
+        thm_8e["F_prime_at_half_tau2_over_48"]["arb_ball_str"]
+    )
+    _, lm_high, _ = _parse_arb_ball_str_to_fractions(
+        thm_8e["log_moment_int_Q_lambda_w_neg_3_2_log_w"]["arb_ball_str"]
+    )
+    nc_low, _, _ = _parse_arb_ball_str_to_fractions(
+        thm_8e["norm_sq_leading_coeff_tau_minus_1_tau4_over_2304"]["arb_ball_str"]
+    )
+    sf_low, _, _ = _parse_arb_ball_str_to_fractions(
+        thm_8e["step_F_Q_T_tail_cap_tau_5_2_over_2"]["arb_ball_str"]
+    )
+    assert fp_low > Fraction(8224, 10000)
+    assert lm_high < Fraction(-8224, 10000)
+    assert nc_low > Fraction(3573, 1000)
+    assert sf_low > Fraction(4947, 100)
+
+    # Claim classification check:
+    claims = tc056_artifact["five_category_claim_classification"]
+    assert any("Theorem 8.C" in item for item in claims["2_analytic_theorems_proved_outside_lean"])
+    assert any("Theorem 8.E" in item for item in claims["5_conditional_and_open_statements"])
+
+
