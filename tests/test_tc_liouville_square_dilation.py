@@ -28,6 +28,7 @@ from tc.liouville_square_dilation import (
     TASK_TC_055_ID,
     TASK_TC_055R_ID,
     TASK_TC_055R2_ID,
+    TASK_TC_056_ID,
     TC_053R2_IMPLEMENTATION_COMMIT,
     TC_053R2_REVIEWED_TIP,
     TC_054_IMPLEMENTATION_COMMIT,
@@ -43,6 +44,8 @@ from tc.liouville_square_dilation import (
     TC_055_REVIEWED_TIP,
     TC_055R_IMPLEMENTATION_COMMIT,
     TC_055R_REVIEWED_TIP,
+    TC_055R2_IMPLEMENTATION_COMMIT,
+    TC_055R2_REVIEWED_TIP,
     compute_hat_f_tail_ratios_arb,
     enclose_unrestricted_tail_floor_bound_arb,
     evaluate_1d_dyadic_sum_U_lambda_arb,
@@ -115,6 +118,10 @@ EXPECTED_PUBLIC_THEOREM_NAMES = (
     "finite_smooth_coprime_cutoff_indexing_bijection_nat",
     "finite_liouville_reindexed_sum_and_excess_cutoff_identity_nat",
     "finite_gaussian_observable_reconstruction_and_weighted_cofactor_square",
+    "finite_prime_adjoining_fiber_and_pointwise_telescoping_tc056",
+    "finite_alternating_unimodal_chain_contraction_tc056",
+    "gaussian_prime_chain_unimodal_and_singleton_contraction_tc056",
+    "mixed_interaction_decomposition_and_p_independence_tc056",
 )
 
 
@@ -456,10 +463,10 @@ def test_lean_formalization_and_serialized_artifact_synchronization() -> None:
     assert "import RiemannScope.LiouvilleSquareDilation" in root_lean
 
     lean_info = verify_liouville_square_dilation_lean_module()
-    assert lean_info["definition_count"] == 33
-    assert lean_info["public_theorem_count"] == 16
-    assert lean_info["private_helper_theorem_count"] == 27
-    assert lean_info["total_declaration_count"] == 76
+    assert lean_info["definition_count"] == 48
+    assert lean_info["public_theorem_count"] == 20
+    assert lean_info["private_helper_theorem_count"] == 49
+    assert lean_info["total_declaration_count"] == 117
     assert lean_info["expected_public_theorems_present"] is True
     assert lean_info["sorry_count"] == 0
     assert lean_info["custom_axiom_count"] == 0
@@ -472,6 +479,7 @@ def test_lean_formalization_and_serialized_artifact_synchronization() -> None:
     assert artifact["simultaneous_compatibility_task_id"] == TASK_TC_055_ID
     assert artifact["simultaneous_compatibility_repair_task_id"] == TASK_TC_055R_ID
     assert artifact["simultaneous_compatibility_closeout_task_id"] == TASK_TC_055R2_ID
+    assert artifact["prime_chain_contraction_task_id"] == TASK_TC_056_ID
     assert artifact["prior_merged_main"] == PRIOR_MERGED_MAIN_TC_053R
     assert artifact["tc053r2_implementation_commit"] == TC_053R2_IMPLEMENTATION_COMMIT
     assert artifact["tc053r2_reviewed_tip"] == TC_053R2_REVIEWED_TIP
@@ -487,6 +495,8 @@ def test_lean_formalization_and_serialized_artifact_synchronization() -> None:
     assert artifact["tc055_initial_closeout_commit"] == TC_055_INITIAL_CLOSEOUT_COMMIT
     assert artifact["tc055r_implementation_commit"] == TC_055R_IMPLEMENTATION_COMMIT
     assert artifact["tc055r_reviewed_tip"] == TC_055R_REVIEWED_TIP
+    assert artifact["tc055r2_implementation_commit"] == TC_055R2_IMPLEMENTATION_COMMIT
+    assert artifact["tc055r2_reviewed_tip"] == TC_055R2_REVIEWED_TIP
     assert artifact["subgate_tc043a_status"] == "OPEN"
     assert artifact["rh_proved"] is False
 
@@ -787,11 +797,16 @@ def test_tc054_review_and_state_synchronization() -> None:
     assert "data/tc_liouville_square_dilation.json" in state["linked_runs"]["campaign_artifacts"]
 
     queue = json.loads((REPO_ROOT / ".agents" / "research" / "queue.json").read_text(encoding="utf-8"))
-    assert queue["active_task_id"] in ("TASK-TC-054", "TASK-TC-055", "TASK-TC-055R", "TASK-TC-055R2")
+    assert queue["active_task_id"] in (
+        "TASK-TC-054",
+        "TASK-TC-055",
+        "TASK-TC-055R",
+        "TASK-TC-055R2",
+        "TASK-TC-056",
+    )
     tc055_entries = [t for t in queue["tasks"] if t["task_id"] == "TASK-TC-055"]
     assert len(tc055_entries) == 1
-    assert tc055_entries[0]["status"] == "OPEN"
-    assert tc055_entries[0]["review_status"] == "AWAITING_INDEPENDENT_REVIEW"
+    assert tc055_entries[0]["status"] in ("OPEN", "ACCEPTED")
 
 
 def test_tc055_simultaneous_joint_identities_and_trivial_zero_cancellation() -> None:

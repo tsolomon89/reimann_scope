@@ -1,6 +1,6 @@
 /-
 RiemannScope.LiouvilleSquareDilation
-TASK-TC-054 / TASK-TC-054R / TASK-TC-054R2 / TASK-TC-055 / TASK-TC-055R / TASK-TC-055R2:
+TASK-TC-054 / TASK-TC-054R / TASK-TC-054R2 / TASK-TC-055 / TASK-TC-055R / TASK-TC-055R2 / TASK-TC-056:
 1. Actual arithmetic definitions and theorems over `ℕ` and `ℤ` using Mathlib's
    `ArithmeticFunction.cardFactors` (`Ω`), `Nat.factorization`, `Nat.divisors`, and
    `ArithmeticFunction.moebius` (`μ`):
@@ -28,7 +28,15 @@ TASK-TC-054 / TASK-TC-054R / TASK-TC-054R2 / TASK-TC-055 / TASK-TC-055R / TASK-T
      bijection for `1 ≤ n ≤ T` with inner cutoff `r ≤ ⌊T/m⌋`, arbitrary-weight reindexed Liouville sum and coprime-outer
      regrouping, exact uncoupled-cutoff (`r ≤ T`) excess sum with vanishing (`P = ∅`, `T ≤ 1`, `(P = {2}, T = 2)`) and
      nonvanishing (`(P = {2}, T = 3)`) witnesses, finite Gaussian observable `Q_{λ,T}(X)` reconstruction, and exact
-     pointwise weighted cofactor square expansion with `1/r` and `λ(r)λ(s)/√(rs)` (`TASK-TC-055R2` §§2–3).
+     pointwise weighted cofactor square expansion with `1/r` and `λ(r)λ(s)/√(rs)` (`TASK-TC-055R2` §§2–3);
+   - Pointwise finite prime filtration (`pointwiseGroupedEnergyV`), endpoints `V_∅ = D_T` and `V_{primes ≤ T} = Q_T^2`,
+     prime-adjoining fiber reconstruction `F_{P ∪ {p}, s} = ∑_{s p^k ≤ T} F_{P, s p^k}`, exact pointwise increment
+     `Δ_{P,p}` and ascending-prime telescoping, finite alternating-unimodal chain inequality `|∑ (-1)^k a_k| ≤ max_k a_k`
+     and `(∑ (-1)^k a_k)^2 ≤ ∑ a_k^2` (with empty-safe max, zero chains, one-term chains, ties, zero extension, and
+     quantitative two-term strict gap), unconditional Gaussian prime-chain unimodality and singleton contraction
+     `V_{p} ≤ D_T` (strict `<` for `X > 0, T ≥ p`), and exact mixed-interaction decomposition `Δ_{P,p} = M_{P,p} - C_{P,p}`
+     with `C_{P,p} ≥ 0`, `P`-independence `C_{P,p} = C_p = D_T - V_{p}` via `r = s m`, and exact alternating shift sum
+     for `C_p` (`TASK-TC-056` §§3–6).
 2. Prime-power exponent models (`liouville_complete_multiplicativity_and_common_factor_cancellation_nat`
    and `prime_power_square_divisor_moebius_liouville_inversion_nat`).
 3. Scalar real-algebra, real-inequality, and finite-sum lemmas for weighted norm bounds, Euler-Maclaurin `C_2`
@@ -1983,6 +1991,2040 @@ theorem finite_gaussian_observable_reconstruction_and_weighted_cofactor_square
         ext r
         simp [coprimeCutoffFinset, primeProductModulus]
       simp [finiteQLambdaCoprime, finiteQLambda, hc_empty]
+
+/-! ### `TASK-TC-056`: Finite Prime Filtration, Alternating-Unimodal Gaussian Chain Contraction, and `P`-Independent Mixed-Interaction Decomposition -/
+
+/-- Positive single-integer Gaussian summand `φ_n(X) := X^{5/2} n^{-3} exp(-X^2 / n^2)` (`n : ℕ`). -/
+noncomputable def gaussianTermPhi (n : ℕ) (X : ℝ) : ℝ :=
+  X ^ (5 / 2 : ℝ) * (((n : ℝ) ^ 3)⁻¹ * Real.exp (-(X ^ 2) / (n : ℝ) ^ 2))
+
+/-- Pointwise grouped squared-fiber sum `v_P(X; T) := ∑_{1 ≤ r ≤ T, gcd(r, N_P) = 1} F_{P,r}(X)^2`
+    (whose `dX / X` integral on `[Y, τ Y]` defines `V_P(Y, T)`). -/
+noncomputable def pointwiseGroupedEnergyV (P : Finset ℕ) (T : ℕ) (X : ℝ) : ℝ :=
+  ∑ r ∈ coprimeCutoffFinset P T, (cofactorFiberF P T r X) ^ 2
+
+/-- Pointwise diagonal sum `d_T(X) := ∑_{1 ≤ n ≤ T} φ_n(X)^2`
+    (whose `dX / X` integral on `[Y, τ Y]` defines `D_T(Y)`). -/
+noncomputable def pointwiseDiagonalD (T : ℕ) (X : ℝ) : ℝ :=
+  ∑ n ∈ Finset.Icc 1 T, (gaussianTermPhi n X) ^ 2
+
+/-- Finite set of all primes `p ≤ T`. -/
+def primesUpToFinset (T : ℕ) : Finset ℕ :=
+  (Finset.Icc 2 T).filter Nat.Prime
+
+/-- Strictly ascending list of all primes `p_1 < p_2 < ... < p_J ≤ T`. -/
+def ascendingPrimesUpTo (T : ℕ) : List ℕ :=
+  (List.range (T + 1)).filter Nat.Prime
+
+/-- Prefix prime set `P_j := {p_1, ..., p_j}` (`P_0 = ∅`) of an ordered list of primes `ps`. -/
+def prefixPrimeSet (ps : List ℕ) (j : ℕ) : Finset ℕ :=
+  (ps.take j).toFinset
+
+/-- Exact finite set of admissible prime exponents `{k ≥ 0 : s * p^k ≤ T}` for `s ≥ 1` and prime `p`. -/
+def admissiblePrimeExponents (T p s : ℕ) : Finset ℕ :=
+  (Finset.range (T + 1)).filter (fun k => s * p ^ k ≤ T)
+
+/-- Pointwise prime-adjoining increment `δ_{P,p}(X; T) := v_{P ∪ {p}}(X; T) - v_P(X; T)`
+    (whose `dX / X` integral on `[Y, τ Y]` defines `Δ_{P,p}(Y, T)`). -/
+noncomputable def pointwiseDelta (P : Finset ℕ) (p T : ℕ) (X : ℝ) : ℝ :=
+  pointwiseGroupedEnergyV (insert p P) T X - pointwiseGroupedEnergyV P T X
+
+/-- Empty-safe finite maximum `max_{0 ≤ k < N} a_k` (`= 0` when `N = 0` or when all `a_k ≤ 0`). -/
+noncomputable def chainMaxUpTo : ℕ → (ℕ → ℝ) → ℝ
+  | 0, _ => 0
+  | n + 1, a => max (chainMaxUpTo n a) (a n)
+
+/-- Finite unimodality on `0, ..., N - 1`: there exists a peak index `k_peak ≤ N` up to which `a` is
+    nondecreasing and from which `a` is nonincreasing (allowing ties, zero chains, `N = 0`, and `N = 1`). -/
+def IsUnimodalChain (N : ℕ) (a : ℕ → ℝ) : Prop :=
+  ∃ k_peak : ℕ, k_peak ≤ N ∧
+    (∀ i j : ℕ, i ≤ j → j ≤ k_peak → j < N → a i ≤ a j) ∧
+    (∀ i j : ℕ, k_peak ≤ i → i ≤ j → j < N → a j ≤ a i)
+
+/-- Helper: `((-1 : ℝ) ^ m) * ((-1 : ℝ) ^ m) = 1`. -/
+private theorem neg_one_pow_mul_self_real_aux (m : ℕ) :
+    ((-1 : ℝ) ^ m) * ((-1 : ℝ) ^ m) = 1 := by
+  rw [← pow_add]
+  have h2 : m + m = 2 * m := by omega
+  rw [h2, pow_mul]
+  norm_num
+
+/-- Helper: for `0 ≤ X` and `0 < r`, `cofactorFiberF P T r X` equals the coupled `P`-smooth sum
+    `∑_{m ∈ S(P), m ≤ ⌊T/r⌋} λ(m r) φ_{m r}(X)`. -/
+private theorem cofactorFiberF_eq_sum_gaussianTermPhi_aux
+    (P : Finset ℕ) (T : ℕ) {r : ℕ} (hr : 0 < r) {X : ℝ} (hX : 0 ≤ X) :
+    cofactorFiberF P T r X =
+      ∑ m ∈ smoothCutoffFinset P (T / r),
+        (liouvilleLambda (m * r) : ℝ) * gaussianTermPhi (m * r) X := by
+  have hr_ne : r ≠ 0 := Nat.pos_iff_ne_zero.mp hr
+  dsimp [cofactorFiberF, finiteQLambdaSmooth, gaussianTermPhi]
+  rw [← mul_assoc, Finset.mul_sum]
+  apply Finset.sum_congr rfl
+  intro m hm
+  have hm_pos : 0 < m := ((Finset.mem_filter.mp hm).2).1
+  have hm_ne : m ≠ 0 := Nat.pos_iff_ne_zero.mp hm_pos
+  have h_sc := gaussian_term_scaling_aux (a := r) (b := m) hX hr
+  have h_comm : r * m = m * r := mul_comm r m
+  rw [h_comm] at h_sc
+  rw [liouvilleLambda_mul_aux hm_ne hr_ne]
+  push_cast
+  have h_lhs :
+      (liouvilleLambda r : ℝ) / Real.sqrt (r : ℝ) * (X / (r : ℝ)) ^ (5 / 2 : ℝ) *
+          ((liouvilleLambda m : ℝ) * ((m : ℝ) ^ 3)⁻¹ * Real.exp (-((X / (r : ℝ)) ^ 2) / (m : ℝ) ^ 2)) =
+        (liouvilleLambda m : ℝ) * (liouvilleLambda r : ℝ) *
+          (((1 : ℝ) / Real.sqrt (r : ℝ)) *
+            ((X / (r : ℝ)) ^ (5 / 2 : ℝ) *
+              (((m : ℝ) ^ 3)⁻¹ * Real.exp (-((X / (r : ℝ)) ^ 2) / (m : ℝ) ^ 2)))) := by ring
+  rw [h_lhs]
+  push_cast at h_sc
+  rw [h_sc]
+
+/-- Helper: exact characterization of `admissiblePrimeExponents T p s` for prime `p` and `1 ≤ s`. -/
+private theorem mem_admissiblePrimeExponents_iff_aux {p s : ℕ} (hp : p.Prime) (hs : 1 ≤ s) (T k : ℕ) :
+    k ∈ admissiblePrimeExponents T p s ↔ s * p ^ k ≤ T := by
+  simp only [admissiblePrimeExponents, Finset.mem_filter, Finset.mem_range]
+  constructor
+  · exact And.right
+  · intro h_le
+    refine ⟨?_, h_le⟩
+    have hk_lt_pow : k < p ^ k := Nat.lt_pow_self hp.one_lt k
+    have hpow_le : p ^ k ≤ s * p ^ k := Nat.le_mul_of_pos_left (p ^ k) (by omega)
+    omega
+
+/-- Helper: `Nat.Coprime (a * b) c` from `Nat.Coprime a c` and `Nat.Coprime b c`. -/
+private theorem coprime_mul_left_nat_aux {a b c : ℕ}
+    (ha : Nat.Coprime a c) (hb : Nat.Coprime b c) : Nat.Coprime (a * b) c := by
+  rw [Nat.coprime_iff_gcd_eq_one]
+  by_contra h_ne
+  obtain ⟨q, hq_prime, hq_dvd⟩ := Nat.exists_prime_and_dvd h_ne
+  have hq_ab : q ∣ a * b := dvd_trans hq_dvd (Nat.gcd_dvd_left _ _)
+  have hq_c : q ∣ c := dvd_trans hq_dvd (Nat.gcd_dvd_right _ _)
+  rcases hq_prime.dvd_mul.mp hq_ab with hqa | hqb
+  · exact hq_prime.not_dvd_one (ha.gcd_eq_one ▸ Nat.dvd_gcd hqa hq_c)
+  · exact hq_prime.not_dvd_one (hb.gcd_eq_one ▸ Nat.dvd_gcd hqb hq_c)
+
+/-- Helper: `pSmoothPart {p} n = p ^ (n.factorization p)` for prime `p` and `n > 0`. -/
+private theorem pSmoothPart_singleton_eq_pow_aux {p n : ℕ} (hp : p.Prime) (hn : 0 < n) :
+    pSmoothPart {p} n = p ^ (n.factorization p) := by
+  have hn_ne : n ≠ 0 := Nat.pos_iff_ne_zero.mp hn
+  dsimp [pSmoothPart]
+  by_cases hp_mem_pf : p ∈ n.primeFactors
+  · have hfilt : n.primeFactors.filter (· ∈ ({p} : Finset ℕ)) = {p} := by
+      ext q
+      simp only [Finset.mem_filter, Finset.mem_singleton]
+      exact ⟨fun h => h.2, fun h => ⟨h ▸ hp_mem_pf, h⟩⟩
+    rw [hfilt, Finset.prod_singleton]
+  · have hfilt : n.primeFactors.filter (· ∈ ({p} : Finset ℕ)) = ∅ := by
+      ext q
+      simp only [Finset.mem_filter, Finset.mem_singleton, Finset.not_mem_empty, iff_false]
+      rintro ⟨hq_pf, rfl⟩
+      exact hp_mem_pf hq_pf
+    have h_not_dvd : ¬ (p ∣ n) := by
+      intro hdvd
+      exact hp_mem_pf (Nat.mem_primeFactors.mpr ⟨hp, hdvd, hn_ne⟩)
+    have hk0 : n.factorization p = 0 := Nat.factorization_eq_zero_of_not_dvd h_not_dvd
+    rw [hfilt, Finset.prod_empty, hk0, pow_zero]
+
+/-- Helper: `primeProductModulus (insert p P) = p * primeProductModulus P` when `p ∉ P`. -/
+private theorem primeProductModulus_insert_aux {P : Finset ℕ} {p : ℕ} (hp_not_mem : p ∉ P) :
+    primeProductModulus (insert p P) = p * primeProductModulus P := by
+  dsimp [primeProductModulus]
+  exact Finset.prod_insert hp_not_mem
+
+/-- Helper: `Nat.Coprime a (primeProductModulus (insert p P)) ↔ Nat.Coprime a p ∧ Nat.Coprime a (primeProductModulus P)`
+    when `p ∉ P`. -/
+private theorem coprime_primeProductModulus_insert_iff_aux {P : Finset ℕ} {p : ℕ} (hp_not_mem : p ∉ P) (a : ℕ) :
+    Nat.Coprime a (primeProductModulus (insert p P)) ↔
+      Nat.Coprime a p ∧ Nat.Coprime a (primeProductModulus P) := by
+  rw [primeProductModulus_insert_aux hp_not_mem, Nat.coprime_mul_iff_right]
+
+/-- Helper: bijection partitioning `coprimeCutoffFinset P T` into `(s, k)` with
+    `s ∈ coprimeCutoffFinset (insert p P) T` and `k ∈ admissiblePrimeExponents T p s` via `r = s * p^k`. -/
+private theorem sum_coprimeCutoffFinset_insert_partition_aux
+    {P : Finset ℕ} (hP : ∀ q ∈ P, q.Prime) {p : ℕ} (hp : p.Prime) (hp_not_mem : p ∉ P)
+    (T : ℕ) (F : ℕ → ℝ) :
+    ∑ r ∈ coprimeCutoffFinset P T, F r =
+      ∑ s ∈ coprimeCutoffFinset (insert p P) T,
+        ∑ k ∈ admissiblePrimeExponents T p s, F (s * p ^ k) := by
+  have hp_set : ∀ q ∈ ({p} : Finset ℕ), q.Prime := by
+    intro q hq
+    rw [Finset.mem_singleton] at hq
+    rwa [hq]
+  have hp_cop_mod : Nat.Coprime p (primeProductModulus P) := by
+    rw [hp.coprime_iff_not_dvd]
+    intro hdvd
+    obtain ⟨q, hq_in_P, hp_dvd_q⟩ := prime_dvd_finset_prod_aux hp P (fun x => x) hdvd
+    have hq_prime : q.Prime := hP q hq_in_P
+    have hpq : p = q := (Nat.dvd_prime hq_prime).mp hp_dvd_q |>.resolve_left hp.ne_one
+    exact hp_not_mem (hpq ▸ hq_in_P)
+  rw [Finset.sum_sigma' (coprimeCutoffFinset (insert p P) T) (fun s => admissiblePrimeExponents T p s)
+        (fun s k => F (s * p ^ k))]
+  symm
+  apply Finset.sum_bij (fun sk _ => sk.1 * p ^ sk.2)
+  · rintro ⟨s, k⟩ hsk
+    simp only [Finset.mem_sigma, coprimeCutoffFinset, Finset.mem_filter, Finset.mem_Icc] at hsk ⊢
+    rcases hsk with ⟨⟨⟨hs1, _⟩, hs_cop_ins⟩, hk_adm⟩
+    have h_spk_le : s * p ^ k ≤ T := (mem_admissiblePrimeExponents_iff_aux hp hs1 T k).mp hk_adm
+    have h_spk_ge : 1 ≤ s * p ^ k := Nat.mul_pos (by omega) (pow_pos hp.pos k)
+    have hs_cop_P : Nat.Coprime s (primeProductModulus P) :=
+      ((coprime_primeProductModulus_insert_iff_aux hp_not_mem s).mp hs_cop_ins).2
+    have hpk_cop_P : Nat.Coprime (p ^ k) (primeProductModulus P) := hp_cop_mod.pow_left k
+    exact ⟨⟨h_spk_ge, h_spk_le⟩, coprime_mul_left_nat_aux hs_cop_P hpk_cop_P⟩
+  · rintro ⟨s1, k1⟩ h1 ⟨s2, k2⟩ h2 h_eq
+    simp only [Finset.mem_sigma, coprimeCutoffFinset, Finset.mem_filter, Finset.mem_Icc] at h1 h2
+    rcases h1 with ⟨⟨⟨hs1_ge, _⟩, hs1_cop⟩, _⟩
+    rcases h2 with ⟨⟨⟨_, _⟩, hs2_cop⟩, _⟩
+    have hs1_cop_p : Nat.Coprime s1 (primeProductModulus {p}) := by
+      simpa [primeProductModulus] using ((coprime_primeProductModulus_insert_iff_aux hp_not_mem s1).mp hs1_cop).1
+    have hs2_cop_p : Nat.Coprime s2 (primeProductModulus {p}) := by
+      simpa [primeProductModulus] using ((coprime_primeProductModulus_insert_iff_aux hp_not_mem s2).mp hs2_cop).1
+    have hpk1_sm : isPSmooth {p} (p ^ k1) := by
+      refine ⟨pow_pos hp.pos k1, ?_⟩
+      intro q hq hdvd
+      have hq_dvd_p : q ∣ p := hq.dvd_of_dvd_pow hdvd
+      have hqp : q = p := (Nat.dvd_prime hp).mp hq_dvd_p |>.resolve_left hq.ne_one
+      exact Finset.mem_singleton.mpr hqp
+    have hpk2_sm : isPSmooth {p} (p ^ k2) := by
+      refine ⟨pow_pos hp.pos k2, ?_⟩
+      intro q hq hdvd
+      have hq_dvd_p : q ∣ p := hq.dvd_of_dvd_pow hdvd
+      have hqp : q = p := (Nat.dvd_prime hp).mp hq_dvd_p |>.resolve_left hq.ne_one
+      exact Finset.mem_singleton.mpr hqp
+    have h_pos : 0 < p ^ k1 * s1 := Nat.mul_pos (pow_pos hp.pos k1) (by omega)
+    obtain ⟨_, h_uniq, _⟩ := smooth_coprime_positive_factorization_exists_unique_nat hp_set h_pos
+    obtain ⟨h_sm1, h_cp1⟩ := h_uniq (p ^ k1) s1 rfl hpk1_sm hs1_cop_p
+    have h_eq_comm : p ^ k2 * s2 = p ^ k1 * s1 := by linarith [mul_comm s1 (p ^ k1), mul_comm s2 (p ^ k2)]
+    obtain ⟨h_sm2, h_cp2⟩ := h_uniq (p ^ k2) s2 h_eq_comm hpk2_sm hs2_cop_p
+    have hs_eq : s1 = s2 := h_cp1.trans h_cp2.symm
+    have hpow_eq : p ^ k1 = p ^ k2 := h_sm1.trans h_sm2.symm
+    have hk_eq : k1 = k2 := Nat.pow_right_injective hp.two_le hpow_eq
+    exact Sigma.ext hs_eq (heq_of_eq hk_eq)
+  · intro r hr
+    simp only [coprimeCutoffFinset, Finset.mem_filter, Finset.mem_Icc] at hr
+    rcases hr with ⟨⟨hr1, hrT⟩, hr_cop_P⟩
+    let k := r.factorization p
+    let s := pCoprimePart {p} r
+    have hm_eq_pk : pSmoothPart {p} r = p ^ k := pSmoothPart_singleton_eq_pow_aux hp (by omega)
+    obtain ⟨⟨h_mul_r, _, hs_cop_p, hs_pos⟩, _, _⟩ :=
+      smooth_coprime_positive_factorization_exists_unique_nat hp_set (n := r) (by omega)
+    rw [hm_eq_pk] at h_mul_r
+    have hs_mul_pk : s * p ^ k = r := by rw [mul_comm]; exact h_mul_r
+    have hs_dvd_r : s ∣ r := ⟨p ^ k, hs_mul_pk.symm⟩
+    have hs_cop_P : Nat.Coprime s (primeProductModulus P) := hr_cop_P.coprime_dvd_left hs_dvd_r
+    have hs_cop_p_plain : Nat.Coprime s p := by simpa [primeProductModulus] using hs_cop_p
+    have hs_cop_ins : Nat.Coprime s (primeProductModulus (insert p P)) :=
+      (coprime_primeProductModulus_insert_iff_aux hp_not_mem s).mpr ⟨hs_cop_p_plain, hs_cop_P⟩
+    have hs_le_r : s ≤ r := by
+      rw [← hs_mul_pk]
+      exact Nat.le_mul_of_pos_right s (pow_pos hp.pos k)
+    refine ⟨⟨s, k⟩, ?_, hs_mul_pk⟩
+    simp only [Finset.mem_sigma, coprimeCutoffFinset, Finset.mem_filter, Finset.mem_Icc]
+    refine ⟨⟨⟨by omega, le_trans hs_le_r hrT⟩, hs_cop_ins⟩, ?_⟩
+    exact (mem_admissiblePrimeExponents_iff_aux hp (by omega) T k).mpr (hs_mul_pk.symm ▸ hrT)
+  · intros; rfl
+
+/-- Helper: bijection partitioning `smoothCutoffFinset (insert p P) L` into `(k, m)` with
+    `k ∈ admissiblePrimeExponents L p 1` and `m ∈ smoothCutoffFinset P (L / p^k)` via `M = m * p^k`. -/
+private theorem sum_smoothCutoffFinset_insert_partition_aux
+    {P : Finset ℕ} (_ : ∀ q ∈ P, q.Prime) {p : ℕ} (hp : p.Prime) (hp_not_mem : p ∉ P)
+    (L : ℕ) (F : ℕ → ℝ) :
+    ∑ M ∈ smoothCutoffFinset (insert p P) L, F M =
+      ∑ k ∈ admissiblePrimeExponents L p 1,
+        ∑ m ∈ smoothCutoffFinset P (L / p ^ k), F (m * p ^ k) := by
+  have hp_set : ∀ q ∈ ({p} : Finset ℕ), q.Prime := by
+    intro q hq
+    rw [Finset.mem_singleton] at hq
+    rwa [hq]
+  rw [Finset.sum_sigma' (admissiblePrimeExponents L p 1) (fun k => smoothCutoffFinset P (L / p ^ k))
+        (fun k m => F (m * p ^ k))]
+  symm
+  apply Finset.sum_bij (fun km _ => km.2 * p ^ km.1)
+  · rintro ⟨k, m⟩ hkm
+    simp only [Finset.mem_sigma, smoothCutoffFinset, Finset.mem_filter, Finset.mem_Icc] at hkm ⊢
+    rcases hkm with ⟨_, ⟨⟨hm1, hm_le_div⟩, hm_sm⟩⟩
+    have hpk_pos : 0 < p ^ k := pow_pos hp.pos k
+    have h_mpk_le : m * p ^ k ≤ L := (Nat.le_div_iff_mul_le hpk_pos).mp hm_le_div
+    have h_mpk_ge : 1 ≤ m * p ^ k := Nat.mul_pos (by omega) hpk_pos
+    refine ⟨⟨h_mpk_ge, h_mpk_le⟩, ⟨by omega, ?_⟩⟩
+    intro q hq hdvd
+    rcases hq.dvd_mul.mp hdvd with hqm | hqpk
+    · exact Finset.mem_insert_of_mem (hm_sm.2 q hq hqm)
+    · have hq_dvd_p : q ∣ p := hq.dvd_of_dvd_pow hqpk
+      have hqp : q = p := (Nat.dvd_prime hp).mp hq_dvd_p |>.resolve_left hq.ne_one
+      exact hqp ▸ Finset.mem_insert_self p P
+  · rintro ⟨k1, m1⟩ h1 ⟨k2, m2⟩ h2 h_eq
+    simp only [Finset.mem_sigma, smoothCutoffFinset, Finset.mem_filter, Finset.mem_Icc] at h1 h2
+    rcases h1 with ⟨_, ⟨⟨hm1_ge, _⟩, hm1_sm⟩⟩
+    rcases h2 with ⟨_, ⟨⟨_, _⟩, hm2_sm⟩⟩
+    have hm1_cop_p : Nat.Coprime m1 (primeProductModulus {p}) := by
+      simp only [primeProductModulus, Finset.prod_singleton]
+      rw [Nat.coprime_comm, hp.coprime_iff_not_dvd]
+      intro hdvd
+      exact hp_not_mem (hm1_sm.2 p hp hdvd)
+    have hm2_cop_p : Nat.Coprime m2 (primeProductModulus {p}) := by
+      simp only [primeProductModulus, Finset.prod_singleton]
+      rw [Nat.coprime_comm, hp.coprime_iff_not_dvd]
+      intro hdvd
+      exact hp_not_mem (hm2_sm.2 p hp hdvd)
+    have hpk1_sm : isPSmooth {p} (p ^ k1) := by
+      refine ⟨pow_pos hp.pos k1, ?_⟩
+      intro q hq hdvd
+      have hqp : q = p := (Nat.dvd_prime hp).mp (hq.dvd_of_dvd_pow hdvd) |>.resolve_left hq.ne_one
+      exact Finset.mem_singleton.mpr hqp
+    have hpk2_sm : isPSmooth {p} (p ^ k2) := by
+      refine ⟨pow_pos hp.pos k2, ?_⟩
+      intro q hq hdvd
+      have hqp : q = p := (Nat.dvd_prime hp).mp (hq.dvd_of_dvd_pow hdvd) |>.resolve_left hq.ne_one
+      exact Finset.mem_singleton.mpr hqp
+    have h_pos : 0 < p ^ k1 * m1 := Nat.mul_pos (pow_pos hp.pos k1) (by omega)
+    obtain ⟨_, h_uniq, _⟩ := smooth_coprime_positive_factorization_exists_unique_nat hp_set h_pos
+    obtain ⟨h_sm1, h_cp1⟩ := h_uniq (p ^ k1) m1 rfl hpk1_sm hm1_cop_p
+    have h_eq_comm : p ^ k2 * m2 = p ^ k1 * m1 := by linarith [mul_comm m1 (p ^ k1), mul_comm m2 (p ^ k2)]
+    obtain ⟨h_sm2, h_cp2⟩ := h_uniq (p ^ k2) m2 h_eq_comm hpk2_sm hm2_cop_p
+    have hm_eq : m1 = m2 := h_cp1.trans h_cp2.symm
+    have hk_eq : k1 = k2 := Nat.pow_right_injective hp.two_le (h_sm1.trans h_sm2.symm)
+    exact Sigma.ext hk_eq (heq_of_eq hm_eq)
+  · intro M hM
+    simp only [smoothCutoffFinset, Finset.mem_filter, Finset.mem_Icc] at hM
+    rcases hM with ⟨⟨hM1, hML⟩, hM_sm_ins⟩
+    let k := M.factorization p
+    let m := pCoprimePart {p} M
+    have hm_eq_pk : pSmoothPart {p} M = p ^ k := pSmoothPart_singleton_eq_pow_aux hp (by omega)
+    obtain ⟨⟨h_mul_M, _, hm_cop_p, hm_pos⟩, _, _⟩ :=
+      smooth_coprime_positive_factorization_exists_unique_nat hp_set (n := M) (by omega)
+    rw [hm_eq_pk] at h_mul_M
+    have hm_mul_pk : m * p ^ k = M := by rw [mul_comm]; exact h_mul_M
+    have hm_sm_P : isPSmooth P m := by
+      refine ⟨hm_pos, ?_⟩
+      intro q hq hdvd
+      have hq_dvd_M : q ∣ M := dvd_trans hdvd ⟨p ^ k, hm_mul_pk.symm⟩
+      have hq_ins : q ∈ insert p P := hM_sm_ins.2 q hq hq_dvd_M
+      have hq_ne_p : q ≠ p := by
+        intro hqp
+        subst hqp
+        have hcop_plain : Nat.Coprime m q := by simpa [primeProductModulus] using hm_cop_p
+        exact hq.not_dvd_one (hcop_plain.gcd_eq_one ▸ Nat.dvd_gcd hdvd (dvd_refl q))
+      exact (Finset.mem_insert.mp hq_ins).resolve_left hq_ne_p
+    have hpk_le_M : p ^ k ≤ M := by
+      rw [← hm_mul_pk]
+      exact Nat.le_mul_of_pos_left (p ^ k) hm_pos
+    have hm_le_div : m ≤ L / p ^ k :=
+      (Nat.le_div_iff_mul_le (pow_pos hp.pos k)).mpr (hm_mul_pk.symm ▸ hML)
+    refine ⟨⟨k, m⟩, ?_, hm_mul_pk⟩
+    simp only [Finset.mem_sigma, smoothCutoffFinset, Finset.mem_filter, Finset.mem_Icc]
+    refine ⟨?_, ⟨⟨by omega, hm_le_div⟩, hm_sm_P⟩⟩
+    exact (mem_admissiblePrimeExponents_iff_aux hp (by omega) L k).mpr (by simpa using le_trans hpk_le_M hML)
+  · intros; rfl
+
+/-- Helper: `prefixPrimeSet ps (m + 1) = insert (ps.getD m 0) (prefixPrimeSet ps m)` for `m < ps.length`. -/
+private theorem prefixPrimeSet_succ_aux :
+    ∀ (ps : List ℕ) (m : ℕ), m < ps.length →
+      prefixPrimeSet ps (m + 1) = insert (ps.getD m 0) (prefixPrimeSet ps m)
+  | [], _, hm => by simp at hm
+  | x :: xs, 0, _ => by simp [prefixPrimeSet]
+  | x :: xs, m + 1, hm => by
+      have hm_xs : m < xs.length := by simpa using hm
+      have ih := prefixPrimeSet_succ_aux xs m hm_xs
+      dsimp [prefixPrimeSet, List.take, List.getD] at ih ⊢
+      rw [List.toFinset_cons, List.toFinset_cons, ih]
+      ext a
+      simp only [Finset.mem_insert]
+      tauto
+
+/-- Helper: symmetric off-diagonal square expansion on any `Finset ℕ`:
+    `(∑ k ∈ S, f k)^2 - ∑ k ∈ S, (f k)^2 = 2 * ∑ k ∈ S, ∑ l ∈ S.filter (fun l => k < l), f k * f l`. -/
+private theorem sq_sum_sub_sum_sq_eq_two_sum_lt_aux (S : Finset ℕ) (f : ℕ → ℝ) :
+    (∑ k ∈ S, f k) ^ 2 - (∑ k ∈ S, (f k) ^ 2) =
+      2 * ∑ k ∈ S, ∑ l ∈ S.filter (fun l => k < l), f k * f l := by
+  induction' S using Finset.induction_on with a s ha ih
+  · simp
+  · rw [Finset.sum_insert ha, Finset.sum_insert ha]
+    have h_diff :
+        (f a + ∑ k ∈ s, f k) ^ 2 - ((f a) ^ 2 + ∑ k ∈ s, (f k) ^ 2) =
+          2 * f a * (∑ k ∈ s, f k) + ((∑ k ∈ s, f k) ^ 2 - ∑ k ∈ s, (f k) ^ 2) := by ring
+    rw [h_diff, ih, Finset.sum_insert ha]
+    have h_split_s :
+        ∑ k ∈ s, f k =
+          (∑ l ∈ s.filter (fun l => a < l), f l) +
+            (∑ k ∈ s.filter (fun k => k < a), f k) := by
+      have h_part := (Finset.sum_filter_add_sum_filter_not s (fun l => a < l) f).symm
+      rw [h_part]
+      congr 1
+      apply Finset.sum_congr
+      · ext k
+        simp only [Finset.mem_filter]
+        constructor
+        · rintro ⟨hk, hnot⟩
+          have hne : k ≠ a := fun h => ha (h ▸ hk)
+          exact ⟨hk, by omega⟩
+        · rintro ⟨hk, hlt⟩
+          exact ⟨hk, by omega⟩
+      · intros; rfl
+    have h_filter_a :
+        (insert a s).filter (fun l => a < l) = s.filter (fun l => a < l) := by
+      ext l
+      simp only [Finset.mem_filter, Finset.mem_insert]
+      constructor
+      · rintro ⟨rfl | hl, hlt⟩
+        · omega
+        · exact ⟨hl, hlt⟩
+      · rintro ⟨hl, hlt⟩
+        exact ⟨Or.inr hl, hlt⟩
+    have h_sum_s_ins :
+        ∑ k ∈ s, ∑ l ∈ (insert a s).filter (fun l => k < l), f k * f l =
+          (∑ k ∈ s.filter (fun k => k < a), f k * f a) +
+            ∑ k ∈ s, ∑ l ∈ s.filter (fun l => k < l), f k * f l := by
+      rw [Finset.sum_filter]
+      rw [← Finset.sum_add_distrib]
+      apply Finset.sum_congr rfl
+      intro k _
+      by_cases hka : k < a
+      · have h_ins_filt : (insert a s).filter (fun l => k < l) = insert a (s.filter (fun l => k < l)) := by
+          ext l
+          simp only [Finset.mem_filter, Finset.mem_insert]
+          constructor
+          · rintro ⟨rfl | hl, hlt⟩
+            · exact Or.inl rfl
+            · exact Or.inr ⟨hl, hlt⟩
+          · rintro (rfl | ⟨hl, hlt⟩)
+            · exact ⟨Or.inl rfl, hka⟩
+            · exact ⟨Or.inr hl, hlt⟩
+        have ha_not_filt : a ∉ s.filter (fun l => k < l) := by
+          simp [ha]
+        rw [if_pos hka, h_ins_filt, Finset.sum_insert ha_not_filt]
+      · have h_ins_filt : (insert a s).filter (fun l => k < l) = s.filter (fun l => k < l) := by
+          ext l
+          simp only [Finset.mem_filter, Finset.mem_insert]
+          constructor
+          · rintro ⟨rfl | hl, hlt⟩
+            · exact False.elim (hka hlt)
+            · exact ⟨hl, hlt⟩
+          · rintro ⟨hl, hlt⟩
+            exact ⟨Or.inr hl, hlt⟩
+        rw [if_neg hka, zero_add, h_ins_filt]
+    rw [h_filter_a, h_sum_s_ins, h_split_s]
+    have h_fa_lt : f a * ∑ l ∈ s.filter (fun l => a < l), f l =
+        ∑ l ∈ s.filter (fun l => a < l), f a * f l := Finset.mul_sum _ _ _
+    have h_fa_gt : f a * ∑ k ∈ s.filter (fun k => k < a), f k =
+        ∑ k ∈ s.filter (fun k => k < a), f k * f a := by
+      rw [Finset.mul_sum]
+      apply Finset.sum_congr rfl
+      intro k _; ring
+    linarith
+
+/-- **Theorem 17 (`TASK-TC-056` §3, Finite Prime Filtration Endpoints, Prime-Adjoining Fiber Identity, Pointwise Increment, and Ascending-Prime Telescoping)**:
+    For every finite set of primes `P : Finset ℕ` (`∀ q ∈ P, q.Prime`), prime `p ∉ P`, cutoff `T : ℕ`,
+    and `X : ℝ` with `0 ≤ X`:
+    1. Exact filtration endpoints:
+       `pointwiseGroupedEnergyV ∅ T X = pointwiseDiagonalD T X` and
+       `pointwiseGroupedEnergyV (primesUpToFinset T) T X = (finiteQLambda T X) ^ 2`;
+    2. Exact coupled prime-adjoining fiber identity (`s ∈ coprimeCutoffFinset (insert p P) T`):
+       `∀ k, k ∈ admissiblePrimeExponents T p s ↔ s * p ^ k ≤ T`, and
+       `cofactorFiberF (insert p P) T s X = ∑ k ∈ admissiblePrimeExponents T p s, cofactorFiberF P T (s * p ^ k) X`;
+    3. Exact pointwise increment identity:
+       `pointwiseDelta P p T X = 2 * ∑ s ∈ coprimeCutoffFinset (insert p P) T, ∑ k ∈ admissiblePrimeExponents T p s, ∑ l ∈ (admissiblePrimeExponents T p s).filter (fun l => k < l), cofactorFiberF P T (s * p ^ k) X * cofactorFiberF P T (s * p ^ l) X`;
+    4. Exact ascending-prime filtration telescoping along `ps := ascendingPrimesUpTo T` (`p_1 < ... < p_J ≤ T`):
+       `ps.Pairwise (· < ·)`, `ps.toFinset = primesUpToFinset T`, and
+       `(finiteQLambda T X) ^ 2 = pointwiseDiagonalD T X + ∑ j ∈ Finset.range ps.length, pointwiseDelta (prefixPrimeSet ps j) (ps.getD j 0) T X`. -/
+theorem finite_prime_adjoining_fiber_and_pointwise_telescoping_tc056
+    {P : Finset ℕ} (hP : ∀ q ∈ P, q.Prime) {p : ℕ} (hp : p.Prime) (hp_not_mem : p ∉ P)
+    (T : ℕ) {X : ℝ} (hX : 0 ≤ X) :
+    (pointwiseGroupedEnergyV ∅ T X = pointwiseDiagonalD T X ∧
+      pointwiseGroupedEnergyV (primesUpToFinset T) T X = (finiteQLambda T X) ^ 2) ∧
+    (∀ s ∈ coprimeCutoffFinset (insert p P) T,
+      (∀ k : ℕ, k ∈ admissiblePrimeExponents T p s ↔ s * p ^ k ≤ T) ∧
+        cofactorFiberF (insert p P) T s X =
+          ∑ k ∈ admissiblePrimeExponents T p s, cofactorFiberF P T (s * p ^ k) X) ∧
+    (pointwiseDelta P p T X =
+      2 * ∑ s ∈ coprimeCutoffFinset (insert p P) T,
+        ∑ k ∈ admissiblePrimeExponents T p s,
+          ∑ l ∈ (admissiblePrimeExponents T p s).filter (fun l => k < l),
+            cofactorFiberF P T (s * p ^ k) X * cofactorFiberF P T (s * p ^ l) X) ∧
+    ((ascendingPrimesUpTo T).Pairwise (· < ·) ∧
+      (ascendingPrimesUpTo T).toFinset = primesUpToFinset T ∧
+      (finiteQLambda T X) ^ 2 =
+        pointwiseDiagonalD T X +
+          ∑ j ∈ Finset.range (ascendingPrimesUpTo T).length,
+            pointwiseDelta (prefixPrimeSet (ascendingPrimesUpTo T) j)
+              ((ascendingPrimesUpTo T).getD j 0) T X) := by
+  have h_end_empty : pointwiseGroupedEnergyV ∅ T X = pointwiseDiagonalD T X := by
+    dsimp [pointwiseGroupedEnergyV, pointwiseDiagonalD]
+    have hc_empty : coprimeCutoffFinset ∅ T = Finset.Icc 1 T := by
+      ext r
+      simp [coprimeCutoffFinset, primeProductModulus]
+    rw [hc_empty]
+    apply Finset.sum_congr rfl
+    intro r hr
+    rw [Finset.mem_Icc] at hr
+    have hr_pos : 0 < r := by omega
+    have hr_ne : r ≠ 0 := by omega
+    rw [cofactorFiberF_eq_sum_gaussianTermPhi_aux ∅ T hr_pos hX]
+    have hdiv_ge1 : 1 ≤ T / r := (Nat.le_div_iff_mul_le hr_pos).mpr (by omega)
+    have hs_empty : smoothCutoffFinset ∅ (T / r) = {1} := by
+      ext m
+      simp only [smoothCutoffFinset, Finset.mem_filter, Finset.mem_Icc, isPSmooth_empty_iff_aux,
+        Finset.mem_singleton]
+      exact ⟨fun h => h.2, fun h => ⟨⟨by omega, by omega⟩, h⟩⟩
+    rw [hs_empty, Finset.sum_singleton, one_mul]
+    have h_lam_sq : ((liouvilleLambda r : ℝ)) ^ 2 = 1 := by
+      have h_int := liouvilleLambda_sq_aux hr_ne
+      have h_cast : (liouvilleLambda r : ℝ) * (liouvilleLambda r : ℝ) = 1 := by exact_mod_cast h_int
+      rw [sq, h_cast]
+    calc
+      ((liouvilleLambda r : ℝ) * gaussianTermPhi r X) ^ 2
+        = ((liouvilleLambda r : ℝ)) ^ 2 * (gaussianTermPhi r X) ^ 2 := by ring
+      _ = (gaussianTermPhi r X) ^ 2 := by rw [h_lam_sq, one_mul]
+  have h_primes_all : ∀ q ∈ primesUpToFinset T, q.Prime := by
+    intro q hq
+    exact (Finset.mem_filter.mp hq).2
+  have h_end_all : pointwiseGroupedEnergyV (primesUpToFinset T) T X = (finiteQLambda T X) ^ 2 := by
+    obtain ⟨_, h_rec_f, _, ⟨hf0, _⟩⟩ :=
+      finite_gaussian_observable_reconstruction_and_weighted_cofactor_square h_primes_all T hX
+    by_cases hT : 1 ≤ T
+    · have hc_all : coprimeCutoffFinset (primesUpToFinset T) T = {1} := by
+        ext r
+        simp only [coprimeCutoffFinset, Finset.mem_filter, Finset.mem_Icc, Finset.mem_singleton]
+        constructor
+        · rintro ⟨⟨hr1, hrT⟩, hcop⟩
+          by_contra hr_ne1
+          obtain ⟨q, hq_prime, hq_dvd_r⟩ := Nat.exists_prime_and_dvd hr_ne1
+          have hq_le_r : q ≤ r := Nat.le_of_dvd (by omega) hq_dvd_r
+          have hq_mem : q ∈ primesUpToFinset T := by
+            simp only [primesUpToFinset, Finset.mem_filter, Finset.mem_Icc]
+            exact ⟨⟨hq_prime.two_le, le_trans hq_le_r hrT⟩, hq_prime⟩
+          have hq_dvd_mod : q ∣ primeProductModulus (primesUpToFinset T) :=
+            Finset.dvd_prod_of_mem (fun x => x) hq_mem
+          exact hq_prime.not_dvd_one (hcop.gcd_eq_one ▸ Nat.dvd_gcd hq_dvd_r hq_dvd_mod)
+        · rintro rfl
+          exact ⟨⟨by omega, hT⟩, Nat.coprime_one_left _⟩
+      dsimp [pointwiseGroupedEnergyV]
+      rw [h_rec_f, hc_all, Finset.sum_singleton, Finset.sum_singleton]
+    · have hT0 : T = 0 := by omega
+      subst hT0
+      simp [pointwiseGroupedEnergyV, coprimeCutoffFinset, hf0]
+  have h_fiber_adj :
+      ∀ s ∈ coprimeCutoffFinset (insert p P) T,
+        (∀ k : ℕ, k ∈ admissiblePrimeExponents T p s ↔ s * p ^ k ≤ T) ∧
+          cofactorFiberF (insert p P) T s X =
+            ∑ k ∈ admissiblePrimeExponents T p s, cofactorFiberF P T (s * p ^ k) X := by
+    intro s hs
+    have hs_mem := (Finset.mem_filter.mp hs).1
+    rw [Finset.mem_Icc] at hs_mem
+    have hs_pos : 0 < s := by omega
+    refine ⟨mem_admissiblePrimeExponents_iff_aux hp hs_mem.1 T, ?_⟩
+    rw [cofactorFiberF_eq_sum_gaussianTermPhi_aux (insert p P) T hs_pos hX]
+    rw [sum_smoothCutoffFinset_insert_partition_aux hP hp hp_not_mem (T / s)
+          (fun M => (liouvilleLambda (M * s) : ℝ) * gaussianTermPhi (M * s) X)]
+    have h_adm_eq : admissiblePrimeExponents (T / s) p 1 = admissiblePrimeExponents T p s := by
+      ext k
+      rw [mem_admissiblePrimeExponents_iff_aux hp (by omega) (T / s) k,
+          mem_admissiblePrimeExponents_iff_aux hp hs_mem.1 T k, one_mul,
+          Nat.le_div_iff_mul_le hs_pos, mul_comm]
+    rw [h_adm_eq]
+    apply Finset.sum_congr rfl
+    intro k _
+    have h_spk_pos : 0 < s * p ^ k := Nat.mul_pos hs_pos (pow_pos hp.pos k)
+    rw [cofactorFiberF_eq_sum_gaussianTermPhi_aux P T h_spk_pos hX]
+    have h_div_eq : (T / s) / p ^ k = T / (s * p ^ k) := Nat.div_div_eq_div_mul T s (p ^ k)
+    rw [h_div_eq]
+    apply Finset.sum_congr rfl
+    intro m _
+    have h_assoc : m * p ^ k * s = m * (s * p ^ k) := by ring
+    rw [h_assoc]
+  have h_delta :
+      pointwiseDelta P p T X =
+        2 * ∑ s ∈ coprimeCutoffFinset (insert p P) T,
+          ∑ k ∈ admissiblePrimeExponents T p s,
+            ∑ l ∈ (admissiblePrimeExponents T p s).filter (fun l => k < l),
+              cofactorFiberF P T (s * p ^ k) X * cofactorFiberF P T (s * p ^ l) X := by
+    dsimp [pointwiseDelta, pointwiseGroupedEnergyV]
+    rw [sum_coprimeCutoffFinset_insert_partition_aux hP hp hp_not_mem T
+          (fun r => (cofactorFiberF P T r X) ^ 2)]
+    have h_ins_sq :
+        ∑ s ∈ coprimeCutoffFinset (insert p P) T, (cofactorFiberF (insert p P) T s X) ^ 2 =
+          ∑ s ∈ coprimeCutoffFinset (insert p P) T,
+            (∑ k ∈ admissiblePrimeExponents T p s, cofactorFiberF P T (s * p ^ k) X) ^ 2 := by
+      apply Finset.sum_congr rfl
+      intro s hs
+      rw [(h_fiber_adj s hs).2]
+    rw [h_ins_sq, ← Finset.sum_sub_distrib, Finset.mul_sum]
+    apply Finset.sum_congr rfl
+    intro s _
+    exact sq_sum_sub_sum_sq_eq_two_sum_lt_aux (admissiblePrimeExponents T p s)
+      (fun k => cofactorFiberF P T (s * p ^ k) X)
+  refine ⟨⟨h_end_empty, h_end_all⟩, h_fiber_adj, h_delta, ?_⟩
+  let ps := ascendingPrimesUpTo T
+  have h_pw : ps.Pairwise (· < ·) := by
+    dsimp [ps, ascendingPrimesUpTo]
+    exact List.Pairwise.filter _ (List.pairwise_lt_range (T + 1))
+  have h_toFin : ps.toFinset = primesUpToFinset T := by
+    ext q
+    simp only [ps, ascendingPrimesUpTo, List.mem_toFinset, List.mem_filter, List.mem_range,
+      primesUpToFinset, Finset.mem_filter, Finset.mem_Icc, decide_eq_true_eq]
+    constructor
+    · rintro ⟨hq_lt, hq_p⟩
+      exact ⟨⟨hq_p.two_le, by omega⟩, hq_p⟩
+    · rintro ⟨⟨_, hq_le⟩, hq_p⟩
+      exact ⟨by omega, hq_p⟩
+  refine ⟨h_pw, h_toFin, ?_⟩
+  have h_tele :
+      ∀ m : ℕ, m ≤ ps.length →
+        pointwiseGroupedEnergyV (prefixPrimeSet ps m) T X =
+          pointwiseGroupedEnergyV ∅ T X +
+            ∑ j ∈ Finset.range m,
+              pointwiseDelta (prefixPrimeSet ps j) (ps.getD j 0) T X := by
+    intro m hm
+    induction' m with m ih
+    · simp [prefixPrimeSet]
+    · have hm_lt : m < ps.length := Nat.lt_of_succ_le hm
+      rw [Finset.sum_range_succ, ← add_assoc, ← ih (Nat.le_of_lt hm_lt)]
+      rw [prefixPrimeSet_succ_aux ps m hm_lt]
+      dsimp [pointwiseDelta]
+      ring
+  have h_full := h_tele ps.length (le_refl _)
+  have h_pref_len : prefixPrimeSet ps ps.length = primesUpToFinset T := by
+    dsimp [prefixPrimeSet]
+    rw [List.take_length, h_toFin]
+  rw [h_pref_len, h_end_all, h_end_empty] at h_full
+  exact h_full
+
+/-- Helper: alternating sum of a finite nonnegative antitone sequence is nonnegative. -/
+private theorem alternating_sum_nonneg_of_antitone_aux :
+    ∀ (L : ℕ) (b : ℕ → ℝ),
+      (∀ k < L, 0 ≤ b k) →
+      (∀ i j : ℕ, i ≤ j → j < L → b j ≤ b i) →
+      0 ≤ ∑ k ∈ Finset.range L, (-1 : ℝ) ^ k * b k
+  | 0, _, _, _ => by simp
+  | 1, b, hb_nn, _ => by
+      simp only [Finset.range_one, Finset.sum_singleton, pow_zero, one_mul]
+      exact hb_nn 0 (by omega)
+  | L + 2, b, hb_nn, hb_anti => by
+      rw [Finset.sum_range_succ', Finset.sum_range_succ']
+      have h_tail_eq :
+          ∑ k ∈ Finset.range L, (-1 : ℝ) ^ (k + 1 + 1) * b (k + 1 + 1) =
+            ∑ k ∈ Finset.range L, (-1 : ℝ) ^ k * b (k + 2) := by
+        apply Finset.sum_congr rfl
+        intro k _
+        have hexp : (-1 : ℝ) ^ (k + 1 + 1) = (-1 : ℝ) ^ k := by
+          rw [pow_add, pow_add]
+          ring
+        have hidx : k + 1 + 1 = k + 2 := by omega
+        rw [hexp, hidx]
+      rw [h_tail_eq]
+      have h_ih := alternating_sum_nonneg_of_antitone_aux L (fun k => b (k + 2))
+        (fun k _ => hb_nn (k + 2) (by omega))
+        (fun i j hij hjL => hb_anti (i + 2) (j + 2) (by omega) (by omega))
+      have h01 : b 1 ≤ b 0 := hb_anti 0 1 (by omega) (by omega)
+      simp only [pow_zero, zero_add, pow_one]
+      linarith
+
+/-- Helper: alternating sum of a finite nonnegative antitone sequence lies in `[0, b 0]` (`= 0` if `L = 0`). -/
+private theorem alternating_sum_bounds_of_antitone_aux (L : ℕ) (b : ℕ → ℝ)
+    (hb_nn : ∀ k < L, 0 ≤ b k)
+    (hb_anti : ∀ i j : ℕ, i ≤ j → j < L → b j ≤ b i) :
+    0 ≤ (∑ k ∈ Finset.range L, (-1 : ℝ) ^ k * b k) ∧
+      (∑ k ∈ Finset.range L, (-1 : ℝ) ^ k * b k) ≤ (if L = 0 then 0 else b 0) := by
+  refine ⟨alternating_sum_nonneg_of_antitone_aux L b hb_nn hb_anti, ?_⟩
+  rcases L with _ | M
+  · simp
+  · simp only [Nat.succ_ne_zero, ↓reduceIte]
+    rw [Finset.sum_range_succ']
+    have h_sub :
+        ∑ k ∈ Finset.range M, (-1 : ℝ) ^ (k + 1) * b (k + 1) =
+          -(∑ k ∈ Finset.range M, (-1 : ℝ) ^ k * b (k + 1)) := by
+      rw [← Finset.sum_neg_distrib]
+      apply Finset.sum_congr rfl
+      intro k _
+      rw [pow_succ]
+      ring
+    rw [h_sub]
+    have h_tail_nn := alternating_sum_nonneg_of_antitone_aux M (fun k => b (k + 1))
+      (fun k hk => hb_nn (k + 1) (by omega))
+      (fun i j hij hjM => hb_anti (i + 1) (j + 1) (by omega) (by omega))
+    simp only [pow_zero, one_mul]
+    linarith
+
+/-- Helper: basic properties of `chainMaxUpTo`: nonnegativity, upper bound on `< N`, attainment when `N > 0`,
+    and invariance under zero-extension. -/
+private theorem chainMaxUpTo_props_aux (N : ℕ) (a : ℕ → ℝ) (ha_nn : ∀ k < N, 0 ≤ a k) :
+    0 ≤ chainMaxUpTo N a ∧
+      (∀ k < N, a k ≤ chainMaxUpTo N a) ∧
+      (0 < N → ∃ k < N, a k = chainMaxUpTo N a) := by
+  induction' N with n ih
+  · refine ⟨le_refl 0, ?_, ?_⟩
+    · intro k hk; omega
+    · intro h0; omega
+  · obtain ⟨h_nn, h_ub, h_att⟩ := ih (fun k hk => ha_nn k (by omega))
+    refine ⟨le_trans h_nn (le_max_left _ _), ?_, ?_⟩
+    · intro k hk
+      by_cases hkn : k = n
+      · rw [hkn]
+        exact le_max_right (chainMaxUpTo n a) (a n)
+      · exact le_trans (h_ub k (by omega)) (le_max_left _ _)
+    · intro _
+      rcases Nat.eq_zero_or_pos n with rfl | hn_pos
+      · refine ⟨0, by omega, ?_⟩
+        dsimp [chainMaxUpTo]
+        exact (max_eq_right (ha_nn 0 (by omega))).symm
+      · by_cases h_cmp : chainMaxUpTo n a ≤ a n
+        · refine ⟨n, by omega, ?_⟩
+          dsimp [chainMaxUpTo]
+          exact (max_eq_right h_cmp).symm
+        · obtain ⟨k, hk_lt, hk_eq⟩ := h_att hn_pos
+          refine ⟨k, by omega, ?_⟩
+          dsimp [chainMaxUpTo]
+          rw [max_eq_left (le_of_not_ge h_cmp)]
+          exact hk_eq
+
+/-- **Theorem 18 (`TASK-TC-056` §4, Finite Alternating-Unimodal Chain Inequality, Squared Contraction, Zero-Extension, and Strict Gap)**:
+    For every length `N : ℕ` and nonnegative finite sequence `a : ℕ → ℝ` (`∀ k < N, 0 ≤ a k`) satisfying
+    `IsUnimodalChain N a` (allowing `N = 0`, `N = 1`, zero chains, and ties at the maximum):
+    1. Alternating sum bounded by empty-safe maximum:
+       `|∑ k ∈ Finset.range N, (-1)^k a_k| ≤ chainMaxUpTo N a`;
+    2. Squared alternating contraction:
+       `(∑ k ∈ Finset.range N, (-1)^k a_k)^2 ≤ ∑ k ∈ Finset.range N, a_k^2`;
+    3. Quantitative two-term strict gap when `2 ≤ N`:
+       `min (a 0 ^ 2) (a 1 ^ 2) ≤ (∑ k ∈ Finset.range N, a_k^2) - (∑ k ∈ Finset.range N, (-1)^k a_k)^2`
+       (hence strict inequality `<` whenever `2 ≤ N`, `0 < a 0`, and `0 < a 1`);
+    4. Degenerate & zero-extension properties: `chainMaxUpTo 0 a = 0`, `chainMaxUpTo 1 a = max 0 (a 0)`, and
+       if `∀ k, N ≤ k → a k = 0` and `N ≤ M`, then `chainMaxUpTo M a = chainMaxUpTo N a`,
+       `∑ k ∈ Finset.range M, (-1)^k a_k = ∑ k ∈ Finset.range N, (-1)^k a_k`, and `IsUnimodalChain M a`. -/
+theorem finite_alternating_unimodal_chain_contraction_tc056
+    (N : ℕ) (a : ℕ → ℝ) (ha_nn : ∀ k < N, 0 ≤ a k) (h_uni : IsUnimodalChain N a) :
+    (|∑ k ∈ Finset.range N, (-1 : ℝ) ^ k * a k| ≤ chainMaxUpTo N a) ∧
+    ((∑ k ∈ Finset.range N, (-1 : ℝ) ^ k * a k) ^ 2 ≤ ∑ k ∈ Finset.range N, (a k) ^ 2) ∧
+    (2 ≤ N →
+      min ((a 0) ^ 2) ((a 1) ^ 2) ≤
+        (∑ k ∈ Finset.range N, (a k) ^ 2) - (∑ k ∈ Finset.range N, (-1 : ℝ) ^ k * a k) ^ 2) ∧
+    (chainMaxUpTo 0 a = 0 ∧
+      chainMaxUpTo 1 a = max 0 (a 0) ∧
+      ∀ M : ℕ, N ≤ M → (∀ k : ℕ, N ≤ k → a k = 0) →
+        chainMaxUpTo M a = chainMaxUpTo N a ∧
+          (∑ k ∈ Finset.range M, (-1 : ℝ) ^ k * a k = ∑ k ∈ Finset.range N, (-1 : ℝ) ^ k * a k) ∧
+          IsUnimodalChain M a) := by
+  obtain ⟨hmax_nn, hmax_ub, _⟩ := chainMaxUpTo_props_aux N a ha_nn
+  have h_peak_bound :
+      0 < N →
+        ∃ kp < N,
+          |∑ idx ∈ Finset.range N, (-1 : ℝ) ^ idx * a idx| ≤ a kp := by
+    intro hN_pos
+    rcases h_uni with ⟨k_raw, hk_le_N, h_inc_raw, h_dec_raw⟩
+    let kp := min k_raw (N - 1)
+    have hkp_lt : kp < N := by omega
+    have h_inc : ∀ i j : ℕ, i ≤ j → j ≤ kp → a i ≤ a j := by
+      intro i j hij hjk
+      exact h_inc_raw i j hij (le_trans hjk (min_le_left _ _)) (by omega)
+    have h_dec : ∀ i j : ℕ, kp ≤ i → i ≤ j → j < N → a j ≤ a i := by
+      intro i j hik hij hjN
+      by_cases hk_lt : k_raw < N
+      · have hkp_eq : kp = k_raw := min_eq_left (by omega)
+        exact h_dec_raw i j (hkp_eq ▸ hik) hij hjN
+      · have hkp_eq : kp = N - 1 := min_eq_right (by omega)
+        have hij_eq : i = j := by omega
+        rw [hij_eq]
+    refine ⟨kp, hkp_lt, ?_⟩
+    have h_split_N : N = kp + (N - kp) := by omega
+    let S := ∑ idx ∈ Finset.range N, (-1 : ℝ) ^ idx * a idx
+    let R_sum := ∑ j ∈ Finset.range (N - kp), (-1 : ℝ) ^ j * a (kp + j)
+    let L_sum := ∑ j ∈ Finset.range kp, (-1 : ℝ) ^ j * a (kp - 1 - j)
+    have h_S_decomp : (-1 : ℝ) ^ kp * S = R_sum - L_sum := by
+      dsimp [S]
+      conv_lhs => rw [h_split_N]
+      rw [Finset.sum_range_add, mul_add]
+      have h_right :
+          (-1 : ℝ) ^ kp * (∑ j ∈ Finset.range (N - kp), (-1 : ℝ) ^ (kp + j) * a (kp + j)) = R_sum := by
+        rw [Finset.mul_sum]
+        apply Finset.sum_congr rfl
+        intro j _
+        rw [pow_add]
+        calc
+          (-1 : ℝ) ^ kp * ((-1 : ℝ) ^ kp * (-1 : ℝ) ^ j * a (kp + j))
+            = (((-1 : ℝ) ^ kp) * ((-1 : ℝ) ^ kp)) * ((-1 : ℝ) ^ j * a (kp + j)) := by ring
+          _ = (-1 : ℝ) ^ j * a (kp + j) := by rw [neg_one_pow_mul_self_real_aux kp, one_mul]
+      have h_left :
+          (-1 : ℝ) ^ kp * (∑ idx ∈ Finset.range kp, (-1 : ℝ) ^ idx * a idx) = -L_sum := by
+        rw [← Finset.sum_range_reflect (fun idx => (-1 : ℝ) ^ idx * a idx) kp]
+        rw [Finset.mul_sum, ← Finset.sum_neg_distrib]
+        apply Finset.sum_congr rfl
+        intro j hj
+        rw [Finset.mem_range] at hj
+        have hkp_split : kp = (kp - 1 - j) + j + 1 := by omega
+        have h_pow_kp : (-1 : ℝ) ^ kp = -((-1 : ℝ) ^ (kp - 1 - j) * (-1 : ℝ) ^ j) := by
+          conv_lhs => rw [hkp_split]
+          rw [pow_add, pow_add, pow_one]
+          ring
+        rw [h_pow_kp]
+        calc
+          -((-1 : ℝ) ^ (kp - 1 - j) * (-1 : ℝ) ^ j) * ((-1 : ℝ) ^ (kp - 1 - j) * a (kp - 1 - j))
+            = -((((-1 : ℝ) ^ (kp - 1 - j)) * ((-1 : ℝ) ^ (kp - 1 - j))) *
+                ((-1 : ℝ) ^ j * a (kp - 1 - j))) := by ring
+          _ = -((-1 : ℝ) ^ j * a (kp - 1 - j)) := by
+                rw [neg_one_pow_mul_self_real_aux (kp - 1 - j), one_mul]
+      rw [h_right, h_left]
+      ring
+    obtain ⟨hR_nn, hR_ub⟩ := alternating_sum_bounds_of_antitone_aux (N - kp) (fun j => a (kp + j))
+      (fun j hj => ha_nn (kp + j) (by omega))
+      (fun i j hij hjlen => h_dec (kp + i) (kp + j) (by omega) (by omega) (by omega))
+    have hR_le_akp : R_sum ≤ a kp := by
+      have hne0 : N - kp ≠ 0 := by omega
+      simpa [R_sum, hne0] using hR_ub
+    obtain ⟨hL_nn, hL_ub⟩ := alternating_sum_bounds_of_antitone_aux kp (fun j => a (kp - 1 - j))
+      (fun j hj => ha_nn (kp - 1 - j) (by omega))
+      (fun i j hij hjkp => h_inc (kp - 1 - j) (kp - 1 - i) (by omega) (by omega))
+    have hL_le_akp : L_sum ≤ a kp := by
+      by_cases hkp0 : kp = 0
+      · have hL0 : L_sum = 0 := by simp [L_sum, hkp0]
+        rw [hL0]
+        exact ha_nn kp hkp_lt
+      · have h_sub1 : L_sum ≤ a (kp - 1) := by simpa [L_sum, hkp0] using hL_ub
+        exact le_trans h_sub1 (h_inc (kp - 1) kp (by omega) (le_refl kp))
+    have h_abs_sign : |(-1 : ℝ) ^ kp * S| = |S| := by
+      rw [abs_mul, abs_pow, abs_neg, abs_one, one_pow, one_mul]
+    rw [← h_abs_sign, h_S_decomp, abs_le]
+    constructor <;> linarith
+  have h_part1 : |∑ k ∈ Finset.range N, (-1 : ℝ) ^ k * a k| ≤ chainMaxUpTo N a := by
+    rcases Nat.eq_zero_or_pos N with rfl | hN_pos
+    · simp [chainMaxUpTo]
+    · obtain ⟨kp, hkp_lt, h_le_akp⟩ := h_peak_bound hN_pos
+      exact le_trans h_le_akp (hmax_ub kp hkp_lt)
+  have h_part2 : (∑ k ∈ Finset.range N, (-1 : ℝ) ^ k * a k) ^ 2 ≤ ∑ k ∈ Finset.range N, (a k) ^ 2 := by
+    rcases Nat.eq_zero_or_pos N with rfl | hN_pos
+    · simp
+    · obtain ⟨kp, hkp_lt, h_le_akp⟩ := h_peak_bound hN_pos
+      have hakp_nn : 0 ≤ a kp := ha_nn kp hkp_lt
+      have h_sq_le : (∑ k ∈ Finset.range N, (-1 : ℝ) ^ k * a k) ^ 2 ≤ (a kp) ^ 2 := by
+        have habs_nn := abs_nonneg (∑ k ∈ Finset.range N, (-1 : ℝ) ^ k * a k)
+        have hsq_abs := sq_abs (∑ k ∈ Finset.range N, (-1 : ℝ) ^ k * a k)
+        nlinarith
+      have h_akp_in_sum : (a kp) ^ 2 ≤ ∑ k ∈ Finset.range N, (a k) ^ 2 :=
+        Finset.single_le_sum (fun k _ => sq_nonneg (a k)) (Finset.mem_range.mpr hkp_lt)
+      exact le_trans h_sq_le h_akp_in_sum
+  have h_part3 :
+      2 ≤ N →
+        min ((a 0) ^ 2) ((a 1) ^ 2) ≤
+          (∑ k ∈ Finset.range N, (a k) ^ 2) - (∑ k ∈ Finset.range N, (-1 : ℝ) ^ k * a k) ^ 2 := by
+    intro hN2
+    obtain ⟨kp, hkp_lt, h_le_akp⟩ := h_peak_bound (by omega)
+    have hakp_nn : 0 ≤ a kp := ha_nn kp hkp_lt
+    have h_sq_le : (∑ k ∈ Finset.range N, (-1 : ℝ) ^ k * a k) ^ 2 ≤ (a kp) ^ 2 := by
+      have habs_nn := abs_nonneg (∑ k ∈ Finset.range N, (-1 : ℝ) ^ k * a k)
+      have hsq_abs := sq_abs (∑ k ∈ Finset.range N, (-1 : ℝ) ^ k * a k)
+      nlinarith
+    let m := if kp = 0 then 1 else 0
+    have hm_lt : m < N := by dsimp [m]; split_ifs <;> omega
+    have hm_ne_kp : m ≠ kp := by dsimp [m]; split_ifs with h0 <;> omega
+    have h_pair_sub : ({kp, m} : Finset ℕ) ⊆ Finset.range N := by
+      intro x hx
+      simp only [Finset.mem_insert, Finset.mem_singleton] at hx
+      rw [Finset.mem_range]
+      rcases hx with rfl | rfl <;> omega
+    have h_pair_sum :
+        (a kp) ^ 2 + (a m) ^ 2 ≤ ∑ k ∈ Finset.range N, (a k) ^ 2 := by
+      calc
+        (a kp) ^ 2 + (a m) ^ 2
+          = ∑ k ∈ ({kp, m} : Finset ℕ), (a k) ^ 2 := by
+              rw [Finset.sum_pair hm_ne_kp.symm]
+        _ ≤ ∑ k ∈ Finset.range N, (a k) ^ 2 :=
+              Finset.sum_le_sum_of_subset_of_nonneg h_pair_sub (fun k _ _ => sq_nonneg (a k))
+    have h_min_le : min ((a 0) ^ 2) ((a 1) ^ 2) ≤ (a m) ^ 2 := by
+      dsimp [m]
+      split_ifs
+      · exact min_le_right _ _
+      · exact min_le_left _ _
+    linarith
+  refine ⟨h_part1, h_part2, h_part3, rfl, rfl, ?_⟩
+  intro M hNM ha_zero
+  have h_max_eq : chainMaxUpTo M a = chainMaxUpTo N a := by
+    obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_le hNM
+    induction' d with d ih
+    · simp
+    · have h_add_succ : N + (d + 1) = (N + d) + 1 := by omega
+      rw [h_add_succ]
+      dsimp [chainMaxUpTo]
+      rw [ih (Nat.le_add_right N d), ha_zero (N + d) (by omega), max_eq_left hmax_nn]
+  have h_sum_eq :
+      ∑ k ∈ Finset.range M, (-1 : ℝ) ^ k * a k = ∑ k ∈ Finset.range N, (-1 : ℝ) ^ k * a k := by
+    obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_le hNM
+    rw [Finset.sum_range_add]
+    have h_tail0 : ∑ x ∈ Finset.range d, (-1 : ℝ) ^ (N + x) * a (N + x) = 0 := by
+      apply Finset.sum_eq_zero
+      intro x _
+      rw [ha_zero (N + x) (by omega), mul_zero]
+    linarith
+  have h_uni_M : IsUnimodalChain M a := by
+    rcases Nat.eq_zero_or_pos N with rfl | hN_pos
+    · refine ⟨0, by omega, ?_, ?_⟩
+      · intro i j hij hj0 _
+        have hi0 : i = 0 := by omega
+        have hj0' : j = 0 := by omega
+        rw [hi0, hj0']
+      · intro i j _ _ _
+        rw [ha_zero i (by omega), ha_zero j (by omega)]
+    · rcases h_uni with ⟨k_raw, _, h_inc_raw, h_dec_raw⟩
+      let kp := min k_raw (N - 1)
+      refine ⟨kp, by omega, ?_, ?_⟩
+      · intro i j hij hjk _
+        exact h_inc_raw i j hij (le_trans hjk (min_le_left _ _)) (by omega)
+      · intro i j hik hij _
+        by_cases hjN : j < N
+        · by_cases hk_lt : k_raw < N
+          · have hkp_eq : kp = k_raw := min_eq_left (by omega)
+            exact h_dec_raw i j (hkp_eq ▸ hik) hij hjN
+          · have hkp_eq : kp = N - 1 := min_eq_right (by omega)
+            have hij_eq : i = j := by omega
+            rw [hij_eq]
+        · rw [ha_zero j (by omega)]
+          by_cases hiN : i < N
+          · exact ha_nn i hiN
+          · rw [ha_zero i (by omega)]
+  exact ⟨h_max_eq, h_sum_eq, h_uni_M⟩
+
+/-- Finite truncated Gaussian prime-power chain `a_{s,m,k}(X) := φ_{s m p^k}(X)` if `s m p^k ≤ T`, else `0`. -/
+noncomputable def gaussianPrimeChain (T p s m : ℕ) (X : ℝ) (k : ℕ) : ℝ :=
+  if s * m * p ^ k ≤ T then gaussianTermPhi (s * m * p ^ k) X else 0
+
+/-- Alternating sum `A_{s,m}(X) := ∑_{0 ≤ k ≤ T} (-1)^k a_{s,m,k}(X)` along a single prime's powers. -/
+noncomputable def gaussianAlternatingChainSum (T p s m : ℕ) (X : ℝ) : ℝ :=
+  ∑ k ∈ Finset.range (T + 1), (-1 : ℝ) ^ k * gaussianPrimeChain T p s m X k
+
+/-- Consecutive admissible Gaussian chain ratio
+    `r_{p,s,m,X}(k) := p^{-3} exp[(X^2 / (s m)^2) p^{-2k} (1 - p^{-2})]`. -/
+noncomputable def gaussianChainRatio (p s m : ℕ) (X : ℝ) (k : ℕ) : ℝ :=
+  ((p : ℝ) ^ 3)⁻¹ *
+    Real.exp ((X ^ 2 / ((s * m : ℕ) : ℝ) ^ 2) * ((p : ℝ) ^ (2 * k))⁻¹ * (1 - ((p : ℝ) ^ 2)⁻¹))
+
+/-- Pointwise single-prime contraction term
+    `c_{P,p}(X; T) := ∑_{s ∈ coprime(P ∪ {p}, T)} ∑_{m ∈ S(P), s m ≤ T} [∑_k a_{s,m,k}(X)^2 - A_{s,m}(X)^2]`. -/
+noncomputable def pointwiseContractionC (P : Finset ℕ) (p T : ℕ) (X : ℝ) : ℝ :=
+  ∑ s ∈ coprimeCutoffFinset (insert p P) T,
+    ∑ m ∈ smoothCutoffFinset P (T / s),
+      ((∑ k ∈ Finset.range (T + 1), (gaussianPrimeChain T p s m X k) ^ 2) -
+        (gaussianAlternatingChainSum T p s m X) ^ 2)
+
+/-- Pointwise ordered (`m ≠ n`) mixed-prime interaction term
+    `m_{P,p}(X; T) := ∑_{s ∈ coprime(P ∪ {p}, T)} ∑_{m ≠ n ∈ S(P), s m, s n ≤ T} λ(m) λ(n) [A_{s,m}(X) A_{s,n}(X) - ∑_k a_{s,m,k}(X) a_{s,n,k}(X)]`
+    (retaining `λ(m) λ(n)`, with `λ(s)^2 = 1` cancelled and NO extra factor of `2`). -/
+noncomputable def pointwiseMixedM (P : Finset ℕ) (p T : ℕ) (X : ℝ) : ℝ :=
+  ∑ s ∈ coprimeCutoffFinset (insert p P) T,
+    ∑ m ∈ smoothCutoffFinset P (T / s),
+      ∑ n ∈ (smoothCutoffFinset P (T / s)).erase m,
+        (liouvilleLambda m : ℝ) * (liouvilleLambda n : ℝ) *
+          (gaussianAlternatingChainSum T p s m X * gaussianAlternatingChainSum T p s n X -
+            ∑ k ∈ Finset.range (T + 1),
+              gaussianPrimeChain T p s m X k * gaussianPrimeChain T p s n X k)
+
+/-- Helper: elementary monotonicity `x ^ a ≤ x ^ b` for `1 ≤ x` and `a ≤ b`. -/
+private theorem real_pow_le_pow_of_one_le_aux {x : ℝ} (hx : 1 ≤ x) {a b : ℕ} (hab : a ≤ b) :
+    x ^ a ≤ x ^ b := by
+  obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_le hab
+  induction' d with d ih
+  · simp
+  · rw [Nat.add_succ, pow_succ]
+    have hpow_nn : 0 ≤ x ^ (a + d) := pow_nonneg (by linarith) _
+    nlinarith [ih (Nat.le_add_right a d)]
+
+/-- Helper: elementary peak-finding lemma from one-step descent `a (k + 1) ≤ a k → a (k + 2) ≤ a (k + 1)`
+    and terminal inequality `a (B + 1) ≤ a B`. -/
+private theorem exists_peak_of_one_step_descent_aux :
+    ∀ (B : ℕ) (a : ℕ → ℝ),
+      (∀ k : ℕ, a (k + 1) ≤ a k → a (k + 2) ≤ a (k + 1)) →
+      a (B + 1) ≤ a B →
+      ∃ kp ≤ B, (∀ j < kp, a j ≤ a (j + 1)) ∧ (∀ j : ℕ, kp ≤ j → a (j + 1) ≤ a j)
+  | 0, a, h_desc, h_end => by
+      refine ⟨0, le_refl 0, (fun j hj => by omega), ?_⟩
+      suffices h_all : ∀ j : ℕ, a (j + 1) ≤ a j by
+        intro j _
+        exact h_all j
+      intro j
+      induction' j with j ih
+      · exact h_end
+      · exact h_desc j ih
+  | B + 1, a, h_desc, h_end => by
+      by_cases h0 : a 1 ≤ a 0
+      · refine ⟨0, by omega, (fun j hj => by omega), ?_⟩
+        suffices h_all : ∀ j : ℕ, a (j + 1) ≤ a j by
+          intro j _
+          exact h_all j
+        intro j
+        induction' j with j ih
+        · exact h0
+        · exact h_desc j ih
+      · have h0_lt : a 0 ≤ a 1 := le_of_not_ge h0
+        obtain ⟨kp', hkp'_le, h_up', h_dn'⟩ :=
+          exists_peak_of_one_step_descent_aux B (fun k => a (k + 1))
+            (fun k hk => h_desc (k + 1) hk) h_end
+        refine ⟨kp' + 1, by omega, ?_, ?_⟩
+        · intro j hj
+          rcases j with _ | j'
+          · exact h0_lt
+          · exact h_up' j' (by omega)
+        · intro j hj
+          rcases j with _ | j'
+          · omega
+          · exact h_dn' j' (by omega)
+
+/-- Helper: nonnegativity and positivity of `gaussianTermPhi n X`. -/
+private theorem gaussianTermPhi_nonneg_and_pos_aux {n : ℕ} (hn : 0 < n) {X : ℝ} (hX : 0 ≤ X) :
+    0 ≤ gaussianTermPhi n X ∧ (0 < X → 0 < gaussianTermPhi n X) := by
+  have hn_pos : (0 : ℝ) < (n : ℝ) := Nat.cast_pos.mpr hn
+  have hinv_pos : 0 < ((n : ℝ) ^ 3)⁻¹ := inv_pos.mpr (pow_pos hn_pos 3)
+  have hexp_pos : 0 < Real.exp (-(X ^ 2) / (n : ℝ) ^ 2) := Real.exp_pos _
+  refine ⟨?_, ?_⟩
+  · dsimp [gaussianTermPhi]
+    exact mul_nonneg (Real.rpow_nonneg hX _) (mul_nonneg (le_of_lt hinv_pos) (le_of_lt hexp_pos))
+  · intro hX_pos
+    dsimp [gaussianTermPhi]
+    exact mul_pos (Real.rpow_pos_of_pos hX_pos _) (mul_pos hinv_pos hexp_pos)
+
+/-- Helper: consecutive ratio identity and antitone property for `gaussianPrimeChain`. -/
+private theorem gaussianPrimeChain_ratio_and_antitone_aux
+    {T p s m : ℕ} (hp : p.Prime) (hs : 0 < s) (hm : 0 < m) (X : ℝ) :
+    (∀ k : ℕ, 0 < X → s * m * p ^ (k + 1) ≤ T →
+      0 < gaussianPrimeChain T p s m X k ∧
+        gaussianPrimeChain T p s m X (k + 1) / gaussianPrimeChain T p s m X k =
+          gaussianChainRatio p s m X k) ∧
+    (∀ k l : ℕ, k ≤ l → gaussianChainRatio p s m X l ≤ gaussianChainRatio p s m X k) := by
+  have hsm_pos : 0 < s * m := Nat.mul_pos hs hm
+  have hp_real_pos : (0 : ℝ) < (p : ℝ) := Nat.cast_pos.mpr hp.pos
+  have hp_ge2 : (2 : ℝ) ≤ (p : ℝ) := by exact_mod_cast hp.two_le
+  refine ⟨?_, ?_⟩
+  · intro k hX_pos hk1_le
+    have hk_le : s * m * p ^ k ≤ T := by
+      have h_pow_le : p ^ k ≤ p ^ (k + 1) := Nat.pow_le_pow_right hp.pos (by omega)
+      exact le_trans (Nat.mul_le_mul_left (s * m) h_pow_le) hk1_le
+    have h_ak_eq : gaussianPrimeChain T p s m X k = gaussianTermPhi (s * m * p ^ k) X := by
+      simp [gaussianPrimeChain, hk_le]
+    have h_ak1_eq : gaussianPrimeChain T p s m X (k + 1) = gaussianTermPhi (s * m * p ^ (k + 1)) X := by
+      simp [gaussianPrimeChain, hk1_le]
+    have h_ak_pos : 0 < gaussianTermPhi (s * m * p ^ k) X :=
+      (gaussianTermPhi_nonneg_and_pos_aux (Nat.mul_pos hsm_pos (pow_pos hp.pos k)) (le_of_lt hX_pos)).2 hX_pos
+    rw [h_ak_eq, h_ak1_eq]
+    refine ⟨h_ak_pos, ?_⟩
+    have hrpow_ne : X ^ (5 / 2 : ℝ) ≠ 0 := ne_of_gt (Real.rpow_pos_of_pos hX_pos _)
+    have hsm_ne : ((s * m : ℕ) : ℝ) ≠ 0 := ne_of_gt (Nat.cast_pos.mpr hsm_pos)
+    have hp_ne : (p : ℝ) ≠ 0 := ne_of_gt hp_real_pos
+    have hexp_ne : Real.exp (-(X ^ 2) / ((s * m * p ^ k : ℕ) : ℝ) ^ 2) ≠ 0 := ne_of_gt (Real.exp_pos _)
+    dsimp [gaussianTermPhi, gaussianChainRatio]
+    have hexp_diff :
+        Real.exp (-(X ^ 2) / ((s * m * p ^ (k + 1) : ℕ) : ℝ) ^ 2) /
+            Real.exp (-(X ^ 2) / ((s * m * p ^ k : ℕ) : ℝ) ^ 2) =
+          Real.exp ((X ^ 2 / ((s * m : ℕ) : ℝ) ^ 2) * ((p : ℝ) ^ (2 * k))⁻¹ * (1 - ((p : ℝ) ^ 2)⁻¹)) := by
+      rw [← Real.exp_sub]
+      congr 1
+      have h_cast_k : ((s * m * p ^ k : ℕ) : ℝ) ^ 2 = ((s * m : ℕ) : ℝ) ^ 2 * (p : ℝ) ^ (2 * k) := by
+        rw [Nat.cast_mul (s * m) (p ^ k), Nat.cast_pow, Nat.mul_comm 2 k, pow_mul]
+        ring
+      have h_cast_k1 : ((s * m * p ^ (k + 1) : ℕ) : ℝ) ^ 2 =
+          ((s * m : ℕ) : ℝ) ^ 2 * ((p : ℝ) ^ (2 * k) * (p : ℝ) ^ 2) := by
+        rw [Nat.cast_mul (s * m) (p ^ (k + 1)), Nat.cast_pow, pow_add, pow_one, Nat.mul_comm 2 k, pow_mul]
+        ring
+      rw [h_cast_k, h_cast_k1]
+      have hpk2_ne : (p : ℝ) ^ (2 * k) ≠ 0 := pow_ne_zero _ hp_ne
+      field_simp [hsm_ne, hpk2_ne, hp_ne]
+      ring
+    have h_inv_div :
+        (((s * m * p ^ (k + 1) : ℕ) : ℝ) ^ 3)⁻¹ / (((s * m * p ^ k : ℕ) : ℝ) ^ 3)⁻¹ =
+          ((p : ℝ) ^ 3)⁻¹ := by
+      push_cast
+      have hpk_ne : (p : ℝ) ^ k ≠ 0 := pow_ne_zero _ hp_ne
+      have hs_ne : (s : ℝ) ≠ 0 := ne_of_gt (Nat.cast_pos.mpr hs)
+      have hm_ne : (m : ℝ) ≠ 0 := ne_of_gt (Nat.cast_pos.mpr hm)
+      rw [pow_succ]
+      field_simp [hs_ne, hm_ne, hpk_ne, hp_ne]
+      ring
+    calc
+      X ^ (5 / 2 : ℝ) * ((((s * m * p ^ (k + 1) : ℕ) : ℝ) ^ 3)⁻¹ *
+            Real.exp (-(X ^ 2) / ((s * m * p ^ (k + 1) : ℕ) : ℝ) ^ 2)) /
+          (X ^ (5 / 2 : ℝ) * ((((s * m * p ^ k : ℕ) : ℝ) ^ 3)⁻¹ *
+            Real.exp (-(X ^ 2) / ((s * m * p ^ k : ℕ) : ℝ) ^ 2)))
+        = ((((s * m * p ^ (k + 1) : ℕ) : ℝ) ^ 3)⁻¹ / (((s * m * p ^ k : ℕ) : ℝ) ^ 3)⁻¹) *
+            (Real.exp (-(X ^ 2) / ((s * m * p ^ (k + 1) : ℕ) : ℝ) ^ 2) /
+              Real.exp (-(X ^ 2) / ((s * m * p ^ k : ℕ) : ℝ) ^ 2)) := by
+            field_simp [hrpow_ne, hexp_ne]
+            ring
+      _ = ((p : ℝ) ^ 3)⁻¹ *
+            Real.exp ((X ^ 2 / ((s * m : ℕ) : ℝ) ^ 2) * ((p : ℝ) ^ (2 * k))⁻¹ * (1 - ((p : ℝ) ^ 2)⁻¹)) := by
+            rw [h_inv_div, hexp_diff]
+  · intro k l hkl
+    dsimp [gaussianChainRatio]
+    have hp3_inv_nn : 0 ≤ ((p : ℝ) ^ 3)⁻¹ := inv_nonneg.mpr (pow_nonneg (le_of_lt hp_real_pos) 3)
+    apply mul_le_mul_of_nonneg_left _ hp3_inv_nn
+    rw [Real.exp_le_exp]
+    have h_p2_ge4 : (4 : ℝ) ≤ (p : ℝ) ^ 2 := by nlinarith
+    have hp2_pos : 0 < (p : ℝ) ^ 2 := by linarith
+    have h_one_sub_nn : 0 ≤ 1 - ((p : ℝ) ^ 2)⁻¹ := by
+      have h_inv_le1 : ((p : ℝ) ^ 2)⁻¹ ≤ 1 := by
+        have h_mul1 : ((p : ℝ) ^ 2)⁻¹ * (p : ℝ) ^ 2 = 1 := by field_simp [ne_of_gt hp2_pos]
+        nlinarith
+      linarith
+    have h_x_div_nn : 0 ≤ X ^ 2 / ((s * m : ℕ) : ℝ) ^ 2 := div_nonneg (sq_nonneg X) (sq_nonneg _)
+    have h_pow_mono : (p : ℝ) ^ (2 * k) ≤ (p : ℝ) ^ (2 * l) :=
+      real_pow_le_pow_of_one_le_aux (by linarith) (by omega)
+    have hpk_pos : 0 < (p : ℝ) ^ (2 * k) := pow_pos hp_real_pos _
+    have hpl_pos : 0 < (p : ℝ) ^ (2 * l) := pow_pos hp_real_pos _
+    have h_inv_anti : ((p : ℝ) ^ (2 * l))⁻¹ ≤ ((p : ℝ) ^ (2 * k))⁻¹ := by
+      have hu_pos : 0 < ((p : ℝ) ^ (2 * k))⁻¹ := inv_pos.mpr hpk_pos
+      have hv_pos : 0 < ((p : ℝ) ^ (2 * l))⁻¹ := inv_pos.mpr hpl_pos
+      have h1 : (p : ℝ) ^ (2 * k) * ((p : ℝ) ^ (2 * k))⁻¹ = 1 := by field_simp [ne_of_gt hpk_pos]
+      have h2 : ((p : ℝ) ^ (2 * l))⁻¹ * (p : ℝ) ^ (2 * l) = 1 := by field_simp [ne_of_gt hpl_pos]
+      calc
+        ((p : ℝ) ^ (2 * l))⁻¹
+          = ((p : ℝ) ^ (2 * l))⁻¹ * ((p : ℝ) ^ (2 * k) * ((p : ℝ) ^ (2 * k))⁻¹) := by rw [h1, mul_one]
+        _ ≤ ((p : ℝ) ^ (2 * l))⁻¹ * ((p : ℝ) ^ (2 * l) * ((p : ℝ) ^ (2 * k))⁻¹) :=
+              mul_le_mul_of_nonneg_left
+                (mul_le_mul_of_nonneg_right h_pow_mono (le_of_lt hu_pos))
+                (le_of_lt hv_pos)
+        _ = (((p : ℝ) ^ (2 * l))⁻¹ * (p : ℝ) ^ (2 * l)) * ((p : ℝ) ^ (2 * k))⁻¹ := by ring
+        _ = ((p : ℝ) ^ (2 * k))⁻¹ := by rw [h2, one_mul]
+    have h_step1 := mul_le_mul_of_nonneg_left h_inv_anti h_x_div_nn
+    exact mul_le_mul_of_nonneg_right h_step1 h_one_sub_nn
+
+/-- Helper: unconditional unimodality `IsUnimodalChain (T + 1) (gaussianPrimeChain T p s m X)`. -/
+private theorem gaussianPrimeChain_unimodal_aux
+    (T : ℕ) {p s m : ℕ} (hp : p.Prime) (hs : 0 < s) (hm : 0 < m) {X : ℝ} (hX : 0 ≤ X) :
+    (∀ k : ℕ, 0 ≤ gaussianPrimeChain T p s m X k) ∧
+      (∀ k : ℕ, T + 1 ≤ k → gaussianPrimeChain T p s m X k = 0) ∧
+      IsUnimodalChain (T + 1) (gaussianPrimeChain T p s m X) := by
+  let a := gaussianPrimeChain T p s m X
+  have hsm_pos : 0 < s * m := Nat.mul_pos hs hm
+  have ha_nn : ∀ k : ℕ, 0 ≤ a k := by
+    intro k
+    dsimp [a, gaussianPrimeChain]
+    split_ifs with hle
+    · exact (gaussianTermPhi_nonneg_and_pos_aux (Nat.mul_pos hsm_pos (pow_pos hp.pos k)) hX).1
+    · exact le_refl 0
+  have ha_tail0 : ∀ k : ℕ, T + 1 ≤ k → a k = 0 := by
+    intro k hk
+    dsimp [a, gaussianPrimeChain]
+    have h_gt : ¬ (s * m * p ^ k ≤ T) := by
+      have hk_lt_pow : k < p ^ k := Nat.lt_pow_self hp.one_lt k
+      have hpow_le : p ^ k ≤ s * m * p ^ k := Nat.le_mul_of_pos_left (p ^ k) hsm_pos
+      omega
+    exact if_neg h_gt
+  refine ⟨ha_nn, ha_tail0, ?_⟩
+  rcases eq_or_lt_of_le hX with rfl | hX_pos
+  · refine ⟨0, by omega, ?_, ?_⟩
+    · intro i j _ _ _
+      have hz : ∀ n : ℕ, gaussianTermPhi n 0 = 0 := by
+        intro n
+        dsimp [gaussianTermPhi]
+        rw [Real.zero_rpow (by norm_num : (5 / 2 : ℝ) ≠ 0), zero_mul]
+      have hai : a i = 0 := by dsimp [a, gaussianPrimeChain]; split_ifs <;> simp [hz]
+      have haj : a j = 0 := by dsimp [a, gaussianPrimeChain]; split_ifs <;> simp [hz]
+      change a i ≤ a j
+      rw [hai, haj]
+    · intro i j _ _ _
+      have hz : ∀ n : ℕ, gaussianTermPhi n 0 = 0 := by
+        intro n
+        dsimp [gaussianTermPhi]
+        rw [Real.zero_rpow (by norm_num : (5 / 2 : ℝ) ≠ 0), zero_mul]
+      have hai : a i = 0 := by dsimp [a, gaussianPrimeChain]; split_ifs <;> simp [hz]
+      have haj : a j = 0 := by dsimp [a, gaussianPrimeChain]; split_ifs <;> simp [hz]
+      change a j ≤ a i
+      rw [hai, haj]
+  · obtain ⟨h_rat_id, h_rat_anti⟩ := gaussianPrimeChain_ratio_and_antitone_aux (T := T) hp hs hm X
+    have h_one_step : ∀ k : ℕ, a (k + 1) ≤ a k → a (k + 2) ≤ a (k + 1) := by
+      intro k hk_le
+      by_cases hk2_adm : s * m * p ^ (k + 2) ≤ T
+      · have hk1_adm : s * m * p ^ (k + 1) ≤ T := by
+          have h_pow : p ^ (k + 1) ≤ p ^ (k + 2) := Nat.pow_le_pow_right hp.pos (by omega)
+          exact le_trans (Nat.mul_le_mul_left (s * m) h_pow) hk2_adm
+        obtain ⟨hak_pos, h_div_k⟩ := h_rat_id k hX_pos hk1_adm
+        obtain ⟨hak1_pos, h_div_k1⟩ := h_rat_id (k + 1) hX_pos hk2_adm
+        have hrk_le1 : gaussianChainRatio p s m X k ≤ 1 := by
+          rw [← h_div_k]
+          exact (div_le_one hak_pos).mpr hk_le
+        have hrk1_le1 : gaussianChainRatio p s m X (k + 1) ≤ 1 :=
+          le_trans (h_rat_anti k (k + 1) (by omega)) hrk_le1
+        rw [← h_div_k1] at hrk1_le1
+        exact (div_le_one hak1_pos).mp hrk1_le1
+      · have hak2_0 : a (k + 2) = 0 := by simp [a, gaussianPrimeChain, hk2_adm]
+        rw [hak2_0]
+        exact ha_nn (k + 1)
+    have h_end : a (T + 1) ≤ a T := by
+      rw [ha_tail0 (T + 1) (le_refl _)]
+      exact ha_nn T
+    obtain ⟨kp, hkp_le, h_up, h_dn⟩ := exists_peak_of_one_step_descent_aux T a h_one_step h_end
+    refine ⟨kp, by omega, ?_, ?_⟩
+    · intro i j hij hjk h_unused
+      clear h_unused
+      change a i ≤ a j
+      obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_le hij
+      clear hij
+      revert hjk
+      induction' d with d ih
+      · intro _; exact le_refl _
+      · intro h_id1
+        rw [Nat.add_succ]
+        exact le_trans (ih (by omega)) (h_up (i + d) (by omega))
+    · intro i j hik hij h_unused
+      clear h_unused
+      change a j ≤ a i
+      obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_le hij
+      clear hij
+      induction' d with d ih
+      · exact le_refl _
+      · rw [Nat.add_succ]
+        exact le_trans (h_dn (i + d) (by omega)) ih
+
+/-- Helper: express `cofactorFiberF P T (s * p^k) X` through `gaussianPrimeChain T p s m X k`
+    for `s ∈ coprimeCutoffFinset (insert p P) T`. -/
+private theorem cofactorFiberF_spk_eq_sum_gaussianPrimeChain_aux
+    {P : Finset ℕ} {p : ℕ} (hp : p.Prime) (T : ℕ)
+    {s : ℕ} (hs : s ∈ coprimeCutoffFinset (insert p P) T) (k : ℕ) {X : ℝ} (hX : 0 ≤ X) :
+    (if s * p ^ k ≤ T then cofactorFiberF P T (s * p ^ k) X else 0) =
+      (liouvilleLambda s : ℝ) * (-1 : ℝ) ^ k *
+        ∑ m ∈ smoothCutoffFinset P (T / s),
+          (liouvilleLambda m : ℝ) * gaussianPrimeChain T p s m X k := by
+  have hs_mem := (Finset.mem_filter.mp hs).1
+  rw [Finset.mem_Icc] at hs_mem
+  have hs_pos : 0 < s := by omega
+  have hs_ne : s ≠ 0 := by omega
+  by_cases h_spk : s * p ^ k ≤ T
+  · rw [if_pos h_spk]
+    have h_spk_pos : 0 < s * p ^ k := Nat.mul_pos hs_pos (pow_pos hp.pos k)
+    have h_spk_ne : s * p ^ k ≠ 0 := Nat.pos_iff_ne_zero.mp h_spk_pos
+    rw [cofactorFiberF_eq_sum_gaussianTermPhi_aux P T h_spk_pos hX]
+    rw [Finset.mul_sum]
+    have h_sub : smoothCutoffFinset P (T / (s * p ^ k)) ⊆ smoothCutoffFinset P (T / s) := by
+      intro m hm
+      simp only [smoothCutoffFinset, Finset.mem_filter, Finset.mem_Icc] at hm ⊢
+      rcases hm with ⟨⟨hm1, hm_le⟩, hm_sm⟩
+      have h_div_le : T / (s * p ^ k) ≤ T / s := by
+        rw [← Nat.div_div_eq_div_mul]
+        exact Nat.div_le_self (T / s) (p ^ k)
+      exact ⟨⟨hm1, le_trans hm_le h_div_le⟩, hm_sm⟩
+    have h_zero_out :
+        ∀ m ∈ smoothCutoffFinset P (T / s),
+          m ∉ smoothCutoffFinset P (T / (s * p ^ k)) →
+            (liouvilleLambda s : ℝ) * (-1 : ℝ) ^ k *
+              ((liouvilleLambda m : ℝ) * gaussianPrimeChain T p s m X k) = 0 := by
+      intro m hm hnot
+      simp only [smoothCutoffFinset, Finset.mem_filter, Finset.mem_Icc] at hm hnot
+      have h_not_le_div : ¬ (m ≤ T / (s * p ^ k)) := fun hle => hnot ⟨⟨hm.1.1, hle⟩, hm.2⟩
+      have h_not_le_prod : ¬ (s * m * p ^ k ≤ T) := by
+        intro hprod
+        apply h_not_le_div
+        rw [Nat.le_div_iff_mul_le h_spk_pos]
+        linarith [show m * (s * p ^ k) = s * m * p ^ k by ring]
+      simp [gaussianPrimeChain, h_not_le_prod]
+    rw [← Finset.sum_subset h_sub h_zero_out]
+    apply Finset.sum_congr rfl
+    intro m hm
+    simp only [smoothCutoffFinset, Finset.mem_filter, Finset.mem_Icc] at hm
+    have hm_ne : m ≠ 0 := Nat.pos_iff_ne_zero.mp hm.1.1
+    have h_prod_le : s * m * p ^ k ≤ T := by
+      have h1 := (Nat.le_div_iff_mul_le h_spk_pos).mp hm.1.2
+      linarith [show m * (s * p ^ k) = s * m * p ^ k by ring]
+    have h_lam_factor :
+        (liouvilleLambda (m * (s * p ^ k)) : ℝ) =
+          (liouvilleLambda s : ℝ) * (-1 : ℝ) ^ k * (liouvilleLambda m : ℝ) := by
+      have hpk_ne : p ^ k ≠ 0 := pow_ne_zero k hp.ne_zero
+      rw [liouvilleLambda_mul_aux hm_ne h_spk_ne, liouvilleLambda_mul_aux hs_ne hpk_ne,
+          liouvilleLambda_prime_pow_aux hp k]
+      dsimp [liouvilleSignFromOmega]
+      push_cast
+      ring
+    have h_mul_eq : m * (s * p ^ k) = s * m * p ^ k := by ring
+    simp only [gaussianPrimeChain, h_prod_le, ↓reduceIte]
+    rw [h_lam_factor, h_mul_eq]
+    ring
+  · rw [if_neg h_spk]
+    symm
+    rw [Finset.mul_sum]
+    apply Finset.sum_eq_zero
+    intro m hm
+    simp only [smoothCutoffFinset, Finset.mem_filter, Finset.mem_Icc] at hm
+    have h_not_prod : ¬ (s * m * p ^ k ≤ T) := by
+      intro hprod
+      have h_le : s * p ^ k ≤ s * m * p ^ k := by
+        have h_sm : s ≤ s * m := Nat.le_mul_of_pos_right s hm.1.1
+        exact Nat.mul_le_mul_right (p ^ k) h_sm
+      exact h_spk (le_trans h_le hprod)
+    simp [gaussianPrimeChain, h_not_prod]
+
+/-- **Theorem 19 (`TASK-TC-056` §4, Actual Gaussian Prime-Chain Ratio, Unconditional Unimodality, and Singleton-Prime Contraction)**:
+    For every prime `p`, positive integers `s, m > 0`, cutoff `T : ℕ`, and `X : ℝ` with `0 ≤ X`:
+    1. Exact consecutive Gaussian chain ratio (`0 < X`, `s * m * p ^ (k + 1) ≤ T`):
+       `0 < gaussianPrimeChain T p s m X k` and
+       `gaussianPrimeChain T p s m X (k + 1) / gaussianPrimeChain T p s m X k = gaussianChainRatio p s m X k`,
+       with `k ↦ gaussianChainRatio p s m X k` antitone (`k ≤ l → r(l) ≤ r(k)`);
+    2. Unconditional unimodality and chain contraction of the concrete Gaussian chain (NOT assumed as a hypothesis):
+       `IsUnimodalChain (T + 1) (gaussianPrimeChain T p s m X)`,
+       `|gaussianAlternatingChainSum T p s m X| ≤ chainMaxUpTo (T + 1) (gaussianPrimeChain T p s m X)`, and
+       `(gaussianAlternatingChainSum T p s m X) ^ 2 ≤ ∑ k ∈ Finset.range (T + 1), (gaussianPrimeChain T p s m X k) ^ 2`;
+    3. Pointwise singleton-prime contraction:
+       `pointwiseGroupedEnergyV {p} T X ≤ pointwiseDiagonalD T X`;
+    4. Quantitative strict singleton-prime contraction when `0 < X` and `p ≤ T`:
+       `min ((gaussianTermPhi 1 X) ^ 2) ((gaussianTermPhi p X) ^ 2) ≤ pointwiseDiagonalD T X - pointwiseGroupedEnergyV {p} T X`
+       and `pointwiseGroupedEnergyV {p} T X < pointwiseDiagonalD T X`. -/
+theorem gaussian_prime_chain_unimodal_and_singleton_contraction_tc056
+    {p s m : ℕ} (hp : p.Prime) (hs : 0 < s) (hm : 0 < m) (T : ℕ) {X : ℝ} (hX : 0 ≤ X) :
+    ((∀ k : ℕ, 0 < X → s * m * p ^ (k + 1) ≤ T →
+        0 < gaussianPrimeChain T p s m X k ∧
+          gaussianPrimeChain T p s m X (k + 1) / gaussianPrimeChain T p s m X k =
+            gaussianChainRatio p s m X k) ∧
+      (∀ k l : ℕ, k ≤ l → gaussianChainRatio p s m X l ≤ gaussianChainRatio p s m X k)) ∧
+    (IsUnimodalChain (T + 1) (gaussianPrimeChain T p s m X) ∧
+      |gaussianAlternatingChainSum T p s m X| ≤
+        chainMaxUpTo (T + 1) (gaussianPrimeChain T p s m X) ∧
+      (gaussianAlternatingChainSum T p s m X) ^ 2 ≤
+        ∑ k ∈ Finset.range (T + 1), (gaussianPrimeChain T p s m X k) ^ 2) ∧
+    (pointwiseGroupedEnergyV {p} T X ≤ pointwiseDiagonalD T X) ∧
+    (0 < X → p ≤ T →
+      min ((gaussianTermPhi 1 X) ^ 2) ((gaussianTermPhi p X) ^ 2) ≤
+        pointwiseDiagonalD T X - pointwiseGroupedEnergyV {p} T X ∧
+        pointwiseGroupedEnergyV {p} T X < pointwiseDiagonalD T X) := by
+  have h_part1 := gaussianPrimeChain_ratio_and_antitone_aux (T := T) hp hs hm X
+  obtain ⟨ha_nn, _, ha_uni⟩ := gaussianPrimeChain_unimodal_aux T hp hs hm hX
+  obtain ⟨h_abs_max, h_sq_chain, _, _⟩ :=
+    finite_alternating_unimodal_chain_contraction_tc056 (T + 1) (gaussianPrimeChain T p s m X)
+      (fun k _ => ha_nn k) ha_uni
+  have h_empty_prime : ∀ q ∈ (∅ : Finset ℕ), q.Prime := fun _ hq => False.elim (Finset.not_mem_empty _ hq)
+  have hp_not_empty : p ∉ (∅ : Finset ℕ) := Finset.not_mem_empty p
+  have h_Vp_eq :
+      pointwiseGroupedEnergyV {p} T X =
+        ∑ r ∈ coprimeCutoffFinset {p} T, (gaussianAlternatingChainSum T p r 1 X) ^ 2 := by
+    obtain ⟨_, h_fib_adj, _, _⟩ :=
+      finite_prime_adjoining_fiber_and_pointwise_telescoping_tc056 h_empty_prime hp hp_not_empty T hX
+    dsimp [pointwiseGroupedEnergyV]
+    apply Finset.sum_congr rfl
+    intro r hr
+    have hr_ins : r ∈ coprimeCutoffFinset (insert p ∅) T := hr
+    have h_fib_r :
+        cofactorFiberF {p} T r X =
+          ∑ k ∈ admissiblePrimeExponents T p r, cofactorFiberF ∅ T (r * p ^ k) X :=
+      (h_fib_adj r hr_ins).2
+    rw [h_fib_r]
+    have h_sum_adm :
+        ∑ k ∈ admissiblePrimeExponents T p r, cofactorFiberF ∅ T (r * p ^ k) X =
+          (liouvilleLambda r : ℝ) * gaussianAlternatingChainSum T p r 1 X := by
+      dsimp [admissiblePrimeExponents, gaussianAlternatingChainSum]
+      rw [Finset.sum_filter, Finset.mul_sum]
+      apply Finset.sum_congr rfl
+      intro k _
+      have h_k := cofactorFiberF_spk_eq_sum_gaussianPrimeChain_aux (P := ∅) hp T hr_ins k hX
+      rw [h_k]
+      have hr_mem := (Finset.mem_filter.mp hr).1
+      rw [Finset.mem_Icc] at hr_mem
+      have hdiv_ge1 : 1 ≤ T / r := (Nat.le_div_iff_mul_le (by omega)).mpr (by omega)
+      have hs_empty : smoothCutoffFinset ∅ (T / r) = {1} := by
+        ext u
+        simp only [smoothCutoffFinset, Finset.mem_filter, Finset.mem_Icc, isPSmooth_empty_iff_aux,
+          Finset.mem_singleton]
+        exact ⟨fun h => h.2, fun h => ⟨⟨by omega, by omega⟩, h⟩⟩
+      have hl1 : (liouvilleLambda 1 : ℝ) = 1 := by simp [liouvilleLambda, natOmega, liouvilleSignFromOmega]
+      rw [hs_empty, Finset.sum_singleton, hl1, one_mul]
+      ring
+    rw [h_sum_adm]
+    have hr_mem := (Finset.mem_filter.mp hr).1
+    rw [Finset.mem_Icc] at hr_mem
+    have hr_ne : r ≠ 0 := by omega
+    have h_lam_sq : ((liouvilleLambda r : ℝ)) ^ 2 = 1 := by
+      have h_int := liouvilleLambda_sq_aux hr_ne
+      have h_cast : (liouvilleLambda r : ℝ) * (liouvilleLambda r : ℝ) = 1 := by exact_mod_cast h_int
+      rw [sq, h_cast]
+    calc
+      ((liouvilleLambda r : ℝ) * gaussianAlternatingChainSum T p r 1 X) ^ 2
+        = ((liouvilleLambda r : ℝ)) ^ 2 * (gaussianAlternatingChainSum T p r 1 X) ^ 2 := by ring
+      _ = (gaussianAlternatingChainSum T p r 1 X) ^ 2 := by rw [h_lam_sq, one_mul]
+  have h_DT_eq :
+      pointwiseDiagonalD T X =
+        ∑ r ∈ coprimeCutoffFinset {p} T,
+          ∑ k ∈ Finset.range (T + 1), (gaussianPrimeChain T p r 1 X k) ^ 2 := by
+    obtain ⟨⟨h_end_empty, _⟩, _, _, _⟩ :=
+      finite_prime_adjoining_fiber_and_pointwise_telescoping_tc056 h_empty_prime hp hp_not_empty T hX
+    rw [← h_end_empty]
+    dsimp [pointwiseGroupedEnergyV]
+    rw [sum_coprimeCutoffFinset_insert_partition_aux h_empty_prime hp hp_not_empty T
+          (fun n => (cofactorFiberF ∅ T n X) ^ 2)]
+    apply Finset.sum_congr rfl
+    intro r hr
+    dsimp [admissiblePrimeExponents]
+    rw [Finset.sum_filter]
+    apply Finset.sum_congr rfl
+    intro k _
+    by_cases h_rpk : r * p ^ k ≤ T
+    · rw [if_pos h_rpk]
+      have hr_mem := (Finset.mem_filter.mp hr).1
+      rw [Finset.mem_Icc] at hr_mem
+      have h_rpk_pos : 0 < r * p ^ k := Nat.mul_pos (by omega) (pow_pos hp.pos k)
+      have h_rpk_ne : r * p ^ k ≠ 0 := Nat.pos_iff_ne_zero.mp h_rpk_pos
+      rw [cofactorFiberF_eq_sum_gaussianTermPhi_aux ∅ T h_rpk_pos hX]
+      have hdiv_ge1 : 1 ≤ T / (r * p ^ k) := (Nat.le_div_iff_mul_le h_rpk_pos).mpr (by simpa using h_rpk)
+      have hs_empty : smoothCutoffFinset ∅ (T / (r * p ^ k)) = {1} := by
+        ext u
+        simp only [smoothCutoffFinset, Finset.mem_filter, Finset.mem_Icc, isPSmooth_empty_iff_aux,
+          Finset.mem_singleton]
+        exact ⟨fun h => h.2, fun h => ⟨⟨by omega, by omega⟩, h⟩⟩
+      rw [hs_empty, Finset.sum_singleton, one_mul]
+      have h_lam_sq : ((liouvilleLambda (r * p ^ k) : ℝ)) ^ 2 = 1 := by
+        have h_int := liouvilleLambda_sq_aux h_rpk_ne
+        have h_cast : (liouvilleLambda (r * p ^ k) : ℝ) * (liouvilleLambda (r * p ^ k) : ℝ) = 1 := by
+          exact_mod_cast h_int
+        rw [sq, h_cast]
+      have h_gchain : gaussianPrimeChain T p r 1 X k = gaussianTermPhi (r * p ^ k) X := by
+        dsimp [gaussianPrimeChain]
+        have h_cond : r * 1 * p ^ k ≤ T := by simpa using h_rpk
+        rw [if_pos h_cond]
+        simp
+      rw [h_gchain]
+      calc
+        ((liouvilleLambda (r * p ^ k) : ℝ) * gaussianTermPhi (r * p ^ k) X) ^ 2
+          = ((liouvilleLambda (r * p ^ k) : ℝ)) ^ 2 * (gaussianTermPhi (r * p ^ k) X) ^ 2 := by ring
+        _ = (gaussianTermPhi (r * p ^ k) X) ^ 2 := by rw [h_lam_sq, one_mul]
+    · rw [if_neg h_rpk]
+      have h_gchain0 : gaussianPrimeChain T p r 1 X k = 0 := by
+        dsimp [gaussianPrimeChain]
+        have h_cond : ¬ (r * 1 * p ^ k ≤ T) := by simpa using h_rpk
+        rw [if_neg h_cond]
+      rw [h_gchain0]
+      ring
+  have h_r_nonneg :
+      ∀ r ∈ coprimeCutoffFinset {p} T,
+        0 ≤ (∑ k ∈ Finset.range (T + 1), (gaussianPrimeChain T p r 1 X k) ^ 2) -
+              (gaussianAlternatingChainSum T p r 1 X) ^ 2 := by
+    intro r hr
+    have hr_mem := (Finset.mem_filter.mp hr).1
+    rw [Finset.mem_Icc] at hr_mem
+    obtain ⟨hr_nn, _, hr_uni⟩ := gaussianPrimeChain_unimodal_aux T hp (by omega : 0 < r) (by omega : 0 < 1) hX
+    obtain ⟨_, hr_sq, _, _⟩ :=
+      finite_alternating_unimodal_chain_contraction_tc056 (T + 1) (gaussianPrimeChain T p r 1 X)
+        (fun k _ => hr_nn k) hr_uni
+    dsimp [gaussianAlternatingChainSum]
+    linarith
+  have h_part3 : pointwiseGroupedEnergyV {p} T X ≤ pointwiseDiagonalD T X := by
+    have h_diff_nn : 0 ≤ pointwiseDiagonalD T X - pointwiseGroupedEnergyV {p} T X := by
+      rw [h_DT_eq, h_Vp_eq, ← Finset.sum_sub_distrib]
+      exact Finset.sum_nonneg h_r_nonneg
+    linarith
+  refine ⟨h_part1, ⟨ha_uni, h_abs_max, h_sq_chain⟩, h_part3, ?_⟩
+  intro hX_pos hp_le_T
+  have hp2 := hp.two_le
+  have h1_mem : (1 : ℕ) ∈ coprimeCutoffFinset {p} T := by
+    simp only [coprimeCutoffFinset, Finset.mem_filter, Finset.mem_Icc]
+    exact ⟨⟨by omega, by omega⟩, Nat.coprime_one_left _⟩
+  obtain ⟨h1_nn, _, h1_uni⟩ := gaussianPrimeChain_unimodal_aux T hp (by omega : 0 < 1) (by omega : 0 < 1) hX
+  obtain ⟨_, _, h1_gap, _⟩ :=
+    finite_alternating_unimodal_chain_contraction_tc056 (T + 1) (gaussianPrimeChain T p 1 1 X)
+      (fun k _ => h1_nn k) h1_uni
+  have hT1_ge2 : 2 ≤ T + 1 := by omega
+  have h_gap_1 := h1_gap hT1_ge2
+  have ha0_eq : gaussianPrimeChain T p 1 1 X 0 = gaussianTermPhi 1 X := by
+    unfold gaussianPrimeChain
+    have h_le : 1 * 1 * p ^ 0 ≤ T := by simp; omega
+    rw [if_pos h_le]
+    simp
+  have ha1_eq : gaussianPrimeChain T p 1 1 X 1 = gaussianTermPhi p X := by
+    unfold gaussianPrimeChain
+    have h_le : 1 * 1 * p ^ 1 ≤ T := by simpa using hp_le_T
+    rw [if_pos h_le]
+    simp
+  rw [ha0_eq, ha1_eq] at h_gap_1
+  have h_single_le_diff :
+      ((∑ k ∈ Finset.range (T + 1), (gaussianPrimeChain T p 1 1 X k) ^ 2) -
+          (gaussianAlternatingChainSum T p 1 1 X) ^ 2) ≤
+        pointwiseDiagonalD T X - pointwiseGroupedEnergyV {p} T X := by
+    rw [h_DT_eq, h_Vp_eq, ← Finset.sum_sub_distrib]
+    exact Finset.single_le_sum h_r_nonneg h1_mem
+  have h_min_le_diff :
+      min ((gaussianTermPhi 1 X) ^ 2) ((gaussianTermPhi p X) ^ 2) ≤
+        pointwiseDiagonalD T X - pointwiseGroupedEnergyV {p} T X :=
+    le_trans h_gap_1 h_single_le_diff
+  have h_phi1_pos : 0 < (gaussianTermPhi 1 X) ^ 2 :=
+    sq_pos_of_pos ((gaussianTermPhi_nonneg_and_pos_aux (by omega) hX).2 hX_pos)
+  have h_phip_pos : 0 < (gaussianTermPhi p X) ^ 2 :=
+    sq_pos_of_pos ((gaussianTermPhi_nonneg_and_pos_aux hp.pos hX).2 hX_pos)
+  have h_min_pos : 0 < min ((gaussianTermPhi 1 X) ^ 2) ((gaussianTermPhi p X) ^ 2) :=
+    lt_min h_phi1_pos h_phip_pos
+  exact ⟨h_min_le_diff, by linarith⟩
+
+/-- Helper: diagonal + ordered off-diagonal expansion of `(∑ m ∈ S, (liouvilleLambda m : ℝ) * f m)^2`
+    when every `m ∈ S` satisfies `m ≠ 0` (discharging `λ(m)^2 = 1`). -/
+private theorem sq_sum_liouville_weighted_split_aux
+    (S : Finset ℕ) (hS_pos : ∀ m ∈ S, m ≠ 0) (f : ℕ → ℝ) :
+    (∑ m ∈ S, (liouvilleLambda m : ℝ) * f m) ^ 2 =
+      (∑ m ∈ S, (f m) ^ 2) +
+        ∑ m ∈ S, ∑ n ∈ S.erase m,
+          (liouvilleLambda m : ℝ) * (liouvilleLambda n : ℝ) * (f m * f n) := by
+  rw [sq, Finset.sum_mul_sum]
+  have h_split :
+      (∑ m ∈ S, ∑ n ∈ S, ((liouvilleLambda m : ℝ) * f m) * ((liouvilleLambda n : ℝ) * f n)) =
+        (∑ m ∈ S, ((liouvilleLambda m : ℝ) * f m) * ((liouvilleLambda m : ℝ) * f m)) +
+          ∑ m ∈ S, ∑ n ∈ S.erase m,
+            ((liouvilleLambda m : ℝ) * f m) * ((liouvilleLambda n : ℝ) * f n) := by
+    rw [← Finset.sum_add_distrib]
+    apply Finset.sum_congr rfl
+    intro m hm
+    exact (Finset.add_sum_erase S
+      (fun n => ((liouvilleLambda m : ℝ) * f m) * ((liouvilleLambda n : ℝ) * f n)) hm).symm
+  rw [h_split]
+  congr 1
+  · apply Finset.sum_congr rfl
+    intro m hm
+    have h_int := liouvilleLambda_sq_aux (hS_pos m hm)
+    have h_cast : (liouvilleLambda m : ℝ) * (liouvilleLambda m : ℝ) = 1 := by exact_mod_cast h_int
+    calc
+      ((liouvilleLambda m : ℝ) * f m) * ((liouvilleLambda m : ℝ) * f m)
+        = ((liouvilleLambda m : ℝ) * (liouvilleLambda m : ℝ)) * (f m) ^ 2 := by ring
+      _ = (f m) ^ 2 := by rw [h_cast, one_mul]
+  · apply Finset.sum_congr rfl
+    intro m _
+    apply Finset.sum_congr rfl
+    intro n _
+    ring
+
+/-- Helper: exact finite alternating shift expansion for `D_T - V_{ {p} }` (`TASK-TC-056` §6). -/
+private theorem singleton_contraction_alternating_shift_aux
+    {p : ℕ} (hp : p.Prime) (T : ℕ) {X : ℝ} (hX : 0 ≤ X) :
+    pointwiseDiagonalD T X - pointwiseGroupedEnergyV {p} T X =
+      2 * ∑ h ∈ (Finset.Icc 1 T).filter (fun h => p ^ h ≤ T),
+        (-1 : ℝ) ^ (h + 1) *
+          ∑ n ∈ Finset.Icc 1 (T / p ^ h),
+            gaussianTermPhi n X * gaussianTermPhi (n * p ^ h) X := by
+  have h_empty_prime : ∀ q ∈ (∅ : Finset ℕ), q.Prime := fun _ hq => False.elim (Finset.not_mem_empty _ hq)
+  have hp_not_empty : p ∉ (∅ : Finset ℕ) := Finset.not_mem_empty p
+  obtain ⟨⟨h_end_empty, _⟩, _, h_delta_e, _⟩ :=
+    finite_prime_adjoining_fiber_and_pointwise_telescoping_tc056 h_empty_prime hp hp_not_empty T hX
+  have h_diff_eq_neg_delta :
+      pointwiseDiagonalD T X - pointwiseGroupedEnergyV {p} T X = -pointwiseDelta ∅ p T X := by
+    dsimp [pointwiseDelta]
+    rw [h_end_empty]
+    ring
+  rw [h_diff_eq_neg_delta, h_delta_e]
+  have h_ins_e : insert p (∅ : Finset ℕ) = {p} := rfl
+  rw [h_ins_e]
+  have h_neg_in :
+      -(2 * ∑ s ∈ coprimeCutoffFinset {p} T,
+          ∑ k ∈ admissiblePrimeExponents T p s,
+            ∑ l ∈ (admissiblePrimeExponents T p s).filter (fun l => k < l),
+              cofactorFiberF ∅ T (s * p ^ k) X * cofactorFiberF ∅ T (s * p ^ l) X) =
+        2 * ∑ s ∈ coprimeCutoffFinset {p} T,
+          ∑ k ∈ admissiblePrimeExponents T p s,
+            ∑ l ∈ (admissiblePrimeExponents T p s).filter (fun l => k < l),
+              (-(cofactorFiberF ∅ T (s * p ^ k) X * cofactorFiberF ∅ T (s * p ^ l) X)) := by
+    have h_two_neg : ∀ x : ℝ, -(2 * x) = 2 * (-x) := fun _ => by ring
+    rw [h_two_neg, ← Finset.sum_neg_distrib]
+    apply congr_arg (2 * ·)
+    apply Finset.sum_congr rfl
+    intro s _
+    rw [← Finset.sum_neg_distrib]
+    apply Finset.sum_congr rfl
+    intro k _
+    rw [← Finset.sum_neg_distrib]
+  rw [h_neg_in]
+  apply congr_arg (2 * ·)
+  have h_rhs_pull :
+      ∑ h ∈ (Finset.Icc 1 T).filter (fun h => p ^ h ≤ T),
+          (-1 : ℝ) ^ (h + 1) *
+            ∑ n ∈ Finset.Icc 1 (T / p ^ h),
+              gaussianTermPhi n X * gaussianTermPhi (n * p ^ h) X =
+        ∑ h ∈ (Finset.Icc 1 T).filter (fun h => p ^ h ≤ T),
+          ∑ n ∈ Finset.Icc 1 (T / p ^ h),
+            (-1 : ℝ) ^ (h + 1) * (gaussianTermPhi n X * gaussianTermPhi (n * p ^ h) X) := by
+    apply Finset.sum_congr rfl
+    intro h _
+    exact Finset.mul_sum _ _ _
+  rw [h_rhs_pull]
+  have h_lhs_sig :
+      (∑ s ∈ coprimeCutoffFinset {p} T,
+        ∑ k ∈ admissiblePrimeExponents T p s,
+          ∑ l ∈ (admissiblePrimeExponents T p s).filter (fun l => k < l),
+            (-(cofactorFiberF ∅ T (s * p ^ k) X * cofactorFiberF ∅ T (s * p ^ l) X))) =
+        ∑ skl ∈ ((coprimeCutoffFinset {p} T).sigma (fun s => admissiblePrimeExponents T p s)).sigma
+            (fun sk => (admissiblePrimeExponents T p sk.1).filter (fun l => sk.2 < l)),
+          -(cofactorFiberF ∅ T (skl.1.1 * p ^ skl.1.2) X * cofactorFiberF ∅ T (skl.1.1 * p ^ skl.2) X) := by
+    rw [Finset.sum_sigma', Finset.sum_sigma']
+  have h_rhs_sig :
+      (∑ h ∈ (Finset.Icc 1 T).filter (fun h => p ^ h ≤ T),
+        ∑ n ∈ Finset.Icc 1 (T / p ^ h),
+          (-1 : ℝ) ^ (h + 1) * (gaussianTermPhi n X * gaussianTermPhi (n * p ^ h) X)) =
+        ∑ hn ∈ ((Finset.Icc 1 T).filter (fun h => p ^ h ≤ T)).sigma (fun h => Finset.Icc 1 (T / p ^ h)),
+          (-1 : ℝ) ^ (hn.1 + 1) * (gaussianTermPhi hn.2 X * gaussianTermPhi (hn.2 * p ^ hn.1) X) := by
+    rw [Finset.sum_sigma']
+  rw [h_lhs_sig, h_rhs_sig]
+  have hp_set : ∀ q ∈ ({p} : Finset ℕ), q.Prime := by
+    intro q hq
+    rw [Finset.mem_singleton] at hq
+    rwa [hq]
+  apply Finset.sum_bij (fun skl _ => ⟨skl.2 - skl.1.2, skl.1.1 * p ^ skl.1.2⟩)
+  · rintro ⟨⟨s, k⟩, l⟩ hskl
+    simp only [Finset.mem_sigma, coprimeCutoffFinset, Finset.mem_filter, Finset.mem_Icc] at hskl ⊢
+    rcases hskl with ⟨⟨⟨⟨hs1, _⟩, _⟩, _⟩, ⟨hl_adm, hkl_lt⟩⟩
+    have hsl_le : s * p ^ l ≤ T := (mem_admissiblePrimeExponents_iff_aux hp hs1 T l).mp hl_adm
+    have h_l_eq : l = k + (l - k) := by omega
+    have h_prod_eq : (s * p ^ k) * p ^ (l - k) = s * p ^ l := by
+      conv_rhs => rw [h_l_eq]
+      rw [pow_add]
+      ring
+    have h_ph_le : p ^ (l - k) ≤ T := by
+      have h1 : p ^ (l - k) ≤ (s * p ^ k) * p ^ (l - k) :=
+        Nat.le_mul_of_pos_left _ (Nat.mul_pos (by omega) (pow_pos hp.pos k))
+      exact le_trans h1 (h_prod_eq.symm ▸ hsl_le)
+    have h_h_lt_ph : l - k < p ^ (l - k) := Nat.lt_pow_self hp.one_lt (l - k)
+    have hn_ge1 : 1 ≤ s * p ^ k := Nat.mul_pos (by omega) (pow_pos hp.pos k)
+    have hn_le_div : s * p ^ k ≤ T / p ^ (l - k) :=
+      (Nat.le_div_iff_mul_le (pow_pos hp.pos (l - k))).mpr (h_prod_eq.symm ▸ hsl_le)
+    exact ⟨⟨⟨by omega, by omega⟩, h_ph_le⟩, ⟨hn_ge1, hn_le_div⟩⟩
+  · rintro ⟨⟨s1, k1⟩, l1⟩ h1 ⟨⟨s2, k2⟩, l2⟩ h2 h_eq
+    simp only [Finset.mem_sigma, coprimeCutoffFinset, Finset.mem_filter, Finset.mem_Icc] at h1 h2
+    rcases h1 with ⟨⟨⟨⟨hs1_ge, _⟩, hs1_cop⟩, _⟩, ⟨_, hkl1⟩⟩
+    rcases h2 with ⟨⟨⟨⟨_, _⟩, hs2_cop⟩, _⟩, ⟨_, hkl2⟩⟩
+    have hh_eq : l1 - k1 = l2 - k2 := (Sigma.mk.inj_iff.mp h_eq).1
+    have hn_eq : s1 * p ^ k1 = s2 * p ^ k2 := eq_of_heq (Sigma.mk.inj_iff.mp h_eq).2
+    have hpk1_sm : isPSmooth {p} (p ^ k1) := by
+      refine ⟨pow_pos hp.pos k1, ?_⟩
+      intro q hq hdvd
+      have hqp : q = p := (Nat.dvd_prime hp).mp (hq.dvd_of_dvd_pow hdvd) |>.resolve_left hq.ne_one
+      exact Finset.mem_singleton.mpr hqp
+    have hpk2_sm : isPSmooth {p} (p ^ k2) := by
+      refine ⟨pow_pos hp.pos k2, ?_⟩
+      intro q hq hdvd
+      have hqp : q = p := (Nat.dvd_prime hp).mp (hq.dvd_of_dvd_pow hdvd) |>.resolve_left hq.ne_one
+      exact Finset.mem_singleton.mpr hqp
+    have h_pos : 0 < p ^ k1 * s1 := Nat.mul_pos (pow_pos hp.pos k1) (by omega)
+    obtain ⟨_, h_uniq, _⟩ := smooth_coprime_positive_factorization_exists_unique_nat hp_set h_pos
+    obtain ⟨h_sm1, h_cp1⟩ := h_uniq (p ^ k1) s1 rfl hpk1_sm hs1_cop
+    have h_comm : p ^ k2 * s2 = p ^ k1 * s1 := by linarith [mul_comm s1 (p ^ k1), mul_comm s2 (p ^ k2)]
+    obtain ⟨h_sm2, h_cp2⟩ := h_uniq (p ^ k2) s2 h_comm hpk2_sm hs2_cop
+    have hs_eq : s1 = s2 := h_cp1.trans h_cp2.symm
+    have hk_eq : k1 = k2 := Nat.pow_right_injective hp.two_le (h_sm1.trans h_sm2.symm)
+    have hl_eq : l1 = l2 := by omega
+    subst hs_eq; subst hk_eq; subst hl_eq
+    rfl
+  · rintro ⟨h, n⟩ hhn
+    simp only [Finset.mem_sigma, Finset.mem_filter, Finset.mem_Icc] at hhn
+    rcases hhn with ⟨⟨⟨hh1, _⟩, _⟩, ⟨hn1, hn_div⟩⟩
+    let k := n.factorization p
+    let s := pCoprimePart {p} n
+    have hm_eq_pk : pSmoothPart {p} n = p ^ k := pSmoothPart_singleton_eq_pow_aux hp (by omega)
+    obtain ⟨⟨h_mul_n, _, hs_cop_p, hs_pos⟩, _, _⟩ :=
+      smooth_coprime_positive_factorization_exists_unique_nat hp_set (n := n) (by omega)
+    rw [hm_eq_pk] at h_mul_n
+    have hs_mul_pk : s * p ^ k = n := by rw [mul_comm]; exact h_mul_n
+    have hnph_le : n * p ^ h ≤ T := (Nat.le_div_iff_mul_le (pow_pos hp.pos h)).mp hn_div
+    have hskh_le : s * p ^ (k + h) ≤ T := by
+      have h_eq : s * p ^ (k + h) = n * p ^ h := by rw [pow_add, ← mul_assoc, hs_mul_pk]
+      exact h_eq.symm ▸ hnph_le
+    have hsk_le : s * p ^ k ≤ T := by
+      rw [hs_mul_pk]
+      exact le_trans (Nat.le_mul_of_pos_right n (pow_pos hp.pos h)) hnph_le
+    have hs_le_T : s ≤ T := by
+      have hs_le_n : s ≤ n := by rw [← hs_mul_pk]; exact Nat.le_mul_of_pos_right s (pow_pos hp.pos k)
+      exact le_trans hs_le_n (hs_mul_pk ▸ hsk_le)
+    refine ⟨⟨⟨s, k⟩, k + h⟩, ?_, ?_⟩
+    · simp only [Finset.mem_sigma, coprimeCutoffFinset, Finset.mem_filter, Finset.mem_Icc]
+      refine ⟨⟨⟨⟨hs_pos, hs_le_T⟩, hs_cop_p⟩, ?_⟩, ⟨?_, by omega⟩⟩
+      · exact (mem_admissiblePrimeExponents_iff_aux hp hs_pos T k).mpr hsk_le
+      · exact (mem_admissiblePrimeExponents_iff_aux hp hs_pos T (k + h)).mpr hskh_le
+    · exact Sigma.ext (Nat.add_sub_cancel_left k h) (heq_of_eq hs_mul_pk)
+  · rintro ⟨⟨s, k⟩, l⟩ hskl
+    simp only [Finset.mem_sigma, coprimeCutoffFinset, Finset.mem_filter, Finset.mem_Icc] at hskl
+    rcases hskl with ⟨⟨⟨⟨hs1, _⟩, _⟩, hk_adm⟩, ⟨hl_adm, hkl_lt⟩⟩
+    have hsk_le : s * p ^ k ≤ T := (mem_admissiblePrimeExponents_iff_aux hp hs1 T k).mp hk_adm
+    have hsl_le : s * p ^ l ≤ T := (mem_admissiblePrimeExponents_iff_aux hp hs1 T l).mp hl_adm
+    have hsk_pos : 0 < s * p ^ k := Nat.mul_pos (by omega) (pow_pos hp.pos k)
+    have hsl_pos : 0 < s * p ^ l := Nat.mul_pos (by omega) (pow_pos hp.pos l)
+    have hf_empty : ∀ {r : ℕ}, 0 < r → r ≤ T →
+        cofactorFiberF ∅ T r X = (liouvilleLambda r : ℝ) * gaussianTermPhi r X := by
+      intro r hr_pos hr_le
+      rw [cofactorFiberF_eq_sum_gaussianTermPhi_aux ∅ T hr_pos hX]
+      have hdiv_ge1 : 1 ≤ T / r := (Nat.le_div_iff_mul_le hr_pos).mpr (by omega)
+      have hs_empty : smoothCutoffFinset ∅ (T / r) = {1} := by
+        ext u
+        simp only [smoothCutoffFinset, Finset.mem_filter, Finset.mem_Icc, isPSmooth_empty_iff_aux,
+          Finset.mem_singleton]
+        exact ⟨fun h => h.2, fun h => ⟨⟨by omega, by omega⟩, h⟩⟩
+      rw [hs_empty, Finset.sum_singleton, one_mul]
+    rw [hf_empty hsk_pos hsk_le, hf_empty hsl_pos hsl_le]
+    have h_l_eq : s * p ^ l = (s * p ^ k) * p ^ (l - k) := by
+      have hl_add : l = k + (l - k) := by omega
+      conv_lhs => rw [hl_add]
+      rw [pow_add]
+      ring
+    rw [h_l_eq]
+    have hsk_ne : s * p ^ k ≠ 0 := Nat.pos_iff_ne_zero.mp hsk_pos
+    have hph_ne : p ^ (l - k) ≠ 0 := pow_ne_zero _ hp.ne_zero
+    have h_lam_prod :
+        (liouvilleLambda (s * p ^ k) : ℝ) * (liouvilleLambda (s * p ^ k * p ^ (l - k)) : ℝ) =
+          (-1 : ℝ) ^ (l - k) := by
+      rw [liouvilleLambda_mul_aux hsk_ne hph_ne, liouvilleLambda_prime_pow_aux hp (l - k)]
+      have h_int := liouvilleLambda_sq_aux hsk_ne
+      have h_cast : (liouvilleLambda (s * p ^ k) : ℝ) * (liouvilleLambda (s * p ^ k) : ℝ) = 1 := by
+        exact_mod_cast h_int
+      dsimp [liouvilleSignFromOmega]
+      push_cast
+      calc
+        (liouvilleLambda (s * p ^ k) : ℝ) * ((liouvilleLambda (s * p ^ k) : ℝ) * (-1 : ℝ) ^ (l - k))
+          = ((liouvilleLambda (s * p ^ k) : ℝ) * (liouvilleLambda (s * p ^ k) : ℝ)) * (-1 : ℝ) ^ (l - k) := by ring
+        _ = (-1 : ℝ) ^ (l - k) := by rw [h_cast, one_mul]
+    have h_lhs_rearr :
+        -(((liouvilleLambda (s * p ^ k) : ℝ) * gaussianTermPhi (s * p ^ k) X) *
+            ((liouvilleLambda (s * p ^ k * p ^ (l - k)) : ℝ) *
+              gaussianTermPhi (s * p ^ k * p ^ (l - k)) X)) =
+          -(((liouvilleLambda (s * p ^ k) : ℝ) * (liouvilleLambda (s * p ^ k * p ^ (l - k)) : ℝ)) *
+              (gaussianTermPhi (s * p ^ k) X * gaussianTermPhi (s * p ^ k * p ^ (l - k)) X)) := by ring
+    rw [h_lhs_rearr, h_lam_prod, pow_succ]
+    ring
+
+/-- **Theorem 20 (`TASK-TC-056` §5 & §6, Mixed-Interaction Decomposition, `P`-Independence of `C_{P,p}`, and Exact Alternating Shift Formula for `C_p`)**:
+    For every finite set of primes `P : Finset ℕ` (`∀ q ∈ P, q.Prime`), prime `p ∉ P`, cutoff `T : ℕ`,
+    and `X : ℝ` with `0 ≤ X`:
+    1. Nonnegativity of contraction and empty-`P` mixed vanishing:
+       `0 ≤ pointwiseContractionC P p T X` and `pointwiseMixedM ∅ p T X = 0`;
+    2. Exact decomposition `δ_{P,p}(X; T) = m_{P,p}(X; T) - c_{P,p}(X; T)` (with `λ(s)^2 = 1` cancelled and
+       ordered `m ≠ n` retaining `λ(m) λ(n)` without an extra factor of `2`):
+       `pointwiseDelta P p T X = pointwiseMixedM P p T X - pointwiseContractionC P p T X`;
+    3. Equivalence of `pointwiseMixedM` with the ordered `k ≠ l` exponent expansion:
+       `pointwiseMixedM P p T X = ∑ s ∈ coprimeCutoffFinset (insert p P) T, ∑ m ∈ smoothCutoffFinset P (T / s), ∑ n ∈ (smoothCutoffFinset P (T / s)).erase m, (liouvilleLambda m : ℝ) * (liouvilleLambda n : ℝ) * (∑ k ∈ Finset.range (T + 1), ∑ l ∈ (Finset.range (T + 1)).erase k, (-1 : ℝ) ^ (k + l) * gaussianPrimeChain T p s m X k * gaussianPrimeChain T p s n X l)`;
+    4. `P`-independence of `C_{P,p}` via the `p`-free cofactor bijection `r = s * m`:
+       `pointwiseContractionC P p T X = pointwiseContractionC ∅ p T X` and
+       `pointwiseContractionC P p T X = pointwiseDiagonalD T X - pointwiseGroupedEnergyV {p} T X`;
+    5. Exact finite alternating shift expansion for `C_p` (`TASK-TC-056` §6):
+       `pointwiseDiagonalD T X - pointwiseGroupedEnergyV {p} T X = 2 * ∑ h ∈ (Finset.Icc 1 T).filter (fun h => p ^ h ≤ T), (-1 : ℝ) ^ (h + 1) * ∑ n ∈ Finset.Icc 1 (T / p ^ h), gaussianTermPhi n X * gaussianTermPhi (n * p ^ h) X`. -/
+theorem mixed_interaction_decomposition_and_p_independence_tc056
+    {P : Finset ℕ} (hP : ∀ q ∈ P, q.Prime) {p : ℕ} (hp : p.Prime) (hp_not_mem : p ∉ P)
+    (T : ℕ) {X : ℝ} (hX : 0 ≤ X) :
+    (0 ≤ pointwiseContractionC P p T X ∧ pointwiseMixedM ∅ p T X = 0) ∧
+    (pointwiseDelta P p T X = pointwiseMixedM P p T X - pointwiseContractionC P p T X) ∧
+    (pointwiseMixedM P p T X =
+      ∑ s ∈ coprimeCutoffFinset (insert p P) T,
+        ∑ m ∈ smoothCutoffFinset P (T / s),
+          ∑ n ∈ (smoothCutoffFinset P (T / s)).erase m,
+            (liouvilleLambda m : ℝ) * (liouvilleLambda n : ℝ) *
+              (∑ k ∈ Finset.range (T + 1),
+                ∑ l ∈ (Finset.range (T + 1)).erase k,
+                  (-1 : ℝ) ^ (k + l) *
+                    gaussianPrimeChain T p s m X k * gaussianPrimeChain T p s n X l)) ∧
+    (pointwiseContractionC P p T X = pointwiseContractionC ∅ p T X ∧
+      pointwiseContractionC P p T X = pointwiseDiagonalD T X - pointwiseGroupedEnergyV {p} T X) ∧
+    (pointwiseDiagonalD T X - pointwiseGroupedEnergyV {p} T X =
+      2 * ∑ h ∈ (Finset.Icc 1 T).filter (fun h => p ^ h ≤ T),
+        (-1 : ℝ) ^ (h + 1) *
+          ∑ n ∈ Finset.Icc 1 (T / p ^ h),
+            gaussianTermPhi n X * gaussianTermPhi (n * p ^ h) X) := by
+  have h_c_nn : 0 ≤ pointwiseContractionC P p T X := by
+    dsimp [pointwiseContractionC]
+    apply Finset.sum_nonneg
+    intro s hs
+    have hs_pos : 0 < s := ((Finset.mem_filter.mp hs).1 |> Finset.mem_Icc.mp).1
+    apply Finset.sum_nonneg
+    intro m hm
+    have hm_pos : 0 < m := ((Finset.mem_filter.mp hm).1 |> Finset.mem_Icc.mp).1
+    obtain ⟨_, ⟨_, _, h_sq_chain⟩, _, _⟩ :=
+      gaussian_prime_chain_unimodal_and_singleton_contraction_tc056 hp hs_pos hm_pos T hX
+    linarith
+  have h_m_empty : pointwiseMixedM ∅ p T X = 0 := by
+    dsimp [pointwiseMixedM]
+    apply Finset.sum_eq_zero
+    intro s _
+    apply Finset.sum_eq_zero
+    intro m hm
+    have hm1 : m = 1 := (isPSmooth_empty_iff_aux m).mp (Finset.mem_filter.mp hm).2
+    have h_er_empty : (smoothCutoffFinset ∅ (T / s)).erase m = ∅ := by
+      ext n
+      simp only [Finset.mem_erase, smoothCutoffFinset, Finset.mem_filter, isPSmooth_empty_iff_aux,
+        Finset.not_mem_empty, iff_false]
+      rintro ⟨hne, _, hn1⟩
+      exact hne (hn1.trans hm1.symm)
+    rw [h_er_empty, Finset.sum_empty]
+  have h_delta_decomp_gen :
+      ∀ {Q : Finset ℕ}, (∀ q ∈ Q, q.Prime) → p ∉ Q →
+        pointwiseDelta Q p T X = pointwiseMixedM Q p T X - pointwiseContractionC Q p T X := by
+    intro Q hQ hp_not_Q
+    obtain ⟨_, h_fib_adj_Q, _, _⟩ :=
+      finite_prime_adjoining_fiber_and_pointwise_telescoping_tc056 hQ hp hp_not_Q T hX
+    dsimp [pointwiseDelta, pointwiseGroupedEnergyV, pointwiseMixedM, pointwiseContractionC]
+    rw [sum_coprimeCutoffFinset_insert_partition_aux hQ hp hp_not_Q T
+          (fun r => (cofactorFiberF Q T r X) ^ 2)]
+    rw [← Finset.sum_sub_distrib, ← Finset.sum_sub_distrib]
+    apply Finset.sum_congr rfl
+    intro s hs
+    have hs_mem := (Finset.mem_filter.mp hs).1
+    rw [Finset.mem_Icc] at hs_mem
+    have hs_ne : s ≠ 0 := by omega
+    have h_lam_s_sq : ((liouvilleLambda s : ℝ)) ^ 2 = 1 := by
+      have h_int := liouvilleLambda_sq_aux hs_ne
+      have h_cast : (liouvilleLambda s : ℝ) * (liouvilleLambda s : ℝ) = 1 := by exact_mod_cast h_int
+      rw [sq, h_cast]
+    let Sm := smoothCutoffFinset Q (T / s)
+    have hSm_ne0 : ∀ m ∈ Sm, m ≠ 0 := by
+      intro m hm
+      have hm_mem := (Finset.mem_filter.mp hm).1
+      rw [Finset.mem_Icc] at hm_mem
+      omega
+    have h_ins_sum :
+        cofactorFiberF (insert p Q) T s X =
+          (liouvilleLambda s : ℝ) * ∑ m ∈ Sm, (liouvilleLambda m : ℝ) * gaussianAlternatingChainSum T p s m X := by
+      rw [(h_fib_adj_Q s hs).2]
+      dsimp [admissiblePrimeExponents]
+      rw [Finset.sum_filter]
+      have h_each :
+          ∑ k ∈ Finset.range (T + 1), (if s * p ^ k ≤ T then cofactorFiberF Q T (s * p ^ k) X else 0) =
+            ∑ k ∈ Finset.range (T + 1),
+              (liouvilleLambda s : ℝ) *
+                ∑ m ∈ Sm, (liouvilleLambda m : ℝ) * ((-1 : ℝ) ^ k * gaussianPrimeChain T p s m X k) := by
+        apply Finset.sum_congr rfl
+        intro k _
+        rw [cofactorFiberF_spk_eq_sum_gaussianPrimeChain_aux hp T hs k hX]
+        dsimp only [Sm]
+        rw [Finset.mul_sum, Finset.mul_sum]
+        apply Finset.sum_congr rfl
+        intro m _
+        ring
+      rw [h_each, ← Finset.mul_sum, Finset.sum_comm]
+      congr 1
+      apply Finset.sum_congr rfl
+      intro m _
+      dsimp [gaussianAlternatingChainSum]
+      rw [Finset.mul_sum]
+    have h_ins_sq :
+        (cofactorFiberF (insert p Q) T s X) ^ 2 =
+          (∑ m ∈ Sm, (gaussianAlternatingChainSum T p s m X) ^ 2) +
+            ∑ m ∈ Sm, ∑ n ∈ Sm.erase m,
+              (liouvilleLambda m : ℝ) * (liouvilleLambda n : ℝ) *
+                (gaussianAlternatingChainSum T p s m X * gaussianAlternatingChainSum T p s n X) := by
+      rw [h_ins_sum, mul_pow, h_lam_s_sq, one_mul]
+      exact sq_sum_liouville_weighted_split_aux Sm hSm_ne0 (fun m => gaussianAlternatingChainSum T p s m X)
+    have h_old_sq :
+        ∑ k ∈ admissiblePrimeExponents T p s, (cofactorFiberF Q T (s * p ^ k) X) ^ 2 =
+          (∑ m ∈ Sm, ∑ k ∈ Finset.range (T + 1), (gaussianPrimeChain T p s m X k) ^ 2) +
+            ∑ m ∈ Sm, ∑ n ∈ Sm.erase m,
+              (liouvilleLambda m : ℝ) * (liouvilleLambda n : ℝ) *
+                (∑ k ∈ Finset.range (T + 1), gaussianPrimeChain T p s m X k * gaussianPrimeChain T p s n X k) := by
+      dsimp [admissiblePrimeExponents]
+      rw [Finset.sum_filter]
+      have h_each_sq :
+          ∑ k ∈ Finset.range (T + 1), (if s * p ^ k ≤ T then (cofactorFiberF Q T (s * p ^ k) X) ^ 2 else 0) =
+            ∑ k ∈ Finset.range (T + 1),
+              ((∑ m ∈ Sm, (gaussianPrimeChain T p s m X k) ^ 2) +
+                ∑ m ∈ Sm, ∑ n ∈ Sm.erase m,
+                  (liouvilleLambda m : ℝ) * (liouvilleLambda n : ℝ) *
+                    (gaussianPrimeChain T p s m X k * gaussianPrimeChain T p s n X k)) := by
+        apply Finset.sum_congr rfl
+        intro k _
+        have h_if_sq :
+            (if s * p ^ k ≤ T then (cofactorFiberF Q T (s * p ^ k) X) ^ 2 else 0) =
+              (if s * p ^ k ≤ T then cofactorFiberF Q T (s * p ^ k) X else 0) ^ 2 := by
+          split_ifs <;> ring
+        rw [h_if_sq, cofactorFiberF_spk_eq_sum_gaussianPrimeChain_aux hp T hs k hX]
+        have h_unit_k : (((liouvilleLambda s : ℝ) * (-1 : ℝ) ^ k)) ^ 2 = 1 := by
+          rw [mul_pow, h_lam_s_sq, one_mul, sq, neg_one_pow_mul_self_real_aux k]
+        rw [mul_pow, h_unit_k, one_mul]
+        exact sq_sum_liouville_weighted_split_aux Sm hSm_ne0 (fun m => gaussianPrimeChain T p s m X k)
+      rw [h_each_sq, Finset.sum_add_distrib]
+      congr 1
+      · exact Finset.sum_comm
+      · rw [Finset.sum_comm]
+        apply Finset.sum_congr rfl
+        intro m _
+        rw [Finset.sum_comm]
+        apply Finset.sum_congr rfl
+        intro n _
+        rw [Finset.mul_sum]
+    rw [h_ins_sq, h_old_sq]
+    have h_diff_cross :
+        (∑ m ∈ Sm, ∑ n ∈ Sm.erase m,
+            (liouvilleLambda m : ℝ) * (liouvilleLambda n : ℝ) *
+              (gaussianAlternatingChainSum T p s m X * gaussianAlternatingChainSum T p s n X)) -
+          (∑ m ∈ Sm, ∑ n ∈ Sm.erase m,
+            (liouvilleLambda m : ℝ) * (liouvilleLambda n : ℝ) *
+              (∑ k ∈ Finset.range (T + 1), gaussianPrimeChain T p s m X k * gaussianPrimeChain T p s n X k)) =
+          ∑ m ∈ Sm, ∑ n ∈ Sm.erase m,
+            (liouvilleLambda m : ℝ) * (liouvilleLambda n : ℝ) *
+              (gaussianAlternatingChainSum T p s m X * gaussianAlternatingChainSum T p s n X -
+                ∑ k ∈ Finset.range (T + 1), gaussianPrimeChain T p s m X k * gaussianPrimeChain T p s n X k) := by
+      rw [← Finset.sum_sub_distrib]
+      apply Finset.sum_congr rfl
+      intro m _
+      rw [← Finset.sum_sub_distrib]
+      apply Finset.sum_congr rfl
+      intro n _
+      ring
+    have h_diff_diag :
+        (∑ m ∈ Sm, ∑ k ∈ Finset.range (T + 1), (gaussianPrimeChain T p s m X k) ^ 2) -
+          (∑ m ∈ Sm, (gaussianAlternatingChainSum T p s m X) ^ 2) =
+          ∑ m ∈ Sm,
+            ((∑ k ∈ Finset.range (T + 1), (gaussianPrimeChain T p s m X k) ^ 2) -
+              (gaussianAlternatingChainSum T p s m X) ^ 2) :=
+      Finset.sum_sub_distrib.symm
+    linarith
+  have h_delta_decomp := h_delta_decomp_gen hP hp_not_mem
+  have h_m_kl :
+      pointwiseMixedM P p T X =
+        ∑ s ∈ coprimeCutoffFinset (insert p P) T,
+          ∑ m ∈ smoothCutoffFinset P (T / s),
+            ∑ n ∈ (smoothCutoffFinset P (T / s)).erase m,
+              (liouvilleLambda m : ℝ) * (liouvilleLambda n : ℝ) *
+                (∑ k ∈ Finset.range (T + 1),
+                  ∑ l ∈ (Finset.range (T + 1)).erase k,
+                    (-1 : ℝ) ^ (k + l) *
+                      gaussianPrimeChain T p s m X k * gaussianPrimeChain T p s n X l) := by
+    dsimp [pointwiseMixedM]
+    apply Finset.sum_congr rfl
+    intro s _
+    apply Finset.sum_congr rfl
+    intro m _
+    apply Finset.sum_congr rfl
+    intro n _
+    congr 1
+    dsimp [gaussianAlternatingChainSum]
+    rw [Finset.sum_mul_sum]
+    have h_split_kl :
+        (∑ k ∈ Finset.range (T + 1), ∑ l ∈ Finset.range (T + 1),
+            ((-1 : ℝ) ^ k * gaussianPrimeChain T p s m X k) *
+              ((-1 : ℝ) ^ l * gaussianPrimeChain T p s n X l)) =
+          (∑ k ∈ Finset.range (T + 1),
+              ((-1 : ℝ) ^ k * gaussianPrimeChain T p s m X k) *
+                ((-1 : ℝ) ^ k * gaussianPrimeChain T p s n X k)) +
+            ∑ k ∈ Finset.range (T + 1), ∑ l ∈ (Finset.range (T + 1)).erase k,
+              ((-1 : ℝ) ^ k * gaussianPrimeChain T p s m X k) *
+                ((-1 : ℝ) ^ l * gaussianPrimeChain T p s n X l) := by
+      rw [← Finset.sum_add_distrib]
+      apply Finset.sum_congr rfl
+      intro k hk
+      exact (Finset.add_sum_erase (Finset.range (T + 1))
+        (fun l => ((-1 : ℝ) ^ k * gaussianPrimeChain T p s m X k) *
+          ((-1 : ℝ) ^ l * gaussianPrimeChain T p s n X l)) hk).symm
+    rw [h_split_kl]
+    have h_diag_kl :
+        ∑ k ∈ Finset.range (T + 1),
+            ((-1 : ℝ) ^ k * gaussianPrimeChain T p s m X k) *
+              ((-1 : ℝ) ^ k * gaussianPrimeChain T p s n X k) =
+          ∑ k ∈ Finset.range (T + 1),
+            gaussianPrimeChain T p s m X k * gaussianPrimeChain T p s n X k := by
+      apply Finset.sum_congr rfl
+      intro k _
+      calc
+        ((-1 : ℝ) ^ k * gaussianPrimeChain T p s m X k) *
+            ((-1 : ℝ) ^ k * gaussianPrimeChain T p s n X k)
+          = (((-1 : ℝ) ^ k) * ((-1 : ℝ) ^ k)) *
+              (gaussianPrimeChain T p s m X k * gaussianPrimeChain T p s n X k) := by ring
+        _ = gaussianPrimeChain T p s m X k * gaussianPrimeChain T p s n X k := by
+              rw [neg_one_pow_mul_self_real_aux k, one_mul]
+    have h_off_kl :
+        ∑ k ∈ Finset.range (T + 1), ∑ l ∈ (Finset.range (T + 1)).erase k,
+            ((-1 : ℝ) ^ k * gaussianPrimeChain T p s m X k) *
+              ((-1 : ℝ) ^ l * gaussianPrimeChain T p s n X l) =
+          ∑ k ∈ Finset.range (T + 1), ∑ l ∈ (Finset.range (T + 1)).erase k,
+            (-1 : ℝ) ^ (k + l) *
+              gaussianPrimeChain T p s m X k * gaussianPrimeChain T p s n X l := by
+      apply Finset.sum_congr rfl
+      intro k _
+      apply Finset.sum_congr rfl
+      intro l _
+      rw [pow_add]
+      ring
+    linarith
+  have h_c_bij_r :
+      pointwiseContractionC P p T X =
+        ∑ r ∈ coprimeCutoffFinset {p} T,
+          ((∑ k ∈ Finset.range (T + 1), (gaussianPrimeChain T p r 1 X k) ^ 2) -
+            (gaussianAlternatingChainSum T p r 1 X) ^ 2) := by
+    dsimp [pointwiseContractionC]
+    rw [Finset.sum_sigma' (coprimeCutoffFinset (insert p P) T) (fun s => smoothCutoffFinset P (T / s))
+          (fun s m => (∑ k ∈ Finset.range (T + 1), (gaussianPrimeChain T p s m X k) ^ 2) -
+            (gaussianAlternatingChainSum T p s m X) ^ 2)]
+    apply Finset.sum_bij (fun sm _ => sm.1 * sm.2)
+    · rintro ⟨s, m⟩ hsm
+      simp only [Finset.mem_sigma, coprimeCutoffFinset, smoothCutoffFinset,
+        Finset.mem_filter, Finset.mem_Icc] at hsm ⊢
+      rcases hsm with ⟨⟨⟨hs1, _⟩, hs_cop_ins⟩, ⟨⟨hm1, hm_le_div⟩, hm_sm_P⟩⟩
+      have hsm_le : s * m ≤ T := by
+        rw [mul_comm]
+        exact (Nat.le_div_iff_mul_le (by omega)).mp hm_le_div
+      have hsm_ge : 1 ≤ s * m := Nat.mul_pos (by omega) (by omega)
+      have hs_cop_p : Nat.Coprime s p :=
+        ((coprime_primeProductModulus_insert_iff_aux hp_not_mem s).mp hs_cop_ins).1
+      have hm_cop_p : Nat.Coprime m p := by
+        rw [Nat.coprime_comm, hp.coprime_iff_not_dvd]
+        intro hdvd
+        exact hp_not_mem (hm_sm_P.2 p hp hdvd)
+      have hsm_cop_p : Nat.Coprime (s * m) (primeProductModulus {p}) := by
+        simpa [primeProductModulus] using coprime_mul_left_nat_aux hs_cop_p hm_cop_p
+      exact ⟨⟨hsm_ge, hsm_le⟩, hsm_cop_p⟩
+    · rintro ⟨s1, m1⟩ h1 ⟨s2, m2⟩ h2 h_eq
+      simp only [Finset.mem_sigma, coprimeCutoffFinset, smoothCutoffFinset,
+        Finset.mem_filter, Finset.mem_Icc] at h1 h2
+      rcases h1 with ⟨⟨⟨hs1_ge, _⟩, hs1_cop_ins⟩, ⟨⟨hm1_ge, _⟩, hm1_sm⟩⟩
+      rcases h2 with ⟨⟨⟨_, _⟩, hs2_cop_ins⟩, ⟨⟨_, _⟩, hm2_sm⟩⟩
+      have hs1_cop_P : Nat.Coprime s1 (primeProductModulus P) :=
+        ((coprime_primeProductModulus_insert_iff_aux hp_not_mem s1).mp hs1_cop_ins).2
+      have hs2_cop_P : Nat.Coprime s2 (primeProductModulus P) :=
+        ((coprime_primeProductModulus_insert_iff_aux hp_not_mem s2).mp hs2_cop_ins).2
+      have h_pos : 0 < m1 * s1 := Nat.mul_pos (by omega) (by omega)
+      obtain ⟨_, h_uniq, _⟩ := smooth_coprime_positive_factorization_exists_unique_nat hP h_pos
+      obtain ⟨hm1_eq, hs1_eq⟩ := h_uniq m1 s1 rfl hm1_sm hs1_cop_P
+      have h_comm : m2 * s2 = m1 * s1 := by linarith [mul_comm s1 m1, mul_comm s2 m2]
+      obtain ⟨hm2_eq, hs2_eq⟩ := h_uniq m2 s2 h_comm hm2_sm hs2_cop_P
+      exact Sigma.ext (hs1_eq.trans hs2_eq.symm) (heq_of_eq (hm1_eq.trans hm2_eq.symm))
+    · intro r hr
+      simp only [coprimeCutoffFinset, Finset.mem_filter, Finset.mem_Icc] at hr
+      rcases hr with ⟨⟨hr1, hrT⟩, hr_cop_p_mod⟩
+      have hr_cop_p : Nat.Coprime r p := by simpa [primeProductModulus] using hr_cop_p_mod
+      obtain ⟨⟨h_mul_r, hm_sm, hs_cop_P, hs_pos⟩, _, _⟩ :=
+        smooth_coprime_positive_factorization_exists_unique_nat hP (n := r) (by omega)
+      let s := pCoprimePart P r
+      let m := pSmoothPart P r
+      have hsm_eq_r : s * m = r := by dsimp [s, m]; rw [mul_comm]; exact h_mul_r
+      have hs_dvd_r : s ∣ r := ⟨m, hsm_eq_r.symm⟩
+      have hs_cop_p : Nat.Coprime s p := hr_cop_p.coprime_dvd_left hs_dvd_r
+      have hs_cop_ins : Nat.Coprime s (primeProductModulus (insert p P)) :=
+        (coprime_primeProductModulus_insert_iff_aux hp_not_mem s).mpr ⟨hs_cop_p, hs_cop_P⟩
+      have hs_le_r : s ≤ r := by rw [← hsm_eq_r]; exact Nat.le_mul_of_pos_right s hm_sm.1
+      have hm_le_div : m ≤ T / s := (Nat.le_div_iff_mul_le hs_pos).mpr (by rw [mul_comm]; exact hsm_eq_r.symm ▸ hrT)
+      refine ⟨⟨s, m⟩, ?_, hsm_eq_r⟩
+      simp only [Finset.mem_sigma, coprimeCutoffFinset, smoothCutoffFinset, Finset.mem_filter, Finset.mem_Icc]
+      exact ⟨⟨⟨hs_pos, le_trans hs_le_r hrT⟩, hs_cop_ins⟩, ⟨⟨hm_sm.1, hm_le_div⟩, hm_sm⟩⟩
+    · rintro ⟨s, m⟩ _
+      have h_ch : ∀ k : ℕ, gaussianPrimeChain T p s m X k = gaussianPrimeChain T p (s * m) 1 X k := by
+        intro k
+        simp [gaussianPrimeChain]
+      have h_alt : gaussianAlternatingChainSum T p s m X = gaussianAlternatingChainSum T p (s * m) 1 X := by
+        dsimp [gaussianAlternatingChainSum]
+        apply Finset.sum_congr rfl
+        intro k _
+        rw [h_ch k]
+      rw [h_alt]
+      congr 1
+      apply Finset.sum_congr rfl
+      intro k _
+      rw [h_ch k]
+  have h_empty_prime : ∀ q ∈ (∅ : Finset ℕ), q.Prime := fun _ hq => False.elim (Finset.not_mem_empty _ hq)
+  have hp_not_empty : p ∉ (∅ : Finset ℕ) := Finset.not_mem_empty p
+  obtain ⟨⟨h_end_empty, _⟩, _, _, _⟩ :=
+    finite_prime_adjoining_fiber_and_pointwise_telescoping_tc056 h_empty_prime hp hp_not_empty T hX
+  have h_c_empty_eq_diff :
+      pointwiseContractionC ∅ p T X = pointwiseDiagonalD T X - pointwiseGroupedEnergyV {p} T X := by
+    have h_de := h_delta_decomp_gen h_empty_prime hp_not_empty
+    rw [h_m_empty, zero_sub] at h_de
+    dsimp [pointwiseDelta] at h_de
+    rw [h_end_empty] at h_de
+    linarith
+  have h_c_empty_sum1 :
+      pointwiseContractionC ∅ p T X =
+        ∑ r ∈ coprimeCutoffFinset {p} T,
+          ((∑ k ∈ Finset.range (T + 1), (gaussianPrimeChain T p r 1 X k) ^ 2) -
+            (gaussianAlternatingChainSum T p r 1 X) ^ 2) := by
+    dsimp [pointwiseContractionC]
+    apply Finset.sum_congr rfl
+    intro r hr
+    have hr_mem := (Finset.mem_filter.mp hr).1
+    rw [Finset.mem_Icc] at hr_mem
+    have hdiv_ge1 : 1 ≤ T / r := (Nat.le_div_iff_mul_le (by omega)).mpr (by omega)
+    have hs_empty : smoothCutoffFinset ∅ (T / r) = {1} := by
+      ext u
+      simp only [smoothCutoffFinset, Finset.mem_filter, Finset.mem_Icc, isPSmooth_empty_iff_aux,
+        Finset.mem_singleton]
+      exact ⟨fun h => h.2, fun h => ⟨⟨by omega, by omega⟩, h⟩⟩
+    rw [hs_empty, Finset.sum_singleton]
+  have h_c_eq_empty : pointwiseContractionC P p T X = pointwiseContractionC ∅ p T X :=
+    h_c_bij_r.trans h_c_empty_sum1.symm
+  have h_c_eq_diff :
+      pointwiseContractionC P p T X = pointwiseDiagonalD T X - pointwiseGroupedEnergyV {p} T X :=
+    h_c_eq_empty.trans h_c_empty_eq_diff
+  refine ⟨⟨h_c_nn, h_m_empty⟩, h_delta_decomp, h_m_kl, ⟨h_c_eq_empty, h_c_eq_diff⟩, ?_⟩
+  exact singleton_contraction_alternating_shift_aux hp T hX
 
 end LiouvilleSquareDilation
 

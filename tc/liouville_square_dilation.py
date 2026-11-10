@@ -96,6 +96,7 @@ TASK_TC_054R2_ID = "TASK-TC-054R2"
 TASK_TC_055_ID = "TASK-TC-055"
 TASK_TC_055R_ID = "TASK-TC-055R"
 TASK_TC_055R2_ID = "TASK-TC-055R2"
+TASK_TC_056_ID = "TASK-TC-056"
 PRIOR_MERGED_MAIN_TC_053R = "c82e439708b0b6031db6a77bf3977688d9f0758b"
 TC_053R2_IMPLEMENTATION_COMMIT = "cc303030138c670e8f01aaaab483bbeca6bc17d1"
 TC_053R2_REVIEWED_TIP = "21576861ecd0dcbf874afec91b299fd6060f4f03"
@@ -111,6 +112,8 @@ TC_055_IMPLEMENTATION_COMMIT = "c44df1ebfd10b8010e216214229a420ce8f3b5c2"
 TC_055_REVIEWED_TIP = "07db77cf0ee62aa42e5c87b28a89a8f98eb3271e"
 TC_055R_IMPLEMENTATION_COMMIT = "35b55405708ae7480263afc93e422b5626b1e134"
 TC_055R_REVIEWED_TIP = "c6a685542c2dd584293b463272c4d95152907b3e"
+TC_055R2_IMPLEMENTATION_COMMIT = "10f4f51246818e9d914113771ae906643dae9fa9"
+TC_055R2_REVIEWED_TIP = "9a3755d977518ca6f0f1fb7ed3386e6a4a97d3ea"
 
 LIOUVILLE_SQUARE_DILATION_LEAN_MODULE_PATH = (
     REPO_ROOT / "formal" / "RiemannScope" / "LiouvilleSquareDilation.lean"
@@ -2557,6 +2560,10 @@ def verify_liouville_square_dilation_lean_module() -> Dict[str, Any]:
         "finite_smooth_coprime_cutoff_indexing_bijection_nat",
         "finite_liouville_reindexed_sum_and_excess_cutoff_identity_nat",
         "finite_gaussian_observable_reconstruction_and_weighted_cofactor_square",
+        "finite_prime_adjoining_fiber_and_pointwise_telescoping_tc056",
+        "finite_alternating_unimodal_chain_contraction_tc056",
+        "gaussian_prime_chain_unimodal_and_singleton_contraction_tc056",
+        "mixed_interaction_decomposition_and_p_independence_tc056",
     ]
 
     live_lean = _capture_live_lean_check_and_axioms(public_theorems)
@@ -2681,6 +2688,36 @@ def verify_liouville_square_dilation_lean_module() -> Dict[str, Any]:
             "`finiteQLambda T X = ∑_{1 ≤ r ≤ T, gcd(r, N_P)=1} cofactorFiberF P T r X` (`cofactorFiberF = (λ(r)/√r) finiteQLambdaSmooth P (T/r) (X/r)`), "
             "and the exact pointwise weighted square expansion `(finiteQLambda T X)^2 = ∑_r (1/r) Q_{λ,S(P),⌊T/r⌋}(X/r)^2 + ∑_r ∑_{s ≠ r} (λ(r)λ(s)/√(r s)) Q_{λ,S(P),⌊T/r⌋}(X/r) Q_{λ,S(P),⌊T/s⌋}(X/s)`, "
             "plus `finiteQLambda 0 X = 0` and `finiteQLambdaCoprime ∅ T X = finiteQLambda T X` (the `[Y, τ Y]` integral decomposition follows analytically outside Lean by finite linearity of the integral).",
+        ),
+        "finite_prime_adjoining_fiber_and_pointwise_telescoping_tc056": (
+            "actual_finite_prime_filtration_adjoining_and_pointwise_telescoping_theorem",
+            "Unconditional finite prime-filtration theorem (`TASK-TC-056` §3) for any finite prime set `P : Finset ℕ` (`∀ q ∈ P, q.Prime`), prime `p ∉ P`, `T : ℕ`, and `X ≥ 0`: "
+            "proves filtration endpoints `pointwiseGroupedEnergyV ∅ T X = pointwiseDiagonalD T X` and `pointwiseGroupedEnergyV (primesUpTo T) T X = (finiteQLambda T X)^2`, "
+            "coupled prime-adjoining identity `cofactorFiberF (insert p P) T s X = ∑_{k ∈ admissiblePrimeExponents T p s} cofactorFiberF P T (s * p^k) X` (`gcd(s, N_{P∪{p}})=1`), "
+            "stepwise identity `pointwiseDelta P p T X = 2 * ∑_s ∑_{k < l} cofactorFiberF P T (s * p^k) X * cofactorFiberF P T (s * p^l) X`, and ascending-prime list telescoping "
+            "(the `[Y, τ Y]` integral transfer to `V_P(Y, T)` and `Δ_{P,p}(Y, T)` follows analytically outside Lean by finite linearity of the integral).",
+        ),
+        "finite_alternating_unimodal_chain_contraction_tc056": (
+            "unconditional_finite_unimodal_alternating_chain_contraction_theorem",
+            "Unconditional finite sequence theorem (`TASK-TC-056` §4) for any `K : ℕ` and nonnegative unimodal sequence `a : ℕ → ℝ` (`∀ k < K, 0 ≤ a k`, `IsUnimodalChain K a`): "
+            "handles empty (`K = 0`), singleton (`K = 1`), ties, and zero extensions (`finiteChainMax 0 a = 0`), proving `|∑_{k < K} (-1)^k a k| ≤ finiteChainMax K a`, "
+            "`(∑_{k < K} (-1)^k a k)^2 ≤ ∑_{k < K} (a k)^2`, strict-gap lower bound `min (a 0)^2 (a 1)^2 ≤ ∑_{k < K} (a k)^2 - (∑_{k < K} (-1)^k a k)^2` for `K ≥ 2`, and zero-extension invariance.",
+        ),
+        "gaussian_prime_chain_unimodal_and_singleton_contraction_tc056": (
+            "actual_gaussian_prime_chain_unimodality_and_singleton_contraction_theorem",
+            "Unconditional instantiation (`TASK-TC-056` §4) to the actual Gaussian prime-power chain `gaussianPrimeChain T p s m X k` (`p.Prime`, `s, m > 0`, `X ≥ 0`): "
+            "proves consecutive admissible ratio identity `a_{k+1}/a_k = p^{-3} exp((X^2/(s m)^2) p^{-2k} (1 - p^{-2}))` and its monotonic decrease in `k`, "
+            "proves `IsUnimodalChain (T + 1) (gaussianPrimeChain T p s m X)` unconditionally without assuming unimodality, proves chain sup/square contraction, "
+            "and deduces `pointwiseGroupedEnergyV {p} T X ≤ pointwiseDiagonalD T X` with strict inequality `<` when `X > 0` and `p ≤ T` "
+            "(strict integral inequality `V_{ {p} }(Y, T) < D_T(Y)` for `Y > 0, T ≥ p` follows analytically by continuity and positivity of `min(φ_1^2, φ_p^2)/X` on `[Y, τ Y]`).",
+        ),
+        "mixed_interaction_decomposition_and_p_independence_tc056": (
+            "actual_mixed_interaction_decomposition_p_independence_and_shift_formula_theorem",
+            "Unconditional decomposition and `P`-independence theorem (`TASK-TC-056` §5 & §6) for any finite prime set `P : Finset ℕ` (`∀ q ∈ P, q.Prime`), prime `p ∉ P`, `T : ℕ`, and `X ≥ 0`: "
+            "proves `0 ≤ pointwiseContractionC P p T X`, `pointwiseMixedM ∅ p T X = 0`, exact decomposition `pointwiseDelta P p T X = pointwiseMixedM P p T X - pointwiseContractionC P p T X` "
+            "(cancelling `λ(s)^2 = 1` and retaining ordered `m ≠ n` without an extra factor of `2`), equivalence with the ordered `k ≠ l` exponent expansion, "
+            "`P`-independence `pointwiseContractionC P p T X = pointwiseContractionC ∅ p T X = pointwiseDiagonalD T X - pointwiseGroupedEnergyV {p} T X` via the `p`-free cofactor bijection `r = s * m`, "
+            "and the exact alternating shift expansion `D_T - V_{ {p} } = 2 * ∑_{h ≥ 1, p^h ≤ T} (-1)^{h+1} ∑_{1 ≤ n ≤ ⌊T/p^h⌋} φ_n(X) φ_{n p^h}(X)`.",
         ),
     }
 
@@ -4561,15 +4598,63 @@ def verify_tc055_multiplicative_parity_controls(
                 "derived_energy_remainder_bound_holds": rem_bnd_ok,
             })
 
-        # 3. Certify S = {3, 5, 7} multi-prime parity control (strictly scoped to mean 1/4 and leading asymptotics):
+        # 3. Certify S = {3, 5, 7} multi-prime parity control and complete finite-S DCT/BCT leading asymptotic proof (`TASK-TC-056` §2):
         mean_357_frac = Fraction(2, 4) * Fraction(4, 6) * Fraction(6, 8)
+        abs_conv_357_frac = Fraction(4, 2) * Fraction(6, 4) * Fraction(8, 6)  # prod_{p in S} (p + 1) / (p - 1) = 4
         lead_Q_357_frac = Fraction(1, 2) * mean_357_frac  # 1/8
         lead_E_357_arb = (tau_arb - arb(1)) / arb(64)
+        zeta3_arb = arb(3).zeta()
+        M_1_global_majorant = arb(1) / arb(2) + exact_C1_unimodal  # 1/2 + 2 * (3/(2e))^{3/2} = 1.31983256...
+        M_1_exceeds_zeta3 = bool((M_1_global_majorant - zeta3_arb).lower() > 0)
+
+        def _dirichlet_b_S_int(d_val: int, primes_S: Tuple[int, ...]) -> int:
+            """Compute b_S(d) = (mu * a_S)(d) = sum_{e | d} mu(e) a_S(d / e)."""
+            acc_b = 0
+            e = 1
+            while e * e <= d_val:
+                if d_val % e == 0:
+                    acc_b += moebius_mu_int(e) * finite_prime_parity_aS_int(d_val // e, primes_S=primes_S)
+                    qe = d_val // e
+                    if qe != e:
+                        acc_b += moebius_mu_int(qe) * finite_prime_parity_aS_int(d_val // qe, primes_S=primes_S)
+                e += 1
+            return acc_b
+
+        convolution_aS_checks_ok = True
+        for test_S in ((2,), (3, 5, 7)):
+            smooth_set_S = set(generate_P_smooth_up_to(test_S, 250))
+            for n_test in range(1, 251):
+                b_val = _dirichlet_b_S_int(n_test, test_S)
+                if n_test not in smooth_set_S and b_val != 0:
+                    convolution_aS_checks_ok = False
+                # Check (1 * b_S)(n_test) == a_S(n_test)
+                conv_sum = 0
+                dv = 1
+                while dv * dv <= n_test:
+                    if n_test % dv == 0:
+                        conv_sum += _dirichlet_b_S_int(dv, test_S)
+                        qdv = n_test // dv
+                        if qdv != dv:
+                            conv_sum += _dirichlet_b_S_int(qdv, test_S)
+                    dv += 1
+                if conv_sum != finite_prime_parity_aS_int(n_test, primes_S=test_S):
+                    convolution_aS_checks_ok = False
+            for p_in_S in test_S:
+                for k_exp in (1, 2, 3):
+                    pk_val = p_in_S ** k_exp
+                    if pk_val <= 250:
+                        expected_b_pk = 2 * ((-1) ** k_exp)
+                        if _dirichlet_b_S_int(pk_val, test_S) != expected_b_pk:
+                            convolution_aS_checks_ok = False
+
         q_357_at_16 = evaluate_Q_aS_certified_arb(arb(16), primes_S=(3, 5, 7), T_cutoff=1200, prec_bits=prec_bits)
         q_357_at_64 = evaluate_Q_aS_certified_arb(arb(64), primes_S=(3, 5, 7), T_cutoff=2000, prec_bits=prec_bits)
         s357_control_ok = bool(
             mean_357_frac == Fraction(1, 4)
+            and abs_conv_357_frac == Fraction(4, 1)
             and lead_Q_357_frac == Fraction(1, 8)
+            and M_1_exceeds_zeta3
+            and convolution_aS_checks_ok
             and q_357_at_16.lower() > 0
             and q_357_at_64.lower() > 0
         )
@@ -4620,11 +4705,28 @@ def verify_tc055_multiplicative_parity_controls(
                 "Q_a2_asymptotic": "Q_{a_2}(X) = (1 / 6) sqrt(X) + O(X^{-1/2}) ~ sqrt(X) / 6 (for X >= 1, with |Q_{a_2}(X) - sqrt(X)/6| <= C_{a_2} X^{-1/2})",
                 "E_a2_asymptotic": "E_{a_2}(Y) := int_Y^{tau Y} |Q_{a_2}(X)|^2 dX/X = ((tau - 1) / 36) Y + O(1) ~ ((tau - 1) / 36) Y (for Y >= 1)",
                 "general_finite_S_asymptotic": (
-                    "For a_S(n) = (-1)^{sum_{p in S} v_p(n)}, the Euler-factor mean is prod_{p in S} (p - 1)/(p + 1), giving leading asymptotics "
-                    "Q_{a_S}(X) ~ (1/2) (prod_{p in S} (p - 1)/(p + 1)) sqrt(X) and "
-                    "E_{a_S}(Y) ~ ((tau - 1) / 4) (prod_{p in S} (p - 1)/(p + 1))^2 Y "
+                    "For any finite prime set S and a_S(n) = (-1)^{sum_{p in S} v_p(n)}, writing a_S = 1 * b_S (b_S = mu * a_S, "
+                    "supported on S(S) with b_S(1) = 1 and b_S(p^k) = 2 (-1)^k for p in S, k >= 1) gives "
+                    "sum_{d in S(S)} |b_S(d)| / d = prod_{p in S} (p + 1)/(p - 1) =: A_S < infty and "
+                    "sum_{d in S(S)} b_S(d) / d = prod_{p in S} (p - 1)/(p + 1) =: m_S. Because |Q_1(w)| / sqrt(w) <= zeta(3) w^2 <= zeta(3) "
+                    "on (0, 1] and |Q_1(w)| / sqrt(w) <= 1/2 + C_{1,uni} w^{-1} <= 1/2 + C_{1,uni} =: M_1 on [1, infty) with zeta(3) < M_1, "
+                    "sup_{w > 0} |Q_1(w)| / sqrt(w) <= M_1 < infty globally. Dominated Convergence on "
+                    "Q_{a_S}(X) / sqrt(X) = sum_{d in S(S)} (b_S(d) / d) (Q_1(X / d) / sqrt(X / d)) proves Q_{a_S}(X) / sqrt(X) -> m_S / 2, "
+                    "and Bounded Convergence on E_{a_S}(Y) / Y = int_1^tau |Q_{a_S}(Y u) / sqrt(Y u)|^2 du (dominated by A_S^2 M_1^2) proves "
+                    "E_{a_S}(Y) / Y -> ((tau - 1) / 4) m_S^2 as Y -> infty "
                     "(quantitative O(X^{-1/2}) and O(1) error bounds are proved here for S = {2}; multi-prime O(X^{-1/2})/O(1) remainders are not claimed)."
                 ),
+                "finite_S_dominated_convergence_majorant": {
+                    "b_S_formula": "b_S = mu * a_S supported on S(S), b_S(1) = 1, b_S(p^k) = 2 (-1)^k (p in S, k >= 1), b_S(p^k) = 0 (p not in S, k >= 1)",
+                    "abs_dirichlet_norm_A_S_formula": "sum_{d in S(S)} |b_S(d)| / d = prod_{p in S} (1 + 2/(p - 1)) = prod_{p in S} (p + 1) / (p - 1) < infty",
+                    "signed_dirichlet_mean_m_S_formula": "sum_{d in S(S)} b_S(d) / d = prod_{p in S} (1 - 2/(p + 1)) = prod_{p in S} (p - 1) / (p + 1)",
+                    "M_1_global_supremum_formula": "M_1 := 1/2 + C_{1,uni} = 1/2 + 2 * (3 / (2 * e))^{3/2} > zeta(3)",
+                    "M_1_global_supremum_majorant": serialize_arb_certified(M_1_global_majorant),
+                    "zeta_3": serialize_arb_certified(zeta3_arb),
+                    "M_1_strictly_exceeds_zeta_3": M_1_exceeds_zeta3,
+                    "convolution_aS_eq_1_star_bS_verified_up_to_250": convolution_aS_checks_ok,
+                    "S_3_5_7_abs_norm_A_S": str(abs_conv_357_frac),
+                },
                 "one_sixth": serialize_arb_certified(one_sixth),
                 "tau_minus_1_over_36": serialize_arb_certified(tau_minus_1_over_36),
                 "control_S_3_5_7": {
@@ -5331,33 +5433,47 @@ def verify_tc055r_finite_truncation_and_signed_energy_attempt(
                 "strict_sign_cancellation_below_unsigned": row_ok,
             })
 
+        # Certify fixed-P smooth-fiber sparsity constants (`TASK-TC-056` §2):
+        # sup_{x > 0} x^{5/2 - eta} exp(-x^2) = ((5 - 2*eta) / (4 * e))^{(5 - 2*eta) / 4} for 0 <= eta < 5/2.
+        e_arb = arb(1).exp()
+        c_eta_0_sparsity = ((arb(5) / (arb(4) * e_arb)) ** (arb(5) / arb(4)))
+        c_eta_quarter_sparsity = ((arb(9) / (arb(8) * e_arb)) ** (arb(9) / arb(8)))
+        sparsity_constants_positive = bool(
+            c_eta_0_sparsity.lower() > 0 and c_eta_quarter_sparsity.lower() > 0
+        )
+
         return {
             "exact_finite_reconstruction_theorem": {
+                "finite_prime_set_hypothesis": (
+                    "Explicitly quantified over any finite set of primes P (`P : Finset Nat`, `forall p in P, p.Prime`, "
+                    "including P = empty with N_empty = 1, S(empty) = {1}, and N_P = prod_{p in P} p)."
+                ),
                 "smooth_outer_formula": (
-                    "For every integer T >= 0, finite prime set P, and X > 0: "
+                    "For every integer T >= 0, finite set of primes P, and X > 0: "
                     "Q_{lambda,T}(X) = sum_{m in S(P), m <= T} (lambda(m) / sqrt(m)) Q_{lambda,P,floor(T/m)}(X / m)."
                 ),
                 "coprime_outer_weighted_cofactor_formula": (
-                    "For every integer T >= 0, finite prime set P, and X > 0: "
+                    "For every integer T >= 0, finite set of primes P, and X > 0: "
                     "Q_{lambda,T}(X) = sum_{1 <= r <= T, gcd(r, N_P)=1} F_r(X), where "
                     "F_r(X) = (lambda(r) / sqrt(r)) Q_{lambda,S(P),floor(T/r)}(X / r) and "
                     "Q_{lambda,S(P),L}(w) = w^{5/2} sum_{m <= L, m in S(P)} lambda(m) m^{-3} exp(-w^2 / m^2) "
                     "(derived from X^{5/2} (m r)^{-3} = r^{-1/2} (X / r)^{5/2} m^{-3})."
                 ),
                 "formula": (
-                    "For every integer T >= 0, finite prime set P, and X > 0: "
+                    "For every integer T >= 0, finite set of primes P, and X > 0: "
                     "Q_{lambda,T}(X) = sum_{m in S(P), m <= T} (lambda(m) / sqrt(m)) Q_{lambda,P,floor(T/m)}(X / m) "
                     "= sum_{1 <= r <= T, gcd(r, N_P)=1} (lambda(r) / sqrt(r)) Q_{lambda,S(P),floor(T/r)}(X / r)."
                 ),
                 "inner_cutoff_dependence_and_exact_excess_note": (
                     "Because 1 <= n = m r <= T with m in S(P) and gcd(r, N_P) = 1 is equivalent to 1 <= m <= T and "
-                    "1 <= r <= floor(T / m), replacing r <= floor(T / m) by an uncoupled cutoff r <= T adds the exact "
-                    "excess sum sum_{m in S(P), m <= T} sum_{floor(T/m) < r <= T, gcd(r, N_P)=1} lambda(m) lambda(r) w(m r) "
+                    "1 <= r <= floor(T / m) for any finite set of primes P, replacing r <= floor(T / m) by an uncoupled cutoff "
+                    "r <= T adds the exact excess sum sum_{m in S(P), m <= T} sum_{floor(T/m) < r <= T, gcd(r, N_P)=1} lambda(m) lambda(r) w(m r) "
                     "(formalized in Lean 4 theorem finite_liouville_reindexed_sum_and_excess_cutoff_identity_nat). "
                     "This excess is NOT universally nonzero: it vanishes identically when P = empty, T <= 1, or "
-                    "(P = {2}, T = 2), and can also vanish by sign cancellation (e.g. T = 5, P = {2}, w = 1), whereas "
-                    "for the Gaussian observable at (P = {2}, T = 3) and (24, {2,3}), (36, {2,3,5}), (50, {2,3,5,7}) "
-                    "it is certified strictly nonzero."
+                    "(P = {2}, T = 2), and can also vanish by sign cancellation (e.g. T = 5, P = {2}, w = 1); "
+                    "at (P = {2}, T = 3) the excess equals w(6), which is nonzero whenever w(6) != 0, including the "
+                    "strictly positive Gaussian case w(n) = phi_n(X) = X^{5/2} n^{-3} exp(-X^2 / n^2) > 0 (X > 0), and "
+                    "for the Gaussian observable at (24, {2,3}), (36, {2,3,5}), (50, {2,3,5,7}) it is also certified strictly nonzero."
                 ),
                 "uncoupled_cutoff_cancellation_witness_T5_P2_unit_weight": {
                     "T": cancel_T,
@@ -5368,7 +5484,9 @@ def verify_tc055r_finite_truncation_and_signed_energy_attempt(
                     "nonempty_excess_index_set_cancels_to_zero": cancellation_witness_ok,
                 },
                 "rows": finite_reconstruction_rows,
-                "all_finite_reconstructions_match": bool(all_finite_reconstructions_match and cancellation_witness_ok),
+                "all_finite_reconstructions_match": bool(
+                    all_finite_reconstructions_match and cancellation_witness_ok and sparsity_constants_positive
+                ),
             },
             "finite_truncation_tail_energy_and_L2_transfer": {
                 "pointwise_tail_bound": "|Q_lambda(X) - Q_{lambda,T}(X)| <= X^{5/2} / (2 T^2)  for all integer T >= 1 and X > 0",
@@ -5413,22 +5531,35 @@ def verify_tc055r_finite_truncation_and_signed_energy_attempt(
                 },
                 "weighted_cofactor_regression_Y4_T6_P_2_3": y4_t6_p23_regression,
                 "proved_partial_saving_on_fixed_smooth_fibers": (
-                    "For any fixed finite prime set P_u, the generating Dirichlet series of the pure P_u-smooth sum is "
-                    "D_{S(P_u)}(s) = sum_{m in S(P_u)} lambda(m) m^{-s} = prod_{p <= u} (1 + p^{-s})^{-1}, which is holomorphic "
-                    "throughout the right half-plane Re(s) > 0 (its poles lie on Re(s) = 0 at s = i (2k+1) tau / (2 log p)). "
-                    "Thus for fixed u, each un-truncated P_u-smooth fiber Q_{lambda,S(P_u)}(w) has contour-shift bound "
-                    "O_{u,eta}(w^eta) for every eta > 0 (power saving in w = X/r as w -> infty, with ineffective/u-dependent constant)."
+                    "For any fixed finite set of primes P, both contour shifting of D_{S(P)}(s) = prod_{p in P}(1 + p^{-s})^{-1} "
+                    "and direct termwise sparsity give |Q_{lambda,S(P),L}(w)| <= Q_{1,S(P),L}(w) <= c_eta w^eta prod_{p in P}(1 - p^{-1/2 - eta})^{-1} "
+                    "for every 0 <= eta < 5/2 (where c_eta = sup_{x > 0} x^{5/2 - eta} exp(-x^2) = ((5 - 2*eta)/(4*e))^{(5 - 2*eta)/4}, uniformly in L >= 0). "
+                    "Because this exact O_{P,eta}(w^eta) power saving already holds for unsigned unit weights +1 from the sparsity of S(P) and "
+                    "convergence of sum_{m in S(P)} m^{-1/2 - eta} = prod_{p in P}(1 - p^{-1/2 - eta})^{-1} < infty, fixed-P smooth-fiber decay "
+                    "is a sparsity/absolute-convergence bound and NOT by itself a new signed cancellation theorem."
                 ),
+                "fixed_P_smooth_fiber_sparsity_constants": {
+                    "c_eta_formula": "c_eta = ((5 - 2*eta) / (4 * e))^{(5 - 2*eta) / 4} for 0 <= eta < 5/2",
+                    "c_0_sparsity_constant": serialize_arb_certified(c_eta_0_sparsity),
+                    "c_quarter_sparsity_constant": serialize_arb_certified(c_eta_quarter_sparsity),
+                    "unsigned_smooth_bound": (
+                        "|Q_{lambda,S(P),L}(w)| <= Q_{1,S(P),L}(w) <= c_eta w^eta prod_{p in P} (1 - p^{-1/2 - eta})^{-1} "
+                        "(holds for unsigned +1 weights solely by sparsity of S(P), uniformly in L >= 0)"
+                    ),
+                },
                 "exact_two_part_obstruction_preventing_all_eps_closure": (
-                    "When attempting to promote the fixed-u smooth-fiber saving to an unconditional bound E_{lambda,T(Y)}(Y) <<_eps Y^eps "
+                    "When attempting to promote the fixed-u smooth-fiber bound to an unconditional bound E_{lambda,T(Y)}(Y) <<_eps Y^eps "
                     "by choosing u = u(Y) (while preserving the combined signed sum E_{same-r} + E_{diff-r}): "
                     "(1) If u >= T(Y) = ceil(Y^{5/4}) so that gcd(r, N_u) = 1 forces r = 1 and E_{diff-r} = 0, then on the contour "
-                    "Re(1/2 + z) = eta in (0, 1/2) the finite Euler product prod_{p <= u}(1 + p^{-eta - i*b})^{-1} has exact Kronecker "
-                    "supremum prod_{p <= u}(1 - p^{-eta})^{-1} = exp((1+o(1)) u^{1-eta} / ((1-eta) log u)), which grows super-polynomially "
-                    "in Y, while the finite truncation m <= T(Y) couples the Mellin integral to the Perron hyperbolic kernel (T/m)^w / w; "
-                    "(2) If u(Y) is chosen small enough to keep prod_{p <= u}(1 - p^{-eta})^{-1} <= Y^eps (requiring u^{1-eta}/log u << eps log Y, "
-                    "so u << (log Y)^{1/(1-eta)}), then almost all integers n <= T(Y) have large P_u-coprime cofactors r > u, and the "
-                    "combined sum E_{same-r}(Y; T(Y), P_u) + E_{diff-r}(Y; T(Y), P_u) retains the unfactored primes p > u across distinct cofactors."
+                    "Re(1/2 + z) = eta in (0, 1/2) (or in the unsigned sparsity product at exponent eta in (0, 1)) the finite Euler product "
+                    "has exact Kronecker supremum prod_{p <= u}(1 - p^{-eta})^{-1} = exp((1 + o_eta(1)) u^{1-eta} / ((1-eta) log u)), which grows "
+                    "super-polynomially in Y, while finite truncation m <= T(Y) couples the Mellin integral to the Perron hyperbolic kernel (T/m)^w / w; "
+                    "(2) Requiring prod_{p <= u}(1 - p^{-eta})^{-1} <= Y^eps for fixed 0 < eta < 1 means (u^{1-eta} / ((1-eta) log u))(1 + o_eta(1)) <= eps log Y: "
+                    "here u(Y) << (log Y)^{1/(1-eta)} is a sufficient-only condition, whereas u(Y) = c * (log Y * log log Y)^{1/(1-eta)} satisfies "
+                    "u(Y)^{1-eta} / ((1-eta) log u(Y)) = c^{1-eta} (1 + o_{eta,c}(1)) log Y and IS admissible whenever 0 < c < eps^{1/(1-eta)} (c^{1-eta} < eps), "
+                    "making u(Y) = O_{eta,eps}((log Y * log log Y)^{1/(1-eta)}) (limsup <= eps^{1/(1-eta)}) the exact necessary polylogarithmic scale. "
+                    "Even at that maximal admissible scale u(Y) = (log Y)^{O_eta(1)} << T(Y), almost all integers n <= T(Y) have large P_u-coprime cofactors r > u, "
+                    "so the combined sum E_{same-r}(Y; T(Y), P_u) + E_{diff-r}(Y; T(Y), P_u) retains the unfactored primes p > u across distinct cofactors."
                 ),
                 "rows": signed_attempt_rows,
                 "all_signed_decompositions_consistent": all_signed_decompositions_consistent,
@@ -5699,6 +5830,7 @@ def execute_task_tc054_liouville_square_dilation_audit(
         "simultaneous_compatibility_task_id": TASK_TC_055_ID,
         "simultaneous_compatibility_repair_task_id": TASK_TC_055R_ID,
         "simultaneous_compatibility_closeout_task_id": TASK_TC_055R2_ID,
+        "prime_chain_contraction_task_id": TASK_TC_056_ID,
         "parent_epic": EPIC_TC_042_ID,
         "prior_merged_main": PRIOR_MERGED_MAIN_TC_053R,
         "tc053r2_implementation_commit": TC_053R2_IMPLEMENTATION_COMMIT,
@@ -5715,7 +5847,9 @@ def execute_task_tc054_liouville_square_dilation_audit(
         "tc055_reviewed_tip": TC_055_REVIEWED_TIP,
         "tc055r_implementation_commit": TC_055R_IMPLEMENTATION_COMMIT,
         "tc055r_reviewed_tip": TC_055R_REVIEWED_TIP,
-        "branch": "task/tc-055r2-weighted-energy-finite-reconstruction-and-closeout",
+        "tc055r2_implementation_commit": TC_055R2_IMPLEMENTATION_COMMIT,
+        "tc055r2_reviewed_tip": TC_055R2_REVIEWED_TIP,
+        "branch": "task/tc-056-prime-chain-contraction-and-mixed-prime-energy",
         "subgate_tc043a_status": "OPEN",
         "rh_proved": False,
         "precision_bits": prec_bits,

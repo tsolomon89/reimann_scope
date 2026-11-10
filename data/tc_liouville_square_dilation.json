@@ -5,6 +5,7 @@
   "simultaneous_compatibility_task_id": "TASK-TC-055",
   "simultaneous_compatibility_repair_task_id": "TASK-TC-055R",
   "simultaneous_compatibility_closeout_task_id": "TASK-TC-055R2",
+  "prime_chain_contraction_task_id": "TASK-TC-056",
   "parent_epic": "EPIC-TC-042",
   "prior_merged_main": "c82e439708b0b6031db6a77bf3977688d9f0758b",
   "tc053r2_implementation_commit": "cc303030138c670e8f01aaaab483bbeca6bc17d1",
@@ -21,7 +22,9 @@
   "tc055_reviewed_tip": "07db77cf0ee62aa42e5c87b28a89a8f98eb3271e",
   "tc055r_implementation_commit": "35b55405708ae7480263afc93e422b5626b1e134",
   "tc055r_reviewed_tip": "c6a685542c2dd584293b463272c4d95152907b3e",
-  "branch": "task/tc-055r2-weighted-energy-finite-reconstruction-and-closeout",
+  "tc055r2_implementation_commit": "10f4f51246818e9d914113771ae906643dae9fa9",
+  "tc055r2_reviewed_tip": "9a3755d977518ca6f0f1fb7ed3386e6a4a97d3ea",
+  "branch": "task/tc-056-prime-chain-contraction-and-mixed-prime-energy",
   "subgate_tc043a_status": "OPEN",
   "rh_proved": false,
   "precision_bits": 256,
@@ -5139,7 +5142,7 @@
   "section_7_lean_formalization_audit": {
     "module_path": "formal/RiemannScope/LiouvilleSquareDilation.lean",
     "namespace": "RiemannScope.LiouvilleSquareDilation",
-    "definition_count": 33,
+    "definition_count": 48,
     "definitions": [
       "primePowerMoebius",
       "liouvilleSignFromOmega",
@@ -5173,9 +5176,24 @@
       "finiteQLambda",
       "finiteQLambdaCoprime",
       "finiteQLambdaSmooth",
-      "cofactorFiberF"
+      "cofactorFiberF",
+      "gaussianTermPhi",
+      "pointwiseGroupedEnergyV",
+      "pointwiseDiagonalD",
+      "primesUpToFinset",
+      "ascendingPrimesUpTo",
+      "prefixPrimeSet",
+      "admissiblePrimeExponents",
+      "pointwiseDelta",
+      "chainMaxUpTo",
+      "IsUnimodalChain",
+      "gaussianPrimeChain",
+      "gaussianAlternatingChainSum",
+      "gaussianChainRatio",
+      "pointwiseContractionC",
+      "pointwiseMixedM"
     ],
-    "public_theorem_count": 16,
+    "public_theorem_count": 20,
     "public_theorems": [
       "liouville_complete_multiplicativity_and_common_factor_cancellation_nat",
       "prime_power_square_divisor_moebius_liouville_inversion_nat",
@@ -5192,9 +5210,13 @@
       "smooth_coprime_positive_factorization_exists_unique_nat",
       "finite_smooth_coprime_cutoff_indexing_bijection_nat",
       "finite_liouville_reindexed_sum_and_excess_cutoff_identity_nat",
-      "finite_gaussian_observable_reconstruction_and_weighted_cofactor_square"
+      "finite_gaussian_observable_reconstruction_and_weighted_cofactor_square",
+      "finite_prime_adjoining_fiber_and_pointwise_telescoping_tc056",
+      "finite_alternating_unimodal_chain_contraction_tc056",
+      "gaussian_prime_chain_unimodal_and_singleton_contraction_tc056",
+      "mixed_interaction_decomposition_and_p_independence_tc056"
     ],
-    "private_helper_theorem_count": 27,
+    "private_helper_theorem_count": 49,
     "private_helper_theorems": [
       "finRangeSum_primePowerMoebius_tail_eq_two",
       "cardFactors_prime_pow_aux",
@@ -5222,10 +5244,32 @@
       "isPSmooth_empty_iff_aux",
       "sum_Icc_eq_smooth_outer_coprime_inner_aux",
       "sum_Icc_eq_coprime_outer_smooth_inner_aux",
-      "gaussian_term_scaling_aux"
+      "gaussian_term_scaling_aux",
+      "neg_one_pow_mul_self_real_aux",
+      "cofactorFiberF_eq_sum_gaussianTermPhi_aux",
+      "mem_admissiblePrimeExponents_iff_aux",
+      "coprime_mul_left_nat_aux",
+      "pSmoothPart_singleton_eq_pow_aux",
+      "primeProductModulus_insert_aux",
+      "coprime_primeProductModulus_insert_iff_aux",
+      "sum_coprimeCutoffFinset_insert_partition_aux",
+      "sum_smoothCutoffFinset_insert_partition_aux",
+      "prefixPrimeSet_succ_aux",
+      "sq_sum_sub_sum_sq_eq_two_sum_lt_aux",
+      "alternating_sum_nonneg_of_antitone_aux",
+      "alternating_sum_bounds_of_antitone_aux",
+      "chainMaxUpTo_props_aux",
+      "real_pow_le_pow_of_one_le_aux",
+      "exists_peak_of_one_step_descent_aux",
+      "gaussianTermPhi_nonneg_and_pos_aux",
+      "gaussianPrimeChain_ratio_and_antitone_aux",
+      "gaussianPrimeChain_unimodal_aux",
+      "cofactorFiberF_spk_eq_sum_gaussianPrimeChain_aux",
+      "sq_sum_liouville_weighted_split_aux",
+      "singleton_contraction_alternating_shift_aux"
     ],
-    "total_theorem_count": 43,
-    "total_declaration_count": 76,
+    "total_theorem_count": 69,
+    "total_declaration_count": 117,
     "expected_public_theorems_present": true,
     "sorry_count": 0,
     "custom_axiom_count": 0,
@@ -5301,6 +5345,22 @@
         "finite_gaussian_observable_reconstruction_and_weighted_cofactor_square": {
           "captured_check_output": "@finite_gaussian_observable_reconstruction_and_weighted_cofactor_square : \u2200 {P : Finset \u2115}, (\u2200 p \u2208 P, p.Prime) \u2192 \u2200 (T : \u2115) {X : \u211d}, 0 \u2264 X \u2192 finiteQLambda T X = \u2211 m \u2208 smoothCutoffFinset P T, \u2191(liouvilleLambda m) / \u221a\u2191m * finiteQLambdaCoprime P (T / m) (X / \u2191m) \u2227 finiteQLambda T X = \u2211 r \u2208 coprimeCutoffFinset P T, cofactorFiberF P T r X \u2227 finiteQLambda T X ^ 2 = \u2211 r \u2208 coprimeCutoffFinset P T, 1 / \u2191r * finiteQLambdaSmooth P (T / r) (X / \u2191r) ^ 2 + \u2211 r \u2208 coprimeCutoffFinset P T, \u2211 s \u2208 (coprimeCutoffFinset P T).erase r, \u2191(liouvilleLambda r) * \u2191(liouvilleLambda s) / \u221a\u2191(r * s) * finiteQLambdaSmooth P (T / r) (X / \u2191r) * finiteQLambdaSmooth P (T / s) (X / \u2191s) \u2227 finiteQLambda 0 X = 0 \u2227 finiteQLambdaCoprime \u2205 T X = finiteQLambda T X",
           "captured_print_axioms_output": "'RiemannScope.LiouvilleSquareDilation.finite_gaussian_observable_reconstruction_and_weighted_cofactor_square' depends on axioms: [propext, Quot.sound, Classical.choice]"
+        },
+        "finite_prime_adjoining_fiber_and_pointwise_telescoping_tc056": {
+          "captured_check_output": "@finite_prime_adjoining_fiber_and_pointwise_telescoping_tc056 : \u2200 {P : Finset \u2115}, (\u2200 q \u2208 P, q.Prime) \u2192 \u2200 {p : \u2115}, p.Prime \u2192 p \u2209 P \u2192 \u2200 (T : \u2115) {X : \u211d}, 0 \u2264 X \u2192 (pointwiseGroupedEnergyV \u2205 T X = pointwiseDiagonalD T X \u2227 pointwiseGroupedEnergyV (primesUpToFinset T) T X = finiteQLambda T X ^ 2) \u2227 (\u2200 s \u2208 coprimeCutoffFinset (insert p P) T, (\u2200 (k : \u2115), k \u2208 admissiblePrimeExponents T p s \u2194 s * p ^ k \u2264 T) \u2227 cofactorFiberF (insert p P) T s X = \u2211 k \u2208 admissiblePrimeExponents T p s, cofactorFiberF P T (s * p ^ k) X) \u2227 pointwiseDelta P p T X = 2 * \u2211 s \u2208 coprimeCutoffFinset (insert p P) T, \u2211 k \u2208 admissiblePrimeExponents T p s, \u2211 l \u2208 Finset.filter (fun l => k < l) (admissiblePrimeExponents T p s), cofactorFiberF P T (s * p ^ k) X * cofactorFiberF P T (s * p ^ l) X \u2227 List.Pairwise (fun x x_1 => x < x_1) (ascendingPrimesUpTo T) \u2227 (ascendingPrimesUpTo T).toFinset = primesUpToFinset T \u2227 finiteQLambda T X ^ 2 = pointwiseDiagonalD T X + \u2211 j \u2208 Finset.range (ascendingPrimesUpTo T).length, pointwiseDelta (prefixPrimeSet (ascendingPrimesUpTo T) j) ((ascendingPrimesUpTo T).getD j 0) T X",
+          "captured_print_axioms_output": "'RiemannScope.LiouvilleSquareDilation.finite_prime_adjoining_fiber_and_pointwise_telescoping_tc056' depends on axioms: [propext, Quot.sound, Classical.choice]"
+        },
+        "finite_alternating_unimodal_chain_contraction_tc056": {
+          "captured_check_output": "finite_alternating_unimodal_chain_contraction_tc056 : \u2200 (N : \u2115) (a : \u2115 \u2192 \u211d), (\u2200 k < N, 0 \u2264 a k) \u2192 IsUnimodalChain N a \u2192 |\u2211 k \u2208 Finset.range N, (-1) ^ k * a k| \u2264 chainMaxUpTo N a \u2227 (\u2211 k \u2208 Finset.range N, (-1) ^ k * a k) ^ 2 \u2264 \u2211 k \u2208 Finset.range N, a k ^ 2 \u2227 (2 \u2264 N \u2192 min (a 0 ^ 2) (a 1 ^ 2) \u2264 \u2211 k \u2208 Finset.range N, a k ^ 2 - (\u2211 k \u2208 Finset.range N, (-1) ^ k * a k) ^ 2) \u2227 chainMaxUpTo 0 a = 0 \u2227 chainMaxUpTo 1 a = max 0 (a 0) \u2227 \u2200 (M : \u2115), N \u2264 M \u2192 (\u2200 (k : \u2115), N \u2264 k \u2192 a k = 0) \u2192 chainMaxUpTo M a = chainMaxUpTo N a \u2227 \u2211 k \u2208 Finset.range M, (-1) ^ k * a k = \u2211 k \u2208 Finset.range N, (-1) ^ k * a k \u2227 IsUnimodalChain M a",
+          "captured_print_axioms_output": "'RiemannScope.LiouvilleSquareDilation.finite_alternating_unimodal_chain_contraction_tc056' depends on axioms: [propext, Classical.choice, Quot.sound]"
+        },
+        "gaussian_prime_chain_unimodal_and_singleton_contraction_tc056": {
+          "captured_check_output": "@gaussian_prime_chain_unimodal_and_singleton_contraction_tc056 : \u2200 {p s m : \u2115}, p.Prime \u2192 0 < s \u2192 0 < m \u2192 \u2200 (T : \u2115) {X : \u211d}, 0 \u2264 X \u2192 ((\u2200 (k : \u2115), 0 < X \u2192 s * m * p ^ (k + 1) \u2264 T \u2192 0 < gaussianPrimeChain T p s m X k \u2227 gaussianPrimeChain T p s m X (k + 1) / gaussianPrimeChain T p s m X k = gaussianChainRatio p s m X k) \u2227 \u2200 (k l : \u2115), k \u2264 l \u2192 gaussianChainRatio p s m X l \u2264 gaussianChainRatio p s m X k) \u2227 (IsUnimodalChain (T + 1) (gaussianPrimeChain T p s m X) \u2227 |gaussianAlternatingChainSum T p s m X| \u2264 chainMaxUpTo (T + 1) (gaussianPrimeChain T p s m X) \u2227 gaussianAlternatingChainSum T p s m X ^ 2 \u2264 \u2211 k \u2208 Finset.range (T + 1), gaussianPrimeChain T p s m X k ^ 2) \u2227 pointwiseGroupedEnergyV {p} T X \u2264 pointwiseDiagonalD T X \u2227 (0 < X \u2192 p \u2264 T \u2192 min (gaussianTermPhi 1 X ^ 2) (gaussianTermPhi p X ^ 2) \u2264 pointwiseDiagonalD T X - pointwiseGroupedEnergyV {p} T X \u2227 pointwiseGroupedEnergyV {p} T X < pointwiseDiagonalD T X)",
+          "captured_print_axioms_output": "'RiemannScope.LiouvilleSquareDilation.gaussian_prime_chain_unimodal_and_singleton_contraction_tc056' depends on axioms: [propext, Classical.choice, Quot.sound]"
+        },
+        "mixed_interaction_decomposition_and_p_independence_tc056": {
+          "captured_check_output": "@mixed_interaction_decomposition_and_p_independence_tc056 : \u2200 {P : Finset \u2115}, (\u2200 q \u2208 P, q.Prime) \u2192 \u2200 {p : \u2115}, p.Prime \u2192 p \u2209 P \u2192 \u2200 (T : \u2115) {X : \u211d}, 0 \u2264 X \u2192 (0 \u2264 pointwiseContractionC P p T X \u2227 pointwiseMixedM \u2205 p T X = 0) \u2227 pointwiseDelta P p T X = pointwiseMixedM P p T X - pointwiseContractionC P p T X \u2227 pointwiseMixedM P p T X = \u2211 s \u2208 coprimeCutoffFinset (insert p P) T, \u2211 m \u2208 smoothCutoffFinset P (T / s), \u2211 n \u2208 (smoothCutoffFinset P (T / s)).erase m, \u2191(liouvilleLambda m) * \u2191(liouvilleLambda n) * \u2211 k \u2208 Finset.range (T + 1), \u2211 l \u2208 (Finset.range (T + 1)).erase k, (-1) ^ (k + l) * gaussianPrimeChain T p s m X k * gaussianPrimeChain T p s n X l \u2227 (pointwiseContractionC P p T X = pointwiseContractionC \u2205 p T X \u2227 pointwiseContractionC P p T X = pointwiseDiagonalD T X - pointwiseGroupedEnergyV {p} T X) \u2227 pointwiseDiagonalD T X - pointwiseGroupedEnergyV {p} T X = 2 * \u2211 h \u2208 Finset.filter (fun h => p ^ h \u2264 T) (Finset.Icc 1 T), (-1) ^ (h + 1) * \u2211 n \u2208 Finset.Icc 1 (T / p ^ h), gaussianTermPhi n X * gaussianTermPhi (n * p ^ h) X",
+          "captured_print_axioms_output": "'RiemannScope.LiouvilleSquareDilation.mixed_interaction_decomposition_and_p_independence_tc056' depends on axioms: [propext, Quot.sound, Classical.choice]"
         }
       }
     },
@@ -5448,6 +5508,42 @@
         "check_signature": "@finite_gaussian_observable_reconstruction_and_weighted_cofactor_square : \u2200 {P : Finset \u2115}, (\u2200 p \u2208 P, p.Prime) \u2192 \u2200 (T : \u2115) {X : \u211d}, 0 \u2264 X \u2192 finiteQLambda T X = \u2211 m \u2208 smoothCutoffFinset P T, \u2191(liouvilleLambda m) / \u221a\u2191m * finiteQLambdaCoprime P (T / m) (X / \u2191m) \u2227 finiteQLambda T X = \u2211 r \u2208 coprimeCutoffFinset P T, cofactorFiberF P T r X \u2227 finiteQLambda T X ^ 2 = \u2211 r \u2208 coprimeCutoffFinset P T, 1 / \u2191r * finiteQLambdaSmooth P (T / r) (X / \u2191r) ^ 2 + \u2211 r \u2208 coprimeCutoffFinset P T, \u2211 s \u2208 (coprimeCutoffFinset P T).erase r, \u2191(liouvilleLambda r) * \u2191(liouvilleLambda s) / \u221a\u2191(r * s) * finiteQLambdaSmooth P (T / r) (X / \u2191r) * finiteQLambdaSmooth P (T / s) (X / \u2191s) \u2227 finiteQLambda 0 X = 0 \u2227 finiteQLambdaCoprime \u2205 T X = finiteQLambda T X",
         "print_axioms": "'RiemannScope.LiouvilleSquareDilation.finite_gaussian_observable_reconstruction_and_weighted_cofactor_square' depends on axioms: [propext, Quot.sound, Classical.choice]",
         "descriptive_scope_metadata_note": "Unconditional finite Gaussian observable reconstruction theorem (`TASK-TC-055R2` \u00a72 & \u00a73c) for `0 \u2264 X`, `T : \u2115`, and finite prime set `P`: discharges the `X^{5/2}` and `(m r)^{-3}` scaling identity to prove `finiteQLambda T X = \u2211_{m \u2208 S(P), m \u2264 T} (\u03bb(m)/\u221am) finiteQLambdaCoprime P (T/m) (X/m)`, `finiteQLambda T X = \u2211_{1 \u2264 r \u2264 T, gcd(r, N_P)=1} cofactorFiberF P T r X` (`cofactorFiberF = (\u03bb(r)/\u221ar) finiteQLambdaSmooth P (T/r) (X/r)`), and the exact pointwise weighted square expansion `(finiteQLambda T X)^2 = \u2211_r (1/r) Q_{\u03bb,S(P),\u230aT/r\u230b}(X/r)^2 + \u2211_r \u2211_{s \u2260 r} (\u03bb(r)\u03bb(s)/\u221a(r s)) Q_{\u03bb,S(P),\u230aT/r\u230b}(X/r) Q_{\u03bb,S(P),\u230aT/s\u230b}(X/s)`, plus `finiteQLambda 0 X = 0` and `finiteQLambdaCoprime \u2205 T X = finiteQLambda T X` (the `[Y, \u03c4 Y]` integral decomposition follows analytically outside Lean by finite linearity of the integral)."
+      },
+      "finite_prime_adjoining_fiber_and_pointwise_telescoping_tc056": {
+        "declaration_name": "RiemannScope.LiouvilleSquareDilation.finite_prime_adjoining_fiber_and_pointwise_telescoping_tc056",
+        "theorem_classification": "actual_finite_prime_filtration_adjoining_and_pointwise_telescoping_theorem",
+        "captured_check_output": "@finite_prime_adjoining_fiber_and_pointwise_telescoping_tc056 : \u2200 {P : Finset \u2115}, (\u2200 q \u2208 P, q.Prime) \u2192 \u2200 {p : \u2115}, p.Prime \u2192 p \u2209 P \u2192 \u2200 (T : \u2115) {X : \u211d}, 0 \u2264 X \u2192 (pointwiseGroupedEnergyV \u2205 T X = pointwiseDiagonalD T X \u2227 pointwiseGroupedEnergyV (primesUpToFinset T) T X = finiteQLambda T X ^ 2) \u2227 (\u2200 s \u2208 coprimeCutoffFinset (insert p P) T, (\u2200 (k : \u2115), k \u2208 admissiblePrimeExponents T p s \u2194 s * p ^ k \u2264 T) \u2227 cofactorFiberF (insert p P) T s X = \u2211 k \u2208 admissiblePrimeExponents T p s, cofactorFiberF P T (s * p ^ k) X) \u2227 pointwiseDelta P p T X = 2 * \u2211 s \u2208 coprimeCutoffFinset (insert p P) T, \u2211 k \u2208 admissiblePrimeExponents T p s, \u2211 l \u2208 Finset.filter (fun l => k < l) (admissiblePrimeExponents T p s), cofactorFiberF P T (s * p ^ k) X * cofactorFiberF P T (s * p ^ l) X \u2227 List.Pairwise (fun x x_1 => x < x_1) (ascendingPrimesUpTo T) \u2227 (ascendingPrimesUpTo T).toFinset = primesUpToFinset T \u2227 finiteQLambda T X ^ 2 = pointwiseDiagonalD T X + \u2211 j \u2208 Finset.range (ascendingPrimesUpTo T).length, pointwiseDelta (prefixPrimeSet (ascendingPrimesUpTo T) j) ((ascendingPrimesUpTo T).getD j 0) T X",
+        "captured_print_axioms_output": "'RiemannScope.LiouvilleSquareDilation.finite_prime_adjoining_fiber_and_pointwise_telescoping_tc056' depends on axioms: [propext, Quot.sound, Classical.choice]",
+        "check_signature": "@finite_prime_adjoining_fiber_and_pointwise_telescoping_tc056 : \u2200 {P : Finset \u2115}, (\u2200 q \u2208 P, q.Prime) \u2192 \u2200 {p : \u2115}, p.Prime \u2192 p \u2209 P \u2192 \u2200 (T : \u2115) {X : \u211d}, 0 \u2264 X \u2192 (pointwiseGroupedEnergyV \u2205 T X = pointwiseDiagonalD T X \u2227 pointwiseGroupedEnergyV (primesUpToFinset T) T X = finiteQLambda T X ^ 2) \u2227 (\u2200 s \u2208 coprimeCutoffFinset (insert p P) T, (\u2200 (k : \u2115), k \u2208 admissiblePrimeExponents T p s \u2194 s * p ^ k \u2264 T) \u2227 cofactorFiberF (insert p P) T s X = \u2211 k \u2208 admissiblePrimeExponents T p s, cofactorFiberF P T (s * p ^ k) X) \u2227 pointwiseDelta P p T X = 2 * \u2211 s \u2208 coprimeCutoffFinset (insert p P) T, \u2211 k \u2208 admissiblePrimeExponents T p s, \u2211 l \u2208 Finset.filter (fun l => k < l) (admissiblePrimeExponents T p s), cofactorFiberF P T (s * p ^ k) X * cofactorFiberF P T (s * p ^ l) X \u2227 List.Pairwise (fun x x_1 => x < x_1) (ascendingPrimesUpTo T) \u2227 (ascendingPrimesUpTo T).toFinset = primesUpToFinset T \u2227 finiteQLambda T X ^ 2 = pointwiseDiagonalD T X + \u2211 j \u2208 Finset.range (ascendingPrimesUpTo T).length, pointwiseDelta (prefixPrimeSet (ascendingPrimesUpTo T) j) ((ascendingPrimesUpTo T).getD j 0) T X",
+        "print_axioms": "'RiemannScope.LiouvilleSquareDilation.finite_prime_adjoining_fiber_and_pointwise_telescoping_tc056' depends on axioms: [propext, Quot.sound, Classical.choice]",
+        "descriptive_scope_metadata_note": "Unconditional finite prime-filtration theorem (`TASK-TC-056` \u00a73) for any finite prime set `P : Finset \u2115` (`\u2200 q \u2208 P, q.Prime`), prime `p \u2209 P`, `T : \u2115`, and `X \u2265 0`: proves filtration endpoints `pointwiseGroupedEnergyV \u2205 T X = pointwiseDiagonalD T X` and `pointwiseGroupedEnergyV (primesUpTo T) T X = (finiteQLambda T X)^2`, coupled prime-adjoining identity `cofactorFiberF (insert p P) T s X = \u2211_{k \u2208 admissiblePrimeExponents T p s} cofactorFiberF P T (s * p^k) X` (`gcd(s, N_{P\u222a{p}})=1`), stepwise identity `pointwiseDelta P p T X = 2 * \u2211_s \u2211_{k < l} cofactorFiberF P T (s * p^k) X * cofactorFiberF P T (s * p^l) X`, and ascending-prime list telescoping (the `[Y, \u03c4 Y]` integral transfer to `V_P(Y, T)` and `\u0394_{P,p}(Y, T)` follows analytically outside Lean by finite linearity of the integral)."
+      },
+      "finite_alternating_unimodal_chain_contraction_tc056": {
+        "declaration_name": "RiemannScope.LiouvilleSquareDilation.finite_alternating_unimodal_chain_contraction_tc056",
+        "theorem_classification": "unconditional_finite_unimodal_alternating_chain_contraction_theorem",
+        "captured_check_output": "finite_alternating_unimodal_chain_contraction_tc056 : \u2200 (N : \u2115) (a : \u2115 \u2192 \u211d), (\u2200 k < N, 0 \u2264 a k) \u2192 IsUnimodalChain N a \u2192 |\u2211 k \u2208 Finset.range N, (-1) ^ k * a k| \u2264 chainMaxUpTo N a \u2227 (\u2211 k \u2208 Finset.range N, (-1) ^ k * a k) ^ 2 \u2264 \u2211 k \u2208 Finset.range N, a k ^ 2 \u2227 (2 \u2264 N \u2192 min (a 0 ^ 2) (a 1 ^ 2) \u2264 \u2211 k \u2208 Finset.range N, a k ^ 2 - (\u2211 k \u2208 Finset.range N, (-1) ^ k * a k) ^ 2) \u2227 chainMaxUpTo 0 a = 0 \u2227 chainMaxUpTo 1 a = max 0 (a 0) \u2227 \u2200 (M : \u2115), N \u2264 M \u2192 (\u2200 (k : \u2115), N \u2264 k \u2192 a k = 0) \u2192 chainMaxUpTo M a = chainMaxUpTo N a \u2227 \u2211 k \u2208 Finset.range M, (-1) ^ k * a k = \u2211 k \u2208 Finset.range N, (-1) ^ k * a k \u2227 IsUnimodalChain M a",
+        "captured_print_axioms_output": "'RiemannScope.LiouvilleSquareDilation.finite_alternating_unimodal_chain_contraction_tc056' depends on axioms: [propext, Classical.choice, Quot.sound]",
+        "check_signature": "finite_alternating_unimodal_chain_contraction_tc056 : \u2200 (N : \u2115) (a : \u2115 \u2192 \u211d), (\u2200 k < N, 0 \u2264 a k) \u2192 IsUnimodalChain N a \u2192 |\u2211 k \u2208 Finset.range N, (-1) ^ k * a k| \u2264 chainMaxUpTo N a \u2227 (\u2211 k \u2208 Finset.range N, (-1) ^ k * a k) ^ 2 \u2264 \u2211 k \u2208 Finset.range N, a k ^ 2 \u2227 (2 \u2264 N \u2192 min (a 0 ^ 2) (a 1 ^ 2) \u2264 \u2211 k \u2208 Finset.range N, a k ^ 2 - (\u2211 k \u2208 Finset.range N, (-1) ^ k * a k) ^ 2) \u2227 chainMaxUpTo 0 a = 0 \u2227 chainMaxUpTo 1 a = max 0 (a 0) \u2227 \u2200 (M : \u2115), N \u2264 M \u2192 (\u2200 (k : \u2115), N \u2264 k \u2192 a k = 0) \u2192 chainMaxUpTo M a = chainMaxUpTo N a \u2227 \u2211 k \u2208 Finset.range M, (-1) ^ k * a k = \u2211 k \u2208 Finset.range N, (-1) ^ k * a k \u2227 IsUnimodalChain M a",
+        "print_axioms": "'RiemannScope.LiouvilleSquareDilation.finite_alternating_unimodal_chain_contraction_tc056' depends on axioms: [propext, Classical.choice, Quot.sound]",
+        "descriptive_scope_metadata_note": "Unconditional finite sequence theorem (`TASK-TC-056` \u00a74) for any `K : \u2115` and nonnegative unimodal sequence `a : \u2115 \u2192 \u211d` (`\u2200 k < K, 0 \u2264 a k`, `IsUnimodalChain K a`): handles empty (`K = 0`), singleton (`K = 1`), ties, and zero extensions (`finiteChainMax 0 a = 0`), proving `|\u2211_{k < K} (-1)^k a k| \u2264 finiteChainMax K a`, `(\u2211_{k < K} (-1)^k a k)^2 \u2264 \u2211_{k < K} (a k)^2`, strict-gap lower bound `min (a 0)^2 (a 1)^2 \u2264 \u2211_{k < K} (a k)^2 - (\u2211_{k < K} (-1)^k a k)^2` for `K \u2265 2`, and zero-extension invariance."
+      },
+      "gaussian_prime_chain_unimodal_and_singleton_contraction_tc056": {
+        "declaration_name": "RiemannScope.LiouvilleSquareDilation.gaussian_prime_chain_unimodal_and_singleton_contraction_tc056",
+        "theorem_classification": "actual_gaussian_prime_chain_unimodality_and_singleton_contraction_theorem",
+        "captured_check_output": "@gaussian_prime_chain_unimodal_and_singleton_contraction_tc056 : \u2200 {p s m : \u2115}, p.Prime \u2192 0 < s \u2192 0 < m \u2192 \u2200 (T : \u2115) {X : \u211d}, 0 \u2264 X \u2192 ((\u2200 (k : \u2115), 0 < X \u2192 s * m * p ^ (k + 1) \u2264 T \u2192 0 < gaussianPrimeChain T p s m X k \u2227 gaussianPrimeChain T p s m X (k + 1) / gaussianPrimeChain T p s m X k = gaussianChainRatio p s m X k) \u2227 \u2200 (k l : \u2115), k \u2264 l \u2192 gaussianChainRatio p s m X l \u2264 gaussianChainRatio p s m X k) \u2227 (IsUnimodalChain (T + 1) (gaussianPrimeChain T p s m X) \u2227 |gaussianAlternatingChainSum T p s m X| \u2264 chainMaxUpTo (T + 1) (gaussianPrimeChain T p s m X) \u2227 gaussianAlternatingChainSum T p s m X ^ 2 \u2264 \u2211 k \u2208 Finset.range (T + 1), gaussianPrimeChain T p s m X k ^ 2) \u2227 pointwiseGroupedEnergyV {p} T X \u2264 pointwiseDiagonalD T X \u2227 (0 < X \u2192 p \u2264 T \u2192 min (gaussianTermPhi 1 X ^ 2) (gaussianTermPhi p X ^ 2) \u2264 pointwiseDiagonalD T X - pointwiseGroupedEnergyV {p} T X \u2227 pointwiseGroupedEnergyV {p} T X < pointwiseDiagonalD T X)",
+        "captured_print_axioms_output": "'RiemannScope.LiouvilleSquareDilation.gaussian_prime_chain_unimodal_and_singleton_contraction_tc056' depends on axioms: [propext, Classical.choice, Quot.sound]",
+        "check_signature": "@gaussian_prime_chain_unimodal_and_singleton_contraction_tc056 : \u2200 {p s m : \u2115}, p.Prime \u2192 0 < s \u2192 0 < m \u2192 \u2200 (T : \u2115) {X : \u211d}, 0 \u2264 X \u2192 ((\u2200 (k : \u2115), 0 < X \u2192 s * m * p ^ (k + 1) \u2264 T \u2192 0 < gaussianPrimeChain T p s m X k \u2227 gaussianPrimeChain T p s m X (k + 1) / gaussianPrimeChain T p s m X k = gaussianChainRatio p s m X k) \u2227 \u2200 (k l : \u2115), k \u2264 l \u2192 gaussianChainRatio p s m X l \u2264 gaussianChainRatio p s m X k) \u2227 (IsUnimodalChain (T + 1) (gaussianPrimeChain T p s m X) \u2227 |gaussianAlternatingChainSum T p s m X| \u2264 chainMaxUpTo (T + 1) (gaussianPrimeChain T p s m X) \u2227 gaussianAlternatingChainSum T p s m X ^ 2 \u2264 \u2211 k \u2208 Finset.range (T + 1), gaussianPrimeChain T p s m X k ^ 2) \u2227 pointwiseGroupedEnergyV {p} T X \u2264 pointwiseDiagonalD T X \u2227 (0 < X \u2192 p \u2264 T \u2192 min (gaussianTermPhi 1 X ^ 2) (gaussianTermPhi p X ^ 2) \u2264 pointwiseDiagonalD T X - pointwiseGroupedEnergyV {p} T X \u2227 pointwiseGroupedEnergyV {p} T X < pointwiseDiagonalD T X)",
+        "print_axioms": "'RiemannScope.LiouvilleSquareDilation.gaussian_prime_chain_unimodal_and_singleton_contraction_tc056' depends on axioms: [propext, Classical.choice, Quot.sound]",
+        "descriptive_scope_metadata_note": "Unconditional instantiation (`TASK-TC-056` \u00a74) to the actual Gaussian prime-power chain `gaussianPrimeChain T p s m X k` (`p.Prime`, `s, m > 0`, `X \u2265 0`): proves consecutive admissible ratio identity `a_{k+1}/a_k = p^{-3} exp((X^2/(s m)^2) p^{-2k} (1 - p^{-2}))` and its monotonic decrease in `k`, proves `IsUnimodalChain (T + 1) (gaussianPrimeChain T p s m X)` unconditionally without assuming unimodality, proves chain sup/square contraction, and deduces `pointwiseGroupedEnergyV {p} T X \u2264 pointwiseDiagonalD T X` with strict inequality `<` when `X > 0` and `p \u2264 T` (strict integral inequality `V_{ {p} }(Y, T) < D_T(Y)` for `Y > 0, T \u2265 p` follows analytically by continuity and positivity of `min(\u03c6_1^2, \u03c6_p^2)/X` on `[Y, \u03c4 Y]`)."
+      },
+      "mixed_interaction_decomposition_and_p_independence_tc056": {
+        "declaration_name": "RiemannScope.LiouvilleSquareDilation.mixed_interaction_decomposition_and_p_independence_tc056",
+        "theorem_classification": "actual_mixed_interaction_decomposition_p_independence_and_shift_formula_theorem",
+        "captured_check_output": "@mixed_interaction_decomposition_and_p_independence_tc056 : \u2200 {P : Finset \u2115}, (\u2200 q \u2208 P, q.Prime) \u2192 \u2200 {p : \u2115}, p.Prime \u2192 p \u2209 P \u2192 \u2200 (T : \u2115) {X : \u211d}, 0 \u2264 X \u2192 (0 \u2264 pointwiseContractionC P p T X \u2227 pointwiseMixedM \u2205 p T X = 0) \u2227 pointwiseDelta P p T X = pointwiseMixedM P p T X - pointwiseContractionC P p T X \u2227 pointwiseMixedM P p T X = \u2211 s \u2208 coprimeCutoffFinset (insert p P) T, \u2211 m \u2208 smoothCutoffFinset P (T / s), \u2211 n \u2208 (smoothCutoffFinset P (T / s)).erase m, \u2191(liouvilleLambda m) * \u2191(liouvilleLambda n) * \u2211 k \u2208 Finset.range (T + 1), \u2211 l \u2208 (Finset.range (T + 1)).erase k, (-1) ^ (k + l) * gaussianPrimeChain T p s m X k * gaussianPrimeChain T p s n X l \u2227 (pointwiseContractionC P p T X = pointwiseContractionC \u2205 p T X \u2227 pointwiseContractionC P p T X = pointwiseDiagonalD T X - pointwiseGroupedEnergyV {p} T X) \u2227 pointwiseDiagonalD T X - pointwiseGroupedEnergyV {p} T X = 2 * \u2211 h \u2208 Finset.filter (fun h => p ^ h \u2264 T) (Finset.Icc 1 T), (-1) ^ (h + 1) * \u2211 n \u2208 Finset.Icc 1 (T / p ^ h), gaussianTermPhi n X * gaussianTermPhi (n * p ^ h) X",
+        "captured_print_axioms_output": "'RiemannScope.LiouvilleSquareDilation.mixed_interaction_decomposition_and_p_independence_tc056' depends on axioms: [propext, Quot.sound, Classical.choice]",
+        "check_signature": "@mixed_interaction_decomposition_and_p_independence_tc056 : \u2200 {P : Finset \u2115}, (\u2200 q \u2208 P, q.Prime) \u2192 \u2200 {p : \u2115}, p.Prime \u2192 p \u2209 P \u2192 \u2200 (T : \u2115) {X : \u211d}, 0 \u2264 X \u2192 (0 \u2264 pointwiseContractionC P p T X \u2227 pointwiseMixedM \u2205 p T X = 0) \u2227 pointwiseDelta P p T X = pointwiseMixedM P p T X - pointwiseContractionC P p T X \u2227 pointwiseMixedM P p T X = \u2211 s \u2208 coprimeCutoffFinset (insert p P) T, \u2211 m \u2208 smoothCutoffFinset P (T / s), \u2211 n \u2208 (smoothCutoffFinset P (T / s)).erase m, \u2191(liouvilleLambda m) * \u2191(liouvilleLambda n) * \u2211 k \u2208 Finset.range (T + 1), \u2211 l \u2208 (Finset.range (T + 1)).erase k, (-1) ^ (k + l) * gaussianPrimeChain T p s m X k * gaussianPrimeChain T p s n X l \u2227 (pointwiseContractionC P p T X = pointwiseContractionC \u2205 p T X \u2227 pointwiseContractionC P p T X = pointwiseDiagonalD T X - pointwiseGroupedEnergyV {p} T X) \u2227 pointwiseDiagonalD T X - pointwiseGroupedEnergyV {p} T X = 2 * \u2211 h \u2208 Finset.filter (fun h => p ^ h \u2264 T) (Finset.Icc 1 T), (-1) ^ (h + 1) * \u2211 n \u2208 Finset.Icc 1 (T / p ^ h), gaussianTermPhi n X * gaussianTermPhi (n * p ^ h) X",
+        "print_axioms": "'RiemannScope.LiouvilleSquareDilation.mixed_interaction_decomposition_and_p_independence_tc056' depends on axioms: [propext, Quot.sound, Classical.choice]",
+        "descriptive_scope_metadata_note": "Unconditional decomposition and `P`-independence theorem (`TASK-TC-056` \u00a75 & \u00a76) for any finite prime set `P : Finset \u2115` (`\u2200 q \u2208 P, q.Prime`), prime `p \u2209 P`, `T : \u2115`, and `X \u2265 0`: proves `0 \u2264 pointwiseContractionC P p T X`, `pointwiseMixedM \u2205 p T X = 0`, exact decomposition `pointwiseDelta P p T X = pointwiseMixedM P p T X - pointwiseContractionC P p T X` (cancelling `\u03bb(s)^2 = 1` and retaining ordered `m \u2260 n` without an extra factor of `2`), equivalence with the ordered `k \u2260 l` exponent expansion, `P`-independence `pointwiseContractionC P p T X = pointwiseContractionC \u2205 p T X = pointwiseDiagonalD T X - pointwiseGroupedEnergyV {p} T X` via the `p`-free cofactor bijection `r = s * m`, and the exact alternating shift expansion `D_T - V_{ {p} } = 2 * \u2211_{h \u2265 1, p^h \u2264 T} (-1)^{h+1} \u2211_{1 \u2264 n \u2264 \u230aT/p^h\u230b} \u03c6_n(X) \u03c6_{n p^h}(X)`."
       }
     }
   },
@@ -9986,7 +10082,30 @@
     "asymptotic_formulas": {
       "Q_a2_asymptotic": "Q_{a_2}(X) = (1 / 6) sqrt(X) + O(X^{-1/2}) ~ sqrt(X) / 6 (for X >= 1, with |Q_{a_2}(X) - sqrt(X)/6| <= C_{a_2} X^{-1/2})",
       "E_a2_asymptotic": "E_{a_2}(Y) := int_Y^{tau Y} |Q_{a_2}(X)|^2 dX/X = ((tau - 1) / 36) Y + O(1) ~ ((tau - 1) / 36) Y (for Y >= 1)",
-      "general_finite_S_asymptotic": "For a_S(n) = (-1)^{sum_{p in S} v_p(n)}, the Euler-factor mean is prod_{p in S} (p - 1)/(p + 1), giving leading asymptotics Q_{a_S}(X) ~ (1/2) (prod_{p in S} (p - 1)/(p + 1)) sqrt(X) and E_{a_S}(Y) ~ ((tau - 1) / 4) (prod_{p in S} (p - 1)/(p + 1))^2 Y (quantitative O(X^{-1/2}) and O(1) error bounds are proved here for S = {2}; multi-prime O(X^{-1/2})/O(1) remainders are not claimed).",
+      "general_finite_S_asymptotic": "For any finite prime set S and a_S(n) = (-1)^{sum_{p in S} v_p(n)}, writing a_S = 1 * b_S (b_S = mu * a_S, supported on S(S) with b_S(1) = 1 and b_S(p^k) = 2 (-1)^k for p in S, k >= 1) gives sum_{d in S(S)} |b_S(d)| / d = prod_{p in S} (p + 1)/(p - 1) =: A_S < infty and sum_{d in S(S)} b_S(d) / d = prod_{p in S} (p - 1)/(p + 1) =: m_S. Because |Q_1(w)| / sqrt(w) <= zeta(3) w^2 <= zeta(3) on (0, 1] and |Q_1(w)| / sqrt(w) <= 1/2 + C_{1,uni} w^{-1} <= 1/2 + C_{1,uni} =: M_1 on [1, infty) with zeta(3) < M_1, sup_{w > 0} |Q_1(w)| / sqrt(w) <= M_1 < infty globally. Dominated Convergence on Q_{a_S}(X) / sqrt(X) = sum_{d in S(S)} (b_S(d) / d) (Q_1(X / d) / sqrt(X / d)) proves Q_{a_S}(X) / sqrt(X) -> m_S / 2, and Bounded Convergence on E_{a_S}(Y) / Y = int_1^tau |Q_{a_S}(Y u) / sqrt(Y u)|^2 du (dominated by A_S^2 M_1^2) proves E_{a_S}(Y) / Y -> ((tau - 1) / 4) m_S^2 as Y -> infty (quantitative O(X^{-1/2}) and O(1) error bounds are proved here for S = {2}; multi-prime O(X^{-1/2})/O(1) remainders are not claimed).",
+      "finite_S_dominated_convergence_majorant": {
+        "b_S_formula": "b_S = mu * a_S supported on S(S), b_S(1) = 1, b_S(p^k) = 2 (-1)^k (p in S, k >= 1), b_S(p^k) = 0 (p not in S, k >= 1)",
+        "abs_dirichlet_norm_A_S_formula": "sum_{d in S(S)} |b_S(d)| / d = prod_{p in S} (1 + 2/(p - 1)) = prod_{p in S} (p + 1) / (p - 1) < infty",
+        "signed_dirichlet_mean_m_S_formula": "sum_{d in S(S)} b_S(d) / d = prod_{p in S} (1 - 2/(p + 1)) = prod_{p in S} (p - 1) / (p + 1)",
+        "M_1_global_supremum_formula": "M_1 := 1/2 + C_{1,uni} = 1/2 + 2 * (3 / (2 * e))^{3/2} > zeta(3)",
+        "M_1_global_supremum_majorant": {
+          "mid_float": 1.31983255788372,
+          "rad_float_outward": 7.33927653990229e-17,
+          "lower_dec": "1.319832557883720076781582020759507823707e+0",
+          "upper_dec": "1.319832557883720076781582020759507823710e+0",
+          "arb_ball_str": "[1.319832557883720076781582020759507823709 +/- 1.76e-40]"
+        },
+        "zeta_3": {
+          "mid_float": 1.2020569031595942,
+          "rad_float_outward": 4.8758910103795324e-17,
+          "lower_dec": "1.202056903159594285399738161511449990763e+0",
+          "upper_dec": "1.202056903159594285399738161511449990766e+0",
+          "arb_ball_str": "[1.202056903159594285399738161511449990765 +/- 1.38e-41]"
+        },
+        "M_1_strictly_exceeds_zeta_3": true,
+        "convolution_aS_eq_1_star_bS_verified_up_to_250": true,
+        "S_3_5_7_abs_norm_A_S": "4"
+      },
       "one_sixth": {
         "mid_float": 0.16666666666666666,
         "rad_float_outward": 9.251858538542972e-18,
@@ -10876,10 +10995,11 @@
   },
   "section_13_tc055r_finite_truncation_and_signed_energy_attempt": {
     "exact_finite_reconstruction_theorem": {
-      "smooth_outer_formula": "For every integer T >= 0, finite prime set P, and X > 0: Q_{lambda,T}(X) = sum_{m in S(P), m <= T} (lambda(m) / sqrt(m)) Q_{lambda,P,floor(T/m)}(X / m).",
-      "coprime_outer_weighted_cofactor_formula": "For every integer T >= 0, finite prime set P, and X > 0: Q_{lambda,T}(X) = sum_{1 <= r <= T, gcd(r, N_P)=1} F_r(X), where F_r(X) = (lambda(r) / sqrt(r)) Q_{lambda,S(P),floor(T/r)}(X / r) and Q_{lambda,S(P),L}(w) = w^{5/2} sum_{m <= L, m in S(P)} lambda(m) m^{-3} exp(-w^2 / m^2) (derived from X^{5/2} (m r)^{-3} = r^{-1/2} (X / r)^{5/2} m^{-3}).",
-      "formula": "For every integer T >= 0, finite prime set P, and X > 0: Q_{lambda,T}(X) = sum_{m in S(P), m <= T} (lambda(m) / sqrt(m)) Q_{lambda,P,floor(T/m)}(X / m) = sum_{1 <= r <= T, gcd(r, N_P)=1} (lambda(r) / sqrt(r)) Q_{lambda,S(P),floor(T/r)}(X / r).",
-      "inner_cutoff_dependence_and_exact_excess_note": "Because 1 <= n = m r <= T with m in S(P) and gcd(r, N_P) = 1 is equivalent to 1 <= m <= T and 1 <= r <= floor(T / m), replacing r <= floor(T / m) by an uncoupled cutoff r <= T adds the exact excess sum sum_{m in S(P), m <= T} sum_{floor(T/m) < r <= T, gcd(r, N_P)=1} lambda(m) lambda(r) w(m r) (formalized in Lean 4 theorem finite_liouville_reindexed_sum_and_excess_cutoff_identity_nat). This excess is NOT universally nonzero: it vanishes identically when P = empty, T <= 1, or (P = {2}, T = 2), and can also vanish by sign cancellation (e.g. T = 5, P = {2}, w = 1), whereas for the Gaussian observable at (P = {2}, T = 3) and (24, {2,3}), (36, {2,3,5}), (50, {2,3,5,7}) it is certified strictly nonzero.",
+      "finite_prime_set_hypothesis": "Explicitly quantified over any finite set of primes P (`P : Finset Nat`, `forall p in P, p.Prime`, including P = empty with N_empty = 1, S(empty) = {1}, and N_P = prod_{p in P} p).",
+      "smooth_outer_formula": "For every integer T >= 0, finite set of primes P, and X > 0: Q_{lambda,T}(X) = sum_{m in S(P), m <= T} (lambda(m) / sqrt(m)) Q_{lambda,P,floor(T/m)}(X / m).",
+      "coprime_outer_weighted_cofactor_formula": "For every integer T >= 0, finite set of primes P, and X > 0: Q_{lambda,T}(X) = sum_{1 <= r <= T, gcd(r, N_P)=1} F_r(X), where F_r(X) = (lambda(r) / sqrt(r)) Q_{lambda,S(P),floor(T/r)}(X / r) and Q_{lambda,S(P),L}(w) = w^{5/2} sum_{m <= L, m in S(P)} lambda(m) m^{-3} exp(-w^2 / m^2) (derived from X^{5/2} (m r)^{-3} = r^{-1/2} (X / r)^{5/2} m^{-3}).",
+      "formula": "For every integer T >= 0, finite set of primes P, and X > 0: Q_{lambda,T}(X) = sum_{m in S(P), m <= T} (lambda(m) / sqrt(m)) Q_{lambda,P,floor(T/m)}(X / m) = sum_{1 <= r <= T, gcd(r, N_P)=1} (lambda(r) / sqrt(r)) Q_{lambda,S(P),floor(T/r)}(X / r).",
+      "inner_cutoff_dependence_and_exact_excess_note": "Because 1 <= n = m r <= T with m in S(P) and gcd(r, N_P) = 1 is equivalent to 1 <= m <= T and 1 <= r <= floor(T / m) for any finite set of primes P, replacing r <= floor(T / m) by an uncoupled cutoff r <= T adds the exact excess sum sum_{m in S(P), m <= T} sum_{floor(T/m) < r <= T, gcd(r, N_P)=1} lambda(m) lambda(r) w(m r) (formalized in Lean 4 theorem finite_liouville_reindexed_sum_and_excess_cutoff_identity_nat). This excess is NOT universally nonzero: it vanishes identically when P = empty, T <= 1, or (P = {2}, T = 2), and can also vanish by sign cancellation (e.g. T = 5, P = {2}, w = 1); at (P = {2}, T = 3) the excess equals w(6), which is nonzero whenever w(6) != 0, including the strictly positive Gaussian case w(n) = phi_n(X) = X^{5/2} n^{-3} exp(-X^2 / n^2) > 0 (X > 0), and for the Gaussian observable at (24, {2,3}), (36, {2,3,5}), (50, {2,3,5,7}) it is also certified strictly nonzero.",
       "uncoupled_cutoff_cancellation_witness_T5_P2_unit_weight": {
         "T": 5,
         "primes_P": [
@@ -11939,8 +12059,26 @@
         },
         "omitted_weight_strictly_detected": true
       },
-      "proved_partial_saving_on_fixed_smooth_fibers": "For any fixed finite prime set P_u, the generating Dirichlet series of the pure P_u-smooth sum is D_{S(P_u)}(s) = sum_{m in S(P_u)} lambda(m) m^{-s} = prod_{p <= u} (1 + p^{-s})^{-1}, which is holomorphic throughout the right half-plane Re(s) > 0 (its poles lie on Re(s) = 0 at s = i (2k+1) tau / (2 log p)). Thus for fixed u, each un-truncated P_u-smooth fiber Q_{lambda,S(P_u)}(w) has contour-shift bound O_{u,eta}(w^eta) for every eta > 0 (power saving in w = X/r as w -> infty, with ineffective/u-dependent constant).",
-      "exact_two_part_obstruction_preventing_all_eps_closure": "When attempting to promote the fixed-u smooth-fiber saving to an unconditional bound E_{lambda,T(Y)}(Y) <<_eps Y^eps by choosing u = u(Y) (while preserving the combined signed sum E_{same-r} + E_{diff-r}): (1) If u >= T(Y) = ceil(Y^{5/4}) so that gcd(r, N_u) = 1 forces r = 1 and E_{diff-r} = 0, then on the contour Re(1/2 + z) = eta in (0, 1/2) the finite Euler product prod_{p <= u}(1 + p^{-eta - i*b})^{-1} has exact Kronecker supremum prod_{p <= u}(1 - p^{-eta})^{-1} = exp((1+o(1)) u^{1-eta} / ((1-eta) log u)), which grows super-polynomially in Y, while the finite truncation m <= T(Y) couples the Mellin integral to the Perron hyperbolic kernel (T/m)^w / w; (2) If u(Y) is chosen small enough to keep prod_{p <= u}(1 - p^{-eta})^{-1} <= Y^eps (requiring u^{1-eta}/log u << eps log Y, so u << (log Y)^{1/(1-eta)}), then almost all integers n <= T(Y) have large P_u-coprime cofactors r > u, and the combined sum E_{same-r}(Y; T(Y), P_u) + E_{diff-r}(Y; T(Y), P_u) retains the unfactored primes p > u across distinct cofactors.",
+      "proved_partial_saving_on_fixed_smooth_fibers": "For any fixed finite set of primes P, both contour shifting of D_{S(P)}(s) = prod_{p in P}(1 + p^{-s})^{-1} and direct termwise sparsity give |Q_{lambda,S(P),L}(w)| <= Q_{1,S(P),L}(w) <= c_eta w^eta prod_{p in P}(1 - p^{-1/2 - eta})^{-1} for every 0 <= eta < 5/2 (where c_eta = sup_{x > 0} x^{5/2 - eta} exp(-x^2) = ((5 - 2*eta)/(4*e))^{(5 - 2*eta)/4}, uniformly in L >= 0). Because this exact O_{P,eta}(w^eta) power saving already holds for unsigned unit weights +1 from the sparsity of S(P) and convergence of sum_{m in S(P)} m^{-1/2 - eta} = prod_{p in P}(1 - p^{-1/2 - eta})^{-1} < infty, fixed-P smooth-fiber decay is a sparsity/absolute-convergence bound and NOT by itself a new signed cancellation theorem.",
+      "fixed_P_smooth_fiber_sparsity_constants": {
+        "c_eta_formula": "c_eta = ((5 - 2*eta) / (4 * e))^{(5 - 2*eta) / 4} for 0 <= eta < 5/2",
+        "c_0_sparsity_constant": {
+          "mid_float": 0.37867742379730174,
+          "rad_float_outward": 1.9664215199686815e-17,
+          "lower_dec": "3.786774237973017179648688732911923409456e-1",
+          "upper_dec": "3.786774237973017179648688732911923409459e-1",
+          "arb_ball_str": "[0.3786774237973017179648688732911923409458 +/- 4.04e-41]"
+        },
+        "c_quarter_sparsity_constant": {
+          "mid_float": 0.3706511019414341,
+          "rad_float_outward": 2.6067833125880985e-17,
+          "lower_dec": "3.706511019414340541102507060436134268254e-1",
+          "upper_dec": "3.706511019414340541102507060436134268257e-1",
+          "arb_ball_str": "[0.3706511019414340541102507060436134268255 +/- 4.02e-41]"
+        },
+        "unsigned_smooth_bound": "|Q_{lambda,S(P),L}(w)| <= Q_{1,S(P),L}(w) <= c_eta w^eta prod_{p in P} (1 - p^{-1/2 - eta})^{-1} (holds for unsigned +1 weights solely by sparsity of S(P), uniformly in L >= 0)"
+      },
+      "exact_two_part_obstruction_preventing_all_eps_closure": "When attempting to promote the fixed-u smooth-fiber bound to an unconditional bound E_{lambda,T(Y)}(Y) <<_eps Y^eps by choosing u = u(Y) (while preserving the combined signed sum E_{same-r} + E_{diff-r}): (1) If u >= T(Y) = ceil(Y^{5/4}) so that gcd(r, N_u) = 1 forces r = 1 and E_{diff-r} = 0, then on the contour Re(1/2 + z) = eta in (0, 1/2) (or in the unsigned sparsity product at exponent eta in (0, 1)) the finite Euler product has exact Kronecker supremum prod_{p <= u}(1 - p^{-eta})^{-1} = exp((1 + o_eta(1)) u^{1-eta} / ((1-eta) log u)), which grows super-polynomially in Y, while finite truncation m <= T(Y) couples the Mellin integral to the Perron hyperbolic kernel (T/m)^w / w; (2) Requiring prod_{p <= u}(1 - p^{-eta})^{-1} <= Y^eps for fixed 0 < eta < 1 means (u^{1-eta} / ((1-eta) log u))(1 + o_eta(1)) <= eps log Y: here u(Y) << (log Y)^{1/(1-eta)} is a sufficient-only condition, whereas u(Y) = c * (log Y * log log Y)^{1/(1-eta)} satisfies u(Y)^{1-eta} / ((1-eta) log u(Y)) = c^{1-eta} (1 + o_{eta,c}(1)) log Y and IS admissible whenever 0 < c < eps^{1/(1-eta)} (c^{1-eta} < eps), making u(Y) = O_{eta,eps}((log Y * log log Y)^{1/(1-eta)}) (limsup <= eps^{1/(1-eta)}) the exact necessary polylogarithmic scale. Even at that maximal admissible scale u(Y) = (log Y)^{O_eta(1)} << T(Y), almost all integers n <= T(Y) have large P_u-coprime cofactors r > u, so the combined sum E_{same-r}(Y; T(Y), P_u) + E_{diff-r}(Y; T(Y), P_u) retains the unfactored primes p > u across distinct cofactors.",
       "rows": [
         {
           "Y": 4,
