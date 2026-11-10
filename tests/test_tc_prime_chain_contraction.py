@@ -32,6 +32,7 @@ from tc.liouville_square_dilation import (
 from tc.prime_chain_contraction import (
     PRIME_CHAIN_CONTRACTION_ARTIFACT_PATH,
     TC_056_REVIEW_DOC_PATH,
+    TC_056R_REVIEWED_COMMIT,
     KernelMatrixCacheArb,
     compute_prime_reciprocal_cube_minus_one_sum_arb,
     evaluate_C_P_p_chain_quadrature_arb,
@@ -48,8 +49,10 @@ from tc.prime_chain_contraction import (
     evaluate_V_P_independent_fiber_quadrature_arb,
     evaluate_V_P_kernel_grouping_arb,
     evaluate_finite_unimodal_alternating_chain_arb,
+    evaluate_low_prime_alpha_half_euler_product_arb,
     evaluate_phi_n_arb,
     evaluate_smooth_cutoff_surge_I_kappa_arb,
+    evaluate_unsigned_euler_product_P_eta_arb,
     exact_M_companion_cutoff,
     exact_T_cutoff_ceil_Y_5_4,
     exact_U0_cutoff_ceil_2_Y_5_8,
@@ -187,19 +190,41 @@ def test_section_2_uncoupled_excess_w6_and_polylog_scale() -> None:
         )
         assert uncoupled - coupled == w6_val
 
-    # Necessary vs sufficient polylogarithmic scale:
-    # For eta = 1/2, eps = 1/4, c_adm = 1/32 (< eps^2 = 1/16) is admissible, whereas
-    # c_inadm = 1/8 (> eps^2 = 1/16) violates u^{1-eta}/((1-eta) log u) <= eps log Y at large Y:
+    # Three-regime analysis of P_eta(u) = prod_{p <= u} (1 - p^{-1/2-eta})^{-2} (beta = 1/2 - eta):
+    # - Regime A (0 < eta < 1/2, concrete case eta = 1/4, alpha = 3/4, beta = 1/4):
+    #   For u(Y) = c * (log Y * log log Y)^{1/beta} = c * (log Y * log log Y)^4 at eps = 1/4:
+    #   c_adm = (1/16)^4 = 1/65536 (2 * c^{1/4} = 1/8 < eps) is admissible, whereas
+    #   c_inc = (1/4)^4 = 1/256 (2 * c^{1/4} = 1/2 > eps) violates 2 * u^beta / (beta * log u) <= eps * log Y:
     saved = flint_ctx.prec
     try:
         flint_ctx.prec = 256
-        logY = arb(10000)
-        u_adm = (arb(1) / arb(32)) * ((logY * logY.log()) ** 2)
-        u_inadm = (arb(1) / arb(8)) * ((logY * logY.log()) ** 2)
-        ratio_adm = u_adm.sqrt() / ((arb(1) / arb(2)) * u_adm.log() * logY)
-        ratio_inadm = u_inadm.sqrt() / ((arb(1) / arb(2)) * u_inadm.log() * logY)
-        assert bool((arb(1) / arb(4) - ratio_adm).lower() > 0)
-        assert bool((ratio_inadm - arb(1) / arb(4)).lower() > 0)
+        logY = arb(1000)
+        beta = arb(1) / arb(4)
+        eps = arb(1) / arb(4)
+        u_adm = (arb(1) / arb(65536)) * ((logY * logY.log()) ** arb(4))
+        u_inc = (arb(1) / arb(256)) * ((logY * logY.log()) ** arb(4))
+        ratio_adm = (arb(2) * (u_adm ** beta)) / (beta * u_adm.log() * logY)
+        ratio_inc = (arb(2) * (u_inc ** beta)) / (beta * u_inc.log() * logY)
+        assert bool((eps - ratio_adm).lower() > 0)
+        assert bool((ratio_inc - eps).lower() > 0)
+
+        regA_1000 = evaluate_unsigned_euler_product_P_eta_arb(Fraction(1, 4), 1000, prec_bits=256)
+        assert regA_1000["regime"] == "REGIME_A_SUBCRITICAL_0_LT_ETA_LT_1_OVER_2"
+        assert bool(regA_1000["higher_power_tail"].lower() > 0)
+
+        # - Regime B (eta = 1/2, alpha = 1, beta = 0): squared Mertens product P_{1/2}(u) ~ e^{2*gamma_E} (log u)^2:
+        regB_1000 = evaluate_unsigned_euler_product_P_eta_arb(Fraction(1, 2), 1000, prec_bits=256)
+        assert regB_1000["regime"] == "REGIME_B_CRITICAL_MERTENS_ETA_EQ_1_OVER_2"
+        assert bool((regB_1000["ratio_to_mertens_asymptotic"] - arb(9) / arb(10)).lower() > 0)
+        assert bool((arb(11) / arb(10) - regB_1000["ratio_to_mertens_asymptotic"]).lower() > 0)
+
+        # - Regime C (1/2 < eta < 1, concrete case eta = 3/4, alpha = 5/4): convergent to zeta(5/4)^2:
+        regC_1000 = evaluate_unsigned_euler_product_P_eta_arb(Fraction(3, 4), 1000, prec_bits=256)
+        regC_10000 = evaluate_unsigned_euler_product_P_eta_arb(Fraction(3, 4), 10000, prec_bits=256)
+        assert regC_1000["regime"] == "REGIME_C_SUPERCRITICAL_CONVERGENT_1_OVER_2_LT_ETA_LT_1"
+        assert bool((regC_10000["P_eta"] - regC_1000["P_eta"]).lower() > 0)
+        assert bool(regC_1000["gap_below_zeta_limit"].lower() > 0)
+        assert bool(regC_10000["gap_below_zeta_limit"].lower() > 0)
     finally:
         flint_ctx.prec = saved
 
@@ -539,7 +564,7 @@ def test_tc056r_rational_vs_algebraic_grade_scope_and_no_overclaim(tc056_artifac
         "admissible_polylogarithmic_scale_correction"
     ]
     assert polylog_audit["unsigned_majorant_budget_scope_only"] is True
-    assert "unsigned Euler-product majorant" in polylog_audit["admissible_and_necessary_scale"]
+    assert "P_eta(u)" in polylog_audit["product_definition"]
 
 
 def test_tc056r_exact_U0_cutoff_boundaries_and_empty_prime_bands(tc056_artifact: dict) -> None:
@@ -609,5 +634,108 @@ def test_tc056r_theorem_8E_mellin_sign_step_B_truncation_and_claim_separation(
     claims = tc056_artifact["five_category_claim_classification"]
     assert any("Theorem 8.C" in item for item in claims["2_analytic_theorems_proved_outside_lean"])
     assert any("Theorem 8.E" in item for item in claims["5_conditional_and_open_statements"])
+
+
+# ---------------------------------------------------------------------------
+# 8. TASK-TC-056R2 Regression Tests (3-Regime P_eta, Low-Prime alpha=1/2,
+#    Unsupported Probe Removal, and Small-Y Cutoff Ordering Domain)
+# ---------------------------------------------------------------------------
+
+
+def test_tc056r2_three_regime_P_eta_and_low_prime_alpha_half_distinction(
+    tc056_artifact: dict,
+) -> None:
+    assert tc056_artifact["repair_task_id"] == "TASK-TC-056R2"
+    assert tc056_artifact["tc056r_reviewed_commit"] == TC_056R_REVIEWED_COMMIT
+
+    polylog_audit = tc056_artifact["section_1_and_2_baseline_and_cleanup"][
+        "admissible_polylogarithmic_scale_correction"
+    ]
+    assert polylog_audit["verified"] is True
+    assert (
+        polylog_audit["regime_A_subcritical_0_lt_eta_lt_half"]["regression_eta_quarter_u1000"]["verified"]
+        is True
+    )
+    assert (
+        polylog_audit["regime_B_critical_eta_eq_half"]["regression_eta_half_u1000"]["verified"]
+        is True
+    )
+    assert (
+        polylog_audit["regime_C_supercritical_half_lt_eta_lt_1"]["regression_eta_three_quarters"]["verified"]
+        is True
+    )
+
+    # Verify invalid eta outside (0, 1) and u < 0 raise ValueError:
+    with pytest.raises(ValueError):
+        evaluate_unsigned_euler_product_P_eta_arb(0, 100)
+    with pytest.raises(ValueError):
+        evaluate_unsigned_euler_product_P_eta_arb(1, 100)
+    with pytest.raises(ValueError):
+        evaluate_unsigned_euler_product_P_eta_arb(Fraction(1, 4), -1)
+
+    # Distinct alpha = 1/2 (eta = 0) low-prime bound in Theorem 8.B(1):
+    thm_8b = tc056_artifact["section_8_mixed_prime_block_attempt"][
+        "theorem_8B_unconditional_low_and_top_block_bounds"
+    ]
+    assert thm_8b["low_prime_abs_sum_samples_verified"] is True
+    abs_sum_low, _, _ = _parse_arb_ball_str_to_fractions(
+        thm_8b["sample_partial_block_Y8_T14_U5_abs_sum_Mp"]["arb_ball_str"]
+    )
+    _, cap_high, _ = _parse_arb_ball_str_to_fractions(
+        thm_8b["sample_partial_block_Y8_T14_U5_analytic_cap"]["arb_ball_str"]
+    )
+    assert abs_sum_low > Fraction(218, 10000)
+    assert cap_high > abs_sum_low
+
+    prod_5 = evaluate_low_prime_alpha_half_euler_product_arb(5, prec_bits=256)
+    assert bool((prod_5 - arb(1)).lower() > 0)
+
+
+def test_tc056r2_unsupported_reciprocal_zeta_probe_removed_and_small_Y_domain(
+    tc056_artifact: dict,
+) -> None:
+    py_src = (REPO_ROOT / "tc" / "prime_chain_contraction.py").read_text(encoding="utf-8")
+    json_src = PRIME_CHAIN_CONTRACTION_ARTIFACT_PATH.read_text(encoding="utf-8")
+    review_src = TC_056_REVIEW_DOC_PATH.read_text(encoding="utf-8")
+
+    for forbidden_token in ("z_probe", "inv_s_minus_1_zeta_ball", "G_at_half_probe"):
+        assert forbidden_token not in py_src
+        assert forbidden_token not in json_src
+        assert forbidden_token not in review_src
+
+    thm_8e = tc056_artifact["section_8_mixed_prime_block_attempt"][
+        "theorem_8E_conditional_moving_cutoff_buchstab_asymptotic"
+    ]
+    assert thm_8e["closed_form_constant_consistency_check_only"] is True
+    assert "closed-form constants" in thm_8e["finite_sample_check_scope"]
+    assert "O(1 / log Y)" in thm_8e["steps_A_through_F_proof_summary"]["step_D_moving_endpoints_and_log_expansion"]
+
+    # Small-Y cutoff ordering:
+    # - At Y in {1, 2, 3}: U_0(Y) >= T(Y) and [U_0(Y), T(Y)] cap P = empty;
+    # - For all tested Y >= 4: 5 <= U_0(Y) <= T(Y) - 1 < T(Y) with non-empty [U_0(Y), T(Y)] cap P:
+    assert (exact_U0_cutoff_ceil_2_Y_5_8(1), exact_T_cutoff_ceil_Y_5_4(1)) == (2, 1)
+    assert (exact_U0_cutoff_ceil_2_Y_5_8(2), exact_T_cutoff_ceil_Y_5_4(2)) == (4, 3)
+    assert (exact_U0_cutoff_ceil_2_Y_5_8(3), exact_T_cutoff_ceil_Y_5_4(3)) == (4, 4)
+    for y_small in (1, 2, 3):
+        u0_s = exact_U0_cutoff_ceil_2_Y_5_8(y_small)
+        t_s = exact_T_cutoff_ceil_Y_5_4(y_small)
+        assert u0_s >= t_s
+        assert [p for p in primes_up_to(t_s) if p >= u0_s] == []
+
+    eps = Fraction(1, 1 << 100)
+    for y_ge_4 in (
+        4,
+        Fraction(4, 1) + eps,
+        Fraction(21, 5),
+        Fraction(22, 5),
+        5,
+        16,
+        128,
+    ):
+        u0_val = exact_U0_cutoff_ceil_2_Y_5_8(y_ge_4)
+        t_val = exact_T_cutoff_ceil_Y_5_4(y_ge_4)
+        assert 5 <= u0_val <= t_val - 1 < t_val
+        assert len([p for p in primes_up_to(t_val) if p >= u0_val]) >= 1
+
 
 

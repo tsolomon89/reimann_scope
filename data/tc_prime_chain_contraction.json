@@ -1,6 +1,7 @@
 {
   "task_id": "TASK-TC-056",
-  "repair_task_id": "TASK-TC-056R",
+  "repair_task_id": "TASK-TC-056R2",
+  "prior_repair_task_id": "TASK-TC-056R",
   "parent_epic": "EPIC-TC-042",
   "prior_tasks": [
     "TASK-TC-054",
@@ -9,7 +10,8 @@
     "TASK-TC-055",
     "TASK-TC-055R",
     "TASK-TC-055R2",
-    "TASK-TC-056"
+    "TASK-TC-056",
+    "TASK-TC-056R"
   ],
   "prior_merged_main": "c82e439708b0b6031db6a77bf3977688d9f0758b",
   "tc054r2_merged_main_baseline": "8a898c60b7c4cb56543a3d1e7960c39e00027c22",
@@ -17,7 +19,8 @@
   "tc055r2_reviewed_tip": "9a3755d977518ca6f0f1fb7ed3386e6a4a97d3ea",
   "tc056_implementation_commit": "73b4e07c06ecd5ce37055965d909ac11794cef02",
   "tc056_reviewed_tip": "15280946101e7dcfcef5d56c967d646cc4a6cea9",
-  "branch": "task/tc-056r-grade-scope-and-uniform-cutoff-proof-closeout",
+  "tc056r_reviewed_commit": "ea86f3348ba7a22197e43ba92524c816fcc15868",
+  "branch": "task/tc-056r2-euler-product-certification-and-report-closeout",
   "subgate_tc043a_status": "OPEN",
   "rh_proved": false,
   "precision_bits": 256,
@@ -229,16 +232,169 @@
       "verified": true
     },
     "admissible_polylogarithmic_scale_correction": {
-      "sufficient_only_scale": "u(Y) << (log Y)^{1/(1-eta)}",
-      "admissible_and_necessary_scale": "u(Y) = c * (log Y * log log Y)^{1/(1-eta)} is admissible whenever 0 < c < eps^{1/(1-eta)} (giving u(Y)^{1-eta} / ((1-eta) log u(Y)) = c^{1-eta} (1 + o_{eta,c}(1)) log Y < eps log Y), and u(Y) = O_{eta,eps}((log Y * log log Y)^{1/(1-eta)}) (limsup <= eps^{1/(1-eta)}) is necessary for keeping the specified unsigned Euler-product majorant prod_{p <= u(Y)} (1 - p^{-1/2-eta})^{-2} within a prescribed O_eps(Y^eps) growth budget. It is NOT a necessity theorem for the signed observable Q_T(X) or for TC compatibility itself.",
-      "unsigned_majorant_budget_scope_only": true,
-      "sample_eta_half_eps_quarter_c_1_over_32_logY_1000_ratio": {
-        "mid_float": 0.17180789894023124,
-        "rad_float_outward": 6.319378958842883e-18,
-        "lower_dec": "1.718078989402312469669704074210509615687e-1",
-        "upper_dec": "1.718078989402312469669704074210509615690e-1",
-        "arb_ball_str": "[0.1718078989402312469669704074210509615688 +/- 9.19e-42]"
+      "product_definition": "P_eta(u) := prod_{p <= u} (1 - p^{-1/2-eta})^{-2}, 0 < eta < 1, alpha := 1/2 + eta, beta := 1 - alpha = 1/2 - eta",
+      "where_P_eta_is_used": "Squared smooth-fiber sparsity bound ||Q_{lambda,S(P_u),L}||_{L^2([Y, tau Y], dX/X)}^2 <= (c_eta^2 (tau^{2*eta} - 1) / (2*eta)) Y^{2*eta} P_eta(u) (Section 2.5) and squared full-space inverse-prime-filter operator norm ||P_u^{-1}||_{H_eta -> H_eta}^2 = P_eta(u) on H_eta = L^2((0,infty), w^{-1-2*eta} dw).",
+      "raw_exponent_parameterization_translation": "In the raw exponent parameterization prod_{p <= u} (1 - p^{-alpha})^{-1} from TC-055R2 (0 < alpha < 1, beta = 1 - alpha), log prod_{p <= u} (1 - p^{-alpha})^{-1} ~ u^{1-alpha} / ((1 - alpha) log u). For the squared shifted product P_eta(u) = prod_{p <= u} (1 - p^{-1/2-eta})^{-2}, the prime exponent is alpha = 1/2 + eta so beta = 1 - alpha = 1/2 - eta (not 1 - eta), and squaring the product multiplies log P_eta(u) by 2.",
+      "regime_A_subcritical_0_lt_eta_lt_half": {
+        "parameter_range": "0 < eta < 1/2 (alpha = 1/2 + eta in (1/2, 1), beta = 1/2 - eta in (0, 1/2), 2*alpha = 1 + 2*eta > 1)",
+        "log_asymptotic": "log P_eta(u) = 2 sum_{p <= u} p^{-1/2-eta} + O_eta(1) ~ 2 u^{1/2-eta} / ((1/2 - eta) log u) as u -> infty (eta fixed)",
+        "sufficient_only_scale": "u(Y) << (log Y)^{1/(1/2-eta)}",
+        "admissible_and_necessary_scale": "For u(Y) = c * (log Y * log log Y)^{1/(1/2-eta)} (c > 0 fixed), log P_eta(u(Y)) / log Y -> 2 * c^{1/2-eta}: 2 * c^{1/2-eta} < eps (i.e. 0 < c < (eps/2)^{1/(1/2-eta)}) is sufficient for P_eta(u(Y)) = O_{eta,c,eps}(Y^eps); 2 * c^{1/2-eta} > eps is incompatible; the equality case 2 * c^{1/2-eta} = eps is NOT decided by the leading (1 + o(1)) asymptotic alone. More generally, any cutoff u(Y) >= 2 satisfying P_eta(u(Y)) <= C_eps Y^eps must obey limsup_{Y -> infty} u(Y) / (log Y * log log Y)^{1/(1/2-eta)} <= (eps / 2)^{1/(1/2-eta)}.",
+        "boundary_case_2_c_beta_eq_eps_decided_by_leading_asymptotic": false,
+        "regression_eta_quarter_u1000": {
+          "eta": "1/4",
+          "alpha": "3/4",
+          "beta": "1/4",
+          "u": 1000,
+          "P_quarter_1000": {
+            "mid_float": 38537.15397879396,
+            "rad_float_outward": 3.421365691294355e-13,
+            "lower_dec": "3.853715397879396221122363935610478583040e+4",
+            "upper_dec": "3.853715397879396221122363935610478583043e+4",
+            "arb_ball_str": "[38537.15397879396221122363935610478583041 +/- 4.78e-36]"
+          },
+          "log_P_quarter_1000": {
+            "mid_float": 10.559378093335905,
+            "rad_float_outward": 2.2050813258721384e-17,
+            "lower_dec": "1.055937809333590491360598609400645065020e+1",
+            "upper_dec": "1.055937809333590491360598609400645065023e+1",
+            "arb_ball_str": "[10.55937809333590491360598609400645065022 +/- 3.64e-39]"
+          },
+          "first_order_prime_sum_2_sum_p_neg_3_4": {
+            "mid_float": 9.324959773628287,
+            "rad_float_outward": 6.069605113911846e-16,
+            "lower_dec": "9.324959773628285934264440697484428965672e+0",
+            "upper_dec": "9.324959773628285934264440697484428965675e+0",
+            "arb_ball_str": "[9.324959773628285934264440697484428965674 +/- 2.95e-40]"
+          },
+          "higher_power_tail_exact": {
+            "mid_float": 1.234418319707619,
+            "rad_float_outward": 8.12241166426308e-17,
+            "lower_dec": "1.234418319707618979341545396522021684541e+0",
+            "upper_dec": "1.234418319707618979341545396522021684544e+0",
+            "arb_ball_str": "[1.234418319707618979341545396522021684543 +/- 3.43e-40]"
+          },
+          "higher_power_tail_analytic_cap": {
+            "mid_float": 3.9772804584759016,
+            "rad_float_outward": 1.963944749675281e-16,
+            "lower_dec": "3.977280458475901810829108269681158437641e+0",
+            "upper_dec": "3.977280458475901810829108269681158437644e+0",
+            "arb_ball_str": "[3.977280458475901810829108269681158437643 +/- 1.82e-40]"
+          },
+          "pnt_leading_8_u_quarter_over_log_u": {
+            "mid_float": 6.512579586035486,
+            "rad_float_outward": 4.823177828119088e-18,
+            "lower_dec": "6.512579586035485595223817749545859682503e+0",
+            "upper_dec": "6.512579586035485595223817749545859682506e+0",
+            "arb_ball_str": "[6.512579586035485595223817749545859682504 +/- 2.59e-41]"
+          },
+          "ratio_log_P_to_pnt_leading": {
+            "mid_float": 1.6213818125121595,
+            "rad_float_outward": 3.350583700280497e-17,
+            "lower_dec": "1.621381812512159481332735246768224079767e+0",
+            "upper_dec": "1.621381812512159481332735246768224079770e+0",
+            "arb_ball_str": "[1.621381812512159481332735246768224079768 +/- 2.90e-42]"
+          },
+          "sample_adm_c_1_over_65536_eps_quarter_logY_1000_lead_ratio": {
+            "mid_float": 0.14230327353820385,
+            "rad_float_outward": 8.893195745110176e-18,
+            "lower_dec": "1.423032735382038593944005286509173854627e-1",
+            "upper_dec": "1.423032735382038593944005286509173854630e-1",
+            "arb_ball_str": "[0.1423032735382038593944005286509173854629 +/- 2.31e-41]"
+          },
+          "sample_inc_c_1_over_256_eps_quarter_logY_1000_lead_ratio": {
+            "mid_float": 0.46335238603266693,
+            "rad_float_outward": 2.581952590358724e-17,
+            "lower_dec": "4.633523860326669038743203103351317791707e-1",
+            "upper_dec": "4.633523860326669038743203103351317791710e-1",
+            "arb_ball_str": "[0.4633523860326669038743203103351317791708 +/- 2.83e-41]"
+          },
+          "verified": true
+        }
       },
+      "regime_B_critical_eta_eq_half": {
+        "parameter_value": "eta = 1/2 (alpha = 1, beta = 0)",
+        "mertens_asymptotic": "P_{1/2}(u) = prod_{p <= u} (1 - p^{-1})^{-2} ~ e^{2*gamma_E} (log u)^2 as u -> infty",
+        "polynomial_cutoff_admissibility": "For any fixed A > 0, u(Y) = Y^A gives P_{1/2}(Y^A) ~ A^2 e^{2*gamma_E} (log Y)^2 = O_{A,eps}(Y^eps) for EVERY eps > 0; eta = 1/2 does NOT force a polylogarithmic cutoff u(Y) = O((log Y log log Y)^2).",
+        "regression_eta_half_u1000": {
+          "u": 1000,
+          "P_half_1000": {
+            "mid_float": 152.5466000960755,
+            "rad_float_outward": 5.961006023480062e-15,
+            "lower_dec": "1.525466000960755022295457492335997294714e+2",
+            "upper_dec": "1.525466000960755022295457492335997294717e+2",
+            "arb_ball_str": "[152.5466000960755022295457492335997294715 +/- 3.85e-38]"
+          },
+          "log_P_half_1000": {
+            "mid_float": 5.027470123769613,
+            "rad_float_outward": 1.4217031854792247e-16,
+            "lower_dec": "5.027470123769613188296336040313094661786e+0",
+            "upper_dec": "5.027470123769613188296336040313094661789e+0",
+            "arb_ball_str": "[5.027470123769613188296336040313094661787 +/- 3.96e-40]"
+          },
+          "mertens_leading_e_2gamma_log_u_sq": {
+            "mid_float": 151.3690353009817,
+            "rad_float_outward": 1.3684198968486838e-14,
+            "lower_dec": "1.513690353009817068104310989398265016099e+2",
+            "upper_dec": "1.513690353009817068104310989398265016102e+2",
+            "arb_ball_str": "[151.3690353009817068104310989398265016100 +/- 2.58e-38]"
+          },
+          "ratio_P_half_to_mertens_asymptotic": {
+            "mid_float": 1.0077794298731728,
+            "rad_float_outward": 8.085348693658813e-17,
+            "lower_dec": "1.007779429873172735347589848048700564113e+0",
+            "upper_dec": "1.007779429873172735347589848048700564116e+0",
+            "arb_ball_str": "[1.007779429873172735347589848048700564114 +/- 4.70e-41]"
+          },
+          "verified": true
+        }
+      },
+      "regime_C_supercritical_half_lt_eta_lt_1": {
+        "parameter_range": "1/2 < eta < 1 (alpha = 1/2 + eta in (1, 3/2), beta = 1/2 - eta < 0)",
+        "convergent_limit": "P_eta(u) <= zeta(1/2 + eta)^2 < infty and lim_{u -> infty} P_eta(u) = zeta(1/2 + eta)^2",
+        "cutoff_growth_restriction": "NONE (P_eta(u) = O_eta(1) uniformly for all u >= 2)",
+        "regression_eta_three_quarters": {
+          "eta": "3/4",
+          "alpha": "5/4",
+          "P_three_quarters_100": {
+            "mid_float": 15.070579641487628,
+            "rad_float_outward": 4.268338570296338e-16,
+            "lower_dec": "1.507057964148762828011403046963196943902e+1",
+            "upper_dec": "1.507057964148762828011403046963196943905e+1",
+            "arb_ball_str": "[15.07057964148762828011403046963196943903 +/- 1.99e-39]"
+          },
+          "P_three_quarters_1000": {
+            "mid_float": 18.30711918205957,
+            "rad_float_outward": 1.3155707274724306e-15,
+            "lower_dec": "1.830711918205957065559715558053399575380e+1",
+            "upper_dec": "1.830711918205957065559715558053399575383e+1",
+            "arb_ball_str": "[18.30711918205957065559715558053399575381 +/- 4.93e-39]"
+          },
+          "zeta_five_quarters_sq_limit": {
+            "mid_float": 21.11505269200167,
+            "rad_float_outward": 3.031645459409611e-17,
+            "lower_dec": "2.111505269200166881849626801263348161066e+1",
+            "upper_dec": "2.111505269200166881849626801263348161069e+1",
+            "arb_ball_str": "[21.11505269200166881849626801263348161068 +/- 4.54e-39]"
+          },
+          "gap_below_limit_at_u1000": {
+            "mid_float": 2.807933509942098,
+            "rad_float_outward": 4.7013356671853536e-17,
+            "lower_dec": "2.807933509942098162899112432099485856859e+0",
+            "upper_dec": "2.807933509942098162899112432099485856862e+0",
+            "arb_ball_str": "[2.807933509942098162899112432099485856861 +/- 4.64e-40]"
+          },
+          "ratio_to_limit_at_u1000": {
+            "mid_float": 0.8670174519144943,
+            "rad_float_outward": 7.835442251338112e-18,
+            "lower_dec": "8.670174519144943159982152466123909279673e-1",
+            "upper_dec": "8.670174519144943159982152466123909279676e-1",
+            "arb_ball_str": "[0.8670174519144943159982152466123909279674 +/- 3.86e-41]"
+          },
+          "verified": true
+        }
+      },
+      "unsigned_majorant_budget_scope_only": true,
       "verified": true
     },
     "finite_S_global_uniform_majorant_M1": {
@@ -1806,7 +1962,50 @@
         "arb_ball_str": "[1.945595069851794767473799256941604027154 +/- 2.67e-40]"
       },
       "D_star_samples_verified": true,
-      "low_block_bound_statement": "M_2(Y, T) = 0 identically; for any dyadic block B = 2^j, |M_j(Y)| <= 2 D_* (sum_{p in I_j} p^{-1/2}) (prod_{q < 2B} (1 - q^{-1/2})^{-2}), giving |M_j(Y)| <<_delta Y^delta unconditionally for B <<_delta (log Y)^2 (Y >= 2, elementary bound) and for B <= (delta^2 / 32) (log Y * log log Y)^2 (Y >= exp(e), PNT prime-reciprocal-root asymptotic).",
+      "low_block_bound_statement": "M_2(Y, T) = 0 identically; for every prime p >= 3, |M_p(Y, T)| <= D_* (2 p^{-1/2} / ((1 - p^{-1})(1 - p^{-1/2}))) prod_{q < p} (1 - q^{-1/2})^{-2} <= 2 D_* p^{-1/2} prod_{q <= p} (1 - q^{-1/2})^{-2}. Consequently, for any dyadic block B = 2^j, |M_j(Y)| <= sum_{p in I_j(Y)} |M_p(Y, T(Y))| <= 2 D_* (sum_{p in I_j(Y)} p^{-1/2}) (prod_{q < 2B} (1 - q^{-1/2})^{-2}), and for any cutoff U >= 2 (including any partial final dyadic block p <= U_{log,delta}(Y)), |sum_{p <= U} M_p(Y, T(Y))| <= sum_{p <= U} |M_p(Y, T(Y))| <= 2 D_* (sum_{p <= U} p^{-1/2}) (prod_{q <= U} (1 - q^{-1/2})^{-2}). Since alpha = 1/2 (eta = 0, beta = 1/2, distinct from alpha = 1/2 + eta > 1/2 in Section 2.3) has log prod_{q < 2B} (1 - q^{-1/2})^{-2} ~ 4 sqrt(2B) / log(2B), setting B = c (log Y log log Y)^2 gives (2 sqrt(2c) + o(1)) log Y, so c = delta^2 / 32 gives leading coefficient delta / 2 and yields sum_{p <= U_{log,delta}(Y)} |M_p(Y, T(Y))| <<_delta Y^delta unconditionally.",
+      "low_prime_alpha_half_product_lt_1000": {
+        "mid_float": 2491676468902.869,
+        "rad_float_outward": 0.0001458021259253616,
+        "lower_dec": "2.491676468902868994822874074638415118486e+12",
+        "upper_dec": "2.491676468902868994822874074638415118489e+12",
+        "arb_ball_str": "[2491676468902.868994822874074638415118488 +/- 2.79e-28]"
+      },
+      "low_prime_alpha_half_log_product_lt_1000": {
+        "mid_float": 28.54397688053729,
+        "rad_float_outward": 8.652885437094707e-16,
+        "lower_dec": "2.854397688053729085153901468395312167194e+1",
+        "upper_dec": "2.854397688053729085153901468395312167197e+1",
+        "arb_ball_str": "[28.54397688053729085153901468395312167196 +/- 1.67e-39]"
+      },
+      "low_prime_alpha_half_pnt_leading_4_sqrt_1000_over_log_1000": {
+        "mid_float": 18.31146317409405,
+        "rad_float_outward": 9.893325737095628e-16,
+        "lower_dec": "1.831146317409405000918680477187021864269e+1",
+        "upper_dec": "1.831146317409405000918680477187021864272e+1",
+        "arb_ball_str": "[18.31146317409405000918680477187021864270 +/- 6.24e-40]"
+      },
+      "low_prime_alpha_half_ratio_to_pnt_leading_at_1000": {
+        "mid_float": 1.5588037181496006,
+        "rad_float_outward": 9.43460179416652e-17,
+        "lower_dec": "1.558803718149600520149380134876996971545e+0",
+        "upper_dec": "1.558803718149600520149380134876996971548e+0",
+        "arb_ball_str": "[1.558803718149600520149380134876996971546 +/- 9.90e-41]"
+      },
+      "sample_partial_block_Y8_T14_U5_abs_sum_Mp": {
+        "mid_float": 0.021821427396009455,
+        "rad_float_outward": 1.1527133331271057e-18,
+        "lower_dec": "2.182142739600945412129299471354692134544e-2",
+        "upper_dec": "2.182142739600945412129299471354692134547e-2",
+        "arb_ball_str": "[0.02182142739600945412129299471354692134545 +/- 3.08e-42]"
+      },
+      "sample_partial_block_Y8_T14_U5_analytic_cap": {
+        "mid_float": 1438.9748858030953,
+        "rad_float_outward": 1.0690134131813344e-13,
+        "lower_dec": "1.438974885803095169158707172629285765819e+3",
+        "upper_dec": "1.438974885803095169158707172629285765822e+3",
+        "arb_ball_str": "[1438.974885803095169158707172629285765820 +/- 4.97e-39]"
+      },
+      "low_prime_abs_sum_samples_verified": true,
       "top_block_constant_2_tau3_minus_1_zeta3_M1_over_3": {
         "mid_float": 261.29905474283373,
         "rad_float_outward": 8.899455014018343e-15,
@@ -2163,12 +2362,12 @@
         },
         "verified": true
       },
-      "surviving_research_target": "For U_0(Y) := ceil(2 Y^{5/8}) (> sqrt(T(Y))), compensated telescoping across all blocks U_0(Y) <= p <= T(Y) cancels every intermediate smooth-cutoff surge +-||S_{<2^j, T}||_{L^2}^2, giving the exact identity sum_{U_0(Y) <= p <= T(Y)} (M_p(Y, T(Y)) - C_p(Y, T(Y))) = E_{T(Y)}(Y) - ||S_{<U_0(Y), T(Y)}||_{L^2}^2 - R_{diag-fib}(Y; U_0(Y), T(Y)), i.e., E_{T(Y)}(Y) = ||S_{<U_0(Y), T(Y)}||_{L^2}^2 + R_{diag-fib}(Y; U_0(Y), T(Y)) + sum_{U_0(Y) <= p <= T(Y)} (M_p(Y, T(Y)) - C_p(Y, T(Y))) = ||S_{<U_0(Y), T(Y)} - H_{[U_0(Y), T(Y)]}||_{L^2([Y, tau Y], dX/X)}^2, where 0 <= R_{diag-fib}(Y; U_0(Y), T(Y)) <= (tau - 1) M_1^2 Y sum_{p >= U_0(Y)} p^{-2} << Y^{3/8} / log(2Y) unconditionally (and E_{431}(128) > ||S_{<42, 431}||_{L^2}^2 > ||S_{<32, 431}||_{L^2}^2 certifies that the super-U_0 band sum cannot be dropped). Rewriting Q_{T(Y)} = S_{<U_0(Y), T(Y)} - H_{[U_0(Y), T(Y)]} is an exact algebraic identity and does NOT by itself supply a smaller upper bound on E_{T(Y)}(Y). See Theorem 8.E for the complete conditional moving-cutoff asymptotic under RH diagnosing why S_{<U_0(Y), T(Y)} and H_{[U_0(Y), T(Y)]} cannot be bounded separately at the O_eps(Y^eps) scale. Setting U_{log,delta}(Y) := (delta^2 / 32) (log Y log log Y)^2 for Y >= exp(e) and 1 for 1 <= Y < exp(e), Theorems 6.1 and 8.B(1) reduce SUBGATE-TC-043A unconditionally across all eps > 0 and Y >= 1 to sum_{U_{log,eps/4}(Y) < p <= T(Y)} M_p(Y, T(Y)) <= C'_eps Y^eps (equivalently ||S_{<U_0(Y), T(Y)} - H_{[U_0(Y), T(Y)]}||_{L^2([Y, tau Y], dX/X)}^2 <= C_eps Y^eps)."
+      "surviving_research_target": "For U_0(Y) := ceil(2 Y^{5/8}) (> sqrt(T(Y))), compensated telescoping across all blocks U_0(Y) <= p <= T(Y) cancels every intermediate smooth-cutoff surge +-||S_{<2^j, T}||_{L^2}^2, giving the exact identity sum_{U_0(Y) <= p <= T(Y)} (M_p(Y, T(Y)) - C_p(Y, T(Y))) = E_{T(Y)}(Y) - ||S_{<U_0(Y), T(Y)}||_{L^2}^2 - R_{diag-fib}(Y; U_0(Y), T(Y)), i.e., E_{T(Y)}(Y) = ||S_{<U_0(Y), T(Y)}||_{L^2}^2 + R_{diag-fib}(Y; U_0(Y), T(Y)) + sum_{U_0(Y) <= p <= T(Y)} (M_p(Y, T(Y)) - C_p(Y, T(Y))) = ||S_{<U_0(Y), T(Y)} - H_{[U_0(Y), T(Y)]}||_{L^2([Y, tau Y], dX/X)}^2, where 0 <= R_{diag-fib}(Y; U_0(Y), T(Y)) <= (tau - 1) M_1^2 Y sum_{p >= U_0(Y)} p^{-2} << Y^{3/8} / log(2Y) unconditionally (and E_{431}(128) > ||S_{<42, 431}||_{L^2}^2 > ||S_{<32, 431}||_{L^2}^2 certifies that the super-U_0 band sum cannot be dropped). Rewriting Q_{T(Y)} = S_{<U_0(Y), T(Y)} - H_{[U_0(Y), T(Y)]} is an exact algebraic identity and does NOT by itself supply a smaller upper bound on E_{T(Y)}(Y). See Theorem 8.E for the complete conditional moving-cutoff asymptotic under RH diagnosing why S_{<U_0(Y), T(Y)} and H_{[U_0(Y), T(Y)]} cannot be bounded separately at the O_eps(Y^eps) scale. Setting U_{log,delta}(Y) := (delta^2 / 32) (log Y log log Y)^2 for Y >= exp(e) and 1 for 1 <= Y < exp(e), Theorems 6.1 and 8.B(1) (bounding sum_{p <= U_{log,eps/4}(Y)} |M_p(Y, T(Y))| <<_eps Y^{eps/2}, including any partial dyadic block) reduce SUBGATE-TC-043A unconditionally across all eps > 0 and Y >= 1 to sum_{U_{log,eps/4}(Y) < p <= T(Y)} M_p(Y, T(Y)) <= C'_eps Y^eps (equivalently ||S_{<U_0(Y), T(Y)} - H_{[U_0(Y), T(Y)]}||_{L^2([Y, tau Y], dX/X)}^2 <= C_eps Y^eps)."
     },
     "theorem_8E_conditional_moving_cutoff_buchstab_asymptotic": {
       "evidence_class": "PROVED_CONDITIONAL (conditional on RH; diagnostic showing why S_{<U_0,T} and H_{[U_0,T]} cannot be uncoupled)",
       "is_conditional_on_rh": true,
-      "asymptotic_threshold": "Y >= 2 (exact finite identity Q_T = S_{<U_0,T} - H_{[U_0,T]} holds for all Y >= 1, with empty prime band at Y = 1 and Y = 2; log Y denominators used only for Y >= 2)",
+      "asymptotic_threshold": "Primary Stieltjes and moving-endpoint proof domain Y >= 4 (where 5 <= U_0(Y) <= T(Y) - 1 < T(Y) holds unconditionally), extended to 2 <= Y < 4 by an explicit boundedness argument over the finite cutoff set (U_0(Y), T(Y)) in {(4, 3), (4, 4), (5, 5), (5, 6)} and X in [Y, tau Y] subset [2, 4*tau]. The exact finite identity Q_T = S_{<U_0,T} - H_{[U_0,T]} holds for all Y >= 1, with empty prime band at Y in {1, 2, 3}; log Y denominators are used only for Y >= 2.",
       "F_at_half_exact_zero": 0,
       "F_prime_at_half_tau2_over_48": {
         "mid_float": 0.8224670334241132,
@@ -2198,13 +2397,15 @@
         "upper_dec": "4.947885890238629610045671517364388860803e+1",
         "arb_ball_str": "[49.47885890238629610045671517364388860802 +/- 2.38e-39]"
       },
+      "closed_form_constant_consistency_check_only": true,
+      "finite_sample_check_scope": "Evaluates the closed-form constants F'(1/2) = zeta(2)/2 = tau^2/48, -tau^2/48, (tau - 1) tau^4 / 2304, and checks the exact finite identity Q_T = S_{<U_0,T} - H_{[U_0,T]} plus Step B/F truncation bounds at sample points (Y, X) in {(1, 1), (2, 3), (3, 4), (4, 5), (16, 20), (128, 160)}. The universal asymptotic as Y -> infty is established by the analytic proof in Steps A-F, not by finite sample evaluation.",
       "steps_A_through_F_proof_summary": {
         "step_A_rh_input_and_derivative_control": "Under RH, L_lambda(t) = sum_{n<=t} lambda(n) <<_eta t^{1/2+eta} (Titchmarsh 2nd ed. \u00a714.25). Termwise differentiation of Q_lambda(w) holds on (0, infty) by Weierstrass M-test against sum n^{-3}, sum n^{-5} < infty, giving w Q'_lambda(w) = (5/2) Q_lambda(w) - 2 sum_{n>=1} lambda(n) w^{9/2} n^{-5} e^{-w^2/n^2}. Partial summation at eta = 1/16 yields |Q_lambda(w)| + |w Q'_lambda(w)| << w^{1/8} for w >= 1 and << w^{5/2} for 0 < w <= 1, hence int_0^infty (|Q_lambda(w)| + |w Q'_lambda(w)|) w^{-3/2} (1 + |log w|^2) dw < infty.",
-        "step_B_finite_cofactor_truncation": "For U_0(Y) <= p <= T(Y), L_p = floor(T(Y)/p) >= 1 satisfies L_p >= T(Y)/(2p), so sum_{m > L_p} m^{-3} <= 1/(2 L_p^2) <= 2 p^2 / T(Y)^2 and p^{-1/2} |Q_lambda(X/p) - Q_{L_p}(X/p)| <= 2 X^{5/2} / (T(Y)^2 p). Summing over U_0(Y) <= p <= T(Y) for X in [Y, tau Y] gives <= 2 tau^{5/2} sum_{U_0(Y) <= p <= T(Y)} 1/p = O(1) uniformly in X in [Y, tau Y].",
-        "step_C_pnt_stieltjes_error": "Unconditional PNT N_prime(t) = li(t) + R(t) with R(t) << t exp(-c sqrt(log t)) applied on [U_0(Y)^-, T(Y)] to f_X(t) = t^{-1/2} Q_lambda(X/t) retains both endpoints R(T(Y)) f_X(T(Y)) - R(U_0(Y)^-) f_X(U_0(Y)) and -int_{U_0(Y)}^{T(Y)} R(t) f'_X(t) dt; changing variable w = X/t (t |f'_X(t)| dt = sqrt(X) w^{-3/2} |(1/2) Q_lambda(w) + w Q'_lambda(w)| dw) and using log t >= (5/8) log Y bounds the total PNT error by O(sqrt(Y) exp(-c' sqrt(log Y))) uniformly in X in [Y, tau Y].",
-        "step_D_moving_endpoints_and_log_expansion": "Under w = X/t in [X/T(Y), X/U_0(Y)], log X - log w = log t >= (5/8) log Y (Y >= 2), so the 2nd-order remainder in 1/(log X - log w) = 1/log X + (log w)/(log X)^2 + (log w)^2 / ((log X)^2 (log X - log w)) integrates to O(sqrt(Y)/(log Y)^3) uniformly in X in [Y, tau Y]. Extending the first two Mellin moments to (0, infty) incurs O(Y^{-1/2}/log Y) = O(1/log Y) at the lower end w < X/T(Y) <<= Y^{-1/4} (via |Q_lambda(w)| << w^{5/2}) and O(Y^{23/64}/log Y) at the upper end w > X/U_0(Y) >>= Y^{3/8} (via |Q_lambda(w)| << w^{1/8}), both absorbed into O(sqrt(Y)/(log Y)^3).",
-        "step_E_mellin_identities_and_signs": "On 1/2 < a < 5/2 (z = a + i b), F(z) = int_0^infty Q_lambda(w) w^{-z} dw/w = Gamma(5/4 - z/2) zeta(1 + 2z) / (2 zeta(1/2 + z)). Under RH, Step A continues the integral holomorphically to 1/8 < a < 5/2 and justifies differentiation under the integral at z = 1/2, giving F(1/2) = 0, F'(1/2) = zeta(2)/2 = tau^2/48 > 0, and int_0^infty Q_lambda(w) w^{-3/2} log(w) dw = -F'(1/2) = -tau^2/48 < 0, whence H_{[U_0(Y), T(Y)]}(X) = -(tau^2/48) sqrt(X)/(log X)^2 + O(sqrt(Y)/(log Y)^3) uniformly for X in [Y, tau Y] (Y >= 2).",
-        "step_F_transfer_to_S_norm_and_coupled_R_diag_fib": "Unconditionally |Q_{T(Y)}(X) - Q_lambda(X)| <= tau^{5/2}/2 = O(1) on [Y, tau Y]; under RH, |Q_{T(Y)}(X)| << Y^{1/8} = O(sqrt(Y)/(log Y)^3), so S_{<U_0(Y), T(Y)}(X) = Q_{T(Y)}(X) + H_{[U_0(Y), T(Y)]}(X) has the same expansion -(tau^2/48) sqrt(X)/(log X)^2 + O(sqrt(Y)/(log Y)^3). Rescaling X = Y u on u in [1, tau] and bounding cross/error terms via Cauchy-Schwarz yields ||H_{[U_0(Y), T(Y)]}||_{L^2}^2 = ((tau - 1) tau^4 / 2304) Y / (log Y)^4 + O(Y / (log Y)^5) and the same asymptotic for ||S_{<U_0(Y), T(Y)}||_{L^2}^2 (Y >= 2). For R_{diag-fib}(Y; U_0(Y), T(Y)), Step B proves |Q_{floor(T(Y)/p)}(X/p) - Q_lambda(X/p)| <= 2 tau^{5/2} p^{-1/2} for the actual coupled cutoff L_p = floor(T(Y)/p), giving |Q_{L_p}(X/p)| << (Y/p)^{1/8} + p^{-1/2} under RH and R_{diag-fib} << Y^{3/32} / log(2Y)."
+        "step_B_finite_cofactor_truncation": "For Y >= 4, 5 <= U_0(Y) <= T(Y) - 1 < T(Y) unconditionally. For U_0(Y) <= p <= T(Y), L_p = floor(T(Y)/p) >= 1 satisfies L_p >= T(Y)/(2p), so sum_{m > L_p} m^{-3} <= 1/(2 L_p^2) <= 2 p^2 / T(Y)^2 and p^{-1/2} |Q_lambda(X/p) - Q_{L_p}(X/p)| <= 2 X^{5/2} / (T(Y)^2 p). Summing over U_0(Y) <= p <= T(Y) for X in [Y, tau Y] gives <= 2 tau^{5/2} sum_{U_0(Y) <= p <= T(Y)} 1/p = O(1) uniformly in X in [Y, tau Y].",
+        "step_C_pnt_stieltjes_error": "For Y >= 4 (so U_0(Y) < T(Y)), unconditional PNT N_prime(t) = li(t) + R(t) with R(t) << t exp(-c sqrt(log t)) applied on [U_0(Y)^-, T(Y)] to f_X(t) = t^{-1/2} Q_lambda(X/t) retains both endpoints R(T(Y)) f_X(T(Y)) - R(U_0(Y)^-) f_X(U_0(Y)) and -int_{U_0(Y)}^{T(Y)} R(t) f'_X(t) dt; changing variable w = X/t (t |f'_X(t)| dt = sqrt(X) w^{-3/2} |(1/2) Q_lambda(w) + w Q'_lambda(w)| dw) and using log t >= (5/8) log Y bounds the total PNT error by O(sqrt(Y) exp(-c' sqrt(log Y))) uniformly in X in [Y, tau Y].",
+        "step_D_moving_endpoints_and_log_expansion": "For Y >= 4, under w = X/t in [X/T(Y), X/U_0(Y)], log X - log w = log t >= (5/8) log Y, so the 2nd-order remainder in 1/(log X - log w) = 1/log X + (log w)/(log X)^2 + (log w)^2 / ((log X)^2 (log X - log w)) integrates (with the sqrt(X) prefactor) to O(sqrt(Y)/(log Y)^3) uniformly in X in [Y, tau Y]. Extending the first two Mellin moments to (0, infty) incurs, after multiplying by sqrt(X) = Theta(sqrt(Y)), O(sqrt(Y) * (X/T(Y))^2 / log Y) = O(1 / log Y) at the lower end w < X/T(Y) <<= Y^{-1/4} (via |Q_lambda(w)| << w^{5/2}) and O(Y^{23/64}/log Y) at the upper end w > X/U_0(Y) >>= Y^{3/8} (via |Q_lambda(w)| << w^{1/8}), both absorbed into O(sqrt(Y)/(log Y)^3).",
+        "step_E_mellin_identities_and_signs": "On 1/2 < a < 5/2 (z = a + i b), F(z) = int_0^infty Q_lambda(w) w^{-z} dw/w = Gamma(5/4 - z/2) zeta(1 + 2z) / (2 zeta(1/2 + z)). Under RH, Step A continues the integral holomorphically to 1/8 < a < 5/2 and justifies differentiation under the integral at z = 1/2, giving F(1/2) = 0, F'(1/2) = zeta(2)/2 = tau^2/48 > 0, and int_0^infty Q_lambda(w) w^{-3/2} log(w) dw = -F'(1/2) = -tau^2/48 < 0, whence H_{[U_0(Y), T(Y)]}(X) = -(tau^2/48) sqrt(X)/(log X)^2 + O(sqrt(Y)/(log Y)^3) uniformly for X in [Y, tau Y] for Y >= 4, and hence for all Y >= 2 by boundedness over the finite cutoff set (U_0(Y), T(Y)) in {(4,3),(4,4),(5,5),(5,6)} on 2 <= Y < 4.",
+        "step_F_transfer_to_S_norm_and_coupled_R_diag_fib": "Unconditionally |Q_{T(Y)}(X) - Q_lambda(X)| <= tau^{5/2}/2 = O(1) on [Y, tau Y]; under RH, |Q_{T(Y)}(X)| << Y^{1/8} = O(sqrt(Y)/(log Y)^3), so S_{<U_0(Y), T(Y)}(X) = Q_{T(Y)}(X) + H_{[U_0(Y), T(Y)]}(X) has the same expansion -(tau^2/48) sqrt(X)/(log X)^2 + O(sqrt(Y)/(log Y)^3). Rescaling X = Y u on u in [1, tau] and bounding cross/error terms via Cauchy-Schwarz yields ||H_{[U_0(Y), T(Y)]}||_{L^2}^2 = ((tau - 1) tau^4 / 2304) Y / (log Y)^4 + O(Y / (log Y)^5) and the same asymptotic for ||S_{<U_0(Y), T(Y)}||_{L^2}^2 (Y >= 4, and extended to 2 <= Y < 4 by finite-cutoff boundedness). For R_{diag-fib}(Y; U_0(Y), T(Y)), Step B proves |Q_{floor(T(Y)/p)}(X/p) - Q_lambda(X/p)| <= 2 tau^{5/2} p^{-1/2} for the actual coupled cutoff L_p = floor(T(Y)/p), giving |Q_{L_p}(X/p)| << (Y/p)^{1/8} + p^{-1/2} under RH and R_{diag-fib} << Y^{3/32} / log(2Y)."
       },
       "verified": true
     },
@@ -2218,30 +2419,31 @@
       "mixed_interaction_decomposition_and_p_independence_tc056 (Theorem 20): unconditional proof of Delta_{P,p} = M_{P,p} - C_{P,p}, ordered k != l equivalence of M_{P,p} (without extra factor of 2 on ordered m != n), P-independence C_{P,p} = C_empty,p = D_T - V_{{p}} via the p-free cofactor bijection r = s*m, and exact finite alternating shift expansion of D_T - V_{{p}}."
     ],
     "2_analytic_theorems_proved_outside_lean": [
-      "Rational-grade exclusion for p^k = tau^K (Section 1.2): unique real solution K = k log(p) / log(tau) is irrational (K not in Q) by clearing K = a/b to tau^{|a|} - p^{kb} = 0 and invoking Lindemann's transcendence of tau = 2*pi; algebraic irrationality vs. transcendence of K is open and not used by any TC-056/TC-056R theorem.",
+      "Rational-grade exclusion for p^k = tau^K (Section 1.2): unique real solution K = k log(p) / log(tau) is irrational (K not in Q) by clearing K = a/b to tau^{|a|} - p^{kb} = 0 and invoking Lindemann's transcendence of tau = 2*pi; algebraic irrationality vs. transcendence of K is open and not used by any TC-056/TC-056R/TC-056R2 theorem.",
       "Dominated and Bounded Convergence proof of Q_{a_S}(X) ~ (m_S / 2) sqrt(X) and E_{a_S}(Y) ~ ((tau - 1) / 4) m_S^2 Y via a_S = 1 * b_S and global majorant sup_{w>0} |Q_1(w)|/sqrt(w) <= M_1 = 1/2 + C_{1,uni}.",
-      "Necessary vs. sufficient polylogarithmic scale u(Y) = c (log Y log log Y)^{1/(1-eta)} (0 < c < eps^{1/(1-eta)}) for keeping the specified unsigned Euler-product majorant within an O_eps(Y^eps) growth budget, and unsigned smooth-fiber sparsity bound c_eta w^eta prod_{p in P}(1 - p^{-1/2-eta})^{-1}.",
+      "Three-regime asymptotic analysis of the unsigned Euler product P_eta(u) := prod_{p <= u}(1 - p^{-1/2-eta})^{-2} (0 < eta < 1, alpha = 1/2 + eta, beta = 1 - alpha = 1/2 - eta) in Section 2.3: Regime A (0 < eta < 1/2, beta = 1/2 - eta > 0) log P_eta(u) ~ 2 u^{1/2-eta} / ((1/2 - eta) log u), with u(Y) = c (log Y log log Y)^{1/(1/2-eta)} admissible for 2 c^{1/2-eta} < eps, incompatible for 2 c^{1/2-eta} > eps, boundary 2 c^{1/2-eta} = eps undecided by the leading asymptotic alone, and general necessary limsup <= (eps/2)^{1/(1/2-eta)}; Regime B (eta = 1/2, alpha = 1) squared Mertens product P_{1/2}(u) ~ e^{2*gamma_E} (log u)^2 (admitting polynomial cutoffs u(Y) = Y^A); Regime C (1/2 < eta < 1, alpha > 1) convergent product P_eta(u) <= zeta(1/2 + eta)^2 (no cutoff growth restriction).",
       "Integrated transfer on [Y, tau Y] against dX/X of Sections 3-5, shifted diagonal identity A_d(Y) = d^{-3} c_d^{-5} D_E(c_d Y), and uniform total contraction bound sum_{p<=T} C_p(Y, T) <= 2^{7/2} B_D sum_p 1/(p^3 - 1) <= 2^{7/2} B_D * (8/7)*(zeta(3)-1) < 1 for all Y >= 1, T >= 0.",
-      "Theorem 8.B (unconditional low-prime block subpower bound and super-sqrt(T) identity + top-block power saving), Theorem 8.C (unconditional PNT refutation of localized single-block subpower bound M_j(Y) - C_j(Y) <= A_delta Y^delta for every delta in (0, 1) via I(2) - I(1) > 0.1189 > 0, with zero RH dependency), and Theorem 8.D (exact compensated multi-block telescoping across super-sqrt(T) bands and unconditional reduction of SUBGATE-TC-043A)."
+      "Theorem 8.B (unconditional low-prime individual and partial-block absolute-sum bound sum_{p <= U} |M_p(Y, T)| <= 2 D_* (sum_{p <= U} p^{-1/2}) prod_{q <= U} (1 - q^{-1/2})^{-2} with alpha = 1/2, c = delta^2 / 32, and super-sqrt(T) identity + top-block power saving), Theorem 8.C (unconditional PNT refutation of localized single-block subpower bound M_j(Y) - C_j(Y) <= A_delta Y^delta for every delta in (0, 1) via I(2) - I(1) > 0.1189 > 0, with zero RH dependency), and Theorem 8.D (exact compensated multi-block telescoping across super-sqrt(T) bands and unconditional reduction of SUBGATE-TC-043A)."
     ],
     "3_certified_finite_evaluations": [
+      "Section 2.3 three-regime Euler-product evaluations at u = 1000: P_{1/4}(1000), log P_{1/4}(1000), P_{1/2}(1000) vs. e^{2*gamma_E}(log 1000)^2, and P_{3/4}(1000) < zeta(5/4)^2.",
       "Section 7a: Delta_{{2},3}(4, 6) = 0.00770859415272760628... > 0 (outward-certified positive lower endpoint).",
       "Section 7b: [sum_{64 <= p < 128} Delta_p(128, 431)] / D_{431}(128) = 1.34144540313580739... > 1 (outward-certified lower endpoint > 1).",
-      "Section 6 & 8 constants: U_{contr,sharp} = 0.8245225510... < U_{contr,elem} = 0.9808486295... < 1; I(1/2), I(1), I(2), I(4) with I(1) - I(1/2) = 0.1185... > 0.118 > 0 and I(2) - I(1) = 0.11903... > 0.1189 > 0; Mellin derivative F'(1/2) = tau^2/48 = 0.8224670334... > 0, log moment -tau^2/48 < 0, and norm coefficient (tau - 1) tau^4 / 2304 = 3.5738213787... > 0."
+      "Section 6 & 8 constants: U_{contr,sharp} = 0.8245225510... < U_{contr,elem} = 0.9808486295... < 1; I(1/2), I(1), I(2), I(4) with I(1) - I(1/2) = 0.1185... > 0.118 > 0 and I(2) - I(1) = 0.11903... > 0.1189 > 0; closed-form Mellin constants F'(1/2) = zeta(2)/2 = tau^2/48 = 0.8224670334... > 0, -tau^2/48 < 0, and (tau - 1) tau^4 / 2304 = 3.5738213787... > 0."
     ],
     "4_consistency_and_falsification_controls": [
       "Kernel-grouping vs. independent acb.integral smooth-fiber quadrature consistency on V_P, C_{P,p}, M_{P,p}, and Delta_{P,p} (exact equality rests on Lean/analytic theorems, never on interval overlap alone).",
       "Parity controls a_2, a_{3,5,7}, and unsigned 1 demonstrating contraction at p in S (a_S(p) = -1) vs. expansion at p not in S (a_S(p) = +1)."
     ],
     "5_conditional_and_open_statements": [
-      "Theorem 8.A (conditional dyadic block transfer for all Y >= 1) and Theorem 8.E (6-step conditional moving-cutoff Buchstab asymptotic under RH at U_0(Y) = ceil(2 Y^{5/8}), T(Y) = ceil(Y^{5/4}) uniformly for X in [Y, tau Y], Y >= 2: H_{[U_0(Y), T(Y)]}(X) = -(tau^2/48) sqrt(X)/(log X)^2 + O(sqrt(Y)/(log Y)^3), S_{<U_0(Y), T(Y)}(X) = -(tau^2/48) sqrt(X)/(log X)^2 + O(sqrt(Y)/(log Y)^3), ||H||_{L^2}^2 = ((tau - 1) tau^4 / 2304) Y / (log Y)^4 + O(Y / (log Y)^5), ||S||_{L^2}^2 = ((tau - 1) tau^4 / 2304) Y / (log Y)^4 + O(Y / (log Y)^5), and coupled-L_p R_{diag-fib} << Y^{3/32} / log(2Y)).",
+      "Theorem 8.A (conditional dyadic block transfer for all Y >= 1) and Theorem 8.E (6-step conditional moving-cutoff Buchstab asymptotic under RH at U_0(Y) = ceil(2 Y^{5/8}), T(Y) = ceil(Y^{5/4}) uniformly for X in [Y, tau Y], proved first for Y >= 4 where 5 <= U_0(Y) < T(Y) and extended to 2 <= Y < 4 by boundedness over the finite cutoff set (U_0, T) in {(4,3),(4,4),(5,5),(5,6)}: H_{[U_0(Y), T(Y)]}(X) = -(tau^2/48) sqrt(X)/(log X)^2 + O(sqrt(Y)/(log Y)^3), S_{<U_0(Y), T(Y)}(X) = -(tau^2/48) sqrt(X)/(log X)^2 + O(sqrt(Y)/(log Y)^3), ||H||_{L^2}^2 = ((tau - 1) tau^4 / 2304) Y / (log Y)^4 + O(Y / (log Y)^5), ||S||_{L^2}^2 = ((tau - 1) tau^4 / 2304) Y / (log Y)^4 + O(Y / (log Y)^5), and coupled-L_p R_{diag-fib} << Y^{3/32} / log(2Y)).",
       "Surviving unconditional obligation (Theorem 8.D(3)): for every eps > 0, E_{T(Y)}(Y) <= C_eps Y^eps uniformly for Y >= 1, equivalently sum_{U_{log,eps/4}(Y) < p <= T(Y)} M_p(Y, T(Y)) <= C'_eps Y^eps (or ||S_{<U_0(Y), T(Y)} - H_{[U_0(Y), T(Y)]}||_{L^2([Y, tau Y], dX/X)}^2 <= C_eps Y^eps at U_0(Y) = ceil(2 Y^{5/8})). Subtracting one asymptotic term, or any fixed finite number of logarithmic terms, does not by itself deliver this all-epsilon estimate.",
       "SUBGATE-TC-043A remains OPEN and rh_proved remains false."
     ]
   },
   "serialized_arb_self_check": {
-    "total_certified_arb_balls_checked": 235,
-    "compared_against_live_original_arb_count": 235,
+    "total_certified_arb_balls_checked": 258,
+    "compared_against_live_original_arb_count": 258,
     "live_original_count_matches_enumerated_total": true,
     "all_enclose_original_256bit_arb_ball": true,
     "failed_paths": [],
@@ -2254,7 +2456,24 @@
       "section_1_and_2_baseline_and_cleanup.truncation_energy_and_two_way_L2_transfer.sample_R_tail_cap_Y8_T14",
       "section_1_and_2_baseline_and_cleanup.uncoupled_excess_w6_witness_P2_T3.phi_6_at_X_4",
       "section_1_and_2_baseline_and_cleanup.uncoupled_excess_w6_witness_P2_T3.excess_gaussian_at_X_4",
-      "section_1_and_2_baseline_and_cleanup.admissible_polylogarithmic_scale_correction.sample_eta_half_eps_quarter_c_1_over_32_logY_1000_ratio",
+      "section_1_and_2_baseline_and_cleanup.admissible_polylogarithmic_scale_correction.regime_A_subcritical_0_lt_eta_lt_half.regression_eta_quarter_u1000.P_quarter_1000",
+      "section_1_and_2_baseline_and_cleanup.admissible_polylogarithmic_scale_correction.regime_A_subcritical_0_lt_eta_lt_half.regression_eta_quarter_u1000.log_P_quarter_1000",
+      "section_1_and_2_baseline_and_cleanup.admissible_polylogarithmic_scale_correction.regime_A_subcritical_0_lt_eta_lt_half.regression_eta_quarter_u1000.first_order_prime_sum_2_sum_p_neg_3_4",
+      "section_1_and_2_baseline_and_cleanup.admissible_polylogarithmic_scale_correction.regime_A_subcritical_0_lt_eta_lt_half.regression_eta_quarter_u1000.higher_power_tail_exact",
+      "section_1_and_2_baseline_and_cleanup.admissible_polylogarithmic_scale_correction.regime_A_subcritical_0_lt_eta_lt_half.regression_eta_quarter_u1000.higher_power_tail_analytic_cap",
+      "section_1_and_2_baseline_and_cleanup.admissible_polylogarithmic_scale_correction.regime_A_subcritical_0_lt_eta_lt_half.regression_eta_quarter_u1000.pnt_leading_8_u_quarter_over_log_u",
+      "section_1_and_2_baseline_and_cleanup.admissible_polylogarithmic_scale_correction.regime_A_subcritical_0_lt_eta_lt_half.regression_eta_quarter_u1000.ratio_log_P_to_pnt_leading",
+      "section_1_and_2_baseline_and_cleanup.admissible_polylogarithmic_scale_correction.regime_A_subcritical_0_lt_eta_lt_half.regression_eta_quarter_u1000.sample_adm_c_1_over_65536_eps_quarter_logY_1000_lead_ratio",
+      "section_1_and_2_baseline_and_cleanup.admissible_polylogarithmic_scale_correction.regime_A_subcritical_0_lt_eta_lt_half.regression_eta_quarter_u1000.sample_inc_c_1_over_256_eps_quarter_logY_1000_lead_ratio",
+      "section_1_and_2_baseline_and_cleanup.admissible_polylogarithmic_scale_correction.regime_B_critical_eta_eq_half.regression_eta_half_u1000.P_half_1000",
+      "section_1_and_2_baseline_and_cleanup.admissible_polylogarithmic_scale_correction.regime_B_critical_eta_eq_half.regression_eta_half_u1000.log_P_half_1000",
+      "section_1_and_2_baseline_and_cleanup.admissible_polylogarithmic_scale_correction.regime_B_critical_eta_eq_half.regression_eta_half_u1000.mertens_leading_e_2gamma_log_u_sq",
+      "section_1_and_2_baseline_and_cleanup.admissible_polylogarithmic_scale_correction.regime_B_critical_eta_eq_half.regression_eta_half_u1000.ratio_P_half_to_mertens_asymptotic",
+      "section_1_and_2_baseline_and_cleanup.admissible_polylogarithmic_scale_correction.regime_C_supercritical_half_lt_eta_lt_1.regression_eta_three_quarters.P_three_quarters_100",
+      "section_1_and_2_baseline_and_cleanup.admissible_polylogarithmic_scale_correction.regime_C_supercritical_half_lt_eta_lt_1.regression_eta_three_quarters.P_three_quarters_1000",
+      "section_1_and_2_baseline_and_cleanup.admissible_polylogarithmic_scale_correction.regime_C_supercritical_half_lt_eta_lt_1.regression_eta_three_quarters.zeta_five_quarters_sq_limit",
+      "section_1_and_2_baseline_and_cleanup.admissible_polylogarithmic_scale_correction.regime_C_supercritical_half_lt_eta_lt_1.regression_eta_three_quarters.gap_below_limit_at_u1000",
+      "section_1_and_2_baseline_and_cleanup.admissible_polylogarithmic_scale_correction.regime_C_supercritical_half_lt_eta_lt_1.regression_eta_three_quarters.ratio_to_limit_at_u1000",
       "section_1_and_2_baseline_and_cleanup.finite_S_global_uniform_majorant_M1.M_1",
       "section_1_and_2_baseline_and_cleanup.finite_S_global_uniform_majorant_M1.zeta_3",
       "section_1_and_2_baseline_and_cleanup.finite_S_global_uniform_majorant_M1.M_1_minus_zeta_3",
@@ -2432,6 +2651,12 @@
       "section_7_falsification_and_parity_controls.control_7c_linear_overtake_Y32_T77.E_77_32_a2",
       "section_7_falsification_and_parity_controls.control_7c_linear_overtake_Y32_T77.E_77_32_a357",
       "section_8_mixed_prime_block_attempt.theorem_8B_unconditional_low_and_top_block_bounds.D_star_shifted_kernel_constant",
+      "section_8_mixed_prime_block_attempt.theorem_8B_unconditional_low_and_top_block_bounds.low_prime_alpha_half_product_lt_1000",
+      "section_8_mixed_prime_block_attempt.theorem_8B_unconditional_low_and_top_block_bounds.low_prime_alpha_half_log_product_lt_1000",
+      "section_8_mixed_prime_block_attempt.theorem_8B_unconditional_low_and_top_block_bounds.low_prime_alpha_half_pnt_leading_4_sqrt_1000_over_log_1000",
+      "section_8_mixed_prime_block_attempt.theorem_8B_unconditional_low_and_top_block_bounds.low_prime_alpha_half_ratio_to_pnt_leading_at_1000",
+      "section_8_mixed_prime_block_attempt.theorem_8B_unconditional_low_and_top_block_bounds.sample_partial_block_Y8_T14_U5_abs_sum_Mp",
+      "section_8_mixed_prime_block_attempt.theorem_8B_unconditional_low_and_top_block_bounds.sample_partial_block_Y8_T14_U5_analytic_cap",
       "section_8_mixed_prime_block_attempt.theorem_8B_unconditional_low_and_top_block_bounds.top_block_constant_2_tau3_minus_1_zeta3_M1_over_3",
       "section_8_mixed_prime_block_attempt.theorem_8B_unconditional_low_and_top_block_bounds.super_sqrt_T_block_rows_Y128_T431[0].M_j_minus_C_j",
       "section_8_mixed_prime_block_attempt.theorem_8B_unconditional_low_and_top_block_bounds.super_sqrt_T_block_rows_Y128_T431[0].M_j",
@@ -2485,8 +2710,8 @@
   },
   "section_9_tc056_review_displayed_enclosures_audit": {
     "review_path": "C:\\Development\\Projects\\reimann_scope\\docs\\reviews\\TC_056_PRIME_CHAIN_CONTRACTION.md",
-    "total_displayed_intervals_found": 59,
-    "tagged_and_checked_count": 59,
+    "total_displayed_intervals_found": 65,
+    "tagged_and_checked_count": 65,
     "untagged_count": 0,
     "failed_count": 0,
     "untagged_intervals": [],

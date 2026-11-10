@@ -1,25 +1,34 @@
 r"""
-TASK-TC-056 / TASK-TC-056R: Prime-Chain Contraction, Uniform Total Contraction Bound, Falsification Controls,
-Quantified Signed Mixed-Prime Block Energy Analysis, Algebraic-Grade Scope Repair, and Uniform Moving-Cutoff
-Proof Closeout toward SUBGATE-TC-043A.
+TASK-TC-056 / TASK-TC-056R / TASK-TC-056R2: Prime-Chain Contraction, Uniform Total Contraction Bound,
+Falsification Controls, Quantified Signed Mixed-Prime Block Energy Analysis, Algebraic-Grade Scope Repair,
+Unsigned Euler-Product Three-Regime Exponent Repair, and Uniform Moving-Cutoff Proof Closeout toward
+SUBGATE-TC-043A.
 
 Implements and certifies in 256-bit FLINT/Arb ball arithmetic (using tau = 2*pi as the sole
 circle constant and z = a + i*b, rho = x + i*y for complex coordinates):
 1. Baseline & Section 2 Cleanup Cross-Checks:
    - Rational vs. algebraic-grade scope for p^k = tau^K: for prime p and integer k >= 1, the unique real
-     solution K = k log(p) / log(tau) is irrational (K not in Q) by clearing K = a/b to tau^a - p^{kb} = 0
+     solution K = k log(p) / log(tau) is irrational (K not in Q) by clearing K = a/b to tau^{|a|} - p^{kb} = 0
      and invoking Lindemann's transcendence of tau = 2*pi; this rational exclusion does not decide whether
      K is algebraic irrational (K in A_R \ Q) or transcendental (K not in A_R), because Gelfond-Schneider
-     requires an algebraic base and Lindemann-Weierstrass requires algebraic exponents in e^alpha. No TC-056
-     or TC-056R theorem depends on algebraic-grade exclusion of p^k = tau^K.
+     requires an algebraic base and Lindemann-Weierstrass requires algebraic exponents in e^alpha. No TC-056,
+     TC-056R, or TC-056R2 theorem depends on algebraic-grade exclusion of p^k = tau^K.
    - Explicit finite prime set P (`primes_P` validated as distinct primes >= 2, including empty P = ()),
      with S(P) := {m in Z_{>=1} : forall q prime, q | m => q in P}, uncoupled cutoff excess witness w(6)
      at (P = {2}, T = 3) (nonzero iff w(6) != 0, including the positive Gaussian observable phi_6(X) > 0),
-     exact admissible polylogarithmic smooth-cutoff scale u(Y) = c * (log Y * log log Y)^{1/(1-eta)}
-     (0 < c < eps^{1/(1-eta)}) for keeping the specified unsigned Euler-product majorant within an O_eps(Y^eps)
-     growth budget (not a necessity theorem for the signed observable or TC compatibility), global uniform
-     majorant M_1 = 1/2 + 2*(3/(2e))^{3/2} > zeta(3) for Dominated/Bounded Convergence on Q_{a_S}(X) and
-     E_{a_S}(Y), and fixed-P smooth-fiber sparsity constants c_eta = ((5 - 2*eta)/(4*e))^{(5 - 2*eta)/4}.
+     three-regime growth classification of the unsigned Euler-product majorant
+     P_eta(u) := prod_{p <= u} (1 - p^{-1/2-eta})^{-2} (0 < eta < 1, alpha := 1/2 + eta, beta := 1 - alpha = 1/2 - eta):
+       * Regime A (subcritical 0 < eta < 1/2, beta = 1/2 - eta > 0): log P_eta(u) ~ 2 u^beta / (beta log u),
+         admissible polylogarithmic cutoff u(Y) = c * (log Y * log log Y)^{1/(1/2-eta)} with 2 c^{1/2-eta} < eps
+         sufficient, 2 c^{1/2-eta} > eps incompatible, boundary 2 c^{1/2-eta} = eps not settled by the leading
+         1 + o(1) asymptotic, and general limsup_{Y->infty} u(Y) / (log Y log log Y)^{1/(1/2-eta)} <= (eps/2)^{1/(1/2-eta)}
+         necessary for P_eta(u(Y)) <= C_eps Y^eps;
+       * Regime B (critical eta = 1/2, alpha = 1): P_{1/2}(u) = prod_{p <= u} (1 - p^{-1})^{-2} ~ e^{2 gamma_E} (log u)^2
+         by Mertens' theorem, so polynomial cutoffs u(Y) = Y^A obey P_{1/2}(Y^A) = O_eps(Y^eps) for every eps > 0;
+       * Regime C (supercritical 1/2 < eta < 1, alpha = 1/2 + eta > 1): P_eta(u) < zeta(1/2 + eta)^2 < infty and
+         P_eta(u) -> zeta(1/2 + eta)^2 as u -> infty, imposing no upper cutoff-growth restriction on u(Y);
+     global uniform majorant M_1 = 1/2 + 2*(3/(2e))^{3/2} > zeta(3) for Dominated/Bounded Convergence on Q_{a_S}(X)
+     and E_{a_S}(Y), and fixed-P smooth-fiber sparsity constants c_eta = ((5 - 2*eta)/(4*e))^{(5 - 2*eta)/4}.
 2. Finite Prime Filtration (Section 3):
    - Grouped cofactor fibers F_{P,r}(X) = sum_{m in S(P), m*r <= T} lambda(m*r) phi_{m*r}(X)
      = (lambda(r) / sqrt(r)) Q_{lambda,S(P),floor(T/r)}(X / r) for 1 <= r <= T, gcd(r, N_P) = 1.
@@ -119,8 +128,10 @@ TC_056_REVIEW_DOC_PATH = (
     REPO_ROOT / "docs" / "reviews" / "TC_056_PRIME_CHAIN_CONTRACTION.md"
 )
 TASK_TC_056R_ID = "TASK-TC-056R"
+TASK_TC_056R2_ID = "TASK-TC-056R2"
 TC_056_IMPLEMENTATION_COMMIT = "73b4e07c06ecd5ce37055965d909ac11794cef02"
 TC_056_REVIEWED_TIP = "15280946101e7dcfcef5d56c967d646cc4a6cea9"
+TC_056R_REVIEWED_COMMIT = "ea86f3348ba7a22197e43ba92524c816fcc15868"
 
 
 # ---------------------------------------------------------------------------
@@ -612,6 +623,115 @@ def evaluate_E_T_signed_arb(
                 an = weight_fn(n)
                 acc += arb(2 * am * an) * kcache.get(m, n)
         return acc
+    finally:
+        flint_ctx.prec = saved_prec
+
+
+def evaluate_unsigned_euler_product_P_eta_arb(
+    eta_val: Union[arb, int, Fraction, str],
+    u_limit: int,
+    prec_bits: int = 256,
+) -> Dict[str, Any]:
+    """Evaluate the unsigned Euler-product majorant (`TASK-TC-056R2` §2.3):
+        P_eta(u) := prod_{p <= u} (1 - p^{-1/2 - eta})^{-2}
+    for `0 < eta < 1` and `u_limit >= 1`, where `alpha := 1/2 + eta` and `beta := 1 - alpha = 1/2 - eta`.
+    Also computes the regime-specific leading comparisons:
+      - Regime A (`0 < eta < 1/2`, `beta = 1/2 - eta > 0`):
+        `first_order_prime_sum = 2 * sum_{p <= u} p^{-alpha}`,
+        `higher_power_tail = log P_eta(u) - 2 * sum_{p <= u} p^{-alpha}`,
+        `pnt_leading_approx = 2 * u^beta / (beta * log u)` (for `u >= 2`),
+      - Regime B (`eta = 1/2`, `alpha = 1`, `beta = 0`):
+        `mertens_asymptotic = e^{2 * gamma_E} * (log u)^2` (for `u >= 2`),
+      - Regime C (`1/2 < eta < 1`, `alpha = 1/2 + eta > 1`, `beta < 0`):
+        `zeta_alpha_sq_limit = zeta(1/2 + eta)^2`, `gap_below_zeta_limit = zeta(1/2 + eta)^2 - P_eta(u)`.
+    """
+    # Allow legacy (u_limit, eta_val) order if first arg is an int >= 1:
+    if isinstance(eta_val, int) and not isinstance(eta_val, bool) and eta_val >= 1 and not (
+        isinstance(u_limit, int) and not isinstance(u_limit, bool)
+    ):
+        eta_val, u_limit = u_limit, eta_val  # type: ignore[assignment]
+    if not isinstance(u_limit, int) or isinstance(u_limit, bool) or u_limit < 1:
+        raise ValueError(f"u_limit must be an integer >= 1, got {u_limit!r}")
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = prec_bits
+        eta_arb = _coerce_arb(eta_val)
+        if not (bool(eta_arb.lower() > 0) and bool((arb(1) - eta_arb).lower() > 0)):
+            raise ValueError(f"eta_val must lie strictly in (0, 1), got {eta_val!r}")
+        half = arb(1) / arb(2)
+        alpha_arb = half + eta_arb
+        beta_arb = half - eta_arb
+        if bool(beta_arb.lower() > 0):
+            regime = "REGIME_A_SUBCRITICAL_0_LT_ETA_LT_1_OVER_2"
+        elif bool((eta_arb - half).contains(0)) and bool(eta_arb.rad() == 0):
+            regime = "REGIME_B_CRITICAL_MERTENS_ETA_EQ_1_OVER_2"
+        elif bool((-beta_arb).lower() > 0):
+            regime = "REGIME_C_SUPERCRITICAL_CONVERGENT_1_OVER_2_LT_ETA_LT_1"
+        else:
+            regime = "AMBIGUOUS_BOUNDARY_BALL"
+        ps = primes_up_to(u_limit)
+        prod_arb = arb(1)
+        first_order_sum = arb(0)
+        for p in ps:
+            p_neg_alpha = arb(p) ** (-alpha_arb)
+            factor = arb(1) - p_neg_alpha
+            prod_arb /= factor * factor
+            first_order_sum += arb(2) * p_neg_alpha
+        log_prod = prod_arb.log()
+        higher_tail = log_prod - first_order_sum
+        out: Dict[str, Any] = {
+            "u_limit": u_limit,
+            "eta": +eta_arb,
+            "alpha_eq_half_plus_eta": +alpha_arb,
+            "beta_eq_half_minus_eta": +beta_arb,
+            "regime": regime,
+            "prime_count": len(ps),
+            "P_eta": +prod_arb,
+            "P_eta_u": +prod_arb,
+            "log_P_eta": +log_prod,
+            "log_P_eta_u": +log_prod,
+            "first_order_prime_sum": +first_order_sum,
+            "higher_power_tail": +higher_tail,
+        }
+        if u_limit >= 2 and regime == "REGIME_A_SUBCRITICAL_0_LT_ETA_LT_1_OVER_2":
+            u_arb = arb(u_limit)
+            pnt_lead = (arb(2) * (u_arb ** beta_arb)) / (beta_arb * u_arb.log())
+            out["pnt_leading_approx"] = +pnt_lead
+            out["ratio_log_P_to_pnt_leading"] = +(log_prod / pnt_lead)
+        if u_limit >= 2 and regime == "REGIME_B_CRITICAL_MERTENS_ETA_EQ_1_OVER_2":
+            u_arb = arb(u_limit)
+            gamma_euler = -arb(1).digamma()
+            mertens_lead = ((arb(2) * gamma_euler).exp()) * (u_arb.log() ** 2)
+            out["mertens_asymptotic"] = +mertens_lead
+            out["ratio_to_mertens_asymptotic"] = +(prod_arb / mertens_lead)
+        if regime == "REGIME_C_SUPERCRITICAL_CONVERGENT_1_OVER_2_LT_ETA_LT_1":
+            zeta_lim = (alpha_arb.zeta()) ** 2
+            out["zeta_alpha_sq_limit"] = +zeta_lim
+            out["gap_below_zeta_limit"] = +(zeta_lim - prod_arb)
+            out["ratio_to_zeta_limit"] = +(prod_arb / zeta_lim)
+        return out
+    finally:
+        flint_ctx.prec = saved_prec
+
+
+def evaluate_low_prime_alpha_half_euler_product_arb(
+    u_limit: int,
+    prec_bits: int = 256,
+) -> arb:
+    """Evaluate the distinct `alpha = 1/2` (`eta = 0, beta = 1/2`) low-prime product (`Theorem 8.B(1)`):
+        prod_{q <= u_limit} (1 - q^{-1/2})^{-2}.
+    """
+    if not isinstance(u_limit, int) or isinstance(u_limit, bool) or u_limit < 1:
+        raise ValueError(f"u_limit must be an integer >= 1, got {u_limit!r}")
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = prec_bits
+        half = arb(1) / arb(2)
+        prod_arb = arb(1)
+        for q in primes_up_to(u_limit):
+            factor = arb(1) - (arb(q) ** (-half))
+            prod_arb /= factor * factor
+        return +prod_arb
     finally:
         flint_ctx.prec = saved_prec
 
@@ -1265,20 +1385,67 @@ def verify_section_1_and_2_baseline_and_cleanup(prec_bits: int = 256) -> Dict[st
             and excess_zero6_sum == 0
         )
 
-        # 3. Admissible polylogarithmic scale u(Y) = c * (log Y * log log Y)^{1/(1-eta)}:
-        #    Test eta = 1/2, eps = 1/4, c = 1/32 (so c^{1-eta} = 1/(4*sqrt(2)) = 0.17677... < eps = 0.25)
-        #    at Y = exp(1000): verify u(Y)^{1-eta} / ((1-eta) log u(Y) log Y) < eps, while u(Y) / (log Y)^2 -> infty!
-        eta_arb = arb(1) / arb(2)
-        eps_arb = arb(1) / arb(4)
-        c_admissible = arb(1) / arb(32)
+        # 3. Three-regime audit of the unsigned Euler product
+        #    P_eta(u) := prod_{p <= u} (1 - p^{-1/2-eta})^{-2} (0 < eta < 1, alpha := 1/2 + eta, beta := 1 - alpha = 1/2 - eta):
+        #    - Regime A (Subcritical 0 < eta < 1/2, beta = 1/2 - eta > 0):
+        #      log P_eta(u) = 2 sum_{p <= u} p^{-alpha} + 2 sum_{p <= u} sum_{k >= 2} p^{-k*alpha}/k ~ 2 u^beta / (beta log u).
+        #      Concrete regression case: eta = 1/4 (alpha = 3/4, beta = 1/4) at u = 1000, and moving scale
+        #      u(Y) = c * (log Y * log log Y)^{1/beta} = c * (log Y * log log Y)^4 at eps = 1/4, log Y = 1000:
+        #      admissible 2 * c^beta < eps (c = (1/16)^4 = 1/65536 => 2 * c^{1/4} = 1/8 < 1/4) vs.
+        #      incompatible 2 * c^beta > eps (c = (1/4)^4 = 1/256 => 2 * c^{1/4} = 1/2 > 1/4).
+        #    - Regime B (Critical eta = 1/2, alpha = 1, beta = 0):
+        #      P_{1/2}(u) = prod_{p <= u} (1 - p^{-1})^{-2} ~ e^{2*gamma_E} (log u)^2 (squared Mertens product),
+        #      so polynomial cutoffs u(Y) = Y^A obey P_{1/2}(Y^A) = O_eps(Y^eps) for every eps > 0.
+        #    - Regime C (Supercritical 1/2 < eta < 1, alpha = 1/2 + eta > 1, beta < 0):
+        #      P_eta(u) <= zeta(1/2 + eta)^2 < infty converges as u -> infty (no upper cutoff growth restriction).
+        #      Concrete regression case: eta = 3/4 (alpha = 5/4) at u = 100 and u = 1000 against zeta(5/4)^2.
+        regA_u1000 = evaluate_unsigned_euler_product_P_eta_arb(Fraction(1, 4), 1000, prec_bits=prec_bits)
+        regA_u10000 = evaluate_unsigned_euler_product_P_eta_arb(Fraction(1, 4), 10000, prec_bits=prec_bits)
+        # Higher prime-power tail 2 sum_{p<=u} (-log(1 - p^{-3/4}) - p^{-3/4}) <= (zeta(3/2) - 1) / (1 - 2^{-3/4}):
+        regA_tail_cap = ((arb(3) / arb(2)).zeta() - arb(1)) / (arb(1) - (arb(2) ** (-arb(3) / arb(4))))
+        beta_regA = arb(1) / arb(4)
+        eps_regA = arb(1) / arb(4)
         logY_test = arb(1000)
-        u_admissible = c_admissible * ((logY_test * logY_test.log()) ** arb(2))
-        lhs_ratio_over_logY = (u_admissible.sqrt()) / ((arb(1) - eta_arb) * u_admissible.log() * logY_test)
-        ratio_to_sufficient_scale = u_admissible / (logY_test ** arb(2))
-        polylog_scale_ok = bool(
-            (eps_arb - lhs_ratio_over_logY).lower() > 0
-            and (ratio_to_sufficient_scale - arb(1) / arb(5)).lower() > 0  # grows as c*(log log Y)^2 -> infty
+        c_adm_regA = arb(1) / arb(65536)  # c^{1/4} = 1/16 => 2 * c^{1/4} = 1/8 < eps = 1/4
+        c_inc_regA = arb(1) / arb(256)    # c^{1/4} = 1/4  => 2 * c^{1/4} = 1/2 > eps = 1/4
+        c_crit_regA = (eps_regA / arb(2)) ** arb(4)  # (1/8)^4 = 1/4096 => 2 * c^{1/4} = eps
+        u_adm_regA = c_adm_regA * ((logY_test * logY_test.log()) ** arb(4))
+        u_inc_regA = c_inc_regA * ((logY_test * logY_test.log()) ** arb(4))
+        lead_ratio_adm_regA = (arb(2) * (u_adm_regA ** beta_regA)) / (beta_regA * u_adm_regA.log() * logY_test)
+        lead_ratio_inc_regA = (arb(2) * (u_inc_regA ** beta_regA)) / (beta_regA * u_inc_regA.log() * logY_test)
+        ratio_to_sufficient_scale_regA = u_adm_regA / (logY_test ** arb(4))
+        regime_A_ok = bool(
+            regA_u1000["higher_power_tail"].lower() > 0
+            and (regA_tail_cap - regA_u1000["higher_power_tail"]).lower() > 0
+            and (regA_tail_cap - regA_u10000["higher_power_tail"]).lower() > 0
+            and (regA_u1000["ratio_log_P_to_pnt_leading"] - arb(1)).lower() > 0
+            and (arb(2) - regA_u1000["ratio_log_P_to_pnt_leading"]).lower() > 0
+            and (regA_u10000["ratio_log_P_to_pnt_leading"] - arb(1)).lower() > 0
+            and (arb(2) - regA_u10000["ratio_log_P_to_pnt_leading"]).lower() > 0
+            and (eps_regA - lead_ratio_adm_regA).lower() > 0
+            and (lead_ratio_inc_regA - eps_regA).lower() > 0
+            and (ratio_to_sufficient_scale_regA - arb(1) / arb(50)).lower() > 0
+            and ((arb(2) * (c_crit_regA ** beta_regA)) - eps_regA).contains(0)
         )
+
+        regB_u1000 = evaluate_unsigned_euler_product_P_eta_arb(Fraction(1, 2), 1000, prec_bits=prec_bits)
+        regime_B_ok = bool(
+            (regB_u1000["ratio_to_mertens_asymptotic"] - arb(1)).lower() > 0
+            and (arb(21) / arb(20) - regB_u1000["ratio_to_mertens_asymptotic"]).lower() > 0
+        )
+
+        regC_u100 = evaluate_unsigned_euler_product_P_eta_arb(Fraction(3, 4), 100, prec_bits=prec_bits)
+        regC_u1000 = evaluate_unsigned_euler_product_P_eta_arb(Fraction(3, 4), 1000, prec_bits=prec_bits)
+        regC_u10000 = evaluate_unsigned_euler_product_P_eta_arb(Fraction(3, 4), 10000, prec_bits=prec_bits)
+        regime_C_ok = bool(
+            (regC_u100["P_eta"] - arb(1)).lower() > 0
+            and (regC_u1000["P_eta"] - regC_u100["P_eta"]).lower() > 0
+            and (regC_u10000["P_eta"] - regC_u1000["P_eta"]).lower() > 0
+            and regC_u10000["gap_below_zeta_limit"].lower() > 0
+            and (regC_u1000["ratio_to_zeta_limit"] - arb(17) / arb(20)).lower() > 0
+            and (regC_u10000["ratio_to_zeta_limit"] - arb(9) / arb(10)).lower() > 0
+        )
+        polylog_scale_ok = bool(regime_A_ok and regime_B_ok and regime_C_ok)
 
         # 4. Global uniform majorant M_1 = 1/2 + 2*(3/(2e))^{3/2} > zeta(3) for Q_1(w)/sqrt(w):
         C1_uni = arb(2) * ((arb(3) / (arb(2) * e_arb)) ** (arb(3) / arb(2)))
@@ -1383,19 +1550,79 @@ def verify_section_1_and_2_baseline_and_cleanup(prec_bits: int = 256) -> Dict[st
                 "verified": excess_w6_ok,
             },
             "admissible_polylogarithmic_scale_correction": {
-                "sufficient_only_scale": "u(Y) << (log Y)^{1/(1-eta)}",
-                "admissible_and_necessary_scale": (
-                    "u(Y) = c * (log Y * log log Y)^{1/(1-eta)} is admissible whenever 0 < c < eps^{1/(1-eta)} "
-                    "(giving u(Y)^{1-eta} / ((1-eta) log u(Y)) = c^{1-eta} (1 + o_{eta,c}(1)) log Y < eps log Y), "
-                    "and u(Y) = O_{eta,eps}((log Y * log log Y)^{1/(1-eta)}) (limsup <= eps^{1/(1-eta)}) is necessary "
-                    "for keeping the specified unsigned Euler-product majorant prod_{p <= u(Y)} (1 - p^{-1/2-eta})^{-2} "
-                    "within a prescribed O_eps(Y^eps) growth budget. It is NOT a necessity theorem for the signed observable "
-                    "Q_T(X) or for TC compatibility itself."
+                "product_definition": "P_eta(u) := prod_{p <= u} (1 - p^{-1/2-eta})^{-2}, 0 < eta < 1, alpha := 1/2 + eta, beta := 1 - alpha = 1/2 - eta",
+                "where_P_eta_is_used": (
+                    "Squared smooth-fiber sparsity bound ||Q_{lambda,S(P_u),L}||_{L^2([Y, tau Y], dX/X)}^2 <= "
+                    "(c_eta^2 (tau^{2*eta} - 1) / (2*eta)) Y^{2*eta} P_eta(u) (Section 2.5) and squared full-space "
+                    "inverse-prime-filter operator norm ||P_u^{-1}||_{H_eta -> H_eta}^2 = P_eta(u) on H_eta = L^2((0,infty), w^{-1-2*eta} dw)."
                 ),
+                "raw_exponent_parameterization_translation": (
+                    "In the raw exponent parameterization prod_{p <= u} (1 - p^{-alpha})^{-1} from TC-055R2 (0 < alpha < 1, beta = 1 - alpha), "
+                    "log prod_{p <= u} (1 - p^{-alpha})^{-1} ~ u^{1-alpha} / ((1 - alpha) log u). For the squared shifted product "
+                    "P_eta(u) = prod_{p <= u} (1 - p^{-1/2-eta})^{-2}, the prime exponent is alpha = 1/2 + eta so beta = 1 - alpha = 1/2 - eta "
+                    "(not 1 - eta), and squaring the product multiplies log P_eta(u) by 2."
+                ),
+                "regime_A_subcritical_0_lt_eta_lt_half": {
+                    "parameter_range": "0 < eta < 1/2 (alpha = 1/2 + eta in (1/2, 1), beta = 1/2 - eta in (0, 1/2), 2*alpha = 1 + 2*eta > 1)",
+                    "log_asymptotic": "log P_eta(u) = 2 sum_{p <= u} p^{-1/2-eta} + O_eta(1) ~ 2 u^{1/2-eta} / ((1/2 - eta) log u) as u -> infty (eta fixed)",
+                    "sufficient_only_scale": "u(Y) << (log Y)^{1/(1/2-eta)}",
+                    "admissible_and_necessary_scale": (
+                        "For u(Y) = c * (log Y * log log Y)^{1/(1/2-eta)} (c > 0 fixed), log P_eta(u(Y)) / log Y -> 2 * c^{1/2-eta}: "
+                        "2 * c^{1/2-eta} < eps (i.e. 0 < c < (eps/2)^{1/(1/2-eta)}) is sufficient for P_eta(u(Y)) = O_{eta,c,eps}(Y^eps); "
+                        "2 * c^{1/2-eta} > eps is incompatible; the equality case 2 * c^{1/2-eta} = eps is NOT decided by the leading "
+                        "(1 + o(1)) asymptotic alone. More generally, any cutoff u(Y) >= 2 satisfying P_eta(u(Y)) <= C_eps Y^eps must obey "
+                        "limsup_{Y -> infty} u(Y) / (log Y * log log Y)^{1/(1/2-eta)} <= (eps / 2)^{1/(1/2-eta)}."
+                    ),
+                    "boundary_case_2_c_beta_eq_eps_decided_by_leading_asymptotic": False,
+                    "regression_eta_quarter_u1000": {
+                        "eta": "1/4",
+                        "alpha": "3/4",
+                        "beta": "1/4",
+                        "u": 1000,
+                        "P_quarter_1000": serialize_arb_certified(regA_u1000["P_eta"]),
+                        "log_P_quarter_1000": serialize_arb_certified(regA_u1000["log_P_eta"]),
+                        "first_order_prime_sum_2_sum_p_neg_3_4": serialize_arb_certified(regA_u1000["first_order_prime_sum"]),
+                        "higher_power_tail_exact": serialize_arb_certified(regA_u1000["higher_power_tail"]),
+                        "higher_power_tail_analytic_cap": serialize_arb_certified(regA_tail_cap),
+                        "pnt_leading_8_u_quarter_over_log_u": serialize_arb_certified(regA_u1000["pnt_leading_approx"]),
+                        "ratio_log_P_to_pnt_leading": serialize_arb_certified(regA_u1000["ratio_log_P_to_pnt_leading"]),
+                        "sample_adm_c_1_over_65536_eps_quarter_logY_1000_lead_ratio": serialize_arb_certified(lead_ratio_adm_regA),
+                        "sample_inc_c_1_over_256_eps_quarter_logY_1000_lead_ratio": serialize_arb_certified(lead_ratio_inc_regA),
+                        "verified": regime_A_ok,
+                    },
+                },
+                "regime_B_critical_eta_eq_half": {
+                    "parameter_value": "eta = 1/2 (alpha = 1, beta = 0)",
+                    "mertens_asymptotic": "P_{1/2}(u) = prod_{p <= u} (1 - p^{-1})^{-2} ~ e^{2*gamma_E} (log u)^2 as u -> infty",
+                    "polynomial_cutoff_admissibility": (
+                        "For any fixed A > 0, u(Y) = Y^A gives P_{1/2}(Y^A) ~ A^2 e^{2*gamma_E} (log Y)^2 = O_{A,eps}(Y^eps) "
+                        "for EVERY eps > 0; eta = 1/2 does NOT force a polylogarithmic cutoff u(Y) = O((log Y log log Y)^2)."
+                    ),
+                    "regression_eta_half_u1000": {
+                        "u": 1000,
+                        "P_half_1000": serialize_arb_certified(regB_u1000["P_eta"]),
+                        "log_P_half_1000": serialize_arb_certified(regB_u1000["log_P_eta"]),
+                        "mertens_leading_e_2gamma_log_u_sq": serialize_arb_certified(regB_u1000["mertens_asymptotic"]),
+                        "ratio_P_half_to_mertens_asymptotic": serialize_arb_certified(regB_u1000["ratio_to_mertens_asymptotic"]),
+                        "verified": regime_B_ok,
+                    },
+                },
+                "regime_C_supercritical_half_lt_eta_lt_1": {
+                    "parameter_range": "1/2 < eta < 1 (alpha = 1/2 + eta in (1, 3/2), beta = 1/2 - eta < 0)",
+                    "convergent_limit": "P_eta(u) <= zeta(1/2 + eta)^2 < infty and lim_{u -> infty} P_eta(u) = zeta(1/2 + eta)^2",
+                    "cutoff_growth_restriction": "NONE (P_eta(u) = O_eta(1) uniformly for all u >= 2)",
+                    "regression_eta_three_quarters": {
+                        "eta": "3/4",
+                        "alpha": "5/4",
+                        "P_three_quarters_100": serialize_arb_certified(regC_u100["P_eta"]),
+                        "P_three_quarters_1000": serialize_arb_certified(regC_u1000["P_eta"]),
+                        "zeta_five_quarters_sq_limit": serialize_arb_certified(regC_u1000["zeta_alpha_sq_limit"]),
+                        "gap_below_limit_at_u1000": serialize_arb_certified(regC_u1000["gap_below_zeta_limit"]),
+                        "ratio_to_limit_at_u1000": serialize_arb_certified(regC_u1000["ratio_to_zeta_limit"]),
+                        "verified": regime_C_ok,
+                    },
+                },
                 "unsigned_majorant_budget_scope_only": True,
-                "sample_eta_half_eps_quarter_c_1_over_32_logY_1000_ratio": serialize_arb_certified(
-                    lhs_ratio_over_logY
-                ),
                 "verified": polylog_scale_ok,
             },
             "finite_S_global_uniform_majorant_M1": {
@@ -2061,6 +2288,59 @@ def verify_section_8_mixed_prime_block_attempt(prec_bits: int = 256) -> Dict[str
             if not bool((bnd_suv - part_suv).lower() > 0):
                 dstar_samples_ok = False
 
+        # Verify Theorem 8.B(i) individual |M_p(Y, T)| bound and partial-block sum_{p <= U} |M_p(Y, T)| bound
+        # at Y = 8, T = T(8) = 14 across low primes p in {2, 3, 5, 7, 11, 13}, including partial block U = 5 in [4, 8):
+        kc_low8 = KernelMatrixCacheArb(8, prec_bits=prec_bits)
+        low_prime_abs_sum_ok = True
+        sum_signed_Mp_le_5 = arb(0)
+        sum_abs_Mp_le_5 = arb(0)
+        sum_p_neg_half_le_5 = arb(0)
+        for p_low in (2, 3, 5, 7, 11, 13):
+            P_lt_p = primes_up_to(p_low - 1)
+            Mp_val = evaluate_M_P_p_ordered_k_ne_l_arb(
+                8, 14, P_lt_p, p_low, prec_bits=prec_bits, kernel_cache=kc_low8
+            )
+            if p_low == 2 and not bool(Mp_val == arb(0)):
+                low_prime_abs_sum_ok = False
+            prod_lt_p = evaluate_low_prime_alpha_half_euler_product_arb(p_low - 1, prec_bits=prec_bits)
+            prod_le_p = evaluate_low_prime_alpha_half_euler_product_arb(p_low, prec_bits=prec_bits)
+            p_arb = arb(p_low)
+            p_power_offdiag_sum = (arb(2) * (p_arb ** (-arb(1) / arb(2)))) / (
+                (arb(1) - (p_arb ** (-1))) * (arb(1) - (p_arb ** (-arb(1) / arb(2))))
+            )
+            indiv_cap_exact_p_powers = D_star * p_power_offdiag_sum * prod_lt_p
+            indiv_cap_le_p = (arb(2) * D_star / p_arb.sqrt()) * prod_le_p
+            if not (
+                bool((indiv_cap_exact_p_powers - abs(Mp_val)).lower() > 0)
+                and bool((indiv_cap_le_p - indiv_cap_exact_p_powers).lower() > 0)
+            ):
+                low_prime_abs_sum_ok = False
+            if p_low <= 5:
+                sum_signed_Mp_le_5 += Mp_val
+                sum_abs_Mp_le_5 += abs(Mp_val)
+                sum_p_neg_half_le_5 += p_arb ** (-arb(1) / arb(2))
+        prod_le_5 = evaluate_low_prime_alpha_half_euler_product_arb(5, prec_bits=prec_bits)
+        partial_cutoff_cap_le_5 = arb(2) * D_star * sum_p_neg_half_le_5 * prod_le_5
+        triangle_diff_le_5 = sum_abs_Mp_le_5 - abs(sum_signed_Mp_le_5)
+        if not (
+            bool(triangle_diff_le_5.contains(0) or triangle_diff_le_5.lower() > 0)
+            and bool((partial_cutoff_cap_le_5 - sum_abs_Mp_le_5).lower() > 0)
+        ):
+            low_prime_abs_sum_ok = False
+
+        # Distinct alpha = 1/2 (eta = 0, beta = 1/2) low-prime Euler product prod_{q < 2B} (1 - q^{-1/2})^{-2}
+        # at 2B = 1000 (q <= 999): log prod_{q < 2B} (1 - q^{-1/2})^{-2} ~ 4 sqrt(2B) / log(2B):
+        prod_alpha_half_lt_1000 = evaluate_low_prime_alpha_half_euler_product_arb(999, prec_bits=prec_bits)
+        log_prod_alpha_half_lt_1000 = prod_alpha_half_lt_1000.log()
+        pnt_lead_alpha_half_1000 = (arb(4) * arb(1000).sqrt()) / arb(1000).log()
+        ratio_log_alpha_half_1000 = log_prod_alpha_half_lt_1000 / pnt_lead_alpha_half_1000
+        if not (
+            bool((ratio_log_alpha_half_1000 - arb(1)).lower() > 0)
+            and bool((arb(2) - ratio_log_alpha_half_1000).lower() > 0)
+        ):
+            low_prime_abs_sum_ok = False
+        dstar_samples_ok = bool(dstar_samples_ok and low_prime_abs_sum_ok)
+
         # Theorem 8.B(ii) & 8.D: Super-sqrt(T) identity and compensated multi-block telescoping at Y = 128, T = 431:
         # Note sqrt(431) = 20.76..., so EVERY dyadic block B in {32, 64, 128, 256} satisfies B > sqrt(T)!
         Y_sup = 128
@@ -2192,9 +2472,12 @@ def verify_section_8_mixed_prime_block_attempt(prec_bits: int = 256) -> Dict[str
             and diff_I_4_minus_2.upper() < 0
         )
 
-        # Theorem 8.E (TASK-TC-056R Section 3): Conditional moving-cutoff Buchstab asymptotic under RH
+        # Theorem 8.E (TASK-TC-056R / TASK-TC-056R2): Conditional moving-cutoff Buchstab asymptotic under RH
         # at U_0(Y) = ceil(2 Y^{5/8}), T(Y) = ceil(Y^{5/4}) uniformly for X in [Y, tau Y]:
-        # 1. Mellin derivative F'(1/2) = zeta(2)/2 = tau^2/48 > 0 and log-moment int_0^infty Q_lambda(w) w^{-3/2} log(w) dw = -tau^2/48 < 0:
+        # 1. Closed-form constant evaluation and consistency check (derived analytically in Theorem 8.E Step E):
+        #    F'(1/2) = zeta(2)/2 = tau^2/48 > 0 and log-moment int_0^infty Q_lambda(w) w^{-3/2} log(w) dw = -tau^2/48 < 0.
+        #    (Note: (F_prime_half_tau2_over_48 - F_prime_half_zeta2_over_2).contains(0) is a closed-form constant
+        #    consistency check between zeta(2)/2 and tau^2/48, NOT an independent numerical integration or probe.)
         zeta2_arb = arb(2).zeta()
         F_prime_half_tau2_over_48 = (tau_arb ** 2) / arb(48)
         F_prime_half_zeta2_over_2 = zeta2_arb / arb(2)
@@ -2202,34 +2485,27 @@ def verify_section_8_mixed_prime_block_attempt(prec_bits: int = 256) -> Dict[str
         norm_sq_coeff_tau_minus_1_tau4_over_2304 = ((tau_arb - arb(1)) * (tau_arb ** 4)) / arb(2304)
         step_F_Q_T_tail_cap = (tau_arb ** (arb(5) / arb(2))) / arb(2)
 
-        # Cross-check F'(1/2) via removable-singularity quotient G(z) := F(z) / (z - 1/2)
-        # = Gamma(5/4 - z/2) * zeta(1 + 2z) / (2 * (z - 1/2) * zeta(1/2 + z)) near z = 1/2:
-        z_probe = arb(1) / arb(2) + (arb(2) ** (-100))
-        s_probe = arb(1) / arb(2) + z_probe  # 1 + 2^-100
-        # On Re(s) > 1, (s - 1)*zeta(s) = 1 + gamma*(s - 1) + O((s - 1)^2):
-        gamma_euler = -arb(1).digamma()
-        inv_s_minus_1_zeta_ball = arb(1) - gamma_euler * (arb(0, arb(2) ** (-98)))
-        G_at_half_probe = (
-            (arb(5) / arb(4) - z_probe / arb(2)).gamma()
-            * (arb(1) + arb(2) * z_probe).zeta()
-            * inv_s_minus_1_zeta_ball
-            / arb(2)
-        )
         mellin_sign_ok = bool(
             (F_prime_half_tau2_over_48 - F_prime_half_zeta2_over_2).contains(0)
-            and (G_at_half_probe - F_prime_half_tau2_over_48).contains(0)
             and F_prime_half_tau2_over_48.lower() > 0
             and log_moment_neg_tau2_over_48.upper() < 0
             and norm_sq_coeff_tau_minus_1_tau4_over_2304.lower() > 0
             and step_F_Q_T_tail_cap.lower() > 0
         )
 
-        # 2. Exact finite identity Q_T(X) = S_{<U_0, T}(X) - H_{[U_0, T]}(X) (including empty prime band at Y = 1)
-        #    and Step B finite-cofactor truncation bound p^{-1/2}|Q_lambda(X/p) - Q_{L_p}(X/p)| <= 2 X^{5/2} / (T^2 p):
+        # 2. Small-Y cutoff ordering audit and exact finite identity Q_T(X) = S_{<U_0, T}(X) - H_{[U_0, T]}(X):
+        #    - At Y = 1: U_0(1) = 2 > 1 = T(1) (empty prime band [2, 1] cap P = empty);
+        #    - At Y = 2: U_0(2) = 4 > 3 = T(2) (empty prime band [4, 3] cap P = empty);
+        #    - At Y = 3: U_0(3) = 4 = T(3) (empty prime band [4, 4] cap P = empty);
+        #    - For all real Y >= 4: 5 <= U_0(Y) <= T(Y) - 1 < T(Y) unconditionally (so [U_0(Y), T(Y)] is a
+        #      non-degenerate interval [U_0(Y), T(Y)] with U_0(Y) < T(Y)).
+        #    Check sample points (y_mc, x_mc) across Y in {1, 2, 3} (empty band) and Y in {4, 16, 128} (U_0(Y) < T(Y)):
         moving_cutoff_samples_ok = True
-        for y_mc, x_mc in ((1, 1), (2, 3), (16, 20), (128, 160)):
+        for y_mc, x_mc in ((1, 1), (2, 3), (3, 4), (4, 5), (16, 20), (128, 160)):
             T_mc = exact_T_cutoff_ceil_Y_5_4(y_mc)
             U0_mc = exact_U0_cutoff_ceil_2_Y_5_8(y_mc)
+            if y_mc >= 4 and not (5 <= U0_mc < T_mc):
+                moving_cutoff_samples_ok = False
             P_lt_U0 = primes_up_to(U0_mc - 1)
             band_p = [p for p in primes_up_to(T_mc) if p >= U0_mc]
             q_T_x = evaluate_Q_lambda_finite_T_certified_arb(x_mc, T_mc, prec_bits=prec_bits)
@@ -2244,7 +2520,7 @@ def verify_section_8_mixed_prime_block_attempt(prec_bits: int = 256) -> Dict[str
                 xp_frac = Fraction(x_mc, p_b)
                 q_Lp = evaluate_Q_lambda_finite_T_certified_arb(xp_frac, Lp, prec_bits=prec_bits)
                 h_band_x += q_Lp / arb(p_b).sqrt()
-                # Check Step B truncation bound against Q_lambda(X/p) approximated to 600 terms + tail:
+                # Check Step B truncation bound against Q_lambda(X/p) approximated to Lp + 200 terms + tail:
                 q_hi = evaluate_Q_lambda_finite_T_certified_arb(xp_frac, Lp + 200, prec_bits=prec_bits)
                 xp_arb = _coerce_arb(xp_frac)
                 rem_hi = (xp_arb ** (arb(5) / arb(2))) / (arb(2) * (arb(Lp + 200) ** 2))
@@ -2252,7 +2528,9 @@ def verify_section_8_mixed_prime_block_attempt(prec_bits: int = 256) -> Dict[str
                 step_B_rhs = (arb(2) * (arb(x_mc) ** (arb(5) / arb(2)))) / (arb(T_mc * T_mc) * arb(p_b))
                 if not bool((step_B_rhs - diff_cof).lower() > 0):
                     moving_cutoff_samples_ok = False
-            if y_mc in (1, 2) and (len(band_p) != 0 or not bool(h_band_x == arb(0))):
+            if y_mc in (1, 2, 3) and (len(band_p) != 0 or not bool(h_band_x == arb(0))):
+                moving_cutoff_samples_ok = False
+            if y_mc >= 4 and len(band_p) == 0:
                 moving_cutoff_samples_ok = False
             if not bool((q_T_x - (s_lt_U0_x - h_band_x)).contains(0)):
                 moving_cutoff_samples_ok = False
@@ -2286,11 +2564,29 @@ def verify_section_8_mixed_prime_block_attempt(prec_bits: int = 256) -> Dict[str
                 "D_star_shifted_kernel_constant": serialize_arb_certified(D_star),
                 "D_star_samples_verified": dstar_samples_ok,
                 "low_block_bound_statement": (
-                    "M_2(Y, T) = 0 identically; for any dyadic block B = 2^j, "
-                    "|M_j(Y)| <= 2 D_* (sum_{p in I_j} p^{-1/2}) (prod_{q < 2B} (1 - q^{-1/2})^{-2}), giving "
-                    "|M_j(Y)| <<_delta Y^delta unconditionally for B <<_delta (log Y)^2 (Y >= 2, elementary bound) "
-                    "and for B <= (delta^2 / 32) (log Y * log log Y)^2 (Y >= exp(e), PNT prime-reciprocal-root asymptotic)."
+                    "M_2(Y, T) = 0 identically; for every prime p >= 3, "
+                    "|M_p(Y, T)| <= D_* (2 p^{-1/2} / ((1 - p^{-1})(1 - p^{-1/2}))) prod_{q < p} (1 - q^{-1/2})^{-2} "
+                    "<= 2 D_* p^{-1/2} prod_{q <= p} (1 - q^{-1/2})^{-2}. "
+                    "Consequently, for any dyadic block B = 2^j, "
+                    "|M_j(Y)| <= sum_{p in I_j(Y)} |M_p(Y, T(Y))| <= 2 D_* (sum_{p in I_j(Y)} p^{-1/2}) (prod_{q < 2B} (1 - q^{-1/2})^{-2}), "
+                    "and for any cutoff U >= 2 (including any partial final dyadic block p <= U_{log,delta}(Y)), "
+                    "|sum_{p <= U} M_p(Y, T(Y))| <= sum_{p <= U} |M_p(Y, T(Y))| <= 2 D_* (sum_{p <= U} p^{-1/2}) (prod_{q <= U} (1 - q^{-1/2})^{-2}). "
+                    "Since alpha = 1/2 (eta = 0, beta = 1/2, distinct from alpha = 1/2 + eta > 1/2 in Section 2.3) has "
+                    "log prod_{q < 2B} (1 - q^{-1/2})^{-2} ~ 4 sqrt(2B) / log(2B), setting B = c (log Y log log Y)^2 gives "
+                    "(2 sqrt(2c) + o(1)) log Y, so c = delta^2 / 32 gives leading coefficient delta / 2 and yields "
+                    "sum_{p <= U_{log,delta}(Y)} |M_p(Y, T(Y))| <<_delta Y^delta unconditionally."
                 ),
+                "low_prime_alpha_half_product_lt_1000": serialize_arb_certified(prod_alpha_half_lt_1000),
+                "low_prime_alpha_half_log_product_lt_1000": serialize_arb_certified(log_prod_alpha_half_lt_1000),
+                "low_prime_alpha_half_pnt_leading_4_sqrt_1000_over_log_1000": serialize_arb_certified(
+                    pnt_lead_alpha_half_1000
+                ),
+                "low_prime_alpha_half_ratio_to_pnt_leading_at_1000": serialize_arb_certified(
+                    ratio_log_alpha_half_1000
+                ),
+                "sample_partial_block_Y8_T14_U5_abs_sum_Mp": serialize_arb_certified(sum_abs_Mp_le_5),
+                "sample_partial_block_Y8_T14_U5_analytic_cap": serialize_arb_certified(partial_cutoff_cap_le_5),
+                "low_prime_abs_sum_samples_verified": low_prime_abs_sum_ok,
                 "top_block_constant_2_tau3_minus_1_zeta3_M1_over_3": serialize_arb_certified(top_block_const),
                 "top_block_bound_verified_at_B256_Y128": top_block_bound_ok,
                 "super_sqrt_T_block_rows_Y128_T431": super_sqrt_rows,
@@ -2351,7 +2647,8 @@ def verify_section_8_mixed_prime_block_attempt(prec_bits: int = 256) -> Dict[str
                     "Rewriting Q_{T(Y)} = S_{<U_0(Y), T(Y)} - H_{[U_0(Y), T(Y)]} is an exact algebraic identity and does NOT by itself supply a smaller "
                     "upper bound on E_{T(Y)}(Y). See Theorem 8.E for the complete conditional moving-cutoff asymptotic under RH diagnosing why "
                     "S_{<U_0(Y), T(Y)} and H_{[U_0(Y), T(Y)]} cannot be bounded separately at the O_eps(Y^eps) scale. Setting U_{log,delta}(Y) := "
-                    "(delta^2 / 32) (log Y log log Y)^2 for Y >= exp(e) and 1 for 1 <= Y < exp(e), Theorems 6.1 and 8.B(1) reduce SUBGATE-TC-043A "
+                    "(delta^2 / 32) (log Y log log Y)^2 for Y >= exp(e) and 1 for 1 <= Y < exp(e), Theorems 6.1 and 8.B(1) (bounding "
+                    "sum_{p <= U_{log,eps/4}(Y)} |M_p(Y, T(Y))| <<_eps Y^{eps/2}, including any partial dyadic block) reduce SUBGATE-TC-043A "
                     "unconditionally across all eps > 0 and Y >= 1 to sum_{U_{log,eps/4}(Y) < p <= T(Y)} M_p(Y, T(Y)) <= C'_eps Y^eps "
                     "(equivalently ||S_{<U_0(Y), T(Y)} - H_{[U_0(Y), T(Y)]}||_{L^2([Y, tau Y], dX/X)}^2 <= C_eps Y^eps)."
                 ),
@@ -2359,7 +2656,13 @@ def verify_section_8_mixed_prime_block_attempt(prec_bits: int = 256) -> Dict[str
             "theorem_8E_conditional_moving_cutoff_buchstab_asymptotic": {
                 "evidence_class": "PROVED_CONDITIONAL (conditional on RH; diagnostic showing why S_{<U_0,T} and H_{[U_0,T]} cannot be uncoupled)",
                 "is_conditional_on_rh": True,
-                "asymptotic_threshold": "Y >= 2 (exact finite identity Q_T = S_{<U_0,T} - H_{[U_0,T]} holds for all Y >= 1, with empty prime band at Y = 1 and Y = 2; log Y denominators used only for Y >= 2)",
+                "asymptotic_threshold": (
+                    "Primary Stieltjes and moving-endpoint proof domain Y >= 4 (where 5 <= U_0(Y) <= T(Y) - 1 < T(Y) holds "
+                    "unconditionally), extended to 2 <= Y < 4 by an explicit boundedness argument over the finite cutoff set "
+                    "(U_0(Y), T(Y)) in {(4, 3), (4, 4), (5, 5), (5, 6)} and X in [Y, tau Y] subset [2, 4*tau]. The exact finite "
+                    "identity Q_T = S_{<U_0,T} - H_{[U_0,T]} holds for all Y >= 1, with empty prime band at Y in {1, 2, 3}; "
+                    "log Y denominators are used only for Y >= 2."
+                ),
                 "F_at_half_exact_zero": 0,
                 "F_prime_at_half_tau2_over_48": serialize_arb_certified(F_prime_half_tau2_over_48),
                 "log_moment_int_Q_lambda_w_neg_3_2_log_w": serialize_arb_certified(log_moment_neg_tau2_over_48),
@@ -2367,6 +2670,13 @@ def verify_section_8_mixed_prime_block_attempt(prec_bits: int = 256) -> Dict[str
                     norm_sq_coeff_tau_minus_1_tau4_over_2304
                 ),
                 "step_F_Q_T_tail_cap_tau_5_2_over_2": serialize_arb_certified(step_F_Q_T_tail_cap),
+                "closed_form_constant_consistency_check_only": True,
+                "finite_sample_check_scope": (
+                    "Evaluates the closed-form constants F'(1/2) = zeta(2)/2 = tau^2/48, -tau^2/48, (tau - 1) tau^4 / 2304, "
+                    "and checks the exact finite identity Q_T = S_{<U_0,T} - H_{[U_0,T]} plus Step B/F truncation bounds at "
+                    "sample points (Y, X) in {(1, 1), (2, 3), (3, 4), (4, 5), (16, 20), (128, 160)}. The universal asymptotic "
+                    "as Y -> infty is established by the analytic proof in Steps A-F, not by finite sample evaluation."
+                ),
                 "steps_A_through_F_proof_summary": {
                     "step_A_rh_input_and_derivative_control": (
                         "Under RH, L_lambda(t) = sum_{n<=t} lambda(n) <<_eta t^{1/2+eta} (Titchmarsh 2nd ed. §14.25). "
@@ -2376,36 +2686,40 @@ def verify_section_8_mixed_prime_block_attempt(prec_bits: int = 256) -> Dict[str
                         "hence int_0^infty (|Q_lambda(w)| + |w Q'_lambda(w)|) w^{-3/2} (1 + |log w|^2) dw < infty."
                     ),
                     "step_B_finite_cofactor_truncation": (
-                        "For U_0(Y) <= p <= T(Y), L_p = floor(T(Y)/p) >= 1 satisfies L_p >= T(Y)/(2p), so sum_{m > L_p} m^{-3} <= 1/(2 L_p^2) <= 2 p^2 / T(Y)^2 "
+                        "For Y >= 4, 5 <= U_0(Y) <= T(Y) - 1 < T(Y) unconditionally. For U_0(Y) <= p <= T(Y), L_p = floor(T(Y)/p) >= 1 "
+                        "satisfies L_p >= T(Y)/(2p), so sum_{m > L_p} m^{-3} <= 1/(2 L_p^2) <= 2 p^2 / T(Y)^2 "
                         "and p^{-1/2} |Q_lambda(X/p) - Q_{L_p}(X/p)| <= 2 X^{5/2} / (T(Y)^2 p). Summing over U_0(Y) <= p <= T(Y) for X in [Y, tau Y] "
                         "gives <= 2 tau^{5/2} sum_{U_0(Y) <= p <= T(Y)} 1/p = O(1) uniformly in X in [Y, tau Y]."
                     ),
                     "step_C_pnt_stieltjes_error": (
-                        "Unconditional PNT N_prime(t) = li(t) + R(t) with R(t) << t exp(-c sqrt(log t)) applied on [U_0(Y)^-, T(Y)] to "
+                        "For Y >= 4 (so U_0(Y) < T(Y)), unconditional PNT N_prime(t) = li(t) + R(t) with R(t) << t exp(-c sqrt(log t)) applied on [U_0(Y)^-, T(Y)] to "
                         "f_X(t) = t^{-1/2} Q_lambda(X/t) retains both endpoints R(T(Y)) f_X(T(Y)) - R(U_0(Y)^-) f_X(U_0(Y)) and "
                         "-int_{U_0(Y)}^{T(Y)} R(t) f'_X(t) dt; changing variable w = X/t (t |f'_X(t)| dt = sqrt(X) w^{-3/2} |(1/2) Q_lambda(w) + w Q'_lambda(w)| dw) "
                         "and using log t >= (5/8) log Y bounds the total PNT error by O(sqrt(Y) exp(-c' sqrt(log Y))) uniformly in X in [Y, tau Y]."
                     ),
                     "step_D_moving_endpoints_and_log_expansion": (
-                        "Under w = X/t in [X/T(Y), X/U_0(Y)], log X - log w = log t >= (5/8) log Y (Y >= 2), so the 2nd-order remainder in "
-                        "1/(log X - log w) = 1/log X + (log w)/(log X)^2 + (log w)^2 / ((log X)^2 (log X - log w)) integrates to O(sqrt(Y)/(log Y)^3) "
-                        "uniformly in X in [Y, tau Y]. Extending the first two Mellin moments to (0, infty) incurs O(Y^{-1/2}/log Y) = O(1/log Y) at the "
-                        "lower end w < X/T(Y) <<= Y^{-1/4} (via |Q_lambda(w)| << w^{5/2}) and O(Y^{23/64}/log Y) at the upper end w > X/U_0(Y) >>= Y^{3/8} "
+                        "For Y >= 4, under w = X/t in [X/T(Y), X/U_0(Y)], log X - log w = log t >= (5/8) log Y, so the 2nd-order remainder in "
+                        "1/(log X - log w) = 1/log X + (log w)/(log X)^2 + (log w)^2 / ((log X)^2 (log X - log w)) integrates (with the sqrt(X) prefactor) "
+                        "to O(sqrt(Y)/(log Y)^3) uniformly in X in [Y, tau Y]. Extending the first two Mellin moments to (0, infty) incurs, after "
+                        "multiplying by sqrt(X) = Theta(sqrt(Y)), O(sqrt(Y) * (X/T(Y))^2 / log Y) = O(1 / log Y) at the lower end w < X/T(Y) <<= Y^{-1/4} "
+                        "(via |Q_lambda(w)| << w^{5/2}) and O(Y^{23/64}/log Y) at the upper end w > X/U_0(Y) >>= Y^{3/8} "
                         "(via |Q_lambda(w)| << w^{1/8}), both absorbed into O(sqrt(Y)/(log Y)^3)."
                     ),
                     "step_E_mellin_identities_and_signs": (
                         "On 1/2 < a < 5/2 (z = a + i b), F(z) = int_0^infty Q_lambda(w) w^{-z} dw/w = Gamma(5/4 - z/2) zeta(1 + 2z) / (2 zeta(1/2 + z)). "
                         "Under RH, Step A continues the integral holomorphically to 1/8 < a < 5/2 and justifies differentiation under the integral at z = 1/2, "
                         "giving F(1/2) = 0, F'(1/2) = zeta(2)/2 = tau^2/48 > 0, and int_0^infty Q_lambda(w) w^{-3/2} log(w) dw = -F'(1/2) = -tau^2/48 < 0, "
-                        "whence H_{[U_0(Y), T(Y)]}(X) = -(tau^2/48) sqrt(X)/(log X)^2 + O(sqrt(Y)/(log Y)^3) uniformly for X in [Y, tau Y] (Y >= 2)."
+                        "whence H_{[U_0(Y), T(Y)]}(X) = -(tau^2/48) sqrt(X)/(log X)^2 + O(sqrt(Y)/(log Y)^3) uniformly for X in [Y, tau Y] for Y >= 4, "
+                        "and hence for all Y >= 2 by boundedness over the finite cutoff set (U_0(Y), T(Y)) in {(4,3),(4,4),(5,5),(5,6)} on 2 <= Y < 4."
                     ),
                     "step_F_transfer_to_S_norm_and_coupled_R_diag_fib": (
                         "Unconditionally |Q_{T(Y)}(X) - Q_lambda(X)| <= tau^{5/2}/2 = O(1) on [Y, tau Y]; under RH, |Q_{T(Y)}(X)| << Y^{1/8} = O(sqrt(Y)/(log Y)^3), "
                         "so S_{<U_0(Y), T(Y)}(X) = Q_{T(Y)}(X) + H_{[U_0(Y), T(Y)]}(X) has the same expansion -(tau^2/48) sqrt(X)/(log X)^2 + O(sqrt(Y)/(log Y)^3). "
                         "Rescaling X = Y u on u in [1, tau] and bounding cross/error terms via Cauchy-Schwarz yields ||H_{[U_0(Y), T(Y)]}||_{L^2}^2 = "
-                        "((tau - 1) tau^4 / 2304) Y / (log Y)^4 + O(Y / (log Y)^5) and the same asymptotic for ||S_{<U_0(Y), T(Y)}||_{L^2}^2 (Y >= 2). "
-                        "For R_{diag-fib}(Y; U_0(Y), T(Y)), Step B proves |Q_{floor(T(Y)/p)}(X/p) - Q_lambda(X/p)| <= 2 tau^{5/2} p^{-1/2} for the actual coupled "
-                        "cutoff L_p = floor(T(Y)/p), giving |Q_{L_p}(X/p)| << (Y/p)^{1/8} + p^{-1/2} under RH and R_{diag-fib} << Y^{3/32} / log(2Y)."
+                        "((tau - 1) tau^4 / 2304) Y / (log Y)^4 + O(Y / (log Y)^5) and the same asymptotic for ||S_{<U_0(Y), T(Y)}||_{L^2}^2 (Y >= 4, and "
+                        "extended to 2 <= Y < 4 by finite-cutoff boundedness). For R_{diag-fib}(Y; U_0(Y), T(Y)), Step B proves "
+                        "|Q_{floor(T(Y)/p)}(X/p) - Q_lambda(X/p)| <= 2 tau^{5/2} p^{-1/2} for the actual coupled cutoff L_p = floor(T(Y)/p), "
+                        "giving |Q_{L_p}(X/p)| << (Y/p)^{1/8} + p^{-1/2} under RH and R_{diag-fib} << Y^{3/32} / log(2Y)."
                     ),
                 },
                 "verified": bool(mellin_sign_ok and moving_cutoff_samples_ok),
@@ -2553,7 +2867,7 @@ def execute_task_tc056_prime_chain_contraction_audit(
     prec_bits: int = 256,
     verify_review_doc: bool = True,
 ) -> Dict[str, Any]:
-    """Execute the complete TASK-TC-056 mathematical and certified Arb audit."""
+    """Execute the complete TASK-TC-056 / TASK-TC-056R / TASK-TC-056R2 mathematical and certified Arb audit."""
     sec1_2 = verify_section_1_and_2_baseline_and_cleanup(prec_bits=prec_bits)
     sec3 = verify_section_3_finite_prime_filtration(prec_bits=prec_bits)
     sec4 = verify_section_4_single_prime_gaussian_contraction(prec_bits=prec_bits)
@@ -2572,7 +2886,8 @@ def execute_task_tc056_prime_chain_contraction_audit(
 
     report: Dict[str, Any] = {
         "task_id": TASK_TC_056_ID,
-        "repair_task_id": TASK_TC_056R_ID,
+        "repair_task_id": TASK_TC_056R2_ID,
+        "prior_repair_task_id": TASK_TC_056R_ID,
         "parent_epic": EPIC_TC_042_ID,
         "prior_tasks": [
             TASK_TC_054_ID,
@@ -2582,6 +2897,7 @@ def execute_task_tc056_prime_chain_contraction_audit(
             TASK_TC_055R_ID,
             TASK_TC_055R2_ID,
             TASK_TC_056_ID,
+            TASK_TC_056R_ID,
         ],
         "prior_merged_main": PRIOR_MERGED_MAIN_TC_053R,
         "tc054r2_merged_main_baseline": TC_054R2_MERGED_MAIN_BASELINE,
@@ -2589,7 +2905,8 @@ def execute_task_tc056_prime_chain_contraction_audit(
         "tc055r2_reviewed_tip": TC_055R2_REVIEWED_TIP,
         "tc056_implementation_commit": TC_056_IMPLEMENTATION_COMMIT,
         "tc056_reviewed_tip": TC_056_REVIEWED_TIP,
-        "branch": "task/tc-056r-grade-scope-and-uniform-cutoff-proof-closeout",
+        "tc056r_reviewed_commit": TC_056R_REVIEWED_COMMIT,
+        "branch": "task/tc-056r2-euler-product-certification-and-report-closeout",
         "subgate_tc043a_status": "OPEN",
         "rh_proved": False,
         "precision_bits": prec_bits,
@@ -2609,23 +2926,24 @@ def execute_task_tc056_prime_chain_contraction_audit(
                 "mixed_interaction_decomposition_and_p_independence_tc056 (Theorem 20): unconditional proof of Delta_{P,p} = M_{P,p} - C_{P,p}, ordered k != l equivalence of M_{P,p} (without extra factor of 2 on ordered m != n), P-independence C_{P,p} = C_empty,p = D_T - V_{{p}} via the p-free cofactor bijection r = s*m, and exact finite alternating shift expansion of D_T - V_{{p}}.",
             ],
             "2_analytic_theorems_proved_outside_lean": [
-                "Rational-grade exclusion for p^k = tau^K (Section 1.2): unique real solution K = k log(p) / log(tau) is irrational (K not in Q) by clearing K = a/b to tau^{|a|} - p^{kb} = 0 and invoking Lindemann's transcendence of tau = 2*pi; algebraic irrationality vs. transcendence of K is open and not used by any TC-056/TC-056R theorem.",
+                "Rational-grade exclusion for p^k = tau^K (Section 1.2): unique real solution K = k log(p) / log(tau) is irrational (K not in Q) by clearing K = a/b to tau^{|a|} - p^{kb} = 0 and invoking Lindemann's transcendence of tau = 2*pi; algebraic irrationality vs. transcendence of K is open and not used by any TC-056/TC-056R/TC-056R2 theorem.",
                 "Dominated and Bounded Convergence proof of Q_{a_S}(X) ~ (m_S / 2) sqrt(X) and E_{a_S}(Y) ~ ((tau - 1) / 4) m_S^2 Y via a_S = 1 * b_S and global majorant sup_{w>0} |Q_1(w)|/sqrt(w) <= M_1 = 1/2 + C_{1,uni}.",
-                "Necessary vs. sufficient polylogarithmic scale u(Y) = c (log Y log log Y)^{1/(1-eta)} (0 < c < eps^{1/(1-eta)}) for keeping the specified unsigned Euler-product majorant within an O_eps(Y^eps) growth budget, and unsigned smooth-fiber sparsity bound c_eta w^eta prod_{p in P}(1 - p^{-1/2-eta})^{-1}.",
+                "Three-regime asymptotic analysis of the unsigned Euler product P_eta(u) := prod_{p <= u}(1 - p^{-1/2-eta})^{-2} (0 < eta < 1, alpha = 1/2 + eta, beta = 1 - alpha = 1/2 - eta) in Section 2.3: Regime A (0 < eta < 1/2, beta = 1/2 - eta > 0) log P_eta(u) ~ 2 u^{1/2-eta} / ((1/2 - eta) log u), with u(Y) = c (log Y log log Y)^{1/(1/2-eta)} admissible for 2 c^{1/2-eta} < eps, incompatible for 2 c^{1/2-eta} > eps, boundary 2 c^{1/2-eta} = eps undecided by the leading asymptotic alone, and general necessary limsup <= (eps/2)^{1/(1/2-eta)}; Regime B (eta = 1/2, alpha = 1) squared Mertens product P_{1/2}(u) ~ e^{2*gamma_E} (log u)^2 (admitting polynomial cutoffs u(Y) = Y^A); Regime C (1/2 < eta < 1, alpha > 1) convergent product P_eta(u) <= zeta(1/2 + eta)^2 (no cutoff growth restriction).",
                 "Integrated transfer on [Y, tau Y] against dX/X of Sections 3-5, shifted diagonal identity A_d(Y) = d^{-3} c_d^{-5} D_E(c_d Y), and uniform total contraction bound sum_{p<=T} C_p(Y, T) <= 2^{7/2} B_D sum_p 1/(p^3 - 1) <= 2^{7/2} B_D * (8/7)*(zeta(3)-1) < 1 for all Y >= 1, T >= 0.",
-                "Theorem 8.B (unconditional low-prime block subpower bound and super-sqrt(T) identity + top-block power saving), Theorem 8.C (unconditional PNT refutation of localized single-block subpower bound M_j(Y) - C_j(Y) <= A_delta Y^delta for every delta in (0, 1) via I(2) - I(1) > 0.1189 > 0, with zero RH dependency), and Theorem 8.D (exact compensated multi-block telescoping across super-sqrt(T) bands and unconditional reduction of SUBGATE-TC-043A).",
+                "Theorem 8.B (unconditional low-prime individual and partial-block absolute-sum bound sum_{p <= U} |M_p(Y, T)| <= 2 D_* (sum_{p <= U} p^{-1/2}) prod_{q <= U} (1 - q^{-1/2})^{-2} with alpha = 1/2, c = delta^2 / 32, and super-sqrt(T) identity + top-block power saving), Theorem 8.C (unconditional PNT refutation of localized single-block subpower bound M_j(Y) - C_j(Y) <= A_delta Y^delta for every delta in (0, 1) via I(2) - I(1) > 0.1189 > 0, with zero RH dependency), and Theorem 8.D (exact compensated multi-block telescoping across super-sqrt(T) bands and unconditional reduction of SUBGATE-TC-043A).",
             ],
             "3_certified_finite_evaluations": [
+                "Section 2.3 three-regime Euler-product evaluations at u = 1000: P_{1/4}(1000), log P_{1/4}(1000), P_{1/2}(1000) vs. e^{2*gamma_E}(log 1000)^2, and P_{3/4}(1000) < zeta(5/4)^2.",
                 "Section 7a: Delta_{{2},3}(4, 6) = 0.00770859415272760628... > 0 (outward-certified positive lower endpoint).",
                 "Section 7b: [sum_{64 <= p < 128} Delta_p(128, 431)] / D_{431}(128) = 1.34144540313580739... > 1 (outward-certified lower endpoint > 1).",
-                "Section 6 & 8 constants: U_{contr,sharp} = 0.8245225510... < U_{contr,elem} = 0.9808486295... < 1; I(1/2), I(1), I(2), I(4) with I(1) - I(1/2) = 0.1185... > 0.118 > 0 and I(2) - I(1) = 0.11903... > 0.1189 > 0; Mellin derivative F'(1/2) = tau^2/48 = 0.8224670334... > 0, log moment -tau^2/48 < 0, and norm coefficient (tau - 1) tau^4 / 2304 = 3.5738213787... > 0.",
+                "Section 6 & 8 constants: U_{contr,sharp} = 0.8245225510... < U_{contr,elem} = 0.9808486295... < 1; I(1/2), I(1), I(2), I(4) with I(1) - I(1/2) = 0.1185... > 0.118 > 0 and I(2) - I(1) = 0.11903... > 0.1189 > 0; closed-form Mellin constants F'(1/2) = zeta(2)/2 = tau^2/48 = 0.8224670334... > 0, -tau^2/48 < 0, and (tau - 1) tau^4 / 2304 = 3.5738213787... > 0.",
             ],
             "4_consistency_and_falsification_controls": [
                 "Kernel-grouping vs. independent acb.integral smooth-fiber quadrature consistency on V_P, C_{P,p}, M_{P,p}, and Delta_{P,p} (exact equality rests on Lean/analytic theorems, never on interval overlap alone).",
                 "Parity controls a_2, a_{3,5,7}, and unsigned 1 demonstrating contraction at p in S (a_S(p) = -1) vs. expansion at p not in S (a_S(p) = +1).",
             ],
             "5_conditional_and_open_statements": [
-                "Theorem 8.A (conditional dyadic block transfer for all Y >= 1) and Theorem 8.E (6-step conditional moving-cutoff Buchstab asymptotic under RH at U_0(Y) = ceil(2 Y^{5/8}), T(Y) = ceil(Y^{5/4}) uniformly for X in [Y, tau Y], Y >= 2: H_{[U_0(Y), T(Y)]}(X) = -(tau^2/48) sqrt(X)/(log X)^2 + O(sqrt(Y)/(log Y)^3), S_{<U_0(Y), T(Y)}(X) = -(tau^2/48) sqrt(X)/(log X)^2 + O(sqrt(Y)/(log Y)^3), ||H||_{L^2}^2 = ((tau - 1) tau^4 / 2304) Y / (log Y)^4 + O(Y / (log Y)^5), ||S||_{L^2}^2 = ((tau - 1) tau^4 / 2304) Y / (log Y)^4 + O(Y / (log Y)^5), and coupled-L_p R_{diag-fib} << Y^{3/32} / log(2Y)).",
+                "Theorem 8.A (conditional dyadic block transfer for all Y >= 1) and Theorem 8.E (6-step conditional moving-cutoff Buchstab asymptotic under RH at U_0(Y) = ceil(2 Y^{5/8}), T(Y) = ceil(Y^{5/4}) uniformly for X in [Y, tau Y], proved first for Y >= 4 where 5 <= U_0(Y) < T(Y) and extended to 2 <= Y < 4 by boundedness over the finite cutoff set (U_0, T) in {(4,3),(4,4),(5,5),(5,6)}: H_{[U_0(Y), T(Y)]}(X) = -(tau^2/48) sqrt(X)/(log X)^2 + O(sqrt(Y)/(log Y)^3), S_{<U_0(Y), T(Y)}(X) = -(tau^2/48) sqrt(X)/(log X)^2 + O(sqrt(Y)/(log Y)^3), ||H||_{L^2}^2 = ((tau - 1) tau^4 / 2304) Y / (log Y)^4 + O(Y / (log Y)^5), ||S||_{L^2}^2 = ((tau - 1) tau^4 / 2304) Y / (log Y)^4 + O(Y / (log Y)^5), and coupled-L_p R_{diag-fib} << Y^{3/32} / log(2Y)).",
                 "Surviving unconditional obligation (Theorem 8.D(3)): for every eps > 0, E_{T(Y)}(Y) <= C_eps Y^eps uniformly for Y >= 1, equivalently sum_{U_{log,eps/4}(Y) < p <= T(Y)} M_p(Y, T(Y)) <= C'_eps Y^eps (or ||S_{<U_0(Y), T(Y)} - H_{[U_0(Y), T(Y)]}||_{L^2([Y, tau Y], dX/X)}^2 <= C_eps Y^eps at U_0(Y) = ceil(2 Y^{5/8})). Subtracting one asymptotic term, or any fixed finite number of logarithmic terms, does not by itself deliver this all-epsilon estimate.",
                 "SUBGATE-TC-043A remains OPEN and rh_proved remains false.",
             ],
