@@ -97,6 +97,7 @@ TASK_TC_055_ID = "TASK-TC-055"
 TASK_TC_055R_ID = "TASK-TC-055R"
 TASK_TC_055R2_ID = "TASK-TC-055R2"
 TASK_TC_056_ID = "TASK-TC-056"
+TASK_TC_057_ID = "TASK-TC-057"
 PRIOR_MERGED_MAIN_TC_053R = "c82e439708b0b6031db6a77bf3977688d9f0758b"
 TC_053R2_IMPLEMENTATION_COMMIT = "cc303030138c670e8f01aaaab483bbeca6bc17d1"
 TC_053R2_REVIEWED_TIP = "21576861ecd0dcbf874afec91b299fd6060f4f03"
@@ -114,6 +115,8 @@ TC_055R_IMPLEMENTATION_COMMIT = "35b55405708ae7480263afc93e422b5626b1e134"
 TC_055R_REVIEWED_TIP = "c6a685542c2dd584293b463272c4d95152907b3e"
 TC_055R2_IMPLEMENTATION_COMMIT = "10f4f51246818e9d914113771ae906643dae9fa9"
 TC_055R2_REVIEWED_TIP = "9a3755d977518ca6f0f1fb7ed3386e6a4a97d3ea"
+TC_056R2_IMPLEMENTATION_COMMIT = "add6930233ebe0c8adf50da0e8a0ae6f18561975"
+TC_056R2_REVIEWED_TIP = "8c92e89c62bdb434d29d7143bacf50308aab78a1"
 
 LIOUVILLE_SQUARE_DILATION_LEAN_MODULE_PATH = (
     REPO_ROOT / "formal" / "RiemannScope" / "LiouvilleSquareDilation.lean"
@@ -2564,6 +2567,11 @@ def verify_liouville_square_dilation_lean_module() -> Dict[str, Any]:
         "finite_alternating_unimodal_chain_contraction_tc056",
         "gaussian_prime_chain_unimodal_and_singleton_contraction_tc056",
         "mixed_interaction_decomposition_and_p_independence_tc056",
+        "abstract_polylog_scale_bootstrap_and_weighted_contraction_tc057",
+        "general_moebius_rough_prime_filtration_descent_tc057",
+        "logarithmic_prime_power_descent_and_kernel_shift_tc057",
+        "quadratic_prime_power_diagonal_off_diagonal_decomposition_tc057",
+        "inherited_vs_canonical_cutoff_comparison_and_counterexample_tc057",
     ]
 
     live_lean = _capture_live_lean_check_and_axioms(public_theorems)
@@ -2718,6 +2726,44 @@ def verify_liouville_square_dilation_lean_module() -> Dict[str, Any]:
             "(cancelling `λ(s)^2 = 1` and retaining ordered `m ≠ n` without an extra factor of `2`), equivalence with the ordered `k ≠ l` exponent expansion, "
             "`P`-independence `pointwiseContractionC P p T X = pointwiseContractionC ∅ p T X = pointwiseDiagonalD T X - pointwiseGroupedEnergyV {p} T X` via the `p`-free cofactor bijection `r = s * m`, "
             "and the exact alternating shift expansion `D_T - V_{ {p} } = 2 * ∑_{h ≥ 1, p^h ≤ T} (-1)^{h+1} ∑_{1 ≤ n ≤ ⌊T/p^h⌋} φ_n(X) φ_{n p^h}(X)`.",
+        ),
+        "abstract_polylog_scale_bootstrap_and_weighted_contraction_tc057": (
+            "conditional_on_recursion_abstract_scale_bootstrap_lemma",
+            "`CONDITIONAL_ON_RECURSION` real-induction lemma (`TASK-TC-057` §3): proves local boundedness and monotonicity of `monotoneScaleEnvelope E Y = sSup (E '' Set.Icc 1 Y)` from `0 ≤ E Z ≤ M_lin * Z`, "
+            "justified `E`-to-`F` envelope passage when `Z / U_η Z` is nondecreasing, unconditional iteration from the assumed single-scale recursion hypothesis "
+            "`∀ Y ≥ Y_star, monotoneScaleEnvelope E Y ≤ A_η * Y ^ η + B_η * monotoneScaleEnvelope E (Y / U_η Y)` (`B_η ≥ 0` arbitrary, NOT required `< 1`, provided `B_η * U_η Y ^ (-ε) ≤ 1 / 2` and `2 ≤ U_η Y ≤ Y`) "
+            "yielding `E Y ≤ (F Y_star + 2 * A_η) * Y ^ ε` for all `Y ≥ 1`, plus single-step weighted multi-scale contraction (`∑ w_i u_i^{-sig} ≤ 1/2`) and weighted lower-bound obstruction (`m_0 > 0`); "
+            "does NOT establish the recursion hypothesis for the actual Liouville energy.",
+        ),
+        "general_moebius_rough_prime_filtration_descent_tc057": (
+            "actual_positive_integer_moebius_rough_descent_and_gaussian_scaling_theorem",
+            "Unconditional finite arithmetic and Gaussian observable descent theorem (`TASK-TC-057` §4A, Route A) over actual positive integers (`2 ≤ U`, `T : ℕ`, `X ≥ 0`, multiplicative `a : ℕ → ℝ`): "
+            "proves `smoothCutoffFinset (smoothPrimeSetBelow U) T = coprimeCutoffFinset (roughPrimeSetBand U T) T`, "
+            "`finiteQGeneral a T X = finiteQSmoothBelow a U T X - ∑_{d ∈ roughSquarefreeDivisorsBand U T} (μ(d) a(d) / √d) finiteQGeneral a (T / d) (X / d)`, "
+            "uniform Liouville rough sign `μ(d) λ(d) = 1` giving `-1/√d` across all `d ∈ roughSquarefreeDivisorsBand U T`, prime-only reduction when `T < U^2`, "
+            "and concrete parity-control sign flip `μ(3) a_2(3) = -1 ≠ +1 = μ(15) a_2(15)` vs `μ(3) λ(3) = μ(15) λ(15) = 1`.",
+        ),
+        "logarithmic_prime_power_descent_and_kernel_shift_tc057": (
+            "actual_positive_integer_mangoldt_liouville_descent_and_kernel_shift_theorem",
+            "Unconditional finite arithmetic and shifted-Gaussian descent theorem (`TASK-TC-057` §4B, Route B) over actual positive integers (`a 1 = 1`, completely multiplicative `a`, `m, M, T : ℕ`, `X > 0`): "
+            "proves `∑_{1 ≤ n ≤ T} a(n) (log n) (log(X/n))^r φ_n(X) = primePowerLogDescentSum a r T X`, Liouville instantiation over `primePowerPairsUpTo T` (with boundary `primePowerPairsUpTo 0 = primePowerPairsUpTo 1 = ∅`), "
+            "shifted recurrence `(log X) * finiteQShifted a m T X = primePowerLogDescentSum a m T X + finiteQShifted a (m + 1) T X`, "
+            "and `M`-fold telescoping for `log X ≠ 0`.",
+        ),
+        "quadratic_prime_power_diagonal_off_diagonal_decomposition_tc057": (
+            "actual_positive_integer_quadratic_prime_power_decomposition_and_amgm_theorem",
+            "Unconditional pointwise quadratic prime-power decomposition theorem (`TASK-TC-057` §4D, Route D) over actual positive integers (`T : ℕ`, `X > 0`): "
+            "proves `((log X) * finiteQLambda T X - finiteQShifted λ 1 T X)^2 = ∑_{(p,k) ∈ primePowerPairsUpTo T} ((log p)^2 / p^k) finiteQLambda (T / p^k) (X / p^k)^2 + ∑_{pk1} ∑_{pk2 ≠ pk1} liouvillePrimePowerTerm T pk1 X * liouvillePrimePowerTerm T pk2 X` "
+            "and the pointwise quadratic upper bound `finiteQLambda T X ^ 2 ≤ (2 / (log X)^2) (∑_{pk} liouvillePrimePowerTerm T pk X)^2 + (2 / (log X)^2) (finiteQShifted λ 1 T X)^2` for `log X ≠ 0` "
+            "(the `[Y, τ Y]` integral transfer and unconditional `2 ζ''(1+ε)/(log Y)^2` diagonal contraction theorem are proved analytically outside Lean).",
+        ),
+        "inherited_vs_canonical_cutoff_comparison_and_counterexample_tc057": (
+            "actual_cutoff_counterexample_ordering_and_small_scale_positivity_theorem",
+            "Unconditional cutoff comparison, counterexample, and small-scale positivity theorem (`TASK-TC-057` §5): "
+            "proves `u + 1 ≤ T / d → ⌈u⌉₊ ≤ T / d`, `canonicalCutoffT W ≤ inheritedCutoffL (W * d) d` for all `W ≥ 1` and `d ≥ 16`, "
+            "all-`d` lower bound `(1/2) W^{5/4} d^{1/4} ≤ inheritedCutoffL (W * d) d` (`W ≥ 1`, `d ≥ 2`), "
+            "concrete counterexample at `(Y = 9/4, d = 2)` where `inheritedCutoffL (9/4) 2 = 1 < 2 = canonicalCutoffT (9/8)` and `0 < finiteQLambda 1 (9/8) - finiteQLambda 2 (9/8)`, "
+            "and uniform small-argument positivity `(1/24) w^{5/2} ≤ finiteQLambda L w` (`0 < finiteQLambda L w`) for all `L ≥ 1` and `0 < w ≤ 1`.",
         ),
     }
 
@@ -5831,6 +5877,7 @@ def execute_task_tc054_liouville_square_dilation_audit(
         "simultaneous_compatibility_repair_task_id": TASK_TC_055R_ID,
         "simultaneous_compatibility_closeout_task_id": TASK_TC_055R2_ID,
         "prime_chain_contraction_task_id": TASK_TC_056_ID,
+        "coupled_scale_energy_bootstrap_task_id": TASK_TC_057_ID,
         "parent_epic": EPIC_TC_042_ID,
         "prior_merged_main": PRIOR_MERGED_MAIN_TC_053R,
         "tc053r2_implementation_commit": TC_053R2_IMPLEMENTATION_COMMIT,
@@ -5849,7 +5896,9 @@ def execute_task_tc054_liouville_square_dilation_audit(
         "tc055r_reviewed_tip": TC_055R_REVIEWED_TIP,
         "tc055r2_implementation_commit": TC_055R2_IMPLEMENTATION_COMMIT,
         "tc055r2_reviewed_tip": TC_055R2_REVIEWED_TIP,
-        "branch": "task/tc-056-prime-chain-contraction-and-mixed-prime-energy",
+        "tc056r2_implementation_commit": TC_056R2_IMPLEMENTATION_COMMIT,
+        "tc056r2_reviewed_tip": TC_056R2_REVIEWED_TIP,
+        "branch": "task/tc-057-coupled-arithmetic-scale-energy-bootstrap",
         "subgate_tc043a_status": "OPEN",
         "rh_proved": False,
         "precision_bits": prec_bits,

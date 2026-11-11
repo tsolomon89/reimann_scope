@@ -29,6 +29,7 @@ from tc.liouville_square_dilation import (
     TASK_TC_055R_ID,
     TASK_TC_055R2_ID,
     TASK_TC_056_ID,
+    TASK_TC_057_ID,
     TC_053R2_IMPLEMENTATION_COMMIT,
     TC_053R2_REVIEWED_TIP,
     TC_054_IMPLEMENTATION_COMMIT,
@@ -122,6 +123,11 @@ EXPECTED_PUBLIC_THEOREM_NAMES = (
     "finite_alternating_unimodal_chain_contraction_tc056",
     "gaussian_prime_chain_unimodal_and_singleton_contraction_tc056",
     "mixed_interaction_decomposition_and_p_independence_tc056",
+    "abstract_polylog_scale_bootstrap_and_weighted_contraction_tc057",
+    "general_moebius_rough_prime_filtration_descent_tc057",
+    "logarithmic_prime_power_descent_and_kernel_shift_tc057",
+    "quadratic_prime_power_diagonal_off_diagonal_decomposition_tc057",
+    "inherited_vs_canonical_cutoff_comparison_and_counterexample_tc057",
 )
 
 
@@ -463,10 +469,10 @@ def test_lean_formalization_and_serialized_artifact_synchronization() -> None:
     assert "import RiemannScope.LiouvilleSquareDilation" in root_lean
 
     lean_info = verify_liouville_square_dilation_lean_module()
-    assert lean_info["definition_count"] == 48
-    assert lean_info["public_theorem_count"] == 20
-    assert lean_info["private_helper_theorem_count"] == 49
-    assert lean_info["total_declaration_count"] == 117
+    assert lean_info["definition_count"] == 60
+    assert lean_info["public_theorem_count"] == 25
+    assert lean_info["private_helper_theorem_count"] == 54
+    assert lean_info["total_declaration_count"] == 139
     assert lean_info["expected_public_theorems_present"] is True
     assert lean_info["sorry_count"] == 0
     assert lean_info["custom_axiom_count"] == 0
@@ -480,6 +486,7 @@ def test_lean_formalization_and_serialized_artifact_synchronization() -> None:
     assert artifact["simultaneous_compatibility_repair_task_id"] == TASK_TC_055R_ID
     assert artifact["simultaneous_compatibility_closeout_task_id"] == TASK_TC_055R2_ID
     assert artifact["prime_chain_contraction_task_id"] == TASK_TC_056_ID
+    assert artifact["coupled_scale_energy_bootstrap_task_id"] == TASK_TC_057_ID
     assert artifact["prior_merged_main"] == PRIOR_MERGED_MAIN_TC_053R
     assert artifact["tc053r2_implementation_commit"] == TC_053R2_IMPLEMENTATION_COMMIT
     assert artifact["tc053r2_reviewed_tip"] == TC_053R2_REVIEWED_TIP
@@ -803,6 +810,9 @@ def test_tc054_review_and_state_synchronization() -> None:
         "TASK-TC-055R",
         "TASK-TC-055R2",
         "TASK-TC-056",
+        "TASK-TC-056R",
+        "TASK-TC-056R2",
+        "TASK-TC-057",
     )
     tc055_entries = [t for t in queue["tasks"] if t["task_id"] == "TASK-TC-055"]
     assert len(tc055_entries) == 1

@@ -1564,7 +1564,20 @@ def verify_section_1_and_2_baseline_and_cleanup(prec_bits: int = 256) -> Dict[st
                 ),
                 "regime_A_subcritical_0_lt_eta_lt_half": {
                     "parameter_range": "0 < eta < 1/2 (alpha = 1/2 + eta in (1/2, 1), beta = 1/2 - eta in (0, 1/2), 2*alpha = 1 + 2*eta > 1)",
-                    "log_asymptotic": "log P_eta(u) = 2 sum_{p <= u} p^{-1/2-eta} + O_eta(1) ~ 2 u^{1/2-eta} / ((1/2 - eta) log u) as u -> infty (eta fixed)",
+                    "first_order_pnt_stieltjes_remainder": (
+                        "sum_{p <= u} p^{-alpha} = int_2^u t^{-alpha}/log(t) dt + O_eta(1 + u^{1-alpha} exp(-c' sqrt(log u))) "
+                        "(c' = c_0 / sqrt(2) > 0, derived from N_prime(t) = li(t) + R(t), |R(t)| <= C_0 t exp(-c_0 sqrt(log t)), "
+                        "by splitting R(u) u^{-alpha} + alpha int_2^u R(t) t^{-alpha-1} dt at sqrt(u); unconditional PNT does NOT "
+                        "yield O_eta(1) for the first-order prime sum when alpha in (1/2, 1))"
+                    ),
+                    "higher_prime_power_tail_bound": (
+                        "0 < 2 sum_{p <= u} sum_{k >= 2} p^{-k*alpha}/k <= (zeta(1 + 2*eta) - 1) / (1 - 2^{-1/2-eta}) = O_eta(1) "
+                        "(valid separate O_eta(1) bound since 2*alpha = 1 + 2*eta > 1)"
+                    ),
+                    "log_asymptotic": (
+                        "log P_eta(u) = 2 int_2^u t^{-1/2-eta}/log(t) dt + O_eta(1 + u^{1/2-eta} exp(-c' sqrt(log u))) + O_eta(1) "
+                        "= (2 u^{1/2-eta} / ((1/2 - eta) log u)) (1 + O_eta(1 / log u)) ~ 2 u^{1/2-eta} / ((1/2 - eta) log u) as u -> infty (eta fixed)"
+                    ),
                     "sufficient_only_scale": "u(Y) << (log Y)^{1/(1/2-eta)}",
                     "admissible_and_necessary_scale": (
                         "For u(Y) = c * (log Y * log log Y)^{1/(1/2-eta)} (c > 0 fixed), log P_eta(u(Y)) / log Y -> 2 * c^{1/2-eta}: "
@@ -2495,12 +2508,85 @@ def verify_section_8_mixed_prime_block_attempt(prec_bits: int = 256) -> Dict[str
 
         # 2. Small-Y cutoff ordering audit and exact finite identity Q_T(X) = S_{<U_0, T}(X) - H_{[U_0, T]}(X):
         #    - At Y = 1: U_0(1) = 2 > 1 = T(1) (empty prime band [2, 1] cap P = empty);
-        #    - At Y = 2: U_0(2) = 4 > 3 = T(2) (empty prime band [4, 3] cap P = empty);
-        #    - At Y = 3: U_0(3) = 4 = T(3) (empty prime band [4, 4] cap P = empty);
+        #    - On [2, 4) (32 <= Y^5 < 1024), exact integer-power partition (noting 2^{8/5} = 4^{4/5} since 4^8 = 256 * 4^4):
+        #        * [2, 3^{4/5}]       : (U_0, T) = (4, 3)
+        #        * (3^{4/5}, 4^{4/5}] : (U_0, T) = (4, 4)
+        #        * (4^{4/5}, 5^{4/5}] : (U_0, T) = (5, 5)  (in particular Y = 7/2 gives (5, 5))
+        #        * (5^{4/5}, 4)       : (U_0, T) = (5, 6);
         #    - For all real Y >= 4: 5 <= U_0(Y) <= T(Y) - 1 < T(Y) unconditionally (so [U_0(Y), T(Y)] is a
         #      non-degenerate interval [U_0(Y), T(Y)] with U_0(Y) < T(Y)).
+        small_y_int_power_relations_ok = bool(
+            (2 ** 5 == 32)
+            and (32 < 3 ** 4 == 81 < 4 ** 4 == 256 < 5 ** 4 == 625 < 4 ** 5 == 1024 < 6 ** 4 == 1296)
+            and (3 ** 8 == 6561 < (2 ** 8) * (2 ** 5) == 8192)
+            and (4 ** 8 == 65536 == (2 ** 8) * (4 ** 4) == (2 ** 8) * (2 ** 8))
+            and ((2 ** 8) * (4 ** 5) == 262144 < 5 ** 8 == 390625)
+        )
+        # Construct exact rational straddling pairs around m^{4/5} (m in {3, 4, 5}) via integer binary search:
+        denom_straddle = 1000
+        denom5 = denom_straddle ** 5
+        straddle_ok = True
+        straddle_rows: List[Dict[str, Any]] = []
+        expected_straddle_pairs = {
+            3: ((4, 3), (4, 4)),
+            4: ((4, 4), (5, 5)),
+            5: ((5, 5), (5, 6)),
+        }
+        for m_thr, (exp_below, exp_above) in expected_straddle_pairs.items():
+            target_int = (m_thr ** 4) * denom5
+            lo_s, hi_s = 2 * denom_straddle, 4 * denom_straddle
+            while lo_s < hi_s:
+                mid_s = (lo_s + hi_s + 1) // 2
+                if mid_s ** 5 <= target_int:
+                    lo_s = mid_s
+                else:
+                    hi_s = mid_s - 1
+            y_below = Fraction(lo_s, denom_straddle)
+            y_above = Fraction(lo_s + 1, denom_straddle)
+            got_below = (exact_U0_cutoff_ceil_2_Y_5_8(y_below), exact_T_cutoff_ceil_Y_5_4(y_below))
+            got_above = (exact_U0_cutoff_ceil_2_Y_5_8(y_above), exact_T_cutoff_ceil_Y_5_4(y_above))
+            row_ok = bool(
+                (lo_s ** 5 < target_int < (lo_s + 1) ** 5)
+                and (got_below == exp_below)
+                and (got_above == exp_above)
+            )
+            if not row_ok:
+                straddle_ok = False
+            straddle_rows.append({
+                "threshold": f"{m_thr}^(4/5)",
+                "y_below": f"{y_below.numerator}/{y_below.denominator}",
+                "got_U0_T_below": list(got_below),
+                "y_above": f"{y_above.numerator}/{y_above.denominator}",
+                "got_U0_T_above": list(got_above),
+                "verified": row_ok,
+            })
+
+        interior_small_y_cases = (
+            ("2", Fraction(2, 1), (4, 3)),
+            ("9/4", Fraction(9, 4), (4, 3)),
+            ("11/4", Fraction(11, 4), (4, 4)),
+            ("3", Fraction(3, 1), (4, 4)),
+            ("7/2", Fraction(7, 2), (5, 5)),
+            ("15/4", Fraction(15, 4), (5, 6)),
+        )
+        interior_small_y_ok = True
+        interior_small_y_rows: List[Dict[str, Any]] = []
+        for lbl_sy, y_sy, exp_pair_sy in interior_small_y_cases:
+            got_pair_sy = (exact_U0_cutoff_ceil_2_Y_5_8(y_sy), exact_T_cutoff_ceil_Y_5_4(y_sy))
+            sy_ok = bool(got_pair_sy == exp_pair_sy)
+            if not sy_ok:
+                interior_small_y_ok = False
+            interior_small_y_rows.append({
+                "Y": lbl_sy,
+                "U_0": got_pair_sy[0],
+                "T": got_pair_sy[1],
+                "verified": sy_ok,
+            })
+
+        small_y_partition_ok = bool(small_y_int_power_relations_ok and straddle_ok and interior_small_y_ok)
+
         #    Check sample points (y_mc, x_mc) across Y in {1, 2, 3} (empty band) and Y in {4, 16, 128} (U_0(Y) < T(Y)):
-        moving_cutoff_samples_ok = True
+        moving_cutoff_samples_ok = bool(small_y_partition_ok)
         for y_mc, x_mc in ((1, 1), (2, 3), (3, 4), (4, 5), (16, 20), (128, 160)):
             T_mc = exact_T_cutoff_ceil_Y_5_4(y_mc)
             U0_mc = exact_U0_cutoff_ceil_2_Y_5_8(y_mc)
@@ -2572,9 +2658,12 @@ def verify_section_8_mixed_prime_block_attempt(prec_bits: int = 256) -> Dict[str
                     "and for any cutoff U >= 2 (including any partial final dyadic block p <= U_{log,delta}(Y)), "
                     "|sum_{p <= U} M_p(Y, T(Y))| <= sum_{p <= U} |M_p(Y, T(Y))| <= 2 D_* (sum_{p <= U} p^{-1/2}) (prod_{q <= U} (1 - q^{-1/2})^{-2}). "
                     "Since alpha = 1/2 (eta = 0, beta = 1/2, distinct from alpha = 1/2 + eta > 1/2 in Section 2.3) has "
-                    "log prod_{q < 2B} (1 - q^{-1/2})^{-2} ~ 4 sqrt(2B) / log(2B), setting B = c (log Y log log Y)^2 gives "
-                    "(2 sqrt(2c) + o(1)) log Y, so c = delta^2 / 32 gives leading coefficient delta / 2 and yields "
-                    "sum_{p <= U_{log,delta}(Y)} |M_p(Y, T(Y))| <<_delta Y^delta unconditionally."
+                    "log prod_{q <= u} (1 - q^{-1/2})^{-2} ~ 4 sqrt(u) / log(u), for a dyadic block B <= U_{log,delta}(Y) := "
+                    "c (log Y log log Y)^2 with c = delta^2 / 32, log prod_{q < 2B} (1 - q^{-1/2})^{-2} = (2 sqrt(2c) + o(1)) log Y "
+                    "= (delta/2 + o(1)) log Y yields |M_j(Y)| <<_delta Y^delta; and for the full low-prime sum up to U = U_{log,delta}(Y), "
+                    "using the product up to U itself gives log prod_{q <= U} (1 - q^{-1/2})^{-2} = (2 sqrt(c) + o(1)) log Y with "
+                    "2 sqrt(c) = delta / (2 sqrt(2)) < delta / 2, supplying strict exponential slack for the intermediate bound "
+                    "sum_{p <= U_{log,delta}(Y)} |M_p(Y, T(Y))| <<_delta Y^{delta/2} (log Y)^2 <<_delta Y^delta unconditionally."
                 ),
                 "low_prime_alpha_half_product_lt_1000": serialize_arb_certified(prod_alpha_half_lt_1000),
                 "low_prime_alpha_half_log_product_lt_1000": serialize_arb_certified(log_prod_alpha_half_lt_1000),
@@ -2658,11 +2747,24 @@ def verify_section_8_mixed_prime_block_attempt(prec_bits: int = 256) -> Dict[str
                 "is_conditional_on_rh": True,
                 "asymptotic_threshold": (
                     "Primary Stieltjes and moving-endpoint proof domain Y >= 4 (where 5 <= U_0(Y) <= T(Y) - 1 < T(Y) holds "
-                    "unconditionally), extended to 2 <= Y < 4 by an explicit boundedness argument over the finite cutoff set "
-                    "(U_0(Y), T(Y)) in {(4, 3), (4, 4), (5, 5), (5, 6)} and X in [Y, tau Y] subset [2, 4*tau]. The exact finite "
-                    "identity Q_T = S_{<U_0,T} - H_{[U_0,T]} holds for all Y >= 1, with empty prime band at Y in {1, 2, 3}; "
-                    "log Y denominators are used only for Y >= 2."
+                    "unconditionally), extended to 2 <= Y < 4 by an explicit boundedness argument over the exact 4-interval "
+                    "step-cutoff partition [2, 3^{4/5}] -> (4, 3), (3^{4/5}, 4^{4/5}] -> (4, 4) (noting 2^{8/5} = 4^{4/5}), "
+                    "(4^{4/5}, 5^{4/5}] -> (5, 5) (including Y = 7/2 -> (5, 5)), and (5^{4/5}, 4) -> (5, 6) on X in [Y, tau Y] "
+                    "subset [2, 4*tau]. The exact finite identity Q_T = S_{<U_0,T} - H_{[U_0,T]} holds for all Y >= 1, with empty "
+                    "prime band on [1, 4^{4/5}]; log Y denominators are used only for Y >= 2."
                 ),
+                "small_Y_2_to_4_step_cutoff_partition": {
+                    "exact_intervals": [
+                        {"interval": "[2, 3^(4/5)]", "U_0": 4, "T": 3},
+                        {"interval": "(3^(4/5), 4^(4/5)]", "U_0": 4, "T": 4, "note": "2^(8/5) == 4^(4/5)"},
+                        {"interval": "(4^(4/5), 5^(4/5)]", "U_0": 5, "T": 5, "note": "Y = 7/2 gives (5, 5)"},
+                        {"interval": "(5^(4/5), 4)", "U_0": 5, "T": 6},
+                    ],
+                    "integer_power_boundary_relations_verified": small_y_int_power_relations_ok,
+                    "straddle_rows": straddle_rows,
+                    "interior_rational_rows": interior_small_y_rows,
+                    "verified": small_y_partition_ok,
+                },
                 "F_at_half_exact_zero": 0,
                 "F_prime_at_half_tau2_over_48": serialize_arb_certified(F_prime_half_tau2_over_48),
                 "log_moment_int_Q_lambda_w_neg_3_2_log_w": serialize_arb_certified(log_moment_neg_tau2_over_48),

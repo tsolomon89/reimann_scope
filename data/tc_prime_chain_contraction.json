@@ -237,7 +237,9 @@
       "raw_exponent_parameterization_translation": "In the raw exponent parameterization prod_{p <= u} (1 - p^{-alpha})^{-1} from TC-055R2 (0 < alpha < 1, beta = 1 - alpha), log prod_{p <= u} (1 - p^{-alpha})^{-1} ~ u^{1-alpha} / ((1 - alpha) log u). For the squared shifted product P_eta(u) = prod_{p <= u} (1 - p^{-1/2-eta})^{-2}, the prime exponent is alpha = 1/2 + eta so beta = 1 - alpha = 1/2 - eta (not 1 - eta), and squaring the product multiplies log P_eta(u) by 2.",
       "regime_A_subcritical_0_lt_eta_lt_half": {
         "parameter_range": "0 < eta < 1/2 (alpha = 1/2 + eta in (1/2, 1), beta = 1/2 - eta in (0, 1/2), 2*alpha = 1 + 2*eta > 1)",
-        "log_asymptotic": "log P_eta(u) = 2 sum_{p <= u} p^{-1/2-eta} + O_eta(1) ~ 2 u^{1/2-eta} / ((1/2 - eta) log u) as u -> infty (eta fixed)",
+        "first_order_pnt_stieltjes_remainder": "sum_{p <= u} p^{-alpha} = int_2^u t^{-alpha}/log(t) dt + O_eta(1 + u^{1-alpha} exp(-c' sqrt(log u))) (c' = c_0 / sqrt(2) > 0, derived from N_prime(t) = li(t) + R(t), |R(t)| <= C_0 t exp(-c_0 sqrt(log t)), by splitting R(u) u^{-alpha} + alpha int_2^u R(t) t^{-alpha-1} dt at sqrt(u); unconditional PNT does NOT yield O_eta(1) for the first-order prime sum when alpha in (1/2, 1))",
+        "higher_prime_power_tail_bound": "0 < 2 sum_{p <= u} sum_{k >= 2} p^{-k*alpha}/k <= (zeta(1 + 2*eta) - 1) / (1 - 2^{-1/2-eta}) = O_eta(1) (valid separate O_eta(1) bound since 2*alpha = 1 + 2*eta > 1)",
+        "log_asymptotic": "log P_eta(u) = 2 int_2^u t^{-1/2-eta}/log(t) dt + O_eta(1 + u^{1/2-eta} exp(-c' sqrt(log u))) + O_eta(1) = (2 u^{1/2-eta} / ((1/2 - eta) log u)) (1 + O_eta(1 / log u)) ~ 2 u^{1/2-eta} / ((1/2 - eta) log u) as u -> infty (eta fixed)",
         "sufficient_only_scale": "u(Y) << (log Y)^{1/(1/2-eta)}",
         "admissible_and_necessary_scale": "For u(Y) = c * (log Y * log log Y)^{1/(1/2-eta)} (c > 0 fixed), log P_eta(u(Y)) / log Y -> 2 * c^{1/2-eta}: 2 * c^{1/2-eta} < eps (i.e. 0 < c < (eps/2)^{1/(1/2-eta)}) is sufficient for P_eta(u(Y)) = O_{eta,c,eps}(Y^eps); 2 * c^{1/2-eta} > eps is incompatible; the equality case 2 * c^{1/2-eta} = eps is NOT decided by the leading (1 + o(1)) asymptotic alone. More generally, any cutoff u(Y) >= 2 satisfying P_eta(u(Y)) <= C_eps Y^eps must obey limsup_{Y -> infty} u(Y) / (log Y * log log Y)^{1/(1/2-eta)} <= (eps / 2)^{1/(1/2-eta)}.",
         "boundary_case_2_c_beta_eq_eps_decided_by_leading_asymptotic": false,
@@ -1962,7 +1964,7 @@
         "arb_ball_str": "[1.945595069851794767473799256941604027154 +/- 2.67e-40]"
       },
       "D_star_samples_verified": true,
-      "low_block_bound_statement": "M_2(Y, T) = 0 identically; for every prime p >= 3, |M_p(Y, T)| <= D_* (2 p^{-1/2} / ((1 - p^{-1})(1 - p^{-1/2}))) prod_{q < p} (1 - q^{-1/2})^{-2} <= 2 D_* p^{-1/2} prod_{q <= p} (1 - q^{-1/2})^{-2}. Consequently, for any dyadic block B = 2^j, |M_j(Y)| <= sum_{p in I_j(Y)} |M_p(Y, T(Y))| <= 2 D_* (sum_{p in I_j(Y)} p^{-1/2}) (prod_{q < 2B} (1 - q^{-1/2})^{-2}), and for any cutoff U >= 2 (including any partial final dyadic block p <= U_{log,delta}(Y)), |sum_{p <= U} M_p(Y, T(Y))| <= sum_{p <= U} |M_p(Y, T(Y))| <= 2 D_* (sum_{p <= U} p^{-1/2}) (prod_{q <= U} (1 - q^{-1/2})^{-2}). Since alpha = 1/2 (eta = 0, beta = 1/2, distinct from alpha = 1/2 + eta > 1/2 in Section 2.3) has log prod_{q < 2B} (1 - q^{-1/2})^{-2} ~ 4 sqrt(2B) / log(2B), setting B = c (log Y log log Y)^2 gives (2 sqrt(2c) + o(1)) log Y, so c = delta^2 / 32 gives leading coefficient delta / 2 and yields sum_{p <= U_{log,delta}(Y)} |M_p(Y, T(Y))| <<_delta Y^delta unconditionally.",
+      "low_block_bound_statement": "M_2(Y, T) = 0 identically; for every prime p >= 3, |M_p(Y, T)| <= D_* (2 p^{-1/2} / ((1 - p^{-1})(1 - p^{-1/2}))) prod_{q < p} (1 - q^{-1/2})^{-2} <= 2 D_* p^{-1/2} prod_{q <= p} (1 - q^{-1/2})^{-2}. Consequently, for any dyadic block B = 2^j, |M_j(Y)| <= sum_{p in I_j(Y)} |M_p(Y, T(Y))| <= 2 D_* (sum_{p in I_j(Y)} p^{-1/2}) (prod_{q < 2B} (1 - q^{-1/2})^{-2}), and for any cutoff U >= 2 (including any partial final dyadic block p <= U_{log,delta}(Y)), |sum_{p <= U} M_p(Y, T(Y))| <= sum_{p <= U} |M_p(Y, T(Y))| <= 2 D_* (sum_{p <= U} p^{-1/2}) (prod_{q <= U} (1 - q^{-1/2})^{-2}). Since alpha = 1/2 (eta = 0, beta = 1/2, distinct from alpha = 1/2 + eta > 1/2 in Section 2.3) has log prod_{q <= u} (1 - q^{-1/2})^{-2} ~ 4 sqrt(u) / log(u), for a dyadic block B <= U_{log,delta}(Y) := c (log Y log log Y)^2 with c = delta^2 / 32, log prod_{q < 2B} (1 - q^{-1/2})^{-2} = (2 sqrt(2c) + o(1)) log Y = (delta/2 + o(1)) log Y yields |M_j(Y)| <<_delta Y^delta; and for the full low-prime sum up to U = U_{log,delta}(Y), using the product up to U itself gives log prod_{q <= U} (1 - q^{-1/2})^{-2} = (2 sqrt(c) + o(1)) log Y with 2 sqrt(c) = delta / (2 sqrt(2)) < delta / 2, supplying strict exponential slack for the intermediate bound sum_{p <= U_{log,delta}(Y)} |M_p(Y, T(Y))| <<_delta Y^{delta/2} (log Y)^2 <<_delta Y^delta unconditionally.",
       "low_prime_alpha_half_product_lt_1000": {
         "mid_float": 2491676468902.869,
         "rad_float_outward": 0.0001458021259253616,
@@ -2367,7 +2369,117 @@
     "theorem_8E_conditional_moving_cutoff_buchstab_asymptotic": {
       "evidence_class": "PROVED_CONDITIONAL (conditional on RH; diagnostic showing why S_{<U_0,T} and H_{[U_0,T]} cannot be uncoupled)",
       "is_conditional_on_rh": true,
-      "asymptotic_threshold": "Primary Stieltjes and moving-endpoint proof domain Y >= 4 (where 5 <= U_0(Y) <= T(Y) - 1 < T(Y) holds unconditionally), extended to 2 <= Y < 4 by an explicit boundedness argument over the finite cutoff set (U_0(Y), T(Y)) in {(4, 3), (4, 4), (5, 5), (5, 6)} and X in [Y, tau Y] subset [2, 4*tau]. The exact finite identity Q_T = S_{<U_0,T} - H_{[U_0,T]} holds for all Y >= 1, with empty prime band at Y in {1, 2, 3}; log Y denominators are used only for Y >= 2.",
+      "asymptotic_threshold": "Primary Stieltjes and moving-endpoint proof domain Y >= 4 (where 5 <= U_0(Y) <= T(Y) - 1 < T(Y) holds unconditionally), extended to 2 <= Y < 4 by an explicit boundedness argument over the exact 4-interval step-cutoff partition [2, 3^{4/5}] -> (4, 3), (3^{4/5}, 4^{4/5}] -> (4, 4) (noting 2^{8/5} = 4^{4/5}), (4^{4/5}, 5^{4/5}] -> (5, 5) (including Y = 7/2 -> (5, 5)), and (5^{4/5}, 4) -> (5, 6) on X in [Y, tau Y] subset [2, 4*tau]. The exact finite identity Q_T = S_{<U_0,T} - H_{[U_0,T]} holds for all Y >= 1, with empty prime band on [1, 4^{4/5}]; log Y denominators are used only for Y >= 2.",
+      "small_Y_2_to_4_step_cutoff_partition": {
+        "exact_intervals": [
+          {
+            "interval": "[2, 3^(4/5)]",
+            "U_0": 4,
+            "T": 3
+          },
+          {
+            "interval": "(3^(4/5), 4^(4/5)]",
+            "U_0": 4,
+            "T": 4,
+            "note": "2^(8/5) == 4^(4/5)"
+          },
+          {
+            "interval": "(4^(4/5), 5^(4/5)]",
+            "U_0": 5,
+            "T": 5,
+            "note": "Y = 7/2 gives (5, 5)"
+          },
+          {
+            "interval": "(5^(4/5), 4)",
+            "U_0": 5,
+            "T": 6
+          }
+        ],
+        "integer_power_boundary_relations_verified": true,
+        "straddle_rows": [
+          {
+            "threshold": "3^(4/5)",
+            "y_below": "301/125",
+            "got_U0_T_below": [
+              4,
+              3
+            ],
+            "y_above": "2409/1000",
+            "got_U0_T_above": [
+              4,
+              4
+            ],
+            "verified": true
+          },
+          {
+            "threshold": "4^(4/5)",
+            "y_below": "3031/1000",
+            "got_U0_T_below": [
+              4,
+              4
+            ],
+            "y_above": "379/125",
+            "got_U0_T_above": [
+              5,
+              5
+            ],
+            "verified": true
+          },
+          {
+            "threshold": "5^(4/5)",
+            "y_below": "3623/1000",
+            "got_U0_T_below": [
+              5,
+              5
+            ],
+            "y_above": "453/125",
+            "got_U0_T_above": [
+              5,
+              6
+            ],
+            "verified": true
+          }
+        ],
+        "interior_rational_rows": [
+          {
+            "Y": "2",
+            "U_0": 4,
+            "T": 3,
+            "verified": true
+          },
+          {
+            "Y": "9/4",
+            "U_0": 4,
+            "T": 3,
+            "verified": true
+          },
+          {
+            "Y": "11/4",
+            "U_0": 4,
+            "T": 4,
+            "verified": true
+          },
+          {
+            "Y": "3",
+            "U_0": 4,
+            "T": 4,
+            "verified": true
+          },
+          {
+            "Y": "7/2",
+            "U_0": 5,
+            "T": 5,
+            "verified": true
+          },
+          {
+            "Y": "15/4",
+            "U_0": 5,
+            "T": 6,
+            "verified": true
+          }
+        ],
+        "verified": true
+      },
       "F_at_half_exact_zero": 0,
       "F_prime_at_half_tau2_over_48": {
         "mid_float": 0.8224670334241132,

@@ -738,4 +738,74 @@ def test_tc056r2_unsupported_reciprocal_zeta_probe_removed_and_small_Y_domain(
         assert len([p for p in primes_up_to(t_val) if p >= u0_val]) >= 1
 
 
+def test_tc057_opening_repairs_stieltjes_remainder_and_small_Y_partition(
+    tc056_artifact: dict,
+) -> None:
+    review_src = TC_056_REVIEW_DOC_PATH.read_text(encoding="utf-8")
+
+    # 1A: First-order PNT Stieltjes remainder separated from higher prime-power O_eta(1) tail:
+    assert r"\int_2^u \frac{t^{-\alpha}}{\log t}\,dt + O_\eta(1)" not in review_src
+    assert r"u^{1 - \alpha}\exp(-c'\sqrt{\log u})" in review_src
+    assert r"\frac{\zeta(1 + 2\eta) - 1}{1 - 2^{-1/2-\eta}} = O_\eta(1)" in review_src
+
+    reg_a = tc056_artifact["section_1_and_2_baseline_and_cleanup"][
+        "admissible_polylogarithmic_scale_correction"
+    ]["regime_A_subcritical_0_lt_eta_lt_half"]
+    assert "u^{1-alpha} exp(-c' sqrt(log u))" in reg_a["first_order_pnt_stieltjes_remainder"]
+    assert "O_eta(1)" in reg_a["higher_prime_power_tail_bound"]
+
+    # 1B: Exact 4-interval small-Y cutoff partition on [2, 4) using integer powers only (no float):
+    assert (2 ** 5 == 32) and (32 < 3 ** 4 == 81 < 4 ** 4 == 256 < 5 ** 4 == 625 < 4 ** 5 == 1024 < 6 ** 4 == 1296)
+    assert (3 ** 8 == 6561) and (6561 < (2 ** 8) * (2 ** 5) == 8192)
+    assert (4 ** 8 == 65536) and (65536 == (2 ** 8) * (4 ** 4) == (2 ** 8) * (2 ** 8))
+    assert ((2 ** 8) * (4 ** 5) == 262144) and (262144 < 5 ** 8 == 390625)
+
+    # Interior rational points on [2, 3^(4/5)], (3^(4/5), 4^(4/5)], (4^(4/5), 5^(4/5)], (5^(4/5), 4):
+    expected_interior = (
+        (Fraction(2, 1), (4, 3)),
+        (Fraction(9, 4), (4, 3)),
+        (Fraction(11, 4), (4, 4)),
+        (Fraction(3, 1), (4, 4)),
+        (Fraction(7, 2), (5, 5)),
+        (Fraction(15, 4), (5, 6)),
+    )
+    for y_rat, exp_u0_t in expected_interior:
+        assert (exact_U0_cutoff_ceil_2_Y_5_8(y_rat), exact_T_cutoff_ceil_Y_5_4(y_rat)) == exp_u0_t
+
+    # Exact integer-power binary-search straddling pairs across 3^(4/5), 4^(4/5), 5^(4/5):
+    denom = 10000
+    denom5 = denom ** 5
+    for m_thr, exp_below, exp_above in (
+        (3, (4, 3), (4, 4)),
+        (4, (4, 4), (5, 5)),
+        (5, (5, 5), (5, 6)),
+    ):
+        target = (m_thr ** 4) * denom5
+        lo, hi = 2 * denom, 4 * denom
+        while lo < hi:
+            mid = (lo + hi + 1) // 2
+            if mid ** 5 <= target:
+                lo = mid
+            else:
+                hi = mid - 1
+        assert lo ** 5 < target < (lo + 1) ** 5
+        y_lo = Fraction(lo, denom)
+        y_hi = Fraction(lo + 1, denom)
+        assert (exact_U0_cutoff_ceil_2_Y_5_8(y_lo), exact_T_cutoff_ceil_Y_5_4(y_lo)) == exp_below
+        assert (exact_U0_cutoff_ceil_2_Y_5_8(y_hi), exact_T_cutoff_ceil_Y_5_4(y_hi)) == exp_above
+
+    part = tc056_artifact["section_8_mixed_prime_block_attempt"][
+        "theorem_8E_conditional_moving_cutoff_buchstab_asymptotic"
+    ]["small_Y_2_to_4_step_cutoff_partition"]
+    assert part["verified"] is True
+
+    # 1C: Low-prime product up to U itself has logarithmic coefficient 2*sqrt(c) = delta/(2*sqrt(2)) < delta/2:
+    assert r"2\sqrt{c} = \frac{\delta}{2\sqrt{2}} < \frac{\delta}{2}" in review_src
+    thm_8b = tc056_artifact["section_8_mixed_prime_block_attempt"][
+        "theorem_8B_unconditional_low_and_top_block_bounds"
+    ]
+    assert "2 sqrt(c) = delta / (2 sqrt(2)) < delta / 2" in thm_8b["low_block_bound_statement"]
+
+
+
 
