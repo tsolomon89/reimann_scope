@@ -7424,6 +7424,599 @@ theorem growing_order_joint_polynomial_filter_and_gram_decomposition_tc058
     have h_mul_le : s * growingLogFilterPoly (k + 1) s ≤ s * 4 := by linarith [h_prod]
     exact le_of_mul_le_mul_left h_mul_le hs_pos
 
+/-- **Theorem 31 (`TASK-TC-058R` §§2A, 2B, 4A, 4B, & 6, Finite Square-Dilation Bridge, Pointwise Young Reconstruction,
+    Conditional Growing-Order Full-Gram & Second-Order Absorption, Inference Countermodel, and Bilateral Finite/Full Transfer)**:
+    Formalizes the repaired algebraic and conditional-absorption bridges for `TC-058R`:
+    1. **Exact Finite Möbius–Liouville Square-Dilation Identity (`§4A`)**:
+       For every `T : ℕ` and `X ≥ 0`,
+       `Q_{λ,T}(X) = ∑_{1 ≤ r ≤ T, r^2 ≤ T} r^{-1} Q_{μ, ⌊T / r^2⌋}(X / r^2)`
+       with exact `r^{-1}` weight (from `φ_{r^2 n}(X) = r^{-1} φ_n(X / r^2)`).
+    2. **Pointwise Growing-Order Reconstruction & Young Inequality (`§2A & §6`)**:
+       Connects `Theorem 30` (`finiteQLambda T X = L_{M,T}(X) + r_{M,T}(X)`) directly to the pointwise quadratic Young bound
+       `Q_{λ,T}(X)^2 ≤ (1 + δ) L_{M,T}(X)^2 + (1 + 1/δ) r_{M,T}(X)^2` for all `X > 0`, `log X ≠ 0`, `δ > 0`.
+    3. **Conditional Growing-Order Full-Gram Absorption (`CONDITIONAL_ON_FULL_GROWING_GRAM_J_M`, `§2A`) & Inference Countermodel**:
+       - Explicit parameter choice `δ = (1 - θ_η) / 2 > 0` and `q = (1 + δ) θ_η = θ_η (3 - θ_η) / 2 ∈ [0, 1)` valid uniformly
+         for all `0 ≤ θ_η < 1` (including `θ_η = 0`, where `δ = 1/2` and `q = 0`);
+       - Conditional finite-horizon `normalizedScaleSupremum` absorption under the full Gram hypothesis
+         `J_M(Y) = D_M(Y) + X_M(Y) ≤ A_η Y^η + θ_η F(Y)` and `R_rem(Y) ≤ B_rem Y^{-2}` (`Y ≥ Y_star ≥ 2`);
+       - Logical non-implication countermodel (`E_cm(Y) = D_cm(Y) = Y / (log Y)^2`, `X_cm = R_cm = 0`): for every
+         `ε ∈ (0, 1)` and `M_c ≥ 0`, there exists `Y ≥ 2` with `M_c Y^ε < Y / (log Y)^2`, showing why `D_M = O(Y / (log Y)^2)`
+         plus an off-diagonal-only bound on `X_M` does not imply `O_ε(Y^ε)`.
+    4. **Conditional Second-Order `T_2` Absorption with `4 Θ_ε^{diag}(Y)` (`§2B`)**:
+       Under `E ≤ 4 D_tilde + T_2` and `T_2(Y) ≤ A_η Y^η + θ_η F(Y)`, absorption holds with contraction coefficient
+       `θ_η + 4 Θ_ε^{diag}(Y) ≤ q < 1` and `K_T2 = A_η Y_star^{η - ε} + 4 C_cut Y_star^{-ε}`.
+    5. **Bilateral Finite/Full Norm & Subpower Energy Comparison Algebra (`§4B`)**:
+       From `|s_T(Y) - s_inf(Y)| ≤ B_tau` (`s_T, s_inf, B_tau ≥ 0`), proves
+       `|s_T(Y)^2 - s_inf(Y)^2| ≤ 2 B_tau s_inf(Y) + B_tau^2`, two-sided `2 s^2 + 2 B_tau^2` domination,
+       and two-way `O_ε(Y^ε)` subpower equivalence on `Y ≥ 1`.
+    Note on scope outside Lean: window integration `∫_Y^{τ Y} · dX/X`, the terminal remainder constant `2068 (log Y) Y^{-3}`,
+    the truncation bound `‖Q_{a,∞} - Q_{a,T(Y)}‖_Y ≤ B_τ`, PNT/Selberg inputs, and the open arithmetic bounds on
+    `S_comb`, `T_2`, and `J_M = D_M + X_M` remain analytic/open outside this theorem. -/
+theorem growing_order_and_second_order_conditional_absorption_and_finite_square_bridge_tc058r
+    {E : ℝ → ℝ} {M_lin : ℝ}
+    (hE_nn : ∀ Z : ℝ, 1 ≤ Z → 0 ≤ E Z)
+    (hM_nn : 0 ≤ M_lin)
+    (hE_lin : ∀ Z : ℝ, 1 ≤ Z → E Z ≤ M_lin * Z) :
+    (∀ (T : ℕ) (X : ℝ), 0 ≤ X →
+      finiteQLambda T X =
+        ∑ r ∈ (Finset.Icc 1 T).filter (fun r => r ^ 2 ≤ T),
+          (1 / (r : ℝ)) *
+            finiteQGeneral (fun n => (ArithmeticFunction.moebius n : ℝ))
+              (T / r ^ 2) (X / ((r ^ 2 : ℕ) : ℝ))) ∧
+    (∀ (M T : ℕ) (X δ : ℝ), 0 < X → Real.log X ≠ 0 → 0 < δ →
+      finiteQLambda T X =
+          (∑ pk ∈ primePowerPairsUpTo T,
+            jointPrimePowerFiber (fun n => (liouvilleLambda n : ℝ)) M T pk X) +
+          finiteQShifted (fun n => (liouvilleLambda n : ℝ)) M T X / (Real.log X) ^ M ∧
+        (finiteQLambda T X) ^ 2 ≤
+          (1 + δ) *
+            ((∑ pk ∈ primePowerPairsUpTo T,
+              jointPrimePowerFiber (fun n => (liouvilleLambda n : ℝ)) M T pk X) ^ 2) +
+          (1 + 1 / δ) *
+            ((finiteQShifted (fun n => (liouvilleLambda n : ℝ)) M T X / (Real.log X) ^ M) ^ 2)) ∧
+    (((∀ θ_η : ℝ, 0 ≤ θ_η → θ_η < 1 →
+        let δ := (1 - θ_η) / 2
+        let q := (1 + δ) * θ_η
+        0 < δ ∧ 0 ≤ q ∧ q < 1 ∧ (θ_η = 0 → δ = 1 / 2 ∧ q = 0)) ∧
+      (∀ (D_M X_M R_rem : ℝ → ℝ) (η ε A_η B_rem θ_η Y_star : ℝ),
+        0 < η → η < ε → 0 ≤ A_η → 0 ≤ B_rem →
+        0 ≤ θ_η → θ_η < 1 → 2 ≤ Y_star →
+        let δ := (1 - θ_η) / 2
+        let q := (1 + δ) * θ_η
+        let K_grow :=
+          (1 + δ) * A_η * Y_star ^ (η - ε) + (1 + 1 / δ) * B_rem * Y_star ^ (-(2 + ε))
+        (∀ Y : ℝ, Y_star ≤ Y →
+          E Y ≤ (1 + δ) * (D_M Y + X_M Y) + (1 + 1 / δ) * R_rem Y) →
+        (∀ Y : ℝ, Y_star ≤ Y →
+          D_M Y + X_M Y ≤ A_η * Y ^ η + θ_η * monotoneScaleEnvelope E Y) →
+        (∀ Y : ℝ, Y_star ≤ Y → R_rem Y ≤ B_rem * Y ^ (-2 : ℝ)) →
+        (∀ R : ℝ, Y_star ≤ R →
+          normalizedScaleSupremum E ε R ≤
+            max (normalizedScaleSupremum E ε Y_star)
+              (K_grow + q * normalizedScaleSupremum E ε R) ∧
+          normalizedScaleSupremum E ε R ≤
+            max (normalizedScaleSupremum E ε Y_star) (K_grow / (1 - q))) ∧
+        (∀ Y : ℝ, 1 ≤ Y →
+          E Y ≤ max (normalizedScaleSupremum E ε Y_star) (K_grow / (1 - q)) * Y ^ ε ∧
+            monotoneScaleEnvelope E Y ≤
+              max (normalizedScaleSupremum E ε Y_star) (K_grow / (1 - q)) * Y ^ ε))) ∧
+      (∀ ε : ℝ, 0 < ε → ε < 1 → ∀ M_c : ℝ, 0 ≤ M_c →
+        ∃ Y : ℝ, 2 ≤ Y ∧ 0 ≤ Y / (Real.log Y) ^ 2 ∧ M_c * Y ^ ε < Y / (Real.log Y) ^ 2)) ∧
+    (∀ (D_tilde T_2 : ℝ → ℝ)
+        (S : ℝ → Finset (ℕ × ℕ)) (w d : ℝ → ℕ × ℕ → ℝ)
+        (η ε A_η θ_η C_cut q Y_star : ℝ),
+      0 < η → η < ε → 0 ≤ A_η → 0 ≤ C_cut →
+      0 ≤ θ_η → θ_η < 1 → θ_η < q → q < 1 → 1 ≤ Y_star →
+      (∀ Y : ℝ, Y_star ≤ Y → E Y ≤ 4 * D_tilde Y + T_2 Y) →
+      (∀ Y : ℝ, Y_star ≤ Y →
+        (∀ pk ∈ S Y, 0 ≤ w Y pk ∧ 1 ≤ d Y pk ∧ d Y pk ≤ Y) ∧
+          D_tilde Y ≤
+            (∑ pk ∈ S Y, w Y pk * monotoneScaleEnvelope E (Y / d Y pk)) + C_cut) →
+      (∀ Y : ℝ, Y_star ≤ Y →
+        T_2 Y ≤ A_η * Y ^ η + θ_η * monotoneScaleEnvelope E Y) →
+      (∀ Y : ℝ, Y_star ≤ Y →
+        θ_η + 4 * (∑ pk ∈ S Y, w Y pk * (d Y pk) ^ (-ε)) ≤ q) →
+      let K_T2 := A_η * Y_star ^ (η - ε) + 4 * C_cut * Y_star ^ (-ε)
+      (∀ R : ℝ, Y_star ≤ R →
+        normalizedScaleSupremum E ε R ≤
+          max (normalizedScaleSupremum E ε Y_star)
+            (K_T2 + q * normalizedScaleSupremum E ε R) ∧
+        normalizedScaleSupremum E ε R ≤
+          max (normalizedScaleSupremum E ε Y_star) (K_T2 / (1 - q))) ∧
+      (∀ Y : ℝ, 1 ≤ Y →
+        E Y ≤ max (normalizedScaleSupremum E ε Y_star) (K_T2 / (1 - q)) * Y ^ ε ∧
+          monotoneScaleEnvelope E Y ≤
+            max (normalizedScaleSupremum E ε Y_star) (K_T2 / (1 - q)) * Y ^ ε)) ∧
+    (∀ (s_T s_inf : ℝ → ℝ) (B_tau : ℝ),
+      0 ≤ B_tau →
+      (∀ Y : ℝ, 1 ≤ Y → 0 ≤ s_T Y ∧ 0 ≤ s_inf Y ∧ |s_T Y - s_inf Y| ≤ B_tau) →
+      (∀ Y : ℝ, 1 ≤ Y →
+        |(s_T Y) ^ 2 - (s_inf Y) ^ 2| ≤ 2 * B_tau * s_inf Y + B_tau ^ 2 ∧
+          (s_inf Y) ^ 2 ≤ 2 * (s_T Y) ^ 2 + 2 * B_tau ^ 2 ∧
+          (s_T Y) ^ 2 ≤ 2 * (s_inf Y) ^ 2 + 2 * B_tau ^ 2) ∧
+      (∀ ε : ℝ, 0 < ε →
+        ((∃ C_T : ℝ, 0 ≤ C_T ∧ ∀ Y : ℝ, 1 ≤ Y → (s_T Y) ^ 2 ≤ C_T * Y ^ ε) ↔
+          (∃ C_inf : ℝ, 0 ≤ C_inf ∧ ∀ Y : ℝ, 1 ≤ Y → (s_inf Y) ^ 2 ≤ C_inf * Y ^ ε)))) := by
+  refine ⟨?_, ?_, ⟨⟨?_, ?_⟩, ?_⟩, ?_, ?_⟩
+  · intro T X hX_nn
+    have h_fQ_lam :
+        ∀ (L : ℕ) (w : ℝ),
+          finiteQLambda L w =
+            ∑ m ∈ Finset.Icc 1 L, (liouvilleLambda m : ℝ) * gaussianTermPhi m w := by
+      intro L w
+      dsimp [finiteQLambda, gaussianTermPhi]
+      rw [Finset.mul_sum]
+      apply Finset.sum_congr rfl
+      intro m _
+      ring
+    rcases eq_or_lt_of_le hX_nn with rfl | hX
+    · have h_zpow : (0 : ℝ) ^ (5 / 2 : ℝ) = 0 := by
+        rw [Real.zero_rpow (by norm_num)]
+      have h_phi0 : ∀ (m : ℕ) (w : ℝ), w = 0 → gaussianTermPhi m w = 0 := by
+        intro m w hw
+        subst hw
+        simp [gaussianTermPhi, h_zpow]
+      rw [h_fQ_lam T 0]
+      simp only [finiteQGeneral, zero_div]
+      rw [Finset.sum_eq_zero]
+      · symm
+        apply Finset.sum_eq_zero
+        intro r _
+        rw [Finset.sum_eq_zero]
+        · ring
+        · intro n _
+          rw [h_phi0 n 0 rfl, mul_zero]
+      · intro m _
+        rw [h_phi0 m 0 rfl, mul_zero]
+    · rw [h_fQ_lam T X]
+      have h_lam_expand :
+          ∀ m ∈ Finset.Icc 1 T,
+            (liouvilleLambda m : ℝ) * gaussianTermPhi m X =
+              ∑ r ∈ ((Finset.Icc 1 T).filter (fun r => r ^ 2 ≤ T)).filter (fun r => r ^ 2 ∣ m),
+                (ArithmeticFunction.moebius (m / r ^ 2) : ℝ) * gaussianTermPhi m X := by
+        intro m hm
+        rw [Finset.mem_Icc] at hm
+        have hm_ne : m ≠ 0 := by omega
+        have hm_pos : 0 < m := by omega
+        obtain ⟨_, _, _, _, _, _, _, h_inv, _⟩ :=
+          actual_prime_power_and_factored_square_divisor_moebius_liouville_inversion_nat
+            Nat.prime_two 0 hm_ne
+        have h_cast :
+            (liouvilleLambda m : ℝ) =
+              ∑ r ∈ squareDivisors m, (ArithmeticFunction.moebius (m / r ^ 2) : ℝ) := by
+          rw [← h_inv]
+          dsimp [actualFlatMoebiusSquareDivisorSum]
+          push_cast
+          rfl
+        have h_set_eq :
+            squareDivisors m =
+              ((Finset.Icc 1 T).filter (fun r => r ^ 2 ≤ T)).filter (fun r => r ^ 2 ∣ m) := by
+          ext r
+          simp only [mem_squareDivisors_iff_aux, Finset.mem_filter, Finset.mem_Icc]
+          constructor
+          · rintro ⟨⟨hr_dvd, _⟩, hrsq_dvd⟩
+            have hr_pos : 0 < r := Nat.pos_of_dvd_of_pos hr_dvd hm_pos
+            have hrsq_le_m : r ^ 2 ≤ m := Nat.le_of_dvd hm_pos hrsq_dvd
+            have hr_le_m : r ≤ m := Nat.le_of_dvd hm_pos hr_dvd
+            exact ⟨⟨⟨hr_pos, le_trans hr_le_m hm.2⟩, le_trans hrsq_le_m hm.2⟩, hrsq_dvd⟩
+          · rintro ⟨⟨⟨_, _⟩, _⟩, hrsq_dvd⟩
+            have hr_dvd : r ∣ m := dvd_trans ⟨r, by ring⟩ hrsq_dvd
+            exact ⟨⟨hr_dvd, hm_ne⟩, hrsq_dvd⟩
+        rw [h_cast, h_set_eq, Finset.sum_mul]
+      rw [Finset.sum_congr rfl h_lam_expand]
+      let R_set := (Finset.Icc 1 T).filter (fun r => r ^ 2 ≤ T)
+      have h_swap :
+          (∑ m ∈ Finset.Icc 1 T,
+            ∑ r ∈ R_set.filter (fun r => r ^ 2 ∣ m),
+              (ArithmeticFunction.moebius (m / r ^ 2) : ℝ) * gaussianTermPhi m X) =
+            ∑ r ∈ R_set,
+              ∑ m ∈ (Finset.Icc 1 T).filter (fun m => r ^ 2 ∣ m),
+                (ArithmeticFunction.moebius (m / r ^ 2) : ℝ) * gaussianTermPhi m X := by
+        simp only [Finset.sum_filter]
+        rw [Finset.sum_comm]
+      rw [h_swap]
+      apply Finset.sum_congr rfl
+      intro r hr
+      simp only [R_set, Finset.mem_filter, Finset.mem_Icc] at hr
+      have hr_pos : 0 < r := hr.1.1
+      have hrsq_pos : 0 < r ^ 2 := pow_pos hr_pos 2
+      have h_bij :
+          (∑ m ∈ (Finset.Icc 1 T).filter (fun m => r ^ 2 ∣ m),
+            (ArithmeticFunction.moebius (m / r ^ 2) : ℝ) * gaussianTermPhi m X) =
+            ∑ n ∈ Finset.Icc 1 (T / r ^ 2),
+              (ArithmeticFunction.moebius n : ℝ) * gaussianTermPhi (r ^ 2 * n) X := by
+        symm
+        apply Finset.sum_bij (fun n _ => r ^ 2 * n)
+        · intro n hn
+          rw [Finset.mem_Icc] at hn
+          simp only [Finset.mem_filter, Finset.mem_Icc]
+          have h_le : r ^ 2 * n ≤ T := by
+            rw [mul_comm]
+            exact (Nat.le_div_iff_mul_le hrsq_pos).mp hn.2
+          exact ⟨⟨Nat.mul_pos hrsq_pos (by omega), h_le⟩, ⟨n, rfl⟩⟩
+        · intro n1 _ n2 _ h_eq
+          exact Nat.eq_of_mul_eq_mul_left hrsq_pos h_eq
+        · intro m hm
+          simp only [Finset.mem_filter, Finset.mem_Icc] at hm
+          rcases hm with ⟨⟨hm1, hmT⟩, ⟨n, rfl⟩⟩
+          have hn_pos : 0 < n := by
+            by_contra h0
+            have hn0 : n = 0 := Nat.eq_zero_of_not_pos h0
+            rw [hn0, mul_zero] at hm1
+            omega
+          have hn_div : n ≤ T / r ^ 2 :=
+            (Nat.le_div_iff_mul_le hrsq_pos).mpr (by rw [mul_comm]; exact hmT)
+          exact ⟨n, Finset.mem_Icc.mpr ⟨hn_pos, hn_div⟩, rfl⟩
+        · intro n _
+          rw [Nat.mul_div_cancel_left n hrsq_pos]
+      rw [h_bij]
+      dsimp [finiteQGeneral]
+      rw [Finset.mul_sum]
+      apply Finset.sum_congr rfl
+      intro n _
+      have h_phi_sc :
+          gaussianTermPhi (r ^ 2 * n) X =
+            (1 / (r : ℝ)) * gaussianTermPhi n (X / ((r ^ 2 : ℕ) : ℝ)) := by
+        have h_raw :
+            gaussianTermPhi (r ^ 2 * n) X =
+              (1 / Real.sqrt (((r ^ 2 : ℕ) : ℝ))) *
+                gaussianTermPhi n (X / ((r ^ 2 : ℕ) : ℝ)) := by
+          dsimp [gaussianTermPhi]
+          exact (gaussian_term_scaling_aux (b := n) (le_of_lt hX) hrsq_pos).symm
+        have h_sqrt : Real.sqrt (((r ^ 2 : ℕ) : ℝ)) = (r : ℝ) := by
+          push_cast
+          exact Real.sqrt_sq (Nat.cast_nonneg r)
+        rw [h_raw, h_sqrt]
+      rw [h_phi_sc]
+      ring
+  · intro M T X δ hX hlog_ne hδ
+    let a_lam : ℕ → ℝ := fun n => (liouvilleLambda n : ℝ)
+    have ha1 : a_lam 1 = 1 := by
+      have h1 : liouvilleLambda 1 = 1 := by decide
+      simp [a_lam, h1]
+    have ha_mult : ∀ u v : ℕ, 0 < u → 0 < v → a_lam (u * v) = a_lam u * a_lam v := by
+      intro u v hu hv
+      have hmul :=
+        (actual_omega_factorization_and_liouville_common_factor_cancellation_nat
+          (m := u) (n := v) (d := 1) (r := 1) (s := 1)
+          Nat.prime_two 0 (by omega) (by omega) (by omega) (by omega) (by omega)).2.2.2.2.1
+      simp [a_lam, hmul]
+    obtain ⟨_, h_resum, _, _⟩ :=
+      growing_order_joint_polynomial_filter_and_gram_decomposition_tc058 M T
+    have h_fQ_eq : finiteQLambda T X = finiteQGeneral a_lam T X := by
+      dsimp [finiteQLambda, finiteQGeneral, gaussianTermPhi, a_lam]
+      rw [Finset.mul_sum]
+      apply Finset.sum_congr rfl
+      intro n _
+      ring
+    have h_eq : finiteQLambda T X =
+        (∑ pk ∈ primePowerPairsUpTo T, jointPrimePowerFiber a_lam M T pk X) +
+          finiteQShifted a_lam M T X / (Real.log X) ^ M := by
+      rw [h_fQ_eq]
+      exact (h_resum a_lam X ha1 ha_mult hX hlog_ne).2
+    refine ⟨h_eq, ?_⟩
+    let u := ∑ pk ∈ primePowerPairsUpTo T, jointPrimePowerFiber a_lam M T pk X
+    let v := finiteQShifted a_lam M T X / (Real.log X) ^ M
+    have h_young : (u + v) ^ 2 ≤ (1 + δ) * u ^ 2 + (1 + 1 / δ) * v ^ 2 := by
+      have h_diff :
+          (1 + δ) * u ^ 2 + (1 + 1 / δ) * v ^ 2 - (u + v) ^ 2 =
+            δ * (u - v / δ) ^ 2 := by
+        field_simp [ne_of_gt hδ]
+        ring
+      have h_nn : 0 ≤ δ * (u - v / δ) ^ 2 := mul_nonneg (le_of_lt hδ) (sq_nonneg _)
+      linarith
+    rw [h_eq]
+    exact h_young
+  · intro θ_η hθ_nn hθ_lt1
+    dsimp only
+    have hδ_pos : 0 < (1 - θ_η) / 2 := by linarith
+    have hq_nn : 0 ≤ (1 + (1 - θ_η) / 2) * θ_η :=
+      mul_nonneg (by linarith) hθ_nn
+    have hq_lt1 : (1 + (1 - θ_η) / 2) * θ_η < 1 := by
+      have h_pos : 0 < (1 - θ_η) * (2 - θ_η) / 2 := by
+        have h1 : 0 < 1 - θ_η := by linarith
+        have h2 : 0 < 2 - θ_η := by linarith
+        positivity
+      have h_id : 1 - (1 + (1 - θ_η) / 2) * θ_η = (1 - θ_η) * (2 - θ_η) / 2 := by ring
+      linarith [h_pos, h_id]
+    refine ⟨hδ_pos, hq_nn, hq_lt1, ?_⟩
+    intro h0
+    subst h0
+    norm_num
+  · intro D_M X_M R_rem η ε A_η B_rem θ_η Y_star
+      hη_pos hηε hA_nn hB_nn hθ_nn hθ_lt1 hY_star2
+    dsimp only
+    let δ := (1 - θ_η) / 2
+    let q := (1 + δ) * θ_η
+    let K_grow :=
+      (1 + δ) * A_η * Y_star ^ (η - ε) + (1 + 1 / δ) * B_rem * Y_star ^ (-(2 + ε))
+    intro hE_young hJ_bound hR_bound
+    have hY_star1 : 1 ≤ Y_star := by linarith
+    have hδ_pos : 0 < δ := by dsimp [δ]; linarith
+    have h1δ_nn : 0 ≤ 1 + δ := by linarith
+    have h1invδ_nn : 0 ≤ 1 + 1 / δ := by positivity
+    have hq_lt1 : q < 1 := by
+      have h_id : 1 - q = (1 - θ_η) * (2 - θ_η) / 2 := by dsimp [q, δ]; ring
+      have h_pos : 0 < (1 - θ_η) * (2 - θ_η) / 2 := by
+        have h1 : 0 < 1 - θ_η := by linarith
+        have h2 : 0 < 2 - θ_η := by linarith
+        positivity
+      linarith [h_pos, h_id]
+    have hε_pos : 0 < ε := lt_trans hη_pos hηε
+    have hε_nn : 0 ≤ ε := le_of_lt hε_pos
+    have h_horizon :
+        ∀ R : ℝ, Y_star ≤ R →
+          normalizedScaleSupremum E ε R ≤
+            max (normalizedScaleSupremum E ε Y_star)
+              (K_grow + q * normalizedScaleSupremum E ε R) ∧
+          normalizedScaleSupremum E ε R ≤
+            max (normalizedScaleSupremum E ε Y_star) (K_grow / (1 - q)) := by
+      intro R hR_star
+      have hR1 : 1 ≤ R := le_trans hY_star1 hR_star
+      obtain ⟨h_ne_R, _, _, _, _, h_env_R⟩ :=
+        normalizedScaleSupremum_props_aux hE_nn hM_nn hE_lin hε_nn hR1
+      obtain ⟨_, _, _, _, h_ub_star, _⟩ :=
+        normalizedScaleSupremum_props_aux hE_nn hM_nn hE_lin hε_nn hY_star1
+      let G := normalizedScaleSupremum E ε R
+      have h_self_rec :
+          G ≤ max (normalizedScaleSupremum E ε Y_star) (K_grow + q * G) := by
+        apply csSup_le h_ne_R
+        rintro _ ⟨Y, ⟨hY1, hYR⟩, rfl⟩
+        by_cases hY_le_star : Y ≤ Y_star
+        · exact le_trans (h_ub_star Y ⟨hY1, hY_le_star⟩).1 (le_max_left _ _)
+        · have hY_ge_star : Y_star ≤ Y := le_of_not_ge hY_le_star
+          have hY_pos : 0 < Y := lt_of_lt_of_le zero_lt_one hY1
+          have hY_eps_pos : 0 < Y ^ ε := Real.rpow_pos_of_pos hY_pos ε
+          have hY_eps_nn : 0 ≤ Y ^ ε := le_of_lt hY_eps_pos
+          have hFY : monotoneScaleEnvelope E Y ≤ G * Y ^ ε := h_env_R Y ⟨hY1, hYR⟩
+          have hJ_Y : D_M Y + X_M Y ≤ A_η * Y ^ η + θ_η * (G * Y ^ ε) := by
+            have h1 := hJ_bound Y hY_ge_star
+            have h2 := mul_le_mul_of_nonneg_left hFY hθ_nn
+            linarith
+          have hE_step1 :
+              E Y ≤ (1 + δ) * (A_η * Y ^ η + θ_η * (G * Y ^ ε)) +
+                (1 + 1 / δ) * (B_rem * Y ^ (-2 : ℝ)) := by
+            have h0 := hE_young Y hY_ge_star
+            change E Y ≤ (1 + δ) * (D_M Y + X_M Y) + (1 + 1 / δ) * R_rem Y at h0
+            have h1 := mul_le_mul_of_nonneg_left hJ_Y h1δ_nn
+            have h2 := mul_le_mul_of_nonneg_left (hR_bound Y hY_ge_star) h1invδ_nn
+            linarith
+          have hE_step2 :
+              E Y ≤ (1 + δ) * A_η * Y ^ η + (1 + 1 / δ) * B_rem * Y ^ (-2 : ℝ) +
+                (q * G) * Y ^ ε := by
+            calc
+              E Y ≤ (1 + δ) * (A_η * Y ^ η + θ_η * (G * Y ^ ε)) +
+                    (1 + 1 / δ) * (B_rem * Y ^ (-2 : ℝ)) := hE_step1
+              _ = (1 + δ) * A_η * Y ^ η + (1 + 1 / δ) * B_rem * Y ^ (-2 : ℝ) +
+                    (q * G) * Y ^ ε := by dsimp [q]; ring
+          have h_eta_div : Y ^ η / Y ^ ε = Y ^ (η - ε) := by
+            rw [← Real.rpow_sub hY_pos]
+          have h_rem_div : Y ^ (-2 : ℝ) / Y ^ ε = Y ^ (-(2 + ε)) := by
+            rw [← Real.rpow_sub hY_pos]
+            congr 1
+            ring
+          have h_eta_mono : Y ^ (η - ε) ≤ Y_star ^ (η - ε) := by
+            have h_sub_eq : η - ε = -(ε - η) := by ring
+            rw [h_sub_eq]
+            exact rpow_neg_antitone_of_one_le_aux hY_star1 hY_ge_star (by linarith)
+          have h_rem_mono : Y ^ (-(2 + ε)) ≤ Y_star ^ (-(2 + ε)) :=
+            rpow_neg_antitone_of_one_le_aux hY_star1 hY_ge_star (by linarith)
+          have h_div_step : E Y / Y ^ ε ≤ K_grow + q * G := by
+            have h_div_raw := div_le_div_of_nonneg_right hE_step2 hY_eps_nn
+            have h_split :
+                ((1 + δ) * A_η * Y ^ η + (1 + 1 / δ) * B_rem * Y ^ (-2 : ℝ) +
+                    (q * G) * Y ^ ε) / Y ^ ε =
+                  (1 + δ) * A_η * (Y ^ η / Y ^ ε) +
+                    (1 + 1 / δ) * B_rem * (Y ^ (-2 : ℝ) / Y ^ ε) + q * G := by
+              field_simp [ne_of_gt hY_eps_pos]
+              ring
+            rw [h_split, h_eta_div, h_rem_div] at h_div_raw
+            have hA_step :
+                (1 + δ) * A_η * Y ^ (η - ε) ≤ (1 + δ) * A_η * Y_star ^ (η - ε) :=
+              mul_le_mul_of_nonneg_left h_eta_mono (mul_nonneg h1δ_nn hA_nn)
+            have hB_step :
+                (1 + 1 / δ) * B_rem * Y ^ (-(2 + ε)) ≤
+                  (1 + 1 / δ) * B_rem * Y_star ^ (-(2 + ε)) :=
+              mul_le_mul_of_nonneg_left h_rem_mono (mul_nonneg h1invδ_nn hB_nn)
+            dsimp [K_grow]
+            linarith
+          exact le_trans h_div_step (le_max_right _ _)
+      have h_abs :
+          G ≤ max (normalizedScaleSupremum E ε Y_star) (K_grow / (1 - q)) := by
+        rcases le_max_iff.mp h_self_rec with h_left | h_right
+        · exact le_trans h_left (le_max_left _ _)
+        · have h1q_pos : 0 < 1 - q := by linarith
+          have h_lin : G * (1 - q) ≤ K_grow := by linarith
+          have h_div : G ≤ K_grow / (1 - q) := (le_div_iff h1q_pos).mpr h_lin
+          exact le_trans h_div (le_max_right _ _)
+      exact ⟨h_self_rec, h_abs⟩
+    refine ⟨h_horizon, ?_⟩
+    intro Y hY1
+    let R := max Y Y_star
+    have hR_star : Y_star ≤ R := le_max_right Y Y_star
+    have hYR : Y ≤ R := le_max_left Y Y_star
+    have hR1 : 1 ≤ R := le_trans hY_star1 hR_star
+    obtain ⟨_, _, _, _, h_ub_R, h_env_R⟩ :=
+      normalizedScaleSupremum_props_aux hE_nn hM_nn hE_lin hε_nn hR1
+    have hG_bound := (h_horizon R hR_star).2
+    have hY_eps_nn : 0 ≤ Y ^ ε := Real.rpow_nonneg (by linarith) ε
+    have hEY_le : E Y ≤ normalizedScaleSupremum E ε R * Y ^ ε :=
+      (h_ub_R Y ⟨hY1, hYR⟩).2
+    have hFY_le : monotoneScaleEnvelope E Y ≤ normalizedScaleSupremum E ε R * Y ^ ε :=
+      h_env_R Y ⟨hY1, hYR⟩
+    have h_mult := mul_le_mul_of_nonneg_right hG_bound hY_eps_nn
+    exact ⟨le_trans hEY_le h_mult, le_trans hFY_le h_mult⟩
+  · intro ε hε_pos hε_lt1 M_c _
+    have h1ε_pos : 0 < 1 - ε := by linarith
+    let t := max 1 (6 * (M_c + 1) / (1 - ε) ^ 2)
+    have ht_ge1 : 1 ≤ t := le_max_left _ _
+    have ht_pos : 0 < t := lt_of_lt_of_le zero_lt_one ht_ge1
+    have ht_nn : 0 ≤ t := le_of_lt ht_pos
+    have ht_big : 6 * (M_c + 1) / (1 - ε) ^ 2 ≤ t := le_max_right _ _
+    let Y := Real.exp (t / (1 - ε))
+    have h_div_ge1 : 1 ≤ t / (1 - ε) := by
+      rw [one_le_div h1ε_pos]
+      linarith
+    have hY_ge2 : 2 ≤ Y := by
+      have h_exp1 : (2 : ℝ) ≤ Real.exp 1 := by
+        have h_sum := Real.sum_le_exp_of_nonneg (by norm_num : (0 : ℝ) ≤ 1) 2
+        simp [Finset.sum_range_succ] at h_sum
+        linarith
+      exact le_trans h_exp1 (Real.exp_le_exp.mpr h_div_ge1)
+    have hY_pos : 0 < Y := Real.exp_pos _
+    have hlogY : Real.log Y = t / (1 - ε) := Real.log_exp _
+    have h_cm_nn : 0 ≤ Y / (Real.log Y) ^ 2 :=
+      div_nonneg (le_of_lt hY_pos) (sq_nonneg _)
+    have h_exp_cubic : t ^ 3 / 6 < Real.exp t := by
+      have h_sum := Real.sum_le_exp_of_nonneg ht_nn 4
+      simp [Finset.sum_range_succ, Nat.factorial] at h_sum
+      have ht_sq_nn : 0 ≤ t ^ 2 := sq_nonneg t
+      linarith
+    have h_Y_rpow : Y ^ (1 - ε) = Real.exp t := by
+      dsimp [Y]
+      rw [← Real.exp_mul]
+      congr 1
+      field_simp [ne_of_gt h1ε_pos]
+    have h_Y_split : Y = Y ^ ε * Real.exp t := by
+      rw [← h_Y_rpow, ← Real.rpow_add hY_pos]
+      have h_add : ε + (1 - ε) = 1 := by ring
+      rw [h_add, Real.rpow_one]
+    have h_ratio_gt : M_c < Real.exp t / (Real.log Y) ^ 2 := by
+      rw [hlogY]
+      have h_den_pos : 0 < (t / (1 - ε)) ^ 2 := sq_pos_of_pos (div_pos ht_pos h1ε_pos)
+      have h_step1 : (t ^ 3 / 6) / (t / (1 - ε)) ^ 2 < Real.exp t / (t / (1 - ε)) ^ 2 :=
+        div_lt_div_of_pos_right h_exp_cubic h_den_pos
+      have h_simp : (t ^ 3 / 6) / (t / (1 - ε)) ^ 2 = (1 - ε) ^ 2 * t / 6 := by
+        field_simp [ne_of_gt ht_pos, ne_of_gt h1ε_pos]
+        ring
+      rw [h_simp] at h_step1
+      have h_ge_Mc1 : M_c + 1 ≤ (1 - ε) ^ 2 * t / 6 := by
+        have h1ε_sq_pos : 0 < (1 - ε) ^ 2 := sq_pos_of_pos h1ε_pos
+        have h_mul := mul_le_mul_of_nonneg_left ht_big (le_of_lt h1ε_sq_pos)
+        have h_lhs : (1 - ε) ^ 2 * (6 * (M_c + 1) / (1 - ε) ^ 2) = 6 * (M_c + 1) := by
+          field_simp [ne_of_gt h1ε_sq_pos]
+        rw [h_lhs] at h_mul
+        linarith
+      linarith
+    refine ⟨Y, hY_ge2, h_cm_nn, ?_⟩
+    have hY_eps_pos : 0 < Y ^ ε := Real.rpow_pos_of_pos hY_pos ε
+    have h_mul_lt := mul_lt_mul_of_pos_right h_ratio_gt hY_eps_pos
+    have h_rhs_eq : (Real.exp t / (Real.log Y) ^ 2) * Y ^ ε = Y / (Real.log Y) ^ 2 := by
+      calc
+        (Real.exp t / (Real.log Y) ^ 2) * Y ^ ε
+          = (Y ^ ε * Real.exp t) / (Real.log Y) ^ 2 := by ring
+        _ = Y / (Real.log Y) ^ 2 := by rw [← h_Y_split]
+    rw [h_rhs_eq] at h_mul_lt
+    exact h_mul_lt
+  · intro D_tilde T_2 S w d η ε A_η θ_η C_cut q Y_star
+      hη_pos hηε hA_nn hC_nn hθ_nn hθ_lt1 hθ_lt_q hq_lt1 hY_star
+      hE_decomp hD_bound hT2_corr h_contract
+    obtain ⟨_, _, h_comb_abs⟩ :=
+      combined_target_exact_quadratic_and_conditional_absorption_tc058 hE_nn hM_nn hE_lin
+    let D_tilde4 := fun Y => 4 * D_tilde Y
+    let w4 := fun Y pk => 4 * w Y pk
+    let C_cut4 := 4 * C_cut
+    have hC4_nn : 0 ≤ C_cut4 := by dsimp [C_cut4]; linarith
+    have hD4_bound :
+        ∀ Y : ℝ, Y_star ≤ Y →
+          (∀ pk ∈ S Y, 0 ≤ w4 Y pk ∧ 1 ≤ d Y pk ∧ d Y pk ≤ Y) ∧
+            D_tilde4 Y ≤
+              (∑ pk ∈ S Y, w4 Y pk * monotoneScaleEnvelope E (Y / d Y pk)) + C_cut4 := by
+      intro Y hY
+      obtain ⟨h_pk, hD⟩ := hD_bound Y hY
+      refine ⟨?_, ?_⟩
+      · intro pk hpk
+        obtain ⟨hw, hd1, hdY⟩ := h_pk pk hpk
+        exact ⟨by dsimp [w4]; linarith, hd1, hdY⟩
+      · have h_sum4 :
+            (∑ pk ∈ S Y, w4 Y pk * monotoneScaleEnvelope E (Y / d Y pk)) =
+              4 * ∑ pk ∈ S Y, w Y pk * monotoneScaleEnvelope E (Y / d Y pk) := by
+          dsimp [w4]
+          rw [Finset.mul_sum]
+          apply Finset.sum_congr rfl
+          intro pk _
+          ring
+        rw [h_sum4]
+        dsimp [D_tilde4, C_cut4]
+        linarith
+    have h_contract4 :
+        ∀ Y : ℝ, Y_star ≤ Y →
+          θ_η + (∑ pk ∈ S Y, w4 Y pk * (d Y pk) ^ (-ε)) ≤ q := by
+      intro Y hY
+      have h_sum4 :
+          (∑ pk ∈ S Y, w4 Y pk * (d Y pk) ^ (-ε)) =
+            4 * ∑ pk ∈ S Y, w Y pk * (d Y pk) ^ (-ε) := by
+        dsimp [w4]
+        rw [Finset.mul_sum]
+        apply Finset.sum_congr rfl
+        intro pk _
+        ring
+      rw [h_sum4]
+      exact h_contract Y hY
+    exact h_comb_abs D_tilde4 T_2 S w4 d η ε A_η θ_η C_cut4 q Y_star
+      hη_pos hηε hA_nn hC4_nn hθ_nn hθ_lt1 hθ_lt_q hq_lt1 hY_star
+      hE_decomp hD4_bound hT2_corr h_contract4
+  · intro s_T s_inf B_tau hB_nn hs_props
+    have h_pt :
+        ∀ Y : ℝ, 1 ≤ Y →
+          |(s_T Y) ^ 2 - (s_inf Y) ^ 2| ≤ 2 * B_tau * s_inf Y + B_tau ^ 2 ∧
+            (s_inf Y) ^ 2 ≤ 2 * (s_T Y) ^ 2 + 2 * B_tau ^ 2 ∧
+            (s_T Y) ^ 2 ≤ 2 * (s_inf Y) ^ 2 + 2 * B_tau ^ 2 := by
+      intro Y hY1
+      obtain ⟨hsT_nn, hsinf_nn, h_diff_abs⟩ := hs_props Y hY1
+      have h_abs_bounds := abs_le.mp h_diff_abs
+      have hsT_upper : s_T Y ≤ s_inf Y + B_tau := by linarith
+      have hsinf_upper : s_inf Y ≤ s_T Y + B_tau := by linarith
+      have h_sq_diff :
+          |(s_T Y) ^ 2 - (s_inf Y) ^ 2| ≤ 2 * B_tau * s_inf Y + B_tau ^ 2 := by
+        have h_fact : (s_T Y) ^ 2 - (s_inf Y) ^ 2 = (s_T Y - s_inf Y) * (s_T Y + s_inf Y) := by
+          ring
+        rw [h_fact, abs_mul, abs_of_nonneg (by linarith : 0 ≤ s_T Y + s_inf Y)]
+        have h_sum_le : s_T Y + s_inf Y ≤ 2 * s_inf Y + B_tau := by linarith
+        calc
+          |s_T Y - s_inf Y| * (s_T Y + s_inf Y)
+            ≤ B_tau * (2 * s_inf Y + B_tau) :=
+              mul_le_mul h_diff_abs h_sum_le (by linarith) hB_nn
+          _ = 2 * B_tau * s_inf Y + B_tau ^ 2 := by ring
+      have h_inf_le : (s_inf Y) ^ 2 ≤ 2 * (s_T Y) ^ 2 + 2 * B_tau ^ 2 := by
+        have h1 : (s_inf Y) ^ 2 ≤ (s_T Y + B_tau) ^ 2 :=
+          pow_le_pow_left hsinf_nn hsinf_upper 2
+        have h2 : (s_T Y + B_tau) ^ 2 ≤ 2 * (s_T Y) ^ 2 + 2 * B_tau ^ 2 := by
+          have h_sq := sq_nonneg (s_T Y - B_tau)
+          linarith
+        exact le_trans h1 h2
+      have h_T_le : (s_T Y) ^ 2 ≤ 2 * (s_inf Y) ^ 2 + 2 * B_tau ^ 2 := by
+        have h1 : (s_T Y) ^ 2 ≤ (s_inf Y + B_tau) ^ 2 :=
+          pow_le_pow_left hsT_nn hsT_upper 2
+        have h2 : (s_inf Y + B_tau) ^ 2 ≤ 2 * (s_inf Y) ^ 2 + 2 * B_tau ^ 2 := by
+          have h_sq := sq_nonneg (s_inf Y - B_tau)
+          linarith
+        exact le_trans h1 h2
+      exact ⟨h_sq_diff, h_inf_le, h_T_le⟩
+    refine ⟨h_pt, ?_⟩
+    intro ε hε_pos
+    constructor
+    · rintro ⟨C_T, hCT_nn, hCT_bound⟩
+      refine ⟨2 * C_T + 2 * B_tau ^ 2, by positivity, ?_⟩
+      intro Y hY1
+      have h1_le_pow : (1 : ℝ) ≤ Y ^ ε := Real.one_le_rpow hY1 (le_of_lt hε_pos)
+      have h_inf_le := (h_pt Y hY1).2.1
+      have h_T_Y := hCT_bound Y hY1
+      have hB_pow : 2 * B_tau ^ 2 ≤ (2 * B_tau ^ 2) * Y ^ ε := by
+        have h2B_nn : 0 ≤ 2 * B_tau ^ 2 := by positivity
+        simpa using mul_le_mul_of_nonneg_left h1_le_pow h2B_nn
+      linarith
+    · rintro ⟨C_inf, hCinf_nn, hCinf_bound⟩
+      refine ⟨2 * C_inf + 2 * B_tau ^ 2, by positivity, ?_⟩
+      intro Y hY1
+      have h1_le_pow : (1 : ℝ) ≤ Y ^ ε := Real.one_le_rpow hY1 (le_of_lt hε_pos)
+      have h_T_le := (h_pt Y hY1).2.2
+      have h_inf_Y := hCinf_bound Y hY1
+      have hB_pow : 2 * B_tau ^ 2 ≤ (2 * B_tau ^ 2) * Y ^ ε := by
+        have h2B_nn : 0 ≤ 2 * B_tau ^ 2 := by positivity
+        simpa using mul_le_mul_of_nonneg_left h1_le_pow h2B_nn
+      linarith
+
 end LiouvilleSquareDilation
 
 end RiemannScope

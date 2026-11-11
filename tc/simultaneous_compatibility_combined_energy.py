@@ -1,64 +1,61 @@
 r"""
-TASK-TC-058: Simultaneous Compatibility, Compensated Selberg Reconstruction, Growing
-Logarithmic Order Joint Energy, and Combined Scale-Energy Analysis toward SUBGATE-TC-043A.
+TASK-TC-058 / TASK-TC-058R: Simultaneous Compatibility, Compensated Selberg Reconstruction,
+Growing Logarithmic Order Joint Energy, Repaired Closure Criteria, and Combined Scale-Energy
+Analysis toward SUBGATE-TC-043A.
 
 Implements and certifies in 256-bit FLINT/Arb ball arithmetic (using tau = 2*pi as the sole
-circle constant and z = x + i*y, with x, y in R and critical line x = 1/2, for complex coordinates):
-1. Narrow Inherited TC-057R Closeout & Compact 5-Category Proof Dependency Audit (Sections 1-2):
+circle constant and z = x + i*y, with x, y in R and critical line x = 1/2, for complex coordinates;
+preserving phi_n(X) = X^{5/2} n^{-3} exp(-X^2/n^2), Q_{a,T}(X), Q_{a,T}^{[m]}(X), T(Y) = ceil(Y^{5/4})
+fixed across X in [Y, tau*Y], <f, g>_Y = int_Y^{tau*Y} f(X)g(X) dX/X, E(Y) = ||Q_{lambda,T(Y)}||_Y^2,
+and F(Y) = sup_{1 <= Z <= Y} E(Z)):
+1. Narrow Inherited TC-057R Closeout, Repaired Square-Dilation & Finite/Full Bridges, & Compact
+   5-Category Proof Dependency Audit (Sections 1-2, Lean Theorem 31(1) & 31(5)):
    - Exact verification of roughSquarefreeDivisorsBand(U, T) vs roughPrimeSetBand(U, T) at
      (U = 5, T = 25) (0 rough composites; 5*7 = 35 > 25), (U = 5, T = 34) (0 rough composites),
      and (U = 5, T = 35) (35 = 5*7 enters as the first admissible squarefree rough composite).
-   - Explicit sufficient-condition scope for TC-057R Theorem 26 (forward implication to subpower
-     energy proved; equivalence is not asserted without separately proving a shifted-kernel converse).
-   - Compact 5-category dependency table ((a) actual arithmetic theorems, (b) analytic results
-     outside Lean, (c) conditional implications, (d) finite numerical observations, (e) missing
-     TC-to-arithmetic implication), plus certified verification of Agarwal-Garg-Maji (2022,
-     Theorem 1.2 at k = 3, u = X^2 recovering Q_mu) and K-independence of normalized trivial-zero
-     slopes a_K Z'_{a_K}(-2*m*a_K) = zeta'(-2*m).
-2. Un-Young-Expanded Combined Target & Direct Cross-Term Evaluation (Section 3, Lean Theorem 29):
-   - Retains T(Y) = ceil(Y^{5/4}) fixed across [Y, tau*Y], P_Y(X) = Sigma_pp(X; T)/log X,
-     R_Y(X) = Q_T^{[1]}(X)/log X, Q_T = P_Y + R_Y, ||P_Y||_Y^2 = D_tilde(Y) + X_tilde(Y), and
+   - Exact finite r^{-1} square-dilation identity Q_{lambda,T}(X) = sum_{r^2 <= T} r^{-1} Q_{mu,floor(T/r^2)}(X/r^2)
+     (Lean Theorem 31(1), checked across T in {0, 1, 2, 15, 40, 100}) with T -> infty passage justified
+     by absolute convergence sum_{r,n >= 1} phi_{r^2 n}(X) = zeta(6)*zeta(3)*X^{5/2} < infty, plus
+     elementary uniform norm comparison ||Q_{a,infty} - Q_{a,T(Y)}||_Y <= B_tau := tau^{5/2}*sqrt(log tau)/2
+     and bilateral O_eps(Y^eps) transfer (Lean Theorem 31(5)), replacing the retired exponential-tail claim.
+   - Compact 5-category dependency table and K-independence of normalized trivial-zero slopes.
+2. Un-Young-Expanded Combined Target, Direct <P_Y, R_Y>_Y Evaluation, & Repaired 4-Row Closure
+   Implication Table (Section 3, Lean Theorems 26, 29, & 31(2)-(4)):
+   - Retains P_Y, R_Y, Q_T = P_Y + R_Y, ||P_Y||_Y^2 = D_tilde(Y) + X_tilde(Y), and
      E(Y) = D_tilde(Y) + S_comb(Y) with S_comb(Y) := X_tilde(Y) + 2*<P_Y, R_Y>_Y + ||R_Y||_Y^2.
    - Evaluates <P_Y, R_Y>_Y directly across Y in {8, 16, 32, 64, 128} via certified 256-bit Arb
-     quadrature and (at Y in {8, 16}) via the finite prime-power fiber sum, strictly separated
-     from subtraction-based consistency checks.
-   - Proves and formalizes (`CONDITIONAL_ON_COMBINED_CORRELATION`, Lean Theorem 29) the relaxed
-     sufficient condition S_comb(Y) <= A_eta*Y^eta + theta_eta*F(Y) across the full range
-     0 <= theta_eta < 1 with contraction theta_eta + Theta_eps^{diag}(Y) <= q < 1 (removing
-     TC-057R's outer Young factor 2), while preserving TC-057R Theorem 26 as an alternative.
+     quadrature and (at Y in {8, 16}) via the finite prime-power fiber sum.
+   - Reconciles all four conditional closure targets via normalized finite-horizon absorption
+     G_eps(R) = sup_{1 <= Z <= R} E(Z)/Z^eps:
+     (i) TC-057R X_tilde + ||R_Y||_Y^2 (0 <= theta < 1/2, contraction 2*theta + 2*Theta_eps^{diag}),
+     (ii) TC-058 S_comb (0 <= theta < 1, contraction theta + Theta_eps^{diag}),
+     (iii) second-order T_2 (0 <= theta < 1, E = 4*D_tilde + T_2, contraction theta + 4*Theta_eps^{diag}),
+     (iv) growing-order FULL joint Gram J_M = D_M + X_M (0 <= theta < 1, contraction (1+delta)*theta
+          with delta = (1-theta)/2, valid at theta = 0), plus the abstract inference countermodel
+          E = D = Y/(log Y)^2, X = r = 0 showing X_M alone does not close the gate without a new
+          cross-scale contraction theorem for D_M.
 3. Primary Proof Attempt — Compensated Selberg Reconstruction, Exact Summation by Parts, &
    Logarithmic-Shift Elimination (Section 4, Lean Theorems 27 & 28):
-   - Proves on actual integers (including T = 0, 1): sum_{d=1}^T g_d(X) = Q_{square,T}(X) and
-     sum_{d=2}^T w_{2,lambda}(d)*g_d(X) = c_lambda*Q_{square,T}(X) + sum_{d=1}^T r_2(d)*g_d(X)
-     (retaining r_2(1) = -c_lambda), with uniform bound 0 <= Q_{square,T}(X) <= C_sq :=
-     Gamma(5/4)/4 + 2*(3/(2*e))^{3/2} for X >= 1 and window energy O((log Y)^{-4}).
-   - Proves the dyadic parity divisor contrast (1 * a_2)(2^v * m) = 1_{v even} * d_div(m) (m odd).
-   - Writes exact finite summation by parts keeping smooth kernel steps and floor(T/d) jumps,
-     splitting W_2(d) = c_lambda*d + R_2^{int}(d) (on integer cutoffs d) only after the exact Abel
-     identity: proves exact collapse of c_lambda*d onto c_lambda*Q_{square,T}(X), unconditional
-     O((log Y)^{-4}) upper-endpoint decay, and unconditional O((log Y)^{-2}) aggregate cutoff-jump
-     decay via (d+1)*(L_{d+1}+1) >= T + 1 and sum_{d=1}^{T-1} d*(L_d - L_{d+1}) <= T*log T.
-   - Combines with Q_T = P_Y + R_Y before taking absolute values to obtain the exact shift
-     elimination P_Y(X) - R_Y(X) = D_{2,Y}(X), eliminating the (log Y)^{-2} first-order shift into
-     E(Y) = 4*D_tilde(Y) + 4*X_tilde(Y) - 4*<P_Y, D_{2,Y}>_Y + ||D_{2,Y}||_Y^2 and isolating the
-     exact surviving O(Y*(log Y)^{-4}) terms alongside 4*X_tilde(Y).
+   - Proves sum_{d=1}^T g_d(X) = Q_{square,T}(X) and compensated Selberg split across all T >= 0,
+     0 <= Q_{square,T}(X) <= C_sq := Gamma(5/4)/4 + 2*(3/(2*e))^{3/2} for X >= 1, and dyadic parity
+     contrast (1 * a_2)(2^v m) = 1_{v even} d_div(m).
+   - Proves O((log Y)^{-4}) upper-endpoint window energy via L_T = 1, g_T = phi_T, |R_2^{int}(T)| <= C_W*T
+     (citing TC-057R Selberg/PNT asymptotic), and X^{5/2}/T(Y)^2 <= tau^{5/2}; proves O((log Y)^{-2})
+     aggregate floor(T/d) jump energy; proves finite-cutoff smooth-step bound
+     |Delta_d^{sm}(X)| <= C_sm*sqrt(X)/(d*(d+1)) < C_sm*sqrt(X)/d^2 giving O(Y*(log Y)^{-4}) normalized
+     window energy because small d >= 1 prevent replacing exp(-c*sqrt(log d)) by a saving in Y; and
+     isolates E(Y) = 4*D_tilde(Y) + T_2(Y).
 4. Second Proof Attempt — Growing Logarithmic Order M(Y) = ceil(2*log Y) & Joint Layer Energy
    (Section 5, Lean Theorem 30):
-   - Proves uniformly for all bounded controls |a(n)| <= 1, L >= 1, and Y >= 2:
-     ||Q_{a,L}^{[M(Y)]} / (log X)^{M(Y)}||_Y^2 <= C_rem * (log Y) * Y^{-3}, bounding ALL THREE parts
-     of A_m via explicit Robbins-Stirling m! <= sqrt(tau*m)*(m/e)^m*exp(1/(12*m)) and exact ceiling
-     cancellation on Y >= e^9 (C_{rem,>=e^9} < 38) plus exact 17-interval derivative monotonicity on
-     the compact range Y in [2, e^9] (C_{rem,[2,e^9]} < 2068), recorded honestly as generic in |a| <= 1.
-   - Derives the closed-form geometric polynomial filter K_M(X; n) = [1 - (log(X/n)/log X)^M] / log n,
-     the exact joint M(Y)-layer Gram decomposition ||L_{a,M}||_Y^2 = D_tilde_{a,pp}^{(M)}(Y) + X_tilde_{a,pp}^{(M)}(Y),
-     and the unconditional joint diagonal bound D_tilde_{a,pp}^{(M(Y))}(Y) = O(Y / (log Y)^2) via
-     0 < P_M(s) <= 4 on s in [1/4, 3/2], quantifying both the Minkowski layer-sum blowup cost and
-     the concentration of growing-control Theta(Y) energy into X_tilde_{a,pp}^{(M(Y))}(Y).
+   - Proves generic terminal-remainder bound ||Q_{a,L}^{[M(Y)]}/(log X)^{M(Y)}||_Y^2 <= 2068*(log Y)*Y^{-3}
+     for all |a(n)| <= 1, L >= 1, Y >= 2, and joint diagonal majorant D_M(Y) = O(Y/(log Y)^2),
+     distinguishing arbitrary |a| <= 1 bounds from multiplicative a(1)=1 prime-power reconstruction,
+     recording live certified Y = 64 off-diagonal shares (~94.86%, ~85.03%, ~96.33%) with asymptotic
+     rate 1 - O((log Y)^{-2}) for E_a(Y) asymp Y, and separating norm vs squared-norm nonmonotone
+     finite strict triangle excess on Y in {8, 16, 32, 64}.
 5. TC Compatibility Discriminators (Section 6):
-   - Pre-stated (Objects, Quantifiers, Hypotheses, Input, Conclusion, TC Classification) schemas,
-     window-base test [Y, b*Y] for b in {2, e, tau} (keeping tau in circle/Fourier/Stirling), and
-     arithmetic control tests across lambda, a_2, a_{3,5,7}, and 1, classifying the proved estimates
-     honestly as TC-inspired analytic number theory while SUBGATE-TC-043A remains OPEN.
+   - Pre-stated schemas, [Y, b*Y] window-base test for b in {2, e, tau}, and arithmetic control tests,
+     keeping SUBGATE-TC-043A OPEN and rh_proved False.
 """
 
 from __future__ import annotations
@@ -135,8 +132,11 @@ from tc.prime_chain_contraction import (
 )
 
 TASK_TC_058_ID = "TASK-TC-058"
+TASK_TC_058R_ID = "TASK-TC-058R"
 TC_057R_IMPLEMENTATION_COMMIT = "484f69fc60e8b077b9586fd347003e72f4a4e930"
 TC_057R_REVIEWED_TIP = "c944b71355d68c4b22b66954af5f620255ba5b14"
+TC_058_IMPLEMENTATION_COMMIT = "d356b386cca8101ad8535d8bc881892f815e92f6"
+TC_058_REVIEWED_TIP = "44a062dadc6a67ad51fcc41fe1f41bd4138007d1"
 
 SIMULTANEOUS_COMPATIBILITY_COMBINED_ENERGY_ARTIFACT_PATH = (
     REPO_ROOT / "data" / "tc_simultaneous_compatibility_combined_energy.json"
@@ -150,6 +150,7 @@ EXPECTED_TC058_THEOREMS = [
     "compensated_selberg_summation_by_parts_and_shift_elimination_tc058",
     "combined_target_exact_quadratic_and_conditional_absorption_tc058",
     "growing_order_joint_polynomial_filter_and_gram_decomposition_tc058",
+    "growing_order_and_second_order_conditional_absorption_and_finite_square_bridge_tc058r",
 ]
 
 
@@ -259,6 +260,143 @@ def evaluate_scaled_fiber_g_arb(
         flint_ctx.prec = saved
 
 
+def evaluate_B_tau_cutoff_norm_bound_arb(prec_bits: int = 256) -> arb:
+    """Certified uniform cutoff norm-difference bound B_tau = tau^{5/2} * sqrt(log tau) / 2."""
+    saved = flint_ctx.prec
+    try:
+        flint_ctx.prec = prec_bits
+        tau = _tau_arb()
+        return (tau ** (arb(5) / arb(2))) * (tau.log().sqrt()) / arb(2)
+    finally:
+        flint_ctx.prec = saved
+
+
+def evaluate_C_smooth_step_arb(prec_bits: int = 256) -> arb:
+    """Certified unimodal derivative constant C_sm = 5/2 + 4*(5/(2*e))^{5/2} + 6*(3/(2*e))^{3/2}
+    bounding |Delta_d^{sm}(X)| <= C_sm * sqrt(X) / (d*(d+1)) < C_sm * sqrt(X) / d^2.
+    """
+    saved = flint_ctx.prec
+    try:
+        flint_ctx.prec = prec_bits
+        e_val = arb(1).exp()
+        return (
+            arb(5) / arb(2)
+            + arb(4) * ((arb(5) / (arb(2) * e_val)) ** (arb(5) / arb(2)))
+            + arb(6) * ((arb(3) / (arb(2) * e_val)) ** (arb(3) / arb(2)))
+        )
+    finally:
+        flint_ctx.prec = saved
+
+
+def evaluate_finite_square_dilation_Q_mu_rhs_arb(
+    X: arb,
+    T: int,
+    prec_bits: int = 256,
+) -> arb:
+    """Certified finite square-dilation sum sum_{1 <= r^2 <= T} r^{-1} Q_{mu, floor(T/r^2)}(X / r^2)."""
+    if not isinstance(T, int) or isinstance(T, bool) or T < 0:
+        raise ValueError(f"T must be integer >= 0, got {T!r}")
+    saved = flint_ctx.prec
+    try:
+        flint_ctx.prec = prec_bits
+        if T == 0 or bool(X == arb(0)):
+            return arb(0)
+        tot = arb(0)
+        r = 1
+        while r * r <= T:
+            L_inner = T // (r * r)
+            x_scaled = X / arb(r * r)
+            q_mu_inner = arb(0)
+            for n in range(1, L_inner + 1):
+                mu_n = moebius_mu_int(n)
+                if mu_n != 0:
+                    q_mu_inner += arb(mu_n) * evaluate_phi_n_arb(
+                        x_scaled, n, prec_bits=prec_bits
+                    )
+            tot += q_mu_inner / arb(r)
+            r += 1
+        return tot
+    finally:
+        flint_ctx.prec = saved
+
+
+def evaluate_window_tail_norm_and_full_energy_enclosure_arb(
+    Y: int,
+    mode: str = "liouville",
+    N_trunc: int = 1200,
+    prec_bits: int = 256,
+) -> Dict[str, arb]:
+    """Certified 256-bit Arb enclosures for E_{a,T(Y)}(Y), E_{a,infty}(Y), and ||Q_{a,infty} - Q_{a,T(Y)}||_Y.
+
+    Splits Q_{a,infty} = Q_{a,N_trunc} + R_{>N_trunc} with N_trunc > T(Y), integrating Q_{a,N_trunc}
+    and Q_{a,N_trunc} - Q_{a,T(Y)} by certified acb quadrature on [Y, tau*Y] and enclosing R_{>N_trunc}
+    by the rigorous analytic bound ||R_{>N_trunc}||_Y <= B_N := (tau*Y)^{5/2}*sqrt(log tau) / (2*N_trunc^2).
+    """
+    saved = flint_ctx.prec
+    try:
+        flint_ctx.prec = prec_bits
+        tau = _tau_arb()
+        y_arb = arb(Y)
+        T_Y = exact_T_cutoff_ceil_Y_5_4(Y)
+        if N_trunc <= T_Y:
+            raise ValueError(f"N_trunc={N_trunc} must exceed T(Y)={T_Y}")
+        w_fn = _weight_fn_for_mode(mode)
+        w_vals = [0] + [w_fn(n) for n in range(1, N_trunc + 1)]
+
+        E_T = evaluate_E_L_scale_arb(Y, L=T_Y, m_shift=0, mode=mode, prec_bits=prec_bits)
+        E_N = evaluate_E_L_scale_arb(Y, L=N_trunc, m_shift=0, mode=mode, prec_bits=prec_bits)
+
+        def _diff_sq_int(
+            z: acb,
+            _analytic: bool,
+            _T: int = T_Y,
+            _N: int = N_trunc,
+            _wv: Sequence[int] = tuple(w_vals),
+        ) -> acb:
+            z2 = z * z
+            acc = acb(0)
+            for n in range(_T + 1, _N + 1):
+                wn = _wv[n]
+                if wn != 0:
+                    nc = acb(n)
+                    acc += acb(wn) * (nc ** (-3)) * (-z2 / (nc * nc)).exp()
+            return (z ** 4) * (acc * acc)
+
+        diff_TN_sq = _acb_integral_certified_arb(
+            _diff_sq_int, y_arb, tau * y_arb, prec_bits=prec_bits
+        )
+        norm_diff_TN = diff_TN_sq.sqrt()
+        B_N = ((tau * y_arb) ** (arb(5) / arb(2))) * (tau.log().sqrt()) / (
+            arb(2) * (arb(N_trunc) ** 2)
+        )
+        norm_N = E_N.sqrt()
+
+        norm_diff_lo = norm_diff_TN - B_N
+        if bool(norm_diff_lo < arb(0)):
+            norm_diff_lo = arb(0)
+        norm_diff_hi = norm_diff_TN + B_N
+        norm_diff_enclosure = arb.union(norm_diff_lo, norm_diff_hi)
+
+        norm_inf_lo = norm_N - B_N
+        if bool(norm_inf_lo < arb(0)):
+            norm_inf_lo = arb(0)
+        norm_inf_hi = norm_N + B_N
+        norm_inf_enclosure = arb.union(norm_inf_lo, norm_inf_hi)
+        E_inf_enclosure = norm_inf_enclosure * norm_inf_enclosure
+
+        return {
+            "E_T": E_T,
+            "E_N_trunc": E_N,
+            "E_inf_enclosure": E_inf_enclosure,
+            "norm_T": E_T.sqrt(),
+            "norm_inf_enclosure": norm_inf_enclosure,
+            "norm_diff_T_to_inf_enclosure": norm_diff_enclosure,
+            "tail_trunc_bound_B_N": B_N,
+        }
+    finally:
+        flint_ctx.prec = saved
+
+
 # ---------------------------------------------------------------------------
 # 2. Sections 1 & 2: Narrow TC-057R Repairs & 5-Category Dependency Audit
 # ---------------------------------------------------------------------------
@@ -297,7 +435,10 @@ def verify_section_1_and_2_narrow_repairs_and_dependency_table(
 
         # 2a. Agarwal-Garg-Maji (arXiv:2202.00637, Theorem 1.2 at k = 3, u = X^2):
         # P_3(u) := sum_{n=1}^infty (mu(n) / n^3) * exp(-u / n^2), so X^{5/2} * P_3(X^2) = Q_mu(X),
-        # and finite square-divisor inversion sum_{1 <= d^2 <= T} d^{-1} Q_{mu, floor(T/d^2)}(X / d^2) = Q_{lambda, T}(X).
+        # and exact finite r^{-1} square-dilation bridge (Lean Theorem 31(1)):
+        #   Q_{lambda, T}(X) = sum_{1 <= r^2 <= T} r^{-1} Q_{mu, floor(T/r^2)}(X / r^2)
+        # across T >= 0, X >= 0 (because phi_{r^2 n}(X) = r^{-1} phi_n(X / r^2)), with passage T -> infty
+        # justified by absolute convergence sum_{r,n >= 1} phi_{r^2 n}(X) <= zeta(6) * zeta(3) * X^{5/2} < infty.
         X_agm = arb(7)
         T_agm = 40
         p3_trunc = arb(0)
@@ -313,29 +454,103 @@ def verify_section_1_and_2_narrow_repairs_and_dependency_table(
                 q_mu_trunc += arb(mu_n) * evaluate_phi_n_arb(X_agm, n, prec_bits=prec_bits)
         agm_res = (X_agm ** (arb(5) / arb(2))) * p3_trunc - q_mu_trunc
 
-        sq_bridge_lhs = arb(0)
-        d_sq = 1
-        while d_sq * d_sq <= T_agm:
-            L_inner = T_agm // (d_sq * d_sq)
-            q_mu_inner = arb(0)
-            for r in range(1, L_inner + 1):
-                mu_r = moebius_mu_int(r)
-                if mu_r != 0:
-                    q_mu_inner += arb(mu_r) * evaluate_phi_n_arb(
-                        X_agm / arb(d_sq * d_sq), r, prec_bits=prec_bits
-                    )
-            sq_bridge_lhs += q_mu_inner / arb(d_sq)
-            d_sq += 1
+        sq_bridge_lhs = evaluate_finite_square_dilation_Q_mu_rhs_arb(
+            X_agm, T_agm, prec_bits=prec_bits
+        )
         q_lam_agm = evaluate_Q_shifted_finite_arb(
             X_agm, L=T_agm, m_shift=0, mode="liouville", prec_bits=prec_bits
         )
         sq_bridge_res = sq_bridge_lhs - q_lam_agm
+
+        finite_sq_bridge_grid_rows: List[Dict[str, Any]] = []
+        sq_grid_ok = True
+        for T_sq in (0, 1, 2, 15, 40, 100):
+            for X_sq_int in (0, 1, 7, 13):
+                X_sq = arb(X_sq_int)
+                rhs_val = evaluate_finite_square_dilation_Q_mu_rhs_arb(
+                    X_sq, T_sq, prec_bits=prec_bits
+                )
+                lhs_val = (
+                    arb(0)
+                    if (T_sq == 0 or X_sq_int == 0)
+                    else evaluate_Q_shifted_finite_arb(
+                        X_sq, L=T_sq, m_shift=0, mode="liouville", prec_bits=prec_bits
+                    )
+                )
+                res_val = rhs_val - lhs_val
+                cell_ok = bool(arb(0) in res_val and abs(res_val) < arb("1e-65"))
+                sq_grid_ok = sq_grid_ok and cell_ok
+                if X_sq_int == 7 or T_sq in (0, 1, 100):
+                    finite_sq_bridge_grid_rows.append(
+                        {
+                            "T": T_sq,
+                            "X": X_sq_int,
+                            "Q_lambda_T": serialize_arb_certified(lhs_val),
+                            "finite_r_inv_square_dilation_rhs": serialize_arb_certified(rhs_val),
+                            "residual": serialize_arb_certified(res_val),
+                            "verified": cell_ok,
+                        }
+                    )
+
+        zeta_6_times_zeta_3 = acb(6).zeta().real * acb(3).zeta().real
         agm_ok = bool(
             arb(0) in agm_res
             and abs(agm_res) < arb("1e-68")
             and arb(0) in sq_bridge_res
             and abs(sq_bridge_res) < arb("1e-68")
+            and sq_grid_ok
+            and zeta_6_times_zeta_3 > arb(1)
         )
+
+        # 2a-bis. Finite/full cutoff comparison (TASK-TC-058R §4B):
+        # For EVERY |a(n)| <= 1 and Y >= 1, on X in [Y, tau*Y]:
+        #   |Q_{a,infty}(X) - Q_{a,T(Y)}(X)| <= X^{5/2} sum_{n > T(Y)} n^{-3} <= X^{5/2}/(2*T(Y)^2) <= tau^{5/2}/2,
+        # hence ||Q_{a,infty} - Q_{a,T(Y)}||_Y <= B_tau := tau^{5/2}*sqrt(log tau)/2,
+        # |sqrt(E_T) - sqrt(E_infty)| <= B_tau, and |E_T - E_infty| <= 2*B_tau*sqrt(E_infty) + B_tau^2,
+        # giving bilateral O_eps(Y^eps) transfer without any unsupported exponential cutoff error claim.
+        B_tau = evaluate_B_tau_cutoff_norm_bound_arb(prec_bits=prec_bits)
+        pointwise_tail_cap = (tau ** (arb(5) / arb(2))) / arb(2)
+        cutoff_comparison_rows: List[Dict[str, Any]] = []
+        cutoff_comp_ok = True
+        for Y_cf in (4, 8, 16):
+            for mode_cf in ("liouville", "unsigned_1"):
+                enc = evaluate_window_tail_norm_and_full_energy_enclosure_arb(
+                    Y_cf, mode=mode_cf, N_trunc=1200, prec_bits=prec_bits
+                )
+                norm_diff = enc["norm_diff_T_to_inf_enclosure"]
+                sqrt_diff = abs(enc["norm_T"] - enc["norm_inf_enclosure"])
+                E_diff_abs = abs(enc["E_T"] - enc["E_inf_enclosure"])
+                quad_transfer_rhs = (
+                    arb(2) * B_tau * enc["norm_inf_enclosure"] + (B_tau * B_tau)
+                )
+                row_cf_ok = bool(
+                    B_tau - norm_diff > arb(0)
+                    and B_tau - sqrt_diff > arb(0)
+                    and quad_transfer_rhs - E_diff_abs > arb(0)
+                )
+                if mode_cf == "unsigned_1":
+                    # Diagnostic: for unsigned a = 1, ||Q_{1,infty} - Q_{1,T(Y)}||_Y is O(1) and bounded away from 0,
+                    # diagnosing why generic |a| <= 1 arguments cannot yield exponential cutoff error (without
+                    # disproving a stronger statement specific to lambda).
+                    exp_ref = arb(Y_cf) * (-arb(2) * arb(Y_cf).sqrt() / (tau * tau)).exp()
+                    row_cf_ok = bool(row_cf_ok and norm_diff > arb(1) and E_diff_abs > exp_ref)
+                cutoff_comp_ok = cutoff_comp_ok and row_cf_ok
+                cutoff_comparison_rows.append(
+                    {
+                        "Y": Y_cf,
+                        "T_Y": exact_T_cutoff_ceil_Y_5_4(Y_cf),
+                        "mode": mode_cf,
+                        "E_T": serialize_arb_certified(enc["E_T"]),
+                        "E_inf_enclosure": serialize_arb_certified(enc["E_inf_enclosure"]),
+                        "norm_diff_T_to_inf_enclosure": serialize_arb_certified(norm_diff),
+                        "B_tau_minus_norm_diff_margin": serialize_arb_certified(B_tau - norm_diff),
+                        "abs_E_T_minus_E_inf_enclosure": serialize_arb_certified(E_diff_abs),
+                        "quad_transfer_2Btau_sqrtEinf_add_Btau2_margin": serialize_arb_certified(
+                            quad_transfer_rhs - E_diff_abs
+                        ),
+                        "verified": row_cf_ok,
+                    }
+                )
 
         # 2b. Normalized trivial-zero slopes: for Z_{a_K}(w) := zeta(w / a_K) with trivial zeros at w = -2*m*a_K
         # (a_K = tau^K), a_K * Z'_{a_K}(-2*m*a_K) = zeta'(-2*m), independent of K.
@@ -377,28 +592,30 @@ def verify_section_1_and_2_narrow_repairs_and_dependency_table(
                 "Complete multiplicativity of liouvilleLambda(n) = (-1)^{Omega(n)}, common-factor cancellation, flat square-divisor Moebius/Liouville inversions, finite prime-exclusion sieve, and P-smooth/coprime finite cutoff bijection (Lean Theorems 3-4, 9-10, 13-16).",
                 "Finite prime-adjoining filtration, unimodal alternating Gaussian prime-chain contraction, and P-independent contraction C_{P,p} = D_T - V_{p} (Lean Theorems 17-20).",
                 "General Moebius-rough descent across U >= 2 (with composite rough divisors entering when an admissible composite exists, e.g. 35 at U=5, T=35 vs none at U=5, T=25), logarithmic prime-power descent & M-step shift telescope, pointwise quadratic prime-power diagonal/off-diagonal decomposition, and inherited-vs-canonical cutoff comparison with (Y=9/4, d=2) counterexample and small-scale positivity (Lean Theorems 22-25).",
-                "NEW in TC-058: All-prime square-divisor indicator (1 * lambda)(n) = 1_{IsSquare n} vs dyadic parity (1 * a_2)(2^v m) = 1_{Even v} d_div(m), actual Selberg Liouville second-order weight w_{2,lambda} = Lambda_lambda*log + Lambda_lambda*Lambda_lambda (Lambda_lambda = -Lambda + 2*B) & finite square projection sum_{d=1}^T g_d = Q_{square,T} (including T = 0, 1), exact summation by parts keeping floor(T/d) jumps with post-Abel c_lambda collapse & jump-count telescope, exact shift elimination P_Y - R_Y = D_{2,Y}, pointwise combined quadratic forms, and growing-order M-layer polynomial filter 0 < P_M(s) <= 4 on [1/4, 3/2] & joint Gram decomposition (Lean Theorems 27-30).",
+                "TC-058 / TC-058R: All-prime square-divisor indicator (1 * lambda)(n) = 1_{IsSquare n} vs dyadic parity (1 * a_2)(2^v m) = 1_{Even v} d_div(m), actual Selberg Liouville second-order weight w_{2,lambda} = Lambda_lambda*log + Lambda_lambda*Lambda_lambda (Lambda_lambda = -Lambda + 2*B) & finite square projection sum_{d=1}^T g_d = Q_{square,T} (including T = 0, 1), exact summation by parts keeping floor(T/d) jumps with post-Abel c_lambda collapse & jump-count telescope, exact shift elimination P_Y - R_Y = D_{2,Y}, pointwise combined quadratic forms, growing-order M-layer polynomial filter 0 < P_M(s) <= 4 on [1/4, 3/2] & joint Gram decomposition, and exact finite r^{-1} square-dilation bridge Q_{lambda,T}(X) = sum_{r^2<=T} r^{-1} Q_{mu,floor(T/r^2)}(X/r^2) for all T >= 0, X >= 0 (Lean Theorems 27-31).",
             ],
             "b_analytic_results_proved_outside_lean": [
-                "Riesz-Gaussian equivalence context: Q_mu(X) = X^{5/2} P_3(X^2) belongs to the published Riesz-type family (Agarwal-Garg-Maji 2022, arXiv:2202.00637, Theorem 1.2 at k = 3, u = X^2), transferred between Q_mu and Q_lambda on weighted L^2((0, infty), X^{-2*eta} dX/X) by reversible square-divisor norm bounds.",
-                "Unconditional Route D cross-scale prime-power diagonal contraction D_tilde_{lambda,pp}(Y) <= (2/(log Y)^2) sum_{p^k<=Y} ((log p)^2/p^k) F(Y/p^k) + C_{cut,diag} with contraction factor Theta_eps^{diag}(Y) < 2*zeta''(1+eps)/(log Y)^2 -> 0, plus scoped majorant obstructions for Route A/B Cauchy-Schwarz and Route C uncompensated Abel majorants.",
-                "NEW in TC-058 (§4): Uniform unimodal bound 0 <= Q_{square,T}(X) <= C_sq := Gamma(5/4)/4 + 2*(3/(2*e))^{3/2} for X >= 1 giving ||c_lambda Q_{square,T}/(log X)^2||_Y^2 = O((log Y)^{-4}), O((log Y)^{-4}) upper-endpoint decay, and unconditional O((log Y)^{-2}) window-energy decay of the entire floor(T/d) cutoff-jump sum via (d+1)(L_{d+1}+1) >= T + 1 and sum_{d=1}^{T-1} d(L_d - L_{d+1}) <= T*log T.",
-                "NEW in TC-058 (§5): Uniform generic terminal remainder bound ||Q_{a,L}^{[M(Y)]}/(log X)^{M(Y)}||_Y^2 <= 2068*(log Y)*Y^{-3} for all |a(n)| <= 1, L >= 1, Y >= 2 (M(Y) = ceil(2*log Y), bounding all three parts of A_m via explicit Robbins-Stirling + 17-interval compact monotonicity), and unconditional joint M(Y)-layer prime-power diagonal bound D_tilde_{a,pp}^{(M(Y))}(Y) = O(Y/(log Y)^2) uniformly for |a(n)| <= 1.",
+                "Riesz-Gaussian & finite/full cutoff bridges: Q_mu(X) = X^{5/2} P_3(X^2) belongs to the published Riesz-type family (Agarwal-Garg-Maji 2022, arXiv:2202.00637, Theorem 1.2 at k = 3, u = X^2); Q_lambda(X) = sum_{r>=1} r^{-1} Q_mu(X/r^2) follows from Lean Theorem 31(1) via absolute convergence sum_{r,n>=1} phi_{r^2 n}(X) = zeta(6)*zeta(3)*X^{5/2} < infty; and for all |a(n)| <= 1, Y >= 1, ||Q_{a,infty} - Q_{a,T(Y)}||_Y <= B_tau := tau^{5/2}*sqrt(log tau)/2 gives |E_T - E_infty| <= 2*B_tau*sqrt(E_infty) + B_tau^2 and bilateral O_eps(Y^eps) transfer (Lean Theorem 31(5)).",
+                "Unconditional Route D cross-scale prime-power diagonal contraction D_tilde_{lambda,pp}(Y) <= (2/(log Y)^2) sum_{p^k<=Y} ((log p)^2/p^k) F(Y/p^k) + C_{cut,diag} with normalized finite-horizon absorption D_tilde(Y)/Y^eps <= Theta_eps^{diag}(Y)*G_eps(R) + C_{cut,diag}/Y^eps (Theta_eps^{diag}(Y) <= 2*zeta''(1+eps)/(log Y)^2 -> 0, G_eps(R) = sup_{1<=Z<=R} E(Z)/Z^eps), plus scoped majorant obstructions for Route A/B Cauchy-Schwarz and Route C uncompensated Abel majorants.",
+                "TC-058 / TC-058R (§4): Uniform unimodal bound 0 <= Q_{square,T}(X) <= C_sq := Gamma(5/4)/4 + 2*(3/(2*e))^{3/2} for X >= 1 giving ||c_lambda Q_{square,T}/(log X)^2||_Y^2 = O((log Y)^{-4}); O((log Y)^{-4}) upper-endpoint window energy via L_T = 1, g_T = phi_T, |R_2^{int}(T)| <= C_W*T (from TC-057R Selberg/PNT asymptotic), and X^{5/2}/T(Y)^2 <= tau^{5/2}; unconditional O((log Y)^{-2}) aggregate floor(T/d) jump energy via (d+1)(L_{d+1}+1) >= T + 1 and sum_{d=1}^{T-1} d(L_d - L_{d+1}) <= T*log T; and finite-cutoff smooth-step derivative bound |Delta_d^{sm}(X)| <= C_sm*sqrt(X)/(d*(d+1)) < C_sm*sqrt(X)/d^2 (C_sm = 5/2 + 4*(5/(2*e))^{5/2} + 6*(3/(2*e))^{3/2}), yielding O(Y*(log Y)^{-4}) normalized window energy when small d >= 1 are included.",
+                "TC-058 / TC-058R (§5): Uniform generic terminal remainder bound ||Q_{a,L}^{[M(Y)]}/(log X)^{M(Y)}||_Y^2 <= 2068*(log Y)*Y^{-3} for all |a(n)| <= 1, L >= 1, Y >= 2 (M(Y) = ceil(2*log Y), bounding all three parts of A_m via explicit Robbins-Stirling + 17-interval compact monotonicity), and unconditional joint M(Y)-layer prime-power diagonal bound D_M(Y) = O(Y/(log Y)^2) uniformly for |a(n)| <= 1 (while Q_{a,T} = L_{a,M,Y} + r_{a,M,Y} requires multiplicative a with a(1) = 1).",
             ],
             "c_conditional_implications": [
                 "Polylogarithmic scale-envelope bootstrap F(Y) <= A_eta Y^eta + B_eta F(Y/U_eta(Y)) => E(Y) <<_eps Y^eps (`CONDITIONAL_ON_RECURSION`, Lean Theorem 21).",
-                "TC-057R Young-expanded same-scale absorption sufficient condition X_tilde(Y) + ||R_Y||_Y^2 <= A_eta Y^eta + theta_eta F(Y) with 0 <= theta_eta < 1/2 => E(Y) <<_eps Y^eps (`CONDITIONAL_ON_SIGNED_CORRELATION`, Lean Theorem 26; forward implication proved, converse not asserted).",
-                "NEW in TC-058 (§3): Un-Young-expanded combined sufficient condition S_comb(Y) := X_tilde(Y) + 2*<P_Y, R_Y>_Y + ||R_Y||_Y^2 <= A_eta Y^eta + theta_eta F(Y) across the full range 0 <= theta_eta < 1 (with theta_eta + Theta_eps^{diag}(Y) <= q < 1, no outer factor 2) => E(Y) <<_eps Y^eps (`CONDITIONAL_ON_COMBINED_CORRELATION`, Lean Theorem 29; forward implication proved).",
+                "TC-057R Young-expanded target X_tilde(Y) + ||R_Y||_Y^2 <= A_eta Y^eta + theta_eta F(Y) (0 <= theta_eta < 1/2, contraction 2*theta_eta + 2*Theta_eps^{diag}(Y)) => E(Y) <<_eps Y^eps (`CONDITIONAL_ON_SIGNED_CORRELATION`, Lean Theorem 26; forward implication only).",
+                "TC-058 combined target S_comb(Y) := X_tilde(Y) + 2*<P_Y, R_Y>_Y + ||R_Y||_Y^2 <= A_eta Y^eta + theta_eta F(Y) (0 <= theta_eta < 1, contraction theta_eta + Theta_eps^{diag}(Y)) => E(Y) <<_eps Y^eps (`CONDITIONAL_ON_COMBINED_CORRELATION`, Lean Theorem 29; forward implication only).",
+                "TC-058R second-order target T_2(Y) := 4*X_tilde(Y) - 4*<P_Y, D_{2,Y}>_Y + ||D_{2,Y}||_Y^2 <= A_eta Y^eta + theta_eta F(Y) (E = 4*D_tilde + T_2, 0 <= theta_eta < 1, contraction theta_eta + 4*Theta_eps^{diag}(Y)) => E(Y) <<_eps Y^eps (Lean Theorem 31(4); forward implication only).",
+                "TC-058R growing-order FULL joint Gram target J_M(Y) := D_M(Y) + X_M(Y) <= A_eta Y^eta + theta_eta F(Y) (0 <= theta_eta < 1, Young parameter delta = (1 - theta_eta)/2 > 0, contraction q = (1 + delta)*theta_eta < 1 valid including theta_eta = 0) => E(Y) <<_eps Y^eps (Lean Theorem 31(3a); abstract countermodel E = D = Y/(log Y)^2, X = r = 0 in Lean Theorem 31(3b) proves bounding X_M alone is insufficient without a new cross-scale contraction theorem for D_M).",
             ],
             "d_finite_numerical_observations": [
-                "Certified 256-bit Arb window evaluations at Y in {8, 16, 32, 64, 128}: direct cross term <P_Y, R_Y>_Y changes sign (> 0 at Y in {8, 16, 32, 128}, < 0 at Y = 64); S_comb(Y) alternates sign (< 0 at Y in {8, 32, 128}, > 0 at Y in {16, 64}); parity controls a_2, a_{3,5,7}, and unsigned 1 concentrate >= 94% of their sampled Y = 64 joint M(Y)-layer energy in the off-diagonal X_tilde_{a,pp}^{(M(Y))}(64) (strictly finite sampled data, never extrapolated to asymptotic claims).",
+                "Certified 256-bit Arb window evaluations at Y in {8, 16, 32, 64, 128}: direct cross term <P_Y, R_Y>_Y changes sign (> 0 at Y in {8, 16, 32, 128}, < 0 at Y = 64); S_comb(Y) alternates sign (< 0 at Y in {8, 32, 128}, > 0 at Y in {16, 64}); at Y = 64, live certified off-diagonal shares 100 * X_{a,M}(64) / J_{a,M}(64) are ~94.86% (a_2), ~85.03% (a_{3,5,7}), and ~96.33% (unsigned 1), consistent with asymptotic off-diagonal fraction 1 - O((log Y)^{-2}) when E_a(Y) asymp Y; sampled Liouville layer-sum norm and squared-norm ratios exhibit nonmonotone strict finite triangle excess on Y in {8, 16, 32, 64}.",
             ],
             "e_missing_tc_to_arithmetic_implication": [
-                "Open SUBGATE-TC-043A arithmetic estimate: an unconditional subpower or contractive bound S_comb(Y) <= A_eta Y^eta + theta_eta F(Y) (0 <= theta_eta < 1), equivalently subpower cancellation in 4*X_tilde_{lambda,pp}(Y) - 4*<P_Y, D_{2,Y}>_Y + ||D_{2,Y}||_Y^2 (§4) or in the joint M(Y)-layer distinct-prime-power off-diagonal X_tilde_{lambda,pp}^{(M(Y))}(Y) (§5). Varying K in normalized trivial-zero slopes yields no additional moments beyond zeta'(-2m), generic unitary dilation covariance does not bound the arithmetic sum, and all §§3-5 theorems generalize to arbitrary multiplicative window base b > 1 (classified honestly as TC-inspired analytic number theory).",
+                "Open SUBGATE-TC-043A arithmetic target: EITHER derive the fixed-order S_comb(Y) <= A_eta Y^eta + theta_eta F(Y) bound (0 <= theta_eta < 1, or T_2(Y) with 4*Theta_eps^{diag}) using the established fixed-order diagonal bootstrap, OR derive a subpower/contractive bound on the FULL growing-order Gram energy J_M(Y) = D_M(Y) + X_M(Y), OR first prove a new cross-scale contraction theorem for the growing-order diagonal D_M(Y) before using an off-diagonal-only X_M(Y) target. Varying K in normalized trivial-zero slopes yields no additional moments beyond zeta'(-2m), and all proved estimates hold for arbitrary multiplicative window base b > 1 (TC-inspired analytic number theory).",
             ],
         }
 
-        all_ok = bool(repair_1a_ok and agm_ok and slope_ok)
+        all_ok = bool(repair_1a_ok and agm_ok and cutoff_comp_ok and slope_ok)
         return {
             "narrow_tc057r_repairs": {
                 "rough_band_U5_T25_divisors": rough_5_25,
@@ -417,10 +634,32 @@ def verify_section_1_and_2_narrow_repairs_and_dependency_table(
                 "reference": "Agarwal, Garg, and Maji (2022), arXiv:2202.00637, Theorem 1.2 (k = 3, u = X^2)",
                 "X": 7,
                 "T": T_agm,
+                "square_dilation_weight_exponent": -1,
+                "square_dilation_scaling_identity": "phi_{r^2 n}(X) = r^{-1} phi_n(X / r^2)",
+                "infinite_identity_justification": (
+                    "Absolute convergence sum_{r >= 1, n >= 1} |mu(n)| phi_{r^2 n}(X) <= zeta(6)*zeta(3)*X^{5/2} < infty "
+                    "justifies termwise T -> infty limit from Lean Theorem 31(1) finite identity."
+                ),
+                "zeta_6_times_zeta_3": serialize_arb_certified(zeta_6_times_zeta_3),
                 "Q_mu_T": serialize_arb_certified(q_mu_trunc),
                 "riesz_k3_minus_Q_mu_residual": serialize_arb_certified(agm_res),
                 "square_divisor_bridge_minus_Q_lambda_residual": serialize_arb_certified(sq_bridge_res),
+                "finite_square_bridge_grid_rows": finite_sq_bridge_grid_rows,
                 "verified": agm_ok,
+            },
+            "finite_to_full_cutoff_comparison": {
+                "pointwise_tail_cap_tau_5_2_over_2": serialize_arb_certified(pointwise_tail_cap),
+                "B_tau_uniform_window_norm_bound": serialize_arb_certified(B_tau),
+                "formula": "||Q_{a,infty} - Q_{a,T(Y)}||_Y <= B_tau := tau^{5/2}*sqrt(log tau)/2 for all |a(n)| <= 1, Y >= 1",
+                "quadratic_energy_transfer": "|E_T - E_infty| <= 2*B_tau*sqrt(E_infty) + B_tau^2 (bilateral O_eps(Y^eps) transfer in Lean Theorem 31(5))",
+                "unsigned_control_diagnostic_note": (
+                    "For unsigned control a = 1, ||Q_{1,infty} - Q_{1,T(Y)}||_Y is O(1) and bounded away from 0 "
+                    "(since exp(-X^2/n^2) -> 1 for n > T(Y) >> X), diagnosing why generic |a| <= 1 tail bounds "
+                    "yield O(1) norm error rather than exponential decay; this does NOT disprove a stronger "
+                    "cutoff-tail statement specific to lambda."
+                ),
+                "sampled_enclosure_rows": cutoff_comparison_rows,
+                "verified": cutoff_comp_ok,
             },
             "normalized_trivial_zero_slope_k_independence": {
                 "grades_tested": [g[0] for g in grade_specs],
@@ -592,8 +831,10 @@ def verify_section_3_combined_target_and_direct_cross_term(
         )
 
         # Relaxed conditional absorption parameters (theta_eta in [0, 1), e.g. theta_eta = 3/4 >= 1/2):
-        # Theta_eps^{diag}(Y) < 2 * zeta''(1 + eps) / (log Y)^2 <= q - theta_eta
-        # whenever log Y >= sqrt(2 * zeta''(1 + eps) / (q - theta_eta)).
+        # S_comb uses Theta_eps^{diag}(Y) < 2*zeta''(1 + eps)/(log Y)^2 <= q - theta_eta
+        #   whenever log Y >= sqrt(2*zeta''(1 + eps)/(q - theta_eta));
+        # T_2 uses 4*Theta_eps^{diag}(Y) < 8*zeta''(1 + eps)/(log Y)^2 <= q - theta_eta
+        #   whenever log Y >= sqrt(8*zeta''(1 + eps)/(q - theta_eta)) = 2 * min_log_Y_S_comb.
         absorption_rows: List[Dict[str, Any]] = []
         for eps_f, theta_f, q_f in (
             (Fraction(1, 2), Fraction(3, 4), Fraction(7, 8)),
@@ -606,6 +847,7 @@ def verify_section_3_combined_target_and_direct_cross_term(
             z_jet = acb_series([acb(arb(1) + eps_arb), acb(1)], prec=3).zeta()
             zetapp_1_eps = arb(2) * z_jet[2].real
             min_log_Y = (arb(2) * zetapp_1_eps / (q_arb - theta_arb)).sqrt()
+            min_log_Y_T2 = (arb(8) * zetapp_1_eps / (q_arb - theta_arb)).sqrt()
             # Evaluate Theta_eps^{diag}(128) directly and check log(Y) threshold
             theta_diag_128 = arb(0)
             for p, k in prime_power_pairs_up_to(128):
@@ -613,7 +855,13 @@ def verify_section_3_combined_target_and_direct_cross_term(
                 theta_diag_128 += (arb(p).log() ** 2) / (arb(pk) ** (arb(1) + eps_arb))
             theta_diag_128 = arb(2) * theta_diag_128 / (arb(128).log() ** 2)
             ub_128 = arb(2) * zetapp_1_eps / (arb(128).log() ** 2)
-            abs_ok = bool(theta_diag_128 < ub_128 and theta_arb < arb(1) and q_arb < arb(1))
+            abs_ok = bool(
+                theta_diag_128 < ub_128
+                and arb(4) * theta_diag_128 < arb(4) * ub_128
+                and abs(min_log_Y_T2 - arb(2) * min_log_Y) < arb("1e-66")
+                and theta_arb < arb(1)
+                and q_arb < arb(1)
+            )
             all_ok = all_ok and abs_ok
             absorption_rows.append(
                 {
@@ -623,13 +871,130 @@ def verify_section_3_combined_target_and_direct_cross_term(
                     "admissible_in_tc058_un_young_transfer": True,
                     "admissible_in_tc057r_young_transfer": bool(theta_f < Fraction(1, 2)),
                     "two_zetapp_1_plus_eps": serialize_arb_certified(arb(2) * zetapp_1_eps),
-                    "threshold_log_Y_for_q": serialize_arb_certified(min_log_Y),
+                    "threshold_log_Y_for_S_comb_q": serialize_arb_certified(min_log_Y),
+                    "threshold_log_Y_for_T2_4Theta_q": serialize_arb_certified(min_log_Y_T2),
                     "Theta_eps_diag_at_Y128": serialize_arb_certified(theta_diag_128),
+                    "four_Theta_eps_diag_at_Y128": serialize_arb_certified(
+                        arb(4) * theta_diag_128
+                    ),
                     "verified": abs_ok,
                 }
             )
 
-        all_ok = bool(all_ok and sign_change_ok)
+        # Growing-order full-Gram Young schedule delta = (1 - theta_eta)/2 across theta_eta in {0, 1/2, 3/4}
+        growing_young_rows: List[Dict[str, Any]] = []
+        growing_young_ok = True
+        for theta_f in (Fraction(0, 1), Fraction(1, 2), Fraction(3, 4)):
+            delta_f = (Fraction(1, 1) - theta_f) / 2
+            q_grow_f = (Fraction(1, 1) + delta_f) * theta_f
+            one_minus_q_f = Fraction(1, 1) - q_grow_f
+            rem_mult_f = Fraction(1, 1) + Fraction(1, 1) / delta_f
+            row_gy_ok = bool(
+                delta_f > 0
+                and 0 <= q_grow_f < 1
+                and one_minus_q_f == (Fraction(1, 1) - theta_f) * (Fraction(2, 1) - theta_f) / 2
+            )
+            growing_young_ok = growing_young_ok and row_gy_ok
+            growing_young_rows.append(
+                {
+                    "theta_eta": str(theta_f),
+                    "delta_young": str(delta_f),
+                    "q_contraction_1_add_delta_mul_theta": str(q_grow_f),
+                    "one_minus_q": str(one_minus_q_f),
+                    "remainder_multiplier_1_add_inv_delta": str(rem_mult_f),
+                    "verified": row_gy_ok,
+                }
+            )
+
+        # Logical non-implication countermodel check (Lean Theorem 31(3b)):
+        # Abstract nonnegative energies E(Y) = D(Y) = Y/(log Y)^2, X(Y) = r(Y) = 0 (Y >= 2) satisfy
+        # E <= (1+delta)(D+X) + (1+1/delta)r, D = O(Y/(log Y)^2), X <= 0, r <= 2068*(log Y)*Y^{-3},
+        # yet fail E(Y) <= M_c * Y^eps for every 0 < eps < 1 (witness t = 6*(M_c+1)/(1-eps)^2, Y = exp(t/(1-eps))).
+        eps_cm = arb(1) / arb(2)
+        M_cm = arb(10)
+        t_cm = arb(6) * (M_cm + arb(1)) / ((arb(1) - eps_cm) ** 2)
+        Y_cm = (t_cm / (arb(1) - eps_cm)).exp()
+        E_cm = Y_cm / (Y_cm.log() ** 2)
+        rhs_cm = M_cm * (Y_cm ** eps_cm)
+        countermodel_ok = bool(Y_cm >= arb(2) and E_cm - rhs_cm > arb(0))
+
+        closure_criteria_table = [
+            {
+                "route_id": "TC-057R_young_expanded",
+                "target_observable": "X_tilde_{lambda,pp}(Y) + ||R_Y||_Y^2",
+                "exact_decomposition": "E(Y) <= 2*D_tilde_{lambda,pp}(Y) + 2*(X_tilde_{lambda,pp}(Y) + ||R_Y||_Y^2)",
+                "quantified_hypothesis": (
+                    "forall eta > 0, exists A_eta >= 0, 0 <= theta_eta < 1/2, Y_eta >= 2: "
+                    "forall Y >= Y_eta, X_tilde_{lambda,pp}(Y) + ||R_Y||_Y^2 <= A_eta*Y^eta + theta_eta*F(Y)"
+                ),
+                "contraction_coefficient": "2*theta_eta + 2*Theta_eps^{diag}(Y)",
+                "parameter_and_horizon_setup": (
+                    "Given eps > 0, choose 0 < eta < min(eps, 1) and Y_* >= Y_eta large enough that "
+                    "2*theta_eta + 2*Theta_eps^{diag}(Y) <= q < 1 for all Y >= Y_*; compact [1, Y_*] "
+                    "controlled by G_eps(Y_*) <= M_lin*Y_* inside G_eps(R) = sup_{1<=Z<=R} E(Z)/Z^eps."
+                ),
+                "implication_direction": "sufficient_forward_implication_only (converse not asserted)",
+                "lean_theorem": "conditional_signed_correlation_same_scale_absorption_transfer_tc057r (Theorem 26)",
+                "arithmetic_hypothesis_status": "OPEN",
+            },
+            {
+                "route_id": "TC-058_combined_un_young",
+                "target_observable": "S_comb(Y) = X_tilde_{lambda,pp}(Y) + 2*<P_Y, R_Y>_Y + ||R_Y||_Y^2",
+                "exact_decomposition": "E(Y) = D_tilde_{lambda,pp}(Y) + S_comb(Y)",
+                "quantified_hypothesis": (
+                    "forall eta > 0, exists A_eta >= 0, 0 <= theta_eta < 1, Y_eta >= 2: "
+                    "forall Y >= Y_eta, S_comb(Y) <= A_eta*Y^eta + theta_eta*F(Y)"
+                ),
+                "contraction_coefficient": "theta_eta + Theta_eps^{diag}(Y)",
+                "parameter_and_horizon_setup": (
+                    "Given eps > 0, choose 0 < eta < eps and Y_* >= Y_eta with theta_eta + Theta_eps^{diag}(Y) <= q < 1 "
+                    "for all Y >= Y_*; compact [1, Y_*] controlled via G_eps(Y_*) inside G_eps(R)."
+                ),
+                "implication_direction": "sufficient_forward_implication_only (converse not asserted)",
+                "lean_theorem": "combined_target_exact_quadratic_and_conditional_absorption_tc058 (Theorem 29)",
+                "arithmetic_hypothesis_status": "OPEN",
+            },
+            {
+                "route_id": "TC-058R_second_order_compensated",
+                "target_observable": "T_2(Y) = 4*X_tilde_{lambda,pp}(Y) - 4*<P_Y, D_{2,Y}>_Y + ||D_{2,Y}||_Y^2",
+                "exact_decomposition": "E(Y) = 4*D_tilde_{lambda,pp}(Y) + T_2(Y) (with S_comb(Y) = 3*D_tilde_{lambda,pp}(Y) + T_2(Y))",
+                "quantified_hypothesis": (
+                    "forall eta > 0, exists A_eta >= 0, 0 <= theta_eta < 1, Y_eta >= 2: "
+                    "forall Y >= Y_eta, T_2(Y) <= A_eta*Y^eta + theta_eta*F(Y)"
+                ),
+                "contraction_coefficient": "theta_eta + 4*Theta_eps^{diag}(Y)",
+                "parameter_and_horizon_setup": (
+                    "Given eps > 0, choose 0 < eta < eps and Y_* >= Y_eta with theta_eta + 4*Theta_eps^{diag}(Y) <= q < 1 "
+                    "(note exact factor 4 on Theta_eps^{diag}(Y)); compact [1, Y_*] controlled via G_eps(Y_*)."
+                ),
+                "implication_direction": "sufficient_forward_implication_only (converse not asserted)",
+                "lean_theorem": "growing_order_and_second_order_conditional_absorption_and_finite_square_bridge_tc058r (Theorem 31(4))",
+                "arithmetic_hypothesis_status": "OPEN",
+            },
+            {
+                "route_id": "TC-058R_growing_order_full_gram",
+                "target_observable": "J_M(Y) = ||L_{M,Y}||_Y^2 = D_M(Y) + X_M(Y) (M = ceil(2*log Y))",
+                "exact_decomposition": "Q_T = L_{M,Y} + r_{M,Y}, E(Y) <= (1 + delta)*J_M(Y) + (1 + 1/delta)*||r_{M,Y}||_Y^2",
+                "quantified_hypothesis": (
+                    "forall eta > 0, exists A_eta >= 0, 0 <= theta_eta < 1, Y_eta >= 2: "
+                    "forall Y >= Y_eta, J_M(Y) = D_M(Y) + X_M(Y) <= A_eta*Y^eta + theta_eta*F(Y)"
+                ),
+                "contraction_coefficient": "(1 + delta)*theta_eta with delta = (1 - theta_eta)/2 > 0 (valid at theta_eta = 0 where q = 0)",
+                "parameter_and_horizon_setup": (
+                    "Given eps > 0, choose 0 < eta < eps, Y_* = Y_eta >= 2, delta = (1 - theta_eta)/2 > 0 so "
+                    "q = (1 + delta)*theta_eta = theta_eta*(3 - theta_eta)/2 < 1, and ||r_{M,Y}||_Y^2 <= 2068*(log Y)*Y^{-3} <= 2068*Y^{-2}; "
+                    "K_grow = (1+delta)*A_eta*Y_*^{eta-eps} + (1+1/delta)*2068*Y_*^{-(2+eps)}, compact [1, Y_*] via G_eps(Y_*)."
+                ),
+                "implication_direction": (
+                    "sufficient_forward_implication_only; X_M(Y) alone does NOT close the gate from D_M(Y) = O(Y/(log Y)^2) "
+                    "unless a new cross-scale contraction theorem for D_M(Y) is separately proved"
+                ),
+                "lean_theorem": "growing_order_and_second_order_conditional_absorption_and_finite_square_bridge_tc058r (Theorem 31(2)-(3))",
+                "arithmetic_hypothesis_status": "OPEN",
+            },
+        ]
+
+        all_ok = bool(all_ok and sign_change_ok and growing_young_ok and countermodel_ok)
         return {
             "sampled_combined_target_rows": scale_rows,
             "independent_prime_power_fiber_cross_checks": fiber_cross_checks,
@@ -638,10 +1003,29 @@ def verify_section_3_combined_target_and_direct_cross_term(
             "S_comb_positive_scales": pos_S_comb_Y,
             "S_comb_negative_scales": neg_S_comb_Y,
             "relaxed_conditional_absorption_schedule_rows": absorption_rows,
+            "growing_order_young_schedule_rows": growing_young_rows,
+            "closure_criteria_implication_table": closure_criteria_table,
+            "logical_non_implication_countermodel": {
+                "classification": "countermodel_to_inference_not_arithmetic_lambda_counterexample",
+                "model_definition": "E(Y) = D(Y) = Y / (log Y)^2, X(Y) = 0, r(Y) = 0 for Y >= 2",
+                "purpose": (
+                    "Demonstrates logically why D_M(Y) = O(Y/(log Y)^2), ||r_{M,Y}||_Y^2 <= 2068*(log Y)*Y^{-3}, "
+                    "and an off-diagonal-only bound X_M(Y) <= A_eta*Y^eta + theta_eta*F(Y) do NOT by themselves "
+                    "imply E(Y) = O_eps(Y^eps): Y/(log Y)^2 exceeds M_c*Y^eps for every 0 < eps < 1."
+                ),
+                "sample_witness_eps_half_Mc_10": {
+                    "epsilon": "1/2",
+                    "M_c": 10,
+                    "t_param": 264,
+                    "log_Y_witness": 528,
+                    "E_witness_minus_Mc_Y_eps_margin": serialize_arb_certified(E_cm - rhs_cm),
+                    "verified": countermodel_ok,
+                },
+            },
             "identity_vs_estimate_note": (
-                "S_comb(Y) = E(Y) - D_tilde(Y) is an exact algebraic identity, NOT an arithmetic "
-                "cancellation theorem; Theorem 29 proves the conditional forward implication from "
-                "S_comb(Y) <= A_eta*Y^eta + theta_eta*F(Y) (0 <= theta_eta < 1) to E(Y) <<_eps Y^eps."
+                "S_comb(Y) = E(Y) - D_tilde(Y), E(Y) = 4*D_tilde(Y) + T_2(Y), and Q_T = L_{M,Y} + r_{M,Y} "
+                "are exact algebraic identities, NOT arithmetic cancellation theorems; Theorems 26, 29, and 31 "
+                "prove conditional forward implications via normalized finite-horizon absorption G_eps(R)."
             ),
             "all_section_3_checks_pass": all_ok,
         }
@@ -987,14 +1371,137 @@ def verify_section_4_compensated_selberg_and_shift_elimination(
                 }
             )
 
-        all_ok = bool(sq_id_ok and dyadic_conv_ok and abel_all_ok and c_lambda < arb(0))
+        # 4.4 TASK-TC-058R §3A–3C focused boundary & finite-cutoff derivative checks
+        # (analytic proofs hold for all parameters; finite checks below are regression witnesses):
+        # (i) Upper endpoint: at T = T(Y) = ceil(Y^{5/4}), L_T = floor(T/T) = 1, g_T(X) = phi_T(X),
+        #     and X^{5/2} / T(Y)^2 <= tau^{5/2} on X in [Y, tau*Y], hitting exact equality at Y in {1, 16, 81}.
+        endpoint_boundary_rows: List[Dict[str, Any]] = []
+        endpoint_checks_ok = True
+        tau_5_2 = tau ** (arb(5) / arb(2))
+        for Y_ep in (1, 2, 16, 81):
+            T_ep = exact_T_cutoff_ceil_Y_5_4(Y_ep)
+            L_T_ep = T_ep // T_ep
+            X_lo = arb(Y_ep)
+            X_hi = tau * arb(Y_ep)
+            gT_lo = evaluate_scaled_fiber_g_arb(X_lo, T_ep, T_ep, mode="liouville", prec_bits=prec_bits)
+            phiT_lo = evaluate_phi_n_arb(X_lo, T_ep, prec_bits=prec_bits)
+            gT_hi = evaluate_scaled_fiber_g_arb(X_hi, T_ep, T_ep, mode="liouville", prec_bits=prec_bits)
+            phiT_hi = evaluate_phi_n_arb(X_hi, T_ep, prec_bits=prec_bits)
+            ratio_hi = (X_hi ** (arb(5) / arb(2))) / (arb(T_ep) ** 2)
+            margin_hi = tau_5_2 - ratio_hi
+            exact_boundary = Y_ep in (1, 16, 81)
+            ep_ok = bool(
+                L_T_ep == 1
+                and arb(0) in (gT_lo - phiT_lo)
+                and abs(gT_lo - phiT_lo) < arb("1e-66")
+                and arb(0) in (gT_hi - phiT_hi)
+                and abs(gT_hi - phiT_hi) < arb("1e-66")
+                and (
+                    (arb(0) in margin_hi and abs(margin_hi) < arb("1e-65"))
+                    if exact_boundary
+                    else (margin_hi > arb(0))
+                )
+            )
+            endpoint_checks_ok = endpoint_checks_ok and ep_ok
+            endpoint_boundary_rows.append(
+                {
+                    "Y": Y_ep,
+                    "T_Y": T_ep,
+                    "L_T": L_T_ep,
+                    "exact_fourth_power_cutoff_boundary": exact_boundary,
+                    "g_T_minus_phi_T_at_Y": serialize_arb_certified(gT_lo - phiT_lo),
+                    "g_T_minus_phi_T_at_tau_Y": serialize_arb_certified(gT_hi - phiT_hi),
+                    "X_hi_5_2_over_T_sq": serialize_arb_certified(ratio_hi),
+                    "tau_5_2_minus_ratio_margin": serialize_arb_certified(margin_hi),
+                    "verified": ep_ok,
+                }
+            )
+
+        # (ii) Finite-cutoff smooth-step bound: |Delta_d^{sm}(X)| <= C_sm * sqrt(X) / (d*(d+1)) < C_sm * sqrt(X) / d^2
+        #      where C_sm = 5/2 + 4*(5/(2*e))^{5/2} + 6*(3/(2*e))^{3/2} > 3*zeta(3).
+        C_sm = evaluate_C_smooth_step_arb(prec_bits=prec_bits)
+        three_zeta_3 = arb(3) * acb(3).zeta().real
+        smooth_step_sample_rows: List[Dict[str, Any]] = []
+        smooth_step_ok = bool(C_sm - three_zeta_3 > arb(0))
+        for Y_sm in (8, 16, 32):
+            T_sm = exact_T_cutoff_ceil_Y_5_4(Y_sm)
+            for x_tag, X_sm in (("Y", arb(Y_sm)), ("tau*Y", tau * arb(Y_sm))):
+                for d_sm in (1, 2, 3, 5, T_sm // 2, T_sm - 1):
+                    L_d_sm = T_sm // d_sm
+                    delta_sm_val = (
+                        evaluate_Q_shifted_finite_arb(
+                            X_sm / arb(d_sm), L=L_d_sm, m_shift=0, mode="liouville", prec_bits=prec_bits
+                        )
+                        / arb(d_sm).sqrt()
+                        - evaluate_Q_shifted_finite_arb(
+                            X_sm / arb(d_sm + 1), L=L_d_sm, m_shift=0, mode="liouville", prec_bits=prec_bits
+                        )
+                        / arb(d_sm + 1).sqrt()
+                    )
+                    abs_delta_sm = abs(delta_sm_val)
+                    tight_ub = C_sm * X_sm.sqrt() / arb(d_sm * (d_sm + 1))
+                    inv_d2_ub = C_sm * X_sm.sqrt() / arb(d_sm * d_sm)
+                    ok_sm = bool(tight_ub - abs_delta_sm > arb(0) and inv_d2_ub - tight_ub > arb(0))
+                    smooth_step_ok = smooth_step_ok and ok_sm
+                    if d_sm in (1, T_sm - 1) and x_tag == "tau*Y":
+                        smooth_step_sample_rows.append(
+                            {
+                                "Y": Y_sm,
+                                "T_Y": T_sm,
+                                "X_point": x_tag,
+                                "d": d_sm,
+                                "L_d": L_d_sm,
+                                "abs_Delta_d_smooth": serialize_arb_certified(abs_delta_sm),
+                                "C_sm_sqrtX_over_d_d_add_1_ub": serialize_arb_certified(tight_ub),
+                                "bound_margin": serialize_arb_certified(tight_ub - abs_delta_sm),
+                                "verified": ok_sm,
+                            }
+                        )
+
+        all_ok = bool(
+            sq_id_ok
+            and dyadic_conv_ok
+            and abel_all_ok
+            and endpoint_checks_ok
+            and smooth_step_ok
+            and c_lambda < arb(0)
+        )
         return {
             "c_lambda": serialize_arb_certified(c_lambda),
             "gamma_5_4_over_4": serialize_arb_certified(gamma_quarter_term),
             "unimodal_peak_const": serialize_arb_certified(unimodal_peak_const),
             "C_sq": serialize_arb_certified(C_sq),
+            "C_sm_smooth_step_const": serialize_arb_certified(C_sm),
+            "three_zeta_3_small_w_const": serialize_arb_certified(three_zeta_3),
             "X1_max_Q_square_sampled": serialize_arb_certified(X1_max_q_sq),
             "pointwise_square_projection_and_compensated_split_rows": X_pt_checks,
+            "upper_endpoint_coupled_cutoff_checks": {
+                "analytic_proof_scope": (
+                    "All Y >= 2, X in [Y, tau*Y]: L_T = floor(T/T) = 1 => g_T(X) = phi_T(X) <= X^{5/2}/T^3; "
+                    "|R_2^{int}(T)| <= C_W*T (TC-057R Selberg/PNT asymptotic) and T(Y)^2 >= Y^{5/2} yield "
+                    "|R_2^{int}(T)*g_T(X)/(log X)^2| <= C_W*X^{5/2}/(T(Y)^2*(log Y)^2) <= C_W*tau^{5/2}/(log Y)^2, "
+                    "giving O((log Y)^{-4}) window energy (finite rows below are boundary checks, not the proof)."
+                ),
+                "rows": endpoint_boundary_rows,
+                "verified": endpoint_checks_ok,
+            },
+            "smooth_step_finite_cutoff_bound_checks": {
+                "analytic_proof_scope": (
+                    "All X > 0, T >= 2, 1 <= d <= T - 1: writing phi_q(X/y)/sqrt(y) = X^{5/2}*y^{-3}*q^{-3}*exp(-X^2/(y^2*q^2)) "
+                    "and w = X/y > 0 gives d/dy [phi_q(X/y)/sqrt(y)] = (sqrt(X)/y^2)*w^2*q^{-3}*exp(-w^2/q^2)*(2*w^2/q^2 - 3); "
+                    "bounding |d/dy sum_{q<=L_d} lambda(q)*phi_q(X/y)/sqrt(y)| <= C_sm*sqrt(X)/y^2 pointwise for all y > 0 "
+                    "via unimodal sum-integral comparison with w^{-1} peaks (w > 1) and 3*zeta(3)*w^2 <= 3*zeta(3) < C_sm (0 < w <= 1) "
+                    "and integrating over y in [d, d+1] proves |Delta_d^{sm}(X)| <= C_sm*sqrt(X)/(d*(d+1)) < C_sm*sqrt(X)/d^2."
+                ),
+                "sample_rows": smooth_step_sample_rows,
+                "verified": smooth_step_ok,
+            },
+            "R2_int_linear_bound_provenance": (
+                "Already established in TC-057R §4 Theorem 4.3(3) via the Selberg/PNT asymptotic "
+                "W_2(u) = c_lambda*u + O(u*exp(-c*sqrt(log u))) (Dirichlet hyperbola cancellation of u*log u "
+                "plus PNT for lambda, NOT Chebyshev's separate O(u*log u) majorants alone), covering all integer "
+                "d >= 1 including d = 1 where R_2^{int}(1) = -c_lambda."
+            ),
             "dyadic_parity_control_divisor_identity": {
                 "checked_range_n_up_to": 240,
                 "X_projection_check": 16,
@@ -1008,13 +1515,13 @@ def verify_section_4_compensated_selberg_and_shift_elimination(
                 "cancelled_or_decaying_components": [
                     "Linear c_lambda*d trend in W_2(d) collapses onto c_lambda*Q_{square,T}(X), whose normalized window energy ||c_lambda*Q_{square,T}/(log X)^2||_Y^2 <= c_lambda^2*C_sq^2*log(tau)/(log Y)^4 = O((log Y)^{-4}) (eliminating TC-057 Route C's uncompensated b = floor(Y) boundary obstruction).",
                     "Lower boundary d = 1 contributes r_2(1)*g_1(X)/(log X)^2 = -c_lambda*Q_T(X)/(log X)^2 with contracting window energy <= c_lambda^2*(log Y)^{-4}*E(Y).",
-                    "Upper endpoint R_2^{int}(T)*g_T(X)/(log X)^2 has window energy O((log Y)^{-4}) since L_T = 1 and g_T(X) <= (3/(2*e))^{3/2}*T^{-1/2}.",
-                    "Aggregate floor(T/d) cutoff-jump sum sum_{d=1}^{T-1} R_2^{int}(d)*Delta^{jump}_d(X)/(log X)^2 has unconditional decaying window energy O((log Y)^{-2}) -> 0 because every jump index satisfies (d+1)*q >= T + 1 > Y^{5/4} (so phi_{(d+1)q}(X) <= tau^{5/2}*Y^{-5/4}) and sum_{d=1}^{T-1} d*(L_d - L_{d+1}) = sum_{d=1}^T floor(T/d) - T <= T*log T.",
+                    "Upper endpoint R_2^{int}(T)*g_T(X)/(log X)^2 has window energy O((log Y)^{-4}) because L_T = floor(T/T) = 1 gives g_T(X) = phi_T(X) <= X^{5/2}/T^3, and combining |R_2^{int}(T)| <= C_W*T (TC-057R Selberg/PNT asymptotic) with T(Y)^2 >= Y^{5/2} yields |R_2^{int}(T)*g_T(X)/(log X)^2| <= C_W*X^{5/2}/(T(Y)^2*(log Y)^2) <= C_W*tau^{5/2}/(log Y)^2 on X in [Y, tau*Y].",
+                    "Aggregate floor(T/d) cutoff-jump sum sum_{d=1}^{T-1} R_2^{int}(d)*Delta^{jump}_d(X)/(log X)^2 has unconditional decaying window energy O((log Y)^{-2}) -> 0 because |R_2^{int}(d)| <= C_W*d (from TC-057R Selberg/PNT asymptotic, including d = 1), every jump index satisfies (d+1)*q >= T + 1 > Y^{5/4} (so phi_{(d+1)q}(X) <= tau^{5/2}*Y^{-5/4}), and sum_{d=1}^{T-1} d*(L_d - L_{d+1}) = sum_{d=1}^T floor(T/d) - T <= T*log T.",
                     "Combining with Q_T = P_Y + R_Y eliminates the O(Y*(log Y)^{-2}) first-order shift R_Y via P_Y - R_Y = D_{2,Y} and Q_T = 2*P_Y - D_{2,Y}.",
                 ],
                 "surviving_uncontrolled_terms_and_exponents": [
-                    "Smooth-step PNT remainder sum_{d=1}^{T-1} R_2^{int}(d)*Delta^{smooth}_d(X)/(log X)^2 inside D_{2,Y}(X): because R_2^{int}(d) = O(d*exp(-c*sqrt(log d))) is not a power saving, unsigned/Minkowski bounds on ||D_{2,Y}||_Y^2 leave O(Y*(log Y)^{-4}) (or O(Y*(log Y)^{-4}*exp(-c'*sqrt(log Y))) on the R_2^{int} piece, while -Q_T^{[2]}/(log X)^2 has unsigned energy O(Y*(log Y)^{-4})).",
-                    "Prime-power off-diagonal 4*X_tilde_{lambda,pp}(Y) and cross term -4*<P_Y, D_{2,Y}>_Y in E(Y) = 4*D_tilde + 4*X_tilde - 4*<P_Y, D_{2,Y}> + ||D_{2,Y}||_Y^2: subpower energy still requires genuine signed cancellation across distinct prime-power fibers.",
+                    "Smooth-step PNT remainder sum_{d=1}^{T-1} R_2^{int}(d)*Delta^{smooth}_d(X)/(log X)^2 inside D_{2,Y}(X): on finite-cutoff fibers L_d = floor(T/d), |Delta^{smooth}_d(X)| <= C_sm*sqrt(X)/(d*(d+1)) < C_sm*sqrt(X)/d^2; because the sum begins at d = 1 (with |R_2^{int}(1)| = |c_lambda| and |R_2^{int}(d)| <= C'*d*exp(-c*sqrt(log d)) for d >= 2, where the PNT saving is in d rather than Y), the unsigned majorant yields only O(sqrt(X)) unnormalized and O(Y*(log Y)^{-4}) in normalized window energy (matching the unsigned order of -Q_T^{[2]}/(log X)^2). Failure of this unsigned majorant to prove subpower growth does not prove the signed expression grows.",
+                    "Prime-power off-diagonal 4*X_tilde_{lambda,pp}(Y) and cross term -4*<P_Y, D_{2,Y}>_Y in E(Y) = 4*D_tilde + T_2 (with T_2 = 4*X_tilde - 4*<P_Y, D_{2,Y}> + ||D_{2,Y}||_Y^2 and conditional contraction coefficient theta_eta + 4*Theta_eps^{diag}(Y)): subpower energy still requires genuine signed cancellation across distinct prime-power fibers.",
                 ],
             },
             "all_section_4_checks_pass": all_ok,
@@ -1309,9 +1816,11 @@ def verify_section_5_growing_order_and_joint_gram(
                     if not bool(arb(0) in direct_pair_res and abs(direct_pair_res) < arb("1e-63")):
                         joint_gram_ok = False
 
-                # Quantify Minkowski layer-sum cost (sum_{m=0}^{M-1} ||Sigma_{a,pp}^{[m]}/(log X)^{m+1}||_Y)^2
-                # at Y in {8, 16, 32, 64} for Liouville & unsigned_1
+                # Quantify Minkowski layer-sum triangle excess:
+                # norm ratio (sum_{m=0}^{M-1} ||layer_m||_Y) / ||L_{a,M}||_Y vs squared-norm ratio
+                # (sum_{m=0}^{M-1} ||layer_m||_Y)^2 / ||L_{a,M}||_Y^2 at Y in {8, 16, 32, 64}
                 layer_minkowski_sq: Optional[arb] = None
+                layer_minkowski_norm: Optional[arb] = None
                 if Y_int in (8, 16, 32, 64) and mode in ("liouville", "unsigned_1"):
                     sum_layer_norms = arb(0)
                     log_n_w = [arb(0)] + [arb(w_vals[n]) * arb(n).log() for n in range(1, T_Y + 1)]
@@ -1343,29 +1852,50 @@ def verify_section_5_growing_order_and_joint_gram(
                             _layer_m_sq, y_arb, tau * y_arb, prec_bits=prec_bits
                         )
                         sum_layer_norms += l_sq.sqrt()
+                    layer_minkowski_norm = sum_layer_norms
                     layer_minkowski_sq = sum_layer_norms * sum_layer_norms
-                    if not bool(layer_minkowski_sq - E_L_joint > arb(0)):
+                    if not bool(
+                        layer_minkowski_norm - E_L_joint.sqrt() > arb(0)
+                        and layer_minkowski_sq - E_L_joint > arb(0)
+                    ):
                         joint_gram_ok = False
 
                 E_tot = evaluate_E_L_scale_arb(
                     Y_int, L=T_Y, m_shift=0, mode=mode, prec_bits=prec_bits
                 )
+                off_diag_ratio = X_M_off_consistency / E_L_joint
+                off_diag_pct = arb(100) * off_diag_ratio
+                diag_ratio = D_M_diag / E_L_joint
                 entry_m: Dict[str, Any] = {
                     "E_total_Y": serialize_arb_certified(E_tot),
                     "joint_M_layer_norm_sq": serialize_arb_certified(E_L_joint),
                     "joint_M_prime_power_diagonal": serialize_arb_certified(D_M_diag),
                     "joint_M_prime_power_off_diagonal": serialize_arb_certified(X_M_off_consistency),
+                    "diagonal_over_joint_ratio": serialize_arb_certified(diag_ratio),
+                    "off_diagonal_over_joint_ratio": serialize_arb_certified(off_diag_ratio),
+                    "off_diagonal_over_joint_pct": serialize_arb_certified(off_diag_pct),
                 }
                 if direct_pair_res is not None:
                     entry_m["direct_pair_minus_consistency_off_diagonal_residual"] = (
                         serialize_arb_certified(direct_pair_res)
                     )
-                if layer_minkowski_sq is not None:
+                if layer_minkowski_sq is not None and layer_minkowski_norm is not None:
+                    norm_ratio = layer_minkowski_norm / E_L_joint.sqrt()
+                    sq_ratio = layer_minkowski_sq / E_L_joint
+                    entry_m["minkowski_layer_sum_norm"] = serialize_arb_certified(
+                        layer_minkowski_norm
+                    )
+                    entry_m["minkowski_norm_ratio_over_joint"] = serialize_arb_certified(
+                        norm_ratio
+                    )
                     entry_m["minkowski_layer_sum_norm_sq"] = serialize_arb_certified(
                         layer_minkowski_sq
                     )
+                    entry_m["minkowski_sq_over_joint_ratio"] = serialize_arb_certified(
+                        sq_ratio
+                    )
                     entry_m["minkowski_over_joint_ratio"] = serialize_arb_certified(
-                        layer_minkowski_sq / E_L_joint
+                        sq_ratio
                     )
                 per_mode_gram[mode] = entry_m
 
@@ -1377,6 +1907,31 @@ def verify_section_5_growing_order_and_joint_gram(
                     "modes": per_mode_gram,
                 }
             )
+
+        # Verify live certified Y = 64 off-diagonal shares (~94.86% for a2, ~85.03% for a_3_5_7,
+        # ~96.33% for unsigned_1) and nonmonotone strict finite triangle excess for Liouville!
+        row_y64 = [r for r in joint_gram_rows if r["Y"] == 64][0]["modes"]
+        pct_a2_64 = arb(row_y64["a2"]["off_diagonal_over_joint_pct"]["arb_ball_str"])
+        pct_a357_64 = arb(row_y64["a_3_5_7"]["off_diagonal_over_joint_pct"]["arb_ball_str"])
+        pct_u1_64 = arb(row_y64["unsigned_1"]["off_diagonal_over_joint_pct"]["arb_ball_str"])
+        liouville_sq_ratios = [
+            arb(r["modes"]["liouville"]["minkowski_sq_over_joint_ratio"]["arb_ball_str"])
+            for r in joint_gram_rows
+        ]
+        liouville_norm_ratios = [
+            arb(r["modes"]["liouville"]["minkowski_norm_ratio_over_joint"]["arb_ball_str"])
+            for r in joint_gram_rows
+        ]
+        pct_and_nonmonotone_ok = bool(
+            arb("94.85") < pct_a2_64 < arb("94.87")
+            and arb("85.02") < pct_a357_64 < arb("85.04")
+            and arb("96.32") < pct_u1_64 < arb("96.34")
+            and all(bool(r_val > arb(1)) for r_val in liouville_norm_ratios)
+            and all(bool(r_val > arb(1)) for r_val in liouville_sq_ratios)
+            and bool(liouville_sq_ratios[1] > liouville_sq_ratios[2])
+            and bool(liouville_norm_ratios[1] > liouville_norm_ratios[2])
+        )
+        joint_gram_ok = bool(joint_gram_ok and pct_and_nonmonotone_ok)
 
         all_ok = bool(global_const_ok and rem_samples_ok and joint_gram_ok)
         return {
@@ -1401,21 +1956,41 @@ def verify_section_5_growing_order_and_joint_gram(
             "generic_in_bounded_controls": True,
             "sampled_terminal_remainder_rows": sampled_remainder_rows,
             "joint_M_layer_gram_rows": joint_gram_rows,
+            "live_Y64_growing_control_off_diagonal_summary": {
+                "a2_off_diagonal_pct_Y64": row_y64["a2"]["off_diagonal_over_joint_pct"],
+                "a_3_5_7_off_diagonal_pct_Y64": row_y64["a_3_5_7"]["off_diagonal_over_joint_pct"],
+                "unsigned_1_off_diagonal_pct_Y64": row_y64["unsigned_1"]["off_diagonal_over_joint_pct"],
+                "liouville_sampled_triangle_excess_is_nonmonotone": True,
+                "verified": pct_and_nonmonotone_ok,
+            },
             "cost_and_concentration_summary": {
                 "resummation_vs_cancellation": (
                     "Resumming the M(Y) layers back to Q_T - Q_T^{[M]}/(log X)^M is a consistency identity, "
                     "not a cancellation proof."
                 ),
+                "arbitrary_bounded_vs_multiplicative_hypotheses": (
+                    "The terminal-remainder bound ||r_{a,M,Y}||_Y^2 <= 2068*(log Y)*Y^{-3} and the fiberwise "
+                    "diagonal majorant D_M(Y) = O(Y/(log Y)^2) hold for arbitrary bounded coefficients |a(n)| <= 1; "
+                    "the prime-power reconstruction Q_{a,T} = L_{a,M,Y} + r_{a,M,Y} and the resulting energy "
+                    "concentration require completely multiplicative a with a(1) = 1 and |a(n)| <= 1."
+                ),
                 "unconditional_joint_diagonal_bound": (
                     "Because 0 < P_M(s) <= 4 uniformly on s in [1/4, 3/2] for all M >= 1 (Lean Theorem 30(4)), "
-                    "the entire joint M(Y)-layer prime-power diagonal satisfies D_tilde_{a,pp}^{(M(Y))}(Y) = O(Y/(log Y)^2) "
-                    "uniformly for all bounded controls |a(n)| <= 1."
+                    "the joint M(Y)-layer prime-power diagonal satisfies D_M(Y) = O(Y/(log Y)^2) uniformly for "
+                    "all bounded |a(n)| <= 1; however O(Y/(log Y)^2) is NOT an all-eps subpower bound and has "
+                    "not been proved to satisfy cross-scale contraction."
                 ),
-                "surviving_joint_off_diagonal_obligation": (
-                    "For growing-energy controls (1, a_2, a_{3,5,7}) with E_a(Y) = Theta(Y), (1 - o(1)) of the "
-                    "window energy concentrates in the distinct-prime-power off-diagonal X_tilde_{a,pp}^{(M(Y))}(Y); "
-                    "meanwhile summing individual layer norms incurs a growing Minkowski blowup factor, isolating "
-                    "all-prime Liouville cancellation in X_tilde_{lambda,pp}^{(M(Y))}(Y) as the exact open target."
+                "surviving_joint_gram_and_concentration_scope": (
+                    "For multiplicative growing-energy controls (1, a_2, a_{3,5,7}) with E_a(Y) asymp Y, the "
+                    "small terminal remainder ||r_{a,M,Y}||_Y^2 = O((log Y)*Y^{-3}) controls proximity to the FULL "
+                    "joint Gram energy J_{a,M}(Y) = D_{a,M}(Y) + X_{a,M}(Y), while subtracting D_{a,M}(Y) = O(Y/(log Y)^2) "
+                    "gives off-diagonal share X_{a,M}(Y)/J_{a,M}(Y) = 1 - O((log Y)^{-2}) (live Y = 64 shares: "
+                    "~94.86% for a_2, ~85.03% for a_{3,5,7}, ~96.33% for 1). Sampled Liouville norm ratios "
+                    "(sum_m ||layer_m||_Y)/||L_M||_Y and squared-norm ratios (sum_m ||layer_m||_Y)^2/||L_M||_Y^2 "
+                    "establish nonmonotone finite strict triangle excess on Y in {8, 16, 32, 64} (not asymptotic "
+                    "divergence). Closing SUBGATE-TC-043A along the growing-order route requires bounding the "
+                    "FULL joint Gram energy J_M(Y) = D_M(Y) + X_M(Y) (or first proving a new cross-scale "
+                    "contraction theorem for D_M(Y))."
                 ),
             },
             "all_section_5_checks_pass": all_ok,
@@ -1470,12 +2045,19 @@ def verify_section_6_tc_compatibility_discriminators(
             {
                 "lemma_id": "LEM-TC058-C",
                 "title": "Post-Abel c_lambda cancellation, cutoff-jump decay, and shift elimination P_Y - R_Y = D_{2,Y}",
-                "objects": "W_2(d), R_2^{int}(d) = W_2(d) - c_lambda*d, Delta^{smooth}_d, Delta^{jump}_d, D_{2,Y}",
+                "objects": "W_2(d), R_2^{int}(d) = W_2(d) - c_lambda*d, Delta^{smooth}_d, Delta^{jump}_d, D_{2,Y}, T_2(Y)",
                 "quantifiers": "forall Y >= 2, T = ceil(Y^{5/4}), X in [Y, b*Y]",
-                "hypotheses": "W_2(u) = c_lambda*u + O(u*exp(-c*sqrt(log u))) and exact integer division (d+1)*(L_{d+1}+1) >= T + 1",
-                "input_source": "PNT for lambda + exact discrete summation by parts + second-order logarithmic shift identity",
-                "conclusion": "Cancels Route C boundary obstruction, bounds jump energy by O((log Y)^{-2}), and eliminates R_Y via Q_T = 2*P_Y - D_{2,Y}, leaving O(Y*(log Y)^{-4}) in ||D_{2,Y}||_Y^2 plus 4*X_tilde",
-                "status": "PROVED_PARTIAL_REDUCTION (identities in Lean Theorems 28-29; leaves O(Y*(log Y)^{-4}) without subpower cancellation)",
+                "hypotheses": (
+                    "|R_2^{int}(d)| <= C_W*d for all d >= 1 (from TC-057R Selberg/PNT asymptotic), "
+                    "|R_2^{int}(d)| <= C'*d*exp(-c*sqrt(log d)) for d >= 2, and (d+1)*(L_{d+1}+1) >= T + 1"
+                ),
+                "input_source": "TC-057R Selberg/PNT asymptotic + exact discrete summation by parts + finite-cutoff smooth-step bound |Delta^{smooth}_d(X)| < C_sm*sqrt(X)/d^2 + second-order shift identity",
+                "conclusion": (
+                    "Cancels Route C boundary obstruction, bounds upper endpoint by O((log Y)^{-4}) (via L_T=1, g_T=phi_T, X^{5/2}/T(Y)^2 <= b^{5/2}) "
+                    "and jump energy by O((log Y)^{-2}), and eliminates R_Y via Q_T = 2*P_Y - D_{2,Y}, leaving O(Y*(log Y)^{-4}) unsigned energy "
+                    "in ||D_{2,Y}||_Y^2 (because small d >= 1 prevent replacing exp(-c*sqrt(log d)) by a saving in Y) and conditional contraction theta_eta + 4*Theta_eps^{diag}(Y) on T_2(Y)"
+                ),
+                "status": "PROVED_PARTIAL_REDUCTION (identities in Lean Theorems 28-29 & 31(4); leaves O(Y*(log Y)^{-4}) unsigned energy without subpower cancellation)",
                 "tc_discriminator_result": "Uses all-prime PNT cancellation for lambda (fails for a_2, a_S, 1 where W_2(u) ~ 2*u*log u); holds for all b > 1",
             },
             {
@@ -1491,14 +2073,33 @@ def verify_section_6_tc_compatibility_discriminators(
             },
             {
                 "lemma_id": "LEM-TC058-E",
-                "title": "Joint M(Y)-layer polynomial kernel bound and prime-power diagonal control",
-                "objects": "P_M(s) = sum_{m < M} (1 - s)^m, L_{a,M}(X; T), D_tilde_{a,pp}^{(M)}(Y), X_tilde_{a,pp}^{(M)}(Y)",
-                "quantifiers": "forall M >= 1, forall bounded multiplicative a with a(1) = 1, forall Y >= 16",
-                "hypotheses": "0 < P_M(s) <= 4 on s in [1/4, 3/2] and |a(n)| <= 1",
+                "title": "Joint M(Y)-layer polynomial kernel bound, prime-power diagonal majorant, and off-diagonal share",
+                "objects": "P_M(s) = sum_{m < M} (1 - s)^m, L_{a,M}(X; T), J_{a,M}(Y) = D_{a,M}(Y) + X_{a,M}(Y)",
+                "quantifiers": "forall M >= 1, forall bounded |a(n)| <= 1 (diagonal bound) and completely multiplicative a with a(1) = 1 (reconstruction), forall Y >= 16",
+                "hypotheses": "0 < P_M(s) <= 4 on s in [1/4, 3/2] and |a(n)| <= 1 (plus multiplicativity of a for Q_{a,T} = L_{a,M,Y} + r_{a,M,Y})",
                 "input_source": "Finite geometric series sum + Gaussian fast decay for n <= Y^{1/2}",
-                "conclusion": "D_tilde_{a,pp}^{(M(Y))}(Y) = O(Y / (log Y)^2), concentrating any Theta(Y) energy into X_tilde_{a,pp}^{(M(Y))}(Y)",
+                "conclusion": (
+                    "D_{a,M}(Y) = O(Y / (log Y)^2) uniformly for |a| <= 1, giving off-diagonal share "
+                    "X_{a,M}(Y)/J_{a,M}(Y) = 1 - O((log Y)^{-2}) for multiplicative controls with E_a(Y) asymp Y; "
+                    "bounding X_M(Y) alone does NOT close SUBGATE-TC-043A without bounding full J_M(Y) or proving a new contraction theorem for D_M(Y)"
+                ),
                 "status": "PROVED_UNCONDITIONAL (polynomial & Gram identities in Lean Theorem 30; integral bound proved analytically)",
-                "tc_discriminator_result": "Diagonal bound is generic in |a| <= 1; isolating X_tilde_{lambda,pp}^{(M(Y))} requires all-prime lambda(p) = -1; holds for all b > 1",
+                "tc_discriminator_result": "Diagonal majorant is generic in |a| <= 1; Q_{a,T} = L_{a,M,Y} + r_{a,M,Y} requires multiplicative a; holds for all b > 1",
+            },
+            {
+                "lemma_id": "LEM-TC058R-F",
+                "title": "Full growing-order Gram conditional absorption, logical non-implication countermodel, finite r^{-1} square bridge, and B_tau cutoff transfer",
+                "objects": "J_M(Y) = D_M(Y) + X_M(Y), T_2(Y), Q_{lambda,T}(X), Q_{mu,floor(T/r^2)}(X/r^2), B_tau = tau^{5/2}*sqrt(log tau)/2",
+                "quantifiers": "forall T >= 0, X >= 0 (square bridge); forall Y >= 1, |a(n)| <= 1 (B_tau); forall eta in (0, eps), 0 <= theta_eta < 1 (absorption)",
+                "hypotheses": "J_M(Y) <= A_eta*Y^eta + theta_eta*F(Y) (or T_2(Y) <= A_eta*Y^eta + theta_eta*F(Y) with 4*Theta_eps^{diag})",
+                "input_source": "Young inequality with delta = (1 - theta_eta)/2 + normalized finite-horizon absorption G_eps(R) + elementary n^{-3} tail sum",
+                "conclusion": (
+                    "J_M bound => E(Y) <<_eps Y^eps (valid including theta_eta = 0); abstract countermodel E = D = Y/(log Y)^2, X = r = 0 "
+                    "refutes off-diagonal-only inference; Q_{lambda,T}(X) = sum_{r^2<=T} r^{-1} Q_{mu,floor(T/r^2)}(X/r^2); and "
+                    "||Q_{a,infty} - Q_{a,T(Y)}||_Y <= B_tau yields bilateral O_eps(Y^eps) transfer"
+                ),
+                "status": "PROVED_CONDITIONAL_AND_BRIDGE (Lean Theorem 31 + analytic B_tau window tail bound)",
+                "tc_discriminator_result": "Square bridge requires all-prime lambda(p) = -1; B_tau and absorption algebra generalize to any b > 1",
             },
         ]
 
@@ -1673,7 +2274,7 @@ def verify_section_6_tc_compatibility_discriminators(
 
 
 def verify_tc058_lean_theorems_live() -> Dict[str, Any]:
-    """Verify Theorems 27-30 in formal/RiemannScope/LiouvilleSquareDilation.lean via live
+    """Verify Theorems 27-31 in formal/RiemannScope/LiouvilleSquareDilation.lean via live
     `lake env lean --stdin` (`#check` and `#print axioms`) and source token checks.
     """
     lean_path = REPO_ROOT / "formal" / "RiemannScope" / "LiouvilleSquareDilation.lean"
@@ -1900,6 +2501,7 @@ def execute_task_tc058_simultaneous_compatibility_audit(
 
     report: Dict[str, Any] = {
         "task_id": TASK_TC_058_ID,
+        "repair_task_id": TASK_TC_058R_ID,
         "parent_epic": EPIC_TC_042_ID,
         "prior_tasks": [
             TASK_TC_054_ID,
@@ -1927,15 +2529,18 @@ def execute_task_tc058_simultaneous_compatibility_audit(
         "tc057_reviewed_tip": TC_057_REVIEWED_TIP,
         "tc057r_implementation_commit": TC_057R_IMPLEMENTATION_COMMIT,
         "tc057r_reviewed_tip": TC_057R_REVIEWED_TIP,
-        "branch": "task/tc-058-simultaneous-compatibility-and-combined-energy",
+        "tc058_implementation_commit": TC_058_IMPLEMENTATION_COMMIT,
+        "tc058_reviewed_tip": TC_058_REVIEWED_TIP,
+        "branch": "task/tc-058r-closure-criteria-and-analytic-scope-repair",
         "research_outcome_class": (
-            "Outcome B / C — Proved partial arithmetic & analytic estimates controlling specified parts "
-            "of the combined energy (square-projection mean O((log Y)^{-4}), cutoff-jump sum O((log Y)^{-2}), "
-            "first-order shift elimination P_Y - R_Y = D_{2,Y}, generic growing-order remainder "
-            "<= 2068*(log Y)*Y^{-3}, and joint M(Y)-layer prime-power diagonal O(Y/(log Y)^2)) with exact "
-            "surviving O(Y*(log Y)^{-4}) and off-diagonal prime-power obligations identified; "
-            "classified honestly via [Y, b*Y] discriminator as TC-inspired analytic number theory; "
-            "SUBGATE-TC-043A remains OPEN"
+            "Outcome B / C (TC-058R Repaired Baseline) — Preserves valid arithmetic & analytic estimates "
+            "(square-projection mean O((log Y)^{-4}), upper endpoint O((log Y)^{-4}), cutoff-jump sum "
+            "O((log Y)^{-2}), first-order shift elimination P_Y - R_Y = D_{2,Y}, smooth-step finite-cutoff "
+            "majorant O(Y*(log Y)^{-4}), generic growing-order remainder <= 2068*(log Y)*Y^{-3}, joint "
+            "M(Y)-layer diagonal majorant O(Y/(log Y)^2), finite r^{-1} square bridge, and B_tau finite/full "
+            "norm transfer) and repairs all four conditional closure criteria (requiring full J_M = D_M + X_M "
+            "rather than X_M alone unless a new diagonal contraction for D_M is proved); classified honestly "
+            "via [Y, b*Y] discriminator as TC-inspired analytic number theory; SUBGATE-TC-043A remains OPEN"
         ),
         "subgate_tc043a_status": "OPEN",
         "rh_proved": False,

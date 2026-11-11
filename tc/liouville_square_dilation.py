@@ -2577,6 +2577,7 @@ def verify_liouville_square_dilation_lean_module() -> Dict[str, Any]:
         "compensated_selberg_summation_by_parts_and_shift_elimination_tc058",
         "combined_target_exact_quadratic_and_conditional_absorption_tc058",
         "growing_order_joint_polynomial_filter_and_gram_decomposition_tc058",
+        "growing_order_and_second_order_conditional_absorption_and_finite_square_bridge_tc058r",
     ]
 
     live_lean = _capture_live_lean_check_and_axioms(public_theorems)
@@ -2812,6 +2813,20 @@ def verify_liouville_square_dilation_lean_module() -> Dict[str, Any]:
             "`∑_{m < M} Σ_{a,pp}^{[m]}(X; T) / (log X)^{m+1} = ∑_{pk ∈ primePowerPairsUpTo T} jointPrimePowerFiber a M T pk X` with inherited `⌊T / p^k⌋` cutoffs, "
             "pointwise joint Gram diagonal/off-diagonal split, and geometric filter identity `s * P_M(s) = 1 - (1 - s)^M` with uniform bound `0 < P_M(s) ≤ 4` "
             "on `s ∈ [1/4, 3/2]` (`M ≥ 1`; Robbins-Stirling and compact-`[2, e^9]` window remainder bounds are proved analytically outside Lean).",
+        ),
+        "growing_order_and_second_order_conditional_absorption_and_finite_square_bridge_tc058r": (
+            "conditional_growing_order_and_second_order_absorption_finite_square_bridge_and_inference_countermodel_theorem",
+            "`TASK-TC-058R` §§2A–2C & §§4A–4B theorem (`CONDITIONAL_ON_FULL_GROWING_GRAM` / `CONDITIONAL_ON_SECOND_ORDER_TARGET` for absorption parts, "
+            "unconditional for finite square-dilation and scalar norm-transfer parts): "
+            "(1) exact finite `r^{-1}` square-dilation bridge `finiteQLambda T X = ∑_{1 ≤ r ≤ T, r^2 ≤ T} (1 / r) finiteQGeneral μ (T / r^2) (X / r^2)` for all `T : ℕ` and `X ≥ 0` "
+            "(passage `T → ∞` follows analytically outside Lean by absolute convergence `∑_{r,n ≥ 1} φ_{r^2 n}(X) = ζ(6) ζ(3) X^{5/2} < ∞`), "
+            "(2) pointwise Liouville reconstruction + Young bound `(finiteQLambda T X)^2 ≤ (1 + δ) L_{M,T}(X)^2 + (1 + 1/δ) r_{M,T}(X)^2` (`X > 0, log X ≠ 0, δ > 0`) and "
+            "universal choice `δ = (1 - θ_η) / 2 > 0`, `q = (1 + δ) θ_η ∈ [0, 1)` valid across `0 ≤ θ_η < 1` including `θ_η = 0`, "
+            "(3) conditional normalized finite-horizon absorption under FULL joint growing-order Gram bound `J_M(Y) = D_M(Y) + X_M(Y) ≤ A_η Y^η + θ_η F(Y)` plus "
+            "logical inference countermodel `Y / (log Y)^2 > M_c Y^ε` (`0 < ε < 1`) showing `X = r = 0` and `D = O(Y / (log Y)^2)` alone do not imply subpower growth, "
+            "(4) second-order target `T_2` conditional absorption with exact `4 Θ_ε^{diag}(Y)` contraction factor (`E = 4 D̃ + T_2`), and "
+            "(5) bilateral `O_ε(Y^ε)` subpower transfer under uniform norm difference `|s_T(Y) - s_∞(Y)| ≤ B_τ` (`|(s_T)^2 - (s_∞)^2| ≤ 2 B_τ s_∞ + B_τ^2`; "
+            "analytic window integration on `[Y, τ Y]` and `B_τ = τ^{5/2} √(log τ) / 2` tail bound are proved outside Lean).",
         ),
     }
 

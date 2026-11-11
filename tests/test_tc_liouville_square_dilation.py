@@ -133,6 +133,7 @@ EXPECTED_PUBLIC_THEOREM_NAMES = (
     "compensated_selberg_summation_by_parts_and_shift_elimination_tc058",
     "combined_target_exact_quadratic_and_conditional_absorption_tc058",
     "growing_order_joint_polynomial_filter_and_gram_decomposition_tc058",
+    "growing_order_and_second_order_conditional_absorption_and_finite_square_bridge_tc058r",
 )
 
 
@@ -475,9 +476,9 @@ def test_lean_formalization_and_serialized_artifact_synchronization() -> None:
 
     lean_info = verify_liouville_square_dilation_lean_module()
     assert lean_info["definition_count"] == 81
-    assert lean_info["public_theorem_count"] == 30
+    assert lean_info["public_theorem_count"] == 31
     assert lean_info["private_helper_theorem_count"] == 63
-    assert lean_info["total_declaration_count"] == 174
+    assert lean_info["total_declaration_count"] == 175
     assert lean_info["expected_public_theorems_present"] is True
     assert lean_info["sorry_count"] == 0
     assert lean_info["custom_axiom_count"] == 0

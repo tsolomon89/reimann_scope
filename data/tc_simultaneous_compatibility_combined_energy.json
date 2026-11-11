@@ -1,5 +1,6 @@
 {
   "task_id": "TASK-TC-058",
+  "repair_task_id": "TASK-TC-058R",
   "parent_epic": "EPIC-TC-042",
   "prior_tasks": [
     "TASK-TC-054",
@@ -27,8 +28,10 @@
   "tc057_reviewed_tip": "82d0ec52085c06e748982287694fb9272ff017d7",
   "tc057r_implementation_commit": "484f69fc60e8b077b9586fd347003e72f4a4e930",
   "tc057r_reviewed_tip": "c944b71355d68c4b22b66954af5f620255ba5b14",
-  "branch": "task/tc-058-simultaneous-compatibility-and-combined-energy",
-  "research_outcome_class": "Outcome B / C \u2014 Proved partial arithmetic & analytic estimates controlling specified parts of the combined energy (square-projection mean O((log Y)^{-4}), cutoff-jump sum O((log Y)^{-2}), first-order shift elimination P_Y - R_Y = D_{2,Y}, generic growing-order remainder <= 2068*(log Y)*Y^{-3}, and joint M(Y)-layer prime-power diagonal O(Y/(log Y)^2)) with exact surviving O(Y*(log Y)^{-4}) and off-diagonal prime-power obligations identified; classified honestly via [Y, b*Y] discriminator as TC-inspired analytic number theory; SUBGATE-TC-043A remains OPEN",
+  "tc058_implementation_commit": "d356b386cca8101ad8535d8bc881892f815e92f6",
+  "tc058_reviewed_tip": "44a062dadc6a67ad51fcc41fe1f41bd4138007d1",
+  "branch": "task/tc-058r-closure-criteria-and-analytic-scope-repair",
+  "research_outcome_class": "Outcome B / C (TC-058R Repaired Baseline) \u2014 Preserves valid arithmetic & analytic estimates (square-projection mean O((log Y)^{-4}), upper endpoint O((log Y)^{-4}), cutoff-jump sum O((log Y)^{-2}), first-order shift elimination P_Y - R_Y = D_{2,Y}, smooth-step finite-cutoff majorant O(Y*(log Y)^{-4}), generic growing-order remainder <= 2068*(log Y)*Y^{-3}, joint M(Y)-layer diagonal majorant O(Y/(log Y)^2), finite r^{-1} square bridge, and B_tau finite/full norm transfer) and repairs all four conditional closure criteria (requiring full J_M = D_M + X_M rather than X_M alone unless a new diagonal contraction for D_M is proved); classified honestly via [Y, b*Y] discriminator as TC-inspired analytic number theory; SUBGATE-TC-043A remains OPEN",
   "subgate_tc043a_status": "OPEN",
   "rh_proved": false,
   "precision_bits": 256,
@@ -70,6 +73,16 @@
       "reference": "Agarwal, Garg, and Maji (2022), arXiv:2202.00637, Theorem 1.2 (k = 3, u = X^2)",
       "X": 7,
       "T": 40,
+      "square_dilation_weight_exponent": -1,
+      "square_dilation_scaling_identity": "phi_{r^2 n}(X) = r^{-1} phi_n(X / r^2)",
+      "infinite_identity_justification": "Absolute convergence sum_{r >= 1, n >= 1} |mu(n)| phi_{r^2 n}(X) <= zeta(6)*zeta(3)*X^{5/2} < infty justifies termwise T -> infty limit from Lean Theorem 31(1) finite identity.",
+      "zeta_6_times_zeta_3": {
+        "mid_float": 1.2229042505399261,
+        "rad_float_outward": 2.3773765309854332e-17,
+        "lower_dec": "1.222904250539926106030037413618141769776e+0",
+        "upper_dec": "1.222904250539926106030037413618141769779e+0",
+        "arb_ball_str": "[1.222904250539926106030037413618141769778 +/- 2.72e-40]"
+      },
       "Q_mu_T": {
         "mid_float": -0.134440767140945,
         "rad_float_outward": 2.1718801709425514e-18,
@@ -91,6 +104,708 @@
         "upper_dec": "2.933377114754278728230186160200981885444e-76",
         "arb_ball_str": "[+/- 2.94e-76]"
       },
+      "finite_square_bridge_grid_rows": [
+        {
+          "T": 0,
+          "X": 0,
+          "Q_lambda_T": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "finite_r_inv_square_dilation_rhs": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "residual": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "verified": true
+        },
+        {
+          "T": 0,
+          "X": 1,
+          "Q_lambda_T": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "finite_r_inv_square_dilation_rhs": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "residual": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "verified": true
+        },
+        {
+          "T": 0,
+          "X": 7,
+          "Q_lambda_T": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "finite_r_inv_square_dilation_rhs": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "residual": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "verified": true
+        },
+        {
+          "T": 0,
+          "X": 13,
+          "Q_lambda_T": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "finite_r_inv_square_dilation_rhs": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "residual": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "verified": true
+        },
+        {
+          "T": 1,
+          "X": 0,
+          "Q_lambda_T": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "finite_r_inv_square_dilation_rhs": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "residual": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "verified": true
+        },
+        {
+          "T": 1,
+          "X": 1,
+          "Q_lambda_T": {
+            "mid_float": 0.36787944117144233,
+            "rad_float_outward": 1.2428753672788364e-17,
+            "lower_dec": "3.678794411714423215955237701614608674457e-1",
+            "upper_dec": "3.678794411714423215955237701614608674460e-1",
+            "arb_ball_str": "[0.3678794411714423215955237701614608674458 +/- 1.12e-41]"
+          },
+          "finite_r_inv_square_dilation_rhs": {
+            "mid_float": 0.36787944117144233,
+            "rad_float_outward": 1.2428753672788364e-17,
+            "lower_dec": "3.678794411714423215955237701614608674457e-1",
+            "upper_dec": "3.678794411714423215955237701614608674460e-1",
+            "arb_ball_str": "[0.3678794411714423215955237701614608674458 +/- 1.12e-41]"
+          },
+          "residual": {
+            "mid_float": 0.0,
+            "rad_float_outward": 8.669903733287841e-78,
+            "lower_dec": "-8.669903733287839503492580622422493510833e-78",
+            "upper_dec": "8.669903733287839503492580622422493510833e-78",
+            "arb_ball_str": "[+/- 8.67e-78]"
+          },
+          "verified": true
+        },
+        {
+          "T": 1,
+          "X": 7,
+          "Q_lambda_T": {
+            "mid_float": 6.796972092626759e-20,
+            "rad_float_outward": 2.5155907421639915e-36,
+            "lower_dec": "6.796972092626758926479287267055570328270e-20",
+            "upper_dec": "6.796972092626758926479287267055570328273e-20",
+            "arb_ball_str": "[6.796972092626758926479287267055570328272e-20 +/- 7.28e-61]"
+          },
+          "finite_r_inv_square_dilation_rhs": {
+            "mid_float": 6.796972092626759e-20,
+            "rad_float_outward": 2.5155907421639915e-36,
+            "lower_dec": "6.796972092626758926479287267055570328270e-20",
+            "upper_dec": "6.796972092626758926479287267055570328273e-20",
+            "arb_ball_str": "[6.796972092626758926479287267055570328272e-20 +/- 7.28e-61]"
+          },
+          "residual": {
+            "mid_float": 0.0,
+            "rad_float_outward": 7.869941638577444e-96,
+            "lower_dec": "-7.869941638577442518143701079974174912258e-96",
+            "upper_dec": "7.869941638577442518143701079974174912258e-96",
+            "arb_ball_str": "[+/- 7.87e-96]"
+          },
+          "verified": true
+        },
+        {
+          "T": 1,
+          "X": 13,
+          "Q_lambda_T": {
+            "mid_float": 2.4495761172753188e-71,
+            "rad_float_outward": 1.9121886068858053e-87,
+            "lower_dec": "2.449576117275318567862261939937774712746e-71",
+            "upper_dec": "2.449576117275318567862261939937774712749e-71",
+            "arb_ball_str": "[2.449576117275318567862261939937774712747e-71 +/- 3.18e-111]"
+          },
+          "finite_r_inv_square_dilation_rhs": {
+            "mid_float": 2.4495761172753188e-71,
+            "rad_float_outward": 1.9121886068858053e-87,
+            "lower_dec": "2.449576117275318567862261939937774712746e-71",
+            "upper_dec": "2.449576117275318567862261939937774712749e-71",
+            "arb_ball_str": "[2.449576117275318567862261939937774712747e-71 +/- 3.18e-111]"
+          },
+          "residual": {
+            "mid_float": 0.0,
+            "rad_float_outward": 2.553564506323189e-147,
+            "lower_dec": "-2.553564506323188507152770199529532462850e-147",
+            "upper_dec": "2.553564506323188507152770199529532462850e-147",
+            "arb_ball_str": "[+/- 2.56e-147]"
+          },
+          "verified": true
+        },
+        {
+          "T": 2,
+          "X": 7,
+          "Q_lambda_T": {
+            "mid_float": -7.754391250966765e-05,
+            "rad_float_outward": 6.242154629717225e-21,
+            "lower_dec": "-7.754391250966764721268076013071893537210e-5",
+            "upper_dec": "-7.754391250966764721268076013071893537207e-5",
+            "arb_ball_str": "[-7.754391250966764721268076013071893537209e-5 +/- 3.99e-45]"
+          },
+          "finite_r_inv_square_dilation_rhs": {
+            "mid_float": -7.754391250966765e-05,
+            "rad_float_outward": 6.242154629717225e-21,
+            "lower_dec": "-7.754391250966764721268076013071893537210e-5",
+            "upper_dec": "-7.754391250966764721268076013071893537207e-5",
+            "arb_ball_str": "[-7.754391250966764721268076013071893537209e-5 +/- 3.99e-45]"
+          },
+          "residual": {
+            "mid_float": 0.0,
+            "rad_float_outward": 1.1030438973607246e-80,
+            "lower_dec": "-1.103043897360724454770021287354391038384e-80",
+            "upper_dec": "1.103043897360724454770021287354391038384e-80",
+            "arb_ball_str": "[+/- 1.11e-80]"
+          },
+          "verified": true
+        },
+        {
+          "T": 15,
+          "X": 7,
+          "Q_lambda_T": {
+            "mid_float": -0.09337159563610847,
+            "rad_float_outward": 4.235841717745535e-19,
+            "lower_dec": "-9.337159563610847354989752803520613604664e-2",
+            "upper_dec": "-9.337159563610847354989752803520613604661e-2",
+            "arb_ball_str": "[-0.09337159563610847354989752803520613604663 +/- 4.00e-42]"
+          },
+          "finite_r_inv_square_dilation_rhs": {
+            "mid_float": -0.09337159563610847,
+            "rad_float_outward": 4.235841717745535e-19,
+            "lower_dec": "-9.337159563610847354989752803520613604664e-2",
+            "upper_dec": "-9.337159563610847354989752803520613604661e-2",
+            "arb_ball_str": "[-0.09337159563610847354989752803520613604663 +/- 4.00e-42]"
+          },
+          "residual": {
+            "mid_float": 2.1590421387736112e-78,
+            "rad_float_outward": 1.831070850125434e-76,
+            "lower_dec": "-1.809480428737697450077915776542706294831e-76",
+            "upper_dec": "1.852661271513169673204847535856708292687e-76",
+            "arb_ball_str": "[+/- 1.86e-76]"
+          },
+          "verified": true
+        },
+        {
+          "T": 40,
+          "X": 7,
+          "Q_lambda_T": {
+            "mid_float": -0.11558169765206415,
+            "rad_float_outward": 3.344944548626639e-18,
+            "lower_dec": "-1.155816976520641531510171835006376727483e-1",
+            "upper_dec": "-1.155816976520641531510171835006376727480e-1",
+            "arb_ball_str": "[-0.1155816976520641531510171835006376727482 +/- 2.74e-42]"
+          },
+          "finite_r_inv_square_dilation_rhs": {
+            "mid_float": -0.11558169765206415,
+            "rad_float_outward": 3.344944548626639e-18,
+            "lower_dec": "-1.155816976520641531510171835006376727483e-1",
+            "upper_dec": "-1.155816976520641531510171835006376727480e-1",
+            "arb_ball_str": "[-0.1155816976520641531510171835006376727482 +/- 2.74e-42]"
+          },
+          "residual": {
+            "mid_float": 7.556647485707639e-78,
+            "rad_float_outward": 2.857810639897203e-76,
+            "lower_dec": "-2.782244165040125947285925002601974892950e-76",
+            "upper_dec": "2.933377114754278728230186160200981885444e-76",
+            "arb_ball_str": "[+/- 2.94e-76]"
+          },
+          "verified": true
+        },
+        {
+          "T": 100,
+          "X": 0,
+          "Q_lambda_T": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "finite_r_inv_square_dilation_rhs": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "residual": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5e-324,
+            "lower_dec": "0",
+            "upper_dec": "0",
+            "arb_ball_str": "0"
+          },
+          "verified": true
+        },
+        {
+          "T": 100,
+          "X": 1,
+          "Q_lambda_T": {
+            "mid_float": 0.24507765781996377,
+            "rad_float_outward": 1.2468814936013153e-17,
+            "lower_dec": "2.450776578199637553913014410377208835082e-1",
+            "upper_dec": "2.450776578199637553913014410377208835085e-1",
+            "arb_ball_str": "[0.2450776578199637553913014410377208835083 +/- 2.16e-41]"
+          },
+          "finite_r_inv_square_dilation_rhs": {
+            "mid_float": 0.24507765781996377,
+            "rad_float_outward": 1.2468814936013153e-17,
+            "lower_dec": "2.450776578199637553913014410377208835082e-1",
+            "upper_dec": "2.450776578199637553913014410377208835085e-1",
+            "arb_ball_str": "[0.2450776578199637553913014410377208835083 +/- 2.16e-41]"
+          },
+          "residual": {
+            "mid_float": 3.0226589942830556e-77,
+            "rad_float_outward": 3.8502077888478884e-76,
+            "lower_dec": "-3.547941889419582250470852468804519187599e-76",
+            "upper_dec": "4.152473688276193374247897099200547157577e-76",
+            "arb_ball_str": "[+/- 4.16e-76]"
+          },
+          "verified": true
+        },
+        {
+          "T": 100,
+          "X": 7,
+          "Q_lambda_T": {
+            "mid_float": -0.12282970791151061,
+            "rad_float_outward": 1.984660356006625e-18,
+            "lower_dec": "-1.228297079115106152787086112906215685640e-1",
+            "upper_dec": "-1.228297079115106152787086112906215685637e-1",
+            "arb_ball_str": "[-0.1228297079115106152787086112906215685639 +/- 4.21e-41]"
+          },
+          "finite_r_inv_square_dilation_rhs": {
+            "mid_float": -0.12282970791151061,
+            "rad_float_outward": 1.984660356006625e-18,
+            "lower_dec": "-1.228297079115106152787086112906215685640e-1",
+            "upper_dec": "-1.228297079115106152787086112906215685637e-1",
+            "arb_ball_str": "[-0.1228297079115106152787086112906215685639 +/- 4.21e-41]"
+          },
+          "residual": {
+            "mid_float": 1.94313792489625e-77,
+            "rad_float_outward": 4.490502053597698e-76,
+            "lower_dec": "-4.296188261108072252656926896569516292873e-76",
+            "upper_dec": "4.684815846087322260799312730395534273573e-76",
+            "arb_ball_str": "[+/- 4.69e-76]"
+          },
+          "verified": true
+        },
+        {
+          "T": 100,
+          "X": 13,
+          "Q_lambda_T": {
+            "mid_float": -0.1535086023900074,
+            "rad_float_outward": 8.654683104381871e-18,
+            "lower_dec": "-1.535086023900074179098735003065983262446e-1",
+            "upper_dec": "-1.535086023900074179098735003065983262443e-1",
+            "arb_ball_str": "[-0.1535086023900074179098735003065983262444 +/- 1.18e-41]"
+          },
+          "finite_r_inv_square_dilation_rhs": {
+            "mid_float": -0.1535086023900074,
+            "rad_float_outward": 8.654683104381871e-18,
+            "lower_dec": "-1.535086023900074179098735003065983262446e-1",
+            "upper_dec": "-1.535086023900074179098735003065983262443e-1",
+            "arb_ball_str": "[-0.1535086023900074179098735003065983262444 +/- 1.18e-41]"
+          },
+          "residual": {
+            "mid_float": -4.965796919179306e-77,
+            "rad_float_outward": 5.052716574235161e-76,
+            "lower_dec": "-5.549296266153091058805312743570100188169e-76",
+            "upper_dec": "4.556136882317229926885882279348054237491e-76",
+            "arb_ball_str": "[+/- 5.55e-76]"
+          },
+          "verified": true
+        }
+      ],
+      "verified": true
+    },
+    "finite_to_full_cutoff_comparison": {
+      "pointwise_tail_cap_tau_5_2_over_2": {
+        "mid_float": 49.47885890238629,
+        "rad_float_outward": 3.5162599343653745e-15,
+        "lower_dec": "4.947885890238629610045671517364388860800e+1",
+        "upper_dec": "4.947885890238629610045671517364388860803e+1",
+        "arb_ball_str": "[49.47885890238629610045671517364388860802 +/- 2.38e-39]"
+      },
+      "B_tau_uniform_window_norm_bound": {
+        "mid_float": 67.07766009852674,
+        "rad_float_outward": 1.0015207878140264e-15,
+        "lower_dec": "6.707766009852673405368136476599654447590e+1",
+        "upper_dec": "6.707766009852673405368136476599654447593e+1",
+        "arb_ball_str": "[67.07766009852673405368136476599654447592 +/- 4.21e-39]"
+      },
+      "formula": "||Q_{a,infty} - Q_{a,T(Y)}||_Y <= B_tau := tau^{5/2}*sqrt(log tau)/2 for all |a(n)| <= 1, Y >= 1",
+      "quadratic_energy_transfer": "|E_T - E_infty| <= 2*B_tau*sqrt(E_infty) + B_tau^2 (bilateral O_eps(Y^eps) transfer in Lean Theorem 31(5))",
+      "unsigned_control_diagnostic_note": "For unsigned control a = 1, ||Q_{1,infty} - Q_{1,T(Y)}||_Y is O(1) and bounded away from 0 (since exp(-X^2/n^2) -> 1 for n > T(Y) >> X), diagnosing why generic |a| <= 1 tail bounds yield O(1) norm error rather than exponential decay; this does NOT disprove a stronger cutoff-tail statement specific to lambda.",
+      "sampled_enclosure_rows": [
+        {
+          "Y": 4,
+          "T_Y": 6,
+          "mode": "liouville",
+          "E_T": {
+            "mid_float": 0.004608633312722756,
+            "rad_float_outward": 2.869350901878105e-19,
+            "lower_dec": "4.608633312722755964394753036415613296615e-3",
+            "upper_dec": "4.608633312722755964394753036415613296618e-3",
+            "arb_ball_str": "[0.004608633312722755964394753036415613296616 +/- 3.52e-43]"
+          },
+          "E_inf_enclosure": {
+            "mid_float": 0.04169632787165423,
+            "rad_float_outward": 0.0006109793885116259,
+            "lower_dec": "4.108534848314260741282871360387782017145e-2",
+            "upper_dec": "4.230730726016585392464569205846766392148e-2",
+            "arb_ball_str": "[0.04 +/- 2.31e-3]"
+          },
+          "norm_diff_T_to_inf_enclosure": {
+            "mid_float": 0.23914184780086253,
+            "rad_float_outward": 0.0014906146734574644,
+            "lower_dec": "2.376512331274050693838492326040187790782e-1",
+            "upper_dec": "2.406324624743199847518101624746242478285e-1",
+            "arb_ball_str": "[0.24 +/- 2.35e-3]"
+          },
+          "B_tau_minus_norm_diff_margin": {
+            "mid_float": 66.83851825072587,
+            "rad_float_outward": 0.0014906146770979113,
+            "lower_dec": "6.683702763604877609012246289057026007182e+1",
+            "upper_dec": "6.684000886540296696310460724634418585310e+1",
+            "arb_ball_str": "[66.84 +/- 2.98e-3]"
+          },
+          "abs_E_T_minus_E_inf_enclosure": {
+            "mid_float": 0.037087694558931475,
+            "rad_float_outward": 0.000610979390330613,
+            "lower_dec": "3.647671516860086204488810409163212874984e-2",
+            "upper_dec": "3.769867394926208736379679549788212874987e-2",
+            "arb_ball_str": "[0.037 +/- 6.99e-4]"
+          },
+          "quad_transfer_2Btau_sqrtEinf_add_Btau2_margin": {
+            "mid_float": 4526.7694819587205,
+            "rad_float_outward": 0.20058487006480985,
+            "lower_dec": "4.526568897088655652153891628276610420286e+3",
+            "upper_dec": "4.526970066828784914362830226909422920289e+3",
+            "arb_ball_str": "[4.527e+3 +/- 0.432]"
+          },
+          "verified": true
+        },
+        {
+          "Y": 4,
+          "T_Y": 6,
+          "mode": "unsigned_1",
+          "E_T": {
+            "mid_float": 0.22293389309250553,
+            "rad_float_outward": 8.617922158447928e-18,
+            "lower_dec": "2.229338930925055337199205455198700527880e-1",
+            "upper_dec": "2.229338930925055337199205455198700527883e-1",
+            "arb_ball_str": "[0.2229338930925055337199205455198700527881 +/- 3.12e-42]"
+          },
+          "E_inf_enclosure": {
+            "mid_float": 5.281088394837788,
+            "rad_float_outward": 0.006853271486761655,
+            "lower_dec": "5.274235123351026149162294416914026080497e+0",
+            "upper_dec": "5.287941666324549177357198744306604205500e+0",
+            "arb_ball_str": "[5.28 +/- 7.95e-3]"
+          },
+          "norm_diff_T_to_inf_enclosure": {
+            "mid_float": 2.0973960431250114,
+            "rad_float_outward": 0.0014906146734574627,
+            "lower_dec": "2.095905428451553924858961071563833536690e+0",
+            "upper_dec": "2.098886657798468840226922001434439005443e+0",
+            "arb_ball_str": "[2.10 +/- 4.10e-3]"
+          },
+          "B_tau_minus_norm_diff_margin": {
+            "mid_float": 64.98026405540172,
+            "rad_float_outward": 0.0014906146770993155,
+            "lower_dec": "6.497877344072462723464735105161044531421e+1",
+            "upper_dec": "6.498175467007881810762949540738437109549e+1",
+            "arb_ball_str": "[64.98 +/- 1.76e-3]"
+          },
+          "abs_E_T_minus_E_inf_enclosure": {
+            "mid_float": 5.058154501745282,
+            "rad_float_outward": 0.006853271501313754,
+            "lower_dec": "5.051301230243968700214007019587515402709e+0",
+            "upper_dec": "5.065007773246595558865645050593374777712e+0",
+            "arb_ball_str": "[5.06 +/- 8.70e-3]"
+          },
+          "quad_transfer_2Btau_sqrtEinf_add_Btau2_margin": {
+            "mid_float": 4802.651556859326,
+            "rad_float_outward": 0.2068271618337931,
+            "lower_dec": "4.802444729697492071867767547322940998730e+3",
+            "upper_dec": "4.802858384021159359694305633260440998733e+3",
+            "arb_ball_str": "[4.803e+3 +/- 0.556]"
+          },
+          "verified": true
+        },
+        {
+          "Y": 8,
+          "T_Y": 14,
+          "mode": "liouville",
+          "E_T": {
+            "mid_float": 0.016280644236178577,
+            "rad_float_outward": 1.14638474407536e-18,
+            "lower_dec": "1.628064423617857591478454843047804761283e-2",
+            "upper_dec": "1.628064423617857591478454843047804761286e-2",
+            "arb_ball_str": "[0.01628064423617857591478454843047804761284 +/- 2.05e-42]"
+          },
+          "E_inf_enclosure": {
+            "mid_float": 0.04480862057497924,
+            "rad_float_outward": 0.00364096167322714,
+            "lower_dec": "4.116765890175209867869984698321379249679e-2",
+            "upper_dec": "4.844958224820637631332051348712004249682e-2",
+            "arb_ball_str": "[0.04 +/- 8.45e-3]"
+          },
+          "norm_diff_T_to_inf_enclosure": {
+            "mid_float": 0.14505363853853284,
+            "rad_float_outward": 0.00843218994850759,
+            "lower_dec": "1.366214485900252534984615397362393942881e-1",
+            "upper_dec": "1.534858284870404227613475870995206442884e-1",
+            "arb_ball_str": "[0.1 +/- 0.0535]"
+          },
+          "B_tau_minus_norm_diff_margin": {
+            "mid_float": 66.93260645998821,
+            "rad_float_outward": 0.008432189977617549,
+            "lower_dec": "6.692417427001058980046328347528374258161e+1",
+            "upper_dec": "6.694103864996581263063963692987358633164e+1",
+            "arb_ball_str": "[66.9 +/- 0.0411]"
+          },
+          "abs_E_T_minus_E_inf_enclosure": {
+            "mid_float": 0.02852797633880066,
+            "rad_float_outward": 0.0036409616768651185,
+            "lower_dec": "2.488701466193554395682358560107558863395e-2",
+            "upper_dec": "3.216893801566577920562767800830215113398e-2",
+            "arb_ball_str": "[0.03 +/- 5.12e-3]"
+          },
+          "quad_transfer_2Btau_sqrtEinf_add_Btau2_margin": {
+            "mid_float": 4527.782017294547,
+            "rad_float_outward": 1.1348641198128695,
+            "lower_dec": "4.526647153174733853374570778862436918306e+3",
+            "upper_dec": "4.528916881414359545742124489799936918309e+3",
+            "arb_ball_str": "[4.53e+3 +/- 3.36]"
+          },
+          "verified": true
+        },
+        {
+          "Y": 8,
+          "T_Y": 14,
+          "mode": "unsigned_1",
+          "E_T": {
+            "mid_float": 0.613331594309828,
+            "rad_float_outward": 3.456806307211682e-17,
+            "lower_dec": "6.133315943098280111202482635113438651674e-1",
+            "upper_dec": "6.133315943098280111202482635113438651677e-1",
+            "arb_ball_str": "[0.6133315943098280111202482635113438651676 +/- 2.45e-41]"
+          },
+          "E_inf_enclosure": {
+            "mid_float": 10.551753462045596,
+            "rad_float_outward": 0.054852447647136066,
+            "lower_dec": "1.049690101439846081261548528814256588328e+1",
+            "upper_dec": "1.060660590969273222212705145025194088331e+1",
+            "arb_ball_str": "[1.1e+1 +/- 0.504]"
+          },
+          "norm_diff_T_to_inf_enclosure": {
+            "mid_float": 2.8929898391182656,
+            "rad_float_outward": 0.008432189963059687,
+            "lower_dec": "2.884557649155206256508562021227505578219e+0",
+            "upper_dec": "2.901422029081325256228181772204068078222e+0",
+            "arb_ball_str": "[2.9 +/- 0.0155]"
+          },
+          "B_tau_minus_norm_diff_margin": {
+            "mid_float": 64.18467025940846,
+            "rad_float_outward": 0.008432189992168363,
+            "lower_dec": "6.417623806941630496699644929017919514768e+1",
+            "upper_dec": "6.419310244940063162762953644838232014771e+1",
+            "arb_ball_str": "[64.2 +/- 0.0238]"
+          },
+          "abs_E_T_minus_E_inf_enclosure": {
+            "mid_float": 9.938421867735768,
+            "rad_float_outward": 0.05485244776355191,
+            "lower_dec": "9.883569419972217479668302210178097018130e+0",
+            "upper_dec": "9.993274315499319532833738001193722018133e+0",
+            "arb_ball_str": "[9.9 +/- 0.0933]"
+          },
+          "quad_transfer_2Btau_sqrtEinf_add_Btau2_margin": {
+            "mid_float": 4925.256995814909,
+            "rad_float_outward": 1.1860756091777618,
+            "lower_dec": "4.924070920205731043732048590876057081111e+3",
+            "upper_dec": "4.926443071424085745727898200251057081114e+3",
+            "arb_ball_str": "[4.93e+3 +/- 5.93]"
+          },
+          "verified": true
+        },
+        {
+          "Y": 16,
+          "T_Y": 32,
+          "mode": "liouville",
+          "E_T": {
+            "mid_float": 0.07304028417222569,
+            "rad_float_outward": 2.409422764444495e-18,
+            "lower_dec": "7.304028417222568662057747520983290617878e-2",
+            "upper_dec": "7.304028417222568662057747520983290617881e-2",
+            "arb_ball_str": "[0.07304028417222568662057747520983290617880 +/- 4.14e-42]"
+          },
+          "E_inf_enclosure": {
+            "mid_float": 0.04426417172176337,
+            "rad_float_outward": 0.02234637524816208,
+            "lower_dec": "2.191779647360129409601300082895526751564e-2",
+            "upper_dec": "6.661054696992544585039227328989276751567e-2",
+            "arb_ball_str": "[+/- 0.0667]"
+          },
+          "norm_diff_T_to_inf_enclosure": {
+            "mid_float": 0.13941584915305238,
+            "rad_float_outward": 0.04769966955063866,
+            "lower_dec": "9.171617960241373446699969695119657465610e-2",
+            "upper_dec": "1.871155187036910262417494528105715746563e-1",
+            "arb_ball_str": "[0.1 +/- 0.0872]"
+          },
+          "B_tau_minus_norm_diff_margin": {
+            "mid_float": 66.93824424937368,
+            "rad_float_outward": 0.047699669667054086,
+            "lower_dec": "6.689054457970662770561268049873284790124e+1",
+            "upper_dec": "6.698594391904073564104129988349847290127e+1",
+            "arb_ball_str": "[66.9 +/- 0.0860]"
+          },
+          "abs_E_T_minus_E_inf_enclosure": {
+            "mid_float": 0.028776112450462316,
+            "rad_float_outward": 0.02234637527726591,
+            "lower_dec": "6.429737173196410313451498306658888663138e-3",
+            "upper_dec": "5.112248772772822298129817799415888866315e-2",
+            "arb_ball_str": "[+/- 0.0512]"
+          },
+          "quad_transfer_2Btau_sqrtEinf_add_Btau2_margin": {
+            "mid_float": 4527.608716018186,
+            "rad_float_outward": 6.421510875225443,
+            "lower_dec": "4.521187205142961294481173457882496851799e+3",
+            "upper_dec": "4.534030226893411428758517207882496851802e+3",
+            "arb_ball_str": "[4.53e+3 +/- 8.82]"
+          },
+          "verified": true
+        },
+        {
+          "Y": 16,
+          "T_Y": 32,
+          "mode": "unsigned_1",
+          "E_T": {
+            "mid_float": 1.6540109104081258,
+            "rad_float_outward": 3.8183854498435076e-17,
+            "lower_dec": "1.654010910408125794460685951286252658281e+0",
+            "upper_dec": "1.654010910408125794460685951286252658284e+0",
+            "arb_ball_str": "[1.654010910408125794460685951286252658282 +/- 1.92e-40]"
+          },
+          "E_inf_enclosure": {
+            "mid_float": 21.01621135702845,
+            "rad_float_outward": 0.4396186633966881,
+            "lower_dec": "2.057659269363176505298736474717268528633e+1",
+            "upper_dec": "2.145583002042513768406036279404768528636e+1",
+            "arb_ball_str": "[2.1e+1 +/- 0.456]"
+          },
+          "norm_diff_T_to_inf_enclosure": {
+            "mid_float": 3.9588232553072715,
+            "rad_float_outward": 0.04769966955063868,
+            "lower_dec": "3.911123585756632907475494284473079491109e+0",
+            "upper_dec": "4.006522924857910199250244040332454491112e+0",
+            "arb_ball_str": "[4.0 +/- 0.0889]"
+          },
+          "B_tau_minus_norm_diff_margin": {
+            "mid_float": 63.11883684321946,
+            "rad_float_outward": 0.04769966966705428,
+            "lower_dec": "6.307113717355240853260418591121096498479e+1",
+            "upper_dec": "6.316653651288651646803280529597658998482e+1",
+            "arb_ball_str": "[63.1 +/- 0.0666]"
+          },
+          "abs_E_T_minus_E_inf_enclosure": {
+            "mid_float": 19.362200446620324,
+            "rad_float_outward": 0.43961866432801017,
+            "lower_dec": "1.892258178229231668391120028026143262804e+1",
+            "upper_dec": "1.980181911094833446421515535838643262807e+1",
+            "arb_ball_str": "[1.9e+1 +/- 0.802]"
+          },
+          "quad_transfer_2Btau_sqrtEinf_add_Btau2_margin": {
+            "mid_float": 5095.064442228164,
+            "rad_float_outward": 6.838783159852242,
+            "lower_dec": "5.088225659068312083566557750157150233512e+3",
+            "upper_dec": "5.101903225388016139352690562657150233515e+3",
+            "arb_ball_str": "[5.1e+3 +/- 11.8]"
+          },
+          "verified": true
+        }
+      ],
       "verified": true
     },
     "normalized_trivial_zero_slope_k_independence": {
@@ -165,24 +880,26 @@
         "Complete multiplicativity of liouvilleLambda(n) = (-1)^{Omega(n)}, common-factor cancellation, flat square-divisor Moebius/Liouville inversions, finite prime-exclusion sieve, and P-smooth/coprime finite cutoff bijection (Lean Theorems 3-4, 9-10, 13-16).",
         "Finite prime-adjoining filtration, unimodal alternating Gaussian prime-chain contraction, and P-independent contraction C_{P,p} = D_T - V_{p} (Lean Theorems 17-20).",
         "General Moebius-rough descent across U >= 2 (with composite rough divisors entering when an admissible composite exists, e.g. 35 at U=5, T=35 vs none at U=5, T=25), logarithmic prime-power descent & M-step shift telescope, pointwise quadratic prime-power diagonal/off-diagonal decomposition, and inherited-vs-canonical cutoff comparison with (Y=9/4, d=2) counterexample and small-scale positivity (Lean Theorems 22-25).",
-        "NEW in TC-058: All-prime square-divisor indicator (1 * lambda)(n) = 1_{IsSquare n} vs dyadic parity (1 * a_2)(2^v m) = 1_{Even v} d_div(m), actual Selberg Liouville second-order weight w_{2,lambda} = Lambda_lambda*log + Lambda_lambda*Lambda_lambda (Lambda_lambda = -Lambda + 2*B) & finite square projection sum_{d=1}^T g_d = Q_{square,T} (including T = 0, 1), exact summation by parts keeping floor(T/d) jumps with post-Abel c_lambda collapse & jump-count telescope, exact shift elimination P_Y - R_Y = D_{2,Y}, pointwise combined quadratic forms, and growing-order M-layer polynomial filter 0 < P_M(s) <= 4 on [1/4, 3/2] & joint Gram decomposition (Lean Theorems 27-30)."
+        "TC-058 / TC-058R: All-prime square-divisor indicator (1 * lambda)(n) = 1_{IsSquare n} vs dyadic parity (1 * a_2)(2^v m) = 1_{Even v} d_div(m), actual Selberg Liouville second-order weight w_{2,lambda} = Lambda_lambda*log + Lambda_lambda*Lambda_lambda (Lambda_lambda = -Lambda + 2*B) & finite square projection sum_{d=1}^T g_d = Q_{square,T} (including T = 0, 1), exact summation by parts keeping floor(T/d) jumps with post-Abel c_lambda collapse & jump-count telescope, exact shift elimination P_Y - R_Y = D_{2,Y}, pointwise combined quadratic forms, growing-order M-layer polynomial filter 0 < P_M(s) <= 4 on [1/4, 3/2] & joint Gram decomposition, and exact finite r^{-1} square-dilation bridge Q_{lambda,T}(X) = sum_{r^2<=T} r^{-1} Q_{mu,floor(T/r^2)}(X/r^2) for all T >= 0, X >= 0 (Lean Theorems 27-31)."
       ],
       "b_analytic_results_proved_outside_lean": [
-        "Riesz-Gaussian equivalence context: Q_mu(X) = X^{5/2} P_3(X^2) belongs to the published Riesz-type family (Agarwal-Garg-Maji 2022, arXiv:2202.00637, Theorem 1.2 at k = 3, u = X^2), transferred between Q_mu and Q_lambda on weighted L^2((0, infty), X^{-2*eta} dX/X) by reversible square-divisor norm bounds.",
-        "Unconditional Route D cross-scale prime-power diagonal contraction D_tilde_{lambda,pp}(Y) <= (2/(log Y)^2) sum_{p^k<=Y} ((log p)^2/p^k) F(Y/p^k) + C_{cut,diag} with contraction factor Theta_eps^{diag}(Y) < 2*zeta''(1+eps)/(log Y)^2 -> 0, plus scoped majorant obstructions for Route A/B Cauchy-Schwarz and Route C uncompensated Abel majorants.",
-        "NEW in TC-058 (\u00a74): Uniform unimodal bound 0 <= Q_{square,T}(X) <= C_sq := Gamma(5/4)/4 + 2*(3/(2*e))^{3/2} for X >= 1 giving ||c_lambda Q_{square,T}/(log X)^2||_Y^2 = O((log Y)^{-4}), O((log Y)^{-4}) upper-endpoint decay, and unconditional O((log Y)^{-2}) window-energy decay of the entire floor(T/d) cutoff-jump sum via (d+1)(L_{d+1}+1) >= T + 1 and sum_{d=1}^{T-1} d(L_d - L_{d+1}) <= T*log T.",
-        "NEW in TC-058 (\u00a75): Uniform generic terminal remainder bound ||Q_{a,L}^{[M(Y)]}/(log X)^{M(Y)}||_Y^2 <= 2068*(log Y)*Y^{-3} for all |a(n)| <= 1, L >= 1, Y >= 2 (M(Y) = ceil(2*log Y), bounding all three parts of A_m via explicit Robbins-Stirling + 17-interval compact monotonicity), and unconditional joint M(Y)-layer prime-power diagonal bound D_tilde_{a,pp}^{(M(Y))}(Y) = O(Y/(log Y)^2) uniformly for |a(n)| <= 1."
+        "Riesz-Gaussian & finite/full cutoff bridges: Q_mu(X) = X^{5/2} P_3(X^2) belongs to the published Riesz-type family (Agarwal-Garg-Maji 2022, arXiv:2202.00637, Theorem 1.2 at k = 3, u = X^2); Q_lambda(X) = sum_{r>=1} r^{-1} Q_mu(X/r^2) follows from Lean Theorem 31(1) via absolute convergence sum_{r,n>=1} phi_{r^2 n}(X) = zeta(6)*zeta(3)*X^{5/2} < infty; and for all |a(n)| <= 1, Y >= 1, ||Q_{a,infty} - Q_{a,T(Y)}||_Y <= B_tau := tau^{5/2}*sqrt(log tau)/2 gives |E_T - E_infty| <= 2*B_tau*sqrt(E_infty) + B_tau^2 and bilateral O_eps(Y^eps) transfer (Lean Theorem 31(5)).",
+        "Unconditional Route D cross-scale prime-power diagonal contraction D_tilde_{lambda,pp}(Y) <= (2/(log Y)^2) sum_{p^k<=Y} ((log p)^2/p^k) F(Y/p^k) + C_{cut,diag} with normalized finite-horizon absorption D_tilde(Y)/Y^eps <= Theta_eps^{diag}(Y)*G_eps(R) + C_{cut,diag}/Y^eps (Theta_eps^{diag}(Y) <= 2*zeta''(1+eps)/(log Y)^2 -> 0, G_eps(R) = sup_{1<=Z<=R} E(Z)/Z^eps), plus scoped majorant obstructions for Route A/B Cauchy-Schwarz and Route C uncompensated Abel majorants.",
+        "TC-058 / TC-058R (\u00a74): Uniform unimodal bound 0 <= Q_{square,T}(X) <= C_sq := Gamma(5/4)/4 + 2*(3/(2*e))^{3/2} for X >= 1 giving ||c_lambda Q_{square,T}/(log X)^2||_Y^2 = O((log Y)^{-4}); O((log Y)^{-4}) upper-endpoint window energy via L_T = 1, g_T = phi_T, |R_2^{int}(T)| <= C_W*T (from TC-057R Selberg/PNT asymptotic), and X^{5/2}/T(Y)^2 <= tau^{5/2}; unconditional O((log Y)^{-2}) aggregate floor(T/d) jump energy via (d+1)(L_{d+1}+1) >= T + 1 and sum_{d=1}^{T-1} d(L_d - L_{d+1}) <= T*log T; and finite-cutoff smooth-step derivative bound |Delta_d^{sm}(X)| <= C_sm*sqrt(X)/(d*(d+1)) < C_sm*sqrt(X)/d^2 (C_sm = 5/2 + 4*(5/(2*e))^{5/2} + 6*(3/(2*e))^{3/2}), yielding O(Y*(log Y)^{-4}) normalized window energy when small d >= 1 are included.",
+        "TC-058 / TC-058R (\u00a75): Uniform generic terminal remainder bound ||Q_{a,L}^{[M(Y)]}/(log X)^{M(Y)}||_Y^2 <= 2068*(log Y)*Y^{-3} for all |a(n)| <= 1, L >= 1, Y >= 2 (M(Y) = ceil(2*log Y), bounding all three parts of A_m via explicit Robbins-Stirling + 17-interval compact monotonicity), and unconditional joint M(Y)-layer prime-power diagonal bound D_M(Y) = O(Y/(log Y)^2) uniformly for |a(n)| <= 1 (while Q_{a,T} = L_{a,M,Y} + r_{a,M,Y} requires multiplicative a with a(1) = 1)."
       ],
       "c_conditional_implications": [
         "Polylogarithmic scale-envelope bootstrap F(Y) <= A_eta Y^eta + B_eta F(Y/U_eta(Y)) => E(Y) <<_eps Y^eps (`CONDITIONAL_ON_RECURSION`, Lean Theorem 21).",
-        "TC-057R Young-expanded same-scale absorption sufficient condition X_tilde(Y) + ||R_Y||_Y^2 <= A_eta Y^eta + theta_eta F(Y) with 0 <= theta_eta < 1/2 => E(Y) <<_eps Y^eps (`CONDITIONAL_ON_SIGNED_CORRELATION`, Lean Theorem 26; forward implication proved, converse not asserted).",
-        "NEW in TC-058 (\u00a73): Un-Young-expanded combined sufficient condition S_comb(Y) := X_tilde(Y) + 2*<P_Y, R_Y>_Y + ||R_Y||_Y^2 <= A_eta Y^eta + theta_eta F(Y) across the full range 0 <= theta_eta < 1 (with theta_eta + Theta_eps^{diag}(Y) <= q < 1, no outer factor 2) => E(Y) <<_eps Y^eps (`CONDITIONAL_ON_COMBINED_CORRELATION`, Lean Theorem 29; forward implication proved)."
+        "TC-057R Young-expanded target X_tilde(Y) + ||R_Y||_Y^2 <= A_eta Y^eta + theta_eta F(Y) (0 <= theta_eta < 1/2, contraction 2*theta_eta + 2*Theta_eps^{diag}(Y)) => E(Y) <<_eps Y^eps (`CONDITIONAL_ON_SIGNED_CORRELATION`, Lean Theorem 26; forward implication only).",
+        "TC-058 combined target S_comb(Y) := X_tilde(Y) + 2*<P_Y, R_Y>_Y + ||R_Y||_Y^2 <= A_eta Y^eta + theta_eta F(Y) (0 <= theta_eta < 1, contraction theta_eta + Theta_eps^{diag}(Y)) => E(Y) <<_eps Y^eps (`CONDITIONAL_ON_COMBINED_CORRELATION`, Lean Theorem 29; forward implication only).",
+        "TC-058R second-order target T_2(Y) := 4*X_tilde(Y) - 4*<P_Y, D_{2,Y}>_Y + ||D_{2,Y}||_Y^2 <= A_eta Y^eta + theta_eta F(Y) (E = 4*D_tilde + T_2, 0 <= theta_eta < 1, contraction theta_eta + 4*Theta_eps^{diag}(Y)) => E(Y) <<_eps Y^eps (Lean Theorem 31(4); forward implication only).",
+        "TC-058R growing-order FULL joint Gram target J_M(Y) := D_M(Y) + X_M(Y) <= A_eta Y^eta + theta_eta F(Y) (0 <= theta_eta < 1, Young parameter delta = (1 - theta_eta)/2 > 0, contraction q = (1 + delta)*theta_eta < 1 valid including theta_eta = 0) => E(Y) <<_eps Y^eps (Lean Theorem 31(3a); abstract countermodel E = D = Y/(log Y)^2, X = r = 0 in Lean Theorem 31(3b) proves bounding X_M alone is insufficient without a new cross-scale contraction theorem for D_M)."
       ],
       "d_finite_numerical_observations": [
-        "Certified 256-bit Arb window evaluations at Y in {8, 16, 32, 64, 128}: direct cross term <P_Y, R_Y>_Y changes sign (> 0 at Y in {8, 16, 32, 128}, < 0 at Y = 64); S_comb(Y) alternates sign (< 0 at Y in {8, 32, 128}, > 0 at Y in {16, 64}); parity controls a_2, a_{3,5,7}, and unsigned 1 concentrate >= 94% of their sampled Y = 64 joint M(Y)-layer energy in the off-diagonal X_tilde_{a,pp}^{(M(Y))}(64) (strictly finite sampled data, never extrapolated to asymptotic claims)."
+        "Certified 256-bit Arb window evaluations at Y in {8, 16, 32, 64, 128}: direct cross term <P_Y, R_Y>_Y changes sign (> 0 at Y in {8, 16, 32, 128}, < 0 at Y = 64); S_comb(Y) alternates sign (< 0 at Y in {8, 32, 128}, > 0 at Y in {16, 64}); at Y = 64, live certified off-diagonal shares 100 * X_{a,M}(64) / J_{a,M}(64) are ~94.86% (a_2), ~85.03% (a_{3,5,7}), and ~96.33% (unsigned 1), consistent with asymptotic off-diagonal fraction 1 - O((log Y)^{-2}) when E_a(Y) asymp Y; sampled Liouville layer-sum norm and squared-norm ratios exhibit nonmonotone strict finite triangle excess on Y in {8, 16, 32, 64}."
       ],
       "e_missing_tc_to_arithmetic_implication": [
-        "Open SUBGATE-TC-043A arithmetic estimate: an unconditional subpower or contractive bound S_comb(Y) <= A_eta Y^eta + theta_eta F(Y) (0 <= theta_eta < 1), equivalently subpower cancellation in 4*X_tilde_{lambda,pp}(Y) - 4*<P_Y, D_{2,Y}>_Y + ||D_{2,Y}||_Y^2 (\u00a74) or in the joint M(Y)-layer distinct-prime-power off-diagonal X_tilde_{lambda,pp}^{(M(Y))}(Y) (\u00a75). Varying K in normalized trivial-zero slopes yields no additional moments beyond zeta'(-2m), generic unitary dilation covariance does not bound the arithmetic sum, and all \u00a7\u00a73-5 theorems generalize to arbitrary multiplicative window base b > 1 (classified honestly as TC-inspired analytic number theory)."
+        "Open SUBGATE-TC-043A arithmetic target: EITHER derive the fixed-order S_comb(Y) <= A_eta Y^eta + theta_eta F(Y) bound (0 <= theta_eta < 1, or T_2(Y) with 4*Theta_eps^{diag}) using the established fixed-order diagonal bootstrap, OR derive a subpower/contractive bound on the FULL growing-order Gram energy J_M(Y) = D_M(Y) + X_M(Y), OR first prove a new cross-scale contraction theorem for the growing-order diagonal D_M(Y) before using an off-diagonal-only X_M(Y) target. Varying K in normalized trivial-zero slopes yields no additional moments beyond zeta'(-2m), and all proved estimates hold for arbitrary multiplicative window base b > 1 (TC-inspired analytic number theory)."
       ]
     },
     "all_section_1_and_2_checks_pass": true
@@ -569,12 +1286,19 @@
           "upper_dec": "3.197911274245137349943779482641467295018e+1",
           "arb_ball_str": "[31.97911274245137349943779482641467295017 +/- 3.28e-39]"
         },
-        "threshold_log_Y_for_q": {
+        "threshold_log_Y_for_S_comb_q": {
           "mid_float": 15.994777333230088,
           "rad_float_outward": 5.385855459400808e-16,
           "lower_dec": "1.599477733323008745146028530761785173935e+1",
           "upper_dec": "1.599477733323008745146028530761785173938e+1",
           "arb_ball_str": "[15.99477733323008745146028530761785173936 +/- 1.78e-39]"
+        },
+        "threshold_log_Y_for_T2_4Theta_q": {
+          "mid_float": 31.989554666460176,
+          "rad_float_outward": 1.0771710918801615e-15,
+          "lower_dec": "3.198955466646017490292057061523570347871e+1",
+          "upper_dec": "3.198955466646017490292057061523570347874e+1",
+          "arb_ball_str": "[31.98955466646017490292057061523570347872 +/- 3.56e-39]"
         },
         "Theta_eps_diag_at_Y128": {
           "mid_float": 0.20366955165438863,
@@ -582,6 +1306,13 @@
           "lower_dec": "2.036695516543886293792756062924747500068e-1",
           "upper_dec": "2.036695516543886293792756062924747500071e-1",
           "arb_ball_str": "[0.2036695516543886293792756062924747500069 +/- 4.85e-41]"
+        },
+        "four_Theta_eps_diag_at_Y128": {
+          "mid_float": 0.8146782066175545,
+          "rad_float_outward": 5.866159796444233e-18,
+          "lower_dec": "8.146782066175545175171024251698990000276e-1",
+          "upper_dec": "8.146782066175545175171024251698990000279e-1",
+          "arb_ball_str": "[0.8146782066175545175171024251698990000278 +/- 6.07e-42]"
         },
         "verified": true
       },
@@ -598,12 +1329,19 @@
           "upper_dec": "2.559797334907582882251372616022073791561e+2",
           "arb_ball_str": "[255.9797334907582882251372616022073791560 +/- 2.27e-39]"
         },
-        "threshold_log_Y_for_q": {
+        "threshold_log_Y_for_S_comb_q": {
           "mid_float": 45.25304263722017,
           "rad_float_outward": 2.5189936884298458e-15,
           "lower_dec": "4.525304263722016632331101325419745105512e+1",
           "upper_dec": "4.525304263722016632331101325419745105515e+1",
           "arb_ball_str": "[45.25304263722016632331101325419745105514 +/- 2.42e-39]"
+        },
+        "threshold_log_Y_for_T2_4Theta_q": {
+          "mid_float": 90.50608527444034,
+          "rad_float_outward": 5.0379873768596916e-15,
+          "lower_dec": "9.050608527444033264662202650839490211026e+1",
+          "upper_dec": "9.050608527444033264662202650839490211029e+1",
+          "arb_ball_str": "[90.50608527444033264662202650839490211028 +/- 4.84e-39]"
         },
         "Theta_eps_diag_at_Y128": {
           "mid_float": 0.41097020690408165,
@@ -611,6 +1349,13 @@
           "lower_dec": "4.109702069040816665678231819902803444758e-1",
           "upper_dec": "4.109702069040816665678231819902803444761e-1",
           "arb_ball_str": "[0.4109702069040816665678231819902803444760 +/- 2.77e-42]"
+        },
+        "four_Theta_eps_diag_at_Y128": {
+          "mid_float": 1.6438808276163266,
+          "rad_float_outward": 7.648061872145294e-17,
+          "lower_dec": "1.643880827616326666271292727961121377902e+0",
+          "upper_dec": "1.643880827616326666271292727961121377905e+0",
+          "arb_ball_str": "[1.643880827616326666271292727961121377904 +/- 1.11e-41]"
         },
         "verified": true
       },
@@ -627,12 +1372,19 @@
           "upper_dec": "2.559797334907582882251372616022073791561e+2",
           "arb_ball_str": "[255.9797334907582882251372616022073791560 +/- 2.27e-39]"
         },
-        "threshold_log_Y_for_q": {
+        "threshold_log_Y_for_S_comb_q": {
           "mid_float": 31.998733318102346,
           "rad_float_outward": 2.1782529469195698e-16,
           "lower_dec": "3.199873331810234567274033512372580042712e+1",
           "upper_dec": "3.199873331810234567274033512372580042715e+1",
           "arb_ball_str": "[31.99873331810234567274033512372580042713 +/- 4.85e-39]"
+        },
+        "threshold_log_Y_for_T2_4Theta_q": {
+          "mid_float": 63.99746663620469,
+          "rad_float_outward": 4.3565058938391396e-16,
+          "lower_dec": "6.399746663620469134548067024745160085425e+1",
+          "upper_dec": "6.399746663620469134548067024745160085428e+1",
+          "arb_ball_str": "[63.99746663620469134548067024745160085427 +/- 3.04e-40]"
         },
         "Theta_eps_diag_at_Y128": {
           "mid_float": 0.41097020690408165,
@@ -641,10 +1393,108 @@
           "upper_dec": "4.109702069040816665678231819902803444761e-1",
           "arb_ball_str": "[0.4109702069040816665678231819902803444760 +/- 2.77e-42]"
         },
+        "four_Theta_eps_diag_at_Y128": {
+          "mid_float": 1.6438808276163266,
+          "rad_float_outward": 7.648061872145294e-17,
+          "lower_dec": "1.643880827616326666271292727961121377902e+0",
+          "upper_dec": "1.643880827616326666271292727961121377905e+0",
+          "arb_ball_str": "[1.643880827616326666271292727961121377904 +/- 1.11e-41]"
+        },
         "verified": true
       }
     ],
-    "identity_vs_estimate_note": "S_comb(Y) = E(Y) - D_tilde(Y) is an exact algebraic identity, NOT an arithmetic cancellation theorem; Theorem 29 proves the conditional forward implication from S_comb(Y) <= A_eta*Y^eta + theta_eta*F(Y) (0 <= theta_eta < 1) to E(Y) <<_eps Y^eps.",
+    "growing_order_young_schedule_rows": [
+      {
+        "theta_eta": "0",
+        "delta_young": "1/2",
+        "q_contraction_1_add_delta_mul_theta": "0",
+        "one_minus_q": "1",
+        "remainder_multiplier_1_add_inv_delta": "3",
+        "verified": true
+      },
+      {
+        "theta_eta": "1/2",
+        "delta_young": "1/4",
+        "q_contraction_1_add_delta_mul_theta": "5/8",
+        "one_minus_q": "3/8",
+        "remainder_multiplier_1_add_inv_delta": "5",
+        "verified": true
+      },
+      {
+        "theta_eta": "3/4",
+        "delta_young": "1/8",
+        "q_contraction_1_add_delta_mul_theta": "27/32",
+        "one_minus_q": "5/32",
+        "remainder_multiplier_1_add_inv_delta": "9",
+        "verified": true
+      }
+    ],
+    "closure_criteria_implication_table": [
+      {
+        "route_id": "TC-057R_young_expanded",
+        "target_observable": "X_tilde_{lambda,pp}(Y) + ||R_Y||_Y^2",
+        "exact_decomposition": "E(Y) <= 2*D_tilde_{lambda,pp}(Y) + 2*(X_tilde_{lambda,pp}(Y) + ||R_Y||_Y^2)",
+        "quantified_hypothesis": "forall eta > 0, exists A_eta >= 0, 0 <= theta_eta < 1/2, Y_eta >= 2: forall Y >= Y_eta, X_tilde_{lambda,pp}(Y) + ||R_Y||_Y^2 <= A_eta*Y^eta + theta_eta*F(Y)",
+        "contraction_coefficient": "2*theta_eta + 2*Theta_eps^{diag}(Y)",
+        "parameter_and_horizon_setup": "Given eps > 0, choose 0 < eta < min(eps, 1) and Y_* >= Y_eta large enough that 2*theta_eta + 2*Theta_eps^{diag}(Y) <= q < 1 for all Y >= Y_*; compact [1, Y_*] controlled by G_eps(Y_*) <= M_lin*Y_* inside G_eps(R) = sup_{1<=Z<=R} E(Z)/Z^eps.",
+        "implication_direction": "sufficient_forward_implication_only (converse not asserted)",
+        "lean_theorem": "conditional_signed_correlation_same_scale_absorption_transfer_tc057r (Theorem 26)",
+        "arithmetic_hypothesis_status": "OPEN"
+      },
+      {
+        "route_id": "TC-058_combined_un_young",
+        "target_observable": "S_comb(Y) = X_tilde_{lambda,pp}(Y) + 2*<P_Y, R_Y>_Y + ||R_Y||_Y^2",
+        "exact_decomposition": "E(Y) = D_tilde_{lambda,pp}(Y) + S_comb(Y)",
+        "quantified_hypothesis": "forall eta > 0, exists A_eta >= 0, 0 <= theta_eta < 1, Y_eta >= 2: forall Y >= Y_eta, S_comb(Y) <= A_eta*Y^eta + theta_eta*F(Y)",
+        "contraction_coefficient": "theta_eta + Theta_eps^{diag}(Y)",
+        "parameter_and_horizon_setup": "Given eps > 0, choose 0 < eta < eps and Y_* >= Y_eta with theta_eta + Theta_eps^{diag}(Y) <= q < 1 for all Y >= Y_*; compact [1, Y_*] controlled via G_eps(Y_*) inside G_eps(R).",
+        "implication_direction": "sufficient_forward_implication_only (converse not asserted)",
+        "lean_theorem": "combined_target_exact_quadratic_and_conditional_absorption_tc058 (Theorem 29)",
+        "arithmetic_hypothesis_status": "OPEN"
+      },
+      {
+        "route_id": "TC-058R_second_order_compensated",
+        "target_observable": "T_2(Y) = 4*X_tilde_{lambda,pp}(Y) - 4*<P_Y, D_{2,Y}>_Y + ||D_{2,Y}||_Y^2",
+        "exact_decomposition": "E(Y) = 4*D_tilde_{lambda,pp}(Y) + T_2(Y) (with S_comb(Y) = 3*D_tilde_{lambda,pp}(Y) + T_2(Y))",
+        "quantified_hypothesis": "forall eta > 0, exists A_eta >= 0, 0 <= theta_eta < 1, Y_eta >= 2: forall Y >= Y_eta, T_2(Y) <= A_eta*Y^eta + theta_eta*F(Y)",
+        "contraction_coefficient": "theta_eta + 4*Theta_eps^{diag}(Y)",
+        "parameter_and_horizon_setup": "Given eps > 0, choose 0 < eta < eps and Y_* >= Y_eta with theta_eta + 4*Theta_eps^{diag}(Y) <= q < 1 (note exact factor 4 on Theta_eps^{diag}(Y)); compact [1, Y_*] controlled via G_eps(Y_*).",
+        "implication_direction": "sufficient_forward_implication_only (converse not asserted)",
+        "lean_theorem": "growing_order_and_second_order_conditional_absorption_and_finite_square_bridge_tc058r (Theorem 31(4))",
+        "arithmetic_hypothesis_status": "OPEN"
+      },
+      {
+        "route_id": "TC-058R_growing_order_full_gram",
+        "target_observable": "J_M(Y) = ||L_{M,Y}||_Y^2 = D_M(Y) + X_M(Y) (M = ceil(2*log Y))",
+        "exact_decomposition": "Q_T = L_{M,Y} + r_{M,Y}, E(Y) <= (1 + delta)*J_M(Y) + (1 + 1/delta)*||r_{M,Y}||_Y^2",
+        "quantified_hypothesis": "forall eta > 0, exists A_eta >= 0, 0 <= theta_eta < 1, Y_eta >= 2: forall Y >= Y_eta, J_M(Y) = D_M(Y) + X_M(Y) <= A_eta*Y^eta + theta_eta*F(Y)",
+        "contraction_coefficient": "(1 + delta)*theta_eta with delta = (1 - theta_eta)/2 > 0 (valid at theta_eta = 0 where q = 0)",
+        "parameter_and_horizon_setup": "Given eps > 0, choose 0 < eta < eps, Y_* = Y_eta >= 2, delta = (1 - theta_eta)/2 > 0 so q = (1 + delta)*theta_eta = theta_eta*(3 - theta_eta)/2 < 1, and ||r_{M,Y}||_Y^2 <= 2068*(log Y)*Y^{-3} <= 2068*Y^{-2}; K_grow = (1+delta)*A_eta*Y_*^{eta-eps} + (1+1/delta)*2068*Y_*^{-(2+eps)}, compact [1, Y_*] via G_eps(Y_*).",
+        "implication_direction": "sufficient_forward_implication_only; X_M(Y) alone does NOT close the gate from D_M(Y) = O(Y/(log Y)^2) unless a new cross-scale contraction theorem for D_M(Y) is separately proved",
+        "lean_theorem": "growing_order_and_second_order_conditional_absorption_and_finite_square_bridge_tc058r (Theorem 31(2)-(3))",
+        "arithmetic_hypothesis_status": "OPEN"
+      }
+    ],
+    "logical_non_implication_countermodel": {
+      "classification": "countermodel_to_inference_not_arithmetic_lambda_counterexample",
+      "model_definition": "E(Y) = D(Y) = Y / (log Y)^2, X(Y) = 0, r(Y) = 0 for Y >= 2",
+      "purpose": "Demonstrates logically why D_M(Y) = O(Y/(log Y)^2), ||r_{M,Y}||_Y^2 <= 2068*(log Y)*Y^{-3}, and an off-diagonal-only bound X_M(Y) <= A_eta*Y^eta + theta_eta*F(Y) do NOT by themselves imply E(Y) = O_eps(Y^eps): Y/(log Y)^2 exceeds M_c*Y^eps for every 0 < eps < 1.",
+      "sample_witness_eps_half_Mc_10": {
+        "epsilon": "1/2",
+        "M_c": 10,
+        "t_param": 264,
+        "log_Y_witness": 528,
+        "E_witness_minus_Mc_Y_eps_margin": {
+          "mid_float": 7.281462208929513e+223,
+          "rad_float_outward": 2.3482896949432398e+207,
+          "lower_dec": "7.281462208929512824252002541325378904200e+223",
+          "upper_dec": "7.281462208929512824252002541325378904203e+223",
+          "arb_ball_str": "[7.281462208929512824252002541325378904201e+223 +/- 4.36e+183]"
+        },
+        "verified": true
+      }
+    },
+    "identity_vs_estimate_note": "S_comb(Y) = E(Y) - D_tilde(Y), E(Y) = 4*D_tilde(Y) + T_2(Y), and Q_T = L_{M,Y} + r_{M,Y} are exact algebraic identities, NOT arithmetic cancellation theorems; Theorems 26, 29, and 31 prove conditional forward implications via normalized finite-horizon absorption G_eps(R).",
     "all_section_3_checks_pass": true
   },
   "section_4_compensated_selberg_and_shift_elimination": {
@@ -675,6 +1525,20 @@
       "lower_dec": "1.046433177147589346277249843001237323895e+0",
       "upper_dec": "1.046433177147589346277249843001237323898e+0",
       "arb_ball_str": "[1.046433177147589346277249843001237323896 +/- 2.30e-41]"
+    },
+    "C_sm_smooth_step_const": {
+      "mid_float": 8.204192140942501,
+      "rad_float_outward": 5.669519140058757e-16,
+      "lower_dec": "8.204192140942501721606478749271576278833e+0",
+      "upper_dec": "8.204192140942501721606478749271576278836e+0",
+      "arb_ball_str": "[8.204192140942501721606478749271576278834 +/- 2.24e-41]"
+    },
+    "three_zeta_3_small_w_const": {
+      "mid_float": 3.606170709478783,
+      "rad_float_outward": 7.576787461364537e-17,
+      "lower_dec": "3.606170709478782856199214484534349972293e+0",
+      "upper_dec": "3.606170709478782856199214484534349972296e+0",
+      "arb_ball_str": "[3.606170709478782856199214484534349972295 +/- 4.12e-41]"
     },
     "X1_max_Q_square_sampled": {
       "mid_float": 0.38425787061555244,
@@ -850,6 +1714,333 @@
         "verified": true
       }
     ],
+    "upper_endpoint_coupled_cutoff_checks": {
+      "analytic_proof_scope": "All Y >= 2, X in [Y, tau*Y]: L_T = floor(T/T) = 1 => g_T(X) = phi_T(X) <= X^{5/2}/T^3; |R_2^{int}(T)| <= C_W*T (TC-057R Selberg/PNT asymptotic) and T(Y)^2 >= Y^{5/2} yield |R_2^{int}(T)*g_T(X)/(log X)^2| <= C_W*X^{5/2}/(T(Y)^2*(log Y)^2) <= C_W*tau^{5/2}/(log Y)^2, giving O((log Y)^{-4}) window energy (finite rows below are boundary checks, not the proof).",
+      "rows": [
+        {
+          "Y": 1,
+          "T_Y": 1,
+          "L_T": 1,
+          "exact_fourth_power_cutoff_boundary": true,
+          "g_T_minus_phi_T_at_Y": {
+            "mid_float": 0.0,
+            "rad_float_outward": 8.669903701115606e-78,
+            "lower_dec": "-8.669903701115604569317399884054042426635e-78",
+            "upper_dec": "8.669903701115604569317399884054042426635e-78",
+            "arb_ball_str": "[+/- 8.67e-78]"
+          },
+          "g_T_minus_phi_T_at_tau_Y": {
+            "mid_float": 0.0,
+            "rad_float_outward": 1.5116387922687775e-90,
+            "lower_dec": "-1.511638792268777322077822993645407606371e-90",
+            "upper_dec": "1.511638792268777322077822993645407606371e-90",
+            "arb_ball_str": "[+/- 1.52e-90]"
+          },
+          "X_hi_5_2_over_T_sq": {
+            "mid_float": 98.95771780477259,
+            "rad_float_outward": 7.032519868730749e-15,
+            "lower_dec": "9.895771780477259220091343034728777721602e+1",
+            "upper_dec": "9.895771780477259220091343034728777721605e+1",
+            "arb_ball_str": "[98.95771780477259220091343034728777721604 +/- 4.76e-39]"
+          },
+          "tau_5_2_minus_ratio_margin": {
+            "mid_float": 6.908934844075556e-76,
+            "rad_float_outward": 6.697293392644817e-75,
+            "lower_dec": "-6.006399908237260706155818697630879166777e-75",
+            "upper_dec": "7.388186877052371846217634995678943098156e-75",
+            "arb_ball_str": "[+/- 7.39e-75]"
+          },
+          "verified": true
+        },
+        {
+          "Y": 2,
+          "T_Y": 3,
+          "L_T": 1,
+          "exact_fourth_power_cutoff_boundary": false,
+          "g_T_minus_phi_T_at_Y": {
+            "mid_float": -2.1590421387736112e-78,
+            "rad_float_outward": 2.4839610795545176e-77,
+            "lower_dec": "-2.699865293431878310895360602532829951988e-77",
+            "upper_dec": "2.268056865677156079626043009392809973433e-77",
+            "arb_ball_str": "[+/- 2.70e-77]"
+          },
+          "g_T_minus_phi_T_at_tau_Y": {
+            "mid_float": -1.6472184286297693e-83,
+            "rad_float_outward": 9.961092438098479e-82,
+            "lower_dec": "-1.012581428096145515050052673418583134190e-81",
+            "upper_dec": "9.796370595235501299739633795083643247900e-82",
+            "arb_ball_str": "[+/- 1.02e-81]"
+          },
+          "X_hi_5_2_over_T_sq": {
+            "mid_float": 62.198820720443955,
+            "rad_float_outward": 2.0740482739623874e-15,
+            "lower_dec": "6.219882072044395678671225486176552454667e+1",
+            "upper_dec": "6.219882072044395678671225486176552454670e+1",
+            "arb_ball_str": "[62.19882072044395678671225486176552454668 +/- 4.85e-39]"
+          },
+          "tau_5_2_minus_ratio_margin": {
+            "mid_float": 36.75889708432864,
+            "rad_float_outward": 2.1469557628326414e-15,
+            "lower_dec": "3.675889708432863541420117548552225266934e+1",
+            "upper_dec": "3.675889708432863541420117548552225266937e+1",
+            "arb_ball_str": "[36.75889708432863541420117548552225266935 +/- 4.02e-40]"
+          },
+          "verified": true
+        },
+        {
+          "Y": 16,
+          "T_Y": 32,
+          "L_T": 1,
+          "exact_fourth_power_cutoff_boundary": true,
+          "g_T_minus_phi_T_at_Y": {
+            "mid_float": -2.698802673467014e-79,
+            "rad_float_outward": 1.7879238187602656e-78,
+            "lower_dec": "-2.057804086106966804463970380921884720448e-78",
+            "upper_dec": "1.518043551413564015377323389496859747253e-78",
+            "arb_ball_str": "[+/- 2.06e-78]"
+          },
+          "g_T_minus_phi_T_at_tau_Y": {
+            "mid_float": -2.1084395886461046e-81,
+            "rad_float_outward": 1.0680808863057321e-79,
+            "lower_dec": "-1.089165282192193039333963204657245931641e-79",
+            "upper_dec": "1.046996490419270946436568908452165855610e-79",
+            "arb_ball_str": "[+/- 1.09e-79]"
+          },
+          "X_hi_5_2_over_T_sq": {
+            "mid_float": 98.95771780477259,
+            "rad_float_outward": 7.032519868730749e-15,
+            "lower_dec": "9.895771780477259220091343034728777721602e+1",
+            "upper_dec": "9.895771780477259220091343034728777721605e+1",
+            "arb_ball_str": "[98.95771780477259220091343034728777721604 +/- 4.76e-39]"
+          },
+          "tau_5_2_minus_ratio_margin": {
+            "mid_float": 6.908934844075556e-76,
+            "rad_float_outward": 6.697293392644817e-75,
+            "lower_dec": "-6.006399908237260706155818697630879166777e-75",
+            "upper_dec": "7.388186877052371846217634995678943098156e-75",
+            "arb_ball_str": "[+/- 7.39e-75]"
+          },
+          "verified": true
+        },
+        {
+          "Y": 81,
+          "T_Y": 243,
+          "L_T": 1,
+          "exact_fourth_power_cutoff_boundary": true,
+          "g_T_minus_phi_T_at_Y": {
+            "mid_float": -1.6867516709168837e-79,
+            "rad_float_outward": 5.361856474373104e-79,
+            "lower_dec": "-7.048608145289987086532468986961519600178e-79",
+            "upper_dec": "3.675104803456219654740925290555113517711e-79",
+            "arb_ball_str": "[+/- 7.05e-79]"
+          },
+          "g_T_minus_phi_T_at_tau_Y": {
+            "mid_float": 2.698802673467014e-79,
+            "rad_float_outward": 4.2607175954553933e-78,
+            "lower_dec": "-3.990837328108691410360689159322266276935e-78",
+            "upper_dec": "4.530597862802094199447336150747291250130e-78",
+            "arb_ball_str": "[+/- 4.54e-78]"
+          },
+          "X_hi_5_2_over_T_sq": {
+            "mid_float": 98.95771780477259,
+            "rad_float_outward": 7.032519868730749e-15,
+            "lower_dec": "9.895771780477259220091343034728777721602e+1",
+            "upper_dec": "9.895771780477259220091343034728777721605e+1",
+            "arb_ball_str": "[98.95771780477259220091343034728777721604 +/- 4.76e-39]"
+          },
+          "tau_5_2_minus_ratio_margin": {
+            "mid_float": -4.1453609064453334e-76,
+            "rad_float_outward": 8.645034897716665e-75,
+            "lower_dec": "-9.059570988361196992836963470951846371369e-75",
+            "upper_dec": "8.230498807072130308799873692123008012542e-75",
+            "arb_ball_str": "[+/- 9.06e-75]"
+          },
+          "verified": true
+        }
+      ],
+      "verified": true
+    },
+    "smooth_step_finite_cutoff_bound_checks": {
+      "analytic_proof_scope": "All X > 0, T >= 2, 1 <= d <= T - 1: writing phi_q(X/y)/sqrt(y) = X^{5/2}*y^{-3}*q^{-3}*exp(-X^2/(y^2*q^2)) and w = X/y > 0 gives d/dy [phi_q(X/y)/sqrt(y)] = (sqrt(X)/y^2)*w^2*q^{-3}*exp(-w^2/q^2)*(2*w^2/q^2 - 3); bounding |d/dy sum_{q<=L_d} lambda(q)*phi_q(X/y)/sqrt(y)| <= C_sm*sqrt(X)/y^2 pointwise for all y > 0 via unimodal sum-integral comparison with w^{-1} peaks (w > 1) and 3*zeta(3)*w^2 <= 3*zeta(3) < C_sm (0 < w <= 1) and integrating over y in [d, d+1] proves |Delta_d^{sm}(X)| <= C_sm*sqrt(X)/(d*(d+1)) < C_sm*sqrt(X)/d^2.",
+      "sample_rows": [
+        {
+          "Y": 8,
+          "T_Y": 14,
+          "X_point": "tau*Y",
+          "d": 1,
+          "L_d": 14,
+          "abs_Delta_d_smooth": {
+            "mid_float": 0.011923339714150504,
+            "rad_float_outward": 7.074353660991944e-19,
+            "lower_dec": "1.192333971415050487796653014905651238843e-2",
+            "upper_dec": "1.192333971415050487796653014905651238846e-2",
+            "arb_ball_str": "[0.01192333971415050487796653014905651238845 +/- 3.28e-42]"
+          },
+          "C_sm_sqrtX_over_d_d_add_1_ub": {
+            "mid_float": 29.083103907564613,
+            "rad_float_outward": 1.3930859191452176e-15,
+            "lower_dec": "2.908310390756461455950026592398275275833e+1",
+            "upper_dec": "2.908310390756461455950026592398275275836e+1",
+            "arb_ball_str": "[29.08310390756461455950026592398275275834 +/- 1.97e-39]"
+          },
+          "bound_margin": {
+            "mid_float": 29.071180567850465,
+            "rad_float_outward": 1.2825651161771185e-15,
+            "lower_dec": "2.907118056785046405462229939383369624594e+1",
+            "upper_dec": "2.907118056785046405462229939383369624597e+1",
+            "arb_ball_str": "[29.07118056785046405462229939383369624595 +/- 3.52e-39]"
+          },
+          "verified": true
+        },
+        {
+          "Y": 8,
+          "T_Y": 14,
+          "X_point": "tau*Y",
+          "d": 13,
+          "L_d": 1,
+          "abs_Delta_d_smooth": {
+            "mid_float": 1.3835553543053463e-05,
+            "rad_float_outward": 4.1988249090261003e-22,
+            "lower_dec": "1.383555354305346246941488856521339576713e-5",
+            "upper_dec": "1.383555354305346246941488856521339576716e-5",
+            "arb_ball_str": "[1.383555354305346246941488856521339576714e-5 +/- 1.72e-46]"
+          },
+          "C_sm_sqrtX_over_d_d_add_1_ub": {
+            "mid_float": 0.31959454843477597,
+            "rad_float_outward": 1.2868585870551497e-17,
+            "lower_dec": "3.195945484347759841703325925712390413003e-1",
+            "upper_dec": "3.195945484347759841703325925712390413006e-1",
+            "arb_ball_str": "[0.3195945484347759841703325925712390413005 +/- 3.89e-41]"
+          },
+          "bound_margin": {
+            "mid_float": 0.3195807128812329,
+            "rad_float_outward": 2.1723888183638858e-17,
+            "lower_dec": "3.195807128812329307078631776826738279045e-1",
+            "upper_dec": "3.195807128812329307078631776826738279048e-1",
+            "arb_ball_str": "[0.3195807128812329307078631776826738279047 +/- 6.00e-42]"
+          },
+          "verified": true
+        },
+        {
+          "Y": 16,
+          "T_Y": 32,
+          "X_point": "tau*Y",
+          "d": 1,
+          "L_d": 32,
+          "abs_Delta_d_smooth": {
+            "mid_float": 0.12101465077846849,
+            "rad_float_outward": 6.007602919457548e-18,
+            "lower_dec": "1.210146507784684794959776900171918653508e-1",
+            "upper_dec": "1.210146507784684794959776900171918653511e-1",
+            "arb_ball_str": "[0.1210146507784684794959776900171918653509 +/- 1.83e-41]"
+          },
+          "C_sm_sqrtX_over_d_d_add_1_ub": {
+            "mid_float": 41.12971998198383,
+            "rad_float_outward": 1.7623506734772147e-15,
+            "lower_dec": "4.112971998198383437304533591219468137786e+1",
+            "upper_dec": "4.112971998198383437304533591219468137789e+1",
+            "arb_ball_str": "[41.12971998198383437304533591219468137788 +/- 2.78e-39]"
+          },
+          "bound_margin": {
+            "mid_float": 41.00870533120536,
+            "rad_float_outward": 3.239403784025005e-15,
+            "lower_dec": "4.100870533120536589354935822217748951251e+1",
+            "upper_dec": "4.100870533120536589354935822217748951254e+1",
+            "arb_ball_str": "[41.00870533120536589354935822217748951253 +/- 3.69e-39]"
+          },
+          "verified": true
+        },
+        {
+          "Y": 16,
+          "T_Y": 32,
+          "X_point": "tau*Y",
+          "d": 31,
+          "L_d": 1,
+          "abs_Delta_d_smooth": {
+            "mid_float": 6.783043684829017e-05,
+            "rad_float_outward": 4.125698826027108e-21,
+            "lower_dec": "6.783043684829016914255529579179123818932e-5",
+            "upper_dec": "6.783043684829016914255529579179123818935e-5",
+            "arb_ball_str": "[6.783043684829016914255529579179123818933e-5 +/- 1.29e-45]"
+          },
+          "C_sm_sqrtX_over_d_d_add_1_ub": {
+            "mid_float": 0.08292282254432225,
+            "rad_float_outward": 4.759088121936843e-19,
+            "lower_dec": "8.292282254432224671984946756490863181022e-2",
+            "upper_dec": "8.292282254432224671984946756490863181025e-2",
+            "arb_ball_str": "[0.08292282254432224671984946756490863181024 +/- 3.66e-42]"
+          },
+          "bound_margin": {
+            "mid_float": 0.08285499210747396,
+            "rad_float_outward": 6.041871774511937e-18,
+            "lower_dec": "8.285499210747395655070691226911684057203e-2",
+            "upper_dec": "8.285499210747395655070691226911684057206e-2",
+            "arb_ball_str": "[0.08285499210747395655070691226911684057205 +/- 2.99e-42]"
+          },
+          "verified": true
+        },
+        {
+          "Y": 32,
+          "T_Y": 77,
+          "X_point": "tau*Y",
+          "d": 1,
+          "L_d": 77,
+          "abs_Delta_d_smooth": {
+            "mid_float": 0.08614694000183075,
+            "rad_float_outward": 5.023288132805838e-18,
+            "lower_dec": "8.614694000183075409069001506323715247765e-2",
+            "upper_dec": "8.614694000183075409069001506323715247768e-2",
+            "arb_ball_str": "[0.08614694000183075409069001506323715247767 +/- 9.81e-43]"
+          },
+          "C_sm_sqrtX_over_d_d_add_1_ub": {
+            "mid_float": 58.166207815129226,
+            "rad_float_outward": 2.7861718382904352e-15,
+            "lower_dec": "5.816620781512922911900053184796550551667e+1",
+            "upper_dec": "5.816620781512922911900053184796550551670e+1",
+            "arb_ball_str": "[58.16620781512922911900053184796550551668 +/- 3.93e-39]"
+          },
+          "bound_margin": {
+            "mid_float": 58.0800608751274,
+            "rad_float_outward": 2.867111087622855e-15,
+            "lower_dec": "5.808006087512739836490984183290226836419e+1",
+            "upper_dec": "5.808006087512739836490984183290226836422e+1",
+            "arb_ball_str": "[58.08006087512739836490984183290226836421 +/- 3.75e-39]"
+          },
+          "verified": true
+        },
+        {
+          "Y": 32,
+          "T_Y": 77,
+          "X_point": "tau*Y",
+          "d": 76,
+          "L_d": 1,
+          "abs_Delta_d_smooth": {
+            "mid_float": 0.00018104115358197155,
+            "rad_float_outward": 1.0079717982641826e-20,
+            "lower_dec": "1.810411535819715424842187510844549953389e-4",
+            "upper_dec": "1.810411535819715424842187510844549953392e-4",
+            "arb_ball_str": "[0.0001810411535819715424842187510844549953390 +/- 4.34e-44]"
+          },
+          "C_sm_sqrtX_over_d_d_add_1_ub": {
+            "mid_float": 0.01987908674474683,
+            "rad_float_outward": 7.008370076815683e-19,
+            "lower_dec": "1.987908674474683155126470671495745232968e-2",
+            "upper_dec": "1.987908674474683155126470671495745232971e-2",
+            "arb_ball_str": "[0.01987908674474683155126470671495745232969 +/- 3.76e-42]"
+          },
+          "bound_margin": {
+            "mid_float": 0.01969804559116486,
+            "rad_float_outward": 9.424915873761843e-19,
+            "lower_dec": "1.969804559116486000878048796387299733434e-2",
+            "upper_dec": "1.969804559116486000878048796387299733437e-2",
+            "arb_ball_str": "[0.01969804559116486000878048796387299733435 +/- 4.72e-42]"
+          },
+          "verified": true
+        }
+      ],
+      "verified": true
+    },
+    "R2_int_linear_bound_provenance": "Already established in TC-057R \u00a74 Theorem 4.3(3) via the Selberg/PNT asymptotic W_2(u) = c_lambda*u + O(u*exp(-c*sqrt(log u))) (Dirichlet hyperbola cancellation of u*log u plus PNT for lambda, NOT Chebyshev's separate O(u*log u) majorants alone), covering all integer d >= 1 including d = 1 where R_2^{int}(1) = -c_lambda.",
     "dyadic_parity_control_divisor_identity": {
       "checked_range_n_up_to": 240,
       "X_projection_check": 16,
@@ -1122,13 +2313,13 @@
       "cancelled_or_decaying_components": [
         "Linear c_lambda*d trend in W_2(d) collapses onto c_lambda*Q_{square,T}(X), whose normalized window energy ||c_lambda*Q_{square,T}/(log X)^2||_Y^2 <= c_lambda^2*C_sq^2*log(tau)/(log Y)^4 = O((log Y)^{-4}) (eliminating TC-057 Route C's uncompensated b = floor(Y) boundary obstruction).",
         "Lower boundary d = 1 contributes r_2(1)*g_1(X)/(log X)^2 = -c_lambda*Q_T(X)/(log X)^2 with contracting window energy <= c_lambda^2*(log Y)^{-4}*E(Y).",
-        "Upper endpoint R_2^{int}(T)*g_T(X)/(log X)^2 has window energy O((log Y)^{-4}) since L_T = 1 and g_T(X) <= (3/(2*e))^{3/2}*T^{-1/2}.",
-        "Aggregate floor(T/d) cutoff-jump sum sum_{d=1}^{T-1} R_2^{int}(d)*Delta^{jump}_d(X)/(log X)^2 has unconditional decaying window energy O((log Y)^{-2}) -> 0 because every jump index satisfies (d+1)*q >= T + 1 > Y^{5/4} (so phi_{(d+1)q}(X) <= tau^{5/2}*Y^{-5/4}) and sum_{d=1}^{T-1} d*(L_d - L_{d+1}) = sum_{d=1}^T floor(T/d) - T <= T*log T.",
+        "Upper endpoint R_2^{int}(T)*g_T(X)/(log X)^2 has window energy O((log Y)^{-4}) because L_T = floor(T/T) = 1 gives g_T(X) = phi_T(X) <= X^{5/2}/T^3, and combining |R_2^{int}(T)| <= C_W*T (TC-057R Selberg/PNT asymptotic) with T(Y)^2 >= Y^{5/2} yields |R_2^{int}(T)*g_T(X)/(log X)^2| <= C_W*X^{5/2}/(T(Y)^2*(log Y)^2) <= C_W*tau^{5/2}/(log Y)^2 on X in [Y, tau*Y].",
+        "Aggregate floor(T/d) cutoff-jump sum sum_{d=1}^{T-1} R_2^{int}(d)*Delta^{jump}_d(X)/(log X)^2 has unconditional decaying window energy O((log Y)^{-2}) -> 0 because |R_2^{int}(d)| <= C_W*d (from TC-057R Selberg/PNT asymptotic, including d = 1), every jump index satisfies (d+1)*q >= T + 1 > Y^{5/4} (so phi_{(d+1)q}(X) <= tau^{5/2}*Y^{-5/4}), and sum_{d=1}^{T-1} d*(L_d - L_{d+1}) = sum_{d=1}^T floor(T/d) - T <= T*log T.",
         "Combining with Q_T = P_Y + R_Y eliminates the O(Y*(log Y)^{-2}) first-order shift R_Y via P_Y - R_Y = D_{2,Y} and Q_T = 2*P_Y - D_{2,Y}."
       ],
       "surviving_uncontrolled_terms_and_exponents": [
-        "Smooth-step PNT remainder sum_{d=1}^{T-1} R_2^{int}(d)*Delta^{smooth}_d(X)/(log X)^2 inside D_{2,Y}(X): because R_2^{int}(d) = O(d*exp(-c*sqrt(log d))) is not a power saving, unsigned/Minkowski bounds on ||D_{2,Y}||_Y^2 leave O(Y*(log Y)^{-4}) (or O(Y*(log Y)^{-4}*exp(-c'*sqrt(log Y))) on the R_2^{int} piece, while -Q_T^{[2]}/(log X)^2 has unsigned energy O(Y*(log Y)^{-4})).",
-        "Prime-power off-diagonal 4*X_tilde_{lambda,pp}(Y) and cross term -4*<P_Y, D_{2,Y}>_Y in E(Y) = 4*D_tilde + 4*X_tilde - 4*<P_Y, D_{2,Y}> + ||D_{2,Y}||_Y^2: subpower energy still requires genuine signed cancellation across distinct prime-power fibers."
+        "Smooth-step PNT remainder sum_{d=1}^{T-1} R_2^{int}(d)*Delta^{smooth}_d(X)/(log X)^2 inside D_{2,Y}(X): on finite-cutoff fibers L_d = floor(T/d), |Delta^{smooth}_d(X)| <= C_sm*sqrt(X)/(d*(d+1)) < C_sm*sqrt(X)/d^2; because the sum begins at d = 1 (with |R_2^{int}(1)| = |c_lambda| and |R_2^{int}(d)| <= C'*d*exp(-c*sqrt(log d)) for d >= 2, where the PNT saving is in d rather than Y), the unsigned majorant yields only O(sqrt(X)) unnormalized and O(Y*(log Y)^{-4}) in normalized window energy (matching the unsigned order of -Q_T^{[2]}/(log X)^2). Failure of this unsigned majorant to prove subpower growth does not prove the signed expression grows.",
+        "Prime-power off-diagonal 4*X_tilde_{lambda,pp}(Y) and cross term -4*<P_Y, D_{2,Y}>_Y in E(Y) = 4*D_tilde + T_2 (with T_2 = 4*X_tilde - 4*<P_Y, D_{2,Y}> + ||D_{2,Y}||_Y^2 and conditional contraction coefficient theta_eta + 4*Theta_eps^{diag}(Y)): subpower energy still requires genuine signed cancellation across distinct prime-power fibers."
       ]
     },
     "all_section_4_checks_pass": true
@@ -2268,6 +3459,27 @@
               "upper_dec": "-1.656042317351745508554746926562574989091e-2",
               "arb_ball_str": "[-0.01656042317351745508554746926562574989093 +/- 2.00e-42]"
             },
+            "diagonal_over_joint_ratio": {
+              "mid_float": 2.0172798725324856,
+              "rad_float_outward": 2.295990075811384e-17,
+              "lower_dec": "2.017279872532485663550394616440064307636e+0",
+              "upper_dec": "2.017279872532485663550394616440064307639e+0",
+              "arb_ball_str": "[2.017279872532485663550394616440064307637 +/- 2.43e-40]"
+            },
+            "off_diagonal_over_joint_ratio": {
+              "mid_float": -1.0172798725324856,
+              "rad_float_outward": 2.295990075811384e-17,
+              "lower_dec": "-1.017279872532485663550394616440064307639e+0",
+              "upper_dec": "-1.017279872532485663550394616440064307636e+0",
+              "arb_ball_str": "[-1.017279872532485663550394616440064307637 +/- 2.43e-40]"
+            },
+            "off_diagonal_over_joint_pct": {
+              "mid_float": -101.72798725324857,
+              "rad_float_outward": 4.8094372817896185e-15,
+              "lower_dec": "-1.017279872532485663550394616440064307639e+2",
+              "upper_dec": "-1.017279872532485663550394616440064307636e+2",
+              "arb_ball_str": "[-101.7279872532485663550394616440064307637 +/- 2.43e-38]"
+            },
             "direct_pair_minus_consistency_off_diagonal_residual": {
               "mid_float": 3.2385632081604167e-78,
               "rad_float_outward": 5.011084667571263e-77,
@@ -2275,12 +3487,33 @@
               "upper_dec": "5.334940988387303999348324384681753044404e-77",
               "arb_ball_str": "[+/- 5.34e-77]"
             },
+            "minkowski_layer_sum_norm": {
+              "mid_float": 0.13180557337034274,
+              "rad_float_outward": 8.023913021470115e-19,
+              "lower_dec": "1.318055733703427387068283603520874568510e-1",
+              "upper_dec": "1.318055733703427387068283603520874568513e-1",
+              "arb_ball_str": "[0.1318055733703427387068283603520874568511 +/- 4.05e-41]"
+            },
+            "minkowski_norm_ratio_over_joint": {
+              "mid_float": 1.0330427294251365,
+              "rad_float_outward": 9.888310023025484e-17,
+              "lower_dec": "1.033042729425136628880175970793838362992e+0",
+              "upper_dec": "1.033042729425136628880175970793838362995e+0",
+              "arb_ball_str": "[1.033042729425136628880175970793838362994 +/- 3.74e-40]"
+            },
             "minkowski_layer_sum_norm_sq": {
               "mid_float": 0.017372709171484802,
               "rad_float_outward": 7.795509795890478e-19,
               "lower_dec": "1.737270917148480290043932621058888303003e-2",
               "upper_dec": "1.737270917148480290043932621058888303006e-2",
               "arb_ball_str": "[0.01737270917148480290043932621058888303005 +/- 3.56e-42]"
+            },
+            "minkowski_sq_over_joint_ratio": {
+              "mid_float": 1.0671772808181361,
+              "rad_float_outward": 7.251517078609786e-17,
+              "lower_dec": "1.067177280818136047773215550953782631097e+0",
+              "upper_dec": "1.067177280818136047773215550953782631100e+0",
+              "arb_ball_str": "[1.067177280818136047773215550953782631098 +/- 2.06e-40]"
             },
             "minkowski_over_joint_ratio": {
               "mid_float": 1.0671772808181361,
@@ -2318,6 +3551,27 @@
               "lower_dec": "-1.055906193830757631843062292226056605051e-2",
               "upper_dec": "-1.055906193830757631843062292226056605048e-2",
               "arb_ball_str": "[-0.01055906193830757631843062292226056605049 +/- 1.51e-42]"
+            },
+            "diagonal_over_joint_ratio": {
+              "mid_float": 1.4196452262869745,
+              "rad_float_outward": 5.2581066213483944e-17,
+              "lower_dec": "1.419645226286974590125049601361174329205e+0",
+              "upper_dec": "1.419645226286974590125049601361174329208e+0",
+              "arb_ball_str": "[1.419645226286974590125049601361174329207 +/- 1.44e-40]"
+            },
+            "off_diagonal_over_joint_ratio": {
+              "mid_float": -0.4196452262869746,
+              "rad_float_outward": 2.9300850177738862e-18,
+              "lower_dec": "-4.196452262869745901250496013611743292070e-1",
+              "upper_dec": "-4.196452262869745901250496013611743292067e-1",
+              "arb_ball_str": "[-0.4196452262869745901250496013611743292069 +/- 4.34e-41]"
+            },
+            "off_diagonal_over_joint_pct": {
+              "mid_float": -41.96452262869746,
+              "rad_float_outward": 7.09638968523573e-17,
+              "lower_dec": "-4.196452262869745901250496013611743292070e+1",
+              "upper_dec": "-4.196452262869745901250496013611743292067e+1",
+              "arb_ball_str": "[-41.96452262869745901250496013611743292069 +/- 4.34e-39]"
             }
           },
           "a_3_5_7": {
@@ -2348,6 +3602,27 @@
               "lower_dec": "-4.738461332417887817692808291858176834964e-2",
               "upper_dec": "-4.738461332417887817692808291858176834961e-2",
               "arb_ball_str": "[-0.04738461332417887817692808291858176834963 +/- 4.48e-43]"
+            },
+            "diagonal_over_joint_ratio": {
+              "mid_float": 10.022922838129832,
+              "rad_float_outward": 1.3625954273516955e-16,
+              "lower_dec": "1.002292283812983151011035112536802658618e+1",
+              "upper_dec": "1.002292283812983151011035112536802658621e+1",
+              "arb_ball_str": "[10.02292283812983151011035112536802658620 +/- 1.38e-39]"
+            },
+            "off_diagonal_over_joint_ratio": {
+              "mid_float": -9.022922838129832,
+              "rad_float_outward": 1.3625954273516955e-16,
+              "lower_dec": "-9.022922838129831510110351125368026586200e+0",
+              "upper_dec": "-9.022922838129831510110351125368026586197e+0",
+              "arb_ball_str": "[-9.022922838129831510110351125368026586199 +/- 3.80e-40]"
+            },
+            "off_diagonal_over_joint_pct": {
+              "mid_float": -902.2922838129831,
+              "rad_float_outward": 5.032289194489207e-14,
+              "lower_dec": "-9.022922838129831510110351125368026586200e+2",
+              "upper_dec": "-9.022922838129831510110351125368026586197e+2",
+              "arb_ball_str": "[-902.2922838129831510110351125368026586199 +/- 3.80e-38]"
             }
           },
           "unsigned_1": {
@@ -2379,12 +3654,54 @@
               "upper_dec": "5.316764777604057928025728225350113696530e-1",
               "arb_ball_str": "[0.5316764777604057928025728225350113696529 +/- 3.23e-41]"
             },
+            "diagonal_over_joint_ratio": {
+              "mid_float": 0.13267558526019116,
+              "rad_float_outward": 9.303176291330016e-18,
+              "lower_dec": "1.326755852601911682459648387224246057385e-1",
+              "upper_dec": "1.326755852601911682459648387224246057388e-1",
+              "arb_ball_str": "[0.1326755852601911682459648387224246057386 +/- 1.43e-41]"
+            },
+            "off_diagonal_over_joint_ratio": {
+              "mid_float": 0.8673244147398088,
+              "rad_float_outward": 1.8452399324298904e-17,
+              "lower_dec": "8.673244147398088317540351612775753942612e-1",
+              "upper_dec": "8.673244147398088317540351612775753942615e-1",
+              "arb_ball_str": "[0.8673244147398088317540351612775753942614 +/- 1.43e-41]"
+            },
+            "off_diagonal_over_joint_pct": {
+              "mid_float": 86.73244147398088,
+              "rad_float_outward": 1.2633845365205485e-15,
+              "lower_dec": "8.673244147398088317540351612775753942612e+1",
+              "upper_dec": "8.673244147398088317540351612775753942615e+1",
+              "arb_ball_str": "[86.73244147398088317540351612775753942614 +/- 1.43e-39]"
+            },
+            "minkowski_layer_sum_norm": {
+              "mid_float": 0.7977535610151969,
+              "rad_float_outward": 1.9216625766639043e-17,
+              "lower_dec": "7.977535610151968800032332391860893941550e-1",
+              "upper_dec": "7.977535610151968800032332391860893941553e-1",
+              "arb_ball_str": "[0.7977535610151968800032332391860893941552 +/- 7.08e-42]"
+            },
+            "minkowski_norm_ratio_over_joint": {
+              "mid_float": 1.0189099749327706,
+              "rad_float_outward": 1.1017233012491018e-16,
+              "lower_dec": "1.018909974932770689231468196808072266679e+0",
+              "upper_dec": "1.018909974932770689231468196808072266682e+0",
+              "arb_ball_str": "[1.018909974932770689231468196808072266680 +/- 3.20e-40]"
+            },
             "minkowski_layer_sum_norm_sq": {
               "mid_float": 0.6364107441124275,
               "rad_float_outward": 3.315372461707152e-17,
               "lower_dec": "6.364107441124274512775689613103677819990e-1",
               "upper_dec": "6.364107441124274512775689613103677819993e-1",
               "arb_ball_str": "[0.6364107441124274512775689613103677819991 +/- 3.06e-41]"
+            },
+            "minkowski_sq_over_joint_ratio": {
+              "mid_float": 1.0381775370174995,
+              "rad_float_outward": 9.117651588797908e-17,
+              "lower_dec": "1.038177537017499394295655839472427812355e+0",
+              "upper_dec": "1.038177537017499394295655839472427812358e+0",
+              "arb_ball_str": "[1.038177537017499394295655839472427812357 +/- 1.85e-40]"
             },
             "minkowski_over_joint_ratio": {
               "mid_float": 1.0381775370174995,
@@ -2430,12 +3747,54 @@
               "upper_dec": "4.022199522924762028332091995361220045245e-2",
               "arb_ball_str": "[0.04022199522924762028332091995361220045243 +/- 2.60e-42]"
             },
+            "diagonal_over_joint_ratio": {
+              "mid_float": 0.4493031933028844,
+              "rad_float_outward": 1.3298555991178986e-17,
+              "lower_dec": "4.493031933028843605512366185107729544926e-1",
+              "upper_dec": "4.493031933028843605512366185107729544929e-1",
+              "arb_ball_str": "[0.4493031933028843605512366185107729544928 +/- 2.36e-41]"
+            },
+            "off_diagonal_over_joint_ratio": {
+              "mid_float": 0.5506968066971156,
+              "rad_float_outward": 1.3298555991178986e-17,
+              "lower_dec": "5.506968066971156394487633814892270455071e-1",
+              "upper_dec": "5.506968066971156394487633814892270455074e-1",
+              "arb_ball_str": "[0.5506968066971156394487633814892270455072 +/- 2.36e-41]"
+            },
+            "off_diagonal_over_joint_pct": {
+              "mid_float": 55.069680669711566,
+              "rad_float_outward": 2.222858079682603e-15,
+              "lower_dec": "5.506968066971156394487633814892270455071e+1",
+              "upper_dec": "5.506968066971156394487633814892270455074e+1",
+              "arb_ball_str": "[55.06968066971156394487633814892270455072 +/- 2.36e-39]"
+            },
+            "minkowski_layer_sum_norm": {
+              "mid_float": 0.2902044433395025,
+              "rad_float_outward": 2.1716227183327224e-17,
+              "lower_dec": "2.902044433395025375246751077552590458923e-1",
+              "upper_dec": "2.902044433395025375246751077552590458926e-1",
+              "arb_ball_str": "[0.2902044433395025375246751077552590458925 +/- 3.33e-41]"
+            },
+            "minkowski_norm_ratio_over_joint": {
+              "mid_float": 1.073812689123958,
+              "rad_float_outward": 1.0757366176188894e-16,
+              "lower_dec": "1.073812689123958000865521217165818496667e+0",
+              "upper_dec": "1.073812689123958000865521217165818496670e+0",
+              "arb_ball_str": "[1.073812689123958000865521217165818496669 +/- 2.52e-40]"
+            },
             "minkowski_layer_sum_norm_sq": {
               "mid_float": 0.08421861893399053,
               "rad_float_outward": 5.931935169062061e-18,
               "lower_dec": "8.421861893399053871413184978985329311046e-2",
               "upper_dec": "8.421861893399053871413184978985329311049e-2",
               "arb_ball_str": "[0.08421861893399053871413184978985329311047 +/- 1.11e-42]"
+            },
+            "minkowski_sq_over_joint_ratio": {
+              "mid_float": 1.1530736913236261,
+              "rad_float_outward": 6.81366928494382e-17,
+              "lower_dec": "1.153073691323626069480304917161337596410e+0",
+              "upper_dec": "1.153073691323626069480304917161337596413e+0",
+              "arb_ball_str": "[1.153073691323626069480304917161337596412 +/- 3.80e-40]"
             },
             "minkowski_over_joint_ratio": {
               "mid_float": 1.1530736913236261,
@@ -2473,6 +3832,27 @@
               "lower_dec": "1.392453747197995952210002009379952164562e-1",
               "upper_dec": "1.392453747197995952210002009379952164565e-1",
               "arb_ball_str": "[0.1392453747197995952210002009379952164563 +/- 4.57e-41]"
+            },
+            "diagonal_over_joint_ratio": {
+              "mid_float": 0.21342758013346774,
+              "rad_float_outward": 1.2548042258166009e-17,
+              "lower_dec": "2.134275801334677550327963842193114224678e-1",
+              "upper_dec": "2.134275801334677550327963842193114224681e-1",
+              "arb_ball_str": "[0.2134275801334677550327963842193114224680 +/- 5.21e-42]"
+            },
+            "off_diagonal_over_joint_ratio": {
+              "mid_float": 0.7865724198665323,
+              "rad_float_outward": 1.2548042258166009e-17,
+              "lower_dec": "7.865724198665322449672036157806885775319e-1",
+              "upper_dec": "7.865724198665322449672036157806885775322e-1",
+              "arb_ball_str": "[0.7865724198665322449672036157806885775320 +/- 5.21e-42]"
+            },
+            "off_diagonal_over_joint_pct": {
+              "mid_float": 78.65724198665322,
+              "rad_float_outward": 5.850623131784402e-15,
+              "lower_dec": "7.865724198665322449672036157806885775319e+1",
+              "upper_dec": "7.865724198665322449672036157806885775322e+1",
+              "arb_ball_str": "[78.65724198665322449672036157806885775320 +/- 5.22e-40]"
             }
           },
           "a_3_5_7": {
@@ -2503,6 +3883,27 @@
               "lower_dec": "2.864002271543240727829778504550715862049e-1",
               "upper_dec": "2.864002271543240727829778504550715862052e-1",
               "arb_ball_str": "[0.2864002271543240727829778504550715862050 +/- 1.37e-41]"
+            },
+            "diagonal_over_joint_ratio": {
+              "mid_float": 0.13455372940324256,
+              "rad_float_outward": 4.939218010689769e-18,
+              "lower_dec": "1.345537294032425563185516831490138394472e-1",
+              "upper_dec": "1.345537294032425563185516831490138394475e-1",
+              "arb_ball_str": "[0.1345537294032425563185516831490138394473 +/- 1.59e-41]"
+            },
+            "off_diagonal_over_joint_ratio": {
+              "mid_float": 0.8654462705967575,
+              "rad_float_outward": 5.057193322056806e-17,
+              "lower_dec": "8.654462705967574436814483168509861605525e-1",
+              "upper_dec": "8.654462705967574436814483168509861605528e-1",
+              "arb_ball_str": "[0.8654462705967574436814483168509861605527 +/- 1.59e-41]"
+            },
+            "off_diagonal_over_joint_pct": {
+              "mid_float": 86.54462705967575,
+              "rad_float_outward": 2.8367472728064933e-15,
+              "lower_dec": "8.654462705967574436814483168509861605525e+1",
+              "upper_dec": "8.654462705967574436814483168509861605528e+1",
+              "arb_ball_str": "[86.54462705967574436814483168509861605527 +/- 1.59e-39]"
             }
           },
           "unsigned_1": {
@@ -2534,12 +3935,54 @@
               "upper_dec": "1.526332432683316768094685730565816718118e+0",
               "arb_ball_str": "[1.526332432683316768094685730565816718117 +/- 4.84e-40]"
             },
+            "diagonal_over_joint_ratio": {
+              "mid_float": 0.07715976166717749,
+              "rad_float_outward": 1.9192269017177266e-18,
+              "lower_dec": "7.715976166717748910693454243223320933870e-2",
+              "upper_dec": "7.715976166717748910693454243223320933873e-2",
+              "arb_ball_str": "[0.07715976166717748910693454243223320933871 +/- 2.69e-42]"
+            },
+            "off_diagonal_over_joint_ratio": {
+              "mid_float": 0.9228402383328225,
+              "rad_float_outward": 3.971413652172565e-17,
+              "lower_dec": "9.228402383328225108930654575677667906611e-1",
+              "upper_dec": "9.228402383328225108930654575677667906614e-1",
+              "arb_ball_str": "[0.9228402383328225108930654575677667906613 +/- 1.27e-41]"
+            },
+            "off_diagonal_over_joint_pct": {
+              "mid_float": 92.28402383328225,
+              "rad_float_outward": 3.0832352324724396e-15,
+              "lower_dec": "9.228402383328225108930654575677667906611e+1",
+              "upper_dec": "9.228402383328225108930654575677667906614e+1",
+              "arb_ball_str": "[92.28402383328225108930654575677667906613 +/- 1.28e-39]"
+            },
+            "minkowski_layer_sum_norm": {
+              "mid_float": 1.311469389596318,
+              "rad_float_outward": 6.383910658062898e-17,
+              "lower_dec": "1.311469389596318027567494944166440339903e+0",
+              "upper_dec": "1.311469389596318027567494944166440339906e+0",
+              "arb_ball_str": "[1.311469389596318027567494944166440339904 +/- 1.53e-41]"
+            },
+            "minkowski_norm_ratio_over_joint": {
+              "mid_float": 1.0197573716598902,
+              "rad_float_outward": 1.7299463524564094e-18,
+              "lower_dec": "1.019757371659890223323460422720473017037e+0",
+              "upper_dec": "1.019757371659890223323460422720473017040e+0",
+              "arb_ball_str": "[1.019757371659890223323460422720473017039 +/- 2.25e-40]"
+            },
             "minkowski_layer_sum_norm_sq": {
               "mid_float": 1.719951959848139,
               "rad_float_outward": 2.172316893573315e-17,
               "lower_dec": "1.719951959848138999882850691375088913954e+0",
               "upper_dec": "1.719951959848138999882850691375088913957e+0",
               "arb_ball_str": "[1.719951959848138999882850691375088913955 +/- 4.07e-40]"
+            },
+            "minkowski_sq_over_joint_ratio": {
+              "mid_float": 1.0399050970546875,
+              "rad_float_outward": 2.7515599910953353e-18,
+              "lower_dec": "1.039905097054687480005324873429842933528e+0",
+              "upper_dec": "1.039905097054687480005324873429842933531e+0",
+              "arb_ball_str": "[1.039905097054687480005324873429842933530 +/- 1.99e-40]"
             },
             "minkowski_over_joint_ratio": {
               "mid_float": 1.0399050970546875,
@@ -2585,12 +4028,54 @@
               "upper_dec": "-3.967023951048226695088569246142427714016e-3",
               "arb_ball_str": "[-0.003967023951048226695088569246142427714018 +/- 1.42e-43]"
             },
+            "diagonal_over_joint_ratio": {
+              "mid_float": 1.1264875394893337,
+              "rad_float_outward": 5.4094265962514604e-17,
+              "lower_dec": "1.126487539489333720958733849140387604457e+0",
+              "upper_dec": "1.126487539489333720958733849140387604460e+0",
+              "arb_ball_str": "[1.126487539489333720958733849140387604459 +/- 6.04e-42]"
+            },
+            "off_diagonal_over_joint_ratio": {
+              "mid_float": -0.12648753948933372,
+              "rad_float_outward": 1.4168852687432286e-18,
+              "lower_dec": "-1.264875394893337209587338491403876044591e-1",
+              "upper_dec": "-1.264875394893337209587338491403876044588e-1",
+              "arb_ball_str": "[-0.1264875394893337209587338491403876044590 +/- 6.02e-42]"
+            },
+            "off_diagonal_over_joint_pct": {
+              "mid_float": -12.648753948933372,
+              "rad_float_outward": 8.035607805070847e-17,
+              "lower_dec": "-1.264875394893337209587338491403876044591e+1",
+              "upper_dec": "-1.264875394893337209587338491403876044588e+1",
+              "arb_ball_str": "[-12.64875394893337209587338491403876044590 +/- 6.02e-40]"
+            },
+            "minkowski_layer_sum_norm": {
+              "mid_float": 0.18493054145607923,
+              "rad_float_outward": 1.05504207844003e-17,
+              "lower_dec": "1.849305414560792232248351589280755342741e-1",
+              "upper_dec": "1.849305414560792232248351589280755342744e-1",
+              "arb_ball_str": "[0.1849305414560792232248351589280755342743 +/- 2.53e-42]"
+            },
+            "minkowski_norm_ratio_over_joint": {
+              "mid_float": 1.0442394642988577,
+              "rad_float_outward": 2.819162213226761e-17,
+              "lower_dec": "1.044239464298857750660105321272075889477e+0",
+              "upper_dec": "1.044239464298857750660105321272075889480e+0",
+              "arb_ball_str": "[1.044239464298857750660105321272075889479 +/- 1.07e-41]"
+            },
             "minkowski_layer_sum_norm_sq": {
               "mid_float": 0.03419930516323864,
               "rad_float_outward": 9.85319049807048e-19,
               "lower_dec": "3.419930516323863618766531901014899550895e-2",
               "upper_dec": "3.419930516323863618766531901014899550898e-2",
               "arb_ball_str": "[0.03419930516323863618766531901014899550897 +/- 3.00e-42]"
+            },
+            "minkowski_sq_over_joint_ratio": {
+              "mid_float": 1.0904360587991655,
+              "rad_float_outward": 8.657808023363608e-17,
+              "lower_dec": "1.090436058799165410812424008867018332585e+0",
+              "upper_dec": "1.090436058799165410812424008867018332588e+0",
+              "arb_ball_str": "[1.090436058799165410812424008867018332586 +/- 2.65e-40]"
             },
             "minkowski_over_joint_ratio": {
               "mid_float": 1.0904360587991655,
@@ -2628,6 +4113,27 @@
               "lower_dec": "5.377096341735071529836655125712771680494e-1",
               "upper_dec": "5.377096341735071529836655125712771680497e-1",
               "arb_ball_str": "[0.5377096341735071529836655125712771680496 +/- 4.88e-41]"
+            },
+            "diagonal_over_joint_ratio": {
+              "mid_float": 0.09018389584660688,
+              "rad_float_outward": 1.7442926953593466e-19,
+              "lower_dec": "9.018389584660688202645486406184694480977e-2",
+              "upper_dec": "9.018389584660688202645486406184694480980e-2",
+              "arb_ball_str": "[0.09018389584660688202645486406184694480979 +/- 1.89e-42]"
+            },
+            "off_diagonal_over_joint_ratio": {
+              "mid_float": 0.9098161041533931,
+              "rad_float_outward": 2.7581146346092983e-17,
+              "lower_dec": "9.098161041533931179735451359381530551901e-1",
+              "upper_dec": "9.098161041533931179735451359381530551904e-1",
+              "arb_ball_str": "[0.9098161041533931179735451359381530551902 +/- 1.19e-41]"
+            },
+            "off_diagonal_over_joint_pct": {
+              "mid_float": 90.98161041533932,
+              "rad_float_outward": 6.567758772242018e-15,
+              "lower_dec": "9.098161041533931179735451359381530551901e+1",
+              "upper_dec": "9.098161041533931179735451359381530551904e+1",
+              "arb_ball_str": "[90.98161041533931179735451359381530551902 +/- 1.19e-39]"
             }
           },
           "a_3_5_7": {
@@ -2658,6 +4164,27 @@
               "lower_dec": "4.661577712044451472083197424422677865104e-1",
               "upper_dec": "4.661577712044451472083197424422677865107e-1",
               "arb_ball_str": "[0.4661577712044451472083197424422677865106 +/- 1.20e-41]"
+            },
+            "diagonal_over_joint_ratio": {
+              "mid_float": 0.1175071714557371,
+              "rad_float_outward": 2.4141846137603685e-19,
+              "lower_dec": "1.175071714557370946757091296083159399102e-1",
+              "upper_dec": "1.175071714557370946757091296083159399105e-1",
+              "arb_ball_str": "[0.1175071714557370946757091296083159399103 +/- 2.66e-41]"
+            },
+            "off_diagonal_over_joint_ratio": {
+              "mid_float": 0.8824928285442629,
+              "rad_float_outward": 1.4119206269190496e-17,
+              "lower_dec": "8.824928285442629053242908703916840600895e-1",
+              "upper_dec": "8.824928285442629053242908703916840600898e-1",
+              "arb_ball_str": "[0.8824928285442629053242908703916840600897 +/- 2.66e-41]"
+            },
+            "off_diagonal_over_joint_pct": {
+              "mid_float": 88.24928285442628,
+              "rad_float_outward": 7.025774360232141e-15,
+              "lower_dec": "8.824928285442629053242908703916840600895e+1",
+              "upper_dec": "8.824928285442629053242908703916840600898e+1",
+              "arb_ball_str": "[88.24928285442629053242908703916840600897 +/- 2.66e-39]"
             }
           },
           "unsigned_1": {
@@ -2689,12 +4216,54 @@
               "upper_dec": "4.704028307314916213028196824556133989166e+0",
               "arb_ball_str": "[4.704028307314916213028196824556133989165 +/- 1.15e-40]"
             },
+            "diagonal_over_joint_ratio": {
+              "mid_float": 0.052545192692677496,
+              "rad_float_outward": 2.1354785625974837e-18,
+              "lower_dec": "5.254519269267749834003488257832183830809e-2",
+              "upper_dec": "5.254519269267749834003488257832183830812e-2",
+              "arb_ball_str": "[0.05254519269267749834003488257832183830811 +/- 1.71e-42]"
+            },
+            "off_diagonal_over_joint_ratio": {
+              "mid_float": 0.9474548073073225,
+              "rad_float_outward": 4.643677876475312e-17,
+              "lower_dec": "9.474548073073225016599651174216781616917e-1",
+              "upper_dec": "9.474548073073225016599651174216781616920e-1",
+              "arb_ball_str": "[0.9474548073073225016599651174216781616919 +/- 8.30e-42]"
+            },
+            "off_diagonal_over_joint_pct": {
+              "mid_float": 94.74548073073225,
+              "rad_float_outward": 3.794017110675879e-15,
+              "lower_dec": "9.474548073073225016599651174216781616917e+1",
+              "upper_dec": "9.474548073073225016599651174216781616920e+1",
+              "arb_ball_str": "[94.74548073073225016599651174216781616919 +/- 8.32e-40]"
+            },
+            "minkowski_layer_sum_norm": {
+              "mid_float": 2.2823812717947867,
+              "rad_float_outward": 1.7825534402422e-16,
+              "lower_dec": "2.282381271794786848425995656581070970150e+0",
+              "upper_dec": "2.282381271794786848425995656581070970153e+0",
+              "arb_ball_str": "[2.282381271794786848425995656581070970151 +/- 4.18e-40]"
+            },
+            "minkowski_norm_ratio_over_joint": {
+              "mid_float": 1.0243125260593302,
+              "rad_float_outward": 3.124748276163068e-17,
+              "lower_dec": "1.024312526059330239630840546981779981968e+0",
+              "upper_dec": "1.024312526059330239630840546981779981971e+0",
+              "arb_ball_str": "[1.024312526059330239630840546981779981970 +/- 1.22e-40]"
+            },
             "minkowski_layer_sum_norm_sq": {
               "mid_float": 5.209264269839589,
               "rad_float_outward": 3.359778460503034e-16,
               "lower_dec": "5.209264269839588676200902766646895145282e+0",
               "upper_dec": "5.209264269839588676200902766646895145285e+0",
               "arb_ball_str": "[5.209264269839588676200902766646895145284 +/- 2.19e-40]"
+            },
+            "minkowski_sq_over_joint_ratio": {
+              "mid_float": 1.0492161510420461,
+              "rad_float_outward": 3.886275851420669e-17,
+              "lower_dec": "1.049216151042046091252423253698910420859e+0",
+              "upper_dec": "1.049216151042046091252423253698910420862e+0",
+              "arb_ball_str": "[1.049216151042046091252423253698910420860 +/- 2.02e-40]"
             },
             "minkowski_over_joint_ratio": {
               "mid_float": 1.0492161510420461,
@@ -2740,12 +4309,54 @@
               "upper_dec": "2.592881258207590976692994253684017674136e-2",
               "arb_ball_str": "[0.02592881258207590976692994253684017674134 +/- 2.13e-42]"
             },
+            "diagonal_over_joint_ratio": {
+              "mid_float": 0.5828102062233929,
+              "rad_float_outward": 3.565253339036548e-17,
+              "lower_dec": "5.828102062233928927358874919981934709881e-1",
+              "upper_dec": "5.828102062233928927358874919981934709884e-1",
+              "arb_ball_str": "[0.5828102062233928927358874919981934709883 +/- 2.44e-41]"
+            },
+            "off_diagonal_over_joint_ratio": {
+              "mid_float": 0.4171897937766071,
+              "rad_float_outward": 1.9858617840892358e-17,
+              "lower_dec": "4.171897937766071072641125080018065290116e-1",
+              "upper_dec": "4.171897937766071072641125080018065290119e-1",
+              "arb_ball_str": "[0.4171897937766071072641125080018065290117 +/- 2.44e-41]"
+            },
+            "off_diagonal_over_joint_pct": {
+              "mid_float": 41.71897937766071,
+              "rad_float_outward": 1.7638171791642045e-15,
+              "lower_dec": "4.171897937766071072641125080018065290116e+1",
+              "upper_dec": "4.171897937766071072641125080018065290119e+1",
+              "arb_ball_str": "[41.71897937766071072641125080018065290117 +/- 2.44e-39]"
+            },
+            "minkowski_layer_sum_norm": {
+              "mid_float": 0.2629663340794532,
+              "rad_float_outward": 1.2105669364259832e-17,
+              "lower_dec": "2.629663340794531779478297921601716161047e-1",
+              "upper_dec": "2.629663340794531779478297921601716161050e-1",
+              "arb_ball_str": "[0.2629663340794531779478297921601716161049 +/- 3.30e-41]"
+            },
+            "minkowski_norm_ratio_over_joint": {
+              "mid_float": 1.0548134900908004,
+              "rad_float_outward": 5.2497677883554675e-17,
+              "lower_dec": "1.054813490090800439975221037645778989221e+0",
+              "upper_dec": "1.054813490090800439975221037645778989224e+0",
+              "arb_ball_str": "[1.054813490090800439975221037645778989222 +/- 4.62e-40]"
+            },
             "minkowski_layer_sum_norm_sq": {
               "mid_float": 0.06915129285918657,
               "rad_float_outward": 5.661604751864374e-18,
               "lower_dec": "6.915129285918657786549369488669404777902e-2",
               "upper_dec": "6.915129285918657786549369488669404777905e-2",
               "arb_ball_str": "[0.06915129285918657786549369488669404777904 +/- 3.53e-42]"
+            },
+            "minkowski_sq_over_joint_ratio": {
+              "mid_float": 1.1126314988775352,
+              "rad_float_outward": 4.974964499111439e-17,
+              "lower_dec": "1.112631498877535157975841552380824757411e+0",
+              "upper_dec": "1.112631498877535157975841552380824757414e+0",
+              "arb_ball_str": "[1.112631498877535157975841552380824757412 +/- 4.36e-40]"
             },
             "minkowski_over_joint_ratio": {
               "mid_float": 1.1126314988775352,
@@ -2783,6 +4394,27 @@
               "lower_dec": "1.423374519708901791150132143004554156517e+0",
               "upper_dec": "1.423374519708901791150132143004554156520e+0",
               "arb_ball_str": "[1.423374519708901791150132143004554156518 +/- 4.63e-40]"
+            },
+            "diagonal_over_joint_ratio": {
+              "mid_float": 0.051428595971499534,
+              "rad_float_outward": 7.054559304822487e-20,
+              "lower_dec": "5.142859597149953408574482992218965505617e-2",
+              "upper_dec": "5.142859597149953408574482992218965505620e-2",
+              "arb_ball_str": "[0.05142859597149953408574482992218965505619 +/- 2.13e-42]"
+            },
+            "off_diagonal_over_joint_ratio": {
+              "mid_float": 0.9485714040285005,
+              "rad_float_outward": 2.0746136118673463e-17,
+              "lower_dec": "9.485714040285004659142551700778103449437e-1",
+              "upper_dec": "9.485714040285004659142551700778103449440e-1",
+              "arb_ball_str": "[0.9485714040285004659142551700778103449438 +/- 1.22e-41]"
+            },
+            "off_diagonal_over_joint_pct": {
+              "mid_float": 94.85714040285005,
+              "rad_float_outward": 2.9627920315674715e-15,
+              "lower_dec": "9.485714040285004659142551700778103449437e+1",
+              "upper_dec": "9.485714040285004659142551700778103449440e+1",
+              "arb_ball_str": "[94.85714040285004659142551700778103449438 +/- 1.22e-39]"
             }
           },
           "a_3_5_7": {
@@ -2813,6 +4445,27 @@
               "lower_dec": "5.287547610087301521075402334682482496356e-1",
               "upper_dec": "5.287547610087301521075402334682482496359e-1",
               "arb_ball_str": "[0.5287547610087301521075402334682482496358 +/- 3.42e-41]"
+            },
+            "diagonal_over_joint_ratio": {
+              "mid_float": 0.1497219735593947,
+              "rad_float_outward": 1.7709197436567374e-18,
+              "lower_dec": "1.497219735593947071928851983181409951083e-1",
+              "upper_dec": "1.497219735593947071928851983181409951086e-1",
+              "arb_ball_str": "[0.1497219735593947071928851983181409951085 +/- 9.17e-42]"
+            },
+            "off_diagonal_over_joint_ratio": {
+              "mid_float": 0.8502780264406052,
+              "rad_float_outward": 5.3740231487601097e-17,
+              "lower_dec": "8.502780264406052928071148016818590048914e-1",
+              "upper_dec": "8.502780264406052928071148016818590048917e-1",
+              "arb_ball_str": "[0.8502780264406052928071148016818590048915 +/- 9.17e-42]"
+            },
+            "off_diagonal_over_joint_pct": {
+              "mid_float": 85.02780264406053,
+              "rad_float_outward": 4.890418404094203e-16,
+              "lower_dec": "8.502780264406052928071148016818590048914e+1",
+              "upper_dec": "8.502780264406052928071148016818590048917e+1",
+              "arb_ball_str": "[85.02780264406052928071148016818590048915 +/- 9.18e-40]"
             }
           },
           "unsigned_1": {
@@ -2844,12 +4497,54 @@
               "upper_dec": "1.330479824547299235195490621212738440159e+1",
               "arb_ball_str": "[13.30479824547299235195490621212738440157 +/- 1.47e-40]"
             },
+            "diagonal_over_joint_ratio": {
+              "mid_float": 0.03667817818464999,
+              "rad_float_outward": 2.300771609953298e-18,
+              "lower_dec": "3.667817818464999082545089709179428944144e-2",
+              "upper_dec": "3.667817818464999082545089709179428944147e-2",
+              "arb_ball_str": "[0.03667817818464999082545089709179428944146 +/- 4.45e-42]"
+            },
+            "off_diagonal_over_joint_ratio": {
+              "mid_float": 0.96332182181535,
+              "rad_float_outward": 3.239369790958285e-17,
+              "lower_dec": "9.633218218153500091745491029082057105584e-1",
+              "upper_dec": "9.633218218153500091745491029082057105587e-1",
+              "arb_ball_str": "[0.9633218218153500091745491029082057105585 +/- 4.45e-41]"
+            },
+            "off_diagonal_over_joint_pct": {
+              "mid_float": 96.332182181535,
+              "rad_float_outward": 2.5337899370925298e-15,
+              "lower_dec": "9.633218218153500091745491029082057105584e+1",
+              "upper_dec": "9.633218218153500091745491029082057105587e+1",
+              "arb_ball_str": "[96.33218218153500091745491029082057105585 +/- 4.45e-39]"
+            },
+            "minkowski_layer_sum_norm": {
+              "mid_float": 3.8179496651485674,
+              "rad_float_outward": 1.9087447248353427e-16,
+              "lower_dec": "3.817949665148567182177474077201563082653e+0",
+              "upper_dec": "3.817949665148567182177474077201563082656e+0",
+              "arb_ball_str": "[3.817949665148567182177474077201563082655 +/- 3.04e-41]"
+            },
+            "minkowski_norm_ratio_over_joint": {
+              "mid_float": 1.0273342117312776,
+              "rad_float_outward": 6.732543107286844e-17,
+              "lower_dec": "1.027334211731277523858721624810224711102e+0",
+              "upper_dec": "1.027334211731277523858721624810224711105e+0",
+              "arb_ball_str": "[1.027334211731277523858721624810224711103 +/- 2.93e-40]"
+            },
             "minkowski_layer_sum_norm_sq": {
               "mid_float": 14.576739645608056,
               "rad_float_outward": 4.764927572019222e-16,
               "lower_dec": "1.457673964560805627187103445481593858887e+1",
               "upper_dec": "1.457673964560805627187103445481593858890e+1",
               "arb_ball_str": "[14.57673964560805627187103445481593858889 +/- 4.92e-39]"
+            },
+            "minkowski_sq_over_joint_ratio": {
+              "mid_float": 1.0554155825935254,
+              "rad_float_outward": 5.674215398114516e-17,
+              "lower_dec": "1.055415582593525357525633728687043631839e+0",
+              "upper_dec": "1.055415582593525357525633728687043631842e+0",
+              "arb_ball_str": "[1.055415582593525357525633728687043631841 +/- 7.60e-41]"
             },
             "minkowski_over_joint_ratio": {
               "mid_float": 1.0554155825935254,
@@ -2862,10 +4557,36 @@
         }
       }
     ],
+    "live_Y64_growing_control_off_diagonal_summary": {
+      "a2_off_diagonal_pct_Y64": {
+        "mid_float": 94.85714040285005,
+        "rad_float_outward": 2.9627920315674715e-15,
+        "lower_dec": "9.485714040285004659142551700778103449437e+1",
+        "upper_dec": "9.485714040285004659142551700778103449440e+1",
+        "arb_ball_str": "[94.85714040285004659142551700778103449438 +/- 1.22e-39]"
+      },
+      "a_3_5_7_off_diagonal_pct_Y64": {
+        "mid_float": 85.02780264406053,
+        "rad_float_outward": 4.890418404094203e-16,
+        "lower_dec": "8.502780264406052928071148016818590048914e+1",
+        "upper_dec": "8.502780264406052928071148016818590048917e+1",
+        "arb_ball_str": "[85.02780264406052928071148016818590048915 +/- 9.18e-40]"
+      },
+      "unsigned_1_off_diagonal_pct_Y64": {
+        "mid_float": 96.332182181535,
+        "rad_float_outward": 2.5337899370925298e-15,
+        "lower_dec": "9.633218218153500091745491029082057105584e+1",
+        "upper_dec": "9.633218218153500091745491029082057105587e+1",
+        "arb_ball_str": "[96.33218218153500091745491029082057105585 +/- 4.45e-39]"
+      },
+      "liouville_sampled_triangle_excess_is_nonmonotone": true,
+      "verified": true
+    },
     "cost_and_concentration_summary": {
       "resummation_vs_cancellation": "Resumming the M(Y) layers back to Q_T - Q_T^{[M]}/(log X)^M is a consistency identity, not a cancellation proof.",
-      "unconditional_joint_diagonal_bound": "Because 0 < P_M(s) <= 4 uniformly on s in [1/4, 3/2] for all M >= 1 (Lean Theorem 30(4)), the entire joint M(Y)-layer prime-power diagonal satisfies D_tilde_{a,pp}^{(M(Y))}(Y) = O(Y/(log Y)^2) uniformly for all bounded controls |a(n)| <= 1.",
-      "surviving_joint_off_diagonal_obligation": "For growing-energy controls (1, a_2, a_{3,5,7}) with E_a(Y) = Theta(Y), (1 - o(1)) of the window energy concentrates in the distinct-prime-power off-diagonal X_tilde_{a,pp}^{(M(Y))}(Y); meanwhile summing individual layer norms incurs a growing Minkowski blowup factor, isolating all-prime Liouville cancellation in X_tilde_{lambda,pp}^{(M(Y))}(Y) as the exact open target."
+      "arbitrary_bounded_vs_multiplicative_hypotheses": "The terminal-remainder bound ||r_{a,M,Y}||_Y^2 <= 2068*(log Y)*Y^{-3} and the fiberwise diagonal majorant D_M(Y) = O(Y/(log Y)^2) hold for arbitrary bounded coefficients |a(n)| <= 1; the prime-power reconstruction Q_{a,T} = L_{a,M,Y} + r_{a,M,Y} and the resulting energy concentration require completely multiplicative a with a(1) = 1 and |a(n)| <= 1.",
+      "unconditional_joint_diagonal_bound": "Because 0 < P_M(s) <= 4 uniformly on s in [1/4, 3/2] for all M >= 1 (Lean Theorem 30(4)), the joint M(Y)-layer prime-power diagonal satisfies D_M(Y) = O(Y/(log Y)^2) uniformly for all bounded |a(n)| <= 1; however O(Y/(log Y)^2) is NOT an all-eps subpower bound and has not been proved to satisfy cross-scale contraction.",
+      "surviving_joint_gram_and_concentration_scope": "For multiplicative growing-energy controls (1, a_2, a_{3,5,7}) with E_a(Y) asymp Y, the small terminal remainder ||r_{a,M,Y}||_Y^2 = O((log Y)*Y^{-3}) controls proximity to the FULL joint Gram energy J_{a,M}(Y) = D_{a,M}(Y) + X_{a,M}(Y), while subtracting D_{a,M}(Y) = O(Y/(log Y)^2) gives off-diagonal share X_{a,M}(Y)/J_{a,M}(Y) = 1 - O((log Y)^{-2}) (live Y = 64 shares: ~94.86% for a_2, ~85.03% for a_{3,5,7}, ~96.33% for 1). Sampled Liouville norm ratios (sum_m ||layer_m||_Y)/||L_M||_Y and squared-norm ratios (sum_m ||layer_m||_Y)^2/||L_M||_Y^2 establish nonmonotone finite strict triangle excess on Y in {8, 16, 32, 64} (not asymptotic divergence). Closing SUBGATE-TC-043A along the growing-order route requires bounding the FULL joint Gram energy J_M(Y) = D_M(Y) + X_M(Y) (or first proving a new cross-scale contraction theorem for D_M(Y))."
     },
     "all_section_5_checks_pass": true
   },
@@ -2896,12 +4617,12 @@
       {
         "lemma_id": "LEM-TC058-C",
         "title": "Post-Abel c_lambda cancellation, cutoff-jump decay, and shift elimination P_Y - R_Y = D_{2,Y}",
-        "objects": "W_2(d), R_2^{int}(d) = W_2(d) - c_lambda*d, Delta^{smooth}_d, Delta^{jump}_d, D_{2,Y}",
+        "objects": "W_2(d), R_2^{int}(d) = W_2(d) - c_lambda*d, Delta^{smooth}_d, Delta^{jump}_d, D_{2,Y}, T_2(Y)",
         "quantifiers": "forall Y >= 2, T = ceil(Y^{5/4}), X in [Y, b*Y]",
-        "hypotheses": "W_2(u) = c_lambda*u + O(u*exp(-c*sqrt(log u))) and exact integer division (d+1)*(L_{d+1}+1) >= T + 1",
-        "input_source": "PNT for lambda + exact discrete summation by parts + second-order logarithmic shift identity",
-        "conclusion": "Cancels Route C boundary obstruction, bounds jump energy by O((log Y)^{-2}), and eliminates R_Y via Q_T = 2*P_Y - D_{2,Y}, leaving O(Y*(log Y)^{-4}) in ||D_{2,Y}||_Y^2 plus 4*X_tilde",
-        "status": "PROVED_PARTIAL_REDUCTION (identities in Lean Theorems 28-29; leaves O(Y*(log Y)^{-4}) without subpower cancellation)",
+        "hypotheses": "|R_2^{int}(d)| <= C_W*d for all d >= 1 (from TC-057R Selberg/PNT asymptotic), |R_2^{int}(d)| <= C'*d*exp(-c*sqrt(log d)) for d >= 2, and (d+1)*(L_{d+1}+1) >= T + 1",
+        "input_source": "TC-057R Selberg/PNT asymptotic + exact discrete summation by parts + finite-cutoff smooth-step bound |Delta^{smooth}_d(X)| < C_sm*sqrt(X)/d^2 + second-order shift identity",
+        "conclusion": "Cancels Route C boundary obstruction, bounds upper endpoint by O((log Y)^{-4}) (via L_T=1, g_T=phi_T, X^{5/2}/T(Y)^2 <= b^{5/2}) and jump energy by O((log Y)^{-2}), and eliminates R_Y via Q_T = 2*P_Y - D_{2,Y}, leaving O(Y*(log Y)^{-4}) unsigned energy in ||D_{2,Y}||_Y^2 (because small d >= 1 prevent replacing exp(-c*sqrt(log d)) by a saving in Y) and conditional contraction theta_eta + 4*Theta_eps^{diag}(Y) on T_2(Y)",
+        "status": "PROVED_PARTIAL_REDUCTION (identities in Lean Theorems 28-29 & 31(4); leaves O(Y*(log Y)^{-4}) unsigned energy without subpower cancellation)",
         "tc_discriminator_result": "Uses all-prime PNT cancellation for lambda (fails for a_2, a_S, 1 where W_2(u) ~ 2*u*log u); holds for all b > 1"
       },
       {
@@ -2917,14 +4638,25 @@
       },
       {
         "lemma_id": "LEM-TC058-E",
-        "title": "Joint M(Y)-layer polynomial kernel bound and prime-power diagonal control",
-        "objects": "P_M(s) = sum_{m < M} (1 - s)^m, L_{a,M}(X; T), D_tilde_{a,pp}^{(M)}(Y), X_tilde_{a,pp}^{(M)}(Y)",
-        "quantifiers": "forall M >= 1, forall bounded multiplicative a with a(1) = 1, forall Y >= 16",
-        "hypotheses": "0 < P_M(s) <= 4 on s in [1/4, 3/2] and |a(n)| <= 1",
+        "title": "Joint M(Y)-layer polynomial kernel bound, prime-power diagonal majorant, and off-diagonal share",
+        "objects": "P_M(s) = sum_{m < M} (1 - s)^m, L_{a,M}(X; T), J_{a,M}(Y) = D_{a,M}(Y) + X_{a,M}(Y)",
+        "quantifiers": "forall M >= 1, forall bounded |a(n)| <= 1 (diagonal bound) and completely multiplicative a with a(1) = 1 (reconstruction), forall Y >= 16",
+        "hypotheses": "0 < P_M(s) <= 4 on s in [1/4, 3/2] and |a(n)| <= 1 (plus multiplicativity of a for Q_{a,T} = L_{a,M,Y} + r_{a,M,Y})",
         "input_source": "Finite geometric series sum + Gaussian fast decay for n <= Y^{1/2}",
-        "conclusion": "D_tilde_{a,pp}^{(M(Y))}(Y) = O(Y / (log Y)^2), concentrating any Theta(Y) energy into X_tilde_{a,pp}^{(M(Y))}(Y)",
+        "conclusion": "D_{a,M}(Y) = O(Y / (log Y)^2) uniformly for |a| <= 1, giving off-diagonal share X_{a,M}(Y)/J_{a,M}(Y) = 1 - O((log Y)^{-2}) for multiplicative controls with E_a(Y) asymp Y; bounding X_M(Y) alone does NOT close SUBGATE-TC-043A without bounding full J_M(Y) or proving a new contraction theorem for D_M(Y)",
         "status": "PROVED_UNCONDITIONAL (polynomial & Gram identities in Lean Theorem 30; integral bound proved analytically)",
-        "tc_discriminator_result": "Diagonal bound is generic in |a| <= 1; isolating X_tilde_{lambda,pp}^{(M(Y))} requires all-prime lambda(p) = -1; holds for all b > 1"
+        "tc_discriminator_result": "Diagonal majorant is generic in |a| <= 1; Q_{a,T} = L_{a,M,Y} + r_{a,M,Y} requires multiplicative a; holds for all b > 1"
+      },
+      {
+        "lemma_id": "LEM-TC058R-F",
+        "title": "Full growing-order Gram conditional absorption, logical non-implication countermodel, finite r^{-1} square bridge, and B_tau cutoff transfer",
+        "objects": "J_M(Y) = D_M(Y) + X_M(Y), T_2(Y), Q_{lambda,T}(X), Q_{mu,floor(T/r^2)}(X/r^2), B_tau = tau^{5/2}*sqrt(log tau)/2",
+        "quantifiers": "forall T >= 0, X >= 0 (square bridge); forall Y >= 1, |a(n)| <= 1 (B_tau); forall eta in (0, eps), 0 <= theta_eta < 1 (absorption)",
+        "hypotheses": "J_M(Y) <= A_eta*Y^eta + theta_eta*F(Y) (or T_2(Y) <= A_eta*Y^eta + theta_eta*F(Y) with 4*Theta_eps^{diag})",
+        "input_source": "Young inequality with delta = (1 - theta_eta)/2 + normalized finite-horizon absorption G_eps(R) + elementary n^{-3} tail sum",
+        "conclusion": "J_M bound => E(Y) <<_eps Y^eps (valid including theta_eta = 0); abstract countermodel E = D = Y/(log Y)^2, X = r = 0 refutes off-diagonal-only inference; Q_{lambda,T}(X) = sum_{r^2<=T} r^{-1} Q_{mu,floor(T/r^2)}(X/r^2); and ||Q_{a,infty} - Q_{a,T(Y)}||_Y <= B_tau yields bilateral O_eps(Y^eps) transfer",
+        "status": "PROVED_CONDITIONAL_AND_BRIDGE (Lean Theorem 31 + analytic B_tau window tail bound)",
+        "tc_discriminator_result": "Square bridge requires all-prime lambda(p) = -1; B_tau and absorption algebra generalize to any b > 1"
       }
     ],
     "window_base_discriminator": {
@@ -3393,7 +5125,8 @@
       "liouville_square_divisor_indicator_and_compensated_selberg_tc058",
       "compensated_selberg_summation_by_parts_and_shift_elimination_tc058",
       "combined_target_exact_quadratic_and_conditional_absorption_tc058",
-      "growing_order_joint_polynomial_filter_and_gram_decomposition_tc058"
+      "growing_order_joint_polynomial_filter_and_gram_decomposition_tc058",
+      "growing_order_and_second_order_conditional_absorption_and_finite_square_bridge_tc058r"
     ],
     "all_tc058_theorems_present": true,
     "sorry_count": 0,
@@ -3439,20 +5172,114 @@
           "Quot.sound"
         ],
         "verified": true
+      },
+      "growing_order_and_second_order_conditional_absorption_and_finite_square_bridge_tc058r": {
+        "captured_check_output": "RiemannScope.LiouvilleSquareDilation.growing_order_and_second_order_conditional_absorption_and_finite_square_bridge_tc058r\n  {E : \u211d \u2192 \u211d} {M_lin : \u211d} (hE_nn : \u2200 (Z : \u211d), 1 \u2264 Z \u2192 0 \u2264 E Z) (hM_nn : 0 \u2264 M_lin)\n  (hE_lin : \u2200 (Z : \u211d), 1 \u2264 Z \u2192 E Z \u2264 M_lin * Z) :\n  (\u2200 (T : \u2115) (X : \u211d),\n      0 \u2264 X \u2192\n        RiemannScope.LiouvilleSquareDilation.finiteQLambda T X =\n          \u2211 r \u2208 Finset.filter (fun r => r ^ 2 \u2264 T) (Finset.Icc 1 T),\n            1 / \u2191r *\n              RiemannScope.LiouvilleSquareDilation.finiteQGeneral (fun n => \u2191(ArithmeticFunction.moebius n)) (T / r ^ 2)\n                (X / \u2191(r ^ 2))) \u2227\n    (\u2200 (M T : \u2115) (X \u03b4 : \u211d),\n        0 < X \u2192\n          X.log \u2260 0 \u2192\n            0 < \u03b4 \u2192\n              RiemannScope.LiouvilleSquareDilation.finiteQLambda T X =\n                  \u2211 pk \u2208 RiemannScope.LiouvilleSquareDilation.primePowerPairsUpTo T,\n                      RiemannScope.LiouvilleSquareDilation.jointPrimePowerFiber\n                        (fun n => \u2191(RiemannScope.LiouvilleSquareDilation.liouvilleLambda n)) M T pk X +\n                    RiemannScope.LiouvilleSquareDilation.finiteQShifted\n                        (fun n => \u2191(RiemannScope.LiouvilleSquareDilation.liouvilleLambda n)) M T X /\n                      X.log ^ M \u2227\n                RiemannScope.LiouvilleSquareDilation.finiteQLambda T X ^ 2 \u2264\n                  (1 + \u03b4) *\n                      (\u2211 pk \u2208 RiemannScope.LiouvilleSquareDilation.primePowerPairsUpTo T,\n                          RiemannScope.LiouvilleSquareDilation.jointPrimePowerFiber\n                            (fun n => \u2191(RiemannScope.LiouvilleSquareDilation.liouvilleLambda n)) M T pk X) ^\n                        2 +\n                    (1 + 1 / \u03b4) *\n                      (RiemannScope.LiouvilleSquareDilation.finiteQShifted\n                            (fun n => \u2191(RiemannScope.LiouvilleSquareDilation.liouvilleLambda n)) M T X /\n                          X.log ^ M) ^\n                        2) \u2227\n      (((\u2200 (\u03b8_\u03b7 : \u211d),\n              0 \u2264 \u03b8_\u03b7 \u2192\n                \u03b8_\u03b7 < 1 \u2192\n                  let \u03b4 := (1 - \u03b8_\u03b7) / 2;\n                  let q := (1 + \u03b4) * \u03b8_\u03b7;\n                  0 < \u03b4 \u2227 0 \u2264 q \u2227 q < 1 \u2227 (\u03b8_\u03b7 = 0 \u2192 \u03b4 = 1 / 2 \u2227 q = 0)) \u2227\n            \u2200 (D_M X_M R_rem : \u211d \u2192 \u211d) (\u03b7 \u03b5 A_\u03b7 B_rem \u03b8_\u03b7 Y_star : \u211d),\n              0 < \u03b7 \u2192\n                \u03b7 < \u03b5 \u2192\n                  0 \u2264 A_\u03b7 \u2192\n                    0 \u2264 B_rem \u2192\n                      0 \u2264 \u03b8_\u03b7 \u2192\n                        \u03b8_\u03b7 < 1 \u2192\n                          2 \u2264 Y_star \u2192\n                            let \u03b4 := (1 - \u03b8_\u03b7) / 2;\n                            let q := (1 + \u03b4) * \u03b8_\u03b7;\n                            let K_grow := (1 + \u03b4) * A_\u03b7 * Y_star ^ (\u03b7 - \u03b5) + (1 + 1 / \u03b4) * B_rem * Y_star ^ (-(2 + \u03b5));\n                            (\u2200 (Y : \u211d), Y_star \u2264 Y \u2192 E Y \u2264 (1 + \u03b4) * (D_M Y + X_M Y) + (1 + 1 / \u03b4) * R_rem Y) \u2192\n                              (\u2200 (Y : \u211d),\n                                  Y_star \u2264 Y \u2192\n                                    D_M Y + X_M Y \u2264\n                                      A_\u03b7 * Y ^ \u03b7 +\n                                        \u03b8_\u03b7 * RiemannScope.LiouvilleSquareDilation.monotoneScaleEnvelope E Y) \u2192\n                                (\u2200 (Y : \u211d), Y_star \u2264 Y \u2192 R_rem Y \u2264 B_rem * Y ^ (-2)) \u2192\n                                  (\u2200 (R : \u211d),\n                                      Y_star \u2264 R \u2192\n                                        RiemannScope.LiouvilleSquareDilation.normalizedScaleSupremum E \u03b5 R \u2264\n                                            max\n                                              (RiemannScope.LiouvilleSquareDilation.normalizedScaleSupremum E \u03b5 Y_star)\n                                              (K_grow +\n                                                q *\n                                                  RiemannScope.LiouvilleSquareDilation.normalizedScaleSupremum E \u03b5 R) \u2227\n                                          RiemannScope.LiouvilleSquareDilation.normalizedScaleSupremum E \u03b5 R \u2264\n                                            max\n                                              (RiemannScope.LiouvilleSquareDilation.normalizedScaleSupremum E \u03b5 Y_star)\n                                              (K_grow / (1 - q))) \u2227\n                                    \u2200 (Y : \u211d),\n                                      1 \u2264 Y \u2192\n                                        E Y \u2264\n                                            max\n                                                (RiemannScope.LiouvilleSquareDilation.normalizedScaleSupremum E \u03b5\n                                                  Y_star)\n                                                (K_grow / (1 - q)) *\n                                              Y ^ \u03b5 \u2227\n                                          RiemannScope.LiouvilleSquareDilation.monotoneScaleEnvelope E Y \u2264\n                                            max\n                                                (RiemannScope.LiouvilleSquareDilation.normalizedScaleSupremum E \u03b5\n                                                  Y_star)\n                                                (K_grow / (1 - q)) *\n                                              Y ^ \u03b5) \u2227\n          \u2200 (\u03b5 : \u211d),\n            0 < \u03b5 \u2192 \u03b5 < 1 \u2192 \u2200 (M_c : \u211d), 0 \u2264 M_c \u2192 \u2203 Y, 2 \u2264 Y \u2227 0 \u2264 Y / Y.log ^ 2 \u2227 M_c * Y ^ \u03b5 < Y / Y.log ^ 2) \u2227\n        (\u2200 (D_tilde T_2 : \u211d \u2192 \u211d) (S : \u211d \u2192 Finset (\u2115 \u00d7 \u2115)) (w d : \u211d \u2192 \u2115 \u00d7 \u2115 \u2192 \u211d) (\u03b7 \u03b5 A_\u03b7 \u03b8_\u03b7 C_cut q Y_star : \u211d),\n            0 < \u03b7 \u2192\n              \u03b7 < \u03b5 \u2192\n                0 \u2264 A_\u03b7 \u2192\n                  0 \u2264 C_cut \u2192\n                    0 \u2264 \u03b8_\u03b7 \u2192\n                      \u03b8_\u03b7 < 1 \u2192\n                        \u03b8_\u03b7 < q \u2192\n                          q < 1 \u2192\n                            1 \u2264 Y_star \u2192\n                              (\u2200 (Y : \u211d), Y_star \u2264 Y \u2192 E Y \u2264 4 * D_tilde Y + T_2 Y) \u2192\n                                (\u2200 (Y : \u211d),\n                                    Y_star \u2264 Y \u2192\n                                      (\u2200 pk \u2208 S Y, 0 \u2264 w Y pk \u2227 1 \u2264 d Y pk \u2227 d Y pk \u2264 Y) \u2227\n                                        D_tilde Y \u2264\n                                          \u2211 pk \u2208 S Y,\n                                              w Y pk *\n                                                RiemannScope.LiouvilleSquareDilation.monotoneScaleEnvelope E\n                                                  (Y / d Y pk) +\n                                            C_cut) \u2192\n                                  (\u2200 (Y : \u211d),\n                                      Y_star \u2264 Y \u2192\n                                        T_2 Y \u2264\n                                          A_\u03b7 * Y ^ \u03b7 +\n                                            \u03b8_\u03b7 * RiemannScope.LiouvilleSquareDilation.monotoneScaleEnvelope E Y) \u2192\n                                    (\u2200 (Y : \u211d), Y_star \u2264 Y \u2192 \u03b8_\u03b7 + 4 * \u2211 pk \u2208 S Y, w Y pk * d Y pk ^ (-\u03b5) \u2264 q) \u2192\n                                      let K_T2 := A_\u03b7 * Y_star ^ (\u03b7 - \u03b5) + 4 * C_cut * Y_star ^ (-\u03b5);\n                                      (\u2200 (R : \u211d),\n                                          Y_star \u2264 R \u2192\n                                            RiemannScope.LiouvilleSquareDilation.normalizedScaleSupremum E \u03b5 R \u2264\n                                                max\n                                                  (RiemannScope.LiouvilleSquareDilation.normalizedScaleSupremum E \u03b5\n                                                    Y_star)\n                                                  (K_T2 +\n                                                    q *\n                                                      RiemannScope.LiouvilleSquareDilation.normalizedScaleSupremum E \u03b5\n                                                        R) \u2227\n                                              RiemannScope.LiouvilleSquareDilation.normalizedScaleSupremum E \u03b5 R \u2264\n                                                max\n                                                  (RiemannScope.LiouvilleSquareDilation.normalizedScaleSupremum E \u03b5\n                                                    Y_star)\n                                                  (K_T2 / (1 - q))) \u2227\n                                        \u2200 (Y : \u211d),\n                                          1 \u2264 Y \u2192\n                                            E Y \u2264\n                                                max\n                                                    (RiemannScope.LiouvilleSquareDilation.normalizedScaleSupremum E \u03b5\n                                                      Y_star)\n                                                    (K_T2 / (1 - q)) *\n                                                  Y ^ \u03b5 \u2227\n                                              RiemannScope.LiouvilleSquareDilation.monotoneScaleEnvelope E Y \u2264\n                                                max\n                                                    (RiemannScope.LiouvilleSquareDilation.normalizedScaleSupremum E \u03b5\n                                                      Y_star)\n                                                    (K_T2 / (1 - q)) *\n                                                  Y ^ \u03b5) \u2227\n          \u2200 (s_T s_inf : \u211d \u2192 \u211d) (B_tau : \u211d),\n            0 \u2264 B_tau \u2192\n              (\u2200 (Y : \u211d), 1 \u2264 Y \u2192 0 \u2264 s_T Y \u2227 0 \u2264 s_inf Y \u2227 |s_T Y - s_inf Y| \u2264 B_tau) \u2192\n                (\u2200 (Y : \u211d),\n                    1 \u2264 Y \u2192\n                      |s_T Y ^ 2 - s_inf Y ^ 2| \u2264 2 * B_tau * s_inf Y + B_tau ^ 2 \u2227\n                        s_inf Y ^ 2 \u2264 2 * s_T Y ^ 2 + 2 * B_tau ^ 2 \u2227 s_T Y ^ 2 \u2264 2 * s_inf Y ^ 2 + 2 * B_tau ^ 2) \u2227\n                  \u2200 (\u03b5 : \u211d),\n                    0 < \u03b5 \u2192\n                      ((\u2203 C_T, 0 \u2264 C_T \u2227 \u2200 (Y : \u211d), 1 \u2264 Y \u2192 s_T Y ^ 2 \u2264 C_T * Y ^ \u03b5) \u2194\n                        \u2203 C_inf, 0 \u2264 C_inf \u2227 \u2200 (Y : \u211d), 1 \u2264 Y \u2192 s_inf Y ^ 2 \u2264 C_inf * Y ^ \u03b5)",
+        "captured_print_axioms_output": "'RiemannScope.LiouvilleSquareDilation.growing_order_and_second_order_conditional_absorption_and_finite_square_bridge_tc058r' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]",
+        "parsed_axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "verified": true
       }
     },
     "all_tc058_lean_checks_pass": true
   },
   "serialized_arb_self_check": {
-    "total_certified_arb_balls_checked": 391,
-    "compared_against_live_original_arb_count": 391,
+    "total_certified_arb_balls_checked": 593,
+    "compared_against_live_original_arb_count": 593,
     "live_original_count_matches_enumerated_total": true,
     "all_enclose_original_256bit_arb_ball": true,
     "failed_paths": [],
     "checked_paths": [
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.zeta_6_times_zeta_3",
       "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.Q_mu_T",
       "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.riesz_k3_minus_Q_mu_residual",
       "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.square_divisor_bridge_minus_Q_lambda_residual",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[0].Q_lambda_T",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[0].finite_r_inv_square_dilation_rhs",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[0].residual",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[1].Q_lambda_T",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[1].finite_r_inv_square_dilation_rhs",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[1].residual",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[2].Q_lambda_T",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[2].finite_r_inv_square_dilation_rhs",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[2].residual",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[3].Q_lambda_T",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[3].finite_r_inv_square_dilation_rhs",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[3].residual",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[4].Q_lambda_T",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[4].finite_r_inv_square_dilation_rhs",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[4].residual",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[5].Q_lambda_T",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[5].finite_r_inv_square_dilation_rhs",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[5].residual",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[6].Q_lambda_T",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[6].finite_r_inv_square_dilation_rhs",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[6].residual",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[7].Q_lambda_T",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[7].finite_r_inv_square_dilation_rhs",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[7].residual",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[8].Q_lambda_T",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[8].finite_r_inv_square_dilation_rhs",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[8].residual",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[9].Q_lambda_T",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[9].finite_r_inv_square_dilation_rhs",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[9].residual",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[10].Q_lambda_T",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[10].finite_r_inv_square_dilation_rhs",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[10].residual",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[11].Q_lambda_T",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[11].finite_r_inv_square_dilation_rhs",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[11].residual",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[12].Q_lambda_T",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[12].finite_r_inv_square_dilation_rhs",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[12].residual",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[13].Q_lambda_T",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[13].finite_r_inv_square_dilation_rhs",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[13].residual",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[14].Q_lambda_T",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[14].finite_r_inv_square_dilation_rhs",
+      "section_1_and_2_narrow_repairs_and_dependency_table.agarwal_garg_maji_riesz_bridge_check.finite_square_bridge_grid_rows[14].residual",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.pointwise_tail_cap_tau_5_2_over_2",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.B_tau_uniform_window_norm_bound",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[0].E_T",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[0].E_inf_enclosure",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[0].norm_diff_T_to_inf_enclosure",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[0].B_tau_minus_norm_diff_margin",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[0].abs_E_T_minus_E_inf_enclosure",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[0].quad_transfer_2Btau_sqrtEinf_add_Btau2_margin",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[1].E_T",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[1].E_inf_enclosure",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[1].norm_diff_T_to_inf_enclosure",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[1].B_tau_minus_norm_diff_margin",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[1].abs_E_T_minus_E_inf_enclosure",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[1].quad_transfer_2Btau_sqrtEinf_add_Btau2_margin",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[2].E_T",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[2].E_inf_enclosure",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[2].norm_diff_T_to_inf_enclosure",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[2].B_tau_minus_norm_diff_margin",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[2].abs_E_T_minus_E_inf_enclosure",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[2].quad_transfer_2Btau_sqrtEinf_add_Btau2_margin",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[3].E_T",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[3].E_inf_enclosure",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[3].norm_diff_T_to_inf_enclosure",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[3].B_tau_minus_norm_diff_margin",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[3].abs_E_T_minus_E_inf_enclosure",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[3].quad_transfer_2Btau_sqrtEinf_add_Btau2_margin",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[4].E_T",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[4].E_inf_enclosure",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[4].norm_diff_T_to_inf_enclosure",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[4].B_tau_minus_norm_diff_margin",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[4].abs_E_T_minus_E_inf_enclosure",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[4].quad_transfer_2Btau_sqrtEinf_add_Btau2_margin",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[5].E_T",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[5].E_inf_enclosure",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[5].norm_diff_T_to_inf_enclosure",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[5].B_tau_minus_norm_diff_margin",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[5].abs_E_T_minus_E_inf_enclosure",
+      "section_1_and_2_narrow_repairs_and_dependency_table.finite_to_full_cutoff_comparison.sampled_enclosure_rows[5].quad_transfer_2Btau_sqrtEinf_add_Btau2_margin",
       "section_1_and_2_narrow_repairs_and_dependency_table.normalized_trivial_zero_slope_k_independence.rows[0].zetap_at_neg_2m",
       "section_1_and_2_narrow_repairs_and_dependency_table.normalized_trivial_zero_slope_k_independence.rows[0].max_grade_normalized_slope_discrepancy",
       "section_1_and_2_narrow_repairs_and_dependency_table.normalized_trivial_zero_slope_k_independence.rows[1].zetap_at_neg_2m",
@@ -3504,18 +5331,27 @@
       "section_3_combined_target_and_direct_cross_term.independent_prime_power_fiber_cross_checks[1].cross_term_prime_power_fiber_sum",
       "section_3_combined_target_and_direct_cross_term.independent_prime_power_fiber_cross_checks[1].direct_minus_fiber_residual",
       "section_3_combined_target_and_direct_cross_term.relaxed_conditional_absorption_schedule_rows[0].two_zetapp_1_plus_eps",
-      "section_3_combined_target_and_direct_cross_term.relaxed_conditional_absorption_schedule_rows[0].threshold_log_Y_for_q",
+      "section_3_combined_target_and_direct_cross_term.relaxed_conditional_absorption_schedule_rows[0].threshold_log_Y_for_S_comb_q",
+      "section_3_combined_target_and_direct_cross_term.relaxed_conditional_absorption_schedule_rows[0].threshold_log_Y_for_T2_4Theta_q",
       "section_3_combined_target_and_direct_cross_term.relaxed_conditional_absorption_schedule_rows[0].Theta_eps_diag_at_Y128",
+      "section_3_combined_target_and_direct_cross_term.relaxed_conditional_absorption_schedule_rows[0].four_Theta_eps_diag_at_Y128",
       "section_3_combined_target_and_direct_cross_term.relaxed_conditional_absorption_schedule_rows[1].two_zetapp_1_plus_eps",
-      "section_3_combined_target_and_direct_cross_term.relaxed_conditional_absorption_schedule_rows[1].threshold_log_Y_for_q",
+      "section_3_combined_target_and_direct_cross_term.relaxed_conditional_absorption_schedule_rows[1].threshold_log_Y_for_S_comb_q",
+      "section_3_combined_target_and_direct_cross_term.relaxed_conditional_absorption_schedule_rows[1].threshold_log_Y_for_T2_4Theta_q",
       "section_3_combined_target_and_direct_cross_term.relaxed_conditional_absorption_schedule_rows[1].Theta_eps_diag_at_Y128",
+      "section_3_combined_target_and_direct_cross_term.relaxed_conditional_absorption_schedule_rows[1].four_Theta_eps_diag_at_Y128",
       "section_3_combined_target_and_direct_cross_term.relaxed_conditional_absorption_schedule_rows[2].two_zetapp_1_plus_eps",
-      "section_3_combined_target_and_direct_cross_term.relaxed_conditional_absorption_schedule_rows[2].threshold_log_Y_for_q",
+      "section_3_combined_target_and_direct_cross_term.relaxed_conditional_absorption_schedule_rows[2].threshold_log_Y_for_S_comb_q",
+      "section_3_combined_target_and_direct_cross_term.relaxed_conditional_absorption_schedule_rows[2].threshold_log_Y_for_T2_4Theta_q",
       "section_3_combined_target_and_direct_cross_term.relaxed_conditional_absorption_schedule_rows[2].Theta_eps_diag_at_Y128",
+      "section_3_combined_target_and_direct_cross_term.relaxed_conditional_absorption_schedule_rows[2].four_Theta_eps_diag_at_Y128",
+      "section_3_combined_target_and_direct_cross_term.logical_non_implication_countermodel.sample_witness_eps_half_Mc_10.E_witness_minus_Mc_Y_eps_margin",
       "section_4_compensated_selberg_and_shift_elimination.c_lambda",
       "section_4_compensated_selberg_and_shift_elimination.gamma_5_4_over_4",
       "section_4_compensated_selberg_and_shift_elimination.unimodal_peak_const",
       "section_4_compensated_selberg_and_shift_elimination.C_sq",
+      "section_4_compensated_selberg_and_shift_elimination.C_sm_smooth_step_const",
+      "section_4_compensated_selberg_and_shift_elimination.three_zeta_3_small_w_const",
       "section_4_compensated_selberg_and_shift_elimination.X1_max_Q_square_sampled",
       "section_4_compensated_selberg_and_shift_elimination.pointwise_square_projection_and_compensated_split_rows[0].Q_square_T",
       "section_4_compensated_selberg_and_shift_elimination.pointwise_square_projection_and_compensated_split_rows[0].C_sq_minus_Q_square_T",
@@ -3537,6 +5373,40 @@
       "section_4_compensated_selberg_and_shift_elimination.pointwise_square_projection_and_compensated_split_rows[4].C_sq_minus_Q_square_T",
       "section_4_compensated_selberg_and_shift_elimination.pointwise_square_projection_and_compensated_split_rows[4].sum_gd_minus_Q_square_residual",
       "section_4_compensated_selberg_and_shift_elimination.pointwise_square_projection_and_compensated_split_rows[4].compensated_selberg_split_residual",
+      "section_4_compensated_selberg_and_shift_elimination.upper_endpoint_coupled_cutoff_checks.rows[0].g_T_minus_phi_T_at_Y",
+      "section_4_compensated_selberg_and_shift_elimination.upper_endpoint_coupled_cutoff_checks.rows[0].g_T_minus_phi_T_at_tau_Y",
+      "section_4_compensated_selberg_and_shift_elimination.upper_endpoint_coupled_cutoff_checks.rows[0].X_hi_5_2_over_T_sq",
+      "section_4_compensated_selberg_and_shift_elimination.upper_endpoint_coupled_cutoff_checks.rows[0].tau_5_2_minus_ratio_margin",
+      "section_4_compensated_selberg_and_shift_elimination.upper_endpoint_coupled_cutoff_checks.rows[1].g_T_minus_phi_T_at_Y",
+      "section_4_compensated_selberg_and_shift_elimination.upper_endpoint_coupled_cutoff_checks.rows[1].g_T_minus_phi_T_at_tau_Y",
+      "section_4_compensated_selberg_and_shift_elimination.upper_endpoint_coupled_cutoff_checks.rows[1].X_hi_5_2_over_T_sq",
+      "section_4_compensated_selberg_and_shift_elimination.upper_endpoint_coupled_cutoff_checks.rows[1].tau_5_2_minus_ratio_margin",
+      "section_4_compensated_selberg_and_shift_elimination.upper_endpoint_coupled_cutoff_checks.rows[2].g_T_minus_phi_T_at_Y",
+      "section_4_compensated_selberg_and_shift_elimination.upper_endpoint_coupled_cutoff_checks.rows[2].g_T_minus_phi_T_at_tau_Y",
+      "section_4_compensated_selberg_and_shift_elimination.upper_endpoint_coupled_cutoff_checks.rows[2].X_hi_5_2_over_T_sq",
+      "section_4_compensated_selberg_and_shift_elimination.upper_endpoint_coupled_cutoff_checks.rows[2].tau_5_2_minus_ratio_margin",
+      "section_4_compensated_selberg_and_shift_elimination.upper_endpoint_coupled_cutoff_checks.rows[3].g_T_minus_phi_T_at_Y",
+      "section_4_compensated_selberg_and_shift_elimination.upper_endpoint_coupled_cutoff_checks.rows[3].g_T_minus_phi_T_at_tau_Y",
+      "section_4_compensated_selberg_and_shift_elimination.upper_endpoint_coupled_cutoff_checks.rows[3].X_hi_5_2_over_T_sq",
+      "section_4_compensated_selberg_and_shift_elimination.upper_endpoint_coupled_cutoff_checks.rows[3].tau_5_2_minus_ratio_margin",
+      "section_4_compensated_selberg_and_shift_elimination.smooth_step_finite_cutoff_bound_checks.sample_rows[0].abs_Delta_d_smooth",
+      "section_4_compensated_selberg_and_shift_elimination.smooth_step_finite_cutoff_bound_checks.sample_rows[0].C_sm_sqrtX_over_d_d_add_1_ub",
+      "section_4_compensated_selberg_and_shift_elimination.smooth_step_finite_cutoff_bound_checks.sample_rows[0].bound_margin",
+      "section_4_compensated_selberg_and_shift_elimination.smooth_step_finite_cutoff_bound_checks.sample_rows[1].abs_Delta_d_smooth",
+      "section_4_compensated_selberg_and_shift_elimination.smooth_step_finite_cutoff_bound_checks.sample_rows[1].C_sm_sqrtX_over_d_d_add_1_ub",
+      "section_4_compensated_selberg_and_shift_elimination.smooth_step_finite_cutoff_bound_checks.sample_rows[1].bound_margin",
+      "section_4_compensated_selberg_and_shift_elimination.smooth_step_finite_cutoff_bound_checks.sample_rows[2].abs_Delta_d_smooth",
+      "section_4_compensated_selberg_and_shift_elimination.smooth_step_finite_cutoff_bound_checks.sample_rows[2].C_sm_sqrtX_over_d_d_add_1_ub",
+      "section_4_compensated_selberg_and_shift_elimination.smooth_step_finite_cutoff_bound_checks.sample_rows[2].bound_margin",
+      "section_4_compensated_selberg_and_shift_elimination.smooth_step_finite_cutoff_bound_checks.sample_rows[3].abs_Delta_d_smooth",
+      "section_4_compensated_selberg_and_shift_elimination.smooth_step_finite_cutoff_bound_checks.sample_rows[3].C_sm_sqrtX_over_d_d_add_1_ub",
+      "section_4_compensated_selberg_and_shift_elimination.smooth_step_finite_cutoff_bound_checks.sample_rows[3].bound_margin",
+      "section_4_compensated_selberg_and_shift_elimination.smooth_step_finite_cutoff_bound_checks.sample_rows[4].abs_Delta_d_smooth",
+      "section_4_compensated_selberg_and_shift_elimination.smooth_step_finite_cutoff_bound_checks.sample_rows[4].C_sm_sqrtX_over_d_d_add_1_ub",
+      "section_4_compensated_selberg_and_shift_elimination.smooth_step_finite_cutoff_bound_checks.sample_rows[4].bound_margin",
+      "section_4_compensated_selberg_and_shift_elimination.smooth_step_finite_cutoff_bound_checks.sample_rows[5].abs_Delta_d_smooth",
+      "section_4_compensated_selberg_and_shift_elimination.smooth_step_finite_cutoff_bound_checks.sample_rows[5].C_sm_sqrtX_over_d_d_add_1_ub",
+      "section_4_compensated_selberg_and_shift_elimination.smooth_step_finite_cutoff_bound_checks.sample_rows[5].bound_margin",
       "section_4_compensated_selberg_and_shift_elimination.dyadic_parity_control_divisor_identity.projection_residual",
       "section_4_compensated_selberg_and_shift_elimination.summation_by_parts_and_shift_elimination_rows[0].M_sq_window_energy",
       "section_4_compensated_selberg_and_shift_elimination.summation_by_parts_and_shift_elimination_rows[0].M_sq_analytic_upper_bound",
@@ -3708,83 +5578,158 @@
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.liouville.joint_M_layer_norm_sq",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.liouville.joint_M_prime_power_diagonal",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.liouville.joint_M_prime_power_off_diagonal",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.liouville.diagonal_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.liouville.off_diagonal_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.liouville.off_diagonal_over_joint_pct",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.liouville.direct_pair_minus_consistency_off_diagonal_residual",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.liouville.minkowski_layer_sum_norm",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.liouville.minkowski_norm_ratio_over_joint",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.liouville.minkowski_layer_sum_norm_sq",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.liouville.minkowski_sq_over_joint_ratio",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.liouville.minkowski_over_joint_ratio",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.a2.E_total_Y",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.a2.joint_M_layer_norm_sq",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.a2.joint_M_prime_power_diagonal",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.a2.joint_M_prime_power_off_diagonal",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.a2.diagonal_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.a2.off_diagonal_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.a2.off_diagonal_over_joint_pct",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.a_3_5_7.E_total_Y",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.a_3_5_7.joint_M_layer_norm_sq",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.a_3_5_7.joint_M_prime_power_diagonal",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.a_3_5_7.joint_M_prime_power_off_diagonal",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.a_3_5_7.diagonal_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.a_3_5_7.off_diagonal_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.a_3_5_7.off_diagonal_over_joint_pct",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.unsigned_1.E_total_Y",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.unsigned_1.joint_M_layer_norm_sq",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.unsigned_1.joint_M_prime_power_diagonal",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.unsigned_1.joint_M_prime_power_off_diagonal",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.unsigned_1.diagonal_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.unsigned_1.off_diagonal_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.unsigned_1.off_diagonal_over_joint_pct",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.unsigned_1.minkowski_layer_sum_norm",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.unsigned_1.minkowski_norm_ratio_over_joint",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.unsigned_1.minkowski_layer_sum_norm_sq",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.unsigned_1.minkowski_sq_over_joint_ratio",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[0].modes.unsigned_1.minkowski_over_joint_ratio",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.liouville.E_total_Y",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.liouville.joint_M_layer_norm_sq",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.liouville.joint_M_prime_power_diagonal",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.liouville.joint_M_prime_power_off_diagonal",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.liouville.diagonal_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.liouville.off_diagonal_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.liouville.off_diagonal_over_joint_pct",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.liouville.minkowski_layer_sum_norm",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.liouville.minkowski_norm_ratio_over_joint",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.liouville.minkowski_layer_sum_norm_sq",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.liouville.minkowski_sq_over_joint_ratio",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.liouville.minkowski_over_joint_ratio",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.a2.E_total_Y",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.a2.joint_M_layer_norm_sq",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.a2.joint_M_prime_power_diagonal",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.a2.joint_M_prime_power_off_diagonal",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.a2.diagonal_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.a2.off_diagonal_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.a2.off_diagonal_over_joint_pct",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.a_3_5_7.E_total_Y",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.a_3_5_7.joint_M_layer_norm_sq",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.a_3_5_7.joint_M_prime_power_diagonal",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.a_3_5_7.joint_M_prime_power_off_diagonal",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.a_3_5_7.diagonal_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.a_3_5_7.off_diagonal_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.a_3_5_7.off_diagonal_over_joint_pct",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.unsigned_1.E_total_Y",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.unsigned_1.joint_M_layer_norm_sq",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.unsigned_1.joint_M_prime_power_diagonal",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.unsigned_1.joint_M_prime_power_off_diagonal",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.unsigned_1.diagonal_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.unsigned_1.off_diagonal_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.unsigned_1.off_diagonal_over_joint_pct",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.unsigned_1.minkowski_layer_sum_norm",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.unsigned_1.minkowski_norm_ratio_over_joint",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.unsigned_1.minkowski_layer_sum_norm_sq",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.unsigned_1.minkowski_sq_over_joint_ratio",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[1].modes.unsigned_1.minkowski_over_joint_ratio",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.liouville.E_total_Y",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.liouville.joint_M_layer_norm_sq",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.liouville.joint_M_prime_power_diagonal",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.liouville.joint_M_prime_power_off_diagonal",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.liouville.diagonal_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.liouville.off_diagonal_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.liouville.off_diagonal_over_joint_pct",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.liouville.minkowski_layer_sum_norm",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.liouville.minkowski_norm_ratio_over_joint",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.liouville.minkowski_layer_sum_norm_sq",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.liouville.minkowski_sq_over_joint_ratio",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.liouville.minkowski_over_joint_ratio",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.a2.E_total_Y",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.a2.joint_M_layer_norm_sq",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.a2.joint_M_prime_power_diagonal",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.a2.joint_M_prime_power_off_diagonal",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.a2.diagonal_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.a2.off_diagonal_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.a2.off_diagonal_over_joint_pct",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.a_3_5_7.E_total_Y",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.a_3_5_7.joint_M_layer_norm_sq",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.a_3_5_7.joint_M_prime_power_diagonal",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.a_3_5_7.joint_M_prime_power_off_diagonal",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.a_3_5_7.diagonal_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.a_3_5_7.off_diagonal_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.a_3_5_7.off_diagonal_over_joint_pct",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.unsigned_1.E_total_Y",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.unsigned_1.joint_M_layer_norm_sq",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.unsigned_1.joint_M_prime_power_diagonal",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.unsigned_1.joint_M_prime_power_off_diagonal",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.unsigned_1.diagonal_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.unsigned_1.off_diagonal_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.unsigned_1.off_diagonal_over_joint_pct",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.unsigned_1.minkowski_layer_sum_norm",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.unsigned_1.minkowski_norm_ratio_over_joint",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.unsigned_1.minkowski_layer_sum_norm_sq",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.unsigned_1.minkowski_sq_over_joint_ratio",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[2].modes.unsigned_1.minkowski_over_joint_ratio",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.liouville.E_total_Y",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.liouville.joint_M_layer_norm_sq",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.liouville.joint_M_prime_power_diagonal",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.liouville.joint_M_prime_power_off_diagonal",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.liouville.diagonal_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.liouville.off_diagonal_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.liouville.off_diagonal_over_joint_pct",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.liouville.minkowski_layer_sum_norm",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.liouville.minkowski_norm_ratio_over_joint",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.liouville.minkowski_layer_sum_norm_sq",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.liouville.minkowski_sq_over_joint_ratio",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.liouville.minkowski_over_joint_ratio",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.a2.E_total_Y",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.a2.joint_M_layer_norm_sq",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.a2.joint_M_prime_power_diagonal",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.a2.joint_M_prime_power_off_diagonal",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.a2.diagonal_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.a2.off_diagonal_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.a2.off_diagonal_over_joint_pct",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.a_3_5_7.E_total_Y",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.a_3_5_7.joint_M_layer_norm_sq",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.a_3_5_7.joint_M_prime_power_diagonal",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.a_3_5_7.joint_M_prime_power_off_diagonal",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.a_3_5_7.diagonal_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.a_3_5_7.off_diagonal_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.a_3_5_7.off_diagonal_over_joint_pct",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.unsigned_1.E_total_Y",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.unsigned_1.joint_M_layer_norm_sq",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.unsigned_1.joint_M_prime_power_diagonal",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.unsigned_1.joint_M_prime_power_off_diagonal",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.unsigned_1.diagonal_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.unsigned_1.off_diagonal_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.unsigned_1.off_diagonal_over_joint_pct",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.unsigned_1.minkowski_layer_sum_norm",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.unsigned_1.minkowski_norm_ratio_over_joint",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.unsigned_1.minkowski_layer_sum_norm_sq",
+      "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.unsigned_1.minkowski_sq_over_joint_ratio",
       "section_5_growing_order_and_joint_gram.joint_M_layer_gram_rows[3].modes.unsigned_1.minkowski_over_joint_ratio",
+      "section_5_growing_order_and_joint_gram.live_Y64_growing_control_off_diagonal_summary.a2_off_diagonal_pct_Y64",
+      "section_5_growing_order_and_joint_gram.live_Y64_growing_control_off_diagonal_summary.a_3_5_7_off_diagonal_pct_Y64",
+      "section_5_growing_order_and_joint_gram.live_Y64_growing_control_off_diagonal_summary.unsigned_1_off_diagonal_pct_Y64",
       "section_6_tc_compatibility_discriminators.window_base_discriminator.rows[0].E_b",
       "section_6_tc_compatibility_discriminators.window_base_discriminator.rows[0].D_tilde_b",
       "section_6_tc_compatibility_discriminators.window_base_discriminator.rows[0].S_comb_b",
@@ -3846,8 +5791,8 @@
   "section_8_tc058_review_displayed_enclosures_audit": {
     "review_path": "C:\\Development\\Projects\\reimann_scope\\docs\\reviews\\TC_058_SIMULTANEOUS_COMPATIBILITY_AND_COMBINED_ENERGY.md",
     "pi_macro_count": 0,
-    "total_displayed_intervals_found": 78,
-    "tagged_and_checked_count": 78,
+    "total_displayed_intervals_found": 101,
+    "tagged_and_checked_count": 101,
     "untagged_count": 0,
     "failed_count": 0,
     "untagged_intervals": [],

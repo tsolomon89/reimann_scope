@@ -631,5 +631,5 @@ def test_lean_formalization_tc057_theorems_zero_sorry_zero_custom_axioms() -> No
     defs_cnt = len(re.findall(r"^(?:noncomputable\s+)?def\s+", no_comments, flags=re.MULTILINE))
     pub_thm_cnt = len(re.findall(r"^theorem\s+", no_comments, flags=re.MULTILINE))
     priv_thm_cnt = len(re.findall(r"^private\s+theorem\s+", no_comments, flags=re.MULTILINE))
-    assert (defs_cnt, pub_thm_cnt, priv_thm_cnt) == (81, 30, 63)
-    assert "81 `def` + 30 public `theorem` + 63 private helper `theorem` = 174 declarations" in readme_src
+    assert (defs_cnt, pub_thm_cnt, priv_thm_cnt) == (81, 31, 63)
+    assert "81 `def` + 31 public `theorem` + 63 private helper `theorem` = 175 declarations" in readme_src
