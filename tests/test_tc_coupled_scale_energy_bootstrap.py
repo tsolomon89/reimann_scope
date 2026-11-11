@@ -331,9 +331,12 @@ def test_scoped_obstructions_prime_subset_lower_bound_abel_jumps_and_three_quant
       and discrete Abel identity with floor(T/d) cutoff jumps + boundary majorant.
     - Linear cutoff replacement: 0 <= signed < Mink < maj across Y in {16, 32, 64}.
     """
-    # 3A: Route A full vs prime-only multiplier
+    # 3A: Route A full vs prime-only multiplier and U = 5, T = 25 boundary check (T >= U^2 yet no rough squarefree composite)
+    assert rough_squarefree_divisors_band(5, 25) == (5, 7, 11, 13, 17, 19, 23)
+    assert rough_squarefree_divisors_band(5, 35) == (5, 7, 11, 13, 17, 19, 23, 29, 31, 35)
     sec3 = verify_section_3_route_a_moebius_rough_descent(prec_bits=256)
     assert sec3["all_section_3_checks_pass"] is True
+    assert sec3["u5_t25_no_squarefree_rough_composite"] is True
     cs_rows = sec3["optimal_cauchy_schwarz_divergence_sigma_half"]
     for row in cs_rows:
         assert row["rough_divisor_count"] >= row["rough_prime_count"]
@@ -628,5 +631,5 @@ def test_lean_formalization_tc057_theorems_zero_sorry_zero_custom_axioms() -> No
     defs_cnt = len(re.findall(r"^(?:noncomputable\s+)?def\s+", no_comments, flags=re.MULTILINE))
     pub_thm_cnt = len(re.findall(r"^theorem\s+", no_comments, flags=re.MULTILINE))
     priv_thm_cnt = len(re.findall(r"^private\s+theorem\s+", no_comments, flags=re.MULTILINE))
-    assert (defs_cnt, pub_thm_cnt, priv_thm_cnt) == (61, 26, 56)
-    assert "61 `def` + 26 public `theorem` + 56 private helper `theorem` = 143 declarations" in readme_src
+    assert (defs_cnt, pub_thm_cnt, priv_thm_cnt) == (81, 30, 63)
+    assert "81 `def` + 30 public `theorem` + 63 private helper `theorem` = 174 declarations" in readme_src

@@ -113,7 +113,7 @@ Distinguish the **actual signed rough-divisor sum** $\mathcal{H}_{A}(X; Y) := \s
 $$\mathcal{H}_{A}(X; Y)^2 \le \left(\sum_{d \in \mathcal{R}_{[U,T(Y)]}} \frac{1}{d \alpha_d}\right) \sum_{d \in \mathcal{R}_{[U,T(Y)]}} \alpha_d Q_{L_d}(X/d)^2 \qquad (\alpha_d > 0).$$
 Against a target bound $E_{L_d}(Y/d) \le C (Y/d)^\sigma$ ($0 \le \sigma < 1$), minimizing the majorant's homogeneous multiplier $Y^{-\sigma} (\sum_d \frac{1}{d\alpha_d})(\sum_d \alpha_d (Y/d)^\sigma)$ over all weights $\alpha_d > 0$ attains its exact minimum at $\alpha_d \propto d^{(\sigma - 1)/2}$:
 $$\mathcal{M}_{A,\sigma}(Y) := \left(\sum_{d \in \mathcal{R}_{[U(Y), T(Y)]}} d^{-\frac{1+\sigma}{2}}\right)^2.$$
-Because every prime $p \in [U(Y), T(Y)]$ belongs to $\mathcal{R}_{[U(Y), T(Y)]}$ while squarefree rough composites in $\mathcal{R}_{[U(Y), T(Y)]} \setminus \mathcal{P}_{[U(Y), T(Y)]}$ contribute nonnegatively (and strictly positively once $T(Y) \ge U(Y)^2$), for any polylogarithmic $U(Y)$ and any $0 \le \sigma < 1$ the **prime subset alone** gives the rigorous lower bound and divergence
+Because every prime $p \in [U(Y), T(Y)]$ belongs to $\mathcal{R}_{[U(Y), T(Y)]}$ while squarefree rough composites in $\mathcal{R}_{[U(Y), T(Y)]} \setminus \mathcal{P}_{[U(Y), T(Y)]}$ contribute nonnegatively (and strictly positively when an admissible composite exists; note that $T \ge U^2$ alone does not force one, since at $U = 5, T = 25$ none exists and the first possible squarefree rough product is $5 \cdot 7 = 35$), for any polylogarithmic $U(Y)$ and any $0 \le \sigma < 1$ the **prime subset alone** gives the rigorous lower bound and divergence
 $$\mathcal{M}_{A,\sigma}(Y) \ge \mathcal{M}_{A,\sigma}^{\mathrm{prime}}(Y) := \left(\sum_{U(Y) \le p \le T(Y)} p^{-\frac{1+\sigma}{2}}\right)^2 \gg_\sigma \frac{T(Y)^{1-\sigma}}{(\log T(Y))^2} \asymp_\sigma \frac{Y^{\frac{5}{4}(1-\sigma)}}{(\log Y)^2} \xrightarrow{Y \to \infty} +\infty.$$
 (Note: we state this proved prime-subset lower bound rather than asserting that the prime asymptotic equals the full rough-divisor asymptotic, which is strictly larger because of composite squarefree rough terms.) This proves that the Cauchy–Schwarz majorant cannot contract at any $\sigma \in [0, 1)$; it does **not** prove a lower bound on the signed integral $\int_Y^{\tau Y} \mathcal{H}_A(X; Y)^2 \frac{dX}{X}$, where $d_1 \neq d_2$ cross terms remain signed.
 - Certified prime-subset lower bound $\mathcal{M}_{A,1/2}^{\mathrm{prime}}(Y)$ vs. full multiplier $\mathcal{M}_{A,1/2}(Y)$ at $U = 5, \sigma = 1/2$:
@@ -237,9 +237,9 @@ For **every real $Y \ge 2$**, let $D_{\lambda,\mathrm{pp}}(Y) := \frac{1}{(\log 
 
 ### Theorem 6.2 (Proved Route D Same-Scale Absorption Transfer — `CONDITIONAL_ON_SIGNED_CORRELATION`, Lean Theorem 26)
 
-*Scope Label*: **`CONDITIONAL_ON_SIGNED_CORRELATION`**. Suppose the **open** signed-correlation hypothesis holds: for every $\eta > 0$ there exist $A_\eta \ge 0$, $\theta_\eta \in [0, 1/2)$, and $Y_\eta \ge 2$ such that
+*Scope Label*: **`CONDITIONAL_ON_SIGNED_CORRELATION`**. Suppose the **open sufficient condition** (signed-correlation hypothesis) holds: for every $\eta > 0$ there exist $A_\eta \ge 0$, $\theta_\eta \in [0, 1/2)$, and $Y_\eta \ge 2$ such that
 $$\widetilde{\mathcal{X}}_{\lambda,\mathrm{pp}}(Y) + E_{\mathrm{sh},1}(Y) \le A_\eta Y^\eta + \theta_\eta F(Y) \qquad \text{for all } Y \ge Y_\eta.$$
-Then **for every $\varepsilon > 0$**, there exists $M_\varepsilon \ge 0$ such that $E(Y) \le F(Y) \le M_\varepsilon Y^\varepsilon$ uniformly for all $Y \ge 1$.
+Then **for every $\varepsilon > 0$**, there exists $M_\varepsilon \ge 0$ such that $E(Y) \le F(Y) \le M_\varepsilon Y^\varepsilon$ uniformly for all $Y \ge 1$. *(Note: Theorem 6.2 / Lean Theorem 26 proves this forward implication to subpower energy as a **sufficient condition**; equivalence is not asserted without separately proving the converse, including any shifted-kernel estimate it needs.)*
 
 *Proof* (without continuity of $E$, attainment of suprema, or a priori global finiteness of $\sup_{Z \ge 1} E(Z)/Z^\varepsilon$; machine-checked in [`conditional_signed_correlation_same_scale_absorption_transfer_tc057r`](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope/LiouvilleSquareDilation.lean), Lean Theorem 26):
 1. Fix $\varepsilon > 0$ and choose $\eta \in (0, \varepsilon)$ (e.g., $\eta = \varepsilon / 2$). For every finite horizon $R \ge 1$, define
@@ -298,9 +298,9 @@ Then **for every $\varepsilon > 0$**, there exists $M_\varepsilon \ge 0$ such th
 `TASK-TC-057` and `TASK-TC-057R` repair the mathematical, formal, and numerical foundation for the next multi-scale attack; **they do not close `SUBGATE-TC-043A`**. Specifically:
 1. Uncompensated Cauchy–Schwarz and triangle-inequality majorants in Routes A, B, and C fail to contract because of the prime-subset multiplier lower bound, small-scale $W < 1$ uniform positivity, and the certified all-$L$ base-scale floor $m_{\mathrm{all}\text{-}L} > 0$ (while signed rough-divisor sums, growing-$M(Y)$ shift expansions, and compensated Abel formulations are not ruled out by those majorant bounds);
 2. Before any norm loss, Route D's cross-scale prime-power diagonal satisfies the **unconditional** inequality $\widetilde{D}_{\lambda,\mathrm{pp}}(Y) \le \frac{2}{(\log Y)^2}\sum_{p^k \le Y}\frac{(\log p)^2}{p^k} F(Y/p^k) + C_{\mathrm{cut,diag}}$ ($Y \ge 2$), whose homogeneous contraction factor satisfies $\Theta_\varepsilon^{\mathrm{diag}}(Y) < \frac{2\zeta''(1+\varepsilon)}{(\log Y)^2} \to 0$ for every $\varepsilon > 0$;
-3. **Single Open Sufficient Target (`CONDITIONAL_ON_SIGNED_CORRELATION`, Hypothesis Open)**: Prove (or refute) that for every $\eta > 0$ there exist $A_\eta \ge 0$, $\theta_\eta \in [0, 1/2)$, and $Y_\eta \ge 2$ such that for all $Y \ge Y_\eta$,
+3. **Single Open Sufficient Condition (`CONDITIONAL_ON_SIGNED_CORRELATION`, Hypothesis Open)**: Prove (or refute) the sufficient condition that for every $\eta > 0$ there exist $A_\eta \ge 0$, $\theta_\eta \in [0, 1/2)$, and $Y_\eta \ge 2$ such that for all $Y \ge Y_\eta$,
    $$\widetilde{\mathcal{X}}_{\lambda,\mathrm{pp}}(Y) + E_{\mathrm{sh},1}(Y) \le A_\eta Y^\eta + \theta_\eta F(Y),$$
-   which by Theorem 6.2 (Lean Theorem 26) and Theorem 6.1 implies $E(Y) \ll_\varepsilon Y^\varepsilon$ uniformly for all $Y \ge 1$.
+   which by Theorem 6.2 (Lean Theorem 26) and Theorem 6.1 implies $E(Y) \ll_\varepsilon Y^\varepsilon$ uniformly for all $Y \ge 1$ (forward implication only; equivalence is not asserted without separately proving the converse).
 
 ---
 

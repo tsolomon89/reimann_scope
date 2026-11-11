@@ -59,9 +59,10 @@ circle constant and z = x + i*y, with x, y in R and critical line x = 1/2, for c
    - Unconditional cross-scale diagonal inequality D_tilde_{lambda,pp}(Y) <= D_{lambda,pp}(Y)
      <= (2/(log Y)^2) sum_{p^k<=Y} ((log p)^2/p^k) F(Y/p^k) + C_{cut,diag} with all-epsilon
      contraction factor Theta_eps^{diag}(Y) < 2*zeta''(1+eps)/(log Y)^2 -> 0, plus complete proof
-     and Lean 4 formalization (`CONDITIONAL_ON_SIGNED_CORRELATION`, Theorem 26) that
-     X_tilde_{lambda,pp}(Y) + E_{sh,1}(Y) <= A_eta Y^eta + theta_eta F(Y) (theta_eta in [0, 1/2))
-     implies E(Y) <<_eps Y^eps via finite-horizon G_eps(R) = sup_{1<=Z<=R} E(Z)/Z^eps absorption.
+     and Lean 4 formalization (`CONDITIONAL_ON_SIGNED_CORRELATION`, Theorem 26) that the sufficient
+     condition X_tilde_{lambda,pp}(Y) + E_{sh,1}(Y) <= A_eta Y^eta + theta_eta F(Y) (theta_eta in [0, 1/2))
+     implies E(Y) <<_eps Y^eps via finite-horizon G_eps(R) = sup_{1<=Z<=R} E(Z)/Z^eps absorption
+     (forward implication only; equivalence is not asserted without separately proving a shifted-kernel converse).
 """
 
 from __future__ import annotations
@@ -863,7 +864,13 @@ def verify_section_3_route_a_moebius_rough_descent(prec_bits: int = 256) -> Dict
         #   M_{A,sigma}(Y) >= M_{A,sigma}^{prime}(Y) := (sum_{U <= p <= T(Y)} p^{-(1+sigma)/2})^2
         #                  >>_sigma T(Y)^{1-sigma} / (log T(Y))^2 -> infty
         # for polylogarithmic U(Y) and 0 <= sigma < 1 (squarefree rough composites contribute strictly
-        # positive excess whenever T(Y) >= U^2).
+        # positive excess when an admissible composite exists; note that T >= U^2 alone does not force
+        # one, e.g. at U = 5, T = 25 none exists since 5^2 = 25 is not squarefree and the first
+        # possible product is 5 * 7 = 35 > 25).
+        u5_t25_no_squarefree_rough_composite = (
+            rough_squarefree_divisors_band(5, 25)
+            == tuple(p for p in primes_up_to(25) if p >= 5)
+        )
         sigma_half = arb("0.5")
         cs_rows: List[Dict[str, Any]] = []
         cs_monotone_vals: List[arb] = []
@@ -916,12 +923,14 @@ def verify_section_3_route_a_moebius_rough_descent(prec_bits: int = 256) -> Dict
         all_ok = bool(
             all_id_ok
             and super_sqrt_eq_primes
+            and u5_t25_no_squarefree_rough_composite
             and a2_falsifies_uniform_sign
             and cs_obstruction_ok
         )
         return {
             "route_a_identity_cases": case_rows,
             "super_sqrt_U42_T431_equals_primes": super_sqrt_eq_primes,
+            "u5_t25_no_squarefree_rough_composite": u5_t25_no_squarefree_rough_composite,
             "a2_wrong_uniform_sign_discrepancy_U3_T15": serialize_arb_certified(
                 wrong_a2_discrepancy
             ),
@@ -2102,7 +2111,7 @@ def verify_section_6_route_d_diagonal_contraction_and_off_diagonal(
             "all_epsilon_diagonal_contraction_table": contraction_rows,
             "conditional_same_scale_absorption_parameters": {
                 "scope_label": "CONDITIONAL_ON_SIGNED_CORRELATION",
-                "open_hypothesis": "For every eta > 0 there exist A_eta >= 0, theta_eta in [0, 1/2), and Y_eta >= 2 such that X_tilde_{lambda,pp}(Y) + E_{sh,1}(Y) <= A_eta * Y^eta + theta_eta * F(Y) for all Y >= Y_eta.",
+                "open_hypothesis": "Sufficient condition (forward implication proved in Lean Theorem 26; converse/equivalence not asserted without a separate shifted-kernel estimate): for every eta > 0 there exist A_eta >= 0, theta_eta in [0, 1/2), and Y_eta >= 2 such that X_tilde_{lambda,pp}(Y) + E_{sh,1}(Y) <= A_eta * Y^eta + theta_eta * F(Y) for all Y >= Y_eta.",
                 "sample_epsilon": "1/4",
                 "sample_eta": "1/8",
                 "sample_theta_eta": "3/8",
@@ -2331,7 +2340,7 @@ def execute_task_tc057_coupled_scale_bootstrap_audit(
             ],
             "3_conditional_implications_open_hypothesis": [
                 "Polylogarithmic bootstrap implication (Theorem 21, CONDITIONAL_ON_RECURSION): IF F(Y) <= A_eta Y^eta + B_eta F(Y/U_eta(Y)) holds for all Y >= Y_eta with U_eta(Y) = c_eta (log Y log log Y)^2, THEN E(Y) <= F(Y) <<_eps Y^eps for every eps > 0.",
-                "Route D same-scale absorption transfer (Theorem 26, CONDITIONAL_ON_SIGNED_CORRELATION): IF for every eta > 0 there exist A_eta >= 0, theta_eta in [0, 1/2), and Y_eta >= 2 such that X_tilde_{lambda,pp}(Y) + E_{sh,1}(Y) <= A_eta Y^eta + theta_eta F(Y) for all Y >= Y_eta, THEN combined with E(Y) <= 2 D_tilde_{lambda,pp}(Y) + 2 X_tilde_{lambda,pp}(Y) + 2 E_{sh,1}(Y) and Theta_eps^{diag}(Y) -> 0, finite-horizon absorption on G_eps(R) = sup_{1<=Z<=R} E(Z)/Z^eps proves E(Y) <<_eps Y^eps uniformly for all Y >= 1.",
+                "Route D same-scale absorption transfer (Theorem 26, CONDITIONAL_ON_SIGNED_CORRELATION): sufficient condition (forward implication to subpower energy proved; equivalence not asserted without separately proving the converse shifted-kernel estimate) — IF for every eta > 0 there exist A_eta >= 0, theta_eta in [0, 1/2), and Y_eta >= 2 such that X_tilde_{lambda,pp}(Y) + E_{sh,1}(Y) <= A_eta Y^eta + theta_eta F(Y) for all Y >= Y_eta, THEN combined with E(Y) <= 2 D_tilde_{lambda,pp}(Y) + 2 X_tilde_{lambda,pp}(Y) + 2 E_{sh,1}(Y) and Theta_eps^{diag}(Y) -> 0, finite-horizon absorption on G_eps(R) = sup_{1<=Z<=R} E(Z)/Z^eps proves E(Y) <<_eps Y^eps uniformly for all Y >= 1.",
             ],
             "4_certified_finite_computations": [
                 (
@@ -2349,7 +2358,7 @@ def execute_task_tc057_coupled_scale_bootstrap_audit(
                 "Complete log-series prime-power sum vs K = 40 and K = 160 series + 2 r^K / [K(1 - r)] tail bounds; w_{2,lambda}(n) direct convolution vs (-Lambda + 2B) decomposition on 2 <= n <= 200; exact discrete Abel summation identity with floor(T/d) cutoff jumps on 2 <= d <= floor(Y); direct pair-by-pair off-diagonal quadrature vs subtraction E_Sigma_pp - D_tilde at Y = 8 (T = 14); Route A / Route B / Route C finite identity zero-enclosures across T = 0, 1, 6, 14, 15, 30, 77, 431 and M = 4 shift telescope.",
             ],
             "6_conjectures_and_falsified_candidates": [
-                "Open target conjecture (SUBGATE-TC-043A): unconditional subpower bound E(Y) <<_eps Y^eps, or sufficient Route D signed-correlation hypothesis X_tilde_{lambda,pp}(Y) + E_{sh,1}(Y) <= A_eta Y^eta + theta_eta F(Y) (theta_eta in [0, 1/2)).",
+                "Open target conjecture (SUBGATE-TC-043A): unconditional subpower bound E(Y) <<_eps Y^eps, or sufficient condition X_tilde_{lambda,pp}(Y) + E_{sh,1}(Y) <= A_eta Y^eta + theta_eta F(Y) (theta_eta in [0, 1/2); forward implication proved in Theorem 26, equivalence not asserted).",
                 "Candidate I (Route A + homogeneous Cauchy-Schwarz majorant): specified Cauchy-Schwarz majorant falsified for contraction via prime-subset lower bound M_{A,sigma}(Y) >= M_{A,sigma}^{prime}(Y) >>_sigma T(Y)^{1-sigma}/(log T(Y))^2 -> infty (does not lower-bound the signed rough sum).",
                 "Candidate II (Route B + fixed finite linear span closure / uncompensated Cauchy-Schwarz majorant): exact closure in a fixed finite span of {(log w)^m w^{5/2} e^{-w^2}} falsified by linear independence, and uncompensated Cauchy-Schwarz majorant diverges via m_{all-L} > 0 and W<1 positivity (growing-order M(Y) approx 2 log Y and vector-energy inequalities remain open).",
                 "Candidate III (Route C + specified discrete Abel triangle-inequality majorant): uncompensated triangle-inequality majorant on 2 <= d <= b = floor(Y) falsified for power saving by its boundary term |W_2(b)| b^{-1/2} sqrt(E_{L_b}(Y/b)) >> sqrt(Y) (does not rule out compensated Abel formulations).",

@@ -129,6 +129,10 @@ EXPECTED_PUBLIC_THEOREM_NAMES = (
     "quadratic_prime_power_diagonal_off_diagonal_decomposition_tc057",
     "inherited_vs_canonical_cutoff_comparison_and_counterexample_tc057",
     "conditional_signed_correlation_same_scale_absorption_transfer_tc057r",
+    "liouville_square_divisor_indicator_and_compensated_selberg_tc058",
+    "compensated_selberg_summation_by_parts_and_shift_elimination_tc058",
+    "combined_target_exact_quadratic_and_conditional_absorption_tc058",
+    "growing_order_joint_polynomial_filter_and_gram_decomposition_tc058",
 )
 
 
@@ -470,10 +474,10 @@ def test_lean_formalization_and_serialized_artifact_synchronization() -> None:
     assert "import RiemannScope.LiouvilleSquareDilation" in root_lean
 
     lean_info = verify_liouville_square_dilation_lean_module()
-    assert lean_info["definition_count"] == 61
-    assert lean_info["public_theorem_count"] == 26
-    assert lean_info["private_helper_theorem_count"] == 56
-    assert lean_info["total_declaration_count"] == 143
+    assert lean_info["definition_count"] == 81
+    assert lean_info["public_theorem_count"] == 30
+    assert lean_info["private_helper_theorem_count"] == 63
+    assert lean_info["total_declaration_count"] == 174
     assert lean_info["expected_public_theorems_present"] is True
     assert lean_info["sorry_count"] == 0
     assert lean_info["custom_axiom_count"] == 0
@@ -814,6 +818,8 @@ def test_tc054_review_and_state_synchronization() -> None:
         "TASK-TC-056R",
         "TASK-TC-056R2",
         "TASK-TC-057",
+        "TASK-TC-057R",
+        "TASK-TC-058",
     )
     tc055_entries = [t for t in queue["tasks"] if t["task_id"] == "TASK-TC-055"]
     assert len(tc055_entries) == 1

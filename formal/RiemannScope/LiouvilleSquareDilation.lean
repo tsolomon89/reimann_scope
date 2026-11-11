@@ -1,6 +1,6 @@
 /-
 RiemannScope.LiouvilleSquareDilation
-TASK-TC-054 / TASK-TC-054R / TASK-TC-054R2 / TASK-TC-055 / TASK-TC-055R / TASK-TC-055R2 / TASK-TC-056 / TASK-TC-057 / TASK-TC-057R:
+TASK-TC-054 / TASK-TC-054R / TASK-TC-054R2 / TASK-TC-055 / TASK-TC-055R / TASK-TC-055R2 / TASK-TC-056 / TASK-TC-057 / TASK-TC-057R / TASK-TC-058:
 1. Actual arithmetic definitions and theorems over `ℕ` and `ℤ` using Mathlib's
    `ArithmeticFunction.cardFactors` (`Ω`), `Nat.factorization`, `Nat.divisors`, and
    `ArithmeticFunction.moebius` (`μ`):
@@ -48,8 +48,18 @@ TASK-TC-054 / TASK-TC-054R / TASK-TC-054R2 / TASK-TC-055 / TASK-TC-055R / TASK-T
      unconditional small-scale positivity `finiteQLambda L w ≥ (1/24) w^{5/2} > 0` for all `L ≥ 1, w ∈ (0, 1]`,
      and `CONDITIONAL_ON_SIGNED_CORRELATION` finite-horizon same-scale absorption transfer via
      `normalizedScaleSupremum E eps R` (`conditional_signed_correlation_same_scale_absorption_transfer_tc057r`,
-     preserving exact outer factor `2` and `θ_η ∈ [0, 1/2)` plus repaired Proposition 2.4 localization vs.
-     `d_top ≥ Y/2` concentration negative control) (`TASK-TC-057` / `TASK-TC-057R` §§3–6).
+     proving the forward implication from the signed-correlation sufficient condition while preserving exact outer
+     factor `2` and `θ_η ∈ [0, 1/2)` plus repaired Proposition 2.4 localization vs. `d_top ≥ Y/2` concentration
+     negative control) (`TASK-TC-057` / `TASK-TC-057R` §§3–6);
+   - Classical all-prime square-divisor indicator `(1 * λ)(n) = 1_{IsSquare n}` vs dyadic parity divisor identity
+     `(1 * a_2)(2^v m) = 1_{Even v} d(m)` (`Odd m`), `(U = 5, T = 25)` vs `(U = 5, T = 35)` rough-composite witness,
+     actual Selberg Liouville second-order weight `w_{2,λ} = Λ_λ log + Λ_λ * Λ_λ` (`Λ_λ = -Λ + 2 B`), finite square
+     projection `∑_{1 ≤ d ≤ T} g_d(X) = Q_{square,T}(X)` (including `T = 0, 1`), compensated Selberg split with
+     `r_2(1) = -c_λ`, exact finite summation by parts keeping `⌊T/d⌋` cutoff jumps and integer `W_2(d) - c_λ d`,
+     logarithmic-shift elimination `P_Y - R_Y = D_{2,Y}`, un-Young-expanded combined quadratic decomposition &
+     `CONDITIONAL_ON_COMBINED_CORRELATION` same-scale absorption transfer (`0 ≤ θ_η < 1`, no outer factor `2`), and
+     growing-order `M`-layer geometric polynomial filter `P_M(s)` (`0 < P_M(s) ≤ 4` on `[1/4, 3/2]`) & joint
+     prime-power Gram decomposition (`TASK-TC-058` §§1, 3–5).
 2. Prime-power exponent models (`liouville_complete_multiplicativity_and_common_factor_cancellation_nat`
    and `prime_power_square_divisor_moebius_liouville_inversion_nat`).
 3. Scalar real-algebra, real-inequality, and finite-sum lemmas for weighted norm bounds, Euler-Maclaurin `C_2`
@@ -63,6 +73,7 @@ TASK-TC-054 / TASK-TC-054R / TASK-TC-054R2 / TASK-TC-055 / TASK-TC-055R / TASK-T
 
 import Mathlib.NumberTheory.LSeries.RiemannZeta
 import Mathlib.NumberTheory.ArithmeticFunction
+import Mathlib.NumberTheory.VonMangoldt
 import Mathlib.Data.Nat.Factorization.Basic
 import Mathlib.Tactic
 import RiemannScope.Basic
@@ -4418,8 +4429,9 @@ private theorem moebius_sq_eq_one_of_dvd_primeProductModulus_aux
     `a : ℕ → ℝ` (`∀ d q, 0 < d → 0 < q → a (d * q) = a d * a q`):
     1. Exact smooth/coprime equivalence on `[1, T]`:
        `smoothCutoffFinset (smoothPrimeSetBelow U) T = coprimeCutoffFinset (roughPrimeSetBand U T) T`;
-    2. Exact general Möbius–rough descent identity across ALL `U ≥ 2` (including `U ≪ √T`, where composite
-       squarefree products of primes in `[U, T]` enter):
+    2. Exact general Möbius–rough descent identity across ALL `U ≥ 2` (including `U ≪ √T`, when an admissible
+       squarefree rough composite product of primes in `[U, T]` exists; e.g. `U = 5, T = 25` has none, whereas
+       `5 · 7 = 35` enters at `T = 35`):
        `finiteQGeneral a T X = finiteQSmoothBelow a U T X - ∑ d ∈ roughSquarefreeDivisorsBand U T, ((ArithmeticFunction.moebius d : ℝ) * a d / Real.sqrt (d : ℝ)) * finiteQGeneral a (T / d) (X / (d : ℝ))`;
     3. Liouville specialization (`λ(p) = -1` at ALL primes `p`):
        `∀ d ∈ roughSquarefreeDivisorsBand U T, (ArithmeticFunction.moebius d : ℝ) * (liouvilleLambda d : ℝ) = 1`, hence
@@ -5556,7 +5568,8 @@ private theorem rpow_neg_antitone_of_one_le_aux
        `E(Y) ≤ 2 * D_tilde(Y) + 2 * X_tilde(Y) + 2 * E_sh1(Y)`:
        if `0 < η < ε`, `0 ≤ θ_η < 1 / 2`, `2 * θ_η < q < 1`, `1 ≤ Y_star`, and for all `Y ≥ Y_star`
        both the Route D diagonal bound `D_tilde(Y) ≤ ∑_{pk ∈ S(Y)} w(Y, pk) F(Y / d(Y, pk)) + C_cut`
-       and the open signed-correlation hypothesis `X_tilde(Y) + E_sh1(Y) ≤ A_η Y^η + θ_η F(Y)` hold
+       and the open signed-correlation sufficient condition `X_tilde(Y) + E_sh1(Y) ≤ A_η Y^η + θ_η F(Y)` hold
+       (forward implication to subpower energy; equivalence is not asserted without separately proving a shifted-kernel converse)
        with `2 * θ_η + 2 * ∑_{pk ∈ S(Y)} w(Y, pk) d(Y, pk)^{-ε} ≤ q`, then for every finite horizon `R ≥ Y_star`,
        `G_ε(R) ≤ max(G_ε(Y_star), K + q * G_ε(R))` with `K = 2 A_η Y_star^{η - ε} + 2 C_cut Y_star^{-ε}`,
        hence `G_ε(R) ≤ max(G_ε(Y_star), K / (1 - q))` and uniformly for all `Y ≥ 1`,
@@ -5783,6 +5796,1633 @@ theorem conditional_signed_correlation_same_scale_absorption_transfer_tc057r
         exact inv_le_inv_of_le (Real.rpow_pos_of_pos hY2_pos sig)
           (Real.rpow_le_rpow (le_of_lt hY2_pos) hd_top hσ)
       exact mul_le_mul_of_nonneg_left h_pow hB
+
+/-! ### `TASK-TC-058`: All-Prime Square-Divisor Indicator, Actual Selberg Second-Order Compensated Reconstruction, Exact Summation by Parts & Shift Elimination, Un-Young-Expanded Combined Absorption (`CONDITIONAL_ON_COMBINED_CORRELATION`), and Growing-Order Joint `M`-Layer Polynomial Filter -/
+
+/-- Positive divisor count `d_div(n) := card(n.divisors)` on `ℕ` (`TASK-TC-058` §4). -/
+def positiveDivisorCount (n : ℕ) : ℕ :=
+  n.divisors.card
+
+/-- Square-supported von Mangoldt arithmetic function `B(n)` (`B(r^2) = Λ(r)` for squares, `B(n) = 0` off squares;
+    `B(0) = Λ(0) = 0`, `B(1) = Λ(1) = 0`) (`TASK-TC-058` §4). -/
+noncomputable def squareVonMangoldtB : ArithmeticFunction ℝ :=
+  ⟨fun n => if IsSquare n then ArithmeticFunction.vonMangoldt (Nat.sqrt n) else 0, by simp⟩
+
+/-- Liouville logarithmic-derivative arithmetic function `Λ_λ := -Λ + 2 B` (`TASK-TC-058` §4). -/
+noncomputable def liouvilleVonMangoldt : ArithmeticFunction ℝ :=
+  ⟨fun n => -ArithmeticFunction.vonMangoldt n + 2 * squareVonMangoldtB n, by simp⟩
+
+/-- Actual Selberg second-order Liouville weight `w_{2,λ}(n) := Λ_λ(n) log n + (Λ_λ * Λ_λ)(n)` (`w_{2,λ}(0) = 0`,
+    `w_{2,λ}(1) = 0`) (`TASK-TC-058` §4). -/
+noncomputable def selbergLiouvilleWeight2 (n : ℕ) : ℝ :=
+  liouvilleVonMangoldt n * Real.log (n : ℝ) + (liouvilleVonMangoldt * liouvilleVonMangoldt) n
+
+/-- Scaled Liouville cofactor fiber `g_d(X; T) := d^{-1/2} Q_{⌊T/d⌋}(X / d)` (`TASK-TC-058` §4). -/
+noncomputable def scaledLiouvilleFiberG (T d : ℕ) (X : ℝ) : ℝ :=
+  (1 / Real.sqrt (d : ℝ)) * finiteQLambda (T / d) (X / (d : ℝ))
+
+/-- Finite square-supported Gaussian projection `Q_{square,T}(X) := ∑_{1 ≤ r ≤ T, r^2 ≤ T} φ_{r^2}(X)`
+    (`TASK-TC-058` §4). -/
+noncomputable def finiteQSquare (T : ℕ) (X : ℝ) : ℝ :=
+  ∑ r ∈ (Finset.Icc 1 T).filter (fun r => r ^ 2 ≤ T), gaussianTermPhi (r ^ 2) X
+
+/-- Cumulative Selberg second-order sum `W_2(u) := ∑_{2 ≤ d ≤ u} w_{2,λ}(d)` on integer cutoffs `u : ℕ`
+    (`W_2(0) = 0`, `W_2(1) = 0`) (`TASK-TC-058` §4). -/
+noncomputable def selbergCumulativeW2 (u : ℕ) : ℝ :=
+  ∑ d ∈ Finset.Icc 2 u, selbergLiouvilleWeight2 d
+
+/-- Centered cumulative Selberg remainder `R_2^{int}(u) := W_2(u) - c_λ u` on integer cutoffs `u : ℕ`
+    (retaining `W_2(⌊u⌋) - c_λ ⌊u⌋`, with `R_2^{int}(1) = -c_λ`) (`TASK-TC-058` §4). -/
+noncomputable def selbergCenteredRemainderInt (c_lam : ℝ) (u : ℕ) : ℝ :=
+  selbergCumulativeW2 u - c_lam * (u : ℝ)
+
+/-- Smooth kernel-variation step `Δ^{smooth}_d(X; T) := d^{-1/2} Q_{⌊T/d⌋}(X / d) - (d + 1)^{-1/2} Q_{⌊T/d⌋}(X / (d + 1))`
+    at fixed inner cutoff `⌊T / d⌋` (`TASK-TC-058` §4). -/
+noncomputable def scaledFiberSmoothStep (T d : ℕ) (X : ℝ) : ℝ :=
+  (1 / Real.sqrt (d : ℝ)) * finiteQLambda (T / d) (X / (d : ℝ)) -
+    (1 / Real.sqrt ((d + 1 : ℕ) : ℝ)) * finiteQLambda (T / d) (X / ((d + 1 : ℕ) : ℝ))
+
+/-- Discrete inner-cutoff jump step
+    `Δ^{jump}_d(X; T) := (d + 1)^{-1/2} (Q_{⌊T/d⌋}(X / (d + 1)) - Q_{⌊T/(d + 1)⌋}(X / (d + 1)))` (`TASK-TC-058` §4). -/
+noncomputable def scaledFiberCutoffJump (T d : ℕ) (X : ℝ) : ℝ :=
+  (1 / Real.sqrt ((d + 1 : ℕ) : ℝ)) *
+    (finiteQLambda (T / d) (X / ((d + 1 : ℕ) : ℝ)) -
+      finiteQLambda (T / (d + 1)) (X / ((d + 1 : ℕ) : ℝ)))
+
+/-- Normalized prime-power descent observable `P_T(X) := Σ_{pp}(X; T) / log X` (`TASK-TC-058` §3). -/
+noncomputable def normalizedPrimePowerTermP (T : ℕ) (X : ℝ) : ℝ :=
+  (∑ pk ∈ primePowerPairsUpTo T, liouvillePrimePowerTerm T pk X) / Real.log X
+
+/-- Normalized first logarithmic-shift observable `R_T(X) := Q_T^{[1]}(X) / log X` (`TASK-TC-058` §3). -/
+noncomputable def normalizedFirstShiftTermR (T : ℕ) (X : ℝ) : ℝ :=
+  finiteQShifted (fun n => (liouvilleLambda n : ℝ)) 1 T X / Real.log X
+
+/-- Normalized second-order compensated Selberg residual
+    `D_{2,T}(X; c_λ) := (c_λ Q_{square,T}(X) + ∑_{1 ≤ d ≤ T} (w_{2,λ}(d) - c_λ) g_d(X) - Q_T^{[2]}(X)) / (log X)^2`
+    (`TASK-TC-058` §4). -/
+noncomputable def compensatedSelbergResidualD2 (c_lam : ℝ) (T : ℕ) (X : ℝ) : ℝ :=
+  (c_lam * finiteQSquare T X +
+    (∑ d ∈ Finset.Icc 1 T, (selbergLiouvilleWeight2 d - c_lam) * scaledLiouvilleFiberG T d X) -
+    finiteQShifted (fun n => (liouvilleLambda n : ℝ)) 2 T X) / (Real.log X) ^ 2
+
+/-- Pointwise normalized prime-power diagonal density
+    `d̃_{λ,pp}(X; T) := (∑_{p^k ≤ T} ((log p)^2 / p^k) Q_{⌊T/p^k⌋}(X / p^k)^2) / (log X)^2` (`TASK-TC-058` §3). -/
+noncomputable def pointwisePrimePowerDiagNorm (T : ℕ) (X : ℝ) : ℝ :=
+  (∑ pk ∈ primePowerPairsUpTo T,
+    ((Real.log (pk.1 : ℝ)) ^ 2 / ((pk.1 ^ pk.2 : ℕ) : ℝ)) *
+      (finiteQLambda (T / pk.1 ^ pk.2) (X / ((pk.1 ^ pk.2 : ℕ) : ℝ))) ^ 2) / (Real.log X) ^ 2
+
+/-- Pointwise normalized prime-power off-diagonal density
+    `x̃_{λ,pp}(X; T) := (∑_{pk_1 ≠ pk_2} term(pk_1) term(pk_2)) / (log X)^2` (`TASK-TC-058` §3). -/
+noncomputable def pointwisePrimePowerOffDiagNorm (T : ℕ) (X : ℝ) : ℝ :=
+  (∑ pk1 ∈ primePowerPairsUpTo T,
+    ∑ pk2 ∈ (primePowerPairsUpTo T).erase pk1,
+      liouvillePrimePowerTerm T pk1 X * liouvillePrimePowerTerm T pk2 X) / (Real.log X) ^ 2
+
+/-- Pointwise un-Young-expanded combined correlation density
+    `s_{comb}(X; T) := x̃_{λ,pp}(X; T) + 2 P_T(X) R_T(X) + R_T(X)^2` (`TASK-TC-058` §3). -/
+noncomputable def pointwiseCombinedResidualS (T : ℕ) (X : ℝ) : ℝ :=
+  pointwisePrimePowerOffDiagNorm T X +
+    2 * normalizedPrimePowerTermP T X * normalizedFirstShiftTermR T X +
+    (normalizedFirstShiftTermR T X) ^ 2
+
+/-- Growing logarithmic-order schedule `M(Y) := ⌈2 log Y⌉₊` (`TASK-TC-058` §5). -/
+noncomputable def growingLogOrderM (Y : ℝ) : ℕ :=
+  Nat.ceil (2 * Real.log Y)
+
+/-- Geometric polynomial filter `P_M(s) := ∑_{0 ≤ m < M} (1 - s)^m` (`TASK-TC-058` §5). -/
+def growingLogFilterPoly (M : ℕ) (s : ℝ) : ℝ :=
+  ∑ m ∈ Finset.range M, (1 - s) ^ m
+
+/-- Joint `M`-layer logarithmic kernel filter
+    `K_M(X; n) := (1 / log X) P_M(log n / log X)` (`TASK-TC-058` §5). -/
+noncomputable def jointLayerKernelFilter (M : ℕ) (n : ℕ) (X : ℝ) : ℝ :=
+  (1 / Real.log X) * growingLogFilterPoly M (Real.log (n : ℝ) / Real.log X)
+
+/-- Joint `M`-layer prime-power fiber
+    `J_{a,M,T}(pk, X) := a(p)^k (log p) p^{-k/2} ∑_{1 ≤ q ≤ ⌊T/p^k⌋} a(q) K_M(X; p^k q) φ_q(X / p^k)`
+    (`TASK-TC-058` §5). -/
+noncomputable def jointPrimePowerFiber (a : ℕ → ℝ) (M T : ℕ) (pk : ℕ × ℕ) (X : ℝ) : ℝ :=
+  (a pk.1) ^ pk.2 * Real.log (pk.1 : ℝ) * (1 / Real.sqrt ((pk.1 ^ pk.2 : ℕ) : ℝ)) *
+    ∑ q ∈ Finset.Icc 1 (T / pk.1 ^ pk.2),
+      a q * jointLayerKernelFilter M (pk.1 ^ pk.2 * q) X *
+        gaussianTermPhi q (X / ((pk.1 ^ pk.2 : ℕ) : ℝ))
+
+/-- Helper (`TASK-TC-058` §4): alternating geometric sum `∑_{0 ≤ j ≤ k} (-1)^j = if Even k then 1 else 0`. -/
+private theorem sum_range_succ_neg_one_pow_int_aux :
+    ∀ k : ℕ, (∑ j ∈ Finset.range (k + 1), (-1 : ℤ) ^ j) = if Even k then 1 else 0
+  | 0 => by simp
+  | k + 1 => by
+      rw [Finset.sum_range_succ, sum_range_succ_neg_one_pow_int_aux k]
+      by_cases hk : Even k
+      · obtain ⟨m, rfl⟩ := hk
+        have h_not_even : ¬ Even (m + m + 1) := by
+          rw [Nat.even_add_one]
+          exact not_not.mpr ⟨m, rfl⟩
+        have h_pow : (-1 : ℤ) ^ (m + m + 1) = -1 := by
+          rw [pow_succ, pow_add]
+          have h2 : (-1 : ℤ) ^ m * (-1 : ℤ) ^ m = 1 := by
+            rw [← pow_add, show m + m = 2 * m by omega, pow_mul]
+            norm_num
+          rw [h2]
+          norm_num
+        simp [h_not_even, h_pow]
+      · have h_odd : Odd k := Nat.odd_iff_not_even.mpr hk
+        obtain ⟨m, rfl⟩ := h_odd
+        have h_even_succ : Even (2 * m + 1 + 1) := ⟨m + 1, by omega⟩
+        have h_pow : (-1 : ℤ) ^ (2 * m + 1 + 1) = 1 := by
+          have h2 : 2 * m + 1 + 1 = 2 * (m + 1) := by omega
+          rw [h2, pow_mul]
+          norm_num
+        simp [hk, h_even_succ, h_pow]
+
+/-- Helper (`TASK-TC-058` §4): `IsSquare n ↔ ∀ p : ℕ, Even (n.factorization p)` for `n ≠ 0`. -/
+private theorem isSquare_iff_forall_even_factorization_aux {n : ℕ} (hn : n ≠ 0) :
+    IsSquare n ↔ ∀ p : ℕ, Even (n.factorization p) := by
+  constructor
+  · rintro ⟨r, rfl⟩ p
+    have hr : r ≠ 0 := fun h0 => hn (by simp [h0])
+    rw [Nat.factorization_mul hr hr, Finsupp.add_apply]
+    exact ⟨r.factorization p, rfl⟩
+  · intro h_even
+    let r := ∏ p ∈ n.primeFactors, p ^ (n.factorization p / 2)
+    refine ⟨r, ?_⟩
+    have h_prod_self :
+        (∏ p ∈ n.primeFactors, p ^ (n.factorization p)) = n := by
+      rw [← Finsupp.prod_of_support_subset (s := n.primeFactors) n.factorization
+        (by rw [Nat.support_factorization]) (fun p k => p ^ k) (fun _ _ => pow_zero _)]
+      exact Nat.factorization_prod_pow_eq_self hn
+    have h_rr : r * r = ∏ p ∈ n.primeFactors, p ^ (n.factorization p) := by
+      dsimp [r]
+      rw [← Finset.prod_mul_distrib]
+      apply Finset.prod_congr rfl
+      intro p _
+      rw [← pow_add]
+      obtain ⟨m, hm⟩ := h_even p
+      have h_div : n.factorization p / 2 + n.factorization p / 2 = n.factorization p := by omega
+      rw [h_div]
+    exact h_prod_self.symm.trans h_rr.symm
+
+/-- Helper (`TASK-TC-058` §4): classical divisor identity `∑_{q ∣ n} λ(q) = 1_{IsSquare n}` for `n > 0`. -/
+private theorem sum_divisors_liouvilleLambda_eq_isSquare_aux {n : ℕ} (hn : 0 < n) :
+    (∑ q ∈ n.divisors, liouvilleLambda q) = if IsSquare n then 1 else 0 := by
+  have h_all : ∀ m : ℕ, m ≠ 0 →
+      (∑ q ∈ m.divisors, liouvilleLambda q) = if IsSquare m then 1 else 0 := by
+    intro m
+    refine Nat.recOnPrimeCoprime ?_ ?_ ?_ m
+    · intro h0; exact False.elim (h0 rfl)
+    · intro p k hp _
+      rw [Nat.sum_divisors_prime_pow hp]
+      have h_sum_pow :
+          (∑ j ∈ Finset.range (k + 1), liouvilleLambda (p ^ j)) =
+            ∑ j ∈ Finset.range (k + 1), (-1 : ℤ) ^ j := by
+        apply Finset.sum_congr rfl
+        intro j _
+        rw [liouvilleLambda_prime_pow_aux hp j, liouvilleSignFromOmega]
+      rw [h_sum_pow, sum_range_succ_neg_one_pow_int_aux k]
+      have hpk_ne : p ^ k ≠ 0 := pow_ne_zero k hp.ne_zero
+      have hfp : (p ^ k).factorization p = k := by
+        rw [Nat.factorization_pow, Finsupp.smul_apply, smul_eq_mul, hp.factorization,
+          Finsupp.single_eq_same, mul_one]
+      have h_sq_iff : IsSquare (p ^ k) ↔ Even k := by
+        rw [isSquare_iff_forall_even_factorization_aux hpk_ne]
+        constructor
+        · intro hall
+          rw [← hfp]
+          exact hall p
+        · intro heven q
+          rcases eq_or_ne q p with rfl | hqp
+          · rw [hfp]
+            exact heven
+          · have hfq : (p ^ k).factorization q = 0 := by
+              rw [Nat.factorization_pow, Finsupp.smul_apply, smul_eq_mul, hp.factorization,
+                Finsupp.single_eq_of_ne (Ne.symm hqp), mul_zero]
+            rw [hfq]
+            exact even_zero
+      by_cases hk : Even k
+      · rw [if_pos hk, if_pos (h_sq_iff.mpr hk)]
+      · rw [if_neg hk, if_neg (mt h_sq_iff.mp hk)]
+    · intro a b ha1 hb1 hab iha ihb _
+      have ha_ne : a ≠ 0 := by omega
+      have hb_ne : b ≠ 0 := by omega
+      have hab_ne : a * b ≠ 0 := mul_ne_zero ha_ne hb_ne
+      have h_div_mul :
+          (∑ q ∈ (a * b).divisors, liouvilleLambda q) =
+            (∑ q1 ∈ a.divisors, liouvilleLambda q1) * (∑ q2 ∈ b.divisors, liouvilleLambda q2) := by
+        rw [Finset.sum_mul_sum, ← Finset.sum_product']
+        symm
+        apply Finset.sum_bij (fun (x : ℕ × ℕ) _ => x.1 * x.2)
+        · rintro ⟨q1, q2⟩ hx
+          simp only [Finset.mem_product, Nat.mem_divisors] at hx ⊢
+          exact ⟨mul_dvd_mul hx.1.1 hx.2.1, hab_ne⟩
+        · rintro ⟨q1, q2⟩ h1 ⟨r1, r2⟩ h2 h_eq
+          simp only [Finset.mem_product, Nat.mem_divisors] at h1 h2
+          have hcop1 : Nat.Coprime q1 r2 :=
+            (hab.coprime_dvd_left h1.1.1).coprime_dvd_right h2.2.1
+          have hcop2 : Nat.Coprime r1 q2 :=
+            (hab.coprime_dvd_left h2.1.1).coprime_dvd_right h1.2.1
+          have hq1_dvd : q1 ∣ r1 := hcop1.dvd_of_dvd_mul_right ⟨q2, h_eq.symm⟩
+          have hr1_dvd : r1 ∣ q1 := hcop2.dvd_of_dvd_mul_right ⟨r2, h_eq⟩
+          have h1_eq : q1 = r1 := Nat.dvd_antisymm hq1_dvd hr1_dvd
+          subst h1_eq
+          have hq1_pos : 0 < q1 := Nat.pos_of_dvd_of_pos h1.1.1 (by omega)
+          have h2_eq : q2 = r2 := Nat.eq_of_mul_eq_mul_left hq1_pos h_eq
+          subst h2_eq
+          rfl
+        · intro d hd
+          rw [Nat.mem_divisors] at hd
+          obtain ⟨q1, q2, hq1, hq2, rfl⟩ := Nat.dvd_mul.mp hd.1
+          refine ⟨⟨q1, q2⟩, ?_, rfl⟩
+          simp only [Finset.mem_product, Nat.mem_divisors]
+          exact ⟨⟨hq1, ha_ne⟩, ⟨hq2, hb_ne⟩⟩
+        · rintro ⟨q1, q2⟩ hx
+          simp only [Finset.mem_product, Nat.mem_divisors] at hx
+          have hq1_ne : q1 ≠ 0 := ne_of_gt (Nat.pos_of_dvd_of_pos hx.1.1 (by omega))
+          have hq2_ne : q2 ≠ 0 := ne_of_gt (Nat.pos_of_dvd_of_pos hx.2.1 (by omega))
+          exact (liouvilleLambda_mul_aux hq1_ne hq2_ne).symm
+      rw [h_div_mul, iha ha_ne, ihb hb_ne]
+      have h_not_prime_fac0 : ∀ (x p : ℕ), ¬ p.Prime → x.factorization p = 0 := by
+        intro x p hp_npr
+        apply Finsupp.not_mem_support_iff.mp
+        rw [Nat.support_factorization, Nat.mem_primeFactors]
+        tauto
+      have h_sq_mul : IsSquare (a * b) ↔ IsSquare a ∧ IsSquare b := by
+        rw [isSquare_iff_forall_even_factorization_aux hab_ne,
+          isSquare_iff_forall_even_factorization_aux ha_ne,
+          isSquare_iff_forall_even_factorization_aux hb_ne]
+        constructor
+        · intro hall
+          refine ⟨fun p => ?_, fun p => ?_⟩
+          · by_cases hp_pr : p.Prime
+            · by_cases hpa : p ∣ a
+              · have hp_not_b : ¬ p ∣ b := fun hpb =>
+                  hp_pr.not_dvd_one (hab.gcd_eq_one ▸ Nat.dvd_gcd hpa hpb)
+                have hfb0 : b.factorization p = 0 := Nat.factorization_eq_zero_of_not_dvd hp_not_b
+                have hfab := hall p
+                rw [Nat.factorization_mul ha_ne hb_ne, Finsupp.add_apply, hfb0, add_zero] at hfab
+                exact hfab
+              · rw [Nat.factorization_eq_zero_of_not_dvd hpa]
+                exact even_zero
+            · rw [h_not_prime_fac0 a p hp_pr]
+              exact even_zero
+          · by_cases hp_pr : p.Prime
+            · by_cases hpb : p ∣ b
+              · have hp_not_a : ¬ p ∣ a := fun hpa =>
+                  hp_pr.not_dvd_one (hab.gcd_eq_one ▸ Nat.dvd_gcd hpa hpb)
+                have hfa0 : a.factorization p = 0 := Nat.factorization_eq_zero_of_not_dvd hp_not_a
+                have hfab := hall p
+                rw [Nat.factorization_mul ha_ne hb_ne, Finsupp.add_apply, hfa0, zero_add] at hfab
+                exact hfab
+              · rw [Nat.factorization_eq_zero_of_not_dvd hpb]
+                exact even_zero
+            · rw [h_not_prime_fac0 b p hp_pr]
+              exact even_zero
+        · rintro ⟨hea, heb⟩ p
+          rw [Nat.factorization_mul ha_ne hb_ne, Finsupp.add_apply]
+          exact Even.add (hea p) (heb p)
+      by_cases hsa : IsSquare a <;> by_cases hsb : IsSquare b <;> simp [h_sq_mul, hsa, hsb]
+  exact h_all n (ne_of_gt hn)
+
+/-- Helper (`TASK-TC-058` §4): dyadic parity control divisor identity
+    `∑_{q ∣ 2^v m} a_2(q) = 1_{Even v} d_div(m)` for odd `m` (`Odd m`). -/
+private theorem sum_divisors_twoAdicParityControl_aux (v : ℕ) {m : ℕ} (hm_odd : Odd m) :
+    (∑ q ∈ (2 ^ v * m).divisors, twoAdicParityControl q) =
+      if Even v then (positiveDivisorCount m : ℤ) else 0 := by
+  have hm_pos : 0 < m := by
+    obtain ⟨k, rfl⟩ := hm_odd
+    omega
+  have hm_ne : m ≠ 0 := ne_of_gt hm_pos
+  have h2_not_m : ¬ 2 ∣ m := fun h2 =>
+    (Nat.odd_iff_not_even.mp hm_odd) (even_iff_two_dvd.mpr h2)
+  have h2m_cop : Nat.Coprime 2 m := Nat.prime_two.coprime_iff_not_dvd.mpr h2_not_m
+  have hpow_cop : Nat.Coprime (2 ^ v) m := h2m_cop.pow_left v
+  have h2v_ne : (2 : ℕ) ^ v ≠ 0 := pow_ne_zero v (by decide)
+  have hprod_ne : 2 ^ v * m ≠ 0 := mul_ne_zero h2v_ne hm_ne
+  have h_prod :
+      (∑ q ∈ (2 ^ v * m).divisors, twoAdicParityControl q) =
+        (∑ q1 ∈ (2 ^ v).divisors, twoAdicParityControl q1) *
+          (∑ q2 ∈ m.divisors, twoAdicParityControl q2) := by
+    rw [Finset.sum_mul_sum, ← Finset.sum_product']
+    symm
+    apply Finset.sum_bij (fun (x : ℕ × ℕ) _ => x.1 * x.2)
+    · rintro ⟨q1, q2⟩ hx
+      simp only [Finset.mem_product, Nat.mem_divisors] at hx ⊢
+      exact ⟨mul_dvd_mul hx.1.1 hx.2.1, hprod_ne⟩
+    · rintro ⟨q1, q2⟩ h1 ⟨r1, r2⟩ h2 h_eq
+      simp only [Finset.mem_product, Nat.mem_divisors] at h1 h2
+      have hcop1 : Nat.Coprime q1 r2 :=
+        (hpow_cop.coprime_dvd_left h1.1.1).coprime_dvd_right h2.2.1
+      have hcop2 : Nat.Coprime r1 q2 :=
+        (hpow_cop.coprime_dvd_left h2.1.1).coprime_dvd_right h1.2.1
+      have h1_eq : q1 = r1 :=
+        Nat.dvd_antisymm (hcop1.dvd_of_dvd_mul_right ⟨q2, h_eq.symm⟩)
+          (hcop2.dvd_of_dvd_mul_right ⟨r2, h_eq⟩)
+      subst h1_eq
+      have hq1_pos : 0 < q1 := Nat.pos_of_dvd_of_pos h1.1.1 (pow_pos (by decide) v)
+      have h2_eq : q2 = r2 := Nat.eq_of_mul_eq_mul_left hq1_pos h_eq
+      subst h2_eq
+      rfl
+    · intro d hd
+      rw [Nat.mem_divisors] at hd
+      obtain ⟨q1, q2, hq1, hq2, rfl⟩ := Nat.dvd_mul.mp hd.1
+      refine ⟨⟨q1, q2⟩, ?_, rfl⟩
+      simp only [Finset.mem_product, Nat.mem_divisors]
+      exact ⟨⟨hq1, h2v_ne⟩, ⟨hq2, hm_ne⟩⟩
+    · rintro ⟨q1, q2⟩ hx
+      simp only [Finset.mem_product, Nat.mem_divisors] at hx
+      have hq1_ne : q1 ≠ 0 := ne_of_gt (Nat.pos_of_dvd_of_pos hx.1.1 (pow_pos (by decide) v))
+      have hq2_ne : q2 ≠ 0 := ne_of_gt (Nat.pos_of_dvd_of_pos hx.2.1 hm_pos)
+      dsimp [twoAdicParityControl, primeParityControl]
+      rw [if_neg (mul_ne_zero hq1_ne hq2_ne), if_neg hq1_ne, if_neg hq2_ne,
+        Nat.factorization_mul hq1_ne hq2_ne, Finsupp.add_apply, pow_add]
+  have h_left :
+      (∑ q1 ∈ (2 ^ v).divisors, twoAdicParityControl q1) = if Even v then 1 else 0 := by
+    rw [Nat.sum_divisors_prime_pow Nat.prime_two]
+    have h_term :
+        (∑ j ∈ Finset.range (v + 1), twoAdicParityControl (2 ^ j)) =
+          ∑ j ∈ Finset.range (v + 1), (-1 : ℤ) ^ j := by
+      apply Finset.sum_congr rfl
+      intro j _
+      have h2j_ne : (2 : ℕ) ^ j ≠ 0 := pow_ne_zero j (by decide)
+      have hfj : ((2 : ℕ) ^ j).factorization 2 = j := by
+        rw [Nat.factorization_pow, Finsupp.smul_apply, smul_eq_mul, Nat.prime_two.factorization,
+          Finsupp.single_eq_same, mul_one]
+      dsimp [twoAdicParityControl, primeParityControl]
+      rw [if_neg h2j_ne, hfj]
+    rw [h_term, sum_range_succ_neg_one_pow_int_aux v]
+  have h_right :
+      (∑ q2 ∈ m.divisors, twoAdicParityControl q2) = (positiveDivisorCount m : ℤ) := by
+    have h_one : ∀ q2 ∈ m.divisors, twoAdicParityControl q2 = 1 := by
+      intro q2 hq2
+      rw [Nat.mem_divisors] at hq2
+      have hq2_ne : q2 ≠ 0 := ne_of_gt (Nat.pos_of_dvd_of_pos hq2.1 hm_pos)
+      have h2_not_q2 : ¬ 2 ∣ q2 := fun hd =>
+        (Nat.odd_iff_not_even.mp hm_odd) (even_iff_two_dvd.mpr (dvd_trans hd hq2.1))
+      have hf0 : q2.factorization 2 = 0 := Nat.factorization_eq_zero_of_not_dvd h2_not_q2
+      dsimp [twoAdicParityControl, primeParityControl]
+      rw [if_neg hq2_ne, hf0, pow_zero]
+    rw [Finset.sum_congr rfl h_one]
+    simp [positiveDivisorCount]
+  rw [h_prod, h_left, h_right]
+  split_ifs <;> ring
+
+/-- Helper (`TASK-TC-058` §4): `liouvilleVonMangoldt n = (liouvilleLambda n : ℝ) * Λ n` for all `n : ℕ`. -/
+private theorem liouvilleVonMangoldt_eq_mul_aux (n : ℕ) :
+    liouvilleVonMangoldt n = (liouvilleLambda n : ℝ) * ArithmeticFunction.vonMangoldt n := by
+  by_cases hpp : IsPrimePow n
+  · obtain ⟨p, k, hp_prime, hk_pos, hpk_eq⟩ := hpp
+    subst hpk_eq
+    have hp_nat : p.Prime := Nat.prime_iff.mpr hp_prime
+    have hk_ne : k ≠ 0 := ne_of_gt hk_pos
+    have h_vm_pk : ArithmeticFunction.vonMangoldt (p ^ k) = Real.log (p : ℝ) := by
+      rw [ArithmeticFunction.vonMangoldt_apply_pow hk_ne, ArithmeticFunction.vonMangoldt_apply_prime hp_nat]
+    have h_lam_pk : (liouvilleLambda (p ^ k) : ℝ) = (-1 : ℝ) ^ k := by
+      rw [liouvilleLambda_prime_pow_aux hp_nat k, liouvilleSignFromOmega]
+      push_cast; rfl
+    change -ArithmeticFunction.vonMangoldt (p ^ k) +
+        2 * (if IsSquare (p ^ k) then ArithmeticFunction.vonMangoldt (Nat.sqrt (p ^ k)) else 0) =
+      (liouvilleLambda (p ^ k) : ℝ) * ArithmeticFunction.vonMangoldt (p ^ k)
+    by_cases hk_even : Even k
+    · obtain ⟨m, rfl⟩ := hk_even
+      have hm_ne : m ≠ 0 := by omega
+      have h_sq : IsSquare (p ^ (m + m)) := ⟨p ^ m, pow_add p m m⟩
+      have h_sqrt : Nat.sqrt (p ^ (m + m)) = p ^ m := by
+        rw [pow_add, Nat.sqrt_eq]
+      have h_vm_pm : ArithmeticFunction.vonMangoldt (p ^ m) = Real.log (p : ℝ) := by
+        rw [ArithmeticFunction.vonMangoldt_apply_pow hm_ne, ArithmeticFunction.vonMangoldt_apply_prime hp_nat]
+      have h_pow_one : (-1 : ℝ) ^ (m + m) = 1 := by
+        rw [pow_add]
+        exact neg_one_pow_mul_self_real_aux m
+      rw [if_pos h_sq, h_sqrt, h_vm_pk, h_vm_pm, h_lam_pk, h_pow_one]
+      ring
+    · have h_not_sq : ¬ IsSquare (p ^ k) := by
+        intro hsq
+        have hpk_ne : p ^ k ≠ 0 := pow_ne_zero k hp_nat.ne_zero
+        have hall := (isSquare_iff_forall_even_factorization_aux hpk_ne).mp hsq p
+        have hfp : (p ^ k).factorization p = k := by
+          rw [Nat.factorization_pow, Finsupp.smul_apply, smul_eq_mul, hp_nat.factorization,
+            Finsupp.single_eq_same, mul_one]
+        rw [hfp] at hall
+        exact hk_even hall
+      obtain ⟨m, rfl⟩ := Nat.odd_iff_not_even.mpr hk_even
+      have h_pow_neg : (-1 : ℝ) ^ (2 * m + 1) = -1 := by
+        rw [pow_succ, pow_mul]
+        norm_num
+      rw [if_neg h_not_sq, h_vm_pk, h_lam_pk, h_pow_neg]
+      ring
+  · have h_vm0 : ArithmeticFunction.vonMangoldt n = 0 :=
+      ArithmeticFunction.vonMangoldt_eq_zero_iff.mpr hpp
+    change -ArithmeticFunction.vonMangoldt n +
+        2 * (if IsSquare n then ArithmeticFunction.vonMangoldt (Nat.sqrt n) else 0) =
+      (liouvilleLambda n : ℝ) * ArithmeticFunction.vonMangoldt n
+    by_cases hsq : IsSquare n
+    · obtain ⟨r, hr⟩ := hsq
+      have h_sqrt : Nat.sqrt n = r := by rw [hr, Nat.sqrt_eq]
+      have hr_not_pp : ¬ IsPrimePow r := by
+        intro hr_pp
+        have hr2_pp : IsPrimePow (r ^ 2) := (isPrimePow_pow_iff (by decide : (2 : ℕ) ≠ 0)).mpr hr_pp
+        rw [sq, ← hr] at hr2_pp
+        exact hpp hr2_pp
+      have h_vm_r0 : ArithmeticFunction.vonMangoldt r = 0 :=
+        ArithmeticFunction.vonMangoldt_eq_zero_iff.mpr hr_not_pp
+      rw [if_pos ⟨r, hr⟩, h_sqrt, h_vm_r0, h_vm0]
+      ring
+    · rw [if_neg hsq, h_vm0]
+      ring
+
+/-- Helper (`TASK-TC-058` §4): Selberg second-order divisor identity for `selbergLiouvilleWeight2`:
+    for all `n > 0`, `∑_{d ∣ n} w_{2,λ}(d) λ(n / d) = λ(n) (log n)^2`. -/
+private theorem sum_divisors_selbergLiouvilleWeight2_aux {n : ℕ} (hn : 0 < n) :
+    (∑ d ∈ n.divisors, selbergLiouvilleWeight2 d * (liouvilleLambda (n / d) : ℝ)) =
+      (liouvilleLambda n : ℝ) * (Real.log (n : ℝ)) ^ 2 := by
+  have hn_ne : n ≠ 0 := ne_of_gt hn
+  have h_w2_factor :
+      ∀ d : ℕ, 0 < d →
+        selbergLiouvilleWeight2 d =
+          (liouvilleLambda d : ℝ) *
+            (ArithmeticFunction.vonMangoldt d * Real.log (d : ℝ) +
+              (ArithmeticFunction.vonMangoldt * ArithmeticFunction.vonMangoldt) d) := by
+    intro d _
+    rw [selbergLiouvilleWeight2, liouvilleVonMangoldt_eq_mul_aux d]
+    have h_conv :
+        (liouvilleVonMangoldt * liouvilleVonMangoldt) d =
+          (liouvilleLambda d : ℝ) *
+            (ArithmeticFunction.vonMangoldt * ArithmeticFunction.vonMangoldt) d := by
+      rw [ArithmeticFunction.mul_apply, ArithmeticFunction.mul_apply, Finset.mul_sum]
+      apply Finset.sum_congr rfl
+      intro x hx
+      rw [Nat.mem_divisorsAntidiagonal] at hx
+      rcases hx with ⟨h_prod, hd_ne⟩
+      have hx1_ne : x.1 ≠ 0 := fun h0 => hd_ne (by rw [← h_prod, h0, zero_mul])
+      have hx2_ne : x.2 ≠ 0 := fun h0 => hd_ne (by rw [← h_prod, h0, mul_zero])
+      rw [liouvilleVonMangoldt_eq_mul_aux x.1, liouvilleVonMangoldt_eq_mul_aux x.2]
+      have h_lam_prod : (liouvilleLambda d : ℝ) = (liouvilleLambda x.1 : ℝ) * (liouvilleLambda x.2 : ℝ) := by
+        rw [← h_prod, liouvilleLambda_mul_aux hx1_ne hx2_ne]
+        push_cast; rfl
+      rw [h_lam_prod]
+      ring
+    rw [h_conv]
+    ring
+  have h_each :
+      ∀ d ∈ n.divisors,
+        selbergLiouvilleWeight2 d * (liouvilleLambda (n / d) : ℝ) =
+          (liouvilleLambda n : ℝ) *
+            (ArithmeticFunction.vonMangoldt d * Real.log (d : ℝ) +
+              (ArithmeticFunction.vonMangoldt * ArithmeticFunction.vonMangoldt) d) := by
+    intro d hd
+    rw [Nat.mem_divisors] at hd
+    have hd_pos : 0 < d := Nat.pos_of_dvd_of_pos hd.1 hn
+    have hd_ne : d ≠ 0 := ne_of_gt hd_pos
+    have hq_pos : 0 < n / d := Nat.div_pos (Nat.le_of_dvd hn hd.1) hd_pos
+    have hq_ne : n / d ≠ 0 := ne_of_gt hq_pos
+    have h_prod : d * (n / d) = n := Nat.mul_div_cancel' hd.1
+    have h_lam_n : (liouvilleLambda n : ℝ) = (liouvilleLambda d : ℝ) * (liouvilleLambda (n / d) : ℝ) := by
+      conv_lhs => rw [← h_prod]
+      rw [liouvilleLambda_mul_aux hd_ne hq_ne]
+      push_cast; rfl
+    rw [h_w2_factor d hd_pos, h_lam_n]
+    ring
+  rw [Finset.sum_congr rfl h_each, ← Finset.mul_sum]
+  congr 1
+  rw [Finset.sum_add_distrib]
+  have h_conv_sum :
+      (∑ d ∈ n.divisors, (ArithmeticFunction.vonMangoldt * ArithmeticFunction.vonMangoldt) d) =
+        (Real.log (n : ℝ)) ^ 2 -
+          ∑ d ∈ n.divisors, ArithmeticFunction.vonMangoldt d * Real.log (d : ℝ) := by
+    have h_assoc :
+        (∑ d ∈ n.divisors, (ArithmeticFunction.vonMangoldt * ArithmeticFunction.vonMangoldt) d) =
+          (ArithmeticFunction.vonMangoldt * ArithmeticFunction.log) n := by
+      rw [← ArithmeticFunction.coe_mul_zeta_apply, mul_assoc, ArithmeticFunction.vonMangoldt_mul_zeta]
+    rw [h_assoc, ArithmeticFunction.mul_apply,
+      Nat.sum_divisorsAntidiagonal (fun i j => ArithmeticFunction.vonMangoldt i * ArithmeticFunction.log j)]
+    have h_log_div :
+        (∑ d ∈ n.divisors, ArithmeticFunction.vonMangoldt d * ArithmeticFunction.log (n / d)) =
+          ∑ d ∈ n.divisors,
+            (ArithmeticFunction.vonMangoldt d * Real.log (n : ℝ) -
+              ArithmeticFunction.vonMangoldt d * Real.log (d : ℝ)) := by
+      apply Finset.sum_congr rfl
+      intro d hd
+      rw [Nat.mem_divisors] at hd
+      have hd_pos : 0 < d := Nat.pos_of_dvd_of_pos hd.1 hn
+      have hd_real_ne : (d : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr (ne_of_gt hd_pos)
+      have hn_real_ne : (n : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr hn_ne
+      rw [ArithmeticFunction.log_apply, Nat.cast_div hd.1 hd_real_ne,
+        Real.log_div hn_real_ne hd_real_ne]
+      ring
+    rw [h_log_div, Finset.sum_sub_distrib, ← Finset.sum_mul, ArithmeticFunction.vonMangoldt_sum]
+    ring
+  rw [h_conv_sum]
+  ring
+
+/-- Helper (`TASK-TC-058` §4): divisor-sum reindexing over `1 ≤ n ≤ T` for `scaledLiouvilleFiberG`:
+    for any weight `u : ℕ → ℝ`, `T : ℕ`, and `X ≥ 0`,
+    `∑_{1 ≤ d ≤ T} u(d) g_d(X; T) = ∑_{1 ≤ n ≤ T} (∑_{d ∣ n} u(d) λ(n / d)) φ_n(X)`. -/
+private theorem sum_Icc_weight_mul_scaledLiouvilleFiberG_aux
+    (u : ℕ → ℝ) (T : ℕ) {X : ℝ} (hX : 0 ≤ X) :
+    (∑ d ∈ Finset.Icc 1 T, u d * scaledLiouvilleFiberG T d X) =
+      ∑ n ∈ Finset.Icc 1 T,
+        (∑ d ∈ n.divisors, u d * (liouvilleLambda (n / d) : ℝ)) * gaussianTermPhi n X := by
+  have h_lhs :
+      (∑ d ∈ Finset.Icc 1 T, u d * scaledLiouvilleFiberG T d X) =
+        ∑ dq ∈ (Finset.Icc 1 T).sigma (fun d => Finset.Icc 1 (T / d)),
+          u dq.1 * (liouvilleLambda dq.2 : ℝ) * gaussianTermPhi (dq.1 * dq.2) X := by
+    rw [Finset.sum_sigma]
+    apply Finset.sum_congr rfl
+    intro d hd
+    rw [Finset.mem_Icc] at hd
+    have hd_pos : 0 < d := by omega
+    dsimp [scaledLiouvilleFiberG, finiteQLambda]
+    rw [← mul_assoc, ← mul_assoc, Finset.mul_sum]
+    apply Finset.sum_congr rfl
+    intro q _
+    have h_sc := gaussian_term_scaling_aux (a := d) (b := q) hX hd_pos
+    dsimp [gaussianTermPhi]
+    calc
+      u d * (1 / Real.sqrt (d : ℝ)) * (X / (d : ℝ)) ^ (5 / 2 : ℝ) *
+          ((liouvilleLambda q : ℝ) * ((q : ℝ) ^ 3)⁻¹ * Real.exp (-((X / (d : ℝ)) ^ 2) / (q : ℝ) ^ 2))
+        = u d * (liouvilleLambda q : ℝ) *
+            ((1 / Real.sqrt (d : ℝ)) *
+              ((X / (d : ℝ)) ^ (5 / 2 : ℝ) *
+                (((q : ℝ) ^ 3)⁻¹ * Real.exp (-((X / (d : ℝ)) ^ 2) / (q : ℝ) ^ 2)))) := by ring
+      _ = u d * (liouvilleLambda q : ℝ) *
+            (X ^ (5 / 2 : ℝ) *
+              ((((d * q : ℕ) : ℝ) ^ 3)⁻¹ * Real.exp (-(X ^ 2) / ((d * q : ℕ) : ℝ) ^ 2))) := by
+            rw [h_sc]
+  have h_rhs :
+      (∑ n ∈ Finset.Icc 1 T,
+          (∑ d ∈ n.divisors, u d * (liouvilleLambda (n / d) : ℝ)) * gaussianTermPhi n X) =
+        ∑ nd ∈ (Finset.Icc 1 T).sigma (fun n => n.divisors),
+          u nd.2 * (liouvilleLambda (nd.1 / nd.2) : ℝ) * gaussianTermPhi nd.1 X := by
+    rw [Finset.sum_sigma]
+    apply Finset.sum_congr rfl
+    intro n _
+    rw [Finset.sum_mul]
+  rw [h_lhs, h_rhs]
+  apply Finset.sum_bij (fun dq _ => ⟨dq.1 * dq.2, dq.1⟩)
+  · rintro ⟨d, q⟩ hdq
+    simp only [Finset.mem_sigma, Finset.mem_Icc, Nat.mem_divisors] at hdq ⊢
+    rcases hdq with ⟨⟨hd1, _⟩, ⟨hq1, hq_div⟩⟩
+    have hd_pos : 0 < d := by omega
+    have h_le : d * q ≤ T := by
+      rw [mul_comm]
+      exact (Nat.le_div_iff_mul_le hd_pos).mp hq_div
+    exact ⟨⟨Nat.mul_pos hd_pos (by omega), h_le⟩, ⟨⟨q, rfl⟩, ne_of_gt (Nat.mul_pos hd_pos (by omega))⟩⟩
+  · rintro ⟨d1, q1⟩ h1 ⟨d2, q2⟩ _ h_eq
+    simp only [Sigma.mk.inj_iff] at h_eq
+    rcases h_eq with ⟨h_mul, hd_eq⟩
+    have hd_eq' : d1 = d2 := eq_of_heq hd_eq
+    subst hd_eq'
+    simp only [Finset.mem_sigma, Finset.mem_Icc] at h1
+    have hd1_pos : 0 < d1 := by omega
+    have hq_eq : q1 = q2 := Nat.eq_of_mul_eq_mul_left hd1_pos h_mul
+    subst hq_eq
+    rfl
+  · rintro ⟨n, d⟩ hnd
+    simp only [Finset.mem_sigma, Finset.mem_Icc, Nat.mem_divisors] at hnd
+    rcases hnd with ⟨⟨hn1, hnT⟩, ⟨hd_dvd, _⟩⟩
+    have hd_pos : 0 < d := Nat.pos_of_dvd_of_pos hd_dvd (by omega)
+    have hd_le_T : d ≤ T := le_trans (Nat.le_of_dvd (by omega) hd_dvd) hnT
+    let q := n / d
+    have hdq : d * q = n := Nat.mul_div_cancel' hd_dvd
+    have hq_pos : 0 < q := Nat.div_pos (Nat.le_of_dvd (by omega) hd_dvd) hd_pos
+    have hq_div : q ≤ T / d :=
+      (Nat.le_div_iff_mul_le hd_pos).mpr (by rw [mul_comm, hdq]; exact hnT)
+    refine ⟨⟨d, q⟩, Finset.mem_sigma.mpr ⟨Finset.mem_Icc.mpr ⟨hd_pos, hd_le_T⟩,
+      Finset.mem_Icc.mpr ⟨hq_pos, hq_div⟩⟩, ?_⟩
+    exact Sigma.ext hdq (heq_of_eq rfl)
+  · rintro ⟨d, q⟩ hdq
+    simp only [Finset.mem_sigma, Finset.mem_Icc] at hdq
+    have hd_pos : 0 < d := by omega
+    rw [Nat.mul_div_right q hd_pos]
+
+/-- **Theorem 27 (`TASK-TC-058` §§1, 4, All-Prime Square-Divisor Indicator, Dyadic Parity Divisor Identity, Rough-Band Witness, Finite Square Projection, and Actual Selberg Second-Order Compensated Reconstruction)**:
+    1. Classical all-prime square-divisor indicator (`n > 0`):
+       `∑ q ∈ n.divisors, liouvilleLambda q = if IsSquare n then 1 else 0`;
+    2. Dyadic parity control divisor identity (`Odd m`, `v : ℕ`):
+       `∑ q ∈ (2 ^ v * m).divisors, twoAdicParityControl q = if Even v then (positiveDivisorCount m : ℤ) else 0`;
+    3. Explicit `TC-057R` §1a rough-band squarefree composite witness:
+       `roughSquarefreeDivisorsBand 5 25 = roughPrimeSetBand 5 5 ∪ ...` (`roughSquarefreeDivisorsBand 5 25 = roughPrimeSetBand 5 25`,
+       whereas `35 ∈ roughSquarefreeDivisorsBand 5 35` and `35 ∉ roughPrimeSetBand 5 35`);
+    4. Exact finite Gaussian square-projection identity across ALL `T : ℕ` (including `T = 0` and `T = 1`) and `X ≥ 0`:
+       `∑ d ∈ Finset.Icc 1 T, scaledLiouvilleFiberG T d X = finiteQSquare T X`;
+    5. Actual Selberg second-order Liouville identity and compensated split across ALL `T : ℕ` (including `T = 0, 1`),
+       `X > 0`, and any centering constant `c_lam : ℝ`:
+       - `∀ n : ℕ, liouvilleVonMangoldt n = (liouvilleLambda n : ℝ) * Λ n` and `selbergLiouvilleWeight2 1 = 0`;
+       - `(Real.log X) ^ 2 * finiteQLambda T X = (∑ d ∈ Finset.Icc 2 T, selbergLiouvilleWeight2 d * scaledLiouvilleFiberG T d X) + 2 * Real.log X * finiteQShifted (fun n => (liouvilleLambda n : ℝ)) 1 T X - finiteQShifted (fun n => (liouvilleLambda n : ℝ)) 2 T X`;
+       - `∑ d ∈ Finset.Icc 2 T, selbergLiouvilleWeight2 d * scaledLiouvilleFiberG T d X = c_lam * finiteQSquare T X + ∑ d ∈ Finset.Icc 1 T, (selbergLiouvilleWeight2 d - c_lam) * scaledLiouvilleFiberG T d X`
+         (retaining the `d = 1` boundary contribution `(w_{2,λ}(1) - c_lam) g_1(X) = -c_lam g_1(X)`). -/
+theorem liouville_square_divisor_indicator_and_compensated_selberg_tc058
+    (T : ℕ) (c_lam : ℝ) :
+    (∀ n : ℕ, 0 < n →
+      (∑ q ∈ n.divisors, liouvilleLambda q) = if IsSquare n then 1 else 0) ∧
+    (∀ (v : ℕ) (m : ℕ), Odd m →
+      (∑ q ∈ (2 ^ v * m).divisors, twoAdicParityControl q) =
+        if Even v then (positiveDivisorCount m : ℤ) else 0) ∧
+    (roughSquarefreeDivisorsBand 5 25 = roughPrimeSetBand 5 25 ∧
+      35 ∈ roughSquarefreeDivisorsBand 5 35 ∧
+      35 ∉ roughPrimeSetBand 5 35) ∧
+    (∀ X : ℝ, 0 ≤ X →
+      (∑ d ∈ Finset.Icc 1 T, scaledLiouvilleFiberG T d X) = finiteQSquare T X) ∧
+    ((∀ n : ℕ, liouvilleVonMangoldt n = (liouvilleLambda n : ℝ) * ArithmeticFunction.vonMangoldt n) ∧
+      selbergLiouvilleWeight2 1 = 0 ∧
+      (∀ X : ℝ, 0 < X →
+        (Real.log X) ^ 2 * finiteQLambda T X =
+          (∑ d ∈ Finset.Icc 2 T, selbergLiouvilleWeight2 d * scaledLiouvilleFiberG T d X) +
+            2 * Real.log X * finiteQShifted (fun n => (liouvilleLambda n : ℝ)) 1 T X -
+            finiteQShifted (fun n => (liouvilleLambda n : ℝ)) 2 T X) ∧
+      (∀ X : ℝ, 0 ≤ X →
+        (∑ d ∈ Finset.Icc 2 T, selbergLiouvilleWeight2 d * scaledLiouvilleFiberG T d X) =
+          c_lam * finiteQSquare T X +
+            ∑ d ∈ Finset.Icc 1 T,
+              (selbergLiouvilleWeight2 d - c_lam) * scaledLiouvilleFiberG T d X)) := by
+  have h_sq_proj :
+      ∀ X : ℝ, 0 ≤ X →
+        (∑ d ∈ Finset.Icc 1 T, scaledLiouvilleFiberG T d X) = finiteQSquare T X := by
+    intro X hX
+    have h_u1 :
+        (∑ d ∈ Finset.Icc 1 T, scaledLiouvilleFiberG T d X) =
+          ∑ d ∈ Finset.Icc 1 T, (1 : ℝ) * scaledLiouvilleFiberG T d X := by
+      apply Finset.sum_congr rfl; intro d _; ring
+    rw [h_u1, sum_Icc_weight_mul_scaledLiouvilleFiberG_aux (fun _ => (1 : ℝ)) T hX]
+    have h_div_swap :
+        ∀ n ∈ Finset.Icc 1 T,
+          (∑ d ∈ n.divisors, (1 : ℝ) * (liouvilleLambda (n / d) : ℝ)) =
+            if IsSquare n then 1 else 0 := by
+      intro n hn
+      rw [Finset.mem_Icc] at hn
+      have hn_pos : 0 < n := by omega
+      have h_antidiag :
+          (∑ d ∈ n.divisors, (1 : ℝ) * (liouvilleLambda (n / d) : ℝ)) =
+            ∑ q ∈ n.divisors, (liouvilleLambda q : ℝ) := by
+        apply Finset.sum_bij (fun d _ => n / d)
+        · intro d hd
+          rw [Nat.mem_divisors] at hd ⊢
+          exact ⟨Nat.div_dvd_of_dvd hd.1, hd.2⟩
+        · intro d1 hd1 d2 hd2 h_eq
+          rw [Nat.mem_divisors] at hd1 hd2
+          have h1 : d1 * (n / d1) = n := Nat.mul_div_cancel' hd1.1
+          have h2 : d2 * (n / d2) = n := Nat.mul_div_cancel' hd2.1
+          have hq_pos : 0 < n / d1 :=
+            Nat.div_pos (Nat.le_of_dvd hn_pos hd1.1) (Nat.pos_of_dvd_of_pos hd1.1 hn_pos)
+          rw [← h_eq] at h2
+          exact Nat.eq_of_mul_eq_mul_right hq_pos (h1.trans h2.symm)
+        · intro q hq
+          rw [Nat.mem_divisors] at hq
+          have hq_pos : 0 < q := Nat.pos_of_dvd_of_pos hq.1 hn_pos
+          let d := n / q
+          have hd_pos : 0 < d := Nat.div_pos (Nat.le_of_dvd hn_pos hq.1) hq_pos
+          have hqd : q * d = n := Nat.mul_div_cancel' hq.1
+          refine ⟨d, Nat.mem_divisors.mpr ⟨Nat.div_dvd_of_dvd hq.1, hq.2⟩, ?_⟩
+          change n / d = q
+          rw [← hqd]
+          exact Nat.mul_div_left q hd_pos
+        · intros; ring
+      rw [h_antidiag]
+      have h_int := sum_divisors_liouvilleLambda_eq_isSquare_aux hn_pos
+      have h_cast : (∑ q ∈ n.divisors, (liouvilleLambda q : ℝ)) =
+          ((∑ q ∈ n.divisors, liouvilleLambda q : ℤ) : ℝ) := by push_cast; rfl
+      rw [h_cast, h_int]
+      split_ifs <;> norm_num
+    have h_filt_sq :
+        (∑ n ∈ Finset.Icc 1 T,
+            (∑ d ∈ n.divisors, (1 : ℝ) * (liouvilleLambda (n / d) : ℝ)) * gaussianTermPhi n X) =
+          ∑ n ∈ (Finset.Icc 1 T).filter IsSquare, gaussianTermPhi n X := by
+      rw [Finset.sum_filter]
+      apply Finset.sum_congr rfl
+      intro n hn
+      rw [h_div_swap n hn]
+      split_ifs <;> ring
+    rw [h_filt_sq]
+    dsimp [finiteQSquare]
+    symm
+    apply Finset.sum_bij (fun r _ => r ^ 2)
+    · intro r hr
+      simp only [Finset.mem_filter, Finset.mem_Icc] at hr ⊢
+      have hr2_ge1 : 1 ≤ r ^ 2 := by
+        rw [sq]
+        exact Nat.mul_pos (by omega) (by omega)
+      exact ⟨⟨hr2_ge1, hr.2⟩, ⟨r, sq r⟩⟩
+    · intro r1 _ r2 _ h_eq
+      have h1 : Nat.sqrt (r1 ^ 2) = r1 := by rw [sq, Nat.sqrt_eq]
+      have h2 : Nat.sqrt (r2 ^ 2) = r2 := by rw [sq, Nat.sqrt_eq]
+      rw [← h1, ← h2, h_eq]
+    · intro n hn
+      simp only [Finset.mem_filter, Finset.mem_Icc] at hn
+      rcases hn with ⟨⟨hn1, hnT⟩, ⟨r, rfl⟩⟩
+      have hr_pos : 0 < r := by
+        by_contra h0
+        have hr0 : r = 0 := Nat.eq_zero_of_not_pos h0
+        rw [hr0, mul_zero] at hn1
+        omega
+      have hr_le_rr : r ≤ r * r := Nat.le_mul_of_pos_left r hr_pos
+      refine ⟨r, Finset.mem_filter.mpr ⟨Finset.mem_Icc.mpr ⟨hr_pos, le_trans hr_le_rr hnT⟩, ?_⟩, sq r⟩
+      rwa [sq]
+    · intros; rfl
+  have hw2_1 : selbergLiouvilleWeight2 1 = 0 := by
+    have h_lv1 : liouvilleVonMangoldt 1 = 0 := by
+      rw [liouvilleVonMangoldt_eq_mul_aux 1, ArithmeticFunction.vonMangoldt_apply_one, mul_zero]
+    have h_conv1 : (liouvilleVonMangoldt * liouvilleVonMangoldt) 1 = 0 := by
+      rw [ArithmeticFunction.mul_apply, Nat.divisorsAntidiagonal_one, Finset.sum_singleton, h_lv1, mul_zero]
+    simp [selbergLiouvilleWeight2, h_lv1, h_conv1]
+  have h_sum_2_eq_1 :
+      ∀ X : ℝ,
+        (∑ d ∈ Finset.Icc 2 T, selbergLiouvilleWeight2 d * scaledLiouvilleFiberG T d X) =
+          ∑ d ∈ Finset.Icc 1 T, selbergLiouvilleWeight2 d * scaledLiouvilleFiberG T d X := by
+    intro X
+    by_cases hT : 1 ≤ T
+    · have h_ins : Finset.Icc 1 T = insert 1 (Finset.Icc 2 T) := by
+        ext d; simp only [Finset.mem_Icc, Finset.mem_insert]; omega
+      have h1_not : (1 : ℕ) ∉ Finset.Icc 2 T := by simp
+      rw [h_ins, Finset.sum_insert h1_not, hw2_1, zero_mul, zero_add]
+    · have h1 : Finset.Icc 2 T = ∅ := by ext d; simp; omega
+      have h2 : Finset.Icc 1 T = ∅ := by ext d; simp; omega
+      rw [h1, h2]
+  have h_rough_witness :
+      roughSquarefreeDivisorsBand 5 25 = roughPrimeSetBand 5 25 ∧
+        35 ∈ roughSquarefreeDivisorsBand 5 35 ∧
+        35 ∉ roughPrimeSetBand 5 35 := by
+    have hP25_prime : ∀ q ∈ roughPrimeSetBand 5 25, q.Prime := fun _ hq =>
+      (Finset.mem_filter.mp hq).2
+    have hN25_pos : 0 < primeProductModulus (roughPrimeSetBand 5 25) := by
+      apply Finset.prod_pos
+      intro q hq
+      exact (hP25_prime q hq).pos
+    have h_eq_25 : roughSquarefreeDivisorsBand 5 25 = roughPrimeSetBand 5 25 := by
+      ext d
+      simp only [roughSquarefreeDivisorsBand, roughPrimeSetBand, Finset.mem_filter,
+        Nat.mem_divisors, Finset.mem_Icc]
+      constructor
+      · rintro ⟨⟨hd_dvd, _⟩, ⟨hd5, hd25⟩⟩
+        refine ⟨⟨hd5, hd25⟩, ?_⟩
+        obtain ⟨p, hp_prime, hp_dvd_d⟩ := Nat.exists_prime_and_dvd (by omega : d ≠ 1)
+        obtain ⟨q, hq_in, hp_dvd_q⟩ :=
+          prime_dvd_finset_prod_aux hp_prime (roughPrimeSetBand 5 25) (fun x => x)
+            (dvd_trans hp_dvd_d hd_dvd)
+        have hq_prime : q.Prime := hP25_prime q hq_in
+        have hpq : p = q := (Nat.dvd_prime hq_prime).mp hp_dvd_q |>.resolve_left hp_prime.ne_one
+        have hp_in : p ∈ roughPrimeSetBand 5 25 := hpq ▸ hq_in
+        have hp_ge5 : 5 ≤ p := ((Finset.mem_filter.mp hp_in).1 |> Finset.mem_Icc.mp).1
+        obtain ⟨k, rfl⟩ := hp_dvd_d
+        have hk_pos : 0 < k := by
+          by_contra h0
+          have hk0 : k = 0 := Nat.eq_zero_of_not_pos h0
+          rw [hk0, mul_zero] at hd5; omega
+        by_cases hk1 : k = 1
+        · rw [hk1, mul_one]; exact hp_prime
+        · have h_erase :
+              primeProductModulus (roughPrimeSetBand 5 25) =
+                p * ∏ x ∈ (roughPrimeSetBand 5 25).erase p, x :=
+            (Finset.mul_prod_erase _ (fun x => x) hp_in).symm
+          have hd_dvd' : p * k ∣ primeProductModulus (roughPrimeSetBand 5 25) := hd_dvd
+          rw [h_erase] at hd_dvd'
+          have hk_dvd_er : k ∣ ∏ x ∈ (roughPrimeSetBand 5 25).erase p, x :=
+            (Nat.mul_dvd_mul_iff_left hp_prime.pos).mp hd_dvd'
+          obtain ⟨r, hr_prime, hr_dvd_k⟩ := Nat.exists_prime_and_dvd hk1
+          obtain ⟨s, hs_in_er, hr_dvd_s⟩ :=
+            prime_dvd_finset_prod_aux hr_prime ((roughPrimeSetBand 5 25).erase p) (fun x => x)
+              (dvd_trans hr_dvd_k hk_dvd_er)
+          have hs_in : s ∈ roughPrimeSetBand 5 25 := Finset.mem_of_mem_erase hs_in_er
+          have hs_prime : s.Prime := hP25_prime s hs_in
+          have hrs : r = s := (Nat.dvd_prime hs_prime).mp hr_dvd_s |>.resolve_left hr_prime.ne_one
+          have hr_ne_p : r ≠ p := by rw [hrs]; exact (Finset.mem_erase.mp hs_in_er).1
+          have hr_in : r ∈ roughPrimeSetBand 5 25 := by rwa [hrs]
+          have hr_ge5 : 5 ≤ r := ((Finset.mem_filter.mp hr_in).1 |> Finset.mem_Icc.mp).1
+          have h_not6 : ¬ Nat.Prime 6 := by decide
+          have hp_mul_r_ge35 : 35 ≤ p * r := by
+            by_cases hp5 : p = 5
+            · subst hp5
+              have hr6 : r ≠ 6 := fun h6 => h_not6 (h6 ▸ hr_prime)
+              have hr7 : 7 ≤ r := by omega
+              omega
+            · have hp6 : p ≠ 6 := fun h6 => h_not6 (h6 ▸ hp_prime)
+              have hp7 : 7 ≤ p := by omega
+              have hprod : 7 * 5 ≤ p * r := Nat.mul_le_mul hp7 hr_ge5
+              omega
+          have hk_ge_r : r ≤ k := Nat.le_of_dvd hk_pos hr_dvd_k
+          have hpk_ge35 : 35 ≤ p * k := le_trans hp_mul_r_ge35 (Nat.mul_le_mul_left p hk_ge_r)
+          omega
+      · rintro ⟨⟨hd5, hd25⟩, hd_prime⟩
+        have hd_mem : d ∈ roughPrimeSetBand 5 25 := by
+          simp only [roughPrimeSetBand, Finset.mem_filter, Finset.mem_Icc]
+          exact ⟨⟨hd5, hd25⟩, hd_prime⟩
+        exact ⟨⟨Finset.dvd_prod_of_mem (fun x => x) hd_mem, ne_of_gt hN25_pos⟩, ⟨hd5, hd25⟩⟩
+    have h35_in : 35 ∈ roughSquarefreeDivisorsBand 5 35 := by
+      have hP35_prime : ∀ q ∈ roughPrimeSetBand 5 35, q.Prime := fun _ hq =>
+        (Finset.mem_filter.mp hq).2
+      have hN35_pos : 0 < primeProductModulus (roughPrimeSetBand 5 35) := by
+        apply Finset.prod_pos
+        intro q hq; exact (hP35_prime q hq).pos
+      have h5_in : 5 ∈ roughPrimeSetBand 5 35 := by decide
+      have h7_in : 7 ∈ roughPrimeSetBand 5 35 := by decide
+      have h5_dvd : 5 ∣ primeProductModulus (roughPrimeSetBand 5 35) :=
+        Finset.dvd_prod_of_mem (fun x => x) h5_in
+      have h7_dvd : 7 ∣ primeProductModulus (roughPrimeSetBand 5 35) :=
+        Finset.dvd_prod_of_mem (fun x => x) h7_in
+      have hcop57 : Nat.Coprime 5 7 := by decide
+      have h35_dvd : 35 ∣ primeProductModulus (roughPrimeSetBand 5 35) :=
+        hcop57.mul_dvd_of_dvd_of_dvd h5_dvd h7_dvd
+      simp only [roughSquarefreeDivisorsBand, Finset.mem_filter, Nat.mem_divisors]
+      exact ⟨⟨h35_dvd, ne_of_gt hN35_pos⟩, ⟨by decide, by decide⟩⟩
+    have h35_not_pr : 35 ∉ roughPrimeSetBand 5 35 := by decide
+    exact ⟨h_eq_25, h35_in, h35_not_pr⟩
+  refine ⟨fun n hn => sum_divisors_liouvilleLambda_eq_isSquare_aux hn,
+    fun v m hm => sum_divisors_twoAdicParityControl_aux v hm,
+    h_rough_witness, h_sq_proj, ⟨liouvilleVonMangoldt_eq_mul_aux, hw2_1, ?_, ?_⟩⟩
+  · intro X hX
+    rw [h_sum_2_eq_1 X,
+      sum_Icc_weight_mul_scaledLiouvilleFiberG_aux selbergLiouvilleWeight2 T (le_of_lt hX)]
+    have h_selb_sum :
+        (∑ n ∈ Finset.Icc 1 T,
+            (∑ d ∈ n.divisors, selbergLiouvilleWeight2 d * (liouvilleLambda (n / d) : ℝ)) *
+              gaussianTermPhi n X) =
+          ∑ n ∈ Finset.Icc 1 T,
+            (liouvilleLambda n : ℝ) * (Real.log (n : ℝ)) ^ 2 * gaussianTermPhi n X := by
+      apply Finset.sum_congr rfl
+      intro n hn
+      rw [Finset.mem_Icc] at hn
+      rw [sum_divisors_selbergLiouvilleWeight2_aux (by omega)]
+    rw [h_selb_sum]
+    dsimp [finiteQLambda, finiteQShifted, gaussianTermPhi]
+    rw [Finset.mul_sum, Finset.mul_sum, Finset.mul_sum,
+      ← Finset.sum_add_distrib, ← Finset.sum_sub_distrib]
+    apply Finset.sum_congr rfl
+    intro n hn
+    rw [Finset.mem_Icc] at hn
+    have hn_pos : (0 : ℝ) < (n : ℝ) := Nat.cast_pos.mpr (by omega)
+    have h_log : Real.log (X / (n : ℝ)) = Real.log X - Real.log (n : ℝ) :=
+      Real.log_div (ne_of_gt hX) (ne_of_gt hn_pos)
+    rw [h_log]
+    ring
+  · intro X hX
+    rw [h_sum_2_eq_1 X, ← h_sq_proj X hX, Finset.mul_sum, ← Finset.sum_add_distrib]
+    apply Finset.sum_congr rfl
+    intro d _; ring
+
+/-- **Theorem 28 (`TASK-TC-058` §4, Exact Finite Summation by Parts Keeping `⌊T/d⌋` Cutoff Jumps, Post-Abel `c_λ` Cancellation, Jump-Count Telescope, and Second-Order Logarithmic-Shift Elimination `P_T - R_T = D_{2,T}`)**:
+    1. Exact step decomposition into smooth kernel variation at fixed inner cutoff `⌊T/d⌋` plus discrete cutoff jump:
+       `scaledLiouvilleFiberG T d X - scaledLiouvilleFiberG T (d + 1) X = scaledFiberSmoothStep T d X + scaledFiberCutoffJump T d X`,
+       with `scaledFiberCutoffJump T d X = (1 / √(d + 1)) ∑_{⌊T/(d+1)⌋ + 1 ≤ q ≤ ⌊T/d⌋} λ(q) φ_q(X / (d + 1))` for `d ≥ 1`;
+    2. Exact finite summation by parts on `2 ≤ d ≤ T` BEFORE splitting `W_2` (`1 ≤ T`):
+       `∑ d ∈ Finset.Icc 2 T, selbergLiouvilleWeight2 d * scaledLiouvilleFiberG T d X = selbergCumulativeW2 T * scaledLiouvilleFiberG T T X + ∑ d ∈ Finset.Icc 1 (T - 1), selbergCumulativeW2 d * (scaledFiberSmoothStep T d X + scaledFiberCutoffJump T d X)`;
+    3. Post-Abel integer split `selbergCumulativeW2 d = c_lam * d + selbergCenteredRemainderInt c_lam d` (`1 ≤ T`, `X ≥ 0`),
+       collapsing the linear `c_lam * d` trend onto `c_lam * finiteQSquare T X` while preserving integer `W_2(d) - c_lam * d`
+       and the exact jump-count telescope `∑_{1 ≤ d ≤ T - 1} d * (T / d - T / (d + 1)) = (∑_{1 ≤ d ≤ T} T / d) - T`:
+       `∑ d ∈ Finset.Icc 2 T, selbergLiouvilleWeight2 d * scaledLiouvilleFiberG T d X = c_lam * finiteQSquare T X + selbergCenteredRemainderInt c_lam T * scaledLiouvilleFiberG T T X + ∑ d ∈ Finset.Icc 1 (T - 1), selbergCenteredRemainderInt c_lam d * (scaledFiberSmoothStep T d X + scaledFiberCutoffJump T d X)`;
+    4. Exact combination with logarithmic-shift terms (`X > 0`, `Real.log X ≠ 0`, all `T : ℕ`):
+       `finiteQLambda T X = normalizedPrimePowerTermP T X + normalizedFirstShiftTermR T X`,
+       `normalizedPrimePowerTermP T X - normalizedFirstShiftTermR T X = compensatedSelbergResidualD2 c_lam T X`, and
+       `finiteQLambda T X = 2 * normalizedPrimePowerTermP T X - compensatedSelbergResidualD2 c_lam T X`. -/
+theorem compensated_selberg_summation_by_parts_and_shift_elimination_tc058
+    (T : ℕ) (c_lam : ℝ) :
+    (∀ (d : ℕ) (X : ℝ),
+      scaledLiouvilleFiberG T d X - scaledLiouvilleFiberG T (d + 1) X =
+        scaledFiberSmoothStep T d X + scaledFiberCutoffJump T d X ∧
+      (1 ≤ d →
+        scaledFiberCutoffJump T d X =
+          (1 / Real.sqrt ((d + 1 : ℕ) : ℝ)) *
+            ((X / ((d + 1 : ℕ) : ℝ)) ^ (5 / 2 : ℝ) *
+              ∑ q ∈ Finset.Icc (T / (d + 1) + 1) (T / d),
+                (liouvilleLambda q : ℝ) * ((q : ℝ) ^ 3)⁻¹ *
+                  Real.exp (-((X / ((d + 1 : ℕ) : ℝ)) ^ 2) / (q : ℝ) ^ 2)))) ∧
+    (1 ≤ T → ∀ X : ℝ,
+      (∑ d ∈ Finset.Icc 2 T, selbergLiouvilleWeight2 d * scaledLiouvilleFiberG T d X) =
+        selbergCumulativeW2 T * scaledLiouvilleFiberG T T X +
+          ∑ d ∈ Finset.Icc 1 (T - 1),
+            selbergCumulativeW2 d * (scaledFiberSmoothStep T d X + scaledFiberCutoffJump T d X)) ∧
+    ((1 ≤ T → ∀ X : ℝ, 0 ≤ X →
+        (∑ d ∈ Finset.Icc 2 T, selbergLiouvilleWeight2 d * scaledLiouvilleFiberG T d X) =
+          c_lam * finiteQSquare T X +
+            selbergCenteredRemainderInt c_lam T * scaledLiouvilleFiberG T T X +
+            ∑ d ∈ Finset.Icc 1 (T - 1),
+              selbergCenteredRemainderInt c_lam d *
+                (scaledFiberSmoothStep T d X + scaledFiberCutoffJump T d X)) ∧
+      (1 ≤ T →
+        (∑ d ∈ Finset.Icc 1 (T - 1), d * (T / d - T / (d + 1))) =
+          (∑ d ∈ Finset.Icc 1 T, T / d) - T)) ∧
+    (∀ X : ℝ, 0 < X → Real.log X ≠ 0 →
+      finiteQLambda T X = normalizedPrimePowerTermP T X + normalizedFirstShiftTermR T X ∧
+      normalizedPrimePowerTermP T X - normalizedFirstShiftTermR T X =
+        compensatedSelbergResidualD2 c_lam T X ∧
+      finiteQLambda T X =
+        2 * normalizedPrimePowerTermP T X - compensatedSelbergResidualD2 c_lam T X) := by
+  have h_step_eq :
+      ∀ (d : ℕ) (X : ℝ),
+        scaledLiouvilleFiberG T d X - scaledLiouvilleFiberG T (d + 1) X =
+          scaledFiberSmoothStep T d X + scaledFiberCutoffJump T d X := by
+    intro d X
+    dsimp [scaledLiouvilleFiberG, scaledFiberSmoothStep, scaledFiberCutoffJump]
+    ring
+  have h_abel_gen :
+      ∀ (a g : ℕ → ℝ) (N : ℕ), 1 ≤ N → a 1 = 0 →
+        (∑ d ∈ Finset.Icc 2 N, (a d - a (d - 1)) * g d) =
+          a N * g N + ∑ d ∈ Finset.Icc 1 (N - 1), a d * (g d - g (d + 1)) := by
+    intro a g N hN ha1
+    obtain ⟨m, rfl⟩ : ∃ m : ℕ, N = m + 1 := ⟨N - 1, by omega⟩
+    induction' m with k ih
+    · simp [ha1]
+    · have h_lhs_ins : Finset.Icc 2 (k + 1 + 1) = insert (k + 2) (Finset.Icc 2 (k + 1)) := by
+        ext d; simp only [Finset.mem_Icc, Finset.mem_insert]; omega
+      have h_lhs_not : (k + 2) ∉ Finset.Icc 2 (k + 1) := by simp
+      have h_rhs_sub1 : k + 1 + 1 - 1 = k + 1 := by omega
+      have h_rhs_sub0 : k + 1 - 1 = k := by omega
+      have h_rhs_ins : Finset.Icc 1 (k + 1) = insert (k + 1) (Finset.Icc 1 k) := by
+        ext d; simp only [Finset.mem_Icc, Finset.mem_insert]; omega
+      have h_rhs_not : (k + 1) ∉ Finset.Icc 1 k := by simp
+      rw [h_lhs_ins, Finset.sum_insert h_lhs_not, ih (by omega), h_rhs_sub0,
+        h_rhs_sub1, h_rhs_ins, Finset.sum_insert h_rhs_not]
+      have hk1_add : k + 1 + 1 = k + 2 := by omega
+      rw [hk1_add]
+      ring
+  have h_W2_diff :
+      ∀ d : ℕ, 2 ≤ d → selbergCumulativeW2 d - selbergCumulativeW2 (d - 1) = selbergLiouvilleWeight2 d := by
+    intro d hd2
+    dsimp [selbergCumulativeW2]
+    have h_ins : Finset.Icc 2 d = insert d (Finset.Icc 2 (d - 1)) := by
+      ext x; simp only [Finset.mem_Icc, Finset.mem_insert]; omega
+    have h_not : d ∉ Finset.Icc 2 (d - 1) := by simp; omega
+    rw [h_ins, Finset.sum_insert h_not]
+    ring
+  have h_W2_1 : selbergCumulativeW2 1 = 0 := by simp [selbergCumulativeW2]
+  have h_abel_W2 :
+      1 ≤ T → ∀ X : ℝ,
+        (∑ d ∈ Finset.Icc 2 T, selbergLiouvilleWeight2 d * scaledLiouvilleFiberG T d X) =
+          selbergCumulativeW2 T * scaledLiouvilleFiberG T T X +
+            ∑ d ∈ Finset.Icc 1 (T - 1),
+              selbergCumulativeW2 d * (scaledFiberSmoothStep T d X + scaledFiberCutoffJump T d X) := by
+    intro hT X
+    have h_lhs_eq :
+        (∑ d ∈ Finset.Icc 2 T, selbergLiouvilleWeight2 d * scaledLiouvilleFiberG T d X) =
+          ∑ d ∈ Finset.Icc 2 T,
+            (selbergCumulativeW2 d - selbergCumulativeW2 (d - 1)) * scaledLiouvilleFiberG T d X := by
+      apply Finset.sum_congr rfl
+      intro d hd
+      rw [Finset.mem_Icc] at hd
+      rw [h_W2_diff d hd.1]
+    rw [h_lhs_eq, h_abel_gen selbergCumulativeW2 (fun d => scaledLiouvilleFiberG T d X) T hT h_W2_1]
+    congr 1
+    apply Finset.sum_congr rfl
+    intro d _
+    rw [h_step_eq d X]
+  have h_lin_abel :
+      ∀ (g : ℕ → ℝ) (N : ℕ), 1 ≤ N →
+        (N : ℝ) * g N + (∑ d ∈ Finset.Icc 1 (N - 1), (d : ℝ) * (g d - g (d + 1))) =
+          ∑ d ∈ Finset.Icc 1 N, g d := by
+    intro g N hN
+    obtain ⟨m, rfl⟩ : ∃ m : ℕ, N = m + 1 := ⟨N - 1, by omega⟩
+    induction' m with k ih
+    · have h1 : Finset.Icc 1 1 = {1} := by decide
+      simp [h1]
+    · have h_sub1 : k + 1 + 1 - 1 = k + 1 := by omega
+      have h_sub0 : k + 1 - 1 = k := by omega
+      have h_ins_k1 : Finset.Icc 1 (k + 1) = insert (k + 1) (Finset.Icc 1 k) := by
+        ext d; simp only [Finset.mem_Icc, Finset.mem_insert]; omega
+      have h_not_k1 : (k + 1) ∉ Finset.Icc 1 k := by simp
+      have h_ins_k2 : Finset.Icc 1 (k + 1 + 1) = insert (k + 2) (Finset.Icc 1 (k + 1)) := by
+        ext d; simp only [Finset.mem_Icc, Finset.mem_insert]; omega
+      have h_not_k2 : (k + 2) ∉ Finset.Icc 1 (k + 1) := by simp
+      rw [h_sub1, h_ins_k1, Finset.sum_insert h_not_k1, h_ins_k2, Finset.sum_insert h_not_k2]
+      have ih_k := ih (by omega)
+      rw [h_sub0] at ih_k
+      have hk12 : k + 1 + 1 = k + 2 := by omega
+      rw [hk12]
+      push_cast at ih_k ⊢
+      linarith
+  refine ⟨?_, h_abel_W2, ⟨?_, ?_⟩, ?_⟩
+  · intro d X
+    refine ⟨h_step_eq d X, ?_⟩
+    intro hd1
+    have h_div_mono : T / (d + 1) ≤ T / d := Nat.div_le_div_left (by omega) (by omega)
+    have h_icc_split : ∀ (a b : ℕ), a ≤ b →
+        Finset.Icc 1 b = Finset.Icc 1 a ∪ Finset.Icc (a + 1) b := by
+      intro a b hab_le
+      ext q; simp only [Finset.mem_Icc, Finset.mem_union]; omega
+    have h_union :
+        Finset.Icc 1 (T / d) =
+          Finset.Icc 1 (T / (d + 1)) ∪ Finset.Icc (T / (d + 1) + 1) (T / d) :=
+      h_icc_split (T / (d + 1)) (T / d) h_div_mono
+    have h_disj :
+        Disjoint (Finset.Icc 1 (T / (d + 1))) (Finset.Icc (T / (d + 1) + 1) (T / d)) := by
+      rw [Finset.disjoint_left]
+      intro q h1 h2
+      simp only [Finset.mem_Icc] at h1 h2
+      omega
+    dsimp [scaledFiberCutoffJump, finiteQLambda]
+    rw [h_union, Finset.sum_union h_disj]
+    ring
+  · intro hT X hX
+    obtain ⟨_, _, _, h_sq_proj, _⟩ :=
+      liouville_square_divisor_indicator_and_compensated_selberg_tc058 T c_lam
+    rw [h_abel_W2 hT X]
+    have h_W2_split :
+        ∀ u : ℕ, selbergCumulativeW2 u = c_lam * (u : ℝ) + selbergCenteredRemainderInt c_lam u := by
+      intro u; dsimp [selbergCenteredRemainderInt]; ring
+    rw [h_W2_split T]
+    have h_sum_split :
+        (∑ d ∈ Finset.Icc 1 (T - 1),
+            selbergCumulativeW2 d * (scaledFiberSmoothStep T d X + scaledFiberCutoffJump T d X)) =
+          c_lam *
+              (∑ d ∈ Finset.Icc 1 (T - 1),
+                (d : ℝ) * (scaledLiouvilleFiberG T d X - scaledLiouvilleFiberG T (d + 1) X)) +
+            ∑ d ∈ Finset.Icc 1 (T - 1),
+              selbergCenteredRemainderInt c_lam d *
+                (scaledFiberSmoothStep T d X + scaledFiberCutoffJump T d X) := by
+      rw [Finset.mul_sum, ← Finset.sum_add_distrib]
+      apply Finset.sum_congr rfl
+      intro d _
+      rw [h_W2_split d, ← h_step_eq d X]
+      ring
+    rw [h_sum_split]
+    have h_lin := h_lin_abel (fun d => scaledLiouvilleFiberG T d X) T hT
+    dsimp only at h_lin
+    rw [h_sq_proj X hX] at h_lin
+    have h_c_lin :
+        c_lam * ((T : ℝ) * scaledLiouvilleFiberG T T X +
+            ∑ d ∈ Finset.Icc 1 (T - 1),
+              (d : ℝ) * (scaledLiouvilleFiberG T d X - scaledLiouvilleFiberG T (d + 1) X)) =
+          c_lam * finiteQSquare T X :=
+      congrArg (fun z => c_lam * z) h_lin
+    linarith [h_c_lin]
+  · intro hT
+    have h_real := h_lin_abel (fun d => ((T / d : ℕ) : ℝ)) T hT
+    dsimp only at h_real
+    have h_T_div_T : T / T = 1 := Nat.div_self (by omega)
+    rw [h_T_div_T, Nat.cast_one, mul_one] at h_real
+    have h_cast_lhs :
+        (∑ d ∈ Finset.Icc 1 (T - 1), (d : ℝ) * (((T / d : ℕ) : ℝ) - ((T / (d + 1) : ℕ) : ℝ))) =
+          ((∑ d ∈ Finset.Icc 1 (T - 1), d * (T / d - T / (d + 1)) : ℕ) : ℝ) := by
+      push_cast
+      apply Finset.sum_congr rfl
+      intro d hd
+      rw [Finset.mem_Icc] at hd
+      have h_le : T / (d + 1) ≤ T / d := Nat.div_le_div_left (by omega) (by omega)
+      rw [Nat.cast_sub h_le]
+    have h_sum_ge_T : T ≤ ∑ d ∈ Finset.Icc 1 T, T / d := by
+      have h1_mem : (1 : ℕ) ∈ Finset.Icc 1 T := Finset.mem_Icc.mpr ⟨le_refl 1, hT⟩
+      have h_single : T / 1 ≤ ∑ d ∈ Finset.Icc 1 T, T / d :=
+        Finset.single_le_sum (fun _ _ => Nat.zero_le _) h1_mem
+      simpa using h_single
+    have h_cast_rhs :
+        (∑ d ∈ Finset.Icc 1 T, ((T / d : ℕ) : ℝ)) - (T : ℝ) =
+          (((∑ d ∈ Finset.Icc 1 T, T / d) - T : ℕ) : ℝ) := by
+      rw [Nat.cast_sub h_sum_ge_T]
+      push_cast; rfl
+    have h_eq_real :
+        ((∑ d ∈ Finset.Icc 1 (T - 1), d * (T / d - T / (d + 1)) : ℕ) : ℝ) =
+          (((∑ d ∈ Finset.Icc 1 T, T / d) - T : ℕ) : ℝ) := by
+      linarith
+    exact_mod_cast h_eq_real
+  · intro X hX hlog_ne
+    have h_lam_1 : (liouvilleLambda 1 : ℝ) = 1 := by
+      simp [liouvilleLambda, natOmega, liouvilleSignFromOmega]
+    have h_lam_mult :
+        ∀ d q : ℕ, 0 < d → 0 < q →
+          (liouvilleLambda (d * q) : ℝ) = (liouvilleLambda d : ℝ) * (liouvilleLambda q : ℝ) := by
+      intro d q hd hq
+      rw [liouvilleLambda_mul_aux (ne_of_gt hd) (ne_of_gt hq)]
+      push_cast; rfl
+    obtain ⟨h_gen_r, ⟨h_lam_pp, _, _⟩, h_rec0, _⟩ :=
+      logarithmic_prime_power_descent_and_kernel_shift_tc057
+        (a := fun n => (liouvilleLambda n : ℝ)) h_lam_1 h_lam_mult 0 0 T hX
+    have h_fQ0 : finiteQShifted (fun n => (liouvilleLambda n : ℝ)) 0 T X = finiteQLambda T X := by
+      dsimp [finiteQShifted, finiteQLambda, gaussianTermPhi]
+      rw [Finset.mul_sum]
+      apply Finset.sum_congr rfl
+      intro n _; simp; ring
+    have h_pp_eq :
+        primePowerLogDescentSum (fun n => (liouvilleLambda n : ℝ)) 0 T X =
+          ∑ pk ∈ primePowerPairsUpTo T, liouvillePrimePowerTerm T pk X := by
+      rw [← h_gen_r 0, ← h_lam_pp]
+      apply Finset.sum_congr rfl
+      intro n _; simp
+    have h_first :
+        Real.log X * finiteQLambda T X =
+          (∑ pk ∈ primePowerPairsUpTo T, liouvillePrimePowerTerm T pk X) +
+            finiteQShifted (fun n => (liouvilleLambda n : ℝ)) 1 T X := by
+      rw [← h_fQ0, ← h_pp_eq]
+      exact h_rec0
+    have h_Q_decomp :
+        finiteQLambda T X = normalizedPrimePowerTermP T X + normalizedFirstShiftTermR T X := by
+      dsimp [normalizedPrimePowerTermP, normalizedFirstShiftTermR]
+      rw [← add_div, ← h_first, mul_div_cancel_left₀ _ hlog_ne]
+    obtain ⟨_, _, _, _, ⟨_, _, h_selb_2, h_comp_2⟩⟩ :=
+      liouville_square_divisor_indicator_and_compensated_selberg_tc058 T c_lam
+    have h_selb_comp :
+        (Real.log X) ^ 2 * finiteQLambda T X =
+          c_lam * finiteQSquare T X +
+            (∑ d ∈ Finset.Icc 1 T,
+              (selbergLiouvilleWeight2 d - c_lam) * scaledLiouvilleFiberG T d X) +
+            2 * Real.log X * finiteQShifted (fun n => (liouvilleLambda n : ℝ)) 1 T X -
+            finiteQShifted (fun n => (liouvilleLambda n : ℝ)) 2 T X := by
+      rw [h_selb_2 X hX, h_comp_2 X (le_of_lt hX)]
+    have h_diff_PR :
+        normalizedPrimePowerTermP T X - normalizedFirstShiftTermR T X =
+          compensatedSelbergResidualD2 c_lam T X := by
+      dsimp [normalizedPrimePowerTermP, normalizedFirstShiftTermR, compensatedSelbergResidualD2]
+      have h_num :
+          (Real.log X) *
+              ((∑ pk ∈ primePowerPairsUpTo T, liouvillePrimePowerTerm T pk X) -
+                finiteQShifted (fun n => (liouvilleLambda n : ℝ)) 1 T X) =
+            c_lam * finiteQSquare T X +
+              (∑ d ∈ Finset.Icc 1 T,
+                (selbergLiouvilleWeight2 d - c_lam) * scaledLiouvilleFiberG T d X) -
+              finiteQShifted (fun n => (liouvilleLambda n : ℝ)) 2 T X := by
+        have h_sub_pp :
+            (∑ pk ∈ primePowerPairsUpTo T, liouvillePrimePowerTerm T pk X) =
+              Real.log X * finiteQLambda T X -
+                finiteQShifted (fun n => (liouvilleLambda n : ℝ)) 1 T X := by
+          linarith [h_first]
+        rw [h_sub_pp]
+        calc
+          Real.log X *
+              (Real.log X * finiteQLambda T X -
+                finiteQShifted (fun n => (liouvilleLambda n : ℝ)) 1 T X -
+                finiteQShifted (fun n => (liouvilleLambda n : ℝ)) 1 T X)
+            = (Real.log X) ^ 2 * finiteQLambda T X -
+                2 * Real.log X * finiteQShifted (fun n => (liouvilleLambda n : ℝ)) 1 T X := by ring
+          _ = c_lam * finiteQSquare T X +
+                (∑ d ∈ Finset.Icc 1 T,
+                  (selbergLiouvilleWeight2 d - c_lam) * scaledLiouvilleFiberG T d X) -
+                finiteQShifted (fun n => (liouvilleLambda n : ℝ)) 2 T X := by
+              linarith [h_selb_comp]
+      calc
+        (∑ pk ∈ primePowerPairsUpTo T, liouvillePrimePowerTerm T pk X) / Real.log X -
+            finiteQShifted (fun n => (liouvilleLambda n : ℝ)) 1 T X / Real.log X
+          = ((∑ pk ∈ primePowerPairsUpTo T, liouvillePrimePowerTerm T pk X) -
+              finiteQShifted (fun n => (liouvilleLambda n : ℝ)) 1 T X) / Real.log X :=
+            (sub_div _ _ _).symm
+        _ = (Real.log X *
+              ((∑ pk ∈ primePowerPairsUpTo T, liouvillePrimePowerTerm T pk X) -
+                finiteQShifted (fun n => (liouvilleLambda n : ℝ)) 1 T X)) /
+              (Real.log X * Real.log X) :=
+            (mul_div_mul_left _ _ hlog_ne).symm
+        _ = (c_lam * finiteQSquare T X +
+              (∑ d ∈ Finset.Icc 1 T,
+                (selbergLiouvilleWeight2 d - c_lam) * scaledLiouvilleFiberG T d X) -
+              finiteQShifted (fun n => (liouvilleLambda n : ℝ)) 2 T X) / (Real.log X) ^ 2 := by
+            rw [h_num, sq]
+    refine ⟨h_Q_decomp, h_diff_PR, ?_⟩
+    linarith
+
+/-- **Theorem 29 (`TASK-TC-058` §§3–4, Un-Young-Expanded Pointwise Combined Quadratic Identities, Shift-Eliminated Quadratic Form, and `CONDITIONAL_ON_COMBINED_CORRELATION` Same-Scale Absorption Transfer)**:
+    *Formal scope*:
+    1. Exact pointwise un-Young-expanded decomposition (`X > 0`, `Real.log X ≠ 0`, all `T : ℕ`):
+       - `(normalizedPrimePowerTermP T X) ^ 2 = pointwisePrimePowerDiagNorm T X + pointwisePrimePowerOffDiagNorm T X`;
+       - `(finiteQLambda T X) ^ 2 = pointwisePrimePowerDiagNorm T X + pointwiseCombinedResidualS T X`;
+    2. Exact pointwise shift-eliminated quadratic form preserving all cross terms (`X > 0`, `Real.log X ≠ 0`):
+       - `(finiteQLambda T X) ^ 2 = 4 * pointwisePrimePowerDiagNorm T X + 4 * pointwisePrimePowerOffDiagNorm T X - 4 * normalizedPrimePowerTermP T X * compensatedSelbergResidualD2 c_lam T X + (compensatedSelbergResidualD2 c_lam T X) ^ 2`;
+       - `pointwiseCombinedResidualS T X = 3 * pointwisePrimePowerDiagNorm T X + 4 * pointwisePrimePowerOffDiagNorm T X - 4 * normalizedPrimePowerTermP T X * compensatedSelbergResidualD2 c_lam T X + (compensatedSelbergResidualD2 c_lam T X) ^ 2`;
+    3. `CONDITIONAL_ON_COMBINED_CORRELATION` same-scale absorption transfer across the full contraction range
+       `0 ≤ θ_η < 1` without `TC-057R`'s outer Young factor `2` (proving the forward implication from the sufficient
+       condition `S_comb(Y) ≤ A_η Y^η + θ_η F(Y)` + `θ_η + Θ_ε^{diag}(Y) ≤ q < 1` to `E(Y), F(Y) ≤ C_ε Y^ε` on `[1, ∞)`,
+       together with sharpness `1 ≤ θ → 0 ≤ Θ_diag → 1 ≤ θ + Θ_diag`).
+    Does NOT prove the open arithmetic inequality `S_comb(Y) ≤ A_η Y^η + θ_η F(Y)`. -/
+theorem combined_target_exact_quadratic_and_conditional_absorption_tc058
+    {E : ℝ → ℝ} {M_lin : ℝ}
+    (hE_nn : ∀ Z : ℝ, 1 ≤ Z → 0 ≤ E Z)
+    (hM_nn : 0 ≤ M_lin)
+    (hE_lin : ∀ Z : ℝ, 1 ≤ Z → E Z ≤ M_lin * Z) :
+    (∀ (T : ℕ) (c_lam X : ℝ), 0 < X → Real.log X ≠ 0 →
+      (normalizedPrimePowerTermP T X) ^ 2 =
+          pointwisePrimePowerDiagNorm T X + pointwisePrimePowerOffDiagNorm T X ∧
+        (finiteQLambda T X) ^ 2 =
+          pointwisePrimePowerDiagNorm T X + pointwiseCombinedResidualS T X ∧
+        (finiteQLambda T X) ^ 2 =
+          4 * pointwisePrimePowerDiagNorm T X + 4 * pointwisePrimePowerOffDiagNorm T X -
+            4 * normalizedPrimePowerTermP T X * compensatedSelbergResidualD2 c_lam T X +
+            (compensatedSelbergResidualD2 c_lam T X) ^ 2 ∧
+        pointwiseCombinedResidualS T X =
+          3 * pointwisePrimePowerDiagNorm T X + 4 * pointwisePrimePowerOffDiagNorm T X -
+            4 * normalizedPrimePowerTermP T X * compensatedSelbergResidualD2 c_lam T X +
+            (compensatedSelbergResidualD2 c_lam T X) ^ 2) ∧
+    ((∀ (θ Θ_diag : ℝ), 1 ≤ θ → 0 ≤ Θ_diag → 1 ≤ θ + Θ_diag) ∧
+      ∀ (D_tilde S_comb : ℝ → ℝ)
+        (S : ℝ → Finset (ℕ × ℕ)) (w d : ℝ → ℕ × ℕ → ℝ)
+        (η ε A_η θ_η C_cut q Y_star : ℝ),
+        0 < η → η < ε → 0 ≤ A_η → 0 ≤ C_cut →
+        0 ≤ θ_η → θ_η < 1 → θ_η < q → q < 1 → 1 ≤ Y_star →
+        (∀ Y : ℝ, Y_star ≤ Y → E Y ≤ D_tilde Y + S_comb Y) →
+        (∀ Y : ℝ, Y_star ≤ Y →
+          (∀ pk ∈ S Y, 0 ≤ w Y pk ∧ 1 ≤ d Y pk ∧ d Y pk ≤ Y) ∧
+            D_tilde Y ≤
+              (∑ pk ∈ S Y, w Y pk * monotoneScaleEnvelope E (Y / d Y pk)) + C_cut) →
+        (∀ Y : ℝ, Y_star ≤ Y →
+          S_comb Y ≤ A_η * Y ^ η + θ_η * monotoneScaleEnvelope E Y) →
+        (∀ Y : ℝ, Y_star ≤ Y →
+          θ_η + (∑ pk ∈ S Y, w Y pk * (d Y pk) ^ (-ε)) ≤ q) →
+        let K_comb := A_η * Y_star ^ (η - ε) + C_cut * Y_star ^ (-ε)
+        (∀ R : ℝ, Y_star ≤ R →
+          normalizedScaleSupremum E ε R ≤
+            max (normalizedScaleSupremum E ε Y_star)
+              (K_comb + q * normalizedScaleSupremum E ε R) ∧
+          normalizedScaleSupremum E ε R ≤
+            max (normalizedScaleSupremum E ε Y_star) (K_comb / (1 - q))) ∧
+        (∀ Y : ℝ, 1 ≤ Y →
+          E Y ≤ max (normalizedScaleSupremum E ε Y_star) (K_comb / (1 - q)) * Y ^ ε ∧
+            monotoneScaleEnvelope E Y ≤
+              max (normalizedScaleSupremum E ε Y_star) (K_comb / (1 - q)) * Y ^ ε)) := by
+  refine ⟨?_, ⟨?_, ?_⟩⟩
+  · intro T c_lam X hX hlog_ne
+    obtain ⟨h_sq_unnorm, _⟩ :=
+      quadratic_prime_power_diagonal_off_diagonal_decomposition_tc057 T hX
+    obtain ⟨_, _, _, h_shift_elim⟩ :=
+      compensated_selberg_summation_by_parts_and_shift_elimination_tc058 T c_lam
+    obtain ⟨h_Q_PR, _, h_Q_2P_D2⟩ := h_shift_elim X hX hlog_ne
+    have h_pp_num :
+        Real.log X * finiteQLambda T X -
+            finiteQShifted (fun n => (liouvilleLambda n : ℝ)) 1 T X =
+          ∑ pk ∈ primePowerPairsUpTo T, liouvillePrimePowerTerm T pk X := by
+      have h_mul : Real.log X * finiteQLambda T X =
+          Real.log X * normalizedPrimePowerTermP T X +
+            Real.log X * normalizedFirstShiftTermR T X := by
+        rw [h_Q_PR]; ring
+      dsimp [normalizedPrimePowerTermP, normalizedFirstShiftTermR] at h_mul
+      rw [mul_div_cancel₀ _ hlog_ne, mul_div_cancel₀ _ hlog_ne] at h_mul
+      linarith
+    rw [h_pp_num] at h_sq_unnorm
+    have h_P_sq :
+        (normalizedPrimePowerTermP T X) ^ 2 =
+          pointwisePrimePowerDiagNorm T X + pointwisePrimePowerOffDiagNorm T X := by
+      dsimp [normalizedPrimePowerTermP, pointwisePrimePowerDiagNorm, pointwisePrimePowerOffDiagNorm]
+      rw [div_pow, h_sq_unnorm, add_div]
+    have h_Q_sq_comb :
+        (finiteQLambda T X) ^ 2 =
+          pointwisePrimePowerDiagNorm T X + pointwiseCombinedResidualS T X := by
+      dsimp [pointwiseCombinedResidualS]
+      rw [h_Q_PR]
+      calc
+        (normalizedPrimePowerTermP T X + normalizedFirstShiftTermR T X) ^ 2
+          = (normalizedPrimePowerTermP T X) ^ 2 +
+              2 * normalizedPrimePowerTermP T X * normalizedFirstShiftTermR T X +
+              (normalizedFirstShiftTermR T X) ^ 2 := by ring
+        _ = pointwisePrimePowerDiagNorm T X +
+              (pointwisePrimePowerOffDiagNorm T X +
+                2 * normalizedPrimePowerTermP T X * normalizedFirstShiftTermR T X +
+                (normalizedFirstShiftTermR T X) ^ 2) := by
+            rw [h_P_sq]; ring
+    have h_Q_sq_D2 :
+        (finiteQLambda T X) ^ 2 =
+          4 * pointwisePrimePowerDiagNorm T X + 4 * pointwisePrimePowerOffDiagNorm T X -
+            4 * normalizedPrimePowerTermP T X * compensatedSelbergResidualD2 c_lam T X +
+            (compensatedSelbergResidualD2 c_lam T X) ^ 2 := by
+      rw [h_Q_2P_D2]
+      calc
+        (2 * normalizedPrimePowerTermP T X - compensatedSelbergResidualD2 c_lam T X) ^ 2
+          = 4 * (normalizedPrimePowerTermP T X) ^ 2 -
+              4 * normalizedPrimePowerTermP T X * compensatedSelbergResidualD2 c_lam T X +
+              (compensatedSelbergResidualD2 c_lam T X) ^ 2 := by ring
+        _ = 4 * pointwisePrimePowerDiagNorm T X + 4 * pointwisePrimePowerOffDiagNorm T X -
+              4 * normalizedPrimePowerTermP T X * compensatedSelbergResidualD2 c_lam T X +
+              (compensatedSelbergResidualD2 c_lam T X) ^ 2 := by
+            rw [h_P_sq]; ring
+    refine ⟨h_P_sq, h_Q_sq_comb, h_Q_sq_D2, ?_⟩
+    linarith
+  · intro θ Θ_diag hθ hΘ
+    linarith
+  · intro D_tilde S_comb S w d η ε A_η θ_η C_cut q Y_star
+      hη_pos hηε hA_nn hC_nn hθ_nn _ _ hq_lt1 hY_star
+      hE_decomp hD_bound hS_corr h_contract
+    dsimp only
+    let K_comb := A_η * Y_star ^ (η - ε) + C_cut * Y_star ^ (-ε)
+    have hε_pos : 0 < ε := lt_trans hη_pos hηε
+    have hε_nn : 0 ≤ ε := le_of_lt hε_pos
+    have h_horizon :
+        ∀ R : ℝ, Y_star ≤ R →
+          normalizedScaleSupremum E ε R ≤
+            max (normalizedScaleSupremum E ε Y_star)
+              (K_comb + q * normalizedScaleSupremum E ε R) ∧
+          normalizedScaleSupremum E ε R ≤
+            max (normalizedScaleSupremum E ε Y_star) (K_comb / (1 - q)) := by
+      intro R hR_star
+      have hR1 : 1 ≤ R := le_trans hY_star hR_star
+      obtain ⟨h_ne_R, _, hG_nn, _, _, h_env_R⟩ :=
+        normalizedScaleSupremum_props_aux hE_nn hM_nn hE_lin hε_nn hR1
+      obtain ⟨_, _, _, _, h_ub_star, _⟩ :=
+        normalizedScaleSupremum_props_aux hE_nn hM_nn hE_lin hε_nn hY_star
+      let G := normalizedScaleSupremum E ε R
+      have h_self_rec :
+          G ≤ max (normalizedScaleSupremum E ε Y_star) (K_comb + q * G) := by
+        apply csSup_le h_ne_R
+        rintro _ ⟨Y, ⟨hY1, hYR⟩, rfl⟩
+        by_cases hY_le_star : Y ≤ Y_star
+        · exact le_trans (h_ub_star Y ⟨hY1, hY_le_star⟩).1 (le_max_left _ _)
+        · have hY_ge_star : Y_star ≤ Y := le_of_not_ge hY_le_star
+          have hY_pos : 0 < Y := lt_of_lt_of_le zero_lt_one hY1
+          have hY_nn : 0 ≤ Y := le_of_lt hY_pos
+          have hY_eps_pos : 0 < Y ^ ε := Real.rpow_pos_of_pos hY_pos ε
+          have hY_eps_nn : 0 ≤ Y ^ ε := le_of_lt hY_eps_pos
+          obtain ⟨h_pk_cond, hD_Y⟩ := hD_bound Y hY_ge_star
+          have h_sum_le :
+              ∑ pk ∈ S Y, w Y pk * monotoneScaleEnvelope E (Y / d Y pk) ≤
+                (G * Y ^ ε) * ∑ pk ∈ S Y, w Y pk * (d Y pk) ^ (-ε) := by
+            rw [Finset.mul_sum]
+            apply Finset.sum_le_sum
+            intro pk hpk
+            obtain ⟨hw_nn, hd1, hdY⟩ := h_pk_cond pk hpk
+            have hd_pos : 0 < d Y pk := lt_of_lt_of_le zero_lt_one hd1
+            have hd_nn : 0 ≤ d Y pk := le_of_lt hd_pos
+            have hW1 : 1 ≤ Y / d Y pk := (one_le_div hd_pos).mpr hdY
+            have hWY : Y / d Y pk ≤ Y := div_le_self hY_nn hd1
+            have hWR : Y / d Y pk ≤ R := le_trans hWY hYR
+            have hFW : monotoneScaleEnvelope E (Y / d Y pk) ≤ G * (Y / d Y pk) ^ ε :=
+              h_env_R (Y / d Y pk) ⟨hW1, hWR⟩
+            have h_pow_div : (Y / d Y pk) ^ ε = Y ^ ε * (d Y pk) ^ (-ε) := by
+              rw [Real.div_rpow hY_nn hd_nn ε, div_eq_mul_inv, Real.rpow_neg hd_nn]
+            rw [h_pow_div] at hFW
+            have h_mul := mul_le_mul_of_nonneg_left hFW hw_nn
+            linarith
+          have hFY : monotoneScaleEnvelope E Y ≤ G * Y ^ ε := h_env_R Y ⟨hY1, hYR⟩
+          have h_same_le : S_comb Y ≤ A_η * Y ^ η + θ_η * (G * Y ^ ε) := by
+            have h1 := hS_corr Y hY_ge_star
+            have h2 := mul_le_mul_of_nonneg_left hFY hθ_nn
+            linarith
+          have hE_raw :
+              E Y ≤ (A_η * Y ^ η + C_cut) +
+                (θ_η + ∑ pk ∈ S Y, w Y pk * (d Y pk) ^ (-ε)) * (G * Y ^ ε) := by
+            have hE_Y := hE_decomp Y hY_ge_star
+            linarith
+          have hGY_nn : 0 ≤ G * Y ^ ε := mul_nonneg hG_nn hY_eps_nn
+          have h_q_mul :
+              (θ_η + ∑ pk ∈ S Y, w Y pk * (d Y pk) ^ (-ε)) * (G * Y ^ ε) ≤
+                q * (G * Y ^ ε) :=
+            mul_le_mul_of_nonneg_right (h_contract Y hY_ge_star) hGY_nn
+          have hE_q : E Y ≤ (A_η * Y ^ η + C_cut) + (q * G) * Y ^ ε := by
+            linarith
+          have h_eta_div : Y ^ η / Y ^ ε = Y ^ (η - ε) := by
+            rw [← Real.rpow_sub hY_pos]
+          have h_eta_mono : Y ^ (η - ε) ≤ Y_star ^ (η - ε) := by
+            have h_sub_eq : η - ε = -(ε - η) := by ring
+            rw [h_sub_eq]
+            exact rpow_neg_antitone_of_one_le_aux hY_star hY_ge_star (by linarith)
+          have h_cut_div : (1 : ℝ) / Y ^ ε = Y ^ (-ε) := by
+            rw [one_div, Real.rpow_neg hY_nn]
+          have h_cut_mono : Y ^ (-ε) ≤ Y_star ^ (-ε) :=
+            rpow_neg_antitone_of_one_le_aux hY_star hY_ge_star hε_nn
+          have h_div_step : E Y / Y ^ ε ≤ K_comb + q * G := by
+            have h_div_raw :
+                E Y / Y ^ ε ≤
+                  ((A_η * Y ^ η + C_cut) + (q * G) * Y ^ ε) / Y ^ ε :=
+              div_le_div_of_nonneg_right hE_q hY_eps_nn
+            have h_split :
+                ((A_η * Y ^ η + C_cut) + (q * G) * Y ^ ε) / Y ^ ε =
+                  A_η * (Y ^ η / Y ^ ε) + C_cut * ((1 : ℝ) / Y ^ ε) + q * G := by
+              field_simp [ne_of_gt hY_eps_pos]
+            rw [h_split, h_eta_div, h_cut_div] at h_div_raw
+            have hA_step : A_η * Y ^ (η - ε) ≤ A_η * Y_star ^ (η - ε) :=
+              mul_le_mul_of_nonneg_left h_eta_mono hA_nn
+            have hC_step : C_cut * Y ^ (-ε) ≤ C_cut * Y_star ^ (-ε) :=
+              mul_le_mul_of_nonneg_left h_cut_mono hC_nn
+            dsimp [K_comb]
+            linarith
+          exact le_trans h_div_step (le_max_right _ _)
+      have h_abs :
+          G ≤ max (normalizedScaleSupremum E ε Y_star) (K_comb / (1 - q)) := by
+        rcases le_max_iff.mp h_self_rec with h_left | h_right
+        · exact le_trans h_left (le_max_left _ _)
+        · have h1q_pos : 0 < 1 - q := by linarith
+          have h_lin : G * (1 - q) ≤ K_comb := by linarith
+          have h_div : G ≤ K_comb / (1 - q) := (le_div_iff h1q_pos).mpr h_lin
+          exact le_trans h_div (le_max_right _ _)
+      exact ⟨h_self_rec, h_abs⟩
+    refine ⟨h_horizon, ?_⟩
+    intro Y hY1
+    let R := max Y Y_star
+    have hR_star : Y_star ≤ R := le_max_right Y Y_star
+    have hYR : Y ≤ R := le_max_left Y Y_star
+    have hR1 : 1 ≤ R := le_trans hY_star hR_star
+    obtain ⟨_, _, _, _, h_ub_R, h_env_R⟩ :=
+      normalizedScaleSupremum_props_aux hE_nn hM_nn hE_lin hε_nn hR1
+    have hG_bound := (h_horizon R hR_star).2
+    have hY_eps_nn : 0 ≤ Y ^ ε := Real.rpow_nonneg (by linarith) ε
+    have hEY_le : E Y ≤ normalizedScaleSupremum E ε R * Y ^ ε :=
+      (h_ub_R Y ⟨hY1, hYR⟩).2
+    have hFY_le : monotoneScaleEnvelope E Y ≤ normalizedScaleSupremum E ε R * Y ^ ε :=
+      h_env_R Y ⟨hY1, hYR⟩
+    have h_mult := mul_le_mul_of_nonneg_right hG_bound hY_eps_nn
+    exact ⟨le_trans hEY_le h_mult, le_trans hFY_le h_mult⟩
+
+/-- **Theorem 30 (`TASK-TC-058` §5, Growing Logarithmic Order Joint Polynomial Filter, Interchanged `M`-Layer Prime-Power Sum, Liouville Joint Gram Decomposition, and Uniform Main-Bulk Polynomial Bound)**:
+    1. Exact closed-form geometric polynomial filter (`M : ℕ`, `n ≥ 2`, `X > 0`, `Real.log X ≠ 0`):
+       - `∑ m ∈ Finset.range M, (Real.log (X / (n : ℝ))) ^ m / (Real.log X) ^ (m + 1) = jointLayerKernelFilter M n X`;
+       - `jointLayerKernelFilter M n X = (1 - (Real.log (X / (n : ℝ)) / Real.log X) ^ M) / Real.log (n : ℝ)`;
+    2. Exact interchanged `M`-layer prime-power fiber identity and consistency resummation for any completely
+       multiplicative weight `a : ℕ → ℝ` (`a 1 = 1`, `X > 0`, `Real.log X ≠ 0`):
+       - `∑ m ∈ Finset.range M, primePowerLogDescentSum a m T X / (Real.log X) ^ (m + 1) = ∑ pk ∈ primePowerPairsUpTo T, jointPrimePowerFiber a M T pk X`;
+       - `finiteQGeneral a T X = (∑ pk ∈ primePowerPairsUpTo T, jointPrimePowerFiber a M T pk X) + finiteQShifted a M T X / (Real.log X) ^ M`;
+    3. Exact Liouville joint `M`-layer Gram diagonal + off-diagonal expansion (`M T : ℕ`, `X > 0`), cancelling
+       `(-1)^k * (-1)^k = 1` on the diagonal while preserving inherited cutoffs `⌊T / p^k⌋`:
+       `(∑ pk ∈ primePowerPairsUpTo T, jointPrimePowerFiber (fun n => (liouvilleLambda n : ℝ)) M T pk X) ^ 2 = (∑ pk ∈ primePowerPairsUpTo T, ((Real.log (pk.1 : ℝ)) ^ 2 / ((pk.1 ^ pk.2 : ℕ) : ℝ)) * (∑ q ∈ Finset.Icc 1 (T / pk.1 ^ pk.2), (liouvilleLambda q : ℝ) * jointLayerKernelFilter M (pk.1 ^ pk.2 * q) X * gaussianTermPhi q (X / ((pk.1 ^ pk.2 : ℕ) : ℝ))) ^ 2) + ∑ pk1 ∈ primePowerPairsUpTo T, ∑ pk2 ∈ (primePowerPairsUpTo T).erase pk1, jointPrimePowerFiber (fun n => (liouvilleLambda n : ℝ)) M T pk1 X * jointPrimePowerFiber (fun n => (liouvilleLambda n : ℝ)) M T pk2 X`;
+    4. Uniform positive main-bulk bound on `growingLogFilterPoly M s` for ALL `M ≥ 1` and `s ∈ [1/4, 3/2]`:
+       `0 < growingLogFilterPoly M s ∧ growingLogFilterPoly M s ≤ 4`. -/
+theorem growing_order_joint_polynomial_filter_and_gram_decomposition_tc058
+    (M T : ℕ) :
+    (∀ (n : ℕ) (X : ℝ), 2 ≤ n → 0 < X → Real.log X ≠ 0 →
+      (∑ m ∈ Finset.range M, (Real.log (X / (n : ℝ))) ^ m / (Real.log X) ^ (m + 1)) =
+          jointLayerKernelFilter M n X ∧
+        jointLayerKernelFilter M n X =
+          (1 - (Real.log (X / (n : ℝ)) / Real.log X) ^ M) / Real.log (n : ℝ)) ∧
+    (∀ (a : ℕ → ℝ) (X : ℝ),
+      a 1 = 1 → (∀ d q : ℕ, 0 < d → 0 < q → a (d * q) = a d * a q) →
+      0 < X → Real.log X ≠ 0 →
+      (∑ m ∈ Finset.range M, primePowerLogDescentSum a m T X / (Real.log X) ^ (m + 1)) =
+          (∑ pk ∈ primePowerPairsUpTo T, jointPrimePowerFiber a M T pk X) ∧
+        finiteQGeneral a T X =
+          (∑ pk ∈ primePowerPairsUpTo T, jointPrimePowerFiber a M T pk X) +
+            finiteQShifted a M T X / (Real.log X) ^ M) ∧
+    (∀ X : ℝ, 0 < X →
+      (∑ pk ∈ primePowerPairsUpTo T,
+          jointPrimePowerFiber (fun n => (liouvilleLambda n : ℝ)) M T pk X) ^ 2 =
+        (∑ pk ∈ primePowerPairsUpTo T,
+          ((Real.log (pk.1 : ℝ)) ^ 2 / ((pk.1 ^ pk.2 : ℕ) : ℝ)) *
+            (∑ q ∈ Finset.Icc 1 (T / pk.1 ^ pk.2),
+              (liouvilleLambda q : ℝ) * jointLayerKernelFilter M (pk.1 ^ pk.2 * q) X *
+                gaussianTermPhi q (X / ((pk.1 ^ pk.2 : ℕ) : ℝ))) ^ 2) +
+          ∑ pk1 ∈ primePowerPairsUpTo T,
+            ∑ pk2 ∈ (primePowerPairsUpTo T).erase pk1,
+              jointPrimePowerFiber (fun n => (liouvilleLambda n : ℝ)) M T pk1 X *
+                jointPrimePowerFiber (fun n => (liouvilleLambda n : ℝ)) M T pk2 X) ∧
+    (1 ≤ M → ∀ s : ℝ, 1 / 4 ≤ s → s ≤ 3 / 2 →
+      0 < growingLogFilterPoly M s ∧ growingLogFilterPoly M s ≤ 4) := by
+  have h_geom_poly :
+      ∀ (N : ℕ) (s : ℝ), s * growingLogFilterPoly N s = 1 - (1 - s) ^ N := by
+    intro N s
+    dsimp [growingLogFilterPoly]
+    induction' N with k ih
+    · simp
+    · rw [Finset.sum_range_succ, mul_add, ih, pow_succ]
+      ring
+  have h_filter_sum :
+      ∀ (n : ℕ) (X : ℝ), 1 ≤ n → 0 < X → Real.log X ≠ 0 →
+        (∑ m ∈ Finset.range M, (Real.log (X / (n : ℝ))) ^ m / (Real.log X) ^ (m + 1)) =
+          jointLayerKernelFilter M n X := by
+    intro n X hn1 hX hlog_ne
+    have hn_pos : (0 : ℝ) < (n : ℝ) := Nat.cast_pos.mpr hn1
+    have h_ratio :
+        1 - Real.log (n : ℝ) / Real.log X = Real.log (X / (n : ℝ)) / Real.log X := by
+      rw [Real.log_div (ne_of_gt hX) (ne_of_gt hn_pos)]
+      field_simp [hlog_ne]
+    dsimp [jointLayerKernelFilter, growingLogFilterPoly]
+    rw [Finset.mul_sum]
+    apply Finset.sum_congr rfl
+    intro m _
+    rw [h_ratio, div_pow, pow_succ']
+    field_simp [hlog_ne]
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · intro n X hn2 hX hlog_ne
+    have hn1 : 1 ≤ n := by omega
+    have h_sum_eq := h_filter_sum n X hn1 hX hlog_ne
+    refine ⟨h_sum_eq, ?_⟩
+    have hn_gt1 : (1 : ℝ) < (n : ℝ) := by exact_mod_cast (by omega : 1 < n)
+    have hlogn_pos : 0 < Real.log (n : ℝ) := Real.log_pos hn_gt1
+    have hlogn_ne : Real.log (n : ℝ) ≠ 0 := ne_of_gt hlogn_pos
+    have hn_pos : (0 : ℝ) < (n : ℝ) := by linarith
+    let s := Real.log (n : ℝ) / Real.log X
+    have h_s_poly := h_geom_poly M s
+    have h_1ms : 1 - s = Real.log (X / (n : ℝ)) / Real.log X := by
+      dsimp [s]
+      rw [Real.log_div (ne_of_gt hX) (ne_of_gt hn_pos)]
+      field_simp [hlog_ne]
+    rw [h_1ms] at h_s_poly
+    dsimp [jointLayerKernelFilter]
+    have h_lhs_mul :
+        Real.log (n : ℝ) * ((1 / Real.log X) * growingLogFilterPoly M s) =
+          s * growingLogFilterPoly M s := by
+      dsimp [s]
+      ring
+    calc
+      (1 / Real.log X) * growingLogFilterPoly M s
+        = (Real.log (n : ℝ) * ((1 / Real.log X) * growingLogFilterPoly M s)) / Real.log (n : ℝ) :=
+            (mul_div_cancel_left₀ _ hlogn_ne).symm
+      _ = (s * growingLogFilterPoly M s) / Real.log (n : ℝ) := by rw [h_lhs_mul]
+      _ = (1 - (Real.log (X / (n : ℝ)) / Real.log X) ^ M) / Real.log (n : ℝ) := by rw [h_s_poly]
+  · intro a X ha1 ha_mult hX hlog_ne
+    have h_interchange :
+        (∑ m ∈ Finset.range M, primePowerLogDescentSum a m T X / (Real.log X) ^ (m + 1)) =
+          ∑ pk ∈ primePowerPairsUpTo T, jointPrimePowerFiber a M T pk X := by
+      have h_div_in :
+          (∑ m ∈ Finset.range M, primePowerLogDescentSum a m T X / (Real.log X) ^ (m + 1)) =
+            ∑ m ∈ Finset.range M,
+              ∑ pk ∈ primePowerPairsUpTo T,
+                ((a pk.1) ^ pk.2 * Real.log (pk.1 : ℝ) *
+                  (1 / Real.sqrt ((pk.1 ^ pk.2 : ℕ) : ℝ)) *
+                  finiteQShifted a m (T / pk.1 ^ pk.2) (X / ((pk.1 ^ pk.2 : ℕ) : ℝ))) /
+                  (Real.log X) ^ (m + 1) := by
+        apply Finset.sum_congr rfl
+        intro m _
+        dsimp [primePowerLogDescentSum]
+        rw [Finset.sum_div]
+      rw [h_div_in, Finset.sum_comm]
+      apply Finset.sum_congr rfl
+      rintro ⟨p, k⟩ hpk
+      simp only [primePowerPairsUpTo, Finset.mem_filter, Finset.mem_product, primesUpToFinset,
+        Finset.mem_Icc] at hpk
+      have hp_prime : p.Prime := hpk.1.1.2
+      have hpk_pos : 0 < p ^ k := pow_pos hp_prime.pos k
+      dsimp [jointPrimePowerFiber, finiteQShifted]
+      have h_inner :
+          (∑ m ∈ Finset.range M,
+              ((a p) ^ k * Real.log (p : ℝ) * (1 / Real.sqrt ((p ^ k : ℕ) : ℝ)) *
+                ∑ q ∈ Finset.Icc 1 (T / p ^ k),
+                  a q * (Real.log ((X / ((p ^ k : ℕ) : ℝ)) / (q : ℝ))) ^ m *
+                    gaussianTermPhi q (X / ((p ^ k : ℕ) : ℝ))) / (Real.log X) ^ (m + 1)) =
+            (a p) ^ k * Real.log (p : ℝ) * (1 / Real.sqrt ((p ^ k : ℕ) : ℝ)) *
+              ∑ m ∈ Finset.range M,
+                ∑ q ∈ Finset.Icc 1 (T / p ^ k),
+                  a q * ((Real.log (X / ((p ^ k * q : ℕ) : ℝ))) ^ m / (Real.log X) ^ (m + 1)) *
+                    gaussianTermPhi q (X / ((p ^ k : ℕ) : ℝ)) := by
+        rw [Finset.mul_sum]
+        apply Finset.sum_congr rfl
+        intro m _
+        rw [mul_div_assoc, Finset.sum_div]
+        congr 1
+        apply Finset.sum_congr rfl
+        intro q _
+        have h_div_arg : (X / ((p ^ k : ℕ) : ℝ)) / (q : ℝ) = X / ((p ^ k * q : ℕ) : ℝ) := by
+          push_cast
+          rw [div_div]
+        rw [h_div_arg]
+        ring
+      rw [h_inner]
+      congr 1
+      rw [Finset.sum_comm]
+      apply Finset.sum_congr rfl
+      intro q hq
+      rw [Finset.mem_Icc] at hq
+      have h_pkq_ge1 : 1 ≤ p ^ k * q := Nat.mul_pos hpk_pos (by omega)
+      rw [← h_filter_sum (p ^ k * q) X h_pkq_ge1 hX hlog_ne, Finset.mul_sum, Finset.sum_mul]
+    refine ⟨h_interchange, ?_⟩
+    obtain ⟨_, _, _, h_tele⟩ :=
+      logarithmic_prime_power_descent_and_kernel_shift_tc057 ha1 ha_mult 0 M T hX
+    rw [h_tele hlog_ne, h_interchange]
+  · intro X _
+    let f := fun pk => jointPrimePowerFiber (fun n => (liouvilleLambda n : ℝ)) M T pk X
+    change (∑ pk ∈ primePowerPairsUpTo T, f pk) ^ 2 = _
+    rw [sq, Finset.sum_mul_sum]
+    have h_split :
+        (∑ pk1 ∈ primePowerPairsUpTo T, ∑ pk2 ∈ primePowerPairsUpTo T, f pk1 * f pk2) =
+          (∑ pk ∈ primePowerPairsUpTo T, f pk * f pk) +
+            ∑ pk1 ∈ primePowerPairsUpTo T, ∑ pk2 ∈ (primePowerPairsUpTo T).erase pk1, f pk1 * f pk2 := by
+      rw [← Finset.sum_add_distrib]
+      apply Finset.sum_congr rfl
+      intro pk1 hpk1
+      exact (Finset.add_sum_erase (primePowerPairsUpTo T) (fun pk2 => f pk1 * f pk2) hpk1).symm
+    rw [h_split]
+    congr 1
+    apply Finset.sum_congr rfl
+    rintro ⟨p, k⟩ hpk
+    simp only [primePowerPairsUpTo, Finset.mem_filter, Finset.mem_product, primesUpToFinset,
+      Finset.mem_Icc] at hpk
+    have hp_prime : p.Prime := hpk.1.1.2
+    have h_lam_p : (liouvilleLambda p : ℝ) = -1 := by
+      have hop : natOmega p = 1 := ArithmeticFunction.cardFactors_eq_one_iff_prime.mpr hp_prime
+      simp [liouvilleLambda, hp_prime.ne_zero, hop, liouvilleSignFromOmega]
+    have h_sign_sq : ((-1 : ℝ) ^ k) * ((-1 : ℝ) ^ k) = 1 := neg_one_pow_mul_self_real_aux k
+    have hpk_nn : (0 : ℝ) ≤ ((p ^ k : ℕ) : ℝ) := Nat.cast_nonneg _
+    have h_sqrt_sq : (Real.sqrt ((p ^ k : ℕ) : ℝ)) ^ 2 = ((p ^ k : ℕ) : ℝ) := Real.sq_sqrt hpk_nn
+    dsimp [f, jointPrimePowerFiber]
+    rw [h_lam_p]
+    let S_inner :=
+      ∑ q ∈ Finset.Icc 1 (T / p ^ k),
+        (liouvilleLambda q : ℝ) * jointLayerKernelFilter M (p ^ k * q) X *
+          gaussianTermPhi q (X / ((p ^ k : ℕ) : ℝ))
+    change ((-1 : ℝ) ^ k * Real.log (p : ℝ) * (1 / Real.sqrt ((p ^ k : ℕ) : ℝ)) * S_inner) *
+        ((-1 : ℝ) ^ k * Real.log (p : ℝ) * (1 / Real.sqrt ((p ^ k : ℕ) : ℝ)) * S_inner) =
+      ((Real.log (p : ℝ)) ^ 2 / ((p ^ k : ℕ) : ℝ)) * S_inner ^ 2
+    calc
+      ((-1 : ℝ) ^ k * Real.log (p : ℝ) * (1 / Real.sqrt ((p ^ k : ℕ) : ℝ)) * S_inner) *
+          ((-1 : ℝ) ^ k * Real.log (p : ℝ) * (1 / Real.sqrt ((p ^ k : ℕ) : ℝ)) * S_inner)
+        = (((-1 : ℝ) ^ k) * ((-1 : ℝ) ^ k)) *
+            ((Real.log (p : ℝ)) ^ 2 / (Real.sqrt ((p ^ k : ℕ) : ℝ)) ^ 2) * S_inner ^ 2 := by ring
+      _ = ((Real.log (p : ℝ)) ^ 2 / ((p ^ k : ℕ) : ℝ)) * S_inner ^ 2 := by
+            rw [h_sign_sq, one_mul, h_sqrt_sq]
+  · intro hM1 s hs_lo hs_hi
+    have hs_pos : 0 < s := by linarith
+    have h_prod := h_geom_poly M s
+    obtain ⟨k, rfl⟩ : ∃ k : ℕ, M = k + 1 := ⟨M - 1, by omega⟩
+    have h_abs_le : |1 - s| ≤ 3 / 4 := abs_le.mpr ⟨by linarith, by linarith⟩
+    have h_abs_le_one : |1 - s| ≤ 1 := by linarith
+    have h_pow_k_le1 : |1 - s| ^ k ≤ 1 := pow_le_one k (abs_nonneg _) h_abs_le_one
+    have h_abs_pow_le : |(1 - s) ^ (k + 1)| ≤ 3 / 4 := by
+      rw [abs_pow, pow_succ']
+      calc
+        |1 - s| * |1 - s| ^ k ≤ (3 / 4 : ℝ) * 1 :=
+          mul_le_mul h_abs_le h_pow_k_le1 (pow_nonneg (abs_nonneg _) k) (by norm_num)
+        _ = 3 / 4 := by ring
+    have h_pow_upper : (1 - s) ^ (k + 1) ≤ 3 / 4 := le_trans (le_abs_self _) h_abs_pow_le
+    have h_poly_pos : 0 < growingLogFilterPoly (k + 1) s := by
+      by_contra h_not
+      have h_le0 : growingLogFilterPoly (k + 1) s ≤ 0 := not_lt.mp h_not
+      have h_mul_le0 : s * growingLogFilterPoly (k + 1) s ≤ 0 :=
+        mul_nonpos_of_nonneg_of_nonpos (le_of_lt hs_pos) h_le0
+      linarith [h_prod]
+    refine ⟨h_poly_pos, ?_⟩
+    have h_num_le_4s : 1 - (1 - s) ^ (k + 1) ≤ 4 * s := by
+      by_cases hs1 : s ≤ 1
+      · have h_pow_nn : 0 ≤ (1 - s) ^ (k + 1) := pow_nonneg (by linarith) (k + 1)
+        linarith
+      · have h_pow_ge : -(3 / 4 : ℝ) ≤ (1 - s) ^ (k + 1) := (abs_le.mp h_abs_pow_le).1
+        linarith
+    have h_mul_le : s * growingLogFilterPoly (k + 1) s ≤ s * 4 := by linarith [h_prod]
+    exact le_of_mul_le_mul_left h_mul_le hs_pos
 
 end LiouvilleSquareDilation
 

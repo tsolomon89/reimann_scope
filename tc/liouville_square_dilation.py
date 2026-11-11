@@ -2573,6 +2573,10 @@ def verify_liouville_square_dilation_lean_module() -> Dict[str, Any]:
         "quadratic_prime_power_diagonal_off_diagonal_decomposition_tc057",
         "inherited_vs_canonical_cutoff_comparison_and_counterexample_tc057",
         "conditional_signed_correlation_same_scale_absorption_transfer_tc057r",
+        "liouville_square_divisor_indicator_and_compensated_selberg_tc058",
+        "compensated_selberg_summation_by_parts_and_shift_elimination_tc058",
+        "combined_target_exact_quadratic_and_conditional_absorption_tc058",
+        "growing_order_joint_polynomial_filter_and_gram_decomposition_tc058",
     ]
 
     live_lean = _capture_live_lean_check_and_axioms(public_theorems)
@@ -2775,6 +2779,39 @@ def verify_liouville_square_dilation_lean_module() -> Dict[str, Any]:
             "`G_ε(R) ≤ max(G_ε(Y_star), K + q * G_ε(R))` (`K = 2 A_η Y_star^{η - ε} + 2 C_cut Y_star^{-ε}`) yielding `E Y ≤ max(G_ε(Y_star), K / (1 - q)) * Y ^ ε` for all `Y ≥ 1` "
             "(plus `θ = 1/2` boundary sharpness), and proves repaired Proposition 2.4 coefficient-mass localization vs `d_top ≥ Y / 2` concentration negative control; "
             "does NOT prove the open arithmetic signed-correlation inequality.",
+        ),
+        "liouville_square_divisor_indicator_and_compensated_selberg_tc058": (
+            "actual_positive_integer_square_projection_and_compensated_selberg_theorem",
+            "Unconditional positive-integer arithmetic and Gaussian square-projection theorem (`TASK-TC-058` §§1, 4): "
+            "proves `∑_{q ∣ n} λ(q) = 1_{IsSquare n}` (`n > 0`), dyadic parity divisor identity `∑_{q ∣ 2^v m} a_2(q) = 1_{Even v} d_div(m)` (`Odd m`), "
+            "explicit `TC-057R` §1a rough-band witness (`roughSquarefreeDivisorsBand 5 25 = roughPrimeSetBand 5 25` vs `35 ∈ roughSquarefreeDivisorsBand 5 35 \\ roughPrimeSetBand 5 35`), "
+            "finite square projection `∑_{1 ≤ d ≤ T} scaledLiouvilleFiberG T d X = finiteQSquare T X` across all `T : ℕ` (including `T = 0, 1`) and `X ≥ 0`, "
+            "and Mathlib `ArithmeticFunction.vonMangoldt`-backed Selberg identity `Λ_λ = λ · Λ`, `w_{2,λ}(1) = 0`, "
+            "`(log X)^2 Q_T(X) = ∑_{2 ≤ d ≤ T} w_{2,λ}(d) g_d(X) + 2(log X) Q_T^{[1]}(X) - Q_T^{[2]}(X)` with compensated split retaining `(w_{2,λ}(1) - c_lam) g_1 = -c_lam g_1`.",
+        ),
+        "compensated_selberg_summation_by_parts_and_shift_elimination_tc058": (
+            "actual_finite_summation_by_parts_cutoff_jump_and_shift_elimination_theorem",
+            "Unconditional discrete Abel summation and shift-elimination theorem (`TASK-TC-058` §4): "
+            "proves `g_d - g_{d+1} = scaledFiberSmoothStep + scaledFiberCutoffJump`, exact summation by parts on `2 ≤ d ≤ T` before splitting `W_2`, "
+            "post-Abel collapse of the linear `c_lam * d` trend onto `c_lam * finiteQSquare T X` retaining integer `W_2(d) - c_lam * d`, "
+            "jump-count telescope `∑_{1 ≤ d ≤ T - 1} d * (T / d - T / (d + 1)) = (∑_{1 ≤ d ≤ T} T / d) - T`, and exact first-shift elimination "
+            "`P_T - R_T = D_{2,T}` and `Q_T = 2 P_T - D_{2,T}` (`X > 0, log X ≠ 0`; analytic residue evaluation of `c_λ` and `C_sq` integral cap are outside Lean).",
+        ),
+        "combined_target_exact_quadratic_and_conditional_absorption_tc058": (
+            "conditional_on_combined_correlation_exact_quadratic_and_absorption_lemma",
+            "`CONDITIONAL_ON_COMBINED_CORRELATION` sufficient-condition absorption and exact pointwise quadratic decomposition theorem (`TASK-TC-058` §§3, 4): "
+            "proves pointwise `Q_T^2 = d̃_{λ,pp} + s_{comb}` without Young's outer factor `2`, second-order compensated quadratic expansion "
+            "`Q_T^2 = 4 d̃_{λ,pp} + 4 x̃_{λ,pp} - 4 P_T D_{2,T} + D_{2,T}^2`, forward implication from sufficient condition "
+            "`S_{comb}(Y) ≤ A_η Y^η + θ_η F(Y)` (`0 ≤ θ_η < 1`, contraction `θ_η + Θ_ε^{diag} ≤ q < 1`) to `E(Y) ≤ F(Y) ≤ M_ε Y^ε` across all `Y ≥ 1` "
+            "(without asserting equivalence), and `θ = 1` boundary sharpness; does NOT prove the open arithmetic bound on `S_{comb}`.",
+        ),
+        "growing_order_joint_polynomial_filter_and_gram_decomposition_tc058": (
+            "actual_growing_order_joint_polynomial_filter_and_gram_decomposition_theorem",
+            "Unconditional finite joint `M`-layer polynomial-filter and Gram decomposition theorem (`TASK-TC-058` §5): "
+            "defines schedule `growingLogOrderM Y = ⌈2 log Y⌉₊` and proves `M`-step telescope specialization, interchanged joint filter identity "
+            "`∑_{m < M} Σ_{a,pp}^{[m]}(X; T) / (log X)^{m+1} = ∑_{pk ∈ primePowerPairsUpTo T} jointPrimePowerFiber a M T pk X` with inherited `⌊T / p^k⌋` cutoffs, "
+            "pointwise joint Gram diagonal/off-diagonal split, and geometric filter identity `s * P_M(s) = 1 - (1 - s)^M` with uniform bound `0 < P_M(s) ≤ 4` "
+            "on `s ∈ [1/4, 3/2]` (`M ≥ 1`; Robbins-Stirling and compact-`[2, e^9]` window remainder bounds are proved analytically outside Lean).",
         ),
     }
 
