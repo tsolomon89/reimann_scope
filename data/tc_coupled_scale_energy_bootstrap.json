@@ -1,5 +1,6 @@
 {
   "task_id": "TASK-TC-057",
+  "repair_task_id": "TASK-TC-057R",
   "parent_epic": "EPIC-TC-042",
   "prior_tasks": [
     "TASK-TC-054",
@@ -21,12 +22,15 @@
   "tc056r_reviewed_commit": "ea86f3348ba7a22197e43ba92524c816fcc15868",
   "tc056r2_implementation_commit": "add6930233ebe0c8adf50da0e8a0ae6f18561975",
   "tc056r2_reviewed_tip": "8c92e89c62bdb434d29d7143bacf50308aab78a1",
-  "branch": "task/tc-057-coupled-arithmetic-scale-energy-bootstrap",
-  "research_outcome_class": "Outcome C (with new unconditional Route D cross-scale diagonal contraction theorem)",
+  "tc057_implementation_commit": "05e7e0f728a0c758973b40c1605793ed9b40f75b",
+  "tc057_reviewed_tip": "82d0ec52085c06e748982287694fb9272ff017d7",
+  "branch": "task/tc-057r-tail-certification-obstruction-scope-and-transfer-proof-repair",
+  "research_outcome_class": "Outcome B / Scoped Obstruction & Conditional Reduction (unconditional Route D cross-scale diagonal estimate with Theta_eps^{diag}(Y) -> 0, proved conditional same-scale absorption transfer, and precisely scoped majorant/fixed-span obstructions; SUBGATE-TC-043A remains OPEN)",
   "subgate_tc043a_status": "OPEN",
   "rh_proved": false,
   "precision_bits": 256,
   "circle_constant_convention": "tau = 2*pi (sole circle constant)",
+  "complex_coordinate_convention": "z = x + i*y (x, y in R; critical line x = 1/2)",
   "section_1_and_2_baseline_and_envelope": {
     "small_Y_partition_2_to_4": {
       "boundary_2_pow_8_5_eq_4_pow_4_5": true,
@@ -61,6 +65,8 @@
     "stieltjes_vs_higher_prime_power_tail_u1000": {
       "u": 1000,
       "alpha": "3/4",
+      "euler_product_regime_split_note": "alpha = 1/2 + eta splits at eta = 1/2 (alpha = 1): 0 < eta < 1/2, eta = 1/2, 1/2 < eta < 1",
+      "li_normalization_note": "li_2(t) := int_2^t dv/log v satisfies li_2(2) = 0 and E_{PNT,2}(2^-) = N_prime(2^-) - li_2(2) = 0 (where N_prime(t) = #{p <= t : p prime})",
       "prime_sum_u": {
         "mid_float": 4.662479886814143,
         "rad_float_outward": 3.034802556955923e-16,
@@ -83,11 +89,11 @@
         "arb_ball_str": "[-0.3402109879187785666398179765061771762511 +/- 8.92e-42]"
       },
       "higher_prime_power_sum": {
-        "mid_float": 1.234418319596601,
-        "rad_float_outward": 7.882938207261782e-17,
-        "lower_dec": "1.234418319596601055780022033323107235561e+0",
-        "upper_dec": "1.234418319596601055780022033323107235564e+0",
-        "arb_ball_str": "[1.234418319596601055780022033323107235562 +/- 2.12e-40]"
+        "mid_float": 1.234418319707619,
+        "rad_float_outward": 8.12241166426308e-17,
+        "lower_dec": "1.234418319707618979341545396522021684541e+0",
+        "upper_dec": "1.234418319707618979341545396522021684544e+0",
+        "arb_ball_str": "[1.234418319707618979341545396522021684543 +/- 3.43e-40]"
       },
       "higher_prime_power_analytic_cap": {
         "mid_float": 3.9772804584759016,
@@ -97,11 +103,61 @@
         "arb_ball_str": "[3.977280458475901810829108269681158437643 +/- 1.82e-40]"
       },
       "higher_prime_power_margin": {
-        "mid_float": 2.7428621388793006,
-        "rad_float_outward": 1.1756509289491028e-16,
-        "lower_dec": "2.742862138879300755049086236358051202079e+0",
-        "upper_dec": "2.742862138879300755049086236358051202082e+0",
-        "arb_ball_str": "[2.742862138879300755049086236358051202081 +/- 3.94e-40]"
+        "mid_float": 2.7428621387682828,
+        "rad_float_outward": 5.557398668512757e-17,
+        "lower_dec": "2.742862138768282831487562873159136753099e+0",
+        "upper_dec": "2.742862138768282831487562873159136753102e+0",
+        "arb_ball_str": "[2.742862138768282831487562873159136753100 +/- 1.61e-40]"
+      },
+      "finite_partial_sum_2_to_39_only": {
+        "mid_float": 1.234418319596601,
+        "rad_float_outward": 7.882938207261782e-17,
+        "lower_dec": "1.234418319596601055780022033323107235561e+0",
+        "upper_dec": "1.234418319596601055780022033323107235564e+0",
+        "arb_ball_str": "[1.234418319596601055780022033323107235562 +/- 2.12e-40]"
+      },
+      "proved_tail_upper_bound_K40": {
+        "mid_float": 1.1486608968768317e-10,
+        "rad_float_outward": 2.3091887099548926e-27,
+        "lower_dec": "1.148660896876831632147446507975179830414e-10",
+        "upper_dec": "1.148660896876831632147446507975179830417e-10",
+        "arb_ball_str": "[1.148660896876831632147446507975179830416e-10 +/- 4.66e-50]"
+      },
+      "series_plus_proved_tail_enclosure_K40": {
+        "mid_float": 1.2344183196540341,
+        "rad_float_outward": 5.7433090685975075e-11,
+        "lower_dec": "1.234418319596601055596153792369599945366e+0",
+        "upper_dec": "1.234418319711467145651573437491359176556e+0",
+        "arb_ball_str": "[1.234418320 +/- 4.04e-10]"
+      },
+      "exact_omitted_p2_k40_term_fraction": "1/21474836480",
+      "exact_omitted_p2_k40_term": {
+        "mid_float": 4.656612873077393e-11,
+        "rad_float_outward": 2.584939414228212e-27,
+        "lower_dec": "4.656612873077392578124999999999999999998e-11",
+        "upper_dec": "4.656612873077392578125000000000000000002e-11",
+        "arb_ball_str": "[4.656612873077392578125000000000000000000e-11 +/- 3e-55]"
+      },
+      "actual_omitted_tail_above_K39": {
+        "mid_float": 1.1101792356152337e-10,
+        "rad_float_outward": 5.9109544504886646e-27,
+        "lower_dec": "1.110179235615233631989144489804458576622e-10",
+        "upper_dec": "1.110179235615233631989144489804458576625e-10",
+        "arb_ball_str": "[1.110179235615233631989144489804458576623e-10 +/- 3.57e-50]"
+      },
+      "proved_tail_upper_bound_K160": {
+        "mid_float": 2.3196934705735264e-38,
+        "rad_float_outward": 3.830537625517616e-55,
+        "lower_dec": "2.319693470573526374061068446309358090826e-38",
+        "upper_dec": "2.319693470573526374061068446309358090829e-38",
+        "arb_ball_str": "[2.319693470573526374061068446309358090827e-38 +/- 5.66e-79]"
+      },
+      "series_plus_proved_tail_enclosure_K160": {
+        "mid_float": 1.234418319707619,
+        "rad_float_outward": 8.12241166426308e-17,
+        "lower_dec": "1.234418319707618979341545396522021684518e+0",
+        "upper_dec": "1.234418319707618979341545396522021684544e+0",
+        "arb_ball_str": "[1.2344183197076189793415453965220216845 +/- 4.29e-38]"
       },
       "u_product_log_coeff_at_delta_half": {
         "mid_float": 0.1767766952966369,
@@ -207,12 +263,26 @@
         "upper_dec": "1.000000000000000000000000000000000000002e+1",
         "arb_ball_str": "[10.00000000000000000000000000000000000000 +/- 1e-43]"
       },
+      "penalty_localized_kappa2_lower_bound_quarter_at_exp100": {
+        "mid_float": 8.408964152537145,
+        "rad_float_outward": 6.319951059541063e-16,
+        "lower_dec": "8.408964152537145430311254762332148950399e+0",
+        "upper_dec": "8.408964152537145430311254762332148950402e+0",
+        "arb_ball_str": "[8.408964152537145430311254762332148950400 +/- 3.43e-40]"
+      },
       "penalty_supercritical_sigma_three_quarters_at_exp100": {
         "mid_float": 0.1,
         "rad_float_outward": 5.551115123125784e-18,
         "lower_dec": "9.999999999999999999999999999999999999998e-2",
         "upper_dec": "1.000000000000000000000000000000000000002e-1",
         "arb_ball_str": "[0.1000000000000000000000000000000000000000 +/- 1e-45]"
+      },
+      "concentration_negative_control_floor_Y_upper_bound_quarter_at_exp100": {
+        "mid_float": 1.6515641656973603e-09,
+        "rad_float_outward": 2.4505081049582744e-26,
+        "lower_dec": "1.651564165697360253200376196721620442965e-9",
+        "upper_dec": "1.651564165697360253200376196721620442968e-9",
+        "arb_ball_str": "[1.651564165697360253200376196721620442967e-9 +/- 3.86e-49]"
       }
     },
     "all_section_1_and_2_checks_pass": true
@@ -470,6 +540,21 @@
         "U": 5,
         "sigma": "1/2",
         "rough_divisor_count": 23,
+        "rough_prime_count": 19,
+        "prime_subset_lower_bound": {
+          "mid_float": 3.3661348474717445,
+          "rad_float_outward": 1.6808636016857465e-16,
+          "lower_dec": "3.366134847471744685919163635746814663108e+0",
+          "upper_dec": "3.366134847471744685919163635746814663111e+0",
+          "arb_ball_str": "[3.366134847471744685919163635746814663110 +/- 1.24e-40]"
+        },
+        "composite_rough_excess_over_prime_subset": {
+          "mid_float": 0.7786127248793762,
+          "rad_float_outward": 2.5454846926846625e-17,
+          "lower_dec": "7.786127248793761867236982464656112043388e-1",
+          "upper_dec": "7.786127248793761867236982464656112043391e-1",
+          "arb_ball_str": "[0.7786127248793761867236982464656112043390 +/- 2.42e-41]"
+        },
         "optimal_cs_homogeneous_multiplier": {
           "mid_float": 4.144747572351121,
           "rad_float_outward": 2.850339782961008e-17,
@@ -491,6 +576,21 @@
         "U": 5,
         "sigma": "1/2",
         "rough_divisor_count": 130,
+        "rough_prime_count": 81,
+        "prime_subset_lower_bound": {
+          "mid_float": 8.91473344141885,
+          "rad_float_outward": 7.626975444567521e-16,
+          "lower_dec": "8.914733441418849172491883467590399776917e+0",
+          "upper_dec": "8.914733441418849172491883467590399776920e+0",
+          "arb_ball_str": "[8.914733441418849172491883467590399776919 +/- 4.95e-40]"
+        },
+        "composite_rough_excess_over_prime_subset": {
+          "mid_float": 6.78509953756249,
+          "rad_float_outward": 8.3623898749307e-17,
+          "lower_dec": "6.785099537562490206930352510584322031928e+0",
+          "upper_dec": "6.785099537562490206930352510584322031931e+0",
+          "arb_ball_str": "[6.785099537562490206930352510584322031929 +/- 3.21e-40]"
+        },
         "optimal_cs_homogeneous_multiplier": {
           "mid_float": 15.69983297898134,
           "rad_float_outward": 4.185697649406619e-17,
@@ -512,6 +612,21 @@
         "U": 5,
         "sigma": "1/2",
         "rough_divisor_count": 738,
+        "rough_prime_count": 358,
+        "prime_subset_lower_bound": {
+          "mid_float": 19.219138922455056,
+          "rad_float_outward": 6.788297362261533e-16,
+          "lower_dec": "1.921913892245505618587338927752205695604e+1",
+          "upper_dec": "1.921913892245505618587338927752205695607e+1",
+          "arb_ball_str": "[19.21913892245505618587338927752205695606 +/- 3.41e-39]"
+        },
+        "composite_rough_excess_over_prime_subset": {
+          "mid_float": 29.261817907185165,
+          "rad_float_outward": 8.394761202754472e-16,
+          "lower_dec": "2.926181790718516579478433003090504290367e+1",
+          "upper_dec": "2.926181790718516579478433003090504290370e+1",
+          "arb_ball_str": "[29.26181790718516579478433003090504290369 +/- 2.03e-39]"
+        },
         "optimal_cs_homogeneous_multiplier": {
           "mid_float": 48.48095682964022,
           "rad_float_outward": 1.5183058565016005e-15,
@@ -1196,7 +1311,32 @@
         }
       }
     ],
+    "narrowed_span_closure_and_growing_M_note": {
+      "scope_note": "Linear independence of {(log w)^m w^{5/2} e^{-w^2}} rules out exact closure in a fixed finite span; growing M(Y) approx 2*log Y makes M!/[2^M*(log Y)^M] small, while accumulated prime-power layers and uniform bounds remain open.",
+      "u_pow_m_plus_5_2_minus_u_pow_3_plus_m_2_at_m2_u3": {
+        "mid_float": 59.29611541307906,
+        "rad_float_outward": 3.2434369113129027e-15,
+        "lower_dec": "5.929611541307906077572315366197566172235e+1",
+        "upper_dec": "5.929611541307906077572315366197566172238e+1",
+        "arb_ball_str": "[59.29611541307906077572315366197566172237 +/- 2.78e-39]"
+      },
+      "growing_order_ratio_M20_at_logY10": {
+        "mid_float": 2.32019615953125e-08,
+        "rad_float_outward": 9.349860795749428e-25,
+        "lower_dec": "2.320196159531249999999999999999999999998e-8",
+        "upper_dec": "2.320196159531250000000000000000000000002e-8",
+        "arb_ball_str": "[2.320196159531250000000000000000000000000e-8 +/- 3e-52]"
+      },
+      "stirling_reference_sqrt_2tau_logY_Y_neg2_at_logY10": {
+        "mid_float": 2.310549589882978e-08,
+        "rad_float_outward": 7.242773262399829e-25,
+        "lower_dec": "2.310549589882977861102969683608399907776e-8",
+        "upper_dec": "2.310549589882977861102969683608399907779e-8",
+        "arb_ball_str": "[2.310549589882977861102969683608399907778e-8 +/- 3.92e-48]"
+      }
+    },
     "route_c_selberg_second_order": {
+      "dirichlet_series_analytic_domain": "z = x + i*y (x, y in R) with x > 1 for bounded controls |a(n)| <= 1 (finite identities hold for all completely multiplicative a with a(1) = 1)",
       "identity_cases_T77": [
         {
           "mode": "liouville",
@@ -1280,6 +1420,14 @@
           "identity_verified": true
         }
       ],
+      "mangoldt_square_B_decomposition_verified_2_to_200": true,
+      "mangoldt_square_B_max_abs_residual": {
+        "mid_float": 0.0,
+        "rad_float_outward": 5e-324,
+        "lower_dec": "0",
+        "upper_dec": "0",
+        "arb_ball_str": "0"
+      },
       "c_sel_lambda_residue_4_zetap2_over_zeta2_minus_2_gamma": {
         "mid_float": -3.434275302181197,
         "rad_float_outward": 2.6297887380595297e-17,
@@ -1301,7 +1449,209 @@
         "lower_dec": "1.166734692133517270013535395925629978056e+0",
         "upper_dec": "1.166734692133517270013535395925629978059e+0",
         "arb_ball_str": "[1.166734692133517270013535395925629978058 +/- 4.71e-40]"
-      }
+      },
+      "abel_summation_procedure_and_boundary_majorant": [
+        {
+          "Y": "16",
+          "b_floor_Y": 16,
+          "T_Y": 32,
+          "L_b": 2,
+          "Y_over_b": "1",
+          "nonzero_cutoff_jump_steps_below_b": 7,
+          "W2_at_b": {
+            "mid_float": -5.9049581641716475,
+            "rad_float_outward": 3.3721634360033736e-16,
+            "lower_dec": "-5.904958164171647201648474161013115398738e+0",
+            "upper_dec": "-5.904958164171647201648474161013115398735e+0",
+            "arb_ball_str": "[-5.904958164171647201648474161013115398737 +/- 4.96e-40]"
+          },
+          "abel_identity_residual": {
+            "mid_float": 0.0,
+            "rad_float_outward": 5.411168321100879e-75,
+            "lower_dec": "-5.411168321100877545883446612950352921802e-75",
+            "upper_dec": "5.411168321100877545883446612950352921802e-75",
+            "arb_ball_str": "[+/- 5.42e-75]"
+          },
+          "step_jump_decomposition_residual": {
+            "mid_float": -8.636168555094445e-78,
+            "rad_float_outward": 7.973823210939684e-75,
+            "lower_dec": "-7.982459379494777466490825699812831575597e-75",
+            "upper_dec": "7.965187042384588577240052996087230776455e-75",
+            "arb_ball_str": "[+/- 7.99e-75]"
+          },
+          "E_Lb_at_Y_over_b": {
+            "mid_float": 0.04724514872869611,
+            "rad_float_outward": 1.4629862660478365e-18,
+            "lower_dec": "4.724514872869611255861253043457391195730e-2",
+            "upper_dec": "4.724514872869611255861253043457391195733e-2",
+            "arb_ball_str": "[0.04724514872869611255861253043457391195732 +/- 2.94e-42]"
+          },
+          "boundary_term_l2_majorant": {
+            "mid_float": 0.3208746765966142,
+            "rad_float_outward": 1.6141622904494966e-18,
+            "lower_dec": "3.208746765966141739111573837970010964210e-1",
+            "upper_dec": "3.208746765966141739111573837970010964213e-1",
+            "arb_ball_str": "[0.3208746765966141739111573837970010964212 +/- 4.54e-41]"
+          },
+          "normalized_boundary_majorant_sq_over_log4": {
+            "mid_float": 0.001742324639851407,
+            "rad_float_outward": 5.694655760977756e-20,
+            "lower_dec": "1.742324639851407000420536601253591158355e-3",
+            "upper_dec": "1.742324639851407000420536601253591158358e-3",
+            "arb_ball_str": "[0.001742324639851407000420536601253591158357 +/- 6.88e-44]"
+          }
+        },
+        {
+          "Y": "32",
+          "b_floor_Y": 32,
+          "T_Y": 77,
+          "L_b": 2,
+          "Y_over_b": "1",
+          "nonzero_cutoff_jump_steps_below_b": 13,
+          "W2_at_b": {
+            "mid_float": -51.925194810493295,
+            "rad_float_outward": 3.5379339731012232e-15,
+            "lower_dec": "-5.192519481049329145662382713586674407302e+1",
+            "upper_dec": "-5.192519481049329145662382713586674407299e+1",
+            "arb_ball_str": "[-51.92519481049329145662382713586674407301 +/- 2.35e-39]"
+          },
+          "abel_identity_residual": {
+            "mid_float": 3.454467422037778e-77,
+            "rad_float_outward": 2.2752555930083887e-74,
+            "lower_dec": "-2.271801125586350534204984476770251003680e-74",
+            "upper_dec": "2.278710060430426089905293558260491323337e-74",
+            "arb_ball_str": "[+/- 2.28e-74]"
+          },
+          "step_jump_decomposition_residual": {
+            "mid_float": -3.454467422037778e-77,
+            "rad_float_outward": 3.725537396188995e-74,
+            "lower_dec": "-3.728991863611031730651117563813054642650e-74",
+            "upper_dec": "3.722082928766956174950808482322814322993e-74",
+            "arb_ball_str": "[+/- 3.73e-74]"
+          },
+          "E_Lb_at_Y_over_b": {
+            "mid_float": 0.04724514872869611,
+            "rad_float_outward": 1.4629862660478365e-18,
+            "lower_dec": "4.724514872869611255861253043457391195730e-2",
+            "upper_dec": "4.724514872869611255861253043457391195733e-2",
+            "arb_ball_str": "[0.04724514872869611255861253043457391195732 +/- 2.94e-42]"
+          },
+          "boundary_term_l2_majorant": {
+            "mid_float": 1.9951784974812037,
+            "rad_float_outward": 5.905150743407999e-17,
+            "lower_dec": "1.995178497481203742301835574355068435485e+0",
+            "upper_dec": "1.995178497481203742301835574355068435488e+0",
+            "arb_ball_str": "[1.995178497481203742301835574355068435487 +/- 4.00e-40]"
+          },
+          "normalized_boundary_majorant_sq_over_log4": {
+            "mid_float": 0.027591902695879394,
+            "rad_float_outward": 1.5440862334264556e-19,
+            "lower_dec": "2.759190269587939394089084877953015780177e-2",
+            "upper_dec": "2.759190269587939394089084877953015780180e-2",
+            "arb_ball_str": "[0.02759190269587939394089084877953015780178 +/- 2.93e-42]"
+          }
+        },
+        {
+          "Y": "65/2",
+          "b_floor_Y": 32,
+          "T_Y": 78,
+          "L_b": 2,
+          "Y_over_b": "65/64",
+          "nonzero_cutoff_jump_steps_below_b": 13,
+          "W2_at_b": {
+            "mid_float": -51.925194810493295,
+            "rad_float_outward": 3.5379339731012232e-15,
+            "lower_dec": "-5.192519481049329145662382713586674407302e+1",
+            "upper_dec": "-5.192519481049329145662382713586674407299e+1",
+            "arb_ball_str": "[-51.92519481049329145662382713586674407301 +/- 2.35e-39]"
+          },
+          "abel_identity_residual": {
+            "mid_float": 4.3180842775472223e-78,
+            "rad_float_outward": 2.1433410899113663e-74,
+            "lower_dec": "-2.142909281483611196274827038472265741818e-74",
+            "upper_dec": "2.143772898339120640737365673658545781775e-74",
+            "arb_ball_str": "[+/- 2.15e-74]"
+          },
+          "step_jump_decomposition_residual": {
+            "mid_float": -3.454467422037778e-77,
+            "rad_float_outward": 3.480071261476939e-74,
+            "lower_dec": "-3.483525728898976457019209175272528874462e-74",
+            "upper_dec": "3.476616794054900901318900093782288554805e-74",
+            "arb_ball_str": "[+/- 3.49e-74]"
+          },
+          "E_Lb_at_Y_over_b": {
+            "mid_float": 0.04611172991469319,
+            "rad_float_outward": 9.75864199808101e-19,
+            "lower_dec": "4.611172991469319429767051912615770087211e-2",
+            "upper_dec": "4.611172991469319429767051912615770087214e-2",
+            "arb_ball_str": "[0.04611172991469319429767051912615770087213 +/- 1.21e-42]"
+          },
+          "boundary_term_l2_majorant": {
+            "mid_float": 1.9711008858142711,
+            "rad_float_outward": 1.0701369343418542e-16,
+            "lower_dec": "1.971100885814271226769551742238978148351e+0",
+            "upper_dec": "1.971100885814271226769551742238978148354e+0",
+            "arb_ball_str": "[1.971100885814271226769551742238978148353 +/- 4.96e-40]"
+          },
+          "normalized_boundary_majorant_sq_over_log4": {
+            "mid_float": 0.026453418441702917,
+            "rad_float_outward": 2.6875300541533954e-19,
+            "lower_dec": "2.645341844170291640595406356268353246965e-2",
+            "upper_dec": "2.645341844170291640595406356268353246968e-2",
+            "arb_ball_str": "[0.02645341844170291640595406356268353246967 +/- 1.26e-42]"
+          }
+        },
+        {
+          "Y": "64",
+          "b_floor_Y": 64,
+          "T_Y": 182,
+          "L_b": 2,
+          "Y_over_b": "1",
+          "nonzero_cutoff_jump_steps_below_b": 23,
+          "W2_at_b": {
+            "mid_float": -91.47391281147682,
+            "rad_float_outward": 5.3145234678963955e-15,
+            "lower_dec": "-9.147391281147681675667595387447568508701e+1",
+            "upper_dec": "-9.147391281147681675667595387447568508698e+1",
+            "arb_ball_str": "[-91.47391281147681675667595387447568508699 +/- 1.43e-39]"
+          },
+          "abel_identity_residual": {
+            "mid_float": -1.727233711018889e-77,
+            "rad_float_outward": 9.147100882868946e-74,
+            "lower_dec": "-9.148828116579962989000471640118931501486e-74",
+            "upper_dec": "9.145373649157925211150317099373811341658e-74",
+            "arb_ball_str": "[+/- 9.15e-74]"
+          },
+          "step_jump_decomposition_residual": {
+            "mid_float": -1.3817869688151111e-76,
+            "rad_float_outward": 1.6288835592021794e-73,
+            "lower_dec": "-1.630265346170994186103756551827621306435e-73",
+            "upper_dec": "1.627501772233363963823632919231525178572e-73",
+            "arb_ball_str": "[+/- 1.64e-73]"
+          },
+          "E_Lb_at_Y_over_b": {
+            "mid_float": 0.04724514872869611,
+            "rad_float_outward": 1.4629862660478365e-18,
+            "lower_dec": "4.724514872869611255861253043457391195730e-2",
+            "upper_dec": "4.724514872869611255861253043457391195733e-2",
+            "arb_ball_str": "[0.04724514872869611255861253043457391195732 +/- 2.94e-42]"
+          },
+          "boundary_term_l2_majorant": {
+            "mid_float": 2.4853404016052822,
+            "rad_float_outward": 1.6351449618201355e-16,
+            "lower_dec": "2.485340401605282409126257209262101615381e+0",
+            "upper_dec": "2.485340401605282409126257209262101615384e+0",
+            "arb_ball_str": "[2.485340401605282409126257209262101615383 +/- 6.00e-41]"
+          },
+          "normalized_boundary_majorant_sq_over_log4": {
+            "mid_float": 0.020647378244182217,
+            "rad_float_outward": 1.5058587569528678e-18,
+            "lower_dec": "2.064737824418221556049048166824711602255e-2",
+            "upper_dec": "2.064737824418221556049048166824711602258e-2",
+            "arb_ball_str": "[0.02064737824418221556049048166824711602257 +/- 1.19e-42]"
+          }
+        }
+      ]
     },
     "all_section_4_checks_pass": true
   },
@@ -1639,6 +1989,91 @@
         }
       }
     ],
+    "linear_cutoff_replacement_three_quantities": {
+      "scope_note": "Separates (i) actual signed aggregate error L^2 norm squared, (ii) squared Minkowski sum of individual error norms, and (iii) squared unsigned analytic majorant (~ Y/(log Y)^2); actual signed cancellation is left unresolved.",
+      "samples": [
+        {
+          "Y": 32,
+          "U": 5,
+          "T_Y": 77,
+          "actual_signed_aggregate_error_l2_sq": {
+            "mid_float": 0.00975279954236304,
+            "rad_float_outward": 6.098856351606819e-19,
+            "lower_dec": "9.752799542363040002186540366638705065985e-3",
+            "upper_dec": "9.752799542363040002186540366638705065988e-3",
+            "arb_ball_str": "[0.009752799542363040002186540366638705065987 +/- 2.42e-43]"
+          },
+          "minkowski_sum_individual_error_norms_sq": {
+            "mid_float": 0.04230339050147617,
+            "rad_float_outward": 1.0851367522254125e-18,
+            "lower_dec": "4.230339050147616827568042886111912373783e-2",
+            "upper_dec": "4.230339050147616827568042886111912373786e-2",
+            "arb_ball_str": "[0.04230339050147616827568042886111912373784 +/- 4.57e-42]"
+          },
+          "unsigned_analytic_majorant_sq": {
+            "mid_float": 4670.107298989985,
+            "rad_float_outward": 3.507138468878288e-13,
+            "lower_dec": "4.670107298989984532805508319852922874307e+3",
+            "upper_dec": "4.670107298989984532805508319852922874310e+3",
+            "arb_ball_str": "[4670.107298989984532805508319852922874308 +/- 3.02e-37]"
+          },
+          "margin_minkowski_minus_signed_sq": {
+            "mid_float": 0.032550590959113126,
+            "rad_float_outward": 1.7744245645675205e-18,
+            "lower_dec": "3.255059095911312827349388849448041867184e-2",
+            "upper_dec": "3.255059095911312827349388849448041867187e-2",
+            "arb_ball_str": "[0.03255059095911312827349388849448041867186 +/- 2.20e-42]"
+          },
+          "margin_majorant_minus_minkowski_sq": {
+            "mid_float": 4670.064995599483,
+            "rad_float_outward": 9.772762890852288e-14,
+            "lower_dec": "4.670064995599483056637232639424061755183e+3",
+            "upper_dec": "4.670064995599483056637232639424061755186e+3",
+            "arb_ball_str": "[4670.064995599483056637232639424061755185 +/- 4.37e-37]"
+          }
+        },
+        {
+          "Y": 64,
+          "U": 5,
+          "T_Y": 182,
+          "actual_signed_aggregate_error_l2_sq": {
+            "mid_float": 0.03518370686041795,
+            "rad_float_outward": 9.298748078246289e-19,
+            "lower_dec": "3.518370686041794824511970985363644386064e-2",
+            "upper_dec": "3.518370686041794824511970985363644386067e-2",
+            "arb_ball_str": "[0.03518370686041794824511970985363644386066 +/- 4.19e-42]"
+          },
+          "minkowski_sum_individual_error_norms_sq": {
+            "mid_float": 0.11573670877360154,
+            "rad_float_outward": 4.3684383350376964e-18,
+            "lower_dec": "1.157367087736015332680278837902949269683e-1",
+            "upper_dec": "1.157367087736015332680278837902949269686e-1",
+            "arb_ball_str": "[0.1157367087736015332680278837902949269685 +/- 4.16e-41]"
+          },
+          "unsigned_analytic_majorant_sq": {
+            "mid_float": 8242.099152207897,
+            "rad_float_outward": 8.26490851355832e-13,
+            "lower_dec": "8.242099152207895796221872554976687384105e+3",
+            "upper_dec": "8.242099152207895796221872554976687384108e+3",
+            "arb_ball_str": "[8242.099152207895796221872554976687384107 +/- 3.26e-37]"
+          },
+          "margin_minkowski_minus_signed_sq": {
+            "mid_float": 0.08055300191318358,
+            "rad_float_outward": 1.640580761044904e-18,
+            "lower_dec": "8.055300191318358502290817393665848310779e-2",
+            "upper_dec": "8.055300191318358502290817393665848310782e-2",
+            "arb_ball_str": "[0.08055300191318358502290817393665848310780 +/- 2.69e-42]"
+          },
+          "margin_majorant_minus_minkowski_sq": {
+            "mid_float": 8241.983415499122,
+            "rad_float_outward": 7.47495765151886e-15,
+            "lower_dec": "8.241983415499122194688604527092897089178e+3",
+            "upper_dec": "8.241983415499122194688604527092897089181e+3",
+            "arb_ball_str": "[8241.983415499122194688604527092897089180 +/- 2.95e-37]"
+          }
+        }
+      ]
+    },
     "small_scale_positivity": {
       "c_small_sharp_1_plus_exp_neg1_minus_zeta3": {
         "mid_float": 0.16582253801184804,
@@ -1800,6 +2235,20 @@
           "upper_dec": "-1.409402748173208332387971123667974082379e-2",
           "arb_ball_str": "[-0.01409402748173208332387971123667974082381 +/- 4.50e-43]"
         },
+        "outer_factor_2_transfer_rhs": {
+          "mid_float": 0.029333483650976867,
+          "rad_float_outward": 4.159134338597864e-19,
+          "lower_dec": "2.933348365097686705163128845204429290195e-2",
+          "upper_dec": "2.933348365097686705163128845204429290198e-2",
+          "arb_ball_str": "[0.02933348365097686705163128845204429290197 +/- 2.02e-42]"
+        },
+        "margin_outer_factor_2_rhs_minus_E": {
+          "mid_float": 0.013052839414798291,
+          "rad_float_outward": 1.7242529804166102e-19,
+          "lower_dec": "1.305283941479829113684674002156624528911e-2",
+          "upper_dec": "1.305283941479829113684674002156624528914e-2",
+          "arb_ball_str": "[0.01305283941479829113684674002156624528913 +/- 4.06e-42]"
+        },
         "analytic_diagonal_bound_rhs": {
           "mid_float": 22312.721070975615,
           "rad_float_outward": 3.2070636981387637e-13,
@@ -1866,6 +2315,20 @@
           "lower_dec": "4.202396242719762288344644288159839137546e-2",
           "upper_dec": "4.202396242719762288344644288159839137549e-2",
           "arb_ball_str": "[0.04202396242719762288344644288159839137548 +/- 9.53e-43]"
+        },
+        "outer_factor_2_transfer_rhs": {
+          "mid_float": 0.14402298037638978,
+          "rad_float_outward": 1.2212703085957446e-18,
+          "lower_dec": "1.440229803763897741264193837572704766969e-1",
+          "upper_dec": "1.440229803763897741264193837572704766972e-1",
+          "arb_ball_str": "[0.1440229803763897741264193837572704766971 +/- 1.89e-41]"
+        },
+        "margin_outer_factor_2_rhs_minus_E": {
+          "mid_float": 0.07098269620416409,
+          "rad_float_outward": 1.1881524558487507e-18,
+          "lower_dec": "7.098269620416408750584190854743757051827e-2",
+          "upper_dec": "7.098269620416408750584190854743757051830e-2",
+          "arb_ball_str": "[0.07098269620416408750584190854743757051829 +/- 4.74e-42]"
         },
         "analytic_diagonal_bound_rhs": {
           "mid_float": 22312.725663830635,
@@ -1934,6 +2397,20 @@
           "upper_dec": "-2.256435196760195370674768860859195181751e-3",
           "arb_ball_str": "[-0.002256435196760195370674768860859195181752 +/- 1.59e-43]"
         },
+        "outer_factor_2_transfer_rhs": {
+          "mid_float": 0.06164560638323913,
+          "rad_float_outward": 1.3785667271493887e-18,
+          "lower_dec": "6.164560638323912793634931055372098702137e-2",
+          "upper_dec": "6.164560638323912793634931055372098702140e-2",
+          "arb_ball_str": "[0.06164560638323912793634931055372098702138 +/- 3.47e-42]"
+        },
+        "margin_outer_factor_2_rhs_minus_E": {
+          "mid_float": 0.03028266402964647,
+          "rad_float_outward": 1.516670829066454e-18,
+          "lower_dec": "3.028266402964647162742787958653229296733e-2",
+          "upper_dec": "3.028266402964647162742787958653229296736e-2",
+          "arb_ball_str": "[0.03028266402964647162742787958653229296734 +/- 6.57e-43]"
+        },
         "analytic_diagonal_bound_rhs": {
           "mid_float": 22312.724119956507,
           "rad_float_outward": 6.891965517636059e-13,
@@ -2000,6 +2477,20 @@
           "lower_dec": "2.785395751697664190739465444751444121842e-2",
           "upper_dec": "2.785395751697664190739465444751444121845e-2",
           "arb_ball_str": "[0.02785395751697664190739465444751444121844 +/- 2.10e-42]"
+        },
+        "outer_factor_2_transfer_rhs": {
+          "mid_float": 0.1246596244301716,
+          "rad_float_outward": 5.690154638029055e-18,
+          "lower_dec": "1.246596244301716090166328293494014127290e-1",
+          "upper_dec": "1.246596244301716090166328293494014127293e-1",
+          "arb_ball_str": "[0.1246596244301716090166328293494014127291 +/- 3.89e-41]"
+        },
+        "margin_outer_factor_2_rhs_minus_E": {
+          "mid_float": 0.06250850953154014,
+          "rad_float_outward": 4.096963775254793e-18,
+          "lower_dec": "6.250850953154013102095808838412016249616e-2",
+          "upper_dec": "6.250850953154013102095808838412016249619e-2",
+          "arb_ball_str": "[0.06250850953154013102095808838412016249617 +/- 3.66e-42]"
         },
         "analytic_diagonal_bound_rhs": {
           "mid_float": 22312.719245910434,
@@ -2068,6 +2559,20 @@
           "upper_dec": "-1.378162760697259204094104165630151369915e-2",
           "arb_ball_str": "[-0.01378162760697259204094104165630151369916 +/- 2.55e-42]"
         },
+        "outer_factor_2_transfer_rhs": {
+          "mid_float": 0.0466950547220376,
+          "rad_float_outward": 1.284625758435269e-18,
+          "lower_dec": "4.669505472203760176087781474949119909384e-2",
+          "upper_dec": "4.669505472203760176087781474949119909387e-2",
+          "arb_ball_str": "[0.04669505472203760176087781474949119909386 +/- 4.02e-42]"
+        },
+        "margin_outer_factor_2_rhs_minus_E": {
+          "mid_float": 0.023062462880054754,
+          "rad_float_outward": 1.2484738735378756e-18,
+          "lower_dec": "2.306246288005475486518369080334866688163e-2",
+          "upper_dec": "2.306246288005475486518369080334866688166e-2",
+          "arb_ball_str": "[0.02306246288005475486518369080334866688165 +/- 4.47e-42]"
+        },
         "analytic_diagonal_bound_rhs": {
           "mid_float": 22312.721428691297,
           "rad_float_outward": 8.638468643934659e-13,
@@ -2091,6 +2596,7 @@
         }
       }
     ],
+    "finite_observation_scope_note": "Liouville X_tilde sign changes across Y in {8, 16, 32, 64, 128} and parity-control a_2 values at Y in {32, 128} are certified finite observations at those sampled scales, not asymptotic zero-mean, O(1), or growth theorems.",
     "pair_by_pair_off_diagonal_check_Y8": {
       "pair_sum_X_tilde_Y8": {
         "mid_float": -0.014094027481732083,
@@ -2429,6 +2935,44 @@
         }
       }
     ],
+    "conditional_same_scale_absorption_parameters": {
+      "scope_label": "CONDITIONAL_ON_SIGNED_CORRELATION",
+      "open_hypothesis": "For every eta > 0 there exist A_eta >= 0, theta_eta in [0, 1/2), and Y_eta >= 2 such that X_tilde_{lambda,pp}(Y) + E_{sh,1}(Y) <= A_eta * Y^eta + theta_eta * F(Y) for all Y >= Y_eta.",
+      "sample_epsilon": "1/4",
+      "sample_eta": "1/8",
+      "sample_theta_eta": "3/8",
+      "sample_q": "7/8",
+      "sample_log_Y_star": 64,
+      "Theta_quarter_cap_at_exp64": {
+        "mid_float": 0.06249505212176716,
+        "rad_float_outward": 9.683400649184664e-19,
+        "lower_dec": "6.249505212176716021121515175835141092674e-2",
+        "upper_dec": "6.249505212176716021121515175835141092677e-2",
+        "arb_ball_str": "[0.06249505212176716021121515175835141092676 +/- 2.75e-42]"
+      },
+      "two_theta_plus_two_Theta_cap_at_exp64": {
+        "mid_float": 0.8749901042435343,
+        "rad_float_outward": 2.5818895485791985e-17,
+        "lower_dec": "8.749901042435343204224303035167028218534e-1",
+        "upper_dec": "8.749901042435343204224303035167028218537e-1",
+        "arb_ball_str": "[0.8749901042435343204224303035167028218535 +/- 1.46e-41]"
+      },
+      "contraction_slack_q_minus_homog_cap": {
+        "mid_float": 9.895756465679577e-06,
+        "rad_float_outward": 3.628124136016199e-22,
+        "lower_dec": "9.895756465679577569696483297178146485480e-6",
+        "upper_dec": "9.895756465679577569696483297178146485483e-6",
+        "arb_ball_str": "[9.895756465679577569696483297178146485481e-6 +/- 2.15e-46]"
+      },
+      "boundary_theta_half_homog_factor_exceeds_one": {
+        "mid_float": 1.1249901042435344,
+        "rad_float_outward": 8.520340697672369e-17,
+        "lower_dec": "1.124990104243534320422430303516702821852e+0",
+        "upper_dec": "1.124990104243534320422430303516702821855e+0",
+        "arb_ball_str": "[1.124990104243534320422430303516702821854 +/- 4.86e-40]"
+      },
+      "absorption_verified": true
+    },
     "all_section_6_checks_pass": true
   },
   "evidence_classification": {
@@ -2437,40 +2981,43 @@
       "general_moebius_rough_prime_filtration_descent_tc057 (Theorem 22): exact general Moebius-rough descent across all U >= 2, uniform Liouville sign mu(d)*lambda(d) = +1 on roughSquarefreeDivisorsBand U T, super-sqrt(T) reduction to primes when T < U^2, and explicit a_2 sign contrast on {3, 15}.",
       "logarithmic_prime_power_descent_and_kernel_shift_tc057 (Theorem 23): exact finite logarithmic prime-power descent at every shift order m >= 0 (including T = 0, 1), Liouville (-1)^k specialization, shift recurrence (log X) Q_T^{[m]} = Sigma_pp^{[m]} + Q_T^{[m+1]}, and M-step telescope.",
       "quadratic_prime_power_diagonal_off_diagonal_decomposition_tc057 (Theorem 24): exact pointwise square decomposition into ((log p)^2 / p^k) Q_{floor(T/p^k)}(X/p^k)^2 diagonal plus pk_1 != pk_2 off-diagonal correlation, and Young domination bound.",
-      "inherited_vs_canonical_cutoff_comparison_and_counterexample_tc057 (Theorem 25): exact d >= 16 cutoff ordering T(W) <= floor(T(W*d)/d), all-d >= 2 lower bound (1/2) W^{5/4} d^{1/4} <= floor(T(W*d)/d), explicit (Y = 9/4, d = 2) counterexample L_2 = 1 < 2 = T(9/8) with Q_{lambda,1}(9/8) - Q_{lambda,2}(9/8) > 0, and unconditional small-scale positivity finiteQLambda L w >= (1/24) w^{5/2} > 0 for all L >= 1, w in (0, 1]."
+      "inherited_vs_canonical_cutoff_comparison_and_counterexample_tc057 (Theorem 25): exact d >= 16 cutoff ordering T(W) <= floor(T(W*d)/d), all-d >= 2 lower bound (1/2) W^{5/4} d^{1/4} <= floor(T(W*d)/d), explicit (Y = 9/4, d = 2) counterexample L_2 = 1 < 2 = T(9/8) with Q_{lambda,1}(9/8) - Q_{lambda,2}(9/8) > 0, and unconditional small-scale positivity finiteQLambda L w >= (1/24) w^{5/2} > 0 for all L >= 1, w in (0, 1].",
+      "conditional_signed_correlation_same_scale_absorption_transfer_tc057r (Theorem 26; CONDITIONAL_ON_SIGNED_CORRELATION): local finiteness and envelope domination of normalizedScaleSupremum E eps R = sup_{1<=Z<=R} E(Z)/Z^eps without continuity or supremum attainment, complete finite-horizon same-scale absorption proof from E(Y) <= 2 D_tilde(Y) + 2 X_tilde(Y) + 2 E_sh1(Y) and X_tilde(Y) + E_sh1(Y) <= A_eta Y^eta + theta_eta F(Y) (theta_eta in [0, 1/2)) to E(Y) <<_eps Y^eps, boundary sharpness at theta = 1/2, and repaired Proposition 2.4 coefficient-mass localization vs. d_top >= Y/2 concentration negative control."
     ],
     "2_analytic_theorems_proved_outside_lean": [
-      "Stieltjes remainder O_eta(1 + u^{1-alpha} exp(-c' sqrt(log u))) for sum_{p<=u} p^{-alpha} (alpha in (1/2, 1)) distinct from O_eta(1) higher prime-power tail, U-product slack 2*sqrt(c) = delta/(2*sqrt(2)) < delta/2, and exact 4-interval small-Y partition on [2, 4).",
-      "Unconditional local boundedness 0 <= E_L(Z) <= (tau - 1) M_1^2 Z and smaller-scale argument monotonicity Z / (log Z log log Z)^2 strictly increasing for Z >= e^4; exact (log Y)^b coefficient-mass exponent penalty requiring sigma > b / a.",
-      "Sharp small-scale positivity Q_{lambda,L}(w) >= (1 + e^{-1} - zeta(3)) w^{5/2} > (4/25) w^{5/2} > (1/24) w^{5/2} on (0, 1] forcing Theta(Y / (log Y)^2) energy on the W = Y/p < 1 band p in [ceil(tau Y), T(Y)] for Y > tau^4.",
-      "All-d >= 2 scalar cutoff energy comparison E_{L_d}(W) <= 2 E(W) + ((tau^5 - 1)/10) max(16/d, 1) (W = Y/d >= 1), contrasting Theta(Y / (log Y)^2) linear prime-sum cutoff replacement error against O(1) quadratic diagonal cutoff replacement error.",
-      "Kernel-shift non-closure and factorial uniform bound |Q_T^{[m]}(X)| <= M_1^{[m]} sqrt(X) (all X >= 1) with lim_{X->infty} X^{-1/2} sum_{n<=T(X)} |log(X/n)|^m phi_n(X) >= m! / (2^{m+1} e) (and lim_{X->infty} X^{-1/2} Q_{1,T(X)}^{[2r]}(X) >= (2r)! / (2^{2r+1} e) for all even m = 2r).",
-      "Second-order Liouville-Selberg double-pole cancellation Res_{s=1}(D_lambda''/D_lambda) = 4*zeta'(2)/zeta(2) - 2*gamma_E < 0 yielding sum_{d<=u} w_{2,lambda}(d) = O(u) (using lambda(p) = -1 at all primes), vs +2 u log u for parity controls a_S.",
-      "Unconditional norm/Cauchy-Schwarz lower-bound obstructions across Routes A, B, and C proved via the certified all-L base-scale energy floor inf_{W in [1,2], L>=1} E_L(W) >= m_{all-L} > 0: optimal CS multipliers diverge as Y^{(5/4)(1-sigma)}/(log Y)^2 (Route A) and Y^{1-sigma}/(log Y)^2 (Route B), and Route C norm passage after Abel summation yields >= c Y/(log Y)^4.",
-      "Unconditional Route D cross-scale prime-power diagonal inequality D_tilde_{lambda,pp}(Y) <= D_{lambda,pp}(Y) <= (2/(log Y)^2) sum_{p^k<=Y} ((log p)^2/p^k) F(Y/p^k) + C_{cut,diag} (all Y >= 2) with all-epsilon contraction factor Theta_eps^{diag}(Y) < 2*zeta''(1+eps)/(log Y)^2 -> 0."
+      "Stieltjes remainder O_eta(1 + u^{1-alpha} exp(-c' sqrt(log u))) for sum_{p<=u} p^{-alpha} (alpha = 1/2 + eta in (1/2, 1), regimes splitting at eta = 1/2, using li_2(t) = int_2^t dv/log v with li_2(2) = 0) distinct from the complete k >= 2 higher prime-power sum 2 sum_{p<=u} [-log(1 - p^{-alpha}) - p^{-alpha}], U-product slack 2*sqrt(c) = delta/(2*sqrt(2)) < delta/2, and exact 4-interval small-Y partition on [2, 4).",
+      "Unconditional local boundedness 0 <= E_L(Z) <= (tau - 1) M_1^2 Z and smaller-scale argument monotonicity Z / (log Z log log Z)^2 strictly increasing for Z >= e^4; repaired Proposition 2.4 showing total mass B_0 (log Y)^b on d >= U(Y) = c (log Y)^a is an upper bound on Theta_sigma(Y), requiring quantitative localization on [U(Y), kappa U(Y)] for the lower barrier sigma < b / a (while equality sigma = b / a can contract if the constant < 1, and mass concentrated at floor(Y) gives (log Y)^b floor(Y)^{-sigma} -> 0).",
+      "Sharp small-scale positivity Q_{lambda,L}(w) >= (1 + e^{-1} - zeta(3)) w^{5/2} > (4/25) w^{5/2} > (1/24) w^{5/2} on (0, 1] forcing Theta(Y / (log Y)^2) individual-norm squared energy on the W = Y/p < 1 band p in [ceil(tau Y), T(Y)] for Y > tau^4.",
+      "All-d >= 2 scalar cutoff energy comparison E_{L_d}(W) <= 2 E(W) + ((tau^5 - 1)/10) max(16/d, 1) (W = Y/d >= 1), proving O(1) quadratic diagonal cutoff replacement cost while bounding the unsigned analytic majorant of linear prime-sum cutoff replacement at asymp Y / (log Y)^2 (leaving actual signed cancellation in the linear aggregate error unresolved).",
+      "Linear independence of {(log w)^m w^{5/2} e^{-w^2}}_{m>=0} ruling out exact algebraic closure in any fixed finite linear span, together with uniform bound |Q_T^{[m]}(X)| <= M_1^{[m]} sqrt(X) (via u^{3+m/2} <= u^{m+5/2} on u >= 1, m >= 1) and asymptotic factorial lower bound >= m! / (2^{m+1} e) at fixed m (not ruling out finite vector-energy inequalities, other kernels, or Y-dependent M(Y) approx 2 log Y).",
+      "Complete PNT and Dirichlet-hyperbola derivation of sum_{d<=x} w_{2,lambda}(d) = [4*zeta'(2)/zeta(2) - 2*gamma_E] x + O(x exp(-c'' sqrt(log x))) via Lambda_lambda = -Lambda + 2 B (with Dirichlet-series convergence on z = x + i y, x > 1, restricted to bounded controls |a(n)| <= 1), contrasted against +2 x log x + O(x) for parity controls a_S.",
+      "Precisely scoped majorant obstructions proved via the certified all-L base-scale energy floor inf_{W in [1,2], L>=1} E_L(W) >= m_{all-L} > 0: Route A prime-subset lower bound M_{A,sigma}(Y) >= (sum_{U<=p<=T(Y)} p^{-(1+sigma)/2})^2 >>_sigma T(Y)^{1-sigma}/(log T(Y))^2 -> infty obstructing the homogeneous Cauchy-Schwarz majorant; Route B Cauchy-Schwarz multiplier divergence >>_sigma Y^{1-sigma}/(log Y)^2; and Route C obstruction of the specified discrete Abel triangle-inequality majorant via its b = floor(Y) boundary term |W_2(b)| b^{-1/2} sqrt(E_{L_b}(Y/b)) >> sqrt(Y) (normalized square >> Y/(log Y)^4), without lower-bounding the signed sums or ruling out compensated formulations.",
+      "Unconditional Route D cross-scale prime-power diagonal inequality D_tilde_{lambda,pp}(Y) <= D_{lambda,pp}(Y) <= (2/(log Y)^2) sum_{p^k<=Y} ((log p)^2/p^k) F(Y/p^k) + C_{cut,diag} (all Y >= 2) whose homogeneous contraction factor satisfies Theta_eps^{diag}(Y) < 2*zeta''(1+eps)/(log Y)^2 -> 0 (not claiming D_tilde_{lambda,pp}(Y) itself tends to 0)."
     ],
     "3_conditional_implications_open_hypothesis": [
       "Polylogarithmic bootstrap implication (Theorem 21, CONDITIONAL_ON_RECURSION): IF F(Y) <= A_eta Y^eta + B_eta F(Y/U_eta(Y)) holds for all Y >= Y_eta with U_eta(Y) = c_eta (log Y log log Y)^2, THEN E(Y) <= F(Y) <<_eps Y^eps for every eps > 0.",
-      "Route D off-diagonal + shifted-kernel transfer: IF for every eta > 0, X_tilde_{lambda,pp}(Y) + 2 E_shifted_1(Y) <= A_eta Y^eta + theta F(Y) (with theta < 1/2), THEN combined with Route D's unconditional diagonal contraction Theta_eps^{diag}(Y) -> 0, E(Y) <<_eps Y^eps follows unconditionally."
+      "Route D same-scale absorption transfer (Theorem 26, CONDITIONAL_ON_SIGNED_CORRELATION): IF for every eta > 0 there exist A_eta >= 0, theta_eta in [0, 1/2), and Y_eta >= 2 such that X_tilde_{lambda,pp}(Y) + E_{sh,1}(Y) <= A_eta Y^eta + theta_eta F(Y) for all Y >= Y_eta, THEN combined with E(Y) <= 2 D_tilde_{lambda,pp}(Y) + 2 X_tilde_{lambda,pp}(Y) + 2 E_{sh,1}(Y) and Theta_eps^{diag}(Y) -> 0, finite-horizon absorption on G_eps(R) = sup_{1<=Z<=R} E(Z)/Z^eps proves E(Y) <<_eps Y^eps uniformly for all Y >= 1."
     ],
     "4_certified_finite_computations": [
-      "Discontinuous jump E_3(2^{4/5}) != E_2(2^{4/5}); counterexample (Y = 9/4, d = 2) Q_{lambda,1}(9/8) - Q_{lambda,2}(9/8) > 0 and E_1(9/8) != E_2(9/8); c_small = 1 + e^{-1} - zeta(3) = 0.165822538011... > 4/25 > 1/24; all-L base-scale energy floor m_{all-L} = I_1 = 0.000804166369... > 8e-4 > 0; Selberg residue c_{Sel,lambda} = -3.434275302181... < -3.43 < 0; C_{cut,diag} = 22312.6918412014...; Theta_eps^{diag}(128) and threshold caps for eps in {1/2, 1/4, 1/8}; sign-oscillating X_tilde_{lambda,pp}(Y) (< 0 at Y in {8,32,128}, > 0 at Y in {16,64}) vs coherently positive linear growth X_tilde_{a_2,pp}(32) = +0.52015... -> X_tilde_{a_2,pp}(128) = +3.93411...."
+      "Complete k >= 2 higher prime-power enclosure 2 sum_{p<=1000} [-log(1 - p^{-3/4}) - p^{-3/4}] = [1.234418319707618979341545396522021684543 +/- 3.43e-40] cross-checked against K = 40 and K = 160 series-plus-proved-tail enclosures, strictly exceeding the invalid uncertified k=2..39 partial sum by more than the exact first omitted term 1/(20 * 2^30) > 4.65e-11.",
+      "Discontinuous jump E_3(2^{4/5}) != E_2(2^{4/5}); counterexample (Y = 9/4, d = 2) Q_{lambda,1}(9/8) - Q_{lambda,2}(9/8) > 0 and E_1(9/8) != E_2(9/8); c_small = 1 + e^{-1} - zeta(3) = 0.165822538011... > 4/25 > 1/24; all-L base-scale energy floor m_{all-L} = I_1 = 0.000804166369... > 8e-4 > 0; Selberg residue c_{Sel,lambda} = -3.434275302181... < -3.43 < 0; C_{cut,diag} = 22312.6918412014...; Theta_eps^{diag}(128) and threshold caps for eps in {1/2, 1/4, 1/8}.",
+      "Certified finite observations at sampled scales: Liouville X_tilde_{lambda,pp}(Y) changes sign across the five sampled scales Y in {8, 16, 32, 64, 128} (< 0 at Y in {8, 32, 128}, > 0 at Y in {16, 64}), whereas at sampled Y in {32, 128} the 2-adic parity control has X_tilde_{a_2,pp}(32) = +0.52015... and X_tilde_{a_2,pp}(128) = +3.93411... (reported strictly as finite sampled data, not asymptotic zero-mean, O(1), or growth claims)."
     ],
     "5_consistency_checks": [
-      "Exact integer-power small-Y cutoff checks on [2, 4) vs Arb bounds; direct pair-by-pair off-diagonal quadrature sum_{pk_1 != pk_2} vs subtraction E_Sigma_pp - D_tilde at Y = 8 (T = 14); Route A / Route B / Route C finite identity zero-enclosures across T = 0, 1, 6, 14, 15, 30, 77, 431 and M = 4 shift telescope."
+      "Complete log-series prime-power sum vs K = 40 and K = 160 series + 2 r^K / [K(1 - r)] tail bounds; w_{2,lambda}(n) direct convolution vs (-Lambda + 2B) decomposition on 2 <= n <= 200; exact discrete Abel summation identity with floor(T/d) cutoff jumps on 2 <= d <= floor(Y); direct pair-by-pair off-diagonal quadrature vs subtraction E_Sigma_pp - D_tilde at Y = 8 (T = 14); Route A / Route B / Route C finite identity zero-enclosures across T = 0, 1, 6, 14, 15, 30, 77, 431 and M = 4 shift telescope."
     ],
     "6_conjectures_and_falsified_candidates": [
-      "Open target conjecture (SUBGATE-TC-043A): unconditional subpower bound E(Y) <<_eps Y^eps (or equivalently Route D signed correlation control X_tilde_{lambda,pp}(Y) + 2 E_shifted_1(Y) <= A_eta Y^eta + theta F(Y) with theta < 1/2).",
-      "Candidate I (Route A + optimal CS): falsified analytically and numerically (M_{A,1/2}(Y) grows monotonically above 1).",
-      "Candidate II (Route B + CS / W<1 tail): falsified analytically via m_{all-L} > 0 and W<1 uniform summand positivity.",
-      "Candidate III (Route C Selberg weight + Minkowski/Abel norm): falsified for power saving via m_{all-L} > 0 on d in [Y/2, Y] (yields >= c Y/(log Y)^4).",
-      "Candidate IV (Inherited cutoff replacement L_d -> T(Y/d) before squaring): falsified at (Y = 9/4, d = 2) for ordering and creates Theta(Y/(log Y)^2) linear error vs O(1) diagonal error.",
-      "Parity controls a_2, a_{3,5,7}, and unsigned 1 falsify uniform Rough-Moebius sign (-1/sqrt(d)), (-1)^k prime-power sign, Selberg double-pole cancellation, and destructive off-diagonal cancellation X_tilde < 0."
+      "Open target conjecture (SUBGATE-TC-043A): unconditional subpower bound E(Y) <<_eps Y^eps, or sufficient Route D signed-correlation hypothesis X_tilde_{lambda,pp}(Y) + E_{sh,1}(Y) <= A_eta Y^eta + theta_eta F(Y) (theta_eta in [0, 1/2)).",
+      "Candidate I (Route A + homogeneous Cauchy-Schwarz majorant): specified Cauchy-Schwarz majorant falsified for contraction via prime-subset lower bound M_{A,sigma}(Y) >= M_{A,sigma}^{prime}(Y) >>_sigma T(Y)^{1-sigma}/(log T(Y))^2 -> infty (does not lower-bound the signed rough sum).",
+      "Candidate II (Route B + fixed finite linear span closure / uncompensated Cauchy-Schwarz majorant): exact closure in a fixed finite span of {(log w)^m w^{5/2} e^{-w^2}} falsified by linear independence, and uncompensated Cauchy-Schwarz majorant diverges via m_{all-L} > 0 and W<1 positivity (growing-order M(Y) approx 2 log Y and vector-energy inequalities remain open).",
+      "Candidate III (Route C + specified discrete Abel triangle-inequality majorant): uncompensated triangle-inequality majorant on 2 <= d <= b = floor(Y) falsified for power saving by its boundary term |W_2(b)| b^{-1/2} sqrt(E_{L_b}(Y/b)) >> sqrt(Y) (does not rule out compensated Abel formulations).",
+      "Candidate IV (Monotone cutoff ordering L_d >= T(Y/d) for all d >= 2): falsified at (Y = 9/4, d = 2); unsigned majorant of linear cutoff replacement has square asymp Y/(log Y)^2 (actual signed cancellation unresolved), whereas quadratic diagonal cutoff replacement costs O(1).",
+      "Parity controls a_2, a_{3,5,7}, and unsigned 1 falsify uniform Rough-Moebius sign (-1/sqrt(d)), (-1)^k prime-power sign, Selberg double-pole cancellation, and sampled negative X_tilde values."
     ]
   },
   "serialized_arb_self_check": {
-    "total_certified_arb_balls_checked": 280,
-    "compared_against_live_original_arb_count": 280,
+    "total_certified_arb_balls_checked": 347,
+    "compared_against_live_original_arb_count": 347,
     "live_original_count_matches_enumerated_total": true,
     "all_enclose_original_256bit_arb_ball": true,
     "failed_paths": [],
@@ -2481,6 +3028,13 @@
       "section_1_and_2_baseline_and_envelope.stieltjes_vs_higher_prime_power_tail_u1000.higher_prime_power_sum",
       "section_1_and_2_baseline_and_envelope.stieltjes_vs_higher_prime_power_tail_u1000.higher_prime_power_analytic_cap",
       "section_1_and_2_baseline_and_envelope.stieltjes_vs_higher_prime_power_tail_u1000.higher_prime_power_margin",
+      "section_1_and_2_baseline_and_envelope.stieltjes_vs_higher_prime_power_tail_u1000.finite_partial_sum_2_to_39_only",
+      "section_1_and_2_baseline_and_envelope.stieltjes_vs_higher_prime_power_tail_u1000.proved_tail_upper_bound_K40",
+      "section_1_and_2_baseline_and_envelope.stieltjes_vs_higher_prime_power_tail_u1000.series_plus_proved_tail_enclosure_K40",
+      "section_1_and_2_baseline_and_envelope.stieltjes_vs_higher_prime_power_tail_u1000.exact_omitted_p2_k40_term",
+      "section_1_and_2_baseline_and_envelope.stieltjes_vs_higher_prime_power_tail_u1000.actual_omitted_tail_above_K39",
+      "section_1_and_2_baseline_and_envelope.stieltjes_vs_higher_prime_power_tail_u1000.proved_tail_upper_bound_K160",
+      "section_1_and_2_baseline_and_envelope.stieltjes_vs_higher_prime_power_tail_u1000.series_plus_proved_tail_enclosure_K160",
       "section_1_and_2_baseline_and_envelope.stieltjes_vs_higher_prime_power_tail_u1000.u_product_log_coeff_at_delta_half",
       "section_1_and_2_baseline_and_envelope.stieltjes_vs_higher_prime_power_tail_u1000.u_product_log_slack_margin",
       "section_1_and_2_baseline_and_envelope.monotone_envelope_local_boundedness.M_1",
@@ -2495,7 +3049,9 @@
       "section_1_and_2_baseline_and_envelope.conditional_bootstrap_and_penalty_barrier.B_eta_10_contraction_factor",
       "section_1_and_2_baseline_and_envelope.conditional_bootstrap_and_penalty_barrier.B_eta_10_margin_below_half",
       "section_1_and_2_baseline_and_envelope.conditional_bootstrap_and_penalty_barrier.penalty_subcritical_sigma_quarter_at_exp100",
+      "section_1_and_2_baseline_and_envelope.conditional_bootstrap_and_penalty_barrier.penalty_localized_kappa2_lower_bound_quarter_at_exp100",
       "section_1_and_2_baseline_and_envelope.conditional_bootstrap_and_penalty_barrier.penalty_supercritical_sigma_three_quarters_at_exp100",
+      "section_1_and_2_baseline_and_envelope.conditional_bootstrap_and_penalty_barrier.concentration_negative_control_floor_Y_upper_bound_quarter_at_exp100",
       "section_3_route_a_moebius_rough_descent.route_a_identity_cases[0].Q_lhs",
       "section_3_route_a_moebius_rough_descent.route_a_identity_cases[0].S_smooth_below_U",
       "section_3_route_a_moebius_rough_descent.route_a_identity_cases[0].rough_descent_sum",
@@ -2521,10 +3077,16 @@
       "section_3_route_a_moebius_rough_descent.route_a_identity_cases[5].rough_descent_sum",
       "section_3_route_a_moebius_rough_descent.route_a_identity_cases[5].residual_lhs_minus_rhs",
       "section_3_route_a_moebius_rough_descent.a2_wrong_uniform_sign_discrepancy_U3_T15",
+      "section_3_route_a_moebius_rough_descent.optimal_cauchy_schwarz_divergence_sigma_half[0].prime_subset_lower_bound",
+      "section_3_route_a_moebius_rough_descent.optimal_cauchy_schwarz_divergence_sigma_half[0].composite_rough_excess_over_prime_subset",
       "section_3_route_a_moebius_rough_descent.optimal_cauchy_schwarz_divergence_sigma_half[0].optimal_cs_homogeneous_multiplier",
       "section_3_route_a_moebius_rough_descent.optimal_cauchy_schwarz_divergence_sigma_half[0].excess_over_contraction_threshold_half",
+      "section_3_route_a_moebius_rough_descent.optimal_cauchy_schwarz_divergence_sigma_half[1].prime_subset_lower_bound",
+      "section_3_route_a_moebius_rough_descent.optimal_cauchy_schwarz_divergence_sigma_half[1].composite_rough_excess_over_prime_subset",
       "section_3_route_a_moebius_rough_descent.optimal_cauchy_schwarz_divergence_sigma_half[1].optimal_cs_homogeneous_multiplier",
       "section_3_route_a_moebius_rough_descent.optimal_cauchy_schwarz_divergence_sigma_half[1].excess_over_contraction_threshold_half",
+      "section_3_route_a_moebius_rough_descent.optimal_cauchy_schwarz_divergence_sigma_half[2].prime_subset_lower_bound",
+      "section_3_route_a_moebius_rough_descent.optimal_cauchy_schwarz_divergence_sigma_half[2].composite_rough_excess_over_prime_subset",
       "section_3_route_a_moebius_rough_descent.optimal_cauchy_schwarz_divergence_sigma_half[2].optimal_cs_homogeneous_multiplier",
       "section_3_route_a_moebius_rough_descent.optimal_cauchy_schwarz_divergence_sigma_half[2].excess_over_contraction_threshold_half",
       "section_4_route_b_and_c_logarithmic_and_selberg.route_b_identity_cases[0].lhs",
@@ -2603,6 +3165,9 @@
       "section_4_route_b_and_c_logarithmic_and_selberg.kernel_shift_factorial_growth_table[6].unsigned_asymptotic_factorial_lower",
       "section_4_route_b_and_c_logarithmic_and_selberg.kernel_shift_factorial_growth_table[6].sampled_unsigned_norm_X128_T431",
       "section_4_route_b_and_c_logarithmic_and_selberg.kernel_shift_factorial_growth_table[6].upper_bound_margin_X128",
+      "section_4_route_b_and_c_logarithmic_and_selberg.narrowed_span_closure_and_growing_M_note.u_pow_m_plus_5_2_minus_u_pow_3_plus_m_2_at_m2_u3",
+      "section_4_route_b_and_c_logarithmic_and_selberg.narrowed_span_closure_and_growing_M_note.growing_order_ratio_M20_at_logY10",
+      "section_4_route_b_and_c_logarithmic_and_selberg.narrowed_span_closure_and_growing_M_note.stirling_reference_sqrt_2tau_logY_Y_neg2_at_logY10",
       "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.identity_cases_T77[0].lhs",
       "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.identity_cases_T77[0].rhs",
       "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.identity_cases_T77[0].residual",
@@ -2612,9 +3177,34 @@
       "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.identity_cases_T77[2].lhs",
       "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.identity_cases_T77[2].rhs",
       "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.identity_cases_T77[2].residual",
+      "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.mangoldt_square_B_max_abs_residual",
       "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.c_sel_lambda_residue_4_zetap2_over_zeta2_minus_2_gamma",
       "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.sum_w2_lambda_over_u",
       "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.sum_w2_a2_over_u_log_u",
+      "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.abel_summation_procedure_and_boundary_majorant[0].W2_at_b",
+      "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.abel_summation_procedure_and_boundary_majorant[0].abel_identity_residual",
+      "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.abel_summation_procedure_and_boundary_majorant[0].step_jump_decomposition_residual",
+      "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.abel_summation_procedure_and_boundary_majorant[0].E_Lb_at_Y_over_b",
+      "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.abel_summation_procedure_and_boundary_majorant[0].boundary_term_l2_majorant",
+      "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.abel_summation_procedure_and_boundary_majorant[0].normalized_boundary_majorant_sq_over_log4",
+      "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.abel_summation_procedure_and_boundary_majorant[1].W2_at_b",
+      "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.abel_summation_procedure_and_boundary_majorant[1].abel_identity_residual",
+      "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.abel_summation_procedure_and_boundary_majorant[1].step_jump_decomposition_residual",
+      "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.abel_summation_procedure_and_boundary_majorant[1].E_Lb_at_Y_over_b",
+      "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.abel_summation_procedure_and_boundary_majorant[1].boundary_term_l2_majorant",
+      "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.abel_summation_procedure_and_boundary_majorant[1].normalized_boundary_majorant_sq_over_log4",
+      "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.abel_summation_procedure_and_boundary_majorant[2].W2_at_b",
+      "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.abel_summation_procedure_and_boundary_majorant[2].abel_identity_residual",
+      "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.abel_summation_procedure_and_boundary_majorant[2].step_jump_decomposition_residual",
+      "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.abel_summation_procedure_and_boundary_majorant[2].E_Lb_at_Y_over_b",
+      "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.abel_summation_procedure_and_boundary_majorant[2].boundary_term_l2_majorant",
+      "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.abel_summation_procedure_and_boundary_majorant[2].normalized_boundary_majorant_sq_over_log4",
+      "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.abel_summation_procedure_and_boundary_majorant[3].W2_at_b",
+      "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.abel_summation_procedure_and_boundary_majorant[3].abel_identity_residual",
+      "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.abel_summation_procedure_and_boundary_majorant[3].step_jump_decomposition_residual",
+      "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.abel_summation_procedure_and_boundary_majorant[3].E_Lb_at_Y_over_b",
+      "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.abel_summation_procedure_and_boundary_majorant[3].boundary_term_l2_majorant",
+      "section_4_route_b_and_c_logarithmic_and_selberg.route_c_selberg_second_order.abel_summation_procedure_and_boundary_majorant[3].normalized_boundary_majorant_sq_over_log4",
       "section_5_cutoffs_small_scales_and_base_floor.counterexample_Y_9_4_d_2.Q_lambda_1_at_9_8",
       "section_5_cutoffs_small_scales_and_base_floor.counterexample_Y_9_4_d_2.Q_lambda_2_at_9_8",
       "section_5_cutoffs_small_scales_and_base_floor.counterexample_Y_9_4_d_2.Q1_minus_Q2_at_9_8",
@@ -2653,6 +3243,16 @@
       "section_5_cutoffs_small_scales_and_base_floor.cutoff_energy_comparison_samples[7].E_TW_W",
       "section_5_cutoffs_small_scales_and_base_floor.cutoff_energy_comparison_samples[7].analytic_upper_bound",
       "section_5_cutoffs_small_scales_and_base_floor.cutoff_energy_comparison_samples[7].outward_margin",
+      "section_5_cutoffs_small_scales_and_base_floor.linear_cutoff_replacement_three_quantities.samples[0].actual_signed_aggregate_error_l2_sq",
+      "section_5_cutoffs_small_scales_and_base_floor.linear_cutoff_replacement_three_quantities.samples[0].minkowski_sum_individual_error_norms_sq",
+      "section_5_cutoffs_small_scales_and_base_floor.linear_cutoff_replacement_three_quantities.samples[0].unsigned_analytic_majorant_sq",
+      "section_5_cutoffs_small_scales_and_base_floor.linear_cutoff_replacement_three_quantities.samples[0].margin_minkowski_minus_signed_sq",
+      "section_5_cutoffs_small_scales_and_base_floor.linear_cutoff_replacement_three_quantities.samples[0].margin_majorant_minus_minkowski_sq",
+      "section_5_cutoffs_small_scales_and_base_floor.linear_cutoff_replacement_three_quantities.samples[1].actual_signed_aggregate_error_l2_sq",
+      "section_5_cutoffs_small_scales_and_base_floor.linear_cutoff_replacement_three_quantities.samples[1].minkowski_sum_individual_error_norms_sq",
+      "section_5_cutoffs_small_scales_and_base_floor.linear_cutoff_replacement_three_quantities.samples[1].unsigned_analytic_majorant_sq",
+      "section_5_cutoffs_small_scales_and_base_floor.linear_cutoff_replacement_three_quantities.samples[1].margin_minkowski_minus_signed_sq",
+      "section_5_cutoffs_small_scales_and_base_floor.linear_cutoff_replacement_three_quantities.samples[1].margin_majorant_minus_minkowski_sq",
       "section_5_cutoffs_small_scales_and_base_floor.small_scale_positivity.c_small_sharp_1_plus_exp_neg1_minus_zeta3",
       "section_5_cutoffs_small_scales_and_base_floor.small_scale_positivity.tau_pow_4_threshold",
       "section_5_cutoffs_small_scales_and_base_floor.small_scale_positivity.max_X_over_p_on_window",
@@ -2674,6 +3274,8 @@
       "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[0].D_tilde_weighted",
       "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[0].D_pp_unweighted",
       "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[0].X_tilde_off_diagonal",
+      "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[0].outer_factor_2_transfer_rhs",
+      "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[0].margin_outer_factor_2_rhs_minus_E",
       "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[0].analytic_diagonal_bound_rhs",
       "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[0].margin_D_pp_minus_D_tilde",
       "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[0].margin_rhs_minus_D_pp",
@@ -2683,6 +3285,8 @@
       "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[1].D_tilde_weighted",
       "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[1].D_pp_unweighted",
       "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[1].X_tilde_off_diagonal",
+      "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[1].outer_factor_2_transfer_rhs",
+      "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[1].margin_outer_factor_2_rhs_minus_E",
       "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[1].analytic_diagonal_bound_rhs",
       "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[1].margin_D_pp_minus_D_tilde",
       "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[1].margin_rhs_minus_D_pp",
@@ -2692,6 +3296,8 @@
       "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[2].D_tilde_weighted",
       "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[2].D_pp_unweighted",
       "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[2].X_tilde_off_diagonal",
+      "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[2].outer_factor_2_transfer_rhs",
+      "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[2].margin_outer_factor_2_rhs_minus_E",
       "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[2].analytic_diagonal_bound_rhs",
       "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[2].margin_D_pp_minus_D_tilde",
       "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[2].margin_rhs_minus_D_pp",
@@ -2701,6 +3307,8 @@
       "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[3].D_tilde_weighted",
       "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[3].D_pp_unweighted",
       "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[3].X_tilde_off_diagonal",
+      "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[3].outer_factor_2_transfer_rhs",
+      "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[3].margin_outer_factor_2_rhs_minus_E",
       "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[3].analytic_diagonal_bound_rhs",
       "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[3].margin_D_pp_minus_D_tilde",
       "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[3].margin_rhs_minus_D_pp",
@@ -2710,6 +3318,8 @@
       "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[4].D_tilde_weighted",
       "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[4].D_pp_unweighted",
       "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[4].X_tilde_off_diagonal",
+      "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[4].outer_factor_2_transfer_rhs",
+      "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[4].margin_outer_factor_2_rhs_minus_E",
       "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[4].analytic_diagonal_bound_rhs",
       "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[4].margin_D_pp_minus_D_tilde",
       "section_6_route_d_diagonal_contraction_and_off_diagonal.liouville_route_d_scale_sweep[4].margin_rhs_minus_D_pp",
@@ -2754,13 +3364,17 @@
       "section_6_route_d_diagonal_contraction_and_off_diagonal.all_epsilon_diagonal_contraction_table[2].Theta_eps_diag_at_Y128",
       "section_6_route_d_diagonal_contraction_and_off_diagonal.all_epsilon_diagonal_contraction_table[2].analytic_cap_at_Y128",
       "section_6_route_d_diagonal_contraction_and_off_diagonal.all_epsilon_diagonal_contraction_table[2].analytic_cap_at_threshold_below_half",
-      "section_6_route_d_diagonal_contraction_and_off_diagonal.all_epsilon_diagonal_contraction_table[2].margin_below_half_at_threshold"
+      "section_6_route_d_diagonal_contraction_and_off_diagonal.all_epsilon_diagonal_contraction_table[2].margin_below_half_at_threshold",
+      "section_6_route_d_diagonal_contraction_and_off_diagonal.conditional_same_scale_absorption_parameters.Theta_quarter_cap_at_exp64",
+      "section_6_route_d_diagonal_contraction_and_off_diagonal.conditional_same_scale_absorption_parameters.two_theta_plus_two_Theta_cap_at_exp64",
+      "section_6_route_d_diagonal_contraction_and_off_diagonal.conditional_same_scale_absorption_parameters.contraction_slack_q_minus_homog_cap",
+      "section_6_route_d_diagonal_contraction_and_off_diagonal.conditional_same_scale_absorption_parameters.boundary_theta_half_homog_factor_exceeds_one"
     ]
   },
   "section_7_tc057_review_displayed_enclosures_audit": {
     "review_path": "C:\\Development\\Projects\\reimann_scope\\docs\\reviews\\TC_057_COUPLED_ARITHMETIC_SCALE_ENERGY_BOOTSTRAP.md",
-    "total_displayed_intervals_found": 54,
-    "tagged_and_checked_count": 54,
+    "total_displayed_intervals_found": 78,
+    "tagged_and_checked_count": 78,
     "untagged_count": 0,
     "failed_count": 0,
     "untagged_intervals": [],

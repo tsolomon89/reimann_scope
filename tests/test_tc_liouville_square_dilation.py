@@ -128,6 +128,7 @@ EXPECTED_PUBLIC_THEOREM_NAMES = (
     "logarithmic_prime_power_descent_and_kernel_shift_tc057",
     "quadratic_prime_power_diagonal_off_diagonal_decomposition_tc057",
     "inherited_vs_canonical_cutoff_comparison_and_counterexample_tc057",
+    "conditional_signed_correlation_same_scale_absorption_transfer_tc057r",
 )
 
 
@@ -469,10 +470,10 @@ def test_lean_formalization_and_serialized_artifact_synchronization() -> None:
     assert "import RiemannScope.LiouvilleSquareDilation" in root_lean
 
     lean_info = verify_liouville_square_dilation_lean_module()
-    assert lean_info["definition_count"] == 60
-    assert lean_info["public_theorem_count"] == 25
-    assert lean_info["private_helper_theorem_count"] == 54
-    assert lean_info["total_declaration_count"] == 139
+    assert lean_info["definition_count"] == 61
+    assert lean_info["public_theorem_count"] == 26
+    assert lean_info["private_helper_theorem_count"] == 56
+    assert lean_info["total_declaration_count"] == 143
     assert lean_info["expected_public_theorems_present"] is True
     assert lean_info["sorry_count"] == 0
     assert lean_info["custom_axiom_count"] == 0

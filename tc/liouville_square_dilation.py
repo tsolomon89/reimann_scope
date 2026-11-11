@@ -2572,6 +2572,7 @@ def verify_liouville_square_dilation_lean_module() -> Dict[str, Any]:
         "logarithmic_prime_power_descent_and_kernel_shift_tc057",
         "quadratic_prime_power_diagonal_off_diagonal_decomposition_tc057",
         "inherited_vs_canonical_cutoff_comparison_and_counterexample_tc057",
+        "conditional_signed_correlation_same_scale_absorption_transfer_tc057r",
     ]
 
     live_lean = _capture_live_lean_check_and_axioms(public_theorems)
@@ -2764,6 +2765,16 @@ def verify_liouville_square_dilation_lean_module() -> Dict[str, Any]:
             "all-`d` lower bound `(1/2) W^{5/4} d^{1/4} ≤ inheritedCutoffL (W * d) d` (`W ≥ 1`, `d ≥ 2`), "
             "concrete counterexample at `(Y = 9/4, d = 2)` where `inheritedCutoffL (9/4) 2 = 1 < 2 = canonicalCutoffT (9/8)` and `0 < finiteQLambda 1 (9/8) - finiteQLambda 2 (9/8)`, "
             "and uniform small-argument positivity `(1/24) w^{5/2} ≤ finiteQLambda L w` (`0 < finiteQLambda L w`) for all `L ≥ 1` and `0 < w ≤ 1`.",
+        ),
+        "conditional_signed_correlation_same_scale_absorption_transfer_tc057r": (
+            "conditional_on_signed_correlation_same_scale_absorption_and_localization_lemma",
+            "`CONDITIONAL_ON_SIGNED_CORRELATION` real-analysis absorption lemma (`TASK-TC-057R` §5): proves local finiteness and envelope domination of "
+            "`normalizedScaleSupremum E ε R = sSup ((fun Z => E Z / Z ^ ε) '' Set.Icc 1 R)` from `0 ≤ E Z ≤ M_lin * Z` without continuity or supremum attainment, "
+            "proves the complete Route D conditional transfer preserving exact outer factor `2` in `E Y ≤ 2 * D_tilde Y + 2 * X_tilde Y + 2 * E_sh1 Y` under "
+            "`X_tilde Y + E_sh1 Y ≤ A_η * Y ^ η + θ_η * monotoneScaleEnvelope E Y` (`0 ≤ θ_η < 1/2`, `2 * θ_η + 2 * Θ_diag ≤ q < 1`) via finite-horizon absorption "
+            "`G_ε(R) ≤ max(G_ε(Y_star), K + q * G_ε(R))` (`K = 2 A_η Y_star^{η - ε} + 2 C_cut Y_star^{-ε}`) yielding `E Y ≤ max(G_ε(Y_star), K / (1 - q)) * Y ^ ε` for all `Y ≥ 1` "
+            "(plus `θ = 1/2` boundary sharpness), and proves repaired Proposition 2.4 coefficient-mass localization vs `d_top ≥ Y / 2` concentration negative control; "
+            "does NOT prove the open arithmetic signed-correlation inequality.",
         ),
     }
 

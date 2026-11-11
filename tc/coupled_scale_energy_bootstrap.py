@@ -1,55 +1,67 @@
 r"""
-TASK-TC-057: Arithmetic Compatibility Across Scales and a Coupled Energy Bootstrap
+TASK-TC-057 / TASK-TC-057R: Arithmetic Compatibility Across Scales, Complete Prime-Power
+Certification, Scoped Obstruction Theorems, and Proved Conditional Correlation Transfer
 toward SUBGATE-TC-043A.
 
 Implements and certifies in 256-bit FLINT/Arb ball arithmetic (using tau = 2*pi as the sole
-circle constant and z = a + i*b, rho = x + i*y for complex coordinates):
-1. Opening Baseline Cross-Checks & Monotone Scale-Envelope Boundedness (Sections 1-3):
+circle constant and z = x + i*y, with x, y in R and critical line x = 1/2, for complex coordinates):
+1. Opening Baseline Cross-Checks, Complete Higher Prime-Power Certificate, & Monotone Scale-Envelope
+   Boundedness (Sections 1-2):
    - Verification of local TC-056R2 opening repairs: exact integer-power small-Y cutoff partition
      on [2, 4) into [2, 3^{4/5}] -> (4, 3), (3^{4/5}, 4^{4/5}] -> (4, 4) (with 2^{8/5} = 4^{4/5}),
      (4^{4/5}, 5^{4/5}] -> (5, 5) (with Y = 7/2 -> (5, 5)), (5^{4/5}, 4) -> (5, 6); Stieltjes
-     prime-sum remainder vs. convergent higher prime-power tail; and U-product logarithmic slack
-     2*sqrt(c) = delta / (2*sqrt(2)) < delta / 2 at c = delta^2 / 32.
+     prime-sum remainder (with exact offset logarithmic integral li_2(t) = int_2^t dv/log v satisfying
+     li_2(2) = 0) vs. the complete k >= 2 higher prime-power sum
+     2*sum_{p<=u} [-log(1 - p^{-alpha}) - p^{-alpha}], independently cross-checked against finite
+     series 2 <= k < K plus proved tail 2*r^K / [K*(1 - r)] and exact first-omitted-term witness
+     at p = 2, k = 40; and U-product logarithmic slack 2*sqrt(c) = delta / (2*sqrt(2)) < delta / 2.
    - Monotone envelope F(Y) := sup_{1 <= Z <= Y} E(Z) (Y >= 1): local boundedness
      0 <= E_L(Z) <= M_lin * Z (M_lin := (tau - 1) * M_1^2) across discontinuous jumps of
      T(Z) = ceil(Z^{5/4}), with certified jump witness E_3(2^{4/5}) - E_2(2^{4/5}) != 0.
-   - Abstract polylog bootstrap implication (`CONDITIONAL_ON_RECURSION`, Lean Theorem 21):
-     E-to-F envelope passage on Z >= e^4 (where d/dZ log(Z / (log Z log log Z)^2) > 0),
-     dyadic-height descent without B_eta < 1, weighted multi-scale contraction factor
-     Theta_sigma(Y), and (log Y)^b coefficient-mass exponent barrier sigma > b / a.
-2. Route A — General Moebius-Rough Prime-Filtration Descent (Section 4A, Lean Theorem 22):
+   - Abstract polylog bootstrap implication (`CONDITIONAL_ON_RECURSION`, Lean Theorem 21) and
+     repaired Proposition 2.4 coefficient-mass localization algebra (Lean Theorem 26): total mass
+     B_0*(log Y)^b on d >= U(Y) = c*(log Y)^a is an upper bound on Theta_sigma(Y), requiring
+     quantitative mass localization near U(Y) for the lower barrier sigma < b / a, contrasted
+     against the concentration negative control at d = floor(Y) where (log Y)^b * floor(Y)^{-sigma} -> 0.
+2. Route A — General Moebius-Rough Prime-Filtration Descent (Section 3, Lean Theorem 22):
    - Exact finite identity for all U >= 2, T >= 0, X >= 0 and completely multiplicative a:
      Q_{a,T}(X) = S_{a,<U,T}(X) - sum_{U <= d <= T, d | N_{[U,T]}} (mu(d)*a(d)/sqrt(d)) Q_{a,floor(T/d)}(X/d).
-   - Uniform Liouville sign mu(d)*lambda(d) = +1 across primes AND composite squarefree rough
-     divisors (including 3-prime d = 385 = 5*7*11 at U = 5, T = 431) vs. 2-adic parity control
-     a_2 sign alternation mu(3)*a_2(3) = -1, mu(15)*a_2(15) = +1; super-sqrt(T) reduction at
-     U = U_0(128) = 42; and optimal Cauchy-Schwarz multiplier divergence M_{A,sigma}(Y) -> infty.
-3. Route B & Route C — Logarithmic Prime-Power Descent, Kernel-Shift Hierarchy, and Second-Order
-   Liouville-Selberg Double-Pole Cancellation (Sections 4B-4C, Lean Theorem 23):
+   - Uniform Liouville sign mu(d)*lambda(d) = +1 across primes and composite squarefree rough
+     divisors vs. 2-adic parity control a_2 sign alternation; super-sqrt(T) reduction at U = 42, T = 431;
+     and proved prime-subset lower bound M_{A,sigma}(Y) >= (sum_{U<=p<=T(Y)} p^{-(1+sigma)/2})^2
+     >>_sigma T(Y)^{1-sigma}/(log T(Y))^2 -> infty obstructing the homogeneous Cauchy-Schwarz majorant.
+3. Route B & Route C — Logarithmic Prime-Power Descent, Narrowed Fixed-Span Non-Closure, and
+   Second-Order Liouville-Selberg Summatory Derivation & Abel Majorant Obstruction (Section 4,
+   Lean Theorem 23):
    - Exact prime-power identity sum_{1<=n<=T} a(n) log(n) (log(X/n))^m phi_n(X)
      = sum_{p^k<=T} a(p)^k log(p) p^{-k/2} Q_{a,floor(T/p^k)}^{[m]}(X/p^k) (including T = 0, 1),
      shift recurrence (log X) Q_T^{[m]}(X) = Sigma_pp^{[m]}(X) + Q_T^{[m+1]}(X), M-step telescope,
-     and factorial uniform bound growth M_1^{[m]} preventing finite-family algebraic closure.
-   - Second-order Selberg-type identity with w_{2,a} = Lambda_a * log + Lambda_a * Lambda_a and
-     double-pole residue cancellation Res_{s=1}(D_lambda''/D_lambda) = 4*zeta'(2)/zeta(2) - 2*gamma_E < 0
-     (giving sum_{d<=u} w_{2,lambda}(d) = O(u) via lambda(p) = -1 at all primes, vs. +2 u log u for a_2).
-4. Exact Cutoff Comparison, Small-Scale Positivity, & Base-Scale Energy Floor (Section 5, Lean Theorem 25):
+     linear independence of {(log w)^m w^{5/2} e^{-w^2}} ruling out exact closure in a fixed finite
+     linear span (while M approx 2*log Y gives M!/[2^M*(log Y)^M] ~ sqrt(log Y)*Y^{-2}, leaving
+     accumulated prime-power layers open), and uniform bound M_1^{[m]} via u^{3+m/2} <= u^{m+5/2}.
+   - Second-order Selberg-type identity w_{2,a} = Lambda_a * log + Lambda_a * Lambda_a (with
+     Dirichlet-series convergence on x > 1, z = x + i*y, restricted to bounded controls |a(n)| <= 1),
+     complete PNT/Dirichlet-hyperbola summatory proof sum_{d<=u} w_{2,lambda}(d)
+     = [4*zeta'(2)/zeta(2) - 2*gamma_E]*u + O(u*exp(-c''*sqrt(log u))) via Lambda_lambda = -Lambda + 2*B,
+     and exact discrete Abel summation identity on 2 <= d <= b = floor(Y) whose specified
+     triangle-inequality majorant is obstructed by its b = floor(Y) boundary term >> sqrt(Y).
+4. Exact Cutoff Comparison, Scoped Linear Cutoff Bounds, Small-Scale Positivity, & Base-Scale
+   Energy Floor (Section 5, Lean Theorem 25):
    - Explicit counterexample (Y = 9/4, d = 2): L_2 = floor(T(9/4)/2) = 1 < 2 = T(9/8) with
      Q_{lambda,1}(9/8) - Q_{lambda,2}(9/8) > 0 and E_1(9/8) != E_2(9/8); exact d >= 16 ordering
      L_d >= T(Y/d) and all-d bound E_{L_d}(W) <= 2 E(W) + ((tau^5 - 1)/10) max(16/d, 1).
-   - Linear prime-sum cutoff error Theta(Y/(log Y)^2) vs. quadratic diagonal cutoff error O(1).
-   - Uniform small-scale positivity on w in (0, 1]: Q_{lambda,L}(w) >= (1 + e^{-1} - zeta(3)) w^{5/2}
-     > (4/25) w^{5/2} > (1/24) w^{5/2} > 0 for all L >= 1, forcing Theta(Y/(log Y)^2) energy on
-     p in [ceil(tau Y), T(Y)] for Y > tau^4.
-   - Certified all-L base-scale energy floor inf_{W in [1,2], L >= 1} E_L(W) >= m_{all-L} > 0 via
-     [2, tau] subset [W, tau W], proving unconditional norm/CS obstructions in Routes A, B, and C.
-5. Route D — Direct Quadratic Prime-Power Expansion & Unconditional Diagonal Contraction (Section 6,
-   Lean Theorem 24):
-   - Unconditional cross-scale diagonal inequality D_{lambda,pp}(Y) <= (2/(log Y)^2) sum_{p^k<=Y}
-     ((log p)^2/p^k) F(Y/p^k) + C_{cut,diag} with all-epsilon contraction factor
-     Theta_eps^{diag}(Y) < 2*zeta''(1+eps)/(log Y)^2 -> 0, isolating the single surviving
-     arithmetic obligation in the signed off-diagonal prime-power correlation X_{lambda,pp}(Y)
-     coupled with Q_{T(Y)}^{[1]}(X)/log X.
+   - Separate evaluation of actual signed aggregate linear cutoff error, Minkowski sum of individual
+     error norms, and unsigned analytic majorant (asymp Y/(log Y)^2) vs. O(1) diagonal cutoff error.
+   - Uniform small-scale positivity on w in (0, 1] and certified all-L base-scale energy floor
+     inf_{W in [1,2], L >= 1} E_L(W) >= m_{all-L} > 0 via [2, tau] subset [W, tau W].
+5. Route D — Direct Quadratic Prime-Power Expansion, Unconditional Diagonal Contraction, & Proved
+   Conditional Same-Scale Absorption Transfer (Section 6, Lean Theorems 24 & 26):
+   - Unconditional cross-scale diagonal inequality D_tilde_{lambda,pp}(Y) <= D_{lambda,pp}(Y)
+     <= (2/(log Y)^2) sum_{p^k<=Y} ((log p)^2/p^k) F(Y/p^k) + C_{cut,diag} with all-epsilon
+     contraction factor Theta_eps^{diag}(Y) < 2*zeta''(1+eps)/(log Y)^2 -> 0, plus complete proof
+     and Lean 4 formalization (`CONDITIONAL_ON_SIGNED_CORRELATION`, Theorem 26) that
+     X_tilde_{lambda,pp}(Y) + E_{sh,1}(Y) <= A_eta Y^eta + theta_eta F(Y) (theta_eta in [0, 1/2))
+     implies E(Y) <<_eps Y^eps via finite-horizon G_eps(R) = sup_{1<=Z<=R} E(Z)/Z^eps absorption.
 """
 
 from __future__ import annotations
@@ -110,8 +122,11 @@ from tc.prime_chain_contraction import (
 )
 
 TASK_TC_057_ID = "TASK-TC-057"
+TASK_TC_057R_ID = "TASK-TC-057R"
 TC_056R2_IMPLEMENTATION_COMMIT = "add6930233ebe0c8adf50da0e8a0ae6f18561975"
 TC_056R2_REVIEWED_TIP = "8c92e89c62bdb434d29d7143bacf50308aab78a1"
+TC_057_IMPLEMENTATION_COMMIT = "05e7e0f728a0c758973b40c1605793ed9b40f75b"
+TC_057_REVIEWED_TIP = "82d0ec52085c06e748982287694fb9272ff017d7"
 
 COUPLED_SCALE_BOOTSTRAP_ARTIFACT_PATH = (
     REPO_ROOT / "data" / "tc_coupled_scale_energy_bootstrap.json"
@@ -430,8 +445,92 @@ def exact_U0_T_pair_for_rational_Y(Y_frac: Union[int, Fraction]) -> Tuple[int, i
     return (u0, t_cut)
 
 
+def evaluate_complete_higher_prime_power_sum_arb(
+    u: int,
+    alpha_frac: Union[int, Fraction],
+    prec_bits: int = 256,
+) -> arb:
+    """Evaluate the COMPLETE k >= 2 higher prime-power sum
+    S_{pp,>=2}(u; alpha) := sum_{p <= u} sum_{k >= 2} (2 / k) p^{-k * alpha}
+                          = 2 * sum_{p <= u} [-log(1 - p^{-alpha}) - p^{-alpha}]
+    for rational alpha > 0 at working precision `prec_bits + 128`, rounded outward to `prec_bits`.
+    """
+    if not isinstance(u, int) or isinstance(u, bool) or u < 1:
+        raise ValueError(f"u must be int >= 1, got {u!r}")
+    alpha_f = Fraction(alpha_frac)
+    if alpha_f <= 0:
+        raise ValueError(f"alpha_frac must be strictly positive, got {alpha_frac!r}")
+    saved = flint_ctx.prec
+    try:
+        flint_ctx.prec = prec_bits + 128
+        alpha_arb = _frac_to_arb(alpha_f)
+        total = arb(0)
+        for p in primes_up_to(u):
+            r = arb(p) ** (-alpha_arb)
+            total += arb(2) * (-((-r).log1p()) - r)
+        flint_ctx.prec = prec_bits
+        return +total
+    finally:
+        flint_ctx.prec = saved
+
+
+def evaluate_higher_prime_power_series_with_tail_arb(
+    u: int,
+    alpha_frac: Union[int, Fraction],
+    K_trunc: int,
+    prec_bits: int = 256,
+) -> Dict[str, arb]:
+    """Independently evaluate the finite partial sum 2 <= k <= K_trunc - 1 together with the
+    proved elementary geometric/log tail bound
+        0 < sum_{p <= u} 2 * sum_{k >= K} r_p^k / k <= sum_{p <= u} 2 * r_p^K / [K * (1 - r_p)]
+    (r_p = p^{-alpha} in (0, 1)), returning outward-rounded `prec_bits` Arb enclosures for:
+    - `partial_sum_below_K`: sum_{p <= u} sum_{k=2}^{K-1} (2/k) p^{-k*alpha} (FINITE sum only),
+    - `tail_upper_bound`: sum_{p <= u} 2 * p^{-K*alpha} / [K * (1 - p^{-alpha})],
+    - `complete_sum_via_tail`: partial_sum_below_K.union(partial_sum_below_K + tail_upper_bound),
+    - `first_omitted_p2_term`: (2 / K) * 2^{-K * alpha} when u >= 2 (else 0).
+    """
+    if not isinstance(u, int) or isinstance(u, bool) or u < 1:
+        raise ValueError(f"u must be int >= 1, got {u!r}")
+    if not isinstance(K_trunc, int) or isinstance(K_trunc, bool) or K_trunc < 2:
+        raise ValueError(f"K_trunc must be int >= 2, got {K_trunc!r}")
+    alpha_f = Fraction(alpha_frac)
+    if alpha_f <= 0:
+        raise ValueError(f"alpha_frac must be strictly positive, got {alpha_frac!r}")
+    saved = flint_ctx.prec
+    try:
+        flint_ctx.prec = prec_bits + 128
+        alpha_arb = _frac_to_arb(alpha_f)
+        partial = arb(0)
+        tail_ub = arb(0)
+        for p in primes_up_to(u):
+            r = arb(p) ** (-alpha_arb)
+            rk = r * r
+            for k in range(2, K_trunc):
+                partial += arb(2) * rk / arb(k)
+                rk *= r
+            # At loop exit, rk == r ** K_trunc
+            tail_ub += (arb(2) * rk) / (arb(K_trunc) * (arb(1) - r))
+        complete_encl = partial.union(partial + tail_ub)
+        omitted_p2 = (
+            (arb(2) * (arb(2) ** (-arb(K_trunc) * alpha_arb))) / arb(K_trunc)
+            if u >= 2
+            else arb(0)
+        )
+        flint_ctx.prec = prec_bits
+        return {
+            "partial_sum_below_K": +partial,
+            "tail_upper_bound": +tail_ub,
+            "complete_sum_via_tail": +complete_encl,
+            "first_omitted_p2_term": +omitted_p2,
+        }
+    finally:
+        flint_ctx.prec = saved
+
+
 def verify_section_1_and_2_baseline_and_envelope(prec_bits: int = 256) -> Dict[str, Any]:
-    """Verify TC-056R2 opening repairs, envelope boundedness across jumps, and conditional bootstrap witnesses."""
+    """Verify TC-056R2/TC-057R opening repairs, complete higher prime-power certificate,
+    envelope boundedness across jumps, and repaired Proposition 2.4 localization vs. negative control.
+    """
     saved = flint_ctx.prec
     try:
         flint_ctx.prec = prec_bits
@@ -461,16 +560,35 @@ def verify_section_1_and_2_baseline_and_envelope(prec_bits: int = 256) -> Dict[s
             boundary_identity_2_8_5_eq_4_4_5 and sample_pairs == expected_pairs
         )
 
-        # 2. Stieltjes prime-sum remainder vs separate higher prime-power tail at eta = 1/4 (alpha = 3/4)
+        # 2. Stieltjes prime-sum remainder (with offset logarithmic integral li_2(t) = int_2^t dv/log v
+        #    so li_2(2) = 0 and E_{PNT,2}(2^-) = N_prime(2^-) - li_2(2) = 0) vs. GENUINE COMPLETE
+        #    k >= 2 higher prime-power sum at eta = 1/4 (alpha = 1/2 + eta = 3/4; Euler-product regimes
+        #    split at eta = 1/2, i.e. alpha = 1, NOT eta = 0).
+        alpha_frac = Fraction(3, 4)
         alpha = arb(3) / arb(4)
         u_test = 1000
         prime_sum_u = arb(0)
-        higher_pp_sum_u = arb(0)
         for p in primes_up_to(u_test):
-            p_arb = arb(p)
-            prime_sum_u += p_arb ** (-alpha)
-            for k in range(2, 40):
-                higher_pp_sum_u += arb(2) * (p_arb ** (-arb(k) * alpha)) / arb(k)
+            prime_sum_u += arb(p) ** (-alpha)
+
+        # Genuine complete k >= 2 sum: 2 * sum_{p <= 1000} [-log(1 - p^{-3/4}) - p^{-3/4}]
+        higher_pp_sum_u = evaluate_complete_higher_prime_power_sum_arb(
+            u_test, alpha_frac, prec_bits=prec_bits
+        )
+        # Independent series-plus-proved-tail checks at K = 40 and K = 160
+        check_K40 = evaluate_higher_prime_power_series_with_tail_arb(
+            u_test, alpha_frac, K_trunc=40, prec_bits=prec_bits
+        )
+        check_K160 = evaluate_higher_prime_power_series_with_tail_arb(
+            u_test, alpha_frac, K_trunc=160, prec_bits=prec_bits
+        )
+        # Exact rational witness for first omitted term at p = 2, k = 40:
+        # 2 / (40 * 2^{30}) = 1 / (20 * 2^{30}) = 1 / 21474836480 > 4.65e-11
+        exact_omitted_p2_k40_frac = Fraction(1, 20 * (2 ** 30))
+        exact_omitted_p2_k40_arb = _frac_to_arb(exact_omitted_p2_k40_frac)
+        omitted_tail_actual_K40 = higher_pp_sum_u - check_K40["partial_sum_below_K"]
+        consistency_diff_K160 = higher_pp_sum_u - check_K160["complete_sum_via_tail"]
+
         stieltjes_main_int = _acb_integral_certified_arb(
             lambda z, _analytic: (
                 z.pow(-acb(alpha), analytic=_analytic) / z.log(analytic=_analytic)
@@ -484,7 +602,16 @@ def verify_section_1_and_2_baseline_and_envelope(prec_bits: int = 256) -> Dict[s
             arb(1) - arb(2) ** (-alpha)
         )
         higher_pp_margin = higher_pp_analytic_cap - higher_pp_sum_u
-        higher_pp_ok = bool(higher_pp_margin > arb(0))
+        higher_pp_ok = bool(
+            higher_pp_margin > arb(0)
+            and exact_omitted_p2_k40_arb > arb("4.65e-11")
+            and omitted_tail_actual_K40 > exact_omitted_p2_k40_arb
+            and omitted_tail_actual_K40 <= check_K40["tail_upper_bound"]
+            and higher_pp_sum_u.overlaps(check_K40["complete_sum_via_tail"])
+            and higher_pp_sum_u.overlaps(check_K160["complete_sum_via_tail"])
+            and arb(0) in consistency_diff_K160
+            and check_K160["tail_upper_bound"] < arb("1e-36")
+        )
 
         # U-product logarithmic slack at delta = 1/2, c = delta^2 / 32 = 1 / 128
         delta_test = arb(1) / arb(2)
@@ -518,9 +645,6 @@ def verify_section_1_and_2_baseline_and_envelope(prec_bits: int = 256) -> Dict[s
         mono_e4_ok = bool(mono_factor_e4 > arb("0.1"))
 
         # 5. Abstract bootstrap witness with B_eta = 10 > 1 (showing B_eta < 1 is NOT needed)
-        # eta = 1/8, eps = 1/4, B_eta = 10, U_eta(Y) = (eta^2 / 32) * (log Y * log log Y)^2 = (1/2048)*(log Y log log Y)^2
-        # Require B_eta * U_eta(Y)^{-1/4} <= 1/2 <=> U_eta(Y) >= 20^4 = 160000
-        # At Y_star = exp(4096): log Y = 4096, U_eta > 566775 > 160000, so 10 * U_eta^{-1/4} < 0.365 < 1/2
         eta_w = arb(1) / arb(8)
         eps_w = arb(1) / arb(4)
         B_eta_w = arb(10)
@@ -534,16 +658,30 @@ def verify_section_1_and_2_baseline_and_envelope(prec_bits: int = 256) -> Dict[s
             U_at_Y_star > arb(2) and contraction_margin_half > arb(0)
         )
 
-        # 6. Coefficient-mass (log Y)^b exponent barrier witness:
-        # B(Y) = log Y (b = 1), U(Y) = (log Y)^2 (a = 2): critical exponent b / a = 1/2.
-        # At sigma = 1/4 < 1/2 and Y = exp(100), B(Y) * U(Y)^{-sigma} = 100^{1/2} = 10 > 1/2 (fails contraction),
-        # whereas at sigma = 3/4 > 1/2 and Y = exp(100), B(Y) * U(Y)^{-sigma} = 100^{-1/2} = 1/10 < 1/2 (contracts).
+        # 6. Repaired Proposition 2.4 coefficient-mass localization vs. concentration negative control:
+        # Total mass B_0*(log Y)^b (b = 1) on d >= U(Y) = (log Y)^2 (a = 2) gives ONLY an UPPER bound
+        # Theta_sigma(Y) <= B_0*(log Y)^b * U(Y)^{-sigma}.
+        # - Localized lower witness: if mass c_0*(log Y) (c_0 = 1) is localized on U(Y) <= d <= 2*U(Y)
+        #   (kappa = 2), then at Y = exp(100), sigma = 1/4 < b/a = 1/2:
+        #   Theta_{1/4}(Y) >= (log Y) * (2 * (log Y)^2)^{-1/4} = 10 * 2^{-1/4} > 8.4 > 1/2 (fails contraction),
+        #   whereas at sigma = 3/4 > 1/2, the total-mass upper bound gives 100 * 100^{-3/2} = 1/10 < 1/2.
+        # - Concentration negative control: the SAME total mass B_0*(log Y) = 100 concentrated at
+        #   d_top = floor(exp(100)) >= exp(100)/2 has homogeneous factor at sigma = 1/4 < 1/2 bounded by
+        #   100 * (exp(100)/2)^{-1/4} = 100 * 2^{1/4} * exp(-25) < 2e-9 << 1/2!
         logY_pen = arb(100)
         theta_subcrit_quarter = logY_pen * ((logY_pen ** 2) ** (-arb("0.25")))
+        theta_localized_kappa2_lb_quarter = logY_pen * (
+            (arb(2) * (logY_pen ** 2)) ** (-arb("0.25"))
+        )
         theta_supercrit_three_quarters = logY_pen * ((logY_pen ** 2) ** (-arb("0.75")))
+        theta_concentrated_at_floor_Y_ub_quarter = logY_pen * (
+            (logY_pen.exp() / arb(2)) ** (-arb("0.25"))
+        )
         penalty_barrier_ok = bool(
             theta_subcrit_quarter > arb(1)
+            and theta_localized_kappa2_lb_quarter > arb(8)
             and arb("0.5") - theta_supercrit_three_quarters > arb(0)
+            and theta_concentrated_at_floor_Y_ub_quarter < arb("1e-8")
         )
 
         all_ok = bool(
@@ -564,12 +702,36 @@ def verify_section_1_and_2_baseline_and_envelope(prec_bits: int = 256) -> Dict[s
             "stieltjes_vs_higher_prime_power_tail_u1000": {
                 "u": u_test,
                 "alpha": "3/4",
+                "euler_product_regime_split_note": "alpha = 1/2 + eta splits at eta = 1/2 (alpha = 1): 0 < eta < 1/2, eta = 1/2, 1/2 < eta < 1",
+                "li_normalization_note": "li_2(t) := int_2^t dv/log v satisfies li_2(2) = 0 and E_{PNT,2}(2^-) = N_prime(2^-) - li_2(2) = 0 (where N_prime(t) = #{p <= t : p prime})",
                 "prime_sum_u": serialize_arb_certified(prime_sum_u),
                 "stieltjes_main_integral": serialize_arb_certified(stieltjes_main_int),
                 "stieltjes_remainder_diff": serialize_arb_certified(stieltjes_diff),
                 "higher_prime_power_sum": serialize_arb_certified(higher_pp_sum_u),
                 "higher_prime_power_analytic_cap": serialize_arb_certified(higher_pp_analytic_cap),
                 "higher_prime_power_margin": serialize_arb_certified(higher_pp_margin),
+                "finite_partial_sum_2_to_39_only": serialize_arb_certified(
+                    check_K40["partial_sum_below_K"]
+                ),
+                "proved_tail_upper_bound_K40": serialize_arb_certified(
+                    check_K40["tail_upper_bound"]
+                ),
+                "series_plus_proved_tail_enclosure_K40": serialize_arb_certified(
+                    check_K40["complete_sum_via_tail"]
+                ),
+                "exact_omitted_p2_k40_term_fraction": f"{exact_omitted_p2_k40_frac.numerator}/{exact_omitted_p2_k40_frac.denominator}",
+                "exact_omitted_p2_k40_term": serialize_arb_certified(
+                    exact_omitted_p2_k40_arb
+                ),
+                "actual_omitted_tail_above_K39": serialize_arb_certified(
+                    omitted_tail_actual_K40
+                ),
+                "proved_tail_upper_bound_K160": serialize_arb_certified(
+                    check_K160["tail_upper_bound"]
+                ),
+                "series_plus_proved_tail_enclosure_K160": serialize_arb_certified(
+                    check_K160["complete_sum_via_tail"]
+                ),
                 "u_product_log_coeff_at_delta_half": serialize_arb_certified(log_coeff_2_sqrt_c),
                 "u_product_log_slack_margin": serialize_arb_certified(log_slack_margin),
             },
@@ -600,8 +762,14 @@ def verify_section_1_and_2_baseline_and_envelope(prec_bits: int = 256) -> Dict[s
                 "penalty_subcritical_sigma_quarter_at_exp100": serialize_arb_certified(
                     theta_subcrit_quarter
                 ),
+                "penalty_localized_kappa2_lower_bound_quarter_at_exp100": serialize_arb_certified(
+                    theta_localized_kappa2_lb_quarter
+                ),
                 "penalty_supercritical_sigma_three_quarters_at_exp100": serialize_arb_certified(
                     theta_supercrit_three_quarters
+                ),
+                "concentration_negative_control_floor_Y_upper_bound_quarter_at_exp100": serialize_arb_certified(
+                    theta_concentrated_at_floor_Y_ub_quarter
                 ),
             },
             "all_section_1_and_2_checks_pass": all_ok,
@@ -689,20 +857,31 @@ def verify_section_3_route_a_moebius_rough_descent(prec_bits: int = 256) -> Dict
         wrong_a2_discrepancy = abs(q_a2_15 - (s_a2_3_15 - wrong_liouville_rough_a2))
         a2_falsifies_uniform_sign = bool(wrong_a2_discrepancy > arb("0.1"))
 
-        # Optimal Cauchy-Schwarz multiplier obstruction M_{A,sigma}(Y) = (sum_{d in R_{[U,T(Y)]}} d^{-(1+sigma)/2})^2
-        # (homogeneous ratio dividing by Y^sigma: must be <= 1/2 to contract Y^sigma, actually diverges as
-        # Y^{(5/4)*(1-sigma)} / (log Y)^2 -> infty for all sigma in [0, 1)).
+        # Optimal Cauchy-Schwarz homogeneous multiplier M_{A,sigma}(Y) = (sum_{d in R_{[U,T(Y)]}} d^{-(1+sigma)/2})^2
+        # for the specified Cauchy-Schwarz majorant (distinguished from the actual signed rough-divisor sum).
+        # Its PRIME SUBSET gives the proved lower bound:
+        #   M_{A,sigma}(Y) >= M_{A,sigma}^{prime}(Y) := (sum_{U <= p <= T(Y)} p^{-(1+sigma)/2})^2
+        #                  >>_sigma T(Y)^{1-sigma} / (log T(Y))^2 -> infty
+        # for polylogarithmic U(Y) and 0 <= sigma < 1 (squarefree rough composites contribute strictly
+        # positive excess whenever T(Y) >= U^2).
         sigma_half = arb("0.5")
         cs_rows: List[Dict[str, Any]] = []
         cs_monotone_vals: List[arb] = []
+        prime_lb_vals: List[arb] = []
         for Y_int in (32, 128, 512):
             T_int = exact_T_cutoff_ceil_Y_5_4(Y_int)
             divs = rough_squarefree_divisors_band(5, T_int)
+            rough_primes = [p for p in primes_up_to(T_int) if p >= 5]
             s_d = arb(0)
             for d in divs:
                 s_d += arb(d) ** (-(arb(1) + sigma_half) / arb(2))
+            s_p = arb(0)
+            for p in rough_primes:
+                s_p += arb(p) ** (-(arb(1) + sigma_half) / arb(2))
             mult_homog = s_d * s_d
+            prime_subset_lb = s_p * s_p
             cs_monotone_vals.append(mult_homog)
+            prime_lb_vals.append(prime_subset_lb)
             cs_rows.append(
                 {
                     "Y": Y_int,
@@ -710,6 +889,11 @@ def verify_section_3_route_a_moebius_rough_descent(prec_bits: int = 256) -> Dict
                     "U": 5,
                     "sigma": "1/2",
                     "rough_divisor_count": len(divs),
+                    "rough_prime_count": len(rough_primes),
+                    "prime_subset_lower_bound": serialize_arb_certified(prime_subset_lb),
+                    "composite_rough_excess_over_prime_subset": serialize_arb_certified(
+                        mult_homog - prime_subset_lb
+                    ),
                     "optimal_cs_homogeneous_multiplier": serialize_arb_certified(mult_homog),
                     "excess_over_contraction_threshold_half": serialize_arb_certified(
                         mult_homog - arb("0.5")
@@ -717,7 +901,14 @@ def verify_section_3_route_a_moebius_rough_descent(prec_bits: int = 256) -> Dict
                 }
             )
         cs_obstruction_ok = bool(
-            cs_monotone_vals[0] > arb(1)
+            prime_lb_vals[0] > arb("0.5")
+            and prime_lb_vals[1] > prime_lb_vals[0]
+            and prime_lb_vals[2] > prime_lb_vals[1]
+            and all(
+                bool(m_full > m_pr)
+                for m_full, m_pr in zip(cs_monotone_vals, prime_lb_vals)
+            )
+            and cs_monotone_vals[0] > arb(1)
             and cs_monotone_vals[1] > cs_monotone_vals[0]
             and cs_monotone_vals[2] > cs_monotone_vals[1]
         )
@@ -776,10 +967,64 @@ def selberg_w2_weight_arb(d: int, mode: str = "liouville") -> arb:
     return total
 
 
+def von_mangoldt_arb(n: int) -> arb:
+    """Ordinary von Mangoldt function Lambda(n) = log p if n = p^k (k >= 1), else 0."""
+    pe = prime_power_base_and_exp(n)
+    if pe is None:
+        return arb(0)
+    return arb(pe[0]).log()
+
+
+def square_mangoldt_B_arb(n: int) -> arb:
+    """Square-supported Mangoldt weight B(n) = Lambda(sqrt(n)) if n = m^2 (m >= 2), else 0,
+    so Lambda_lambda(n) = -Lambda(n) + 2*B(n).
+    """
+    if n < 4:
+        return arb(0)
+    r = math.isqrt(n)
+    if r * r != n:
+        return arb(0)
+    return von_mangoldt_arb(r)
+
+
+def selberg_w2_via_mangoldt_square_decomposition_arb(n: int) -> arb:
+    """Evaluate w_{2,lambda}(n) via the PNT/hyperbola decomposition
+    w_{2,lambda}(n) = (-Lambda(n)*log(n) + (Lambda*Lambda)(n))
+                    + 2*(B(n)*log(n) - 2*(Lambda*B)(n)) + 4*(B*B)(n).
+    """
+    if n < 2:
+        return arb(0)
+    lg_n = arb(n).log()
+    lam_n = von_mangoldt_arb(n)
+    b_n = square_mangoldt_B_arb(n)
+    conv_ll = arb(0)
+    conv_lb = arb(0)
+    conv_bb = arb(0)
+    for u in range(2, n):
+        if n % u != 0:
+            continue
+        v = n // u
+        lu = von_mangoldt_arb(u)
+        lv = von_mangoldt_arb(v)
+        bu = square_mangoldt_B_arb(u)
+        bv = square_mangoldt_B_arb(v)
+        conv_ll += lu * lv
+        conv_lb += lu * bv
+        conv_bb += bu * bv
+    return (
+        (-lam_n * lg_n + conv_ll)
+        + arb(2) * (b_n * lg_n - arb(2) * conv_lb)
+        + arb(4) * conv_bb
+    )
+
+
 def verify_section_4_route_b_and_c_logarithmic_and_selberg(
     prec_bits: int = 256,
 ) -> Dict[str, Any]:
-    """Verify Route B exact prime-power identity, shift hierarchy, factorial growth, and Route C w_2 cancellation."""
+    """Verify Route B exact prime-power identity, shift hierarchy, narrowed fixed-span non-closure
+    (including u^{3+m/2} <= u^{m+5/2} and M approx 2*log Y ratio), and Route C Selberg decomposition
+    plus exact discrete Abel summation identity and boundary-term majorant obstruction.
+    """
     saved = flint_ctx.prec
     try:
         flint_ctx.prec = prec_bits
@@ -900,11 +1145,13 @@ def verify_section_4_route_b_and_c_logarithmic_and_selberg(
         tele_res = q0_128 - (tele_sum + q4_128 / (lg128 ** 4))
         tele_ok = bool(arb(0) in tele_res and abs(tele_res) < arb("1e-66"))
 
-        # 3. Kernel-shift uniform bound for all X >= 1:
+        # 3. Kernel-shift uniform bound for all X >= 1 (using u^{3+m/2} <= u^{m+5/2} for u >= 1, m >= 1):
         #    m = 0: M_1^{[0]} = 1/2 + 2*(3/(2e))^{3/2}
         #    m >= 1: M_1^{[m]} = 2*((2m+5)/(4e))^{(2m+5)/4} + (m!/2^{m+1})*(1 + 1/e) + 2*(m/(3e))^m
-        # and asymptotic factorial lower bound >= m! / (2^{m+1} * e) on lim_{X->infty} X^{-1/2} sum_{n<=T(X)} |log(X/n)|^m phi_n(X)
-        # (and directly on lim_{X->infty} X^{-1/2} Q_{1,T(X)}^{[2r]}(X) for all even m = 2r).
+        # Linear independence of {(log w)^m w^{5/2} e^{-w^2}}_{m>=0} rules out exact closure in a FIXED
+        # finite linear span. It does NOT rule out Y-dependent growing truncation order M(Y): at
+        # M = 2*log Y (illustrated at log Y = 10, M = 20), M! / [2^M * (log Y)^M] ~ sqrt(2*tau*log Y) * Y^{-2}
+        # is small, while accumulated prime-power layers and uniform error control remain open.
         growth_rows: List[Dict[str, Any]] = []
         growth_ok = True
         for m_ord in range(0, 7):
@@ -922,7 +1169,6 @@ def verify_section_4_route_b_and_c_logarithmic_and_selberg(
                 t3 = arb(2) * ((arb(m_ord) / (arb(3) * e_val)) ** m_ord)
                 M_upper = t1 + t2 + t3
             asymp_lb = m_fact / ((arb(2) ** (m_ord + 1)) * e_val)
-            # Sample check at X = 128, T = 431 for unsigned_1: Q_1^{[m]}(128)/sqrt(128) <= M_upper
             q_uns_norm = abs(
                 evaluate_Q_shifted_finite_arb(
                     X128, L=431, m_shift=m_ord, mode="unsigned_1", prec_bits=prec_bits
@@ -940,8 +1186,27 @@ def verify_section_4_route_b_and_c_logarithmic_and_selberg(
                 }
             )
 
-        # 4. Route C: Second-order Liouville-Selberg identity & double-pole residue cancellation
-        # Verify sum_{1<=n<=T} a(n) (log n)^2 phi_n(X) = sum_{2<=d<=T} w_{2,a}(d) d^{-1/2} Q_{a,floor(T/d)}(X/d)
+        # Certify u^{3+m/2} <= u^{m+5/2} for u >= 1, m >= 1 (since (m+5/2) - (3+m/2) = (m-1)/2 >= 0)
+        # and growing-order M = 2*log Y ratio at log Y = 10, M = 20:
+        logY_grow = arb(10)
+        M_grow = 20
+        growing_order_ratio_M20 = arb(math.factorial(M_grow)) / (
+            (arb(2) ** M_grow) * (logY_grow ** M_grow)
+        )
+        stirling_scale_sqrt_tau_2_logY_Y_neg2 = (
+            (_tau_arb() * arb(2) * logY_grow).sqrt()
+        ) * ((-arb(2) * logY_grow).exp())
+        u_step_sample_diff_m2_u3 = (arb(3) ** (arb(2) + arb("2.5"))) - (
+            arb(3) ** (arb(3) + arb(1))
+        )
+        growing_order_check_ok = bool(
+            growing_order_ratio_M20 < arb("1e-7")
+            and growing_order_ratio_M20 > stirling_scale_sqrt_tau_2_logY_Y_neg2
+            and u_step_sample_diff_m2_u3 > arb(0)
+        )
+
+        # 4. Route C: Second-order Liouville-Selberg identity, Lambda_lambda = -Lambda + 2*B decomposition,
+        #    and exact discrete Abel summation identity + boundary-term majorant obstruction
         rc_rows: List[Dict[str, Any]] = []
         rc_id_ok = True
         for mode in ("liouville", "a2", "unsigned_1"):
@@ -978,8 +1243,26 @@ def verify_section_4_route_b_and_c_logarithmic_and_selberg(
                 }
             )
 
+        # Verify w_{2,lambda}(n) == (-Lambda + 2B)*log + (-Lambda + 2B)*(-Lambda + 2B) for all 2 <= n <= 200
+        mangoldt_decomp_ok = True
+        max_decomp_res = arb(0)
+        for n_chk in range(2, 201):
+            diff_n = abs(
+                selberg_w2_weight_arb(n_chk, "liouville")
+                - selberg_w2_via_mangoldt_square_decomposition_arb(n_chk)
+            )
+            mangoldt_decomp_ok = mangoldt_decomp_ok and bool(
+                arb(0)
+                in (
+                    selberg_w2_weight_arb(n_chk, "liouville")
+                    - selberg_w2_via_mangoldt_square_decomposition_arb(n_chk)
+                )
+                and diff_n < arb("1e-70")
+            )
+            if bool(diff_n > max_decomp_res):
+                max_decomp_res = diff_n
+
         # Certified Selberg double-pole residue Res_{s=1}(D_lambda''(s)/D_lambda(s)) = 4*zeta'(2)/zeta(2) - 2*gamma_E
-        # Using acb_series([2, 1], prec=2).zeta() Taylor jet at s = 2: [zeta(2), zeta'(2)]
         z2_jet = acb_series([acb(2), acb(1)], prec=2).zeta()
         zeta_2 = z2_jet[0].real
         zeta_prime_2 = z2_jet[1].real
@@ -988,7 +1271,12 @@ def verify_section_4_route_b_and_c_logarithmic_and_selberg(
 
         # Summatory comparison at u = 400: (1/u)*sum_{d<=u} w_{2,lambda}(d) vs (1/(u log u))*sum_{d<=u} w_{2,a2}(d)
         u_sel = 400
-        sum_w2_lam = sum((selberg_w2_weight_arb(d, "liouville") for d in range(2, u_sel + 1)), arb(0))
+        W2_prefix: Dict[int, arb] = {1: arb(0)}
+        running_w2 = arb(0)
+        for d_idx in range(2, u_sel + 1):
+            running_w2 += selberg_w2_weight_arb(d_idx, "liouville")
+            W2_prefix[d_idx] = running_w2
+        sum_w2_lam = W2_prefix[u_sel]
         sum_w2_a2 = sum((selberg_w2_weight_arb(d, "a2") for d in range(2, u_sel + 1)), arb(0))
         avg_w2_lam = sum_w2_lam / arb(u_sel)
         avg_w2_a2_over_log = sum_w2_a2 / (arb(u_sel) * arb(u_sel).log())
@@ -998,14 +1286,101 @@ def verify_section_4_route_b_and_c_logarithmic_and_selberg(
             and avg_w2_a2_over_log > arb("1.0")
         )
 
+        # Exact discrete Abel summation identity on 2 <= d <= b = floor(Y) (including boundary W_2(b)*g_b(X)
+        # and cutoff jumps L_d -> L_{d+1}) and certified boundary-term lower bound of the specified
+        # triangle-inequality majorant: |W_2(b)| * b^{-1/2} * sqrt(E_{L_b}(Y / b)).
+        abel_rows: List[Dict[str, Any]] = []
+        abel_all_ok = True
+        for Y_abel_fr in (Fraction(16, 1), Fraction(32, 1), Fraction(65, 2), Fraction(64, 1)):
+            b_floor = int(Y_abel_fr.numerator // Y_abel_fr.denominator)
+            _, T_ab = exact_U0_T_pair_for_rational_Y(Y_abel_fr)
+            X_ab = _frac_to_arb(Y_abel_fr)
+
+            def _g_d(d_val: int, _T: int = T_ab, _X: arb = X_ab) -> arb:
+                return evaluate_Q_shifted_finite_arb(
+                    _X / arb(d_val),
+                    L=_T // d_val,
+                    m_shift=0,
+                    mode="liouville",
+                    prec_bits=prec_bits,
+                ) / arb(d_val).sqrt()
+
+            direct_block = sum((selberg_w2_weight_arb(d, "liouville") * _g_d(d) for d in range(2, b_floor + 1)), arb(0))
+            boundary_val = W2_prefix[b_floor] * _g_d(b_floor)
+            abel_step_sum = arb(0)
+            decomposed_step_sum = arb(0)
+            jump_count = 0
+            for d in range(2, b_floor):
+                L_d = T_ab // d
+                L_d1 = T_ab // (d + 1)
+                if L_d > L_d1:
+                    jump_count += 1
+                diff_direct = _g_d(d) - _g_d(d + 1)
+                smooth_step = (
+                    evaluate_Q_shifted_finite_arb(X_ab / arb(d), L=L_d, m_shift=0, mode="liouville", prec_bits=prec_bits)
+                    / arb(d).sqrt()
+                    - evaluate_Q_shifted_finite_arb(X_ab / arb(d + 1), L=L_d, m_shift=0, mode="liouville", prec_bits=prec_bits)
+                    / arb(d + 1).sqrt()
+                )
+                cutoff_jump = arb(0)
+                for n_jmp in range(L_d1 + 1, L_d + 1):
+                    cutoff_jump += arb(liouville_lambda_int(n_jmp)) * evaluate_phi_n_arb(
+                        X_ab / arb(d + 1), n_jmp, prec_bits=prec_bits
+                    )
+                cutoff_jump /= arb(d + 1).sqrt()
+                abel_step_sum += W2_prefix[d] * diff_direct
+                decomposed_step_sum += W2_prefix[d] * (smooth_step + cutoff_jump)
+
+            abel_res = direct_block - (boundary_val + abel_step_sum)
+            step_decomp_res = abel_step_sum - decomposed_step_sum
+            L_b = T_ab // b_floor
+            W_b_fr = Y_abel_fr / b_floor
+            E_Lb_Wb = evaluate_E_L_scale_arb(W_b_fr, L=L_b, mode="liouville", prec_bits=prec_bits)
+            boundary_majorant_l2 = (abs(W2_prefix[b_floor]) / arb(b_floor).sqrt()) * E_Lb_Wb.sqrt()
+            lg_Y_ab = X_ab.log()
+            boundary_majorant_norm_sq = (boundary_majorant_l2 * boundary_majorant_l2) / (
+                lg_Y_ab ** 4
+            )
+            ok_ab = bool(
+                arb(0) in abel_res
+                and abs(abel_res) < arb("1e-65")
+                and arb(0) in step_decomp_res
+                and abs(step_decomp_res) < arb("1e-65")
+                and jump_count > 0
+                and boundary_majorant_l2 > arb("0.2")
+                and boundary_majorant_norm_sq > arb("1e-4")
+            )
+            abel_all_ok = abel_all_ok and ok_ab
+            abel_rows.append(
+                {
+                    "Y": str(Y_abel_fr),
+                    "b_floor_Y": b_floor,
+                    "T_Y": T_ab,
+                    "L_b": L_b,
+                    "Y_over_b": str(W_b_fr),
+                    "nonzero_cutoff_jump_steps_below_b": jump_count,
+                    "W2_at_b": serialize_arb_certified(W2_prefix[b_floor]),
+                    "abel_identity_residual": serialize_arb_certified(abel_res),
+                    "step_jump_decomposition_residual": serialize_arb_certified(step_decomp_res),
+                    "E_Lb_at_Y_over_b": serialize_arb_certified(E_Lb_Wb),
+                    "boundary_term_l2_majorant": serialize_arb_certified(boundary_majorant_l2),
+                    "normalized_boundary_majorant_sq_over_log4": serialize_arb_certified(
+                        boundary_majorant_norm_sq
+                    ),
+                }
+            )
+
         all_ok = bool(
             all_rb_ok
             and rb_a2_falsifies_neg1_k
             and shift_ok
             and tele_ok
             and growth_ok
+            and growing_order_check_ok
             and rc_id_ok
+            and mangoldt_decomp_ok
             and selberg_pole_contrast_ok
+            and abel_all_ok
         )
         return {
             "route_b_identity_cases": rb_rows,
@@ -1017,14 +1392,30 @@ def verify_section_4_route_b_and_c_logarithmic_and_selberg(
                 "telescope_verified": tele_ok,
             },
             "kernel_shift_factorial_growth_table": growth_rows,
+            "narrowed_span_closure_and_growing_M_note": {
+                "scope_note": "Linear independence of {(log w)^m w^{5/2} e^{-w^2}} rules out exact closure in a fixed finite span; growing M(Y) approx 2*log Y makes M!/[2^M*(log Y)^M] small, while accumulated prime-power layers and uniform bounds remain open.",
+                "u_pow_m_plus_5_2_minus_u_pow_3_plus_m_2_at_m2_u3": serialize_arb_certified(
+                    u_step_sample_diff_m2_u3
+                ),
+                "growing_order_ratio_M20_at_logY10": serialize_arb_certified(
+                    growing_order_ratio_M20
+                ),
+                "stirling_reference_sqrt_2tau_logY_Y_neg2_at_logY10": serialize_arb_certified(
+                    stirling_scale_sqrt_tau_2_logY_Y_neg2
+                ),
+            },
             "route_c_selberg_second_order": {
+                "dirichlet_series_analytic_domain": "z = x + i*y (x, y in R) with x > 1 for bounded controls |a(n)| <= 1 (finite identities hold for all completely multiplicative a with a(1) = 1)",
                 "identity_cases_T77": rc_rows,
+                "mangoldt_square_B_decomposition_verified_2_to_200": mangoldt_decomp_ok,
+                "mangoldt_square_B_max_abs_residual": serialize_arb_certified(max_decomp_res),
                 "c_sel_lambda_residue_4_zetap2_over_zeta2_minus_2_gamma": serialize_arb_certified(
                     c_sel_lambda
                 ),
                 "u_summatory": u_sel,
                 "sum_w2_lambda_over_u": serialize_arb_certified(avg_w2_lam),
                 "sum_w2_a2_over_u_log_u": serialize_arb_certified(avg_w2_a2_over_log),
+                "abel_summation_procedure_and_boundary_majorant": abel_rows,
             },
             "all_section_4_checks_pass": all_ok,
         }
@@ -1178,8 +1569,127 @@ def verify_section_5_cutoffs_small_scales_and_base_floor(
             and m_all_L_arb > arb("8e-4")
         )
 
+        # 5. Scoped linear cutoff replacement audit (Section 5.2 repair):
+        # Define SEPARATELY:
+        # (i) actual signed aggregate linear cutoff error ||E_{cut,lin}||_{L^2([Y, tau Y], dX/X)}^2,
+        # (ii) squared Minkowski sum of individual L^2 cutoff error norms,
+        # (iii) squared unsigned analytic majorant (asymp Y / (log Y)^2).
+        # State ONLY the proved chain 0 <= (i) <= (ii) <= (iii); do NOT claim a Theta(Y/(log Y)^2)
+        # lower bound on the signed aggregate error (actual signed cancellation remains unresolved).
+        lin_cut_rows: List[Dict[str, Any]] = []
+        lin_cut_all_ok = True
+        for Y_lc in (32, 64):
+            T_lc = exact_T_cutoff_ceil_Y_5_4(Y_lc)
+            Y_lc_arb = arb(Y_lc)
+            primes_lc = [p for p in primes_up_to(Y_lc) if p >= 5]
+            prime_ranges: List[Tuple[int, int, int, int]] = []
+            sum_indiv_norms = arb(0)
+            sum_unsigned_maj = arb(0)
+            for p_lc in primes_lc:
+                L_p = T_lc // p_lc
+                _, T_Wp = exact_U0_T_pair_for_rational_Y(Fraction(Y_lc, p_lc))
+                lo_n = min(L_p, T_Wp) + 1
+                hi_n = max(L_p, T_Wp)
+                sgn_p = 1 if L_p >= T_Wp else -1
+                prime_ranges.append((p_lc, lo_n, hi_n, sgn_p))
+                if lo_n > hi_n:
+                    indiv_norm = arb(0)
+                else:
+                    Wp_arb = Y_lc_arb / arb(p_lc)
+
+                    def _indiv_diff_sq(
+                        z: acb,
+                        _analytic: bool,
+                        _lo: int = lo_n,
+                        _hi: int = hi_n,
+                    ) -> acb:
+                        dg = acb(0)
+                        z2 = z * z
+                        for n_k in range(_lo, _hi + 1):
+                            nc = acb(n_k)
+                            dg += (
+                                acb(liouville_lambda_int(n_k))
+                                * (nc ** (-3))
+                                * (-z2 / (nc * nc)).exp()
+                            )
+                        return (z ** 4) * (dg * dg)
+
+                    indiv_sq = _acb_integral_certified_arb(
+                        _indiv_diff_sq,
+                        Wp_arb,
+                        tau * Wp_arb,
+                        prec_bits=prec_bits,
+                    )
+                    indiv_norm = indiv_sq.sqrt()
+                sum_indiv_norms += indiv_norm / arb(p_lc).sqrt()
+                maj_factor_p = arb(16) / arb(p_lc) if p_lc < 16 else arb(1)
+                indiv_maj = ((tau5_minus_1 / arb(20)) * maj_factor_p).sqrt()
+                sum_unsigned_maj += indiv_maj / arb(p_lc).sqrt()
+
+            def _agg_signed_diff_sq(
+                z: acb,
+                _analytic: bool,
+                _pr: Sequence[Tuple[int, int, int, int]] = tuple(prime_ranges),
+            ) -> acb:
+                tot = acb(0)
+                for p_lc, lo_n, hi_n, sgn_p in _pr:
+                    if lo_n > hi_n:
+                        continue
+                    w_z = z / acb(p_lc)
+                    w2 = w_z * w_z
+                    dg = acb(0)
+                    for n_k in range(lo_n, hi_n + 1):
+                        nc = acb(n_k)
+                        dg += (
+                            acb(liouville_lambda_int(n_k))
+                            * (nc ** (-3))
+                            * (-w2 / (nc * nc)).exp()
+                        )
+                    tot += acb(sgn_p) * (acb(p_lc) ** (-3)) * dg
+                return (z ** 4) * (tot * tot)
+
+            signed_agg_sq = _acb_integral_certified_arb(
+                _agg_signed_diff_sq,
+                Y_lc_arb,
+                tau * Y_lc_arb,
+                prec_bits=prec_bits,
+            )
+            minkowski_sq = sum_indiv_norms * sum_indiv_norms
+            unsigned_maj_sq = sum_unsigned_maj * sum_unsigned_maj
+            ok_lc = bool(
+                minkowski_sq - signed_agg_sq > arb(0)
+                and unsigned_maj_sq - minkowski_sq > arb(0)
+            )
+            lin_cut_all_ok = lin_cut_all_ok and ok_lc
+            lin_cut_rows.append(
+                {
+                    "Y": Y_lc,
+                    "U": 5,
+                    "T_Y": T_lc,
+                    "actual_signed_aggregate_error_l2_sq": serialize_arb_certified(
+                        signed_agg_sq
+                    ),
+                    "minkowski_sum_individual_error_norms_sq": serialize_arb_certified(
+                        minkowski_sq
+                    ),
+                    "unsigned_analytic_majorant_sq": serialize_arb_certified(
+                        unsigned_maj_sq
+                    ),
+                    "margin_minkowski_minus_signed_sq": serialize_arb_certified(
+                        minkowski_sq - signed_agg_sq
+                    ),
+                    "margin_majorant_minus_minkowski_sq": serialize_arb_certified(
+                        unsigned_maj_sq - minkowski_sq
+                    ),
+                }
+            )
+
         all_ok = bool(
-            counterexample_ok and cmp_all_ok and small_scale_ok and base_floor_ok
+            counterexample_ok
+            and cmp_all_ok
+            and small_scale_ok
+            and base_floor_ok
+            and lin_cut_all_ok
         )
         return {
             "counterexample_Y_9_4_d_2": {
@@ -1198,6 +1708,10 @@ def verify_section_5_cutoffs_small_scales_and_base_floor(
                 "counterexample_certified": counterexample_ok,
             },
             "cutoff_energy_comparison_samples": cmp_rows,
+            "linear_cutoff_replacement_three_quantities": {
+                "scope_note": "Separates (i) actual signed aggregate error L^2 norm squared, (ii) squared Minkowski sum of individual error norms, and (iii) squared unsigned analytic majorant (~ Y/(log Y)^2); actual signed cancellation is left unresolved.",
+                "samples": lin_cut_rows,
+            },
             "small_scale_positivity": {
                 "c_small_sharp_1_plus_exp_neg1_minus_zeta3": serialize_arb_certified(
                     c_small_sharp
@@ -1369,15 +1883,26 @@ def verify_section_6_route_d_diagonal_contraction_and_off_diagonal(
         )
 
         # 2. Evaluate Route D across scales Y in {8, 16, 32, 64, 128} for Liouville
+        #    (finite 5-scale certified observations; also verifies exact outer factor 2 in
+        #    E(Y) <= 2*D_tilde(Y) + 2*X_tilde(Y) + 2*E_sh1(Y)).
         liouville_scale_rows: List[Dict[str, Any]] = []
         diag_bound_all_ok = True
+        outer_factor_2_all_ok = True
         for Y_int in (8, 16, 32, 64, 128):
             vals = _evaluate_route_d_totals_arb(Y_int, mode="liouville", prec_bits=prec_bits)
             rhs_diag_bound = arb(2) * vals["D_pp_W_ge_1_canonical"] + C_cut_diag
             margin_tilde_le_unw = vals["D_pp_unweighted"] - vals["D_tilde"]
             margin_diag_cap = rhs_diag_bound - vals["D_pp_unweighted"]
+            outer_2_rhs = (
+                arb(2) * vals["D_tilde"]
+                + arb(2) * vals["X_tilde"]
+                + arb(2) * vals["E_sh1"]
+            )
+            margin_outer_2 = outer_2_rhs - vals["E_main"]
             ok_y = bool(margin_tilde_le_unw > arb(0) and margin_diag_cap > arb(0))
+            ok_outer2 = bool(margin_outer_2 > arb(0))
             diag_bound_all_ok = diag_bound_all_ok and ok_y
+            outer_factor_2_all_ok = outer_factor_2_all_ok and ok_outer2
             liouville_scale_rows.append(
                 {
                     "Y": Y_int,
@@ -1388,6 +1913,10 @@ def verify_section_6_route_d_diagonal_contraction_and_off_diagonal(
                     "D_tilde_weighted": serialize_arb_certified(vals["D_tilde"]),
                     "D_pp_unweighted": serialize_arb_certified(vals["D_pp_unweighted"]),
                     "X_tilde_off_diagonal": serialize_arb_certified(vals["X_tilde"]),
+                    "outer_factor_2_transfer_rhs": serialize_arb_certified(outer_2_rhs),
+                    "margin_outer_factor_2_rhs_minus_E": serialize_arb_certified(
+                        margin_outer_2
+                    ),
                     "analytic_diagonal_bound_rhs": serialize_arb_certified(rhs_diag_bound),
                     "margin_D_pp_minus_D_tilde": serialize_arb_certified(margin_tilde_le_unw),
                     "margin_rhs_minus_D_pp": serialize_arb_certified(margin_diag_cap),
@@ -1522,15 +2051,46 @@ def verify_section_6_route_d_diagonal_contraction_and_off_diagonal(
                 }
             )
 
+        # 6. Conditional same-scale absorption parameter audit (`CONDITIONAL_ON_SIGNED_CORRELATION`, Theorem 26):
+        # Preserve exact outer factor 2: E(Y) <= 2*D_tilde(Y) + 2*[X_tilde(Y) + E_sh1(Y)].
+        # Under open hypothesis X_tilde(Y) + E_sh1(Y) <= A_eta * Y^eta + theta_eta * F(Y) with theta_eta in [0, 1/2):
+        # at eps = 1/4, eta = 1/8, theta_eta = 3/8 (< 1/2), choose q = 7/8 in (2*theta_eta, 1) = (3/4, 1)
+        # and log Y_* = 64. Note D_tilde(Y) <= D_pp(Y) <= (2/(log Y)^2) sum_{p^k<=Y} ((log p)^2/p^k) F(Y/p^k) + C_{cut,diag},
+        # so 2*D_tilde(Y) contributes homogeneous factor 2*Theta_eps^{diag}(Y) < 4*zeta''(1+eps)/(log Y)^2!
+        # Wait: let's track the exact factor 2 carefully:
+        # Since D_tilde(Y) <= Theta_eps^{diag,1}(Y) * G_eps(R) * Y^eps + C_{cut,diag} where
+        # Theta_eps^{diag}(Y) = (2/(log Y)^2) sum_{p^k<=Y} (log p)^2 / p^{k(1+eps)} < 2*zeta''(1+eps)/(log Y)^2,
+        # multiplying by the outer factor 2 in E(Y) <= 2*D_tilde(Y) + 2*(X_tilde(Y) + E_sh1(Y)) gives
+        # 2*theta_eta + 2*Theta_eps^{diag}(Y) < 2*theta_eta + 4*zeta''(1+eps)/(log Y)^2!
+        eps_abs = arb(1) / arb(4)
+        eta_abs = arb(1) / arb(8)
+        theta_abs = arb(3) / arb(8)
+        q_abs = arb(7) / arb(8)
+        logY_star_abs = arb(64)
+        jet3_quarter = acb_series([acb(arb(1) + eps_abs), acb(1)], prec=3).zeta()
+        zeta_pp_quarter = arb(2) * jet3_quarter[2].real
+        Theta_cap_at_Y_star = (arb(2) * zeta_pp_quarter) / (logY_star_abs * logY_star_abs)
+        total_homog_cap_at_Y_star = arb(2) * theta_abs + arb(2) * Theta_cap_at_Y_star
+        margin_below_q = q_abs - total_homog_cap_at_Y_star
+        boundary_theta_half_total = arb(2) * arb("0.5") + arb(2) * Theta_cap_at_Y_star
+        absorption_check_ok = bool(
+            margin_below_q > arb(0)
+            and arb(1) - q_abs > arb(0)
+            and boundary_theta_half_total > arb(1)
+        )
+
         all_ok = bool(
             diag_bound_all_ok
+            and outer_factor_2_all_ok
             and pair_consistency_ok
             and sign_split_ok
             and contraction_ok
+            and absorption_check_ok
         )
         return {
             "C_cut_diag_explicit_constant": serialize_arb_certified(C_cut_diag),
             "liouville_route_d_scale_sweep": liouville_scale_rows,
+            "finite_observation_scope_note": "Liouville X_tilde sign changes across Y in {8, 16, 32, 64, 128} and parity-control a_2 values at Y in {32, 128} are certified finite observations at those sampled scales, not asymptotic zero-mean, O(1), or growth theorems.",
             "pair_by_pair_off_diagonal_check_Y8": {
                 "pair_sum_X_tilde_Y8": serialize_arb_certified(pair_sum_8),
                 "subtraction_X_tilde_Y8": serialize_arb_certified(vals_8["X_tilde"]),
@@ -1540,6 +2100,28 @@ def verify_section_6_route_d_diagonal_contraction_and_off_diagonal(
             "parity_control_sign_split": control_comparison_rows,
             "sign_split_liouville_neg_vs_controls_pos": sign_split_ok,
             "all_epsilon_diagonal_contraction_table": contraction_rows,
+            "conditional_same_scale_absorption_parameters": {
+                "scope_label": "CONDITIONAL_ON_SIGNED_CORRELATION",
+                "open_hypothesis": "For every eta > 0 there exist A_eta >= 0, theta_eta in [0, 1/2), and Y_eta >= 2 such that X_tilde_{lambda,pp}(Y) + E_{sh,1}(Y) <= A_eta * Y^eta + theta_eta * F(Y) for all Y >= Y_eta.",
+                "sample_epsilon": "1/4",
+                "sample_eta": "1/8",
+                "sample_theta_eta": "3/8",
+                "sample_q": "7/8",
+                "sample_log_Y_star": 64,
+                "Theta_quarter_cap_at_exp64": serialize_arb_certified(
+                    Theta_cap_at_Y_star
+                ),
+                "two_theta_plus_two_Theta_cap_at_exp64": serialize_arb_certified(
+                    total_homog_cap_at_Y_star
+                ),
+                "contraction_slack_q_minus_homog_cap": serialize_arb_certified(
+                    margin_below_q
+                ),
+                "boundary_theta_half_homog_factor_exceeds_one": serialize_arb_certified(
+                    boundary_theta_half_total
+                ),
+                "absorption_verified": absorption_check_ok,
+            },
             "all_section_6_checks_pass": all_ok,
         }
     finally:
@@ -1692,6 +2274,7 @@ def execute_task_tc057_coupled_scale_bootstrap_audit(
 
     report: Dict[str, Any] = {
         "task_id": TASK_TC_057_ID,
+        "repair_task_id": TASK_TC_057R_ID,
         "parent_epic": EPIC_TC_042_ID,
         "prior_tasks": [
             TASK_TC_054_ID,
@@ -1713,12 +2296,15 @@ def execute_task_tc057_coupled_scale_bootstrap_audit(
         "tc056r_reviewed_commit": TC_056R_REVIEWED_COMMIT,
         "tc056r2_implementation_commit": TC_056R2_IMPLEMENTATION_COMMIT,
         "tc056r2_reviewed_tip": TC_056R2_REVIEWED_TIP,
-        "branch": "task/tc-057-coupled-arithmetic-scale-energy-bootstrap",
-        "research_outcome_class": "Outcome C (with new unconditional Route D cross-scale diagonal contraction theorem)",
+        "tc057_implementation_commit": TC_057_IMPLEMENTATION_COMMIT,
+        "tc057_reviewed_tip": TC_057_REVIEWED_TIP,
+        "branch": "task/tc-057r-tail-certification-obstruction-scope-and-transfer-proof-repair",
+        "research_outcome_class": "Outcome B / Scoped Obstruction & Conditional Reduction (unconditional Route D cross-scale diagonal estimate with Theta_eps^{diag}(Y) -> 0, proved conditional same-scale absorption transfer, and precisely scoped majorant/fixed-span obstructions; SUBGATE-TC-043A remains OPEN)",
         "subgate_tc043a_status": "OPEN",
         "rh_proved": False,
         "precision_bits": prec_bits,
         "circle_constant_convention": "tau = 2*pi (sole circle constant)",
+        "complex_coordinate_convention": "z = x + i*y (x, y in R; critical line x = 1/2)",
         "section_1_and_2_baseline_and_envelope": sec1_2,
         "section_3_route_a_moebius_rough_descent": sec3,
         "section_4_route_b_and_c_logarithmic_and_selberg": sec4,
@@ -1731,34 +2317,44 @@ def execute_task_tc057_coupled_scale_bootstrap_audit(
                 "logarithmic_prime_power_descent_and_kernel_shift_tc057 (Theorem 23): exact finite logarithmic prime-power descent at every shift order m >= 0 (including T = 0, 1), Liouville (-1)^k specialization, shift recurrence (log X) Q_T^{[m]} = Sigma_pp^{[m]} + Q_T^{[m+1]}, and M-step telescope.",
                 "quadratic_prime_power_diagonal_off_diagonal_decomposition_tc057 (Theorem 24): exact pointwise square decomposition into ((log p)^2 / p^k) Q_{floor(T/p^k)}(X/p^k)^2 diagonal plus pk_1 != pk_2 off-diagonal correlation, and Young domination bound.",
                 "inherited_vs_canonical_cutoff_comparison_and_counterexample_tc057 (Theorem 25): exact d >= 16 cutoff ordering T(W) <= floor(T(W*d)/d), all-d >= 2 lower bound (1/2) W^{5/4} d^{1/4} <= floor(T(W*d)/d), explicit (Y = 9/4, d = 2) counterexample L_2 = 1 < 2 = T(9/8) with Q_{lambda,1}(9/8) - Q_{lambda,2}(9/8) > 0, and unconditional small-scale positivity finiteQLambda L w >= (1/24) w^{5/2} > 0 for all L >= 1, w in (0, 1].",
+                "conditional_signed_correlation_same_scale_absorption_transfer_tc057r (Theorem 26; CONDITIONAL_ON_SIGNED_CORRELATION): local finiteness and envelope domination of normalizedScaleSupremum E eps R = sup_{1<=Z<=R} E(Z)/Z^eps without continuity or supremum attainment, complete finite-horizon same-scale absorption proof from E(Y) <= 2 D_tilde(Y) + 2 X_tilde(Y) + 2 E_sh1(Y) and X_tilde(Y) + E_sh1(Y) <= A_eta Y^eta + theta_eta F(Y) (theta_eta in [0, 1/2)) to E(Y) <<_eps Y^eps, boundary sharpness at theta = 1/2, and repaired Proposition 2.4 coefficient-mass localization vs. d_top >= Y/2 concentration negative control.",
             ],
             "2_analytic_theorems_proved_outside_lean": [
-                "Stieltjes remainder O_eta(1 + u^{1-alpha} exp(-c' sqrt(log u))) for sum_{p<=u} p^{-alpha} (alpha in (1/2, 1)) distinct from O_eta(1) higher prime-power tail, U-product slack 2*sqrt(c) = delta/(2*sqrt(2)) < delta/2, and exact 4-interval small-Y partition on [2, 4).",
-                "Unconditional local boundedness 0 <= E_L(Z) <= (tau - 1) M_1^2 Z and smaller-scale argument monotonicity Z / (log Z log log Z)^2 strictly increasing for Z >= e^4; exact (log Y)^b coefficient-mass exponent penalty requiring sigma > b / a.",
-                "Sharp small-scale positivity Q_{lambda,L}(w) >= (1 + e^{-1} - zeta(3)) w^{5/2} > (4/25) w^{5/2} > (1/24) w^{5/2} on (0, 1] forcing Theta(Y / (log Y)^2) energy on the W = Y/p < 1 band p in [ceil(tau Y), T(Y)] for Y > tau^4.",
-                "All-d >= 2 scalar cutoff energy comparison E_{L_d}(W) <= 2 E(W) + ((tau^5 - 1)/10) max(16/d, 1) (W = Y/d >= 1), contrasting Theta(Y / (log Y)^2) linear prime-sum cutoff replacement error against O(1) quadratic diagonal cutoff replacement error.",
-                "Kernel-shift non-closure and factorial uniform bound |Q_T^{[m]}(X)| <= M_1^{[m]} sqrt(X) (all X >= 1) with lim_{X->infty} X^{-1/2} sum_{n<=T(X)} |log(X/n)|^m phi_n(X) >= m! / (2^{m+1} e) (and lim_{X->infty} X^{-1/2} Q_{1,T(X)}^{[2r]}(X) >= (2r)! / (2^{2r+1} e) for all even m = 2r).",
-                "Second-order Liouville-Selberg double-pole cancellation Res_{s=1}(D_lambda''/D_lambda) = 4*zeta'(2)/zeta(2) - 2*gamma_E < 0 yielding sum_{d<=u} w_{2,lambda}(d) = O(u) (using lambda(p) = -1 at all primes), vs +2 u log u for parity controls a_S.",
-                "Unconditional norm/Cauchy-Schwarz lower-bound obstructions across Routes A, B, and C proved via the certified all-L base-scale energy floor inf_{W in [1,2], L>=1} E_L(W) >= m_{all-L} > 0: optimal CS multipliers diverge as Y^{(5/4)(1-sigma)}/(log Y)^2 (Route A) and Y^{1-sigma}/(log Y)^2 (Route B), and Route C norm passage after Abel summation yields >= c Y/(log Y)^4.",
-                "Unconditional Route D cross-scale prime-power diagonal inequality D_tilde_{lambda,pp}(Y) <= D_{lambda,pp}(Y) <= (2/(log Y)^2) sum_{p^k<=Y} ((log p)^2/p^k) F(Y/p^k) + C_{cut,diag} (all Y >= 2) with all-epsilon contraction factor Theta_eps^{diag}(Y) < 2*zeta''(1+eps)/(log Y)^2 -> 0.",
+                "Stieltjes remainder O_eta(1 + u^{1-alpha} exp(-c' sqrt(log u))) for sum_{p<=u} p^{-alpha} (alpha = 1/2 + eta in (1/2, 1), regimes splitting at eta = 1/2, using li_2(t) = int_2^t dv/log v with li_2(2) = 0) distinct from the complete k >= 2 higher prime-power sum 2 sum_{p<=u} [-log(1 - p^{-alpha}) - p^{-alpha}], U-product slack 2*sqrt(c) = delta/(2*sqrt(2)) < delta/2, and exact 4-interval small-Y partition on [2, 4).",
+                "Unconditional local boundedness 0 <= E_L(Z) <= (tau - 1) M_1^2 Z and smaller-scale argument monotonicity Z / (log Z log log Z)^2 strictly increasing for Z >= e^4; repaired Proposition 2.4 showing total mass B_0 (log Y)^b on d >= U(Y) = c (log Y)^a is an upper bound on Theta_sigma(Y), requiring quantitative localization on [U(Y), kappa U(Y)] for the lower barrier sigma < b / a (while equality sigma = b / a can contract if the constant < 1, and mass concentrated at floor(Y) gives (log Y)^b floor(Y)^{-sigma} -> 0).",
+                "Sharp small-scale positivity Q_{lambda,L}(w) >= (1 + e^{-1} - zeta(3)) w^{5/2} > (4/25) w^{5/2} > (1/24) w^{5/2} on (0, 1] forcing Theta(Y / (log Y)^2) individual-norm squared energy on the W = Y/p < 1 band p in [ceil(tau Y), T(Y)] for Y > tau^4.",
+                "All-d >= 2 scalar cutoff energy comparison E_{L_d}(W) <= 2 E(W) + ((tau^5 - 1)/10) max(16/d, 1) (W = Y/d >= 1), proving O(1) quadratic diagonal cutoff replacement cost while bounding the unsigned analytic majorant of linear prime-sum cutoff replacement at asymp Y / (log Y)^2 (leaving actual signed cancellation in the linear aggregate error unresolved).",
+                "Linear independence of {(log w)^m w^{5/2} e^{-w^2}}_{m>=0} ruling out exact algebraic closure in any fixed finite linear span, together with uniform bound |Q_T^{[m]}(X)| <= M_1^{[m]} sqrt(X) (via u^{3+m/2} <= u^{m+5/2} on u >= 1, m >= 1) and asymptotic factorial lower bound >= m! / (2^{m+1} e) at fixed m (not ruling out finite vector-energy inequalities, other kernels, or Y-dependent M(Y) approx 2 log Y).",
+                "Complete PNT and Dirichlet-hyperbola derivation of sum_{d<=x} w_{2,lambda}(d) = [4*zeta'(2)/zeta(2) - 2*gamma_E] x + O(x exp(-c'' sqrt(log x))) via Lambda_lambda = -Lambda + 2 B (with Dirichlet-series convergence on z = x + i y, x > 1, restricted to bounded controls |a(n)| <= 1), contrasted against +2 x log x + O(x) for parity controls a_S.",
+                "Precisely scoped majorant obstructions proved via the certified all-L base-scale energy floor inf_{W in [1,2], L>=1} E_L(W) >= m_{all-L} > 0: Route A prime-subset lower bound M_{A,sigma}(Y) >= (sum_{U<=p<=T(Y)} p^{-(1+sigma)/2})^2 >>_sigma T(Y)^{1-sigma}/(log T(Y))^2 -> infty obstructing the homogeneous Cauchy-Schwarz majorant; Route B Cauchy-Schwarz multiplier divergence >>_sigma Y^{1-sigma}/(log Y)^2; and Route C obstruction of the specified discrete Abel triangle-inequality majorant via its b = floor(Y) boundary term |W_2(b)| b^{-1/2} sqrt(E_{L_b}(Y/b)) >> sqrt(Y) (normalized square >> Y/(log Y)^4), without lower-bounding the signed sums or ruling out compensated formulations.",
+                "Unconditional Route D cross-scale prime-power diagonal inequality D_tilde_{lambda,pp}(Y) <= D_{lambda,pp}(Y) <= (2/(log Y)^2) sum_{p^k<=Y} ((log p)^2/p^k) F(Y/p^k) + C_{cut,diag} (all Y >= 2) whose homogeneous contraction factor satisfies Theta_eps^{diag}(Y) < 2*zeta''(1+eps)/(log Y)^2 -> 0 (not claiming D_tilde_{lambda,pp}(Y) itself tends to 0).",
             ],
             "3_conditional_implications_open_hypothesis": [
                 "Polylogarithmic bootstrap implication (Theorem 21, CONDITIONAL_ON_RECURSION): IF F(Y) <= A_eta Y^eta + B_eta F(Y/U_eta(Y)) holds for all Y >= Y_eta with U_eta(Y) = c_eta (log Y log log Y)^2, THEN E(Y) <= F(Y) <<_eps Y^eps for every eps > 0.",
-                "Route D off-diagonal + shifted-kernel transfer: IF for every eta > 0, X_tilde_{lambda,pp}(Y) + 2 E_shifted_1(Y) <= A_eta Y^eta + theta F(Y) (with theta < 1/2), THEN combined with Route D's unconditional diagonal contraction Theta_eps^{diag}(Y) -> 0, E(Y) <<_eps Y^eps follows unconditionally.",
+                "Route D same-scale absorption transfer (Theorem 26, CONDITIONAL_ON_SIGNED_CORRELATION): IF for every eta > 0 there exist A_eta >= 0, theta_eta in [0, 1/2), and Y_eta >= 2 such that X_tilde_{lambda,pp}(Y) + E_{sh,1}(Y) <= A_eta Y^eta + theta_eta F(Y) for all Y >= Y_eta, THEN combined with E(Y) <= 2 D_tilde_{lambda,pp}(Y) + 2 X_tilde_{lambda,pp}(Y) + 2 E_{sh,1}(Y) and Theta_eps^{diag}(Y) -> 0, finite-horizon absorption on G_eps(R) = sup_{1<=Z<=R} E(Z)/Z^eps proves E(Y) <<_eps Y^eps uniformly for all Y >= 1.",
             ],
             "4_certified_finite_computations": [
-                "Discontinuous jump E_3(2^{4/5}) != E_2(2^{4/5}); counterexample (Y = 9/4, d = 2) Q_{lambda,1}(9/8) - Q_{lambda,2}(9/8) > 0 and E_1(9/8) != E_2(9/8); c_small = 1 + e^{-1} - zeta(3) = 0.165822538011... > 4/25 > 1/24; all-L base-scale energy floor m_{all-L} = I_1 = 0.000804166369... > 8e-4 > 0; Selberg residue c_{Sel,lambda} = -3.434275302181... < -3.43 < 0; C_{cut,diag} = 22312.6918412014...; Theta_eps^{diag}(128) and threshold caps for eps in {1/2, 1/4, 1/8}; sign-oscillating X_tilde_{lambda,pp}(Y) (< 0 at Y in {8,32,128}, > 0 at Y in {16,64}) vs coherently positive linear growth X_tilde_{a_2,pp}(32) = +0.52015... -> X_tilde_{a_2,pp}(128) = +3.93411....",
+                (
+                    "Complete k >= 2 higher prime-power enclosure "
+                    "2 sum_{p<=1000} [-log(1 - p^{-3/4}) - p^{-3/4}] = "
+                    f"{sec1_2['stieltjes_vs_higher_prime_power_tail_u1000']['higher_prime_power_sum']['arb_ball_str']} "
+                    "cross-checked against K = 40 and K = 160 series-plus-proved-tail enclosures, strictly exceeding "
+                    "the invalid uncertified k=2..39 partial sum by more than the exact first omitted term "
+                    "1/(20 * 2^30) > 4.65e-11."
+                ),
+                "Discontinuous jump E_3(2^{4/5}) != E_2(2^{4/5}); counterexample (Y = 9/4, d = 2) Q_{lambda,1}(9/8) - Q_{lambda,2}(9/8) > 0 and E_1(9/8) != E_2(9/8); c_small = 1 + e^{-1} - zeta(3) = 0.165822538011... > 4/25 > 1/24; all-L base-scale energy floor m_{all-L} = I_1 = 0.000804166369... > 8e-4 > 0; Selberg residue c_{Sel,lambda} = -3.434275302181... < -3.43 < 0; C_{cut,diag} = 22312.6918412014...; Theta_eps^{diag}(128) and threshold caps for eps in {1/2, 1/4, 1/8}.",
+                "Certified finite observations at sampled scales: Liouville X_tilde_{lambda,pp}(Y) changes sign across the five sampled scales Y in {8, 16, 32, 64, 128} (< 0 at Y in {8, 32, 128}, > 0 at Y in {16, 64}), whereas at sampled Y in {32, 128} the 2-adic parity control has X_tilde_{a_2,pp}(32) = +0.52015... and X_tilde_{a_2,pp}(128) = +3.93411... (reported strictly as finite sampled data, not asymptotic zero-mean, O(1), or growth claims).",
             ],
             "5_consistency_checks": [
-                "Exact integer-power small-Y cutoff checks on [2, 4) vs Arb bounds; direct pair-by-pair off-diagonal quadrature sum_{pk_1 != pk_2} vs subtraction E_Sigma_pp - D_tilde at Y = 8 (T = 14); Route A / Route B / Route C finite identity zero-enclosures across T = 0, 1, 6, 14, 15, 30, 77, 431 and M = 4 shift telescope.",
+                "Complete log-series prime-power sum vs K = 40 and K = 160 series + 2 r^K / [K(1 - r)] tail bounds; w_{2,lambda}(n) direct convolution vs (-Lambda + 2B) decomposition on 2 <= n <= 200; exact discrete Abel summation identity with floor(T/d) cutoff jumps on 2 <= d <= floor(Y); direct pair-by-pair off-diagonal quadrature vs subtraction E_Sigma_pp - D_tilde at Y = 8 (T = 14); Route A / Route B / Route C finite identity zero-enclosures across T = 0, 1, 6, 14, 15, 30, 77, 431 and M = 4 shift telescope.",
             ],
             "6_conjectures_and_falsified_candidates": [
-                "Open target conjecture (SUBGATE-TC-043A): unconditional subpower bound E(Y) <<_eps Y^eps (or equivalently Route D signed correlation control X_tilde_{lambda,pp}(Y) + 2 E_shifted_1(Y) <= A_eta Y^eta + theta F(Y) with theta < 1/2).",
-                "Candidate I (Route A + optimal CS): falsified analytically and numerically (M_{A,1/2}(Y) grows monotonically above 1).",
-                "Candidate II (Route B + CS / W<1 tail): falsified analytically via m_{all-L} > 0 and W<1 uniform summand positivity.",
-                "Candidate III (Route C Selberg weight + Minkowski/Abel norm): falsified for power saving via m_{all-L} > 0 on d in [Y/2, Y] (yields >= c Y/(log Y)^4).",
-                "Candidate IV (Inherited cutoff replacement L_d -> T(Y/d) before squaring): falsified at (Y = 9/4, d = 2) for ordering and creates Theta(Y/(log Y)^2) linear error vs O(1) diagonal error.",
-                "Parity controls a_2, a_{3,5,7}, and unsigned 1 falsify uniform Rough-Moebius sign (-1/sqrt(d)), (-1)^k prime-power sign, Selberg double-pole cancellation, and destructive off-diagonal cancellation X_tilde < 0.",
+                "Open target conjecture (SUBGATE-TC-043A): unconditional subpower bound E(Y) <<_eps Y^eps, or sufficient Route D signed-correlation hypothesis X_tilde_{lambda,pp}(Y) + E_{sh,1}(Y) <= A_eta Y^eta + theta_eta F(Y) (theta_eta in [0, 1/2)).",
+                "Candidate I (Route A + homogeneous Cauchy-Schwarz majorant): specified Cauchy-Schwarz majorant falsified for contraction via prime-subset lower bound M_{A,sigma}(Y) >= M_{A,sigma}^{prime}(Y) >>_sigma T(Y)^{1-sigma}/(log T(Y))^2 -> infty (does not lower-bound the signed rough sum).",
+                "Candidate II (Route B + fixed finite linear span closure / uncompensated Cauchy-Schwarz majorant): exact closure in a fixed finite span of {(log w)^m w^{5/2} e^{-w^2}} falsified by linear independence, and uncompensated Cauchy-Schwarz majorant diverges via m_{all-L} > 0 and W<1 positivity (growing-order M(Y) approx 2 log Y and vector-energy inequalities remain open).",
+                "Candidate III (Route C + specified discrete Abel triangle-inequality majorant): uncompensated triangle-inequality majorant on 2 <= d <= b = floor(Y) falsified for power saving by its boundary term |W_2(b)| b^{-1/2} sqrt(E_{L_b}(Y/b)) >> sqrt(Y) (does not rule out compensated Abel formulations).",
+                "Candidate IV (Monotone cutoff ordering L_d >= T(Y/d) for all d >= 2): falsified at (Y = 9/4, d = 2); unsigned majorant of linear cutoff replacement has square asymp Y/(log Y)^2 (actual signed cancellation unresolved), whereas quadratic diagonal cutoff replacement costs O(1).",
+                "Parity controls a_2, a_{3,5,7}, and unsigned 1 falsify uniform Rough-Moebius sign (-1/sqrt(d)), (-1)^k prime-power sign, Selberg double-pole cancellation, and sampled negative X_tilde values.",
             ],
         },
     }

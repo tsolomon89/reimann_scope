@@ -1566,7 +1566,8 @@ def verify_section_1_and_2_baseline_and_cleanup(prec_bits: int = 256) -> Dict[st
                     "parameter_range": "0 < eta < 1/2 (alpha = 1/2 + eta in (1/2, 1), beta = 1/2 - eta in (0, 1/2), 2*alpha = 1 + 2*eta > 1)",
                     "first_order_pnt_stieltjes_remainder": (
                         "sum_{p <= u} p^{-alpha} = int_2^u t^{-alpha}/log(t) dt + O_eta(1 + u^{1-alpha} exp(-c' sqrt(log u))) "
-                        "(c' = c_0 / sqrt(2) > 0, derived from N_prime(t) = li(t) + R(t), |R(t)| <= C_0 t exp(-c_0 sqrt(log t)), "
+                        "(c' = c_0 / sqrt(2) > 0, derived from N_prime(t) = li_2(t) + R(t) with offset li_2(t) := int_2^t dv/log(v) "
+                        "so li_2(2) = 0 and R(2^-) = N_prime(2^-) - li_2(2) = 0, |R(t)| <= C_0 t exp(-c_0 sqrt(log t)), "
                         "by splitting R(u) u^{-alpha} + alpha int_2^u R(t) t^{-alpha-1} dt at sqrt(u); unconditional PNT does NOT "
                         "yield O_eta(1) for the first-order prime sum when alpha in (1/2, 1))"
                     ),
@@ -2794,7 +2795,7 @@ def verify_section_8_mixed_prime_block_attempt(prec_bits: int = 256) -> Dict[str
                         "gives <= 2 tau^{5/2} sum_{U_0(Y) <= p <= T(Y)} 1/p = O(1) uniformly in X in [Y, tau Y]."
                     ),
                     "step_C_pnt_stieltjes_error": (
-                        "For Y >= 4 (so U_0(Y) < T(Y)), unconditional PNT N_prime(t) = li(t) + R(t) with R(t) << t exp(-c sqrt(log t)) applied on [U_0(Y)^-, T(Y)] to "
+                        "For Y >= 4 (so U_0(Y) < T(Y)), unconditional PNT N_prime(t) = li_2(t) + R(t) with li_2(t) := int_2^t du/log u and R(t) << t exp(-c sqrt(log t)) applied on [U_0(Y)^-, T(Y)] to "
                         "f_X(t) = t^{-1/2} Q_lambda(X/t) retains both endpoints R(T(Y)) f_X(T(Y)) - R(U_0(Y)^-) f_X(U_0(Y)) and "
                         "-int_{U_0(Y)}^{T(Y)} R(t) f'_X(t) dt; changing variable w = X/t (t |f'_X(t)| dt = sqrt(X) w^{-3/2} |(1/2) Q_lambda(w) + w Q'_lambda(w)| dw) "
                         "and using log t >= (5/8) log Y bounds the total PNT error by O(sqrt(Y) exp(-c' sqrt(log Y))) uniformly in X in [Y, tau Y]."

@@ -1,6 +1,6 @@
 /-
 RiemannScope.LiouvilleSquareDilation
-TASK-TC-054 / TASK-TC-054R / TASK-TC-054R2 / TASK-TC-055 / TASK-TC-055R / TASK-TC-055R2 / TASK-TC-056 / TASK-TC-057:
+TASK-TC-054 / TASK-TC-054R / TASK-TC-054R2 / TASK-TC-055 / TASK-TC-055R / TASK-TC-055R2 / TASK-TC-056 / TASK-TC-057 / TASK-TC-057R:
 1. Actual arithmetic definitions and theorems over `ℕ` and `ℤ` using Mathlib's
    `ArithmeticFunction.cardFactors` (`Ω`), `Nat.factorization`, `Nat.divisors`, and
    `ArithmeticFunction.moebius` (`μ`):
@@ -45,8 +45,11 @@ TASK-TC-054 / TASK-TC-054R / TASK-TC-054R2 / TASK-TC-055 / TASK-TC-055R / TASK-T
      kernel-shift hierarchy `Q_T^{[m]}` with `M`-step telescope (Route B, including `T = 0, 1`), exact quadratic
      prime-power diagonal/off-diagonal square expansion (Route D), and inherited-vs-canonical cutoff comparison
      `T(W) ≤ ⌊T(W d)/d⌋` (`d ≥ 16, W ≥ 1`), `(Y = 9/4, d = 2)` counterexample `⌊T(9/4)/2⌋ = 1 < 2 = T(9/8)`,
-     and unconditional small-scale positivity `finiteQLambda L w ≥ (1/24) w^{5/2} > 0` for all `L ≥ 1, w ∈ (0, 1]`
-     (`TASK-TC-057` §§3–5).
+     unconditional small-scale positivity `finiteQLambda L w ≥ (1/24) w^{5/2} > 0` for all `L ≥ 1, w ∈ (0, 1]`,
+     and `CONDITIONAL_ON_SIGNED_CORRELATION` finite-horizon same-scale absorption transfer via
+     `normalizedScaleSupremum E eps R` (`conditional_signed_correlation_same_scale_absorption_transfer_tc057r`,
+     preserving exact outer factor `2` and `θ_η ∈ [0, 1/2)` plus repaired Proposition 2.4 localization vs.
+     `d_top ≥ Y/2` concentration negative control) (`TASK-TC-057` / `TASK-TC-057R` §§3–6).
 2. Prime-power exponent models (`liouville_complete_multiplicativity_and_common_factor_cancellation_nat`
    and `prime_power_square_divisor_moebius_liouville_inversion_nat`).
 3. Scalar real-algebra, real-inequality, and finite-sum lemmas for weighted norm bounds, Euler-Maclaurin `C_2`
@@ -5464,6 +5467,322 @@ theorem inherited_vs_canonical_cutoff_comparison_and_counterexample_tc057 :
       have h_mul := mul_le_mul_of_nonneg_left h_bracket (le_of_lt hw_pow_pos)
       linarith
   exact ⟨h_lb, lt_of_lt_of_le (by positivity) h_lb⟩
+
+/-- Finite-horizon normalized energy supremum `G_ε(R) := sup_{1 ≤ Z ≤ R} (E(Z) / Z^ε)` (`TASK-TC-057R` §5). -/
+noncomputable def normalizedScaleSupremum (E : ℝ → ℝ) (ε R : ℝ) : ℝ :=
+  sSup ((fun Z => E Z / Z ^ ε) '' Set.Icc 1 R)
+
+/-- Helper (`TASK-TC-057R` §5): local finiteness, nonnegativity, pointwise domination, and
+    `monotoneScaleEnvelope` domination for `normalizedScaleSupremum E ε R` on `[1, R]`
+    without assuming continuity of `E`, supremum attainment, or global normalized finiteness. -/
+private theorem normalizedScaleSupremum_props_aux
+    {E : ℝ → ℝ} {M_lin : ℝ}
+    (hE_nn : ∀ Z : ℝ, 1 ≤ Z → 0 ≤ E Z)
+    (hM_nn : 0 ≤ M_lin)
+    (hE_lin : ∀ Z : ℝ, 1 ≤ Z → E Z ≤ M_lin * Z)
+    {ε R : ℝ} (hε : 0 ≤ ε) (hR : 1 ≤ R) :
+    ((fun Z => E Z / Z ^ ε) '' Set.Icc 1 R).Nonempty ∧
+      BddAbove ((fun Z => E Z / Z ^ ε) '' Set.Icc 1 R) ∧
+      0 ≤ normalizedScaleSupremum E ε R ∧
+      normalizedScaleSupremum E ε R ≤ M_lin * R ∧
+      (∀ Z ∈ Set.Icc 1 R,
+        E Z / Z ^ ε ≤ normalizedScaleSupremum E ε R ∧
+          E Z ≤ normalizedScaleSupremum E ε R * Z ^ ε) ∧
+      (∀ W ∈ Set.Icc 1 R,
+        monotoneScaleEnvelope E W ≤ normalizedScaleSupremum E ε R * W ^ ε) := by
+  let S_norm := (fun Z => E Z / Z ^ ε) '' Set.Icc 1 R
+  have h_ne : S_norm.Nonempty := ⟨E 1 / (1 : ℝ) ^ ε, 1, ⟨le_refl 1, hR⟩, rfl⟩
+  have h_pt_lin : ∀ Z ∈ Set.Icc 1 R, E Z / Z ^ ε ≤ M_lin * R := by
+    intro Z hZ
+    rcases hZ with ⟨hZ1, hZR⟩
+    have hZ_pow_ge1 : (1 : ℝ) ≤ Z ^ ε := Real.one_le_rpow hZ1 hε
+    have h_div_le : E Z / Z ^ ε ≤ E Z := div_le_self (hE_nn Z hZ1) hZ_pow_ge1
+    exact le_trans h_div_le (le_trans (hE_lin Z hZ1) (mul_le_mul_of_nonneg_left hZR hM_nn))
+  have h_bdd : BddAbove S_norm := by
+    refine ⟨M_lin * R, ?_⟩
+    rintro _ ⟨Z, hZ, rfl⟩
+    exact h_pt_lin Z hZ
+  have h_ub_div : ∀ Z ∈ Set.Icc 1 R, E Z / Z ^ ε ≤ normalizedScaleSupremum E ε R := by
+    intro Z hZ
+    exact le_csSup h_bdd ⟨Z, hZ, rfl⟩
+  have h_nn : 0 ≤ normalizedScaleSupremum E ε R := by
+    have h1_div_nn : 0 ≤ E 1 / (1 : ℝ) ^ ε := by
+      rw [Real.one_rpow, div_one]
+      exact hE_nn 1 (le_refl 1)
+    exact le_trans h1_div_nn (h_ub_div 1 ⟨le_refl 1, hR⟩)
+  have h_le_MR : normalizedScaleSupremum E ε R ≤ M_lin * R := by
+    apply csSup_le h_ne
+    rintro _ ⟨Z, hZ, rfl⟩
+    exact h_pt_lin Z hZ
+  have h_ub_both : ∀ Z ∈ Set.Icc 1 R,
+      E Z / Z ^ ε ≤ normalizedScaleSupremum E ε R ∧
+        E Z ≤ normalizedScaleSupremum E ε R * Z ^ ε := by
+    intro Z hZ
+    have hZ_pos : 0 < Z := lt_of_lt_of_le zero_lt_one hZ.1
+    have hZ_pow_pos : 0 < Z ^ ε := Real.rpow_pos_of_pos hZ_pos ε
+    have h1 := h_ub_div Z hZ
+    exact ⟨h1, (div_le_iff hZ_pow_pos).mp h1⟩
+  have h_env : ∀ W ∈ Set.Icc 1 R,
+      monotoneScaleEnvelope E W ≤ normalizedScaleSupremum E ε R * W ^ ε := by
+    intro W hW
+    rcases hW with ⟨hW1, hWR⟩
+    obtain ⟨h_pt_F, _⟩ := monotoneScaleEnvelope_basic_props_aux hE_nn hM_nn hE_lin
+    obtain ⟨hF_ne, _, _, _, _⟩ := h_pt_F W hW1
+    apply csSup_le hF_ne
+    rintro _ ⟨Z, ⟨hZ1, hZW⟩, rfl⟩
+    have hZ_mem : Z ∈ Set.Icc 1 R := ⟨hZ1, le_trans hZW hWR⟩
+    have hEZ := (h_ub_both Z hZ_mem).2
+    have hZ_pow_le : Z ^ ε ≤ W ^ ε := Real.rpow_le_rpow (by linarith) hZW hε
+    exact le_trans hEZ (mul_le_mul_of_nonneg_left hZ_pow_le h_nn)
+  exact ⟨h_ne, h_bdd, h_nn, h_le_MR, h_ub_both, h_env⟩
+
+/-- Helper (`TASK-TC-057R` §5): monotone decay of `Y ^ (-α)` for `0 ≤ α` and `1 ≤ Y_star ≤ Y`. -/
+private theorem rpow_neg_antitone_of_one_le_aux
+    {Y_star Y α : ℝ} (hY_star : 1 ≤ Y_star) (hYY : Y_star ≤ Y) (hα : 0 ≤ α) :
+    Y ^ (-α) ≤ Y_star ^ (-α) := by
+  have hY_star_pos : 0 < Y_star := lt_of_lt_of_le zero_lt_one hY_star
+  have hY_nn : 0 ≤ Y := le_of_lt (lt_of_lt_of_le hY_star_pos hYY)
+  have h_pos_pow : 0 < Y_star ^ α := Real.rpow_pos_of_pos hY_star_pos α
+  have h_le_pow : Y_star ^ α ≤ Y ^ α := Real.rpow_le_rpow (le_of_lt hY_star_pos) hYY hα
+  rw [Real.rpow_neg hY_nn, Real.rpow_neg (le_of_lt hY_star_pos)]
+  exact inv_le_inv_of_le h_pos_pow h_le_pow
+
+/-- **Theorem 26 (`TASK-TC-057R` §5, `CONDITIONAL_ON_SIGNED_CORRELATION` Route D Same-Scale Absorption Transfer and Repaired Coefficient-Mass Localization)**:
+    *Formal scope (`CONDITIONAL_ON_SIGNED_CORRELATION`)*:
+    1. Finite-horizon local finiteness and envelope domination of `normalizedScaleSupremum E ε R = sup_{1 ≤ Z ≤ R} (E(Z) / Z^ε)`
+       from the local linear bound `E(Z) ≤ M_lin * Z`, without assuming continuity of `E`, supremum attainment,
+       or a priori global normalized finiteness;
+    2. Complete conditional Route D transfer preserving exact outer factor `2` in
+       `E(Y) ≤ 2 * D_tilde(Y) + 2 * X_tilde(Y) + 2 * E_sh1(Y)`:
+       if `0 < η < ε`, `0 ≤ θ_η < 1 / 2`, `2 * θ_η < q < 1`, `1 ≤ Y_star`, and for all `Y ≥ Y_star`
+       both the Route D diagonal bound `D_tilde(Y) ≤ ∑_{pk ∈ S(Y)} w(Y, pk) F(Y / d(Y, pk)) + C_cut`
+       and the open signed-correlation hypothesis `X_tilde(Y) + E_sh1(Y) ≤ A_η Y^η + θ_η F(Y)` hold
+       with `2 * θ_η + 2 * ∑_{pk ∈ S(Y)} w(Y, pk) d(Y, pk)^{-ε} ≤ q`, then for every finite horizon `R ≥ Y_star`,
+       `G_ε(R) ≤ max(G_ε(Y_star), K + q * G_ε(R))` with `K = 2 A_η Y_star^{η - ε} + 2 C_cut Y_star^{-ε}`,
+       hence `G_ε(R) ≤ max(G_ε(Y_star), K / (1 - q))` and uniformly for all `Y ≥ 1`,
+       `E(Y) ≤ max(G_ε(Y_star), K / (1 - q)) * Y^ε` and `F(Y) ≤ max(G_ε(Y_star), K / (1 - q)) * Y^ε`
+       (together with sharpness of `θ_η < 1 / 2`: when `1 / 2 ≤ θ` and `0 ≤ Θ_diag`, `1 ≤ 2 * θ + 2 * Θ_diag`);
+    3. Repaired Proposition 2.4 coefficient-mass algebra: total mass on `d ≥ U_Y` gives an upper bound on
+       `∑ w_i d_i^{-σ}`, a lower bound requires quantitative mass localization on `d_i ≤ κ * U_Y`, and
+       mass concentrated at `d_top ≥ Y / 2` satisfies `B_mass * d_top^{-σ} ≤ B_mass * (Y / 2)^{-σ}`.
+    Does NOT prove the open arithmetic signed-correlation inequality for `Q_{λ,T(Y)}`. -/
+theorem conditional_signed_correlation_same_scale_absorption_transfer_tc057r
+    {E : ℝ → ℝ} {M_lin : ℝ}
+    (hE_nn : ∀ Z : ℝ, 1 ≤ Z → 0 ≤ E Z)
+    (hM_nn : 0 ≤ M_lin)
+    (hE_lin : ∀ Z : ℝ, 1 ≤ Z → E Z ≤ M_lin * Z) :
+    (∀ (ε R : ℝ), 0 ≤ ε → 1 ≤ R →
+      BddAbove ((fun Z => E Z / Z ^ ε) '' Set.Icc 1 R) ∧
+        0 ≤ normalizedScaleSupremum E ε R ∧
+        normalizedScaleSupremum E ε R ≤ M_lin * R ∧
+        (∀ W ∈ Set.Icc 1 R,
+          monotoneScaleEnvelope E W ≤ normalizedScaleSupremum E ε R * W ^ ε)) ∧
+    ((∀ (θ Θ_diag : ℝ), 1 / 2 ≤ θ → 0 ≤ Θ_diag → 1 ≤ 2 * θ + 2 * Θ_diag) ∧
+      ∀ (D_tilde X_tilde E_sh1 : ℝ → ℝ)
+        (S : ℝ → Finset (ℕ × ℕ)) (w d : ℝ → ℕ × ℕ → ℝ)
+        (η ε A_η θ_η C_cut q Y_star : ℝ),
+        0 < η → η < ε → 0 ≤ A_η → 0 ≤ C_cut →
+        0 ≤ θ_η → θ_η < 1 / 2 → 2 * θ_η < q → q < 1 → 1 ≤ Y_star →
+        (∀ Y : ℝ, Y_star ≤ Y →
+          E Y ≤ 2 * D_tilde Y + 2 * X_tilde Y + 2 * E_sh1 Y) →
+        (∀ Y : ℝ, Y_star ≤ Y →
+          (∀ pk ∈ S Y, 0 ≤ w Y pk ∧ 1 ≤ d Y pk ∧ d Y pk ≤ Y) ∧
+            D_tilde Y ≤
+              (∑ pk ∈ S Y, w Y pk * monotoneScaleEnvelope E (Y / d Y pk)) + C_cut) →
+        (∀ Y : ℝ, Y_star ≤ Y →
+          X_tilde Y + E_sh1 Y ≤ A_η * Y ^ η + θ_η * monotoneScaleEnvelope E Y) →
+        (∀ Y : ℝ, Y_star ≤ Y →
+          2 * θ_η + 2 * (∑ pk ∈ S Y, w Y pk * (d Y pk) ^ (-ε)) ≤ q) →
+        let K := 2 * A_η * Y_star ^ (η - ε) + 2 * C_cut * Y_star ^ (-ε)
+        (∀ R : ℝ, Y_star ≤ R →
+          normalizedScaleSupremum E ε R ≤
+            max (normalizedScaleSupremum E ε Y_star)
+              (K + q * normalizedScaleSupremum E ε R) ∧
+          normalizedScaleSupremum E ε R ≤
+            max (normalizedScaleSupremum E ε Y_star) (K / (1 - q))) ∧
+        (∀ Y : ℝ, 1 ≤ Y →
+          E Y ≤ max (normalizedScaleSupremum E ε Y_star) (K / (1 - q)) * Y ^ ε ∧
+            monotoneScaleEnvelope E Y ≤
+              max (normalizedScaleSupremum E ε Y_star) (K / (1 - q)) * Y ^ ε)) ∧
+    (∀ (S_loc S_all : Finset ℕ) (w d : ℕ → ℝ) (U_Y κ sig B_mass d_top Y : ℝ),
+      ((0 < U_Y → 0 ≤ sig → (∀ i ∈ S_all, 0 ≤ w i ∧ U_Y ≤ d i) →
+          ∑ i ∈ S_all, w i * (d i) ^ (-sig) ≤ (∑ i ∈ S_all, w i) * U_Y ^ (-sig)) ∧
+        (S_loc ⊆ S_all → 0 < U_Y → 1 ≤ κ → 0 ≤ sig →
+          (∀ i ∈ S_all, 0 ≤ w i ∧ 0 < d i) →
+          (∀ i ∈ S_loc, d i ≤ κ * U_Y) →
+          (∑ i ∈ S_loc, w i) * (κ * U_Y) ^ (-sig) ≤ ∑ i ∈ S_all, w i * (d i) ^ (-sig)) ∧
+        (0 ≤ B_mass → 0 ≤ sig → 0 < Y → Y / 2 ≤ d_top →
+          B_mass * d_top ^ (-sig) ≤ B_mass * (Y / 2) ^ (-sig)))) := by
+  refine ⟨?_, ⟨?_, ?_⟩, ?_⟩
+  · intro ε R hε hR
+    obtain ⟨_, h_bdd, h_nn, h_MR, _, h_env⟩ :=
+      normalizedScaleSupremum_props_aux hE_nn hM_nn hE_lin hε hR
+    exact ⟨h_bdd, h_nn, h_MR, h_env⟩
+  · intro θ Θ_diag hθ hΘ
+    linarith
+  · intro D_tilde X_tilde E_sh1 S w d η ε A_η θ_η C_cut q Y_star
+      hη_pos hηε hA_nn hC_nn hθ_nn _ _ hq_lt1 hY_star
+      hE_decomp hD_bound hX_corr h_contract
+    dsimp only
+    let K := 2 * A_η * Y_star ^ (η - ε) + 2 * C_cut * Y_star ^ (-ε)
+    have hε_pos : 0 < ε := lt_trans hη_pos hηε
+    have hε_nn : 0 ≤ ε := le_of_lt hε_pos
+    have h_horizon :
+        ∀ R : ℝ, Y_star ≤ R →
+          normalizedScaleSupremum E ε R ≤
+            max (normalizedScaleSupremum E ε Y_star)
+              (K + q * normalizedScaleSupremum E ε R) ∧
+          normalizedScaleSupremum E ε R ≤
+            max (normalizedScaleSupremum E ε Y_star) (K / (1 - q)) := by
+      intro R hR_star
+      have hR1 : 1 ≤ R := le_trans hY_star hR_star
+      obtain ⟨h_ne_R, _, hG_nn, _, _, h_env_R⟩ :=
+        normalizedScaleSupremum_props_aux hE_nn hM_nn hE_lin hε_nn hR1
+      obtain ⟨_, _, _, _, h_ub_star, _⟩ :=
+        normalizedScaleSupremum_props_aux hE_nn hM_nn hE_lin hε_nn hY_star
+      let G := normalizedScaleSupremum E ε R
+      have h_self_rec :
+          G ≤ max (normalizedScaleSupremum E ε Y_star) (K + q * G) := by
+        apply csSup_le h_ne_R
+        rintro _ ⟨Y, ⟨hY1, hYR⟩, rfl⟩
+        by_cases hY_le_star : Y ≤ Y_star
+        · exact le_trans (h_ub_star Y ⟨hY1, hY_le_star⟩).1 (le_max_left _ _)
+        · have hY_ge_star : Y_star ≤ Y := le_of_not_ge hY_le_star
+          have hY_pos : 0 < Y := lt_of_lt_of_le zero_lt_one hY1
+          have hY_nn : 0 ≤ Y := le_of_lt hY_pos
+          have hY_eps_pos : 0 < Y ^ ε := Real.rpow_pos_of_pos hY_pos ε
+          have hY_eps_nn : 0 ≤ Y ^ ε := le_of_lt hY_eps_pos
+          obtain ⟨h_pk_cond, hD_Y⟩ := hD_bound Y hY_ge_star
+          have h_sum_le :
+              ∑ pk ∈ S Y, w Y pk * monotoneScaleEnvelope E (Y / d Y pk) ≤
+                (G * Y ^ ε) * ∑ pk ∈ S Y, w Y pk * (d Y pk) ^ (-ε) := by
+            rw [Finset.mul_sum]
+            apply Finset.sum_le_sum
+            intro pk hpk
+            obtain ⟨hw_nn, hd1, hdY⟩ := h_pk_cond pk hpk
+            have hd_pos : 0 < d Y pk := lt_of_lt_of_le zero_lt_one hd1
+            have hd_nn : 0 ≤ d Y pk := le_of_lt hd_pos
+            have hW1 : 1 ≤ Y / d Y pk := (one_le_div hd_pos).mpr hdY
+            have hWY : Y / d Y pk ≤ Y := div_le_self hY_nn hd1
+            have hWR : Y / d Y pk ≤ R := le_trans hWY hYR
+            have hFW : monotoneScaleEnvelope E (Y / d Y pk) ≤ G * (Y / d Y pk) ^ ε :=
+              h_env_R (Y / d Y pk) ⟨hW1, hWR⟩
+            have h_pow_div : (Y / d Y pk) ^ ε = Y ^ ε * (d Y pk) ^ (-ε) := by
+              rw [Real.div_rpow hY_nn hd_nn ε, div_eq_mul_inv, Real.rpow_neg hd_nn]
+            rw [h_pow_div] at hFW
+            have h_mul := mul_le_mul_of_nonneg_left hFW hw_nn
+            linarith
+          have hFY : monotoneScaleEnvelope E Y ≤ G * Y ^ ε := h_env_R Y ⟨hY1, hYR⟩
+          have h_same_le : X_tilde Y + E_sh1 Y ≤ A_η * Y ^ η + θ_η * (G * Y ^ ε) := by
+            have h1 := hX_corr Y hY_ge_star
+            have h2 := mul_le_mul_of_nonneg_left hFY hθ_nn
+            linarith
+          have hE_raw :
+              E Y ≤ (2 * A_η * Y ^ η + 2 * C_cut) +
+                (2 * θ_η + 2 * ∑ pk ∈ S Y, w Y pk * (d Y pk) ^ (-ε)) * (G * Y ^ ε) := by
+            have hE_Y := hE_decomp Y hY_ge_star
+            linarith
+          have hGY_nn : 0 ≤ G * Y ^ ε := mul_nonneg hG_nn hY_eps_nn
+          have h_q_mul :
+              (2 * θ_η + 2 * ∑ pk ∈ S Y, w Y pk * (d Y pk) ^ (-ε)) * (G * Y ^ ε) ≤
+                q * (G * Y ^ ε) :=
+            mul_le_mul_of_nonneg_right (h_contract Y hY_ge_star) hGY_nn
+          have hE_q : E Y ≤ (2 * A_η * Y ^ η + 2 * C_cut) + (q * G) * Y ^ ε := by
+            linarith
+          have h_eta_div : Y ^ η / Y ^ ε = Y ^ (η - ε) := by
+            rw [← Real.rpow_sub hY_pos]
+          have h_eta_mono : Y ^ (η - ε) ≤ Y_star ^ (η - ε) := by
+            have h_sub_eq : η - ε = -(ε - η) := by ring
+            rw [h_sub_eq]
+            exact rpow_neg_antitone_of_one_le_aux hY_star hY_ge_star (by linarith)
+          have h_cut_div : (1 : ℝ) / Y ^ ε = Y ^ (-ε) := by
+            rw [one_div, Real.rpow_neg hY_nn]
+          have h_cut_mono : Y ^ (-ε) ≤ Y_star ^ (-ε) :=
+            rpow_neg_antitone_of_one_le_aux hY_star hY_ge_star hε_nn
+          have h_div_step : E Y / Y ^ ε ≤ K + q * G := by
+            have h_div_raw :
+                E Y / Y ^ ε ≤
+                  ((2 * A_η * Y ^ η + 2 * C_cut) + (q * G) * Y ^ ε) / Y ^ ε :=
+              div_le_div_of_nonneg_right hE_q hY_eps_nn
+            have h_split :
+                ((2 * A_η * Y ^ η + 2 * C_cut) + (q * G) * Y ^ ε) / Y ^ ε =
+                  2 * A_η * (Y ^ η / Y ^ ε) + 2 * C_cut * ((1 : ℝ) / Y ^ ε) + q * G := by
+              field_simp [ne_of_gt hY_eps_pos]
+            rw [h_split, h_eta_div, h_cut_div] at h_div_raw
+            have hA_step : 2 * A_η * Y ^ (η - ε) ≤ 2 * A_η * Y_star ^ (η - ε) :=
+              mul_le_mul_of_nonneg_left h_eta_mono (by linarith)
+            have hC_step : 2 * C_cut * Y ^ (-ε) ≤ 2 * C_cut * Y_star ^ (-ε) :=
+              mul_le_mul_of_nonneg_left h_cut_mono (by linarith)
+            dsimp [K]
+            linarith
+          exact le_trans h_div_step (le_max_right _ _)
+      have h_abs :
+          G ≤ max (normalizedScaleSupremum E ε Y_star) (K / (1 - q)) := by
+        rcases le_max_iff.mp h_self_rec with h_left | h_right
+        · exact le_trans h_left (le_max_left _ _)
+        · have h1q_pos : 0 < 1 - q := by linarith
+          have h_lin : G * (1 - q) ≤ K := by linarith
+          have h_div : G ≤ K / (1 - q) := (le_div_iff h1q_pos).mpr h_lin
+          exact le_trans h_div (le_max_right _ _)
+      exact ⟨h_self_rec, h_abs⟩
+    refine ⟨h_horizon, ?_⟩
+    intro Y hY1
+    let R := max Y Y_star
+    have hR_star : Y_star ≤ R := le_max_right Y Y_star
+    have hYR : Y ≤ R := le_max_left Y Y_star
+    have hR1 : 1 ≤ R := le_trans hY_star hR_star
+    obtain ⟨_, _, _, _, h_ub_R, h_env_R⟩ :=
+      normalizedScaleSupremum_props_aux hE_nn hM_nn hE_lin hε_nn hR1
+    have hG_bound := (h_horizon R hR_star).2
+    have hY_eps_nn : 0 ≤ Y ^ ε := Real.rpow_nonneg (by linarith) ε
+    have hEY_le : E Y ≤ normalizedScaleSupremum E ε R * Y ^ ε :=
+      (h_ub_R Y ⟨hY1, hYR⟩).2
+    have hFY_le : monotoneScaleEnvelope E Y ≤ normalizedScaleSupremum E ε R * Y ^ ε :=
+      h_env_R Y ⟨hY1, hYR⟩
+    have h_mult := mul_le_mul_of_nonneg_right hG_bound hY_eps_nn
+    exact ⟨le_trans hEY_le h_mult, le_trans hFY_le h_mult⟩
+  · intro S_loc S_all w d U_Y κ sig B_mass d_top Y
+    refine ⟨?_, ?_, ?_⟩
+    · intro hU_pos hσ h_all
+      rw [Finset.sum_mul]
+      apply Finset.sum_le_sum
+      intro i hi
+      obtain ⟨hwi, hdi⟩ := h_all i hi
+      have hd_pos : 0 < d i := lt_of_lt_of_le hU_pos hdi
+      have h_pow : (d i) ^ (-sig) ≤ U_Y ^ (-sig) := by
+        rw [Real.rpow_neg (le_of_lt hd_pos), Real.rpow_neg (le_of_lt hU_pos)]
+        exact inv_le_inv_of_le (Real.rpow_pos_of_pos hU_pos sig)
+          (Real.rpow_le_rpow (le_of_lt hU_pos) hdi hσ)
+      exact mul_le_mul_of_nonneg_left h_pow hwi
+    · intro h_sub hU_pos hκ1 hσ h_all h_loc
+      have hκU_pos : 0 < κ * U_Y := mul_pos (lt_of_lt_of_le zero_lt_one hκ1) hU_pos
+      have h_loc_le :
+          (∑ i ∈ S_loc, w i) * (κ * U_Y) ^ (-sig) ≤ ∑ i ∈ S_loc, w i * (d i) ^ (-sig) := by
+        rw [Finset.sum_mul]
+        apply Finset.sum_le_sum
+        intro i hi
+        obtain ⟨hwi, hdi_pos⟩ := h_all i (h_sub hi)
+        have hdi_le := h_loc i hi
+        have h_pow : (κ * U_Y) ^ (-sig) ≤ (d i) ^ (-sig) := by
+          rw [Real.rpow_neg (le_of_lt hκU_pos), Real.rpow_neg (le_of_lt hdi_pos)]
+          exact inv_le_inv_of_le (Real.rpow_pos_of_pos hdi_pos sig)
+            (Real.rpow_le_rpow (le_of_lt hdi_pos) hdi_le hσ)
+        exact mul_le_mul_of_nonneg_left h_pow hwi
+      have h_sub_le :
+          ∑ i ∈ S_loc, w i * (d i) ^ (-sig) ≤ ∑ i ∈ S_all, w i * (d i) ^ (-sig) := by
+        apply Finset.sum_le_sum_of_subset_of_nonneg h_sub
+        intro i hi _
+        obtain ⟨hwi, hdi_pos⟩ := h_all i hi
+        exact mul_nonneg hwi (Real.rpow_nonneg (le_of_lt hdi_pos) (-sig))
+      exact le_trans h_loc_le h_sub_le
+    · intro hB hσ hY_pos hd_top
+      have hY2_pos : 0 < Y / 2 := half_pos hY_pos
+      have hd_pos : 0 < d_top := lt_of_lt_of_le hY2_pos hd_top
+      have h_pow : d_top ^ (-sig) ≤ (Y / 2) ^ (-sig) := by
+        rw [Real.rpow_neg (le_of_lt hd_pos), Real.rpow_neg (le_of_lt hY2_pos)]
+        exact inv_le_inv_of_le (Real.rpow_pos_of_pos hY2_pos sig)
+          (Real.rpow_le_rpow (le_of_lt hY2_pos) hd_top hσ)
+      exact mul_le_mul_of_nonneg_left h_pow hB
 
 end LiouvilleSquareDilation
 
