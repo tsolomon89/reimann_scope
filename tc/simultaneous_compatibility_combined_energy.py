@@ -1,7 +1,7 @@
 r"""
-TASK-TC-058 / TASK-TC-058R: Simultaneous Compatibility, Compensated Selberg Reconstruction,
-Growing Logarithmic Order Joint Energy, Repaired Closure Criteria, and Combined Scale-Energy
-Analysis toward SUBGATE-TC-043A.
+TASK-TC-058 / TASK-TC-058R / TASK-TC-058R2: Simultaneous Compatibility, Compensated Selberg
+Reconstruction, Growing Logarithmic Order Joint Energy, Repaired Closure Criteria, and Combined
+Scale-Energy Analysis & Closeout toward SUBGATE-TC-043A.
 
 Implements and certifies in 256-bit FLINT/Arb ball arithmetic (using tau = 2*pi as the sole
 circle constant and z = x + i*y, with x, y in R and critical line x = 1/2, for complex coordinates;
@@ -15,7 +15,7 @@ and F(Y) = sup_{1 <= Z <= Y} E(Z)):
      and (U = 5, T = 35) (35 = 5*7 enters as the first admissible squarefree rough composite).
    - Exact finite r^{-1} square-dilation identity Q_{lambda,T}(X) = sum_{r^2 <= T} r^{-1} Q_{mu,floor(T/r^2)}(X/r^2)
      (Lean Theorem 31(1), checked across T in {0, 1, 2, 15, 40, 100}) with T -> infty passage justified
-     by absolute convergence sum_{r,n >= 1} phi_{r^2 n}(X) = zeta(6)*zeta(3)*X^{5/2} < infty, plus
+     by absolute convergence sum_{r,n >= 1} |mu(n)| r^{-1} phi_n(X/r^2) <= sum_{r,n >= 1} phi_{r^2 n}(X) <= X^{5/2} sum_{r >= 1} r^{-6} sum_{n >= 1} n^{-3} = zeta(6)*zeta(3)*X^{5/2} < infty, plus
      elementary uniform norm comparison ||Q_{a,infty} - Q_{a,T(Y)}||_Y <= B_tau := tau^{5/2}*sqrt(log tau)/2
      and bilateral O_eps(Y^eps) transfer (Lean Theorem 31(5)), replacing the retired exponential-tail claim.
    - Compact 5-category dependency table and K-independence of normalized trivial-zero slopes.
@@ -133,16 +133,22 @@ from tc.prime_chain_contraction import (
 
 TASK_TC_058_ID = "TASK-TC-058"
 TASK_TC_058R_ID = "TASK-TC-058R"
+TASK_TC_058R2_ID = "TASK-TC-058R2"
 TC_057R_IMPLEMENTATION_COMMIT = "484f69fc60e8b077b9586fd347003e72f4a4e930"
 TC_057R_REVIEWED_TIP = "c944b71355d68c4b22b66954af5f620255ba5b14"
 TC_058_IMPLEMENTATION_COMMIT = "d356b386cca8101ad8535d8bc881892f815e92f6"
 TC_058_REVIEWED_TIP = "44a062dadc6a67ad51fcc41fe1f41bd4138007d1"
+TC_058R_IMPLEMENTATION_COMMIT = "ede203120a9238c143d86ae65ba5ca4c2a9c5bcf"
+TC_058R_REVIEWED_TIP = "9e1eb7766a34a34a92a514efffeee543d6b29649"
 
 SIMULTANEOUS_COMPATIBILITY_COMBINED_ENERGY_ARTIFACT_PATH = (
     REPO_ROOT / "data" / "tc_simultaneous_compatibility_combined_energy.json"
 )
 TC_058_REVIEW_DOC_PATH = (
     REPO_ROOT / "docs" / "reviews" / "TC_058_SIMULTANEOUS_COMPATIBILITY_AND_COMBINED_ENERGY.md"
+)
+TC_058R2_CLOSEOUT_DOC_PATH = (
+    REPO_ROOT / "docs" / "reviews" / "TC_058R2_REPORT_AND_DOCUMENTATION_CLOSEOUT.md"
 )
 
 EXPECTED_TC058_THEOREMS = [
@@ -592,12 +598,12 @@ def verify_section_1_and_2_narrow_repairs_and_dependency_table(
                 "Complete multiplicativity of liouvilleLambda(n) = (-1)^{Omega(n)}, common-factor cancellation, flat square-divisor Moebius/Liouville inversions, finite prime-exclusion sieve, and P-smooth/coprime finite cutoff bijection (Lean Theorems 3-4, 9-10, 13-16).",
                 "Finite prime-adjoining filtration, unimodal alternating Gaussian prime-chain contraction, and P-independent contraction C_{P,p} = D_T - V_{p} (Lean Theorems 17-20).",
                 "General Moebius-rough descent across U >= 2 (with composite rough divisors entering when an admissible composite exists, e.g. 35 at U=5, T=35 vs none at U=5, T=25), logarithmic prime-power descent & M-step shift telescope, pointwise quadratic prime-power diagonal/off-diagonal decomposition, and inherited-vs-canonical cutoff comparison with (Y=9/4, d=2) counterexample and small-scale positivity (Lean Theorems 22-25).",
-                "TC-058 / TC-058R: All-prime square-divisor indicator (1 * lambda)(n) = 1_{IsSquare n} vs dyadic parity (1 * a_2)(2^v m) = 1_{Even v} d_div(m), actual Selberg Liouville second-order weight w_{2,lambda} = Lambda_lambda*log + Lambda_lambda*Lambda_lambda (Lambda_lambda = -Lambda + 2*B) & finite square projection sum_{d=1}^T g_d = Q_{square,T} (including T = 0, 1), exact summation by parts keeping floor(T/d) jumps with post-Abel c_lambda collapse & jump-count telescope, exact shift elimination P_Y - R_Y = D_{2,Y}, pointwise combined quadratic forms, growing-order M-layer polynomial filter 0 < P_M(s) <= 4 on [1/4, 3/2] & joint Gram decomposition, and exact finite r^{-1} square-dilation bridge Q_{lambda,T}(X) = sum_{r^2<=T} r^{-1} Q_{mu,floor(T/r^2)}(X/r^2) for all T >= 0, X >= 0 (Lean Theorems 27-31).",
+                "TC-058 / TC-058R / TC-058R2: All-prime square-divisor indicator (1 * lambda)(n) = 1_{IsSquare n} vs dyadic parity (1 * a_2)(2^v m) = 1_{Even v} d_div(m), actual Selberg Liouville second-order weight w_{2,lambda} = Lambda_lambda*log + Lambda_lambda*Lambda_lambda (Lambda_lambda = -Lambda + 2*B) & finite square projection sum_{d=1}^T g_d = Q_{square,T} (including T = 0, 1), exact summation by parts keeping floor(T/d) jumps with post-Abel c_lambda collapse & jump-count telescope, exact shift elimination P_Y - R_Y = D_{2,Y}, pointwise combined quadratic forms, growing-order M-layer polynomial filter P_M(u) = sum_{m=0}^{M-1}(1-u)^m (u*P_M(u) = 1 - (1-u)^M) satisfying 0 < P_M(u) <= 4 for real u in [1/4, 3/2] & joint Gram decomposition, and exact finite r^{-1} square-dilation bridge Q_{lambda,T}(X) = sum_{r^2<=T} r^{-1} Q_{mu,floor(T/r^2)}(X/r^2) for all T >= 0, X >= 0 (Lean Theorems 27-31).",
             ],
             "b_analytic_results_proved_outside_lean": [
-                "Riesz-Gaussian & finite/full cutoff bridges: Q_mu(X) = X^{5/2} P_3(X^2) belongs to the published Riesz-type family (Agarwal-Garg-Maji 2022, arXiv:2202.00637, Theorem 1.2 at k = 3, u = X^2); Q_lambda(X) = sum_{r>=1} r^{-1} Q_mu(X/r^2) follows from Lean Theorem 31(1) via absolute convergence sum_{r,n>=1} phi_{r^2 n}(X) = zeta(6)*zeta(3)*X^{5/2} < infty; and for all |a(n)| <= 1, Y >= 1, ||Q_{a,infty} - Q_{a,T(Y)}||_Y <= B_tau := tau^{5/2}*sqrt(log tau)/2 gives |E_T - E_infty| <= 2*B_tau*sqrt(E_infty) + B_tau^2 and bilateral O_eps(Y^eps) transfer (Lean Theorem 31(5)).",
+                "Riesz-Gaussian & finite/full cutoff bridges: Q_mu(X) = X^{5/2} P_3(X^2) belongs to the published Riesz-type family (Agarwal-Garg-Maji 2022, arXiv:2202.00637, Theorem 1.2 at k = 3, u = X^2); Q_lambda(X) = sum_{r>=1} r^{-1} Q_mu(X/r^2) follows from Lean Theorem 31(1) via absolute convergence sum_{r,n>=1} |mu(n)| r^{-1} phi_n(X/r^2) <= sum_{r,n>=1} phi_{r^2 n}(X) <= X^{5/2} sum_{r>=1} r^{-6} sum_{n>=1} n^{-3} = zeta(6)*zeta(3)*X^{5/2} < infty; and for all |a(n)| <= 1, Y >= 1, ||Q_{a,infty} - Q_{a,T(Y)}||_Y <= B_tau := tau^{5/2}*sqrt(log tau)/2 gives |E_T - E_infty| <= 2*B_tau*sqrt(E_infty) + B_tau^2 and bilateral O_eps(Y^eps) transfer (Lean Theorem 31(5)).",
                 "Unconditional Route D cross-scale prime-power diagonal contraction D_tilde_{lambda,pp}(Y) <= (2/(log Y)^2) sum_{p^k<=Y} ((log p)^2/p^k) F(Y/p^k) + C_{cut,diag} with normalized finite-horizon absorption D_tilde(Y)/Y^eps <= Theta_eps^{diag}(Y)*G_eps(R) + C_{cut,diag}/Y^eps (Theta_eps^{diag}(Y) <= 2*zeta''(1+eps)/(log Y)^2 -> 0, G_eps(R) = sup_{1<=Z<=R} E(Z)/Z^eps), plus scoped majorant obstructions for Route A/B Cauchy-Schwarz and Route C uncompensated Abel majorants.",
-                "TC-058 / TC-058R (§4): Uniform unimodal bound 0 <= Q_{square,T}(X) <= C_sq := Gamma(5/4)/4 + 2*(3/(2*e))^{3/2} for X >= 1 giving ||c_lambda Q_{square,T}/(log X)^2||_Y^2 = O((log Y)^{-4}); O((log Y)^{-4}) upper-endpoint window energy via L_T = 1, g_T = phi_T, |R_2^{int}(T)| <= C_W*T (from TC-057R Selberg/PNT asymptotic), and X^{5/2}/T(Y)^2 <= tau^{5/2}; unconditional O((log Y)^{-2}) aggregate floor(T/d) jump energy via (d+1)(L_{d+1}+1) >= T + 1 and sum_{d=1}^{T-1} d(L_d - L_{d+1}) <= T*log T; and finite-cutoff smooth-step derivative bound |Delta_d^{sm}(X)| <= C_sm*sqrt(X)/(d*(d+1)) < C_sm*sqrt(X)/d^2 (C_sm = 5/2 + 4*(5/(2*e))^{5/2} + 6*(3/(2*e))^{3/2}), yielding O(Y*(log Y)^{-4}) normalized window energy when small d >= 1 are included.",
+                "TC-058 / TC-058R (§4): Uniform unimodal sum-integral comparison bound 0 <= Q_{square,T}(X) <= C_sq := Gamma(5/4)/4 + 2*(3/(2*e))^{3/2} for X >= 1 giving ||c_lambda Q_{square,T}/(log X)^2||_Y^2 = O((log Y)^{-4}); O((log Y)^{-4}) upper-endpoint window energy via L_T = 1, g_T = phi_T, |R_2^{int}(T)| <= C_W*T (from TC-057R Selberg/PNT asymptotic), and X^{5/2}/T(Y)^2 <= tau^{5/2}; unconditional O((log Y)^{-2}) aggregate floor(T/d) jump energy via (d+1)(L_{d+1}+1) >= T + 1 and sum_{d=1}^{T-1} d(L_d - L_{d+1}) <= T*log T; and finite-cutoff smooth-step derivative bound |Delta_d^{sm}(X)| <= C_sm*sqrt(X)/(d*(d+1)) < C_sm*sqrt(X)/d^2 (C_sm = 5/2 + 4*(5/(2*e))^{5/2} + 6*(3/(2*e))^{3/2}), yielding O(Y*(log Y)^{-4}) normalized window energy when small d >= 1 are included.",
                 "TC-058 / TC-058R (§5): Uniform generic terminal remainder bound ||Q_{a,L}^{[M(Y)]}/(log X)^{M(Y)}||_Y^2 <= 2068*(log Y)*Y^{-3} for all |a(n)| <= 1, L >= 1, Y >= 2 (M(Y) = ceil(2*log Y), bounding all three parts of A_m via explicit Robbins-Stirling + 17-interval compact monotonicity), and unconditional joint M(Y)-layer prime-power diagonal bound D_M(Y) = O(Y/(log Y)^2) uniformly for |a(n)| <= 1 (while Q_{a,T} = L_{a,M,Y} + r_{a,M,Y} requires multiplicative a with a(1) = 1).",
             ],
             "c_conditional_implications": [
@@ -605,7 +611,7 @@ def verify_section_1_and_2_narrow_repairs_and_dependency_table(
                 "TC-057R Young-expanded target X_tilde(Y) + ||R_Y||_Y^2 <= A_eta Y^eta + theta_eta F(Y) (0 <= theta_eta < 1/2, contraction 2*theta_eta + 2*Theta_eps^{diag}(Y)) => E(Y) <<_eps Y^eps (`CONDITIONAL_ON_SIGNED_CORRELATION`, Lean Theorem 26; forward implication only).",
                 "TC-058 combined target S_comb(Y) := X_tilde(Y) + 2*<P_Y, R_Y>_Y + ||R_Y||_Y^2 <= A_eta Y^eta + theta_eta F(Y) (0 <= theta_eta < 1, contraction theta_eta + Theta_eps^{diag}(Y)) => E(Y) <<_eps Y^eps (`CONDITIONAL_ON_COMBINED_CORRELATION`, Lean Theorem 29; forward implication only).",
                 "TC-058R second-order target T_2(Y) := 4*X_tilde(Y) - 4*<P_Y, D_{2,Y}>_Y + ||D_{2,Y}||_Y^2 <= A_eta Y^eta + theta_eta F(Y) (E = 4*D_tilde + T_2, 0 <= theta_eta < 1, contraction theta_eta + 4*Theta_eps^{diag}(Y)) => E(Y) <<_eps Y^eps (Lean Theorem 31(4); forward implication only).",
-                "TC-058R growing-order FULL joint Gram target J_M(Y) := D_M(Y) + X_M(Y) <= A_eta Y^eta + theta_eta F(Y) (0 <= theta_eta < 1, Young parameter delta = (1 - theta_eta)/2 > 0, contraction q = (1 + delta)*theta_eta < 1 valid including theta_eta = 0) => E(Y) <<_eps Y^eps (Lean Theorem 31(3a); abstract countermodel E = D = Y/(log Y)^2, X = r = 0 in Lean Theorem 31(3b) proves bounding X_M alone is insufficient without a new cross-scale contraction theorem for D_M).",
+                "TC-058R growing-order FULL joint Gram target J_M(Y) := D_M(Y) + X_M(Y) <= A_eta Y^eta + theta_eta F(Y) (0 <= theta_eta < 1, Young parameter delta = (1 - theta_eta)/2 > 0, contraction q = (1 + delta)*theta_eta < 1 valid including theta_eta = 0) => E(Y) <<_eps Y^eps (Lean Theorem 31(3a)-(3b); abstract countermodel E = D = Y/(log Y)^2, X = r = 0 in Lean Theorem 31(3c) proves bounding X_M alone is insufficient without a new cross-scale contraction theorem for D_M).",
             ],
             "d_finite_numerical_observations": [
                 "Certified 256-bit Arb window evaluations at Y in {8, 16, 32, 64, 128}: direct cross term <P_Y, R_Y>_Y changes sign (> 0 at Y in {8, 16, 32, 128}, < 0 at Y = 64); S_comb(Y) alternates sign (< 0 at Y in {8, 32, 128}, > 0 at Y in {16, 64}); at Y = 64, live certified off-diagonal shares 100 * X_{a,M}(64) / J_{a,M}(64) are ~94.86% (a_2), ~85.03% (a_{3,5,7}), and ~96.33% (unsigned 1), consistent with asymptotic off-diagonal fraction 1 - O((log Y)^{-2}) when E_a(Y) asymp Y; sampled Liouville layer-sum norm and squared-norm ratios exhibit nonmonotone strict finite triangle excess on Y in {8, 16, 32, 64}.",
@@ -637,7 +643,8 @@ def verify_section_1_and_2_narrow_repairs_and_dependency_table(
                 "square_dilation_weight_exponent": -1,
                 "square_dilation_scaling_identity": "phi_{r^2 n}(X) = r^{-1} phi_n(X / r^2)",
                 "infinite_identity_justification": (
-                    "Absolute convergence sum_{r >= 1, n >= 1} |mu(n)| phi_{r^2 n}(X) <= zeta(6)*zeta(3)*X^{5/2} < infty "
+                    "Absolute convergence sum_{r >= 1, n >= 1} |mu(n)| r^{-1} phi_n(X/r^2) <= sum_{r >= 1, n >= 1} phi_{r^2 n}(X) "
+                    "<= X^{5/2} sum_{r >= 1} r^{-6} sum_{n >= 1} n^{-3} = zeta(6)*zeta(3)*X^{5/2} < infty "
                     "justifies termwise T -> infty limit from Lean Theorem 31(1) finite identity."
                 ),
                 "zeta_6_times_zeta_3": serialize_arb_certified(zeta_6_times_zeta_3),
@@ -653,10 +660,12 @@ def verify_section_1_and_2_narrow_repairs_and_dependency_table(
                 "formula": "||Q_{a,infty} - Q_{a,T(Y)}||_Y <= B_tau := tau^{5/2}*sqrt(log tau)/2 for all |a(n)| <= 1, Y >= 1",
                 "quadratic_energy_transfer": "|E_T - E_infty| <= 2*B_tau*sqrt(E_infty) + B_tau^2 (bilateral O_eps(Y^eps) transfer in Lean Theorem 31(5))",
                 "unsigned_control_diagnostic_note": (
-                    "For unsigned control a = 1, ||Q_{1,infty} - Q_{1,T(Y)}||_Y is O(1) and bounded away from 0 "
-                    "(since exp(-X^2/n^2) -> 1 for n > T(Y) >> X), diagnosing why generic |a| <= 1 tail bounds "
-                    "yield O(1) norm error rather than exponential decay; this does NOT disprove a stronger "
-                    "cutoff-tail statement specific to lambda."
+                    "For unsigned control a = 1, ||Q_{1,infty} - Q_{1,T(Y)}||_Y is O(1) and bounded away from 0 for large Y "
+                    "(since T(Y)/X >= Y^{1/4}/tau -> infty uniformly on X in [Y, tau*Y], so X^2/n^2 <= tau^2*Y^{-1/2} -> 0 "
+                    "and exp(-X^2/n^2) -> 1 for n > T(Y) as Y -> infty; as a certified finite calculation at Y = 16, T(16) = 32, "
+                    "||Q_{1,infty} - Q_{1,32}||_{16} = [4.0 +/- 0.0889] vs ||Q_{lambda,infty} - Q_{lambda,32}||_{16} = [0.1 +/- 0.0872]), "
+                    "diagnosing why generic |a| <= 1 tail bounds yield O(1) norm error rather than exponential decay; "
+                    "this does NOT disprove a stronger cutoff-tail statement specific to lambda."
                 ),
                 "sampled_enclosure_rows": cutoff_comparison_rows,
                 "verified": cutoff_comp_ok,
@@ -1497,9 +1506,14 @@ def verify_section_4_compensated_selberg_and_shift_elimination(
                 "verified": smooth_step_ok,
             },
             "R2_int_linear_bound_provenance": (
-                "Already established in TC-057R §4 Theorem 4.3(3) via the Selberg/PNT asymptotic "
-                "W_2(u) = c_lambda*u + O(u*exp(-c*sqrt(log u))) (Dirichlet hyperbola cancellation of u*log u "
-                "plus PNT for lambda, NOT Chebyshev's separate O(u*log u) majorants alone), covering all integer "
+                "Already established in TC-057R §4 Theorem 4.3(3): in w_{2,lambda} = (-Lambda + 2*B)*log "
+                "+ (-Lambda + 2*B)*(-Lambda + 2*B) = -Lambda*log + Lambda*Lambda + 2*B*log - 4*Lambda*B + 4*B*B "
+                "(B(r^2) = Lambda(r), B = 0 off squares; note Lambda*B is supported on prime-power-times-square "
+                "indices p^a*r^2, not only on squares), the leading d*log d terms cancel between -Lambda*log and "
+                "Lambda*Lambda via Dirichlet hyperbola + PNT (whereas Chebyshev's separate O(d*log d) majorants "
+                "alone do not cancel d*log d, and the B-dependent terms are not required to supply a -2*d*log d "
+                "cancellation), yielding W_2(d) = c_lambda*d + O(d*exp(-c*sqrt(log d))) (c_lambda = 4*zeta'(2)/zeta(2) "
+                "- 2*gamma_E) and, with the finite initial range included, |R_2^{int}(d)| <= C_W*d for all integers "
                 "d >= 1 including d = 1 where R_2^{int}(1) = -c_lambda."
             ),
             "dyadic_parity_control_divisor_identity": {
@@ -1975,17 +1989,22 @@ def verify_section_5_growing_order_and_joint_gram(
                     "concentration require completely multiplicative a with a(1) = 1 and |a(n)| <= 1."
                 ),
                 "unconditional_joint_diagonal_bound": (
-                    "Because 0 < P_M(s) <= 4 uniformly on s in [1/4, 3/2] for all M >= 1 (Lean Theorem 30(4)), "
+                    "Because 0 < P_M(u) <= 4 uniformly for real u in [1/4, 3/2] and all integers M >= 1 (Lean Theorem 30(4), "
+                    "where P_M(u) = sum_{m=0}^{M-1} (1 - u)^m and u*P_M(u) = 1 - (1 - u)^M), "
                     "the joint M(Y)-layer prime-power diagonal satisfies D_M(Y) = O(Y/(log Y)^2) uniformly for "
                     "all bounded |a(n)| <= 1; however O(Y/(log Y)^2) is NOT an all-eps subpower bound and has "
                     "not been proved to satisfy cross-scale contraction."
                 ),
                 "surviving_joint_gram_and_concentration_scope": (
-                    "For multiplicative growing-energy controls (1, a_2, a_{3,5,7}) with E_a(Y) asymp Y, the "
-                    "small terminal remainder ||r_{a,M,Y}||_Y^2 = O((log Y)*Y^{-3}) controls proximity to the FULL "
-                    "joint Gram energy J_{a,M}(Y) = D_{a,M}(Y) + X_{a,M}(Y), while subtracting D_{a,M}(Y) = O(Y/(log Y)^2) "
-                    "gives off-diagonal share X_{a,M}(Y)/J_{a,M}(Y) = 1 - O((log Y)^{-2}) (live Y = 64 shares: "
-                    "~94.86% for a_2, ~85.03% for a_{3,5,7}, ~96.33% for 1). Sampled Liouville norm ratios "
+                    "Write Q = L + r on [Y, tau*Y] with E = ||Q||_Y^2, J = ||L||_Y^2, and rho = ||r||_Y^2; then "
+                    "|sqrt(J) - sqrt(E)| <= sqrt(rho) and |J - E| <= 2*sqrt(E*rho) + rho. For completely multiplicative "
+                    "growing-energy controls (1, a_2, a_{3,5,7}) with a(1) = 1, |a(n)| <= 1, E_a(Y) asymp Y (E_a(Y) > 0 "
+                    "for large Y; never extending E(Y) asymp Y to Liouville lambda), and rho_a(Y) = O((log Y)*Y^{-3}), "
+                    "the remainder-energy ratio satisfies rho_a(Y)/E_a(Y) = O((log Y)*Y^{-4}), while the normalized "
+                    "full-energy error satisfies |J_{a,M}(Y) - E_a(Y)|/E_a(Y) = O(Y^{-2}*sqrt(log Y)) + O((log Y)*Y^{-4}) "
+                    "= O(Y^{-2}*sqrt(log Y)) (so J_{a,M}(Y) asymp Y), and separately subtracting D_{a,M}(Y) = O(Y/(log Y)^2) "
+                    "gives off-diagonal share X_{a,M}(Y)/J_{a,M}(Y) = 1 - D_{a,M}(Y)/J_{a,M}(Y) = 1 - O((log Y)^{-2}) "
+                    "(live Y = 64 shares: ~94.86% for a_2, ~85.03% for a_{3,5,7}, ~96.33% for 1). Sampled Liouville norm ratios "
                     "(sum_m ||layer_m||_Y)/||L_M||_Y and squared-norm ratios (sum_m ||layer_m||_Y)^2/||L_M||_Y^2 "
                     "establish nonmonotone finite strict triangle excess on Y in {8, 16, 32, 64} (not asymptotic "
                     "divergence). Closing SUBGATE-TC-043A along the growing-order route requires bounding the "
@@ -2074,9 +2093,9 @@ def verify_section_6_tc_compatibility_discriminators(
             {
                 "lemma_id": "LEM-TC058-E",
                 "title": "Joint M(Y)-layer polynomial kernel bound, prime-power diagonal majorant, and off-diagonal share",
-                "objects": "P_M(s) = sum_{m < M} (1 - s)^m, L_{a,M}(X; T), J_{a,M}(Y) = D_{a,M}(Y) + X_{a,M}(Y)",
+                "objects": "P_M(u) = sum_{m < M} (1 - u)^m (u*P_M(u) = 1 - (1 - u)^M), L_{a,M}(X; T), J_{a,M}(Y) = D_{a,M}(Y) + X_{a,M}(Y)",
                 "quantifiers": "forall M >= 1, forall bounded |a(n)| <= 1 (diagonal bound) and completely multiplicative a with a(1) = 1 (reconstruction), forall Y >= 16",
-                "hypotheses": "0 < P_M(s) <= 4 on s in [1/4, 3/2] and |a(n)| <= 1 (plus multiplicativity of a for Q_{a,T} = L_{a,M,Y} + r_{a,M,Y})",
+                "hypotheses": "0 < P_M(u) <= 4 for real u in [1/4, 3/2] and |a(n)| <= 1 (plus multiplicativity of a for Q_{a,T} = L_{a,M,Y} + r_{a,M,Y})",
                 "input_source": "Finite geometric series sum + Gaussian fast decay for n <= Y^{1/2}",
                 "conclusion": (
                     "D_{a,M}(Y) = O(Y / (log Y)^2) uniformly for |a| <= 1, giving off-diagonal share "
@@ -2468,8 +2487,12 @@ def verify_tc058_review_displayed_enclosures(
         and len(untagged_intervals) == 0
         and len(failed_intervals) == 0
     )
+    try:
+        rel_review_path = review_path.resolve().relative_to(REPO_ROOT.resolve()).as_posix()
+    except ValueError:
+        rel_review_path = str(review_path)
     return {
-        "review_path": str(review_path),
+        "review_path": rel_review_path,
         "pi_macro_count": len(pi_macros),
         "total_displayed_intervals_found": len(raw_intervals),
         "tagged_and_checked_count": len(checked_rows),
@@ -2502,6 +2525,7 @@ def execute_task_tc058_simultaneous_compatibility_audit(
     report: Dict[str, Any] = {
         "task_id": TASK_TC_058_ID,
         "repair_task_id": TASK_TC_058R_ID,
+        "closeout_task_id": TASK_TC_058R2_ID,
         "parent_epic": EPIC_TC_042_ID,
         "prior_tasks": [
             TASK_TC_054_ID,
@@ -2531,14 +2555,16 @@ def execute_task_tc058_simultaneous_compatibility_audit(
         "tc057r_reviewed_tip": TC_057R_REVIEWED_TIP,
         "tc058_implementation_commit": TC_058_IMPLEMENTATION_COMMIT,
         "tc058_reviewed_tip": TC_058_REVIEWED_TIP,
-        "branch": "task/tc-058r-closure-criteria-and-analytic-scope-repair",
+        "tc058r_implementation_commit": TC_058R_IMPLEMENTATION_COMMIT,
+        "tc058r_reviewed_tip": TC_058R_REVIEWED_TIP,
+        "branch": "task/tc-058r2-report-and-documentation-closeout",
         "research_outcome_class": (
-            "Outcome B / C (TC-058R Repaired Baseline) — Preserves valid arithmetic & analytic estimates "
-            "(square-projection mean O((log Y)^{-4}), upper endpoint O((log Y)^{-4}), cutoff-jump sum "
+            "Outcome B / C (TC-058R / TC-058R2 Repaired & Closed-Out Baseline) — Preserves valid arithmetic & analytic estimates "
+            "(unimodal sum-integral comparison square-projection mean O((log Y)^{-4}), upper endpoint O((log Y)^{-4}), cutoff-jump sum "
             "O((log Y)^{-2}), first-order shift elimination P_Y - R_Y = D_{2,Y}, smooth-step finite-cutoff "
             "majorant O(Y*(log Y)^{-4}), generic growing-order remainder <= 2068*(log Y)*Y^{-3}, joint "
-            "M(Y)-layer diagonal majorant O(Y/(log Y)^2), finite r^{-1} square bridge, and B_tau finite/full "
-            "norm transfer) and repairs all four conditional closure criteria (requiring full J_M = D_M + X_M "
+            "M(Y)-layer diagonal majorant O(Y/(log Y)^2) from 0 < P_M(u) <= 4 on real u in [1/4, 3/2], finite r^{-1} square bridge, "
+            "and B_tau finite/full norm transfer) and repairs all four conditional closure criteria (requiring full J_M = D_M + X_M "
             "rather than X_M alone unless a new diagonal contraction for D_M is proved); classified honestly "
             "via [Y, b*Y] discriminator as TC-inspired analytic number theory; SUBGATE-TC-043A remains OPEN"
         ),
@@ -2575,6 +2601,17 @@ def execute_task_tc058_simultaneous_compatibility_audit(
             f"failed={rev_audit['failed_intervals']}"
         )
         report["section_8_tc058_review_displayed_enclosures_audit"] = rev_audit
+
+    if verify_review_doc and TC_058R2_CLOSEOUT_DOC_PATH.exists():
+        closeout_audit = verify_tc058_review_displayed_enclosures(
+            report, TC_058R2_CLOSEOUT_DOC_PATH
+        )
+        assert closeout_audit["all_displayed_intervals_contain_generated_enclosures"] is True, (
+            "Displayed intervals in TC_058R2_REPORT_AND_DOCUMENTATION_CLOSEOUT.md failed check: "
+            f"pi_macros={closeout_audit['pi_macro_count']}, untagged={closeout_audit['untagged_intervals']}, "
+            f"failed={closeout_audit['failed_intervals']}"
+        )
+        report["section_9_tc058r2_closeout_displayed_enclosures_audit"] = closeout_audit
 
     return report
 

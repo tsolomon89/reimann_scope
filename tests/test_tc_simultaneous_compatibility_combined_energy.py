@@ -55,11 +55,15 @@ from tc.simultaneous_compatibility_combined_energy import (
     SIMULTANEOUS_COMPATIBILITY_COMBINED_ENERGY_ARTIFACT_PATH,
     TASK_TC_058_ID,
     TASK_TC_058R_ID,
+    TASK_TC_058R2_ID,
     TC_057R_IMPLEMENTATION_COMMIT,
     TC_057R_REVIEWED_TIP,
     TC_058_IMPLEMENTATION_COMMIT,
     TC_058_REVIEW_DOC_PATH,
     TC_058_REVIEWED_TIP,
+    TC_058R_IMPLEMENTATION_COMMIT,
+    TC_058R_REVIEWED_TIP,
+    TC_058R2_CLOSEOUT_DOC_PATH,
     evaluate_B_tau_cutoff_norm_bound_arb,
     evaluate_C_smooth_step_arb,
     evaluate_C_square_arb,
@@ -71,6 +75,7 @@ from tc.simultaneous_compatibility_combined_energy import (
     evaluate_window_tail_norm_and_full_energy_enclosure_arb,
     exact_growing_order_M_int,
     positive_divisor_count_int,
+    selberg_w2_weight_arb,
     verify_section_1_and_2_narrow_repairs_and_dependency_table,
     verify_section_3_combined_target_and_direct_cross_term,
     verify_section_4_compensated_selberg_and_shift_elimination,
@@ -667,3 +672,161 @@ def test_section_7_lean_theorems_links_retired_claims_and_tampering_controls(
     res_wide = verify_tc058_review_displayed_enclosures(tc058_artifact, p_wide)
     assert res_wide["failed_count"] >= 1
     assert res_wide["all_displayed_intervals_contain_generated_enclosures"] is False
+
+
+def test_tc058r2_closeout_filter_selberg_links_and_errata(tc058_artifact: dict) -> None:
+    """Focused TASK-TC-058R2 regression coverage for geometric filter P_M(u), 5-term Selberg w_{2,lambda}
+    expansion & non-square (Lambda * B)(12) > 0 support, portable relative links, and closeout report audit.
+    """
+    assert tc058_artifact["closeout_task_id"] == TASK_TC_058R2_ID
+    assert tc058_artifact["tc058r_implementation_commit"] == TC_058R_IMPLEMENTATION_COMMIT
+    assert tc058_artifact["tc058r_reviewed_tip"] == TC_058R_REVIEWED_TIP
+    assert tc058_artifact["subgate_tc043a_status"] == "OPEN"
+    assert tc058_artifact["rh_proved"] is False
+
+    # 1. Exact rational geometric filter P_M(u) = sum_{m=0}^{M-1} (1 - u)^m and P_3(1/4) = 37/16 counterexample
+    for M in (1, 2, 3, 5, 9):
+        for u in (
+            Fraction(1, 4),
+            Fraction(1, 2),
+            Fraction(1, 1),
+            Fraction(5, 4),
+            Fraction(3, 2),
+        ):
+            p_m_u = sum((Fraction(1, 1) - u) ** m for m in range(M))
+            assert u * p_m_u == Fraction(1, 1) - (Fraction(1, 1) - u) ** M
+            assert Fraction(0, 1) < p_m_u <= Fraction(4, 1)
+
+    p3_quarter = sum((Fraction(1, 1) - Fraction(1, 4)) ** m for m in range(3))
+    assert p3_quarter == Fraction(37, 16)
+
+    saved = flint_ctx.prec
+    try:
+        flint_ctx.prec = 256
+        erroneous_report_cap = arb("1.5").exp() / arb(2)
+        assert bool(arb(37) / arb(16) > erroneous_report_cap)
+
+        # 2. Exact 5-term Selberg expansion w_{2,lambda} = -Lambda*log + Lambda*Lambda + 2*B*log - 4*Lambda*B + 4*B*B
+        def _von_mangoldt_arb(k: int) -> arb:
+            if k <= 1:
+                return arb(0)
+            m = k
+            p_found = 0
+            d = 2
+            while d * d <= m:
+                if m % d == 0:
+                    p_found = d
+                    while m % d == 0:
+                        m //= d
+                    return arb(p_found).log() if m == 1 else arb(0)
+                d += 1
+            return arb(m).log()
+
+        def _square_B_arb(k: int) -> arb:
+            if k <= 1:
+                return arb(0)
+            r = int(round(k ** 0.5))
+            if r * r == k:
+                return _von_mangoldt_arb(r)
+            return arb(0)
+
+        lam_arr = [arb(0)] + [_von_mangoldt_arb(k) for k in range(1, 61)]
+        B_arr = [arb(0)] + [_square_B_arb(k) for k in range(1, 61)]
+
+        for n in range(1, 61):
+            w2_actual = arb(0) if n == 1 else selberg_w2_weight_arb(n, "liouville")
+            if n == 1:
+                w2_five_term = arb(0)
+            else:
+                lg_n = arb(n).log()
+                conv_LL = arb(0)
+                conv_LB = arb(0)
+                conv_BB = arb(0)
+                for d in range(1, n + 1):
+                    if n % d == 0:
+                        q = n // d
+                        conv_LL += lam_arr[d] * lam_arr[q]
+                        conv_LB += lam_arr[d] * B_arr[q]
+                        conv_BB += B_arr[d] * B_arr[q]
+                w2_five_term = (
+                    -lam_arr[n] * lg_n
+                    + conv_LL
+                    + arb(2) * B_arr[n] * lg_n
+                    - arb(4) * conv_LB
+                    + arb(4) * conv_BB
+                )
+                if n == 12:
+                    # 12 = 3 * 2^2 is NOT a square, yet (Lambda * B)(12) = Lambda(3)*B(4) = (log 3)*(log 2) > 0
+                    expected_12 = arb(3).log() * arb(2).log()
+                    assert bool(arb(0) in (conv_LB - expected_12))
+                    assert bool(conv_LB > arb("0.76"))
+            diff_w2 = w2_actual - w2_five_term
+            assert bool(arb(0) in diff_w2)
+            assert bool(abs(diff_w2) < arb("1e-65"))
+    finally:
+        flint_ctx.prec = saved
+
+    # 3. Closeout report enclosure audit & portable relative link validation
+    assert TC_058R2_CLOSEOUT_DOC_PATH.exists()
+    closeout_check = verify_tc058_review_displayed_enclosures(
+        tc058_artifact, TC_058R2_CLOSEOUT_DOC_PATH
+    )
+    assert closeout_check["pi_macro_count"] == 0
+    assert closeout_check["untagged_count"] == 0
+    assert closeout_check["failed_count"] == 0
+    assert closeout_check["total_displayed_intervals_found"] == 10
+    assert closeout_check["all_displayed_intervals_contain_generated_enclosures"] is True
+    assert (
+        tc058_artifact["section_9_tc058r2_closeout_displayed_enclosures_audit"][
+            "all_displayed_intervals_contain_generated_enclosures"
+        ]
+        is True
+    )
+
+    lean_lines = (
+        REPO_ROOT / "formal" / "RiemannScope" / "LiouvilleSquareDilation.lean"
+    ).read_text(encoding="utf-8").splitlines()
+    checked_docs = (
+        TC_058_REVIEW_DOC_PATH,
+        TC_058R2_CLOSEOUT_DOC_PATH,
+        REPO_ROOT / "docs" / "reviews" / "TC_057_COUPLED_ARITHMETIC_SCALE_ENERGY_BOOTSTRAP.md",
+        REPO_ROOT / "docs" / "reviews" / "TC_LIOUVILLE_SQUARE_DILATION.md",
+        REPO_ROOT / "formal" / "RiemannScope" / "README.md",
+    )
+    for doc_path in checked_docs:
+        doc_txt = doc_path.read_text(encoding="utf-8")
+        assert "](file:" not in doc_txt, f"Non-portable file:// Markdown link in {doc_path.name}"
+        doc_non_math = re.sub(r"\$\$[\s\S]*?\$\$|\$[^$\n]+\$", "", doc_txt)
+        for target_raw in re.findall(r"(?<!!)\[[^\]]+\]\(([^)]+)\)", doc_non_math):
+            assert not target_raw.startswith("file:"), (
+                f"Non-portable file:// link target {target_raw!r} in {doc_path.name}"
+            )
+            if target_raw.startswith(("http://", "https://", "mailto:", "#")):
+                continue
+            rel_part, _, frag = target_raw.partition("#")
+            resolved = (doc_path.parent / rel_part).resolve()
+            assert resolved.exists(), f"Broken relative link {target_raw!r} in {doc_path.name}"
+            if frag and resolved.name == "LiouvilleSquareDilation.lean":
+                m_anc = re.fullmatch(r"L(\d+)-L(\d+)", frag)
+                assert m_anc is not None, f"Unexpected Lean anchor {frag!r} in {doc_path.name}"
+                s_ln, e_ln = int(m_anc.group(1)), int(m_anc.group(2))
+                assert 1 <= s_ln <= e_ln <= len(lean_lines)
+                assert lean_lines[s_ln - 1].startswith("theorem ")
+
+    # 4. Verify propagated errors do not recur in TC-058 review doc or regenerated JSON artifact
+    tc058_doc_txt = TC_058_REVIEW_DOC_PATH.read_text(encoding="utf-8")
+    artifact_raw = SIMULTANEOUS_COMPATIBILITY_COMBINED_ENERGY_ARTIFACT_PATH.read_text(
+        encoding="utf-8"
+    )
+    for bad_str in (
+        "1/6 = \\tau^2/24",
+        "1/6=τ²/24",
+        "n > T(Y) >> X",
+        "n > T(Y) \\gg X",
+        "d \\in (U, T]",
+        "positive algebraic grades",
+        "phi_{r^2 n}(X) = zeta(6)*zeta(3)*X^{5/2}",
+    ):
+        assert bad_str not in tc058_doc_txt, f"Disallowed string {bad_str!r} in TC_058 review doc"
+        assert bad_str not in artifact_raw, f"Disallowed string {bad_str!r} in TC_058 JSON artifact"
+

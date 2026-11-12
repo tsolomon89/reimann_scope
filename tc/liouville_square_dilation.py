@@ -2811,15 +2811,15 @@ def verify_liouville_square_dilation_lean_module() -> Dict[str, Any]:
             "Unconditional finite joint `M`-layer polynomial-filter and Gram decomposition theorem (`TASK-TC-058` §5): "
             "defines schedule `growingLogOrderM Y = ⌈2 log Y⌉₊` and proves `M`-step telescope specialization, interchanged joint filter identity "
             "`∑_{m < M} Σ_{a,pp}^{[m]}(X; T) / (log X)^{m+1} = ∑_{pk ∈ primePowerPairsUpTo T} jointPrimePowerFiber a M T pk X` with inherited `⌊T / p^k⌋` cutoffs, "
-            "pointwise joint Gram diagonal/off-diagonal split, and geometric filter identity `s * P_M(s) = 1 - (1 - s)^M` with uniform bound `0 < P_M(s) ≤ 4` "
-            "on `s ∈ [1/4, 3/2]` (`M ≥ 1`; Robbins-Stirling and compact-`[2, e^9]` window remainder bounds are proved analytically outside Lean).",
+            "pointwise joint Gram diagonal/off-diagonal split, and geometric filter identity `u * P_M(u) = 1 - (1 - u)^M` (`P_M(u) = ∑_{m < M} (1 - u)^m`) with uniform bound `0 < P_M(u) ≤ 4` "
+            "for real `u ∈ [1/4, 3/2]` (`M ≥ 1`; Robbins-Stirling and compact-`[2, e^9]` window remainder bounds are proved analytically outside Lean).",
         ),
         "growing_order_and_second_order_conditional_absorption_and_finite_square_bridge_tc058r": (
             "conditional_growing_order_and_second_order_absorption_finite_square_bridge_and_inference_countermodel_theorem",
             "`TASK-TC-058R` §§2A–2C & §§4A–4B theorem (`CONDITIONAL_ON_FULL_GROWING_GRAM` / `CONDITIONAL_ON_SECOND_ORDER_TARGET` for absorption parts, "
             "unconditional for finite square-dilation and scalar norm-transfer parts): "
             "(1) exact finite `r^{-1}` square-dilation bridge `finiteQLambda T X = ∑_{1 ≤ r ≤ T, r^2 ≤ T} (1 / r) finiteQGeneral μ (T / r^2) (X / r^2)` for all `T : ℕ` and `X ≥ 0` "
-            "(passage `T → ∞` follows analytically outside Lean by absolute convergence `∑_{r,n ≥ 1} φ_{r^2 n}(X) = ζ(6) ζ(3) X^{5/2} < ∞`), "
+            "(passage `T → ∞` follows analytically outside Lean by absolute convergence `∑_{r,n ≥ 1} |μ(n)| r^{-1} φ_n(X / r^2) ≤ ∑_{r,n ≥ 1} φ_{r^2 n}(X) ≤ ζ(6) ζ(3) X^{5/2} < ∞`), "
             "(2) pointwise Liouville reconstruction + Young bound `(finiteQLambda T X)^2 ≤ (1 + δ) L_{M,T}(X)^2 + (1 + 1/δ) r_{M,T}(X)^2` (`X > 0, log X ≠ 0, δ > 0`) and "
             "universal choice `δ = (1 - θ_η) / 2 > 0`, `q = (1 + δ) θ_η ∈ [0, 1)` valid across `0 ≤ θ_η < 1` including `θ_η = 0`, "
             "(3) conditional normalized finite-horizon absorption under FULL joint growing-order Gram bound `J_M(Y) = D_M(Y) + X_M(Y) ≤ A_η Y^η + θ_η F(Y)` plus "
