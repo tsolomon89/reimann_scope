@@ -30,8 +30,8 @@ Writing $\cos(\omega u^{-1}) = -\frac{u^2}{\omega}\frac{d}{du}\!\left[\sin(\omeg
 $$\int_\varepsilon^R u^4 e^{-u^2}\cos(\omega u^{-1})\,du = \left[-\frac{u^6 e^{-u^2}\sin(\omega u^{-1})}{\omega}\right]_\varepsilon^R + \frac{1}{\omega}\int_\varepsilon^R (6u^5 - 2u^7)e^{-u^2}\sin(\omega u^{-1})\,du,$$
 where boundary terms vanish as $\varepsilon \to 0^+$ and $R \to \infty$, proving $\widehat{f}(\xi) = +\frac{2}{\omega}\int_0^\infty (6u^5 - 2u^7)e^{-u^2}\sin(\omega u^{-1})\,du$. For the conditional cosine transform $\lim_{U\to\infty}\int_0^U u^{z-1}\cos(\omega u)\,du$ on $0 < a = \operatorname{Re}(z) < 1$, integrating by parts on $[\varepsilon, U]$ gives
 $$\int_0^U u^{z-1}\cos(\omega u)\,du = \left[\frac{u^{z-1}\sin(\omega u)}{\omega}\right]_0^U + \frac{1-z}{\omega}\int_0^U u^{z-2}\sin(\omega u)\,du \xrightarrow{U\to\infty} \frac{1-z}{\omega}\int_0^\infty u^{z-2}\sin(\omega u)\,du = \Gamma(z)\cos\!\left(\frac{\tau z}{4}\right)\omega^{-z},$$
-where $u^{z-1}\sin(\omega u) = O(u^a) \to 0$ as $u \to 0^+$ and $u^{z-2}\sin(\omega u) = O(u^{a-1}) \in L^1(0, 1) \cap L^1(1, \infty)$ for $0 < a < 1$. Because $g(u) := 2u^4 e^{-u^2} \in \mathcal{S}(\mathbb{R}_{>0})$ has rapidly decaying Mellin transform $\mathcal{M}[g](1-z) = \Gamma\!\left(\frac{5-z}{2}\right)$ on $a < 5$, Parseval's Mellin relation holds on $a_0 = 1/2$:
-$$\widehat{f}(\xi) = \frac{1}{i\tau}\int_{1/2 - i\infty}^{1/2 + i\infty} \mathcal{M}H(z)\,\omega^{-z}\,dz, \qquad \mathcal{M}H(z) := \Gamma(z)\cos\!\left(\frac{\tau z}{4}\right)\Gamma\!\left(\frac{5+z}{2}\right).$$
+where $u^{z-1}\sin(\omega u) = O(u^a) \to 0$ as $u \to 0^+$ and $u^{z-2}\sin(\omega u) = O(u^{a-1}) \in L^1(0, 1) \cap L^1(1, \infty)$ for $0 < a < 1$. Because $f(v) = v^{-6}e^{-1/v^2}$ has Mellin transform $\int_0^\infty v^{s-1}f(v)\,dv = \frac{1}{2}\Gamma\!\left(\frac{6-s}{2}\right)$ for $\operatorname{Re}(s) < 6$, evaluating at $s = 1 - z$ gives $\frac{1}{2}\Gamma\!\left(\frac{5+z}{2}\right)$ on $a > -5$, so Parseval's Mellin relation holds on $a_0 = c \in (0, 1)$ (where $|\mathcal{M}H(a+ib)| \asymp_a |b|^{3a/2+3/2}e^{-\tau|b|/8}$ decays exponentially in $|b|$):
+$$\widehat{f}(\xi) = \frac{1}{i\tau}\int_{c - i\infty}^{c + i\infty} \mathcal{M}H(z)\,\omega^{-z}\,dz, \qquad \mathcal{M}H(z) := \Gamma(z)\cos\!\left(\frac{\tau z}{4}\right)\Gamma\!\left(\frac{5+z}{2}\right).$$
 
 ### 1.2 Corrected Reflection Identities, DLMF 5.8.3 Lower Bound, and Shifted Contour Decay
 By the Gamma reflection formula $\Gamma(w)\Gamma(1-w) = \frac{\tau/2}{\sin(\tau w/2)}$ applied at $w = \frac{5+z}{2}$ (using $\sin(\tau(5+z)/4) = \cos(\tau z/4)$) and at $w = z$:
@@ -48,13 +48,13 @@ Combining the three factors shows that the exponential growth $e^{3\tau|b|/8}$ o
 $$|\mathcal{M}H(a_M + ib)| \le \frac{(\tau/2)^2}{\cosh(\tau b/2)\,\Gamma(2M+5/2)\,\Gamma(M-3/4)\,e^{-3\tau|b|/8}} \le \frac{2(\tau/2)^2\,e^{-\tau|b|/8}}{\Gamma(2M+5/2)\,\Gamma(M-3/4)}.$$
 Integrating along $z = a_M + ib$ ($b \in \mathbb{R}$) gives the explicit contour remainder bound:
 $$|R_M(\omega)| = \left|\frac{1}{i\tau}\int_{a_M - i\infty}^{a_M + i\infty}\mathcal{M}H(z)\,\omega^{-z}\,dz\right| \le \frac{8\,\omega^{2M+3/2}}{\Gamma(2M+5/2)\,\Gamma(M-3/4)} \xrightarrow{M\to\infty} 0 \qquad (\forall\,\omega > 0),$$
-and horizontal segments at height $|b| = T \to \infty$ vanish as $O(e^{-\tau T/8})$.
+and on horizontal segments $z = a \pm i B$ across the entire strip $a \in [a_M, c]$ ($c \in (0, 1)$, $B \ge 1$), shifting $\Gamma(1-z) = \frac{\Gamma(2-z)}{1-z}$ ($R_1^* = 2-a > 1 \ge 1/2$) and $\Gamma(\frac{-3-z}{2}) = \frac{\Gamma(\frac{3-z}{2})}{(\frac{-3-z}{2})(\frac{-1-z}{2})(\frac{1-z}{2})}$ ($R_2^* = \frac{3-a}{2} > 1 \ge 1/2$) places both Gamma arguments in $\operatorname{Re} \ge 1/2$ throughout $a \in [a_M, c]$ so DLMF 5.8.3 bounds the horizontal contour integrals by $O_{M, c, \omega}(B^4 e^{-\tau B/8}) \to 0$ as $B \to \infty$.
 
 ### 1.3 Corrected Even-Series Tail Sign Analysis
-In the even subseries $\sum_{m=0}^\infty \frac{(-1)^m\Gamma(5/2-m)}{(2m)!}\omega^{2m}$:
+At the even poles $z = -2m$ ($m \ge 0$), $\operatorname*{Res}_{z=-2m}\Gamma(z) = \frac{(-1)^{2m}}{(2m)!} = \frac{1}{(2m)!}$, while $\cos(\tau(-2m)/4) = \cos(-m\tau/2) = (-1)^m$ supplies the alternating factor in the even subseries $\sum_{m=0}^\infty \frac{(-1)^m\Gamma(5/2-m)}{(2m)!}\omega^{2m}$:
 - For $m = 0$: $(-1)^0\Gamma(5/2) = \frac{3\sqrt{\tau/2}}{4} > 0$;
 - For $m = 1$: $(-1)^1\Gamma(3/2)\frac{\omega^2}{2!} = -\frac{\sqrt{\tau/2}}{4}\omega^2 < 0$;
-- For every integer $m \ge 2$: $5/2 - m = -(m - 5/2) < 0$ lies in the interval $(-m + 2, -m + 3)$, where $\operatorname{sgn}\Gamma(5/2 - m) = (-1)^m$, so
+- For every integer $m \ge 2$: iterating $\Gamma(w) = \frac{\Gamma(w+1)}{w}$ from $w = \frac{5}{2} - m$ up to $\frac{1}{2}$ gives $\Gamma(5/2 - m) = \frac{\Gamma(1/2)}{(-1/2)(-3/2)\cdots(5/2-m)} = \frac{(-1)^{m-2}\Gamma(1/2)}{\prod_{j=1}^{m-2}(j - 1/2)}$, which has sign $(-1)^{m-2} = (-1)^m$, so
   $$(-1)^m\Gamma\!\left(\frac{5}{2} - m\right) = \left|\Gamma\!\left(\frac{5}{2} - m\right)\right| = \frac{\sqrt{\tau/2}}{\prod_{j=1}^{m-2}\!\left(j - \frac{1}{2}\right)} > 0 \qquad (\forall\,m \ge 2).$$
 In particular, the $m = 2, 3, 4, \dots$ even terms all have **strictly positive** coefficients (for example, at $m = 3$, $\frac{(-1)^3\Gamma(-1/2)\omega^6}{6!} = +\frac{2\sqrt{\tau/2}\,\omega^6}{6!} > 0$ does not alternate against $m = 2$). Both our geometric tail bound (`R_even(K_eff, omega) <= 1/2` for $K_{\mathrm{eff}} \ge 2$) and the non-negative lower bound for the positive even tail from $m = 2$ onward are therefore unconditionally valid.
 
@@ -77,14 +77,14 @@ In `tc/liouville_square_dilation.py` (`pairwise_spurious_factor_counterexample_r
 
 Each of the 6 Fourier sign-change witnesses $\xi \in \{0, 1/2, 4/\tau, 1, 3/2, 2\}$ in `section_5_transition_poisson_summation.hat_f_sign_change_witnesses` records separate accuracy metadata for the power-series evaluation and the independent `acb.integral` quadrature cross-check:
 
-| $\xi$ | $\widehat{f}(\xi)$ (256-bit Arb series) | `working_prec_bits` | $K_{\mathrm{eff}}$ | `series_total_radius` | `quadrature_interval` $[v_0, V_1]$ | `quadrature_right_tail_bound` $\frac{2}{5V_1^5}$ | `quadrature_total_radius` | `quadrature_contains_series` | `series_overlaps_quadrature` |
-| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| $0$ | `[1.329340388179137020473625612505858887098 +/- 1.63e-40]` | $512$ | $200$ | `1.56e-154` | `[1/7, 32]` | `1.1920928955e-8` | `1.1920928980e-8` | `True` | `True` |
-| $1/2$ | `[-0.5628546550179851263755109492164491931001 +/- 4.04e-41]` | $525$ | $200$ | `5.41e-155` | `[1/7, 32]` | `1.1920928955e-8` | `1.1920928980e-8` | `True` | `True` |
-| $4/\tau$ | `[-0.7757751802167744117629682956314216290713 +/- 2.04e-41]` | $529$ | $200$ | `7.63e-77` | `[1/7, 32]` | `1.1920928955e-8` | `1.1920928980e-8` | `True` | `True` |
-| $1$ | `[-0.3668367826642069184644449070564857828859 +/- 4.03e-41]` | $538$ | $200$ | `4.20e-157` | `[1/7, 32]` | `1.1920928955e-8` | `1.1920928980e-8` | `True` | `True` |
-| $3/2$ | `[0.2636171831500303372338138695632955698496 +/- 2.39e-41]` | $550$ | $200$ | `1.71e-159` | `[1/7, 32]` | `1.1920928955e-8` | `1.1920928980e-8` | `True` | `True` |
-| $2$ | `[0.1247126116325928138362162976104693467978 +/- 9.77e-42]` | $563$ | $200$ | `8.59e-162` | `[1/7, 32]` | `1.1920928955e-8` | `1.1920928980e-8` | `True` | `True` |
+| $\xi$ | $\widehat{f}(\xi)$ (256-bit Arb series) | `working_prec_bits` | $K_{\mathrm{eff}}$ | `series_truncation_radius` | `series_total_radius` | `quadrature_interval` $[v_0, V_1]$ | `quadrature_right_tail_bound` $\frac{2}{5V_1^5}$ | `quadrature_total_radius` | `quadrature_contains_series` | `series_overlaps_quadrature` |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| $0$ | `[1.329340388179137020473625612505858887098 +/- 1.63e-40]` | $512$ | $200$ | `0` | `1.56e-154` | `[1/7, 32]` | `1.1920928955e-8` | `1.1920928980e-8` | `True` | `True` |
+| $1/2$ | `[-0.5628546550179851263755109492164491931001 +/- 4.04e-41]` | $525$ | $200$ | `1.56e-1045` | `5.41e-155` | `[1/7, 32]` | `1.1920928955e-8` | `1.1920928980e-8` | `True` | `True` |
+| $4/\tau$ | `[-0.7757751802167744117629682956314216290713 +/- 2.04e-41]` | $529$ | $200$ | `2.32e-1003` | `7.63e-77` | `[1/7, 32]` | `1.1920928955e-8` | `1.1920928980e-8` | `True` | `True` |
+| $1$ | `[-0.3668367826642069184644449070564857828859 +/- 4.03e-41]` | $538$ | $200$ | `1.61e-924` | `4.20e-157` | `[1/7, 32]` | `1.1920928955e-8` | `1.1920928980e-8` | `True` | `True` |
+| $3/2$ | `[0.2636171831500303372338138695632955698496 +/- 2.39e-41]` | $550$ | $200$ | `9.89e-854` | `1.71e-159` | `[1/7, 32]` | `1.1920928955e-8` | `1.1920928980e-8` | `True` | `True` |
+| $2$ | `[0.1247126116325928138362162976104693467978 +/- 9.77e-42]` | $563$ | $200$ | `1.66e-803` | `1.65e-162` | `[1/7, 32]` | `1.1920928955e-8` | `1.1920928980e-8` | `True` | `True` |
 
 In addition, `legacy_k1_fourier_counterexample_regression` checks both `.contains(...)` (`repaired_k4_contains_adaptive == True`, since the coarse $K=4$ enclosure `[-1e+0 +/- 0.605]` strictly contains the adaptive $K_{\mathrm{eff}}=200$ ball `[-0.7757751802167744117629682956314216290713 +/- 2.04e-41]`) and `.overlaps(...)` (`repaired_k4_overlaps_adaptive == True`).
 
