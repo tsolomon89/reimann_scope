@@ -1,6 +1,7 @@
 {
-  "task_id": "TASK-TC-059R",
+  "task_id": "TASK-TC-059R2",
   "repaired_task_id": "TASK-TC-059",
+  "prior_repair_task_id": "TASK-TC-059R",
   "parent_epic": "EPIC-TC-042",
   "parent_subgate": "SUBGATE-TC-043A",
   "prior_tasks": [
@@ -18,14 +19,19 @@
     "TASK-TC-058",
     "TASK-TC-058R",
     "TASK-TC-058R2",
-    "TASK-TC-059"
+    "TASK-TC-059",
+    "TASK-TC-059R"
   ],
   "reviewed_merged_main_baseline": "2c784c9433edcf37d3f666b75e7ac0d83abc919a",
   "included_tc058r2_tip": "c5135ea9c98dd9056850873f39cc23f434614a35",
   "reviewed_tc059_branch": "task/tc-059-power-lift-and-primitive-correlation",
   "reviewed_tc059_implementation_commit": "46b633d1738b3c4b354b9c80aebe13f7e861105b",
   "reviewed_tc059_head_commit": "55e8193a7d753454fa4a7acf3c19cc1deca6ea88",
-  "branch": "task/tc-059r-normalized-closure-mellin-and-smooth-increment-repair",
+  "reviewed_tc059r_branch": "task/tc-059r-normalized-closure-mellin-and-smooth-increment-repair",
+  "reviewed_tc059r_implementation_commit": "501e520144526d51e43c189a6d4a2d605a58e949",
+  "reviewed_tc059r_head_commit": "e6d3209f482e63fa1c08a5c9e9462ae53e7cf9c8",
+  "inherited_formal_producing_commit": "501e520144526d51e43c189a6d4a2d605a58e949",
+  "branch": "task/tc-059r2-numerical-assertion-and-report-closeout",
   "epistemic_categories_enforced": [
     "UNCONDITIONAL_FINITE_ARITHMETIC",
     "ANALYTIC_PROVED_OUTSIDE_LEAN",
@@ -34,7 +40,7 @@
     "CERTIFIED_FINITE_OBSERVATION",
     "OPEN_CONJECTURE_OR_FAILED_CANDIDATE"
   ],
-  "research_outcome_class": "Repaired Conditional Closure Interface, Mellin Bridge, & Smooth-Increment Scope (TASK-TC-059R) \u2014 Preserves TC-059's finite arithmetic, Gaussian window integrals, Attempt A counterexamples, and PNT-based C_var / C_{chi,var} remainder bounds; formalizes in Lean 4 (0 sorry, 0 custom axioms, 7 theorems total) the repaired Route D shifted prime-power weighted-diagonal closure transfer (Theorem 6, matching D_tilde(Y) <= (2/(log Y)^2)*sum_{p^k<=Y} ((log p)^2/p^k)*F(Y/p^k) + C_cut via finite-horizon G_eps(R) with C_eps = 2*zeta''(1+eps), R-independent Y_*, and concrete canonicalLiouvilleEnergyE specialization) and the direct smooth-increment window norm bound ||Delta_d^{sm}||_Y <= d^{-1/2}*sqrt(E_{lambda,L_d}(Y/d)) + (d+1)^{-1/2}*sqrt(E_{lambda,L_d}(Y/(d+1))) plus domain-separated small-scale O(u^5) tail control (Theorem 7); repairs the inverse-Mellin formula M_Q(w) = Gamma(5/4 - w/2)*zeta(1 + 2*w)/(2*zeta(1/2 + w)) on 1/2 < u < 5/2 (extending holomorphically to 0 < u < 5/2 under E(Y) = O_eps(Y^eps) with w_rho = rho - 1/2); replaces the deleted critical-line-crossing claim with the exact adjacent-scale O(1/d) cancellation loss analysis; and keeps SUBGATE-TC-043A OPEN and rh_proved False.",
+  "research_outcome_class": "Repaired Conditional Closure Interface, Mellin Bridge, Smooth-Increment Scope, & Numerical Assertion / Citation Closeout (TASK-TC-059R / TASK-TC-059R2) \u2014 Preserves TC-059's finite arithmetic, Gaussian window integrals, Attempt A counterexamples, and PNT-based C_var / C_{chi,var} remainder bounds; formalizes in Lean 4 (0 sorry, 0 custom axioms, 7 theorems total, inherited formal producing commit 501e520144526d51e43c189a6d4a2d605a58e949) the repaired Route D shifted prime-power weighted-diagonal closure transfer (Theorem 6, matching D_tilde(Y) <= (2/(log Y)^2)*sum_{p^k<=Y} ((log p)^2/p^k)*F(Y/p^k) + C_cut via finite-horizon G_eps(R) with C_eps = 2*zeta''(1+eps), R-independent Y_*, and concrete canonicalLiouvilleEnergyE specialization) and the direct smooth-increment window norm bound ||Delta_d^{sm}||_Y <= d^{-1/2}*sqrt(E_{lambda,L_d}(Y/d)) + (d+1)^{-1/2}*sqrt(E_{lambda,L_d}(Y/(d+1))) plus domain-separated small-scale O(u^5) tail control (Theorem 7); repairs the inverse-Mellin formula M_Q(w) = Gamma(5/4 - w/2)*zeta(1 + 2*w)/(2*zeta(1/2 + w)) on 1/2 < u < 5/2 (extending holomorphically to 0 < u < 5/2 under E(Y) = O_eps(Y^eps) with w_rho = rho - 1/2); replaces the deleted critical-line-crossing claim with the exact adjacent-scale O(1/d) cancellation-loss upper-bound scope, exact LiouvilleSquareDilation.lean Theorem 25 (first main conjunct, third item) cutoff citation, and non-speculative research-target labeling; and keeps SUBGATE-TC-043A OPEN and rh_proved False.",
   "subgate_tc043a_status": "OPEN",
   "rh_proved": false,
   "precision_bits": 256,
@@ -1571,7 +1577,7 @@
           "hypothesis_id": "H3_ROUTE_D_SHIFTED_PRIME_POWER_DIAGONAL",
           "formal_expression": "0 <= C_cut, e <= Y_diag, and forall Y >= Y_diag, canonicalPrimePowerDiagDtilde Y <= (2 / (log Y)^2) * sum_{p^k <= floor(Y)} ((log p)^2 / p^k) * monotoneScaleEnvelope canonicalLiouvilleEnergyE (Y / p^k) + C_cut",
           "classification": "ANALYTIC_PROVED_OUTSIDE_LEAN",
-          "source_and_discharge": "Explicit external analytic input established unconditionally in TC-057R Theorem 5.1 (Route D shifted prime-power diagonal estimate with `O(1)` super-`Y` prime-power tail and inherited-to-canonical cutoff conversion absorbed into `C_cut`, keeping factor `2` from `(log X)^{-2} <= (log Y)^{-2}` and cutoff Young split once)."
+          "source_and_discharge": "Explicit external analytic input established unconditionally in TC-057R Theorem 6.1 (`docs/reviews/TC_057_COUPLED_ARITHMETIC_SCALE_ENERGY_BOOTSTRAP.md` \u00a76, Route D shifted prime-power diagonal estimate with `O(1)` super-`Y` prime-power tail and inherited-to-canonical cutoff conversion absorbed into `C_cut`, keeping factor `2` from `(log X)^{-2} <= (log Y)^{-2}` and cutoff Young split once)."
         },
         {
           "hypothesis_id": "H4_WEIGHTED_PRIME_POWER_ZETA_MAJORANT",
@@ -4308,7 +4314,7 @@
           "upper_dec": "1.283648053631594230528555980930748910644e+3",
           "arb_ball_str": "[1283.648053631594230528555980930748910643 +/- 2.68e-37]"
         },
-        "remaining_quantitative_requirement": "Either an adjacent-scale difference norm estimate saving an extra d^{-1-alpha} (alpha > 0) on ||Delta_d^{sm}||_Y relative to scale energy, or signed cancellation across the d-sum against R_2^{int}(d) avoiding the outer triangle inequality.",
+        "possible_next_research_target": "A possible next route is a uniformly summable relative bound for the complete weighted remainder, or a signed aggregation estimate avoiding the outer triangle inequality on R_2^{int}(d). Its scale normalization, forcing terms, coefficient size, cutoff transfer, and all other reconstruction terms must be controlled before it can imply the existing closure contract (under the particular scalar majorant ||Delta_d^{sm}||_Y <= C * d^{-3/2 - alpha} * sqrt(F(Y/d)) with separately controlled forcing, multiplication by |R_2^{int}(d)| <= C_R * d * exp(-c_W * sqrt(log d)) leaves weights d^{-1/2 - alpha} * exp(-c_W * sqrt(log d)) that converge for alpha >= 1/2 and diverge for 0 < alpha < 1/2; alpha >= 1/2 is only that scalar-majorant threshold and is neither sufficient by itself nor necessary for signed aggregation). Such an estimate is not established here.",
         "verified": true
       },
       "verified": true
@@ -4478,7 +4484,7 @@
         "lemma_id": "LEMMA-B2-DIMENSIONLESS-CHI-VARIATION-AND-SUPER-POLYLOG-SMOOTH-STEP-BOUND",
         "epistemic_class": "ANALYTIC_PROVED_OUTSIDE_LEAN",
         "statement": "For all w > 0 and all integers L >= 1, L*|chi_L(w)| + sum_{q=1}^{L-1} q*|chi_q(w) - chi_{q+1}(w)| <= C_{chi,var} := exp(-1/2) + 1/2 + (4*sqrt(7)-8)*exp(-(2-sqrt(7)/2)) + (4*sqrt(7)+8)*exp(-(2+sqrt(7)/2)) ~= 3.08879258 (dimensionless and independent of w). Splitting d in [1, T-1] at d = floor(sqrt(X)) combines inner q-sum cancellation exp(-c_0*sqrt(log(X/(d+1)))) for d <= sqrt(X) with outer Selberg/PNT cancellation |R_2^{int}(d)| << d*exp(-c_W*sqrt(log d)) for d > sqrt(X), proving unconditionally ||r_smooth / (log X)^2||_Y^2 << (Y/(log Y)^4)*exp(-2*c_* * sqrt(log Y)) = O_A(Y*(log Y)^{-A}) for every A > 0; combining with the analogous C_var^{[2]}*sqrt(w) weighted variation bound on psi_t^{[2]}(w) = (log(w/t))^2*phi_t(w) for -Q_{lambda,T}^{[2]}/(log X)^2 and TC-058's o(1) bounds O((log Y)^{-4}) and O((log Y)^{-2}) on the square, endpoint, and jump pieces likewise proves ||D_{2,Y}||_Y^2 = O_A(Y*(log Y)^{-A}) for every A > 0, strictly breaking TC-058's O(Y/(log Y)^4) unsigned smooth-step barrier.",
-        "why_not_subpower": "Lemma B2 is an absolute super-polylogarithmic upper bound saving every fixed power of log Y, NOT a relative bound in D_tilde(Y) or F(Y) and NOT subpower O_eps(Y^eps) (an upper bound of size Y^{1-o(1)} does not prove the signed remainder itself grows that fast). Conversely, the exact smooth-endpoint identity Delta_d^{sm}(X) = d^{-1/2}*Q_{lambda,L_d}(X/d) - (d+1)^{-1/2}*Q_{lambda,L_d}(X/(d+1)) (with unchanged L_d = floor(T/d) at both endpoints) already gives the direct window norm bound ||Delta_d^{sm}||_Y <= d^{-1/2}*sqrt(E_{lambda,L_d}(Y/d)) + (d+1)^{-1/2}*sqrt(E_{lambda,L_d}(Y/(d+1))) (Lean Theorem 7) without crossing the critical line, and TC-057R Theorem 5.1(2) converts both inherited cutoffs to sqrt(F(Y/m)) + O(1) on Y/m >= 1 (O((Y/m)^{5/2}) on Y/m < 1). However, splitting the endpoint difference by Minkowski discards the O(1/d) adjacent-scale cancellation between d and d+1, so multiplying by |R_2^{int}(d)| and summing over 1 <= d <= floor(Y) yields O(Y^{3/2}*exp(-c'_W*sqrt(log Y))) in norm (O(Y^3*exp(-2*c'_W*sqrt(log Y))/(log Y)^4) in energy) and fails to contract. Closing via this route requires an additional quantitative estimate: either an adjacent-scale difference norm bound saving an extra d^{-1-alpha} relative to scale energy or signed cancellation across the d-sum avoiding the outer triangle inequality on R_2^{int}(d)."
+        "why_not_subpower": "Lemma B2 is an absolute super-polylogarithmic upper bound saving every fixed power of log Y, NOT a relative bound in D_tilde(Y) or F(Y) and NOT subpower O_eps(Y^eps) (an upper bound of size Y^{1-o(1)} does not prove the signed remainder itself grows that fast). Conversely, the exact smooth-endpoint identity Delta_d^{sm}(X) = d^{-1/2}*Q_{lambda,L_d}(X/d) - (d+1)^{-1/2}*Q_{lambda,L_d}(X/(d+1)) (with unchanged L_d = floor(T/d) at both endpoints) already gives the direct window norm bound ||Delta_d^{sm}||_Y <= d^{-1/2}*sqrt(E_{lambda,L_d}(Y/d)) + (d+1)^{-1/2}*sqrt(E_{lambda,L_d}(Y/(d+1))) (Lean Theorem 7) without crossing the critical line, and inherited_vs_canonical_cutoff_comparison_and_counterexample_tc057 (formal/RiemannScope/LiouvilleSquareDilation.lean#L5230-L5243, Theorem 25, first main conjunct, third item: for W >= 1 and integer d >= 2, (1/2)*W^{5/4}*d^{1/4} <= inheritedCutoffL(W*d, d), combined with L_d >= L_{d+1} when m = d+1; Theorem 25's second main conjunct is the explicit cutoff counterexample) converts both inherited cutoffs to sqrt(F(Y/m)) + sqrt(2*(tau^5 - 1)/5) on Y/m >= 1 (O((Y/m)^{5/2}) on Y/m < 1). However, splitting the endpoint difference by Minkowski discards the O(1/d) adjacent-scale cancellation between d and d+1: multiplying d^{-1/2}*sqrt(F(Y/d)) by the PNT upper bound |R_2^{int}(d)| << d*exp(-c_W*sqrt(log d)) yields only the summand upper bound << d^{1/2}*exp(-c_W*sqrt(log d))*sqrt(F(Y/d)), whose sum over 1 <= d <= floor(Y) (with forcing constants and the d > floor(Y) sub-unit tail handled separately) gives an available aggregate upper bound of O(Y^{3/2}*exp(-c'_W*sqrt(log Y))) in norm (O(Y^3*exp(-2*c'_W*sqrt(log Y))/(log Y)^4) in normalized window energy) that does not establish contraction and does not prove that either the signed remainder or the exact endpoint majorant actually grows at that rate (certified at Y = 64, T = 182 strictly as a finite observation rather than an asymptotic conclusion). A possible next route is a uniformly summable relative bound for the complete weighted remainder, or a signed aggregation estimate avoiding the outer triangle inequality on R_2^{int}(d). Its scale normalization, forcing terms, coefficient size, cutoff transfer, and all other reconstruction terms must be controlled before it can imply the existing closure contract (under the particular scalar-majorant assumption ||Delta_d^{sm}||_Y <= C * d^{-3/2 - alpha} * sqrt(F(Y/d)) with separately controlled forcing, multiplication by |R_2^{int}(d)| <= C_R * d * exp(-c_W * sqrt(log d)) leaves scalar weights d^{-1/2 - alpha} * exp(-c_W * sqrt(log d)) whose infinite sum converges for alpha >= 1/2 and diverges for 0 < alpha < 1/2; that alpha >= 1/2 threshold governs only that scalar majorant and is neither sufficient by itself for gate closure nor necessary for signed aggregation). Such an estimate is not established here."
       },
       {
         "lemma_id": "LEMMA-B3-PARTIAL-BLOCK-SAVING-AGGREGATION-AND-SMALL-SCALE-TAIL",

@@ -1,6 +1,7 @@
 r"""
-TASK-TC-059 / TASK-TC-059R: Dyadic Power-Lift Arithmetic, Primitive Coprime Correlations, Repaired
-Weighted-Diagonal Closure Interface, Mellin Bridge, and Smooth-Increment Scope toward SUBGATE-TC-043A.
+TASK-TC-059 / TASK-TC-059R / TASK-TC-059R2: Dyadic Power-Lift Arithmetic, Primitive Coprime
+Correlations, Repaired Weighted-Diagonal Closure Interface, Mellin Bridge, Smooth-Increment Scope,
+and Numerical Assertion / Citation Closeout toward SUBGATE-TC-043A.
 
 Implements, tests, falsifies, and certifies in 256-bit FLINT/Arb ball arithmetic (using tau
 strictly via `_tau_arb()` as the sole circle constant, complex variable z = x + i*y with real x, y,
@@ -148,6 +149,7 @@ from tc.simultaneous_compatibility_combined_energy import (
 
 TASK_TC_059_ID = "TASK-TC-059"
 TASK_TC_059R_ID = "TASK-TC-059R"
+TASK_TC_059R2_ID = "TASK-TC-059R2"
 PARENT_SUBGATE_ID = "SUBGATE-TC-043A"
 REVIEWED_MERGED_MAIN_BASELINE = "2c784c9433edcf37d3f666b75e7ac0d83abc919a"
 INCLUDED_TC_058R2_TIP = "c5135ea9c98dd9056850873f39cc23f434614a35"
@@ -155,6 +157,9 @@ PROPOSED_BRANCH = "task/tc-059-power-lift-and-primitive-correlation"
 REVIEWED_TC_059_IMPLEMENTATION = "46b633d1738b3c4b354b9c80aebe13f7e861105b"
 REVIEWED_TC_059_HEAD = "55e8193a7d753454fa4a7acf3c19cc1deca6ea88"
 REPAIR_BRANCH = "task/tc-059r-normalized-closure-mellin-and-smooth-increment-repair"
+REVIEWED_TC_059R_IMPLEMENTATION = "501e520144526d51e43c189a6d4a2d605a58e949"
+REVIEWED_TC_059R_HEAD = "e6d3209f482e63fa1c08a5c9e9462ae53e7cf9c8"
+CLOSEOUT_BRANCH = "task/tc-059r2-numerical-assertion-and-report-closeout"
 
 DYADIC_POWER_LIFT_PRIMITIVE_CORRELATION_ARTIFACT_PATH = (
     REPO_ROOT / "data" / "tc_dyadic_power_lift_primitive_correlation.json"
@@ -901,7 +906,9 @@ def verify_section_1_observable_and_closure_contract(prec_bits: int = 256) -> Di
                         }
                     )
 
-        # (b) Sampled shifted-scale normalization identity on prime powers r = p^k <= 16 (Y = 16, eps = 1/2):
+        # (b) Algebraic exponent-identity enclosure consistency check on prime powers r = p^k <= 16
+        # (Y = 16, eps = 1/2): checks ((log p)^2 / r)*(Y/r)^eps - ((log p)^2 / r^{1+eps})*Y^eps encloses 0
+        # (exact equality is proved deductively in Lean Theorem 6(2), not inferred from 0-containment):
         Y_norm_chk = arb(16)
         eps_norm = arb(1) / arb(2)
         shifted_norm_id_max_res = arb(0)
@@ -945,7 +952,8 @@ def verify_section_1_observable_and_closure_contract(prec_bits: int = 256) -> Di
                 ),
                 "classification": "ANALYTIC_PROVED_OUTSIDE_LEAN",
                 "source_and_discharge": (
-                    "Explicit external analytic input established unconditionally in TC-057R Theorem 5.1 (Route D "
+                    "Explicit external analytic input established unconditionally in TC-057R Theorem 6.1 "
+                    "(`docs/reviews/TC_057_COUPLED_ARITHMETIC_SCALE_ENERGY_BOOTSTRAP.md` §6, Route D "
                     "shifted prime-power diagonal estimate with `O(1)` super-`Y` prime-power tail and inherited-to-canonical "
                     "cutoff conversion absorbed into `C_cut`, keeping factor `2` from `(log X)^{-2} <= (log Y)^{-2}` "
                     "and cutoff Young split once)."
@@ -2341,14 +2349,31 @@ def verify_section_4_dyadic_blocks_and_attempt_b(prec_bits: int = 256) -> Dict[s
                     "identity Delta_d^{sm}(X) = d^{-1/2}*Q_{lambda,L_d}(X/d) - (d+1)^{-1/2}*Q_{lambda,L_d}(X/(d+1)) "
                     "(with unchanged L_d = floor(T/d) at both endpoints) already gives the direct window norm bound "
                     "||Delta_d^{sm}||_Y <= d^{-1/2}*sqrt(E_{lambda,L_d}(Y/d)) + (d+1)^{-1/2}*sqrt(E_{lambda,L_d}(Y/(d+1))) "
-                    "(Lean Theorem 7) without crossing the critical line, and TC-057R Theorem 5.1(2) converts both inherited "
-                    "cutoffs to sqrt(F(Y/m)) + O(1) on Y/m >= 1 (O((Y/m)^{5/2}) on Y/m < 1). However, splitting the "
-                    "endpoint difference by Minkowski discards the O(1/d) adjacent-scale cancellation between d and d+1, "
-                    "so multiplying by |R_2^{int}(d)| and summing over 1 <= d <= floor(Y) yields "
-                    "O(Y^{3/2}*exp(-c'_W*sqrt(log Y))) in norm (O(Y^3*exp(-2*c'_W*sqrt(log Y))/(log Y)^4) in energy) and "
-                    "fails to contract. Closing via this route requires an additional quantitative estimate: either an "
-                    "adjacent-scale difference norm bound saving an extra d^{-1-alpha} relative to scale energy or signed "
-                    "cancellation across the d-sum avoiding the outer triangle inequality on R_2^{int}(d)."
+                    "(Lean Theorem 7) without crossing the critical line, and "
+                    "inherited_vs_canonical_cutoff_comparison_and_counterexample_tc057 "
+                    "(formal/RiemannScope/LiouvilleSquareDilation.lean#L5230-L5243, Theorem 25, first main conjunct, "
+                    "third item: for W >= 1 and integer d >= 2, (1/2)*W^{5/4}*d^{1/4} <= inheritedCutoffL(W*d, d), "
+                    "combined with L_d >= L_{d+1} when m = d+1; Theorem 25's second main conjunct is the explicit cutoff "
+                    "counterexample) converts both inherited cutoffs to sqrt(F(Y/m)) + sqrt(2*(tau^5 - 1)/5) on Y/m >= 1 "
+                    "(O((Y/m)^{5/2}) on Y/m < 1). However, splitting the endpoint difference by Minkowski discards the "
+                    "O(1/d) adjacent-scale cancellation between d and d+1: multiplying d^{-1/2}*sqrt(F(Y/d)) by the PNT "
+                    "upper bound |R_2^{int}(d)| << d*exp(-c_W*sqrt(log d)) yields only the summand upper bound "
+                    "<< d^{1/2}*exp(-c_W*sqrt(log d))*sqrt(F(Y/d)), whose sum over 1 <= d <= floor(Y) (with forcing "
+                    "constants and the d > floor(Y) sub-unit tail handled separately) gives an available aggregate upper "
+                    "bound of O(Y^{3/2}*exp(-c'_W*sqrt(log Y))) in norm (O(Y^3*exp(-2*c'_W*sqrt(log Y))/(log Y)^4) in "
+                    "normalized window energy) that does not establish contraction and does not prove that either the "
+                    "signed remainder or the exact endpoint majorant actually grows at that rate (certified at Y = 64, "
+                    "T = 182 strictly as a finite observation rather than an asymptotic conclusion). A possible next "
+                    "route is a uniformly summable relative bound for the complete weighted remainder, or a signed "
+                    "aggregation estimate avoiding the outer triangle inequality on R_2^{int}(d). Its scale "
+                    "normalization, forcing terms, coefficient size, cutoff transfer, and all other reconstruction terms "
+                    "must be controlled before it can imply the existing closure contract (under the particular "
+                    "scalar-majorant assumption ||Delta_d^{sm}||_Y <= C * d^{-3/2 - alpha} * sqrt(F(Y/d)) with "
+                    "separately controlled forcing, multiplication by |R_2^{int}(d)| <= C_R * d * exp(-c_W * sqrt(log d)) "
+                    "leaves scalar weights d^{-1/2 - alpha} * exp(-c_W * sqrt(log d)) whose infinite sum converges for "
+                    "alpha >= 1/2 and diverges for 0 < alpha < 1/2; that alpha >= 1/2 threshold governs only that "
+                    "scalar majorant and is neither sufficient by itself for gate closure nor necessary for signed "
+                    "aggregation). Such an estimate is not established here."
                 ),
             },
             {
@@ -2403,10 +2428,18 @@ def verify_section_4_dyadic_blocks_and_attempt_b(prec_bits: int = 256) -> Dict[s
                         minkowski_split_sum
                     ),
                     "minkowski_over_actual_ratio": serialize_arb_certified(canc_loss_ratio),
-                    "remaining_quantitative_requirement": (
-                        "Either an adjacent-scale difference norm estimate saving an extra d^{-1-alpha} "
-                        "(alpha > 0) on ||Delta_d^{sm}||_Y relative to scale energy, or signed cancellation "
-                        "across the d-sum against R_2^{int}(d) avoiding the outer triangle inequality."
+                    "possible_next_research_target": (
+                        "A possible next route is a uniformly summable relative bound for the complete weighted "
+                        "remainder, or a signed aggregation estimate avoiding the outer triangle inequality on "
+                        "R_2^{int}(d). Its scale normalization, forcing terms, coefficient size, cutoff transfer, "
+                        "and all other reconstruction terms must be controlled before it can imply the existing "
+                        "closure contract (under the particular scalar majorant "
+                        "||Delta_d^{sm}||_Y <= C * d^{-3/2 - alpha} * sqrt(F(Y/d)) with separately controlled "
+                        "forcing, multiplication by |R_2^{int}(d)| <= C_R * d * exp(-c_W * sqrt(log d)) leaves "
+                        "weights d^{-1/2 - alpha} * exp(-c_W * sqrt(log d)) that converge for alpha >= 1/2 and "
+                        "diverge for 0 < alpha < 1/2; alpha >= 1/2 is only that scalar-majorant threshold and is "
+                        "neither sufficient by itself nor necessary for signed aggregation). Such an estimate is "
+                        "not established here."
                     ),
                     "verified": ok_adj,
                 },
@@ -3064,8 +3097,9 @@ def execute_task_tc059_dyadic_power_lift_audit(
     assert sec5["all_section_5_checks_pass"] is True
 
     report: Dict[str, Any] = {
-        "task_id": TASK_TC_059R_ID,
+        "task_id": TASK_TC_059R2_ID,
         "repaired_task_id": TASK_TC_059_ID,
+        "prior_repair_task_id": TASK_TC_059R_ID,
         "parent_epic": EPIC_TC_042_ID,
         "parent_subgate": PARENT_SUBGATE_ID,
         "prior_tasks": [
@@ -3084,28 +3118,37 @@ def execute_task_tc059_dyadic_power_lift_audit(
             TASK_TC_058R_ID,
             TASK_TC_058R2_ID,
             TASK_TC_059_ID,
+            TASK_TC_059R_ID,
         ],
         "reviewed_merged_main_baseline": REVIEWED_MERGED_MAIN_BASELINE,
         "included_tc058r2_tip": INCLUDED_TC_058R2_TIP,
         "reviewed_tc059_branch": PROPOSED_BRANCH,
         "reviewed_tc059_implementation_commit": REVIEWED_TC_059_IMPLEMENTATION,
         "reviewed_tc059_head_commit": REVIEWED_TC_059_HEAD,
-        "branch": REPAIR_BRANCH,
+        "reviewed_tc059r_branch": REPAIR_BRANCH,
+        "reviewed_tc059r_implementation_commit": REVIEWED_TC_059R_IMPLEMENTATION,
+        "reviewed_tc059r_head_commit": REVIEWED_TC_059R_HEAD,
+        "inherited_formal_producing_commit": REVIEWED_TC_059R_IMPLEMENTATION,
+        "branch": CLOSEOUT_BRANCH,
         "epistemic_categories_enforced": list(EPISTEMIC_CATEGORIES),
         "research_outcome_class": (
-            "Repaired Conditional Closure Interface, Mellin Bridge, & Smooth-Increment Scope (TASK-TC-059R) — "
-            "Preserves TC-059's finite arithmetic, Gaussian window integrals, Attempt A counterexamples, and "
-            "PNT-based C_var / C_{chi,var} remainder bounds; formalizes in Lean 4 (0 sorry, 0 custom axioms, "
-            "7 theorems total) the repaired Route D shifted prime-power weighted-diagonal closure transfer "
-            "(Theorem 6, matching D_tilde(Y) <= (2/(log Y)^2)*sum_{p^k<=Y} ((log p)^2/p^k)*F(Y/p^k) + C_cut "
-            "via finite-horizon G_eps(R) with C_eps = 2*zeta''(1+eps), R-independent Y_*, and concrete "
-            "canonicalLiouvilleEnergyE specialization) and the direct smooth-increment window norm bound "
+            "Repaired Conditional Closure Interface, Mellin Bridge, Smooth-Increment Scope, & Numerical "
+            "Assertion / Citation Closeout (TASK-TC-059R / TASK-TC-059R2) — Preserves TC-059's finite "
+            "arithmetic, Gaussian window integrals, Attempt A counterexamples, and PNT-based C_var / C_{chi,var} "
+            "remainder bounds; formalizes in Lean 4 (0 sorry, 0 custom axioms, 7 theorems total, inherited "
+            "formal producing commit 501e520144526d51e43c189a6d4a2d605a58e949) the repaired Route D shifted "
+            "prime-power weighted-diagonal closure transfer (Theorem 6, matching "
+            "D_tilde(Y) <= (2/(log Y)^2)*sum_{p^k<=Y} ((log p)^2/p^k)*F(Y/p^k) + C_cut via finite-horizon "
+            "G_eps(R) with C_eps = 2*zeta''(1+eps), R-independent Y_*, and concrete canonicalLiouvilleEnergyE "
+            "specialization) and the direct smooth-increment window norm bound "
             "||Delta_d^{sm}||_Y <= d^{-1/2}*sqrt(E_{lambda,L_d}(Y/d)) + (d+1)^{-1/2}*sqrt(E_{lambda,L_d}(Y/(d+1))) "
             "plus domain-separated small-scale O(u^5) tail control (Theorem 7); repairs the inverse-Mellin "
             "formula M_Q(w) = Gamma(5/4 - w/2)*zeta(1 + 2*w)/(2*zeta(1/2 + w)) on 1/2 < u < 5/2 (extending "
             "holomorphically to 0 < u < 5/2 under E(Y) = O_eps(Y^eps) with w_rho = rho - 1/2); replaces the "
-            "deleted critical-line-crossing claim with the exact adjacent-scale O(1/d) cancellation loss "
-            "analysis; and keeps SUBGATE-TC-043A OPEN and rh_proved False."
+            "deleted critical-line-crossing claim with the exact adjacent-scale O(1/d) cancellation-loss "
+            "upper-bound scope, exact LiouvilleSquareDilation.lean Theorem 25 (first main conjunct, third item) "
+            "cutoff citation, and non-speculative research-target labeling; and keeps SUBGATE-TC-043A OPEN and "
+            "rh_proved False."
         ),
         "subgate_tc043a_status": "OPEN",
         "rh_proved": False,

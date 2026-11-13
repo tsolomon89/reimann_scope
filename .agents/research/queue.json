@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": "TASK-TC-059R",
+  "active_task_id": "TASK-TC-059R2",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -1888,8 +1888,8 @@
       "epic_id": "EPIC-TC-042",
       "priority": 73,
       "objective": "Repair the Normalized Closure Interface, Mellin Bridge, and Smooth-Increment Scope toward SUBGATE-TC-043A (TASK-TC-059R)",
-      "status": "OPEN",
-      "review_status": "AWAITING_INDEPENDENT_REVIEW",
+      "status": "ACCEPTED",
+      "review_status": "ACCEPTED",
       "open_implication": "SUBGATE-TC-043A remains OPEN (rh_proved = False): establish unconditionally either (i) the subpower primitive-correlation bound |Pi_{lambda,floor(T(Y)/g)}(Y/g)| = O_eps((Y/g)^eps) for every eps > 0 uniformly across 1 <= g <= floor(Y/2) (u = Y/g >= 2, paired with Theorem 7's proved O(1) tail on g > floor(Y/2)), OR (ii) the logarithmic-saving closure contract E(Y) <= A_eta*Y^eta + B_eta*(log Y)^{2-kappa_eta}*D_tilde(Y) (kappa_eta in (0, 2]), which transfers to E(Y) = O_eps(Y^eps) via repaired Theorem 6.",
       "planned_calculation": "1) Formalize Theorem 6 (repaired_weighted_diagonal_closure_and_actual_observable_tc059r matching TC-057R Route D shifted prime-power diagonal with C_eps = 2*zeta''(1+eps), R-independent Y_*, and concrete canonicalLiouvilleEnergyE specialization) and Theorem 7 (smooth_increment_window_norm_and_small_scale_tail_tc059r proving direct ||Delta_d^{sm}||_Y window norm bound with unchanged L_d = floor(T/d) at both smooth endpoints plus u < 2 O(u^5) tail control) in formal/RiemannScope/DyadicPowerLiftPrimitiveCorrelation.lean (7 public theorems, 82 declarations, 0 sorry, 0 custom axioms). 2) Repair consistent inverse-Mellin formula M_Q(w) = Gamma(5/4 - w/2)*zeta(1 + 2*w)/(2*zeta(1/2 + w)) on 1/2 < u < 5/2 -> 0 < u < 5/2 with w_rho = rho - 1/2, delete critical-line-crossing claim in favor of adjacent-scale O(1/d) cancellation loss analysis, repair 4A-4E scope labels, and regenerate 535 certified 256-bit Arb balls and 85/85 verified review intervals.",
       "dependencies": [
@@ -1909,6 +1909,34 @@
       ],
       "acceptance_criterion": "All 11 tests in tests/test_tc_dyadic_power_lift_primitive_correlation.py and all 146 tests across the 8 EPIC-TC-042 TC suites passing; formal/RiemannScope/DyadicPowerLiftPrimitiveCorrelation.lean compiled with 82 declarations (35 def + 7 public theorems + 40 private helper theorems, 808 total compiled public theorems across 39 local modules + umbrella = 40 files, 0 sorry, 0 admit, 0 custom axioms); data/tc_dyadic_power_lift_primitive_correlation.json (535 certified 256-bit Arb balls) and docs/reviews/TC_059_POWER_LIFT_AND_PRIMITIVE_CORRELATION.md (85/85 displayed intervals verified, 0 pi macros) generated and synchronized; SUBGATE-TC-043A kept OPEN and rh_proved = False.",
       "resolution": "TASK-TC-059R completed all 5 repair groups while preserving all 448 TC-059 certified Arb balls and Theorems 1-5: (1) formalized primary closure theorem repaired_weighted_diagonal_closure_and_actual_observable_tc059r (Theorem 6) matching TC-057R Route D's shifted prime-power diagonal D_tilde(Y) <= (2/(log Y)^2)*sum_{p^k <= Y} ((log p)^2 / p^k) F(Y/p^k) + C_cut via finite-horizon G_eps(R) = sup_{1<=Z<=R} E(Z)/Z^eps (0 <= G_eps(R) <= M_lin*R without infinite-horizon finiteness assumptions), C_eps = 2*zeta''(1+eps) keeping factor 2 once, R-independent Y_*, q = 1/2, G_eps(R) <= max(G_eps(Y_*), 2*K), and concrete specialization to canonicalLiouvilleEnergyE and canonicalPrimePowerDiagDtilde (retaining Theorem 5(5) strictly as a labeled auxiliary same-scale lemma); (2) unified the inverse-Mellin bridge M_Q(w) = int_0^infty Q_{lambda,infty}(X)*X^{-w} dX/X = Gamma(5/4 - w/2)*zeta(1 + 2*w)/(2*zeta(1/2 + w)) on 1/2 < u < 5/2 extending conditionally under E(Y) = O_eps(Y^eps) via TC-058R Section 2.3 (Lean Theorem 31(5)) and TC-054R2 Proposition 3.1 to the open strip 0 < u < 5/2 with pole coordinate w_rho = rho - 1/2 for 1/2 < x < 1, backed by certified 256-bit Arb single-term quadrature refuting the retired mixed formula; (3) preserved TC-058's smooth/jump split with unchanged L_d = floor(T/d) at both smooth endpoints and minus sign -sqrt(X)*int_d^{d+1}, formalized smooth_increment_window_norm_and_small_scale_tail_tc059r (Theorem 7) proving ||Delta_d^{sm}||_Y <= d^{-1/2}*sqrt(E_{lambda,L_d}(Y/d)) + (d+1)^{-1/2}*sqrt(E_{lambda,L_d}(Y/(d+1))), deleted the critical-line-crossing claim, proved cutoff conversion to sqrt(F(Y/m)) + O(1), and quantified why Minkowski splitting discards O(1/d) adjacent-scale cancellation (1283.65x loss at Y = 64); (4) completed 4A-4E scope repairs (removed >60% resonant-shell claim, labeled K^* = 1 - log(2)/log(tau) as auxiliary real coordinate with algebraic-grade admissibility not established, stated complete multiplicativity and a(g)^2 = 1 on Pi_a <-> E_a and quotientDyadicShellQ, proved |Pi_{a,L}(u)| <= (9*(tau^5-1)/20)*u^5 and O(1) tail on g > floor(Y/2) in Theorem 7(4), separated Lean J_T inequalities from outside-Lean O(log log T), replaced zero-free labels with computed without sampled zeta-zero inputs, and proved [Y, b*Y] scaling for arbitrary b > 1); (5) regenerated 535 certified 256-bit Arb balls in data/tc_dyadic_power_lift_primitive_correlation.json, verified 85/85 displayed review intervals, compiled 808 project public theorems (0 sorry, 0 custom axioms), and passed 146/146 EPIC-TC-042 unit tests; SUBGATE-TC-043A remains OPEN and rh_proved = False."
+    },
+    {
+      "task_id": "TASK-TC-059R2",
+      "epic_id": "EPIC-TC-042",
+      "priority": 74,
+      "objective": "Numerical Assertion and Report Closeout for TC-059R toward SUBGATE-TC-043A (TASK-TC-059R2)",
+      "status": "OPEN",
+      "review_status": "AWAITING_INDEPENDENT_REVIEW",
+      "open_implication": "SUBGATE-TC-043A remains OPEN (rh_proved = False): establish unconditionally either (i) the subpower primitive-correlation bound |Pi_{lambda,floor(T(Y)/g)}(Y/g)| = O_eps((Y/g)^eps) for every eps > 0 uniformly across 1 <= g <= floor(Y/2) (u = Y/g >= 2, paired with Theorem 7(4)'s proved O(1) tail on g > floor(Y/2)), OR (ii) the logarithmic-saving closure contract E(Y) <= A_eta*Y^eta + B_eta*(log Y)^{2-kappa_eta}*D_tilde(Y) (kappa_eta in (0, 2]), which transfers to E(Y) = O_eps(Y^eps) via repaired Theorem 6.",
+      "planned_calculation": "1) Replace the overlapping-interval endpoint check in tests/test_tc_dyadic_power_lift_primitive_correlation.py with two-sided discrete grid maxima enclosures F_grid and G_grid on S_64 = {2, 4, 8, 16, 32, 64} (distinct from continuous suprema F and G_eps proved in Lean Theorem 6), directed separation upper(LHS) <= lower(RHS) (handling the r_div = 16, u_sub = 2 exact tie via verified finite-set maximizer + real algebraic identity rather than 0-containment alone), and an adversarial regression test confirming LHS = [2, 4] and RHS = [1, 3] are rejected as NOT_NUMERICALLY_CERTIFIED_OVERLAP. 2) Replace the underspecified extra d^{-1-alpha} (alpha > 0) closure claim with an accurately labeled research target (noting the scalar-majorant weights d^{-1/2-alpha}*exp(-c_W*sqrt(log d)) converge only for alpha >= 1/2 and diverge for 0 < alpha < 1/2, which is neither sufficient by itself nor necessary for signed aggregation). 3) Replace the two-sided \\asymp summand phrase in Review §4.2 with the PNT-backed upper bound << d^{1/2}*exp(-c_W*sqrt(log d))*sqrt(F(Y/d)) and available aggregate upper bound O(Y^{3/2}*exp(-c'_W*sqrt(log Y))), and cite inherited_vs_canonical_cutoff_comparison_and_counterexample_tc057 (LiouvilleSquareDilation.lean, Theorem 25, first main conjunct, third item) accurately. 4) Regenerate data/tc_dyadic_power_lift_primitive_correlation.json preserving all 535 Arb balls (including all 448 original TC-059 balls), 85/85 review intervals, and inherited formal build provenance 501e520144526d51e43c189a6d4a2d605a58e949.",
+      "dependencies": [
+        "TASK-TC-059",
+        "TASK-TC-059R"
+      ],
+      "evidence": [
+        "tests/test_tc_dyadic_power_lift_primitive_correlation.py",
+        "tc/dyadic_power_lift_primitive_correlation.py",
+        "data/tc_dyadic_power_lift_primitive_correlation.json",
+        "docs/reviews/TC_059_POWER_LIFT_AND_PRIMITIVE_CORRELATION.md",
+        "formal/RiemannScope/LiouvilleSquareDilation.lean",
+        "formal/RiemannScope/DyadicPowerLiftPrimitiveCorrelation.lean",
+        "formal/RiemannScope/README.md",
+        "TRANSCENDENTAL_CONTINUATION.md",
+        "RESEARCH_LEDGER.md",
+        ".agents/corpus_map/obligation_register.md"
+      ],
+      "acceptance_criterion": "All 12 tests in tests/test_tc_dyadic_power_lift_primitive_correlation.py and all 147 tests across the 8 EPIC-TC-042 TC suites passing; all 535 serialized 256-bit Arb balls (including all 448 original TC-059 balls) and 85/85 displayed review intervals preserved and verified; formal/RiemannScope/*.lean unchanged with inherited formal build provenance 501e520144526d51e43c189a6d4a2d605a58e949 (808 compiled public theorems, 0 sorry, 0 custom axioms); SUBGATE-TC-043A kept OPEN and rh_proved = False.",
+      "resolution": "TASK-TC-059R2 completed all 4 bounded closeout items while leaving accepted Lean sources and all 535 certified 256-bit Arb balls unchanged: (1) repaired the discrete grid normalization check in tests/test_tc_dyadic_power_lift_primitive_correlation.py to enclose F_grid and G_grid two-sidedly on S_64 = {2, 4, 8, 16, 32, 64}, require directed separation upper(LHS) <= lower(RHS) on non-tie cases, prove the r_div = 16 (u_sub = 2) tie via strict finite-set maximizer separation + exact real identity 2^eps * (E(2)/2^eps) = E(2), and added adversarial regression test_tc059r2_adversarial_interval_inequality_semantics rejecting LHS = [2, 4] vs RHS = [1, 3]; (2) replaced the underspecified extra d^{-1-alpha} (alpha > 0) closure promise in generator, JSON, and Review §4.2 with an accurately labeled research target; (3) replaced the unsupported \\asymp summand symbol in Review §4.2 with the PNT-backed upper bound << d^{1/2}*exp(-c_W*sqrt(log d))*sqrt(F(Y/d)) and available aggregate upper bound O(Y^{3/2}*exp(-c'_W*sqrt(log Y))), and corrected the inherited-cutoff lower-bound citation to inherited_vs_canonical_cutoff_comparison_and_counterexample_tc057 (LiouvilleSquareDilation.lean#L5230-L5243, Theorem 25, first main conjunct, third item) plus TC-057R Theorem 6.1 in H3; (4) regenerated data/tc_dyadic_power_lift_primitive_correlation.json (535/535 Arb balls unchanged, 85/85 review intervals verified), preserved inherited formal build provenance 501e520144526d51e43c189a6d4a2d605a58e949 (808 public theorems), and passed 12/12 focused tests (147/147 EPIC-TC-042 tests); SUBGATE-TC-043A remains OPEN and rh_proved = False."
     }
   ]
 }

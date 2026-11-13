@@ -1,6 +1,7 @@
 """Focused mathematical, falsification, formalization, and 256-bit Arb certification test suite
-for TASK-TC-059 / TASK-TC-059R: Dyadic Power-Lift Arithmetic, Primitive Coprime Correlations,
-Repaired Weighted-Diagonal Closure Interface, Mellin Bridge, and Smooth-Increment Scope.
+for TASK-TC-059 / TASK-TC-059R / TASK-TC-059R2: Dyadic Power-Lift Arithmetic, Primitive Coprime
+Correlations, Repaired Weighted-Diagonal Closure Interface, Mellin Bridge, Smooth-Increment Scope,
+and Numerical Assertion / Citation Closeout.
 """
 
 from __future__ import annotations
@@ -10,6 +11,7 @@ import json
 import math
 from pathlib import Path
 import re
+from typing import Sequence, Tuple
 
 from flint import acb, acb_series, arb, ctx as flint_ctx
 import pytest
@@ -25,6 +27,7 @@ from tc.coupled_scale_energy_bootstrap import (
     prime_power_pairs_up_to,
 )
 from tc.dyadic_power_lift_primitive_correlation import (
+    CLOSEOUT_BRANCH,
     DYADIC_POWER_LIFT_PRIMITIVE_CORRELATION_ARTIFACT_PATH,
     EPISTEMIC_CATEGORIES,
     EXPECTED_TC059_THEOREMS,
@@ -33,9 +36,12 @@ from tc.dyadic_power_lift_primitive_correlation import (
     PROPOSED_BRANCH,
     REPAIR_BRANCH,
     REVIEWED_MERGED_MAIN_BASELINE,
+    REVIEWED_TC_059R_HEAD,
+    REVIEWED_TC_059R_IMPLEMENTATION,
     REVIEWED_TC_059_HEAD,
     REVIEWED_TC_059_IMPLEMENTATION,
     TASK_TC_059_ID,
+    TASK_TC_059R2_ID,
     TASK_TC_059R_ID,
     TC_059_LEAN_MODULE_PATH,
     TC_059_REVIEW_DOC_PATH,
@@ -56,8 +62,83 @@ from tc.dyadic_power_lift_primitive_correlation import (
     verify_tc059_lean_theorems_live,
     verify_tc059_review_displayed_enclosures,
 )
-from tc.liouville_square_dilation import liouville_lambda_int
+from tc.liouville_square_dilation import (
+    _exact_arb_endpoints_as_fractions,
+    liouville_lambda_int,
+)
 from tc.prime_chain_contraction import evaluate_phi_n_arb, exact_T_cutoff_ceil_Y_5_4
+
+
+def _enclose_discrete_grid_max(balls: Sequence[arb]) -> arb:
+    """Return an outward-rounded two-sided Arb enclosure of `max_i v_i` given enclosures `B_i ni v_i`.
+
+    Lower bound: `max_i lower(B_i) <= max_i v_i`; upper bound: `max_i v_i <= max_i upper(B_i)`.
+    """
+    if not balls:
+        raise ValueError("Discrete grid maximum requires at least one Arb ball")
+    lo_balls = [b.lower() for b in balls]
+    hi_balls = [b.upper() for b in balls]
+    lo_max = max(lo_balls, key=lambda b: _exact_arb_endpoints_as_fractions(b)[0])
+    hi_max = max(hi_balls, key=lambda b: _exact_arb_endpoints_as_fractions(b)[1])
+    return lo_max.union(hi_max)
+
+
+def _classify_interval_endpoints_le(
+    lhs_lo: Fraction,
+    lhs_hi: Fraction,
+    rhs_lo: Fraction,
+    rhs_hi: Fraction,
+    *,
+    exact_algebraic_equality_justified: bool = False,
+) -> Tuple[str, bool]:
+    """Classify whether exact intervals `[lhs_lo, lhs_hi]` and `[rhs_lo, rhs_hi]` certify `LHS <= RHS`.
+
+    - `lhs_hi <= rhs_lo`: sufficient directed separation (`CERTIFIED_DIRECTED_INEQUALITY`, True),
+      unless `exact_algebraic_equality_justified=True` is asserted on strictly separated intervals
+      `lhs_hi < rhs_lo` (`INCONSISTENT_ALGEBRAIC_EQUALITY_CLAIM`, False).
+    - `lhs_lo > rhs_hi`: strict violation (`REFUTED_STRICT_VIOLATION`, False).
+    - Overlapping intervals (`lhs_hi > rhs_lo` and `lhs_lo <= rhs_hi`):
+      returns (`NOT_NUMERICALLY_CERTIFIED_OVERLAP`, False) unless backed by an explicit exact
+      algebraic or formal equality theorem (`exact_algebraic_equality_justified=True`), in which
+      case enclosure overlap confirms consistency (`CERTIFIED_EXACT_ALGEBRAIC_EQUALITY_WITH_CONSISTENT_ENCLOSURE`, True).
+    """
+    if lhs_lo > lhs_hi or rhs_lo > rhs_hi:
+        raise ValueError(f"Invalid interval endpoints: [{lhs_lo}, {lhs_hi}] vs [{rhs_lo}, {rhs_hi}]")
+    if lhs_hi <= rhs_lo:
+        if exact_algebraic_equality_justified and lhs_hi < rhs_lo:
+            return ("INCONSISTENT_ALGEBRAIC_EQUALITY_CLAIM", False)
+        return ("CERTIFIED_DIRECTED_INEQUALITY", True)
+    if lhs_lo > rhs_hi:
+        return ("REFUTED_STRICT_VIOLATION", False)
+    if not exact_algebraic_equality_justified:
+        return ("NOT_NUMERICALLY_CERTIFIED_OVERLAP", False)
+    return ("CERTIFIED_EXACT_ALGEBRAIC_EQUALITY_WITH_CONSISTENT_ENCLOSURE", True)
+
+
+def _classify_arb_le_certificate(
+    lhs_ball: arb,
+    rhs_ball: arb,
+    *,
+    exact_algebraic_equality_justified: bool = False,
+) -> Tuple[str, bool]:
+    """Directed Arb inequality certificate check using exact dyadic endpoints + outward difference."""
+    lhs_lo, lhs_hi = _exact_arb_endpoints_as_fractions(lhs_ball)
+    rhs_lo, rhs_hi = _exact_arb_endpoints_as_fractions(rhs_ball)
+    status, certified = _classify_interval_endpoints_le(
+        lhs_lo,
+        lhs_hi,
+        rhs_lo,
+        rhs_hi,
+        exact_algebraic_equality_justified=exact_algebraic_equality_justified,
+    )
+    diff_ball = rhs_ball - lhs_ball
+    if status == "CERTIFIED_DIRECTED_INEQUALITY":
+        if not bool(lhs_ball.upper() <= rhs_ball.lower() and diff_ball.lower() >= arb(0)):
+            return ("NOT_NUMERICALLY_CERTIFIED_OVERLAP", False)
+    elif status == "CERTIFIED_EXACT_ALGEBRAIC_EQUALITY_WITH_CONSISTENT_ENCLOSURE":
+        if not bool(arb(0) in diff_ball):
+            return ("INCONSISTENT_ALGEBRAIC_EQUALITY_CLAIM", False)
+    return (status, certified)
 
 
 @pytest.fixture(scope="module")
@@ -72,15 +153,22 @@ def tc059_artifact() -> dict:
 
 def test_artifact_metadata_and_epistemic_hygiene(tc059_artifact: dict) -> None:
     """Verify baseline provenance, gate status, zero-tau-only convention, and 256-bit Arb self-check."""
-    assert tc059_artifact["task_id"] == TASK_TC_059R_ID
+    assert tc059_artifact["task_id"] == TASK_TC_059R2_ID
     assert tc059_artifact["repaired_task_id"] == TASK_TC_059_ID
+    assert tc059_artifact["prior_repair_task_id"] == TASK_TC_059R_ID
     assert tc059_artifact["parent_subgate"] == PARENT_SUBGATE_ID
     assert tc059_artifact["reviewed_merged_main_baseline"] == REVIEWED_MERGED_MAIN_BASELINE
     assert tc059_artifact["included_tc058r2_tip"] == INCLUDED_TC_058R2_TIP
     assert tc059_artifact["reviewed_tc059_branch"] == PROPOSED_BRANCH
     assert tc059_artifact["reviewed_tc059_implementation_commit"] == REVIEWED_TC_059_IMPLEMENTATION
     assert tc059_artifact["reviewed_tc059_head_commit"] == REVIEWED_TC_059_HEAD
-    assert tc059_artifact["branch"] == REPAIR_BRANCH
+    assert tc059_artifact["reviewed_tc059r_branch"] == REPAIR_BRANCH
+    assert (
+        tc059_artifact["reviewed_tc059r_implementation_commit"] == REVIEWED_TC_059R_IMPLEMENTATION
+    )
+    assert tc059_artifact["reviewed_tc059r_head_commit"] == REVIEWED_TC_059R_HEAD
+    assert tc059_artifact["inherited_formal_producing_commit"] == REVIEWED_TC_059R_IMPLEMENTATION
+    assert tc059_artifact["branch"] == CLOSEOUT_BRANCH
     assert tc059_artifact["subgate_tc043a_status"] == "OPEN"
     assert tc059_artifact["rh_proved"] is False
     assert tc059_artifact["precision_bits"] == 256
@@ -419,9 +507,11 @@ def test_lean_module_wiring_axioms_and_review_doc_enclosures(
 def test_tc059r_repair1_weighted_normalization_and_actual_observable_corollary(
     tc059_artifact: dict,
 ) -> None:
-    """Verify Repair 1: shifted prime-power weighted normalization F(Y/r) <= (Y/r)^eps * G_eps(R),
-    finite weighted mass <= zeta''(1+eps), factor 2 kept once in C_eps = 2*zeta''(1+eps),
-    R-independent threshold Y_* and 2*K, and explicit 5-hypothesis trace on canonicalLiouvilleEnergyE.
+    """Verify Repair 1 & TC-059R2 Item 1: finite weighted mass <= zeta''(1+eps), factor 2 kept once
+    in C_eps = 2*zeta''(1+eps), R-independent threshold Y_* and 2*K, explicit 5-hypothesis trace on
+    canonicalLiouvilleEnergyE, and directed inequality certification for the discrete sampled maxima
+    F_grid(Y/r) <= (Y/r)^eps * G_grid(64) on S_64 = {2, 4, 8, 16, 32, 64} (kept strictly distinct
+    from the continuous suprema F and G_eps proved deductively in Lean Theorem 6).
     """
     sec1 = tc059_artifact["section_1_observable_and_closure_contract"]
     rep1 = sec1["repaired_weighted_diagonal_closure_and_actual_observable_tc059r"]
@@ -451,6 +541,7 @@ def test_tc059r_repair1_weighted_normalization_and_actual_observable_corollary(
     assert trace["H3_ROUTE_D_SHIFTED_PRIME_POWER_DIAGONAL"]["classification"] == (
         "ANALYTIC_PROVED_OUTSIDE_LEAN"
     )
+    assert "Theorem 6.1" in trace["H3_ROUTE_D_SHIFTED_PRIME_POWER_DIAGONAL"]["source_and_discharge"]
     assert trace["H4_WEIGHTED_PRIME_POWER_ZETA_MAJORANT"]["classification"] == (
         "ANALYTIC_PROVED_OUTSIDE_LEAN"
     )
@@ -464,13 +555,17 @@ def test_tc059r_repair1_weighted_normalization_and_actual_observable_corollary(
         # Independent 256-bit Arb check across eps in {1/2, 1/4, 1/8}:
         # 1) sum_{p^k <= Y} (log p)^2 / (p^k)^{1+eps} <= sum_{p^k <= Y} (log(p^k))^2 / (p^k)^{1+eps} < zeta''(1+eps)
         # 2) C_eps = 2*zeta''(1+eps) (not 4*zeta''(1+eps))
-        # 3) On independently evaluated E(Z) balls for Z in {2, 4, 8, 16, 32, 64}, F(Y/r) <= (Y/r)^eps * G_eps(R)
+        # 3) On the discrete 6-point sample set S_64 = {2, 4, 8, 16, 32, 64} with exact cutoff T(z),
+        #    define finite sampled maxima F_grid(u) := max_{z in S_64, z <= u} E(z) and
+        #    G_grid(64) := max_{z in S_64} E(z)/z^eps (distinct from continuous suprema F and G_eps,
+        #    which are proved for all real 1 <= r <= Y <= R in Lean Theorem 6(2)).
+        S_64 = (2, 4, 8, 16, 32, 64)
         lam_182 = [0] + [liouville_lambda_int(n) for n in range(1, 183)]
         grid_E = {
             z_val: evaluate_bilinear_window_pairing_closed_arb(
                 arb(z_val), exact_T_cutoff_ceil_Y_5_4(z_val), lam_182, lam_182, prec_bits=256
             )
-            for z_val in (2, 4, 8, 16, 32, 64)
+            for z_val in S_64
         }
         for eps_fr in (Fraction(1, 2), Fraction(1, 4), Fraction(1, 8)):
             eps_a = _frac_to_arb(eps_fr)
@@ -491,18 +586,142 @@ def test_tc059r_repair1_weighted_normalization_and_actual_observable_corollary(
                 assert bool(zeta_pp - pp_log_n > arb(0))
                 assert bool(zeta_pp - pp_mass > arb(0))
 
-            # Outward-rounded finite-horizon weighted normalization on dyadic grid {2, 4, 8, 16, 32, 64}:
-            G_64_upper = max(
-                (val / (arb(z_k) ** eps_a)).upper() for z_k, val in grid_E.items() if z_k <= 64
+            # Two-sided outward-rounded enclosure of G_grid(64) := max_{z in S_64} E(z) / z^eps
+            # (never substituting upper(G_grid) on the RHS of an inequality certificate):
+            quotients_grid = {
+                z_k: val / (arb(z_k) ** eps_a) for z_k, val in grid_E.items()
+            }
+            G_grid_ball = _enclose_discrete_grid_max(list(quotients_grid.values()))
+
+            # Certify by strict directed separation on the finite set S_64 that z = 2 is the unique
+            # maximizer of E(z)/z^eps on S_64 (so G_grid(64) = E(2)/2^eps as exact real numbers):
+            unique_maximizer_is_2 = all(
+                _classify_arb_le_certificate(
+                    quotients_grid[z_other], quotients_grid[2]
+                )
+                == ("CERTIFIED_DIRECTED_INEQUALITY", True)
+                and bool(quotients_grid[2] - quotients_grid[z_other] > arb(0))
+                for z_other in S_64
+                if z_other != 2
             )
+            assert unique_maximizer_is_2 is True
+
             Y_sample = 32
             for r_div in (1, 2, 4, 8, 16):
-                u_sub = Y_sample // r_div  # in {2, 4, 8, 16, 32}
-                F_disc_lower = max(
-                    val.lower() for z_k, val in grid_E.items() if z_k <= u_sub
-                )
-                rhs_norm_upper = ((arb(Y_sample) / arb(r_div)) ** eps_a * G_64_upper).upper()
-                assert bool(rhs_norm_upper >= F_disc_lower)
+                u_sub = Y_sample // r_div  # in {32, 16, 8, 4, 2}
+                subgrid_pts = tuple(z_k for z_k in S_64 if z_k <= u_sub)
+                F_grid_ball = _enclose_discrete_grid_max([grid_E[z_k] for z_k in subgrid_pts])
+                rhs_grid_ball = ((arb(Y_sample) / arb(r_div)) ** eps_a) * G_grid_ball
+
+                if r_div in (1, 2, 4, 8):
+                    # Non-singleton subgrids u_sub in {32, 16, 8, 4}: certified strictly by directed
+                    # interval separation upper(F_grid_ball) <= lower(rhs_grid_ball):
+                    status, certified = _classify_arb_le_certificate(
+                        F_grid_ball, rhs_grid_ball, exact_algebraic_equality_justified=False
+                    )
+                    assert (status, certified) == ("CERTIFIED_DIRECTED_INEQUALITY", True)
+                else:
+                    # r_div == 16 (u_sub == 2): raw overlapping balls alone must NOT be reported as
+                    # numerically certified inequality:
+                    raw_status, raw_certified = _classify_arb_le_certificate(
+                        F_grid_ball, rhs_grid_ball, exact_algebraic_equality_justified=False
+                    )
+                    assert (raw_status, raw_certified) == (
+                        "NOT_NUMERICALLY_CERTIFIED_OVERLAP",
+                        False,
+                    )
+                    # Genuine exact equality F_grid(2) = E(2) = 2^eps * (E(2)/2^eps) = 2^eps * G_grid(64),
+                    # justified by singleton subgrid {z in S_64 : z <= 2} == {2}, strict finite-set
+                    # maximizer proof G_grid(64) = E(2)/2^eps, and real algebra a * (x / a) = x (a = 2^eps > 0):
+                    exact_algebraic_tie = bool(
+                        subgrid_pts == (2,)
+                        and unique_maximizer_is_2
+                        and Fraction(Y_sample, r_div) == Fraction(2, 1)
+                    )
+                    assert exact_algebraic_tie is True
+                    eq_status, eq_certified = _classify_arb_le_certificate(
+                        F_grid_ball,
+                        rhs_grid_ball,
+                        exact_algebraic_equality_justified=exact_algebraic_tie,
+                    )
+                    assert (eq_status, eq_certified) == (
+                        "CERTIFIED_EXACT_ALGEBRAIC_EQUALITY_WITH_CONSISTENT_ENCLOSURE",
+                        True,
+                    )
+                    assert bool(abs(rhs_grid_ball - F_grid_ball) < arb("1e-73"))
+    finally:
+        flint_ctx.prec = saved
+
+
+def test_tc059r2_adversarial_interval_inequality_semantics() -> None:
+    """Adversarial regression for TC-059R2 Item 1:
+    1) Overlapping intervals LHS = [2, 4] and RHS = [1, 3] pass the retired endpoint check
+       upper(RHS) >= lower(LHS) (3 >= 2) despite violating LHS <= RHS (e.g. 4 > 1), and MUST
+       be rejected as NOT_NUMERICALLY_CERTIFIED_OVERLAP (False).
+    2) Separated valid intervals LHS = [1, 2], RHS = [3, 4] certify LHS <= RHS via directed separation.
+    3) Separated violated intervals LHS = [4, 5], RHS = [1, 2] fail as REFUTED_STRICT_VIOLATION.
+    4) Zero-containing residual overlap without algebraic proof is NOT certified; genuine algebraic
+       equality requires explicit justification and consistent enclosure, and rejects separated balls.
+    """
+    saved = flint_ctx.prec
+    try:
+        flint_ctx.prec = 256
+        # 1) Adversarial overlap: LHS = [2, 4], RHS = [1, 3]
+        assert Fraction(3) >= Fraction(2)  # retired endpoint check passes falsely
+        assert _classify_interval_endpoints_le(
+            Fraction(2), Fraction(4), Fraction(1), Fraction(3)
+        ) == ("NOT_NUMERICALLY_CERTIFIED_OVERLAP", False)
+
+        lhs_overlap = arb(2).union(arb(4))
+        rhs_overlap = arb(1).union(arb(3))
+        assert bool(rhs_overlap.upper() >= lhs_overlap.lower()) is True  # old check passes!
+        assert _classify_arb_le_certificate(lhs_overlap, rhs_overlap) == (
+            "NOT_NUMERICALLY_CERTIFIED_OVERLAP",
+            False,
+        )
+
+        # 2) Separated valid case: LHS = [1, 2], RHS = [3, 4]
+        lhs_valid = arb(1).union(arb(2))
+        rhs_valid = arb(3).union(arb(4))
+        assert _classify_arb_le_certificate(lhs_valid, rhs_valid) == (
+            "CERTIFIED_DIRECTED_INEQUALITY",
+            True,
+        )
+
+        # 3) Separated violated case: LHS = [4, 5], RHS = [1, 2]
+        lhs_viol = arb(4).union(arb(5))
+        rhs_viol = arb(1).union(arb(2))
+        assert _classify_arb_le_certificate(lhs_viol, rhs_viol) == (
+            "REFUTED_STRICT_VIOLATION",
+            False,
+        )
+
+        # 4) Zero-containing residual without algebraic proof must NOT certify equality or inequality
+        same_a = arb(2).union(arb(3))
+        same_b = arb(2).union(arb(3))
+        assert bool(arb(0) in (same_b - same_a)) is True
+        assert _classify_arb_le_certificate(
+            same_a, same_b, exact_algebraic_equality_justified=False
+        ) == ("NOT_NUMERICALLY_CERTIFIED_OVERLAP", False)
+
+        # Genuine algebraic identity x = (2^eps) * (x / 2^eps) on non-exact binary ball x = 7/3:
+        x_val = arb(7) / arb(3)
+        scale_val = arb(2) ** (arb(1) / arb(2))
+        rhs_alg = scale_val * (x_val / scale_val)
+        assert _classify_arb_le_certificate(
+            x_val, rhs_alg, exact_algebraic_equality_justified=False
+        ) == ("NOT_NUMERICALLY_CERTIFIED_OVERLAP", False)
+        assert _classify_arb_le_certificate(
+            x_val, rhs_alg, exact_algebraic_equality_justified=True
+        ) == ("CERTIFIED_EXACT_ALGEBRAIC_EQUALITY_WITH_CONSISTENT_ENCLOSURE", True)
+
+        # Misapplying algebraic-equality flag to separated intervals fails closed:
+        assert _classify_arb_le_certificate(
+            lhs_valid, rhs_valid, exact_algebraic_equality_justified=True
+        ) == ("INCONSISTENT_ALGEBRAIC_EQUALITY_CLAIM", False)
+        assert _classify_arb_le_certificate(
+            lhs_viol, rhs_viol, exact_algebraic_equality_justified=True
+        ) == ("REFUTED_STRICT_VIOLATION", False)
     finally:
         flint_ctx.prec = saved
 
@@ -601,6 +820,25 @@ def test_tc059r_repair3_smooth_increment_jump_norm_and_cancellation_loss(
     adj = sm_rep["adjacent_scale_cancellation_loss_Y64_T182"]
     assert adj["verified"] is True
     assert float(adj["minkowski_over_actual_ratio"]["lower_dec"]) > 1000.0
+    assert "remaining_quantitative_requirement" not in adj
+    assert "possible_next_research_target" in adj
+    assert "Such an estimate is not established here." in adj["possible_next_research_target"]
+    assert "alpha >= 1/2" in adj["possible_next_research_target"]
+    assert "extra d^{-1-alpha}" not in adj["possible_next_research_target"]
+
+    why_b2 = sec4["attempt_b_pre_stated_schemas"][1]["why_not_subpower"]
+    assert "inherited_vs_canonical_cutoff_comparison_and_counterexample_tc057" in why_b2
+    assert "Theorem 25, first main conjunct, third item" in why_b2
+    assert "Theorem 5.1(2)" not in why_b2
+    assert "extra d^{-1-alpha}" not in why_b2
+    assert "Such an estimate is not established here." in why_b2
+
+    rev_txt = TC_059_REVIEW_DOC_PATH.read_text(encoding="utf-8")
+    assert "inherited_vs_canonical_cutoff_comparison_and_counterexample_tc057" in rev_txt
+    assert "Theorem 25, first main conjunct, third item" in rev_txt
+    assert "Theorem 25(2)" not in rev_txt
+    assert "\\asymp d^{1/2}" not in rev_txt
+    assert "extra $d^{-1-\\alpha}$" not in rev_txt
 
     saved = flint_ctx.prec
     try:
