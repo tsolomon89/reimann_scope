@@ -1,5 +1,6 @@
 """Focused mathematical, falsification, formalization, and 256-bit Arb certification test suite
-for TASK-TC-059: Dyadic Power-Lift Arithmetic and Primitive Coprime Correlations.
+for TASK-TC-059 / TASK-TC-059R: Dyadic Power-Lift Arithmetic, Primitive Coprime Correlations,
+Repaired Weighted-Diagonal Closure Interface, Mellin Bridge, and Smooth-Increment Scope.
 """
 
 from __future__ import annotations
@@ -10,7 +11,7 @@ import math
 from pathlib import Path
 import re
 
-from flint import acb, arb, ctx as flint_ctx
+from flint import acb, acb_series, arb, ctx as flint_ctx
 import pytest
 
 import certification
@@ -18,8 +19,10 @@ from scripts import build_formal
 from tc.canonical_theta_correlation_bound import REPO_ROOT
 from tc.coupled_scale_energy_bootstrap import (
     _acb_integral_certified_arb,
+    _frac_to_arb,
     _tau_arb,
     moebius_mu_int,
+    prime_power_pairs_up_to,
 )
 from tc.dyadic_power_lift_primitive_correlation import (
     DYADIC_POWER_LIFT_PRIMITIVE_CORRELATION_ARTIFACT_PATH,
@@ -28,8 +31,12 @@ from tc.dyadic_power_lift_primitive_correlation import (
     INCLUDED_TC_058R2_TIP,
     PARENT_SUBGATE_ID,
     PROPOSED_BRANCH,
+    REPAIR_BRANCH,
     REVIEWED_MERGED_MAIN_BASELINE,
+    REVIEWED_TC_059_HEAD,
+    REVIEWED_TC_059_IMPLEMENTATION,
     TASK_TC_059_ID,
+    TASK_TC_059R_ID,
     TC_059_LEAN_MODULE_PATH,
     TC_059_REVIEW_DOC_PATH,
     dyadic_power_lift_b_J_conv_table,
@@ -39,6 +46,8 @@ from tc.dyadic_power_lift_primitive_correlation import (
     evaluate_Q_general_arb,
     evaluate_bilinear_window_pairing_closed_arb,
     evaluate_primitive_coprime_sum_Pi_arb,
+    evaluate_single_term_mellin_phi_quadrature_arb,
+    evaluate_smooth_increment_and_jump_arb,
     evaluate_window_kernel_K_closed_arb,
     evaluate_window_kernel_K_quadrature_arb,
     is_squarefree_int,
@@ -62,20 +71,38 @@ def tc059_artifact() -> dict:
 
 
 def test_artifact_metadata_and_epistemic_hygiene(tc059_artifact: dict) -> None:
-    """Verify baseline provenance, gate status, zero-pi convention, and 256-bit Arb self-check."""
-    assert tc059_artifact["task_id"] == TASK_TC_059_ID
+    """Verify baseline provenance, gate status, zero-tau-only convention, and 256-bit Arb self-check."""
+    assert tc059_artifact["task_id"] == TASK_TC_059R_ID
+    assert tc059_artifact["repaired_task_id"] == TASK_TC_059_ID
     assert tc059_artifact["parent_subgate"] == PARENT_SUBGATE_ID
     assert tc059_artifact["reviewed_merged_main_baseline"] == REVIEWED_MERGED_MAIN_BASELINE
     assert tc059_artifact["included_tc058r2_tip"] == INCLUDED_TC_058R2_TIP
-    assert tc059_artifact["branch"] == PROPOSED_BRANCH
+    assert tc059_artifact["reviewed_tc059_branch"] == PROPOSED_BRANCH
+    assert tc059_artifact["reviewed_tc059_implementation_commit"] == REVIEWED_TC_059_IMPLEMENTATION
+    assert tc059_artifact["reviewed_tc059_head_commit"] == REVIEWED_TC_059_HEAD
+    assert tc059_artifact["branch"] == REPAIR_BRANCH
     assert tc059_artifact["subgate_tc043a_status"] == "OPEN"
     assert tc059_artifact["rh_proved"] is False
     assert tc059_artifact["precision_bits"] == 256
     assert tc059_artifact["epistemic_categories_enforced"] == list(EPISTEMIC_CATEGORIES)
+    assert "w = u + i*v" in tc059_artifact["complex_coordinate_convention"]
 
     arb_self = tc059_artifact["serialized_arb_self_check"]
     assert arb_self["all_enclose_original_256bit_arb_ball"] is True
-    assert arb_self["total_certified_arb_balls_checked"] >= 200
+    assert arb_self["total_certified_arb_balls_checked"] >= 450
+
+    # Zero forbidden circle-half macros or Unicode characters across TC-059/TC-059R deliverables
+    for chk_path in (
+        TC_059_LEAN_MODULE_PATH,
+        REPO_ROOT / "tc" / "dyadic_power_lift_primitive_correlation.py",
+        DYADIC_POWER_LIFT_PRIMITIVE_CORRELATION_ARTIFACT_PATH,
+        TC_059_REVIEW_DOC_PATH,
+    ):
+        txt = chk_path.read_text(encoding="utf-8")
+        assert "\u03c0" not in txt, f"Forbidden Unicode circle-half char in {chk_path}"
+        assert len(re.findall(r"\x5cpi(?![a-zA-Z])", txt)) == 0, (
+            f"Forbidden LaTeX circle-half macro in {chk_path}"
+        )
 
 
 def test_section_1_observable_reconstruction_and_closure_contract(tc059_artifact: dict) -> None:
@@ -386,3 +413,314 @@ def test_lean_module_wiring_axioms_and_review_doc_enclosures(
     res_corrupt = verify_tc059_review_displayed_enclosures(tc059_artifact, corrupt_md)
     assert res_corrupt["failed_count"] >= 1
     assert res_corrupt["all_displayed_intervals_contain_generated_enclosures"] is False
+    assert len(EXPECTED_TC059_THEOREMS) == 7
+
+
+def test_tc059r_repair1_weighted_normalization_and_actual_observable_corollary(
+    tc059_artifact: dict,
+) -> None:
+    """Verify Repair 1: shifted prime-power weighted normalization F(Y/r) <= (Y/r)^eps * G_eps(R),
+    finite weighted mass <= zeta''(1+eps), factor 2 kept once in C_eps = 2*zeta''(1+eps),
+    R-independent threshold Y_* and 2*K, and explicit 5-hypothesis trace on canonicalLiouvilleEnergyE.
+    """
+    sec1 = tc059_artifact["section_1_observable_and_closure_contract"]
+    rep1 = sec1["repaired_weighted_diagonal_closure_and_actual_observable_tc059r"]
+    assert rep1["verified"] is True
+    assert (
+        rep1["primary_lean_theorem"]
+        == "repaired_weighted_diagonal_closure_and_actual_observable_tc059r"
+    )
+    assert rep1["infinite_horizon_supremum_assumed_finite"] is False
+    assert rep1["auxiliary_same_scale_lemma_retained"].startswith(
+        "parity_uniqueness_turn_chart_defect_and_log_saving_closure_tc059"
+    )
+    for wm_row in rep1["weighted_mass_and_horizon_checks"]:
+        assert wm_row["factor_two_count"] == 1
+        assert wm_row["verified"] is True
+
+    trace = {h["hypothesis_id"]: h for h in rep1["actual_observable_corollary_hypothesis_trace"]}
+    assert set(trace.keys()) == {
+        "H1_NONNEGATIVITY",
+        "H2_LINEAR_SCALE_MAJORANT",
+        "H3_ROUTE_D_SHIFTED_PRIME_POWER_DIAGONAL",
+        "H4_WEIGHTED_PRIME_POWER_ZETA_MAJORANT",
+        "H5_QUANTIFIED_ARITHMETIC_LOG_SAVING_CONTRACT",
+    }
+    assert trace["H1_NONNEGATIVITY"]["classification"] == "CONCRETE_ANALYTIC_IN_LEAN"
+    assert trace["H2_LINEAR_SCALE_MAJORANT"]["classification"] == "ANALYTIC_PROVED_OUTSIDE_LEAN"
+    assert trace["H3_ROUTE_D_SHIFTED_PRIME_POWER_DIAGONAL"]["classification"] == (
+        "ANALYTIC_PROVED_OUTSIDE_LEAN"
+    )
+    assert trace["H4_WEIGHTED_PRIME_POWER_ZETA_MAJORANT"]["classification"] == (
+        "ANALYTIC_PROVED_OUTSIDE_LEAN"
+    )
+    assert trace["H5_QUANTIFIED_ARITHMETIC_LOG_SAVING_CONTRACT"]["classification"] == (
+        "OPEN_CONJECTURE_OR_FAILED_CANDIDATE"
+    )
+
+    saved = flint_ctx.prec
+    try:
+        flint_ctx.prec = 256
+        # Independent 256-bit Arb check across eps in {1/2, 1/4, 1/8}:
+        # 1) sum_{p^k <= Y} (log p)^2 / (p^k)^{1+eps} <= sum_{p^k <= Y} (log(p^k))^2 / (p^k)^{1+eps} < zeta''(1+eps)
+        # 2) C_eps = 2*zeta''(1+eps) (not 4*zeta''(1+eps))
+        # 3) On independently evaluated E(Z) balls for Z in {2, 4, 8, 16, 32, 64}, F(Y/r) <= (Y/r)^eps * G_eps(R)
+        lam_182 = [0] + [liouville_lambda_int(n) for n in range(1, 183)]
+        grid_E = {
+            z_val: evaluate_bilinear_window_pairing_closed_arb(
+                arb(z_val), exact_T_cutoff_ceil_Y_5_4(z_val), lam_182, lam_182, prec_bits=256
+            )
+            for z_val in (2, 4, 8, 16, 32, 64)
+        }
+        for eps_fr in (Fraction(1, 2), Fraction(1, 4), Fraction(1, 8)):
+            eps_a = _frac_to_arb(eps_fr)
+            z_ser = acb_series([acb(arb(1) + eps_a), acb(1)], prec=256).zeta()
+            zeta_pp = arb(2) * z_ser[2].real
+            C_eps = arb(2) * zeta_pp
+            assert bool(zeta_pp > arb(0) and abs(C_eps - arb(4) * zeta_pp) > arb(1))
+
+            for Y_chk in (16, 64, 256):
+                pp_mass = arb(0)
+                pp_log_n = arb(0)
+                for p_v, k_v in prime_power_pairs_up_to(Y_chk):
+                    pk_a = arb(p_v ** k_v)
+                    denom = pk_a ** (arb(1) + eps_a)
+                    pp_mass += ((arb(p_v).log()) ** 2) / denom
+                    pp_log_n += ((pk_a.log()) ** 2) / denom
+                assert bool(pp_log_n - pp_mass >= arb(0))
+                assert bool(zeta_pp - pp_log_n > arb(0))
+                assert bool(zeta_pp - pp_mass > arb(0))
+
+            # Outward-rounded finite-horizon weighted normalization on dyadic grid {2, 4, 8, 16, 32, 64}:
+            G_64_upper = max(
+                (val / (arb(z_k) ** eps_a)).upper() for z_k, val in grid_E.items() if z_k <= 64
+            )
+            Y_sample = 32
+            for r_div in (1, 2, 4, 8, 16):
+                u_sub = Y_sample // r_div  # in {2, 4, 8, 16, 32}
+                F_disc_lower = max(
+                    val.lower() for z_k, val in grid_E.items() if z_k <= u_sub
+                )
+                rhs_norm_upper = ((arb(Y_sample) / arb(r_div)) ** eps_a * G_64_upper).upper()
+                assert bool(rhs_norm_upper >= F_disc_lower)
+    finally:
+        flint_ctx.prec = saved
+
+
+def test_tc059r_repair2_single_term_mellin_scaling_and_pole_coordinates(
+    tc059_artifact: dict,
+) -> None:
+    """Verify Repair 2: consistent inverse-Mellin convention M_Q(w) = int_0^infty Q(X)*X^{-w} dX/X,
+    single-term scaling (1/2)*Gamma(5/4 - w/2)*n^{-1/2 - w} on u < 5/2, strict refutation of the
+    retired mixed formula (1/2)*Gamma((2w+5)/4)*n^{-(w+3/2)}, u = 5/2 boundary guard, and pole map
+    w_rho = rho - 1/2 in {0 < u < 5/2}.
+    """
+    sec5 = tc059_artifact["section_5_tc_geometry_defect_and_murmurations"]
+    mel = sec5["mellin_convention_and_pole_domain_audit_tc059r"]
+    assert mel["verified"] is True
+    assert "1/2 < u < 5/2" in mel["initial_absolute_convergence_strip"]
+    assert "0 < u < 5/2" in mel["subpower_holomorphic_extension_strip"]
+    assert "w_rho = rho - 1/2" in mel["pole_coordinate_for_hypothetical_zero_rho_x_gt_half"]
+
+    saved = flint_ctx.prec
+    try:
+        flint_ctx.prec = 256
+        # Check domain guard at u = 5/2 (small-X divergence boundary)
+        with pytest.raises(ValueError, match="Re\\(w\\) < 5/2"):
+            evaluate_single_term_mellin_phi_quadrature_arb(1, acb(arb(5) / arb(2)), prec_bits=256)
+
+        # Check n-scaling and Gamma factor across initial strip (u = 5/4) and continuation strip (u = 1/4)
+        for w_test in (acb(arb(5) / arb(4), arb(3) / arb(4)), acb(arb(1) / arb(4), arb(1))):
+            i_1 = evaluate_single_term_mellin_phi_quadrature_arb(1, w_test, prec_bits=256)
+            for n_test in (1, 2, 5):
+                i_n = evaluate_single_term_mellin_phi_quadrature_arb(n_test, w_test, prec_bits=256)
+                rhs_true = (
+                    (acb(1) / acb(2))
+                    * (acb(arb(5) / arb(4)) - w_test / acb(2)).gamma()
+                    * (acb(n_test) ** (-acb(1) / acb(2) - w_test))
+                )
+                rhs_retired = (
+                    (acb(1) / acb(2))
+                    * ((acb(2) * w_test + acb(5)) / acb(4)).gamma()
+                    * (acb(n_test) ** (-w_test - acb(3) / acb(2)))
+                )
+                diff_true = i_n - rhs_true
+                assert bool(
+                    arb(0) in diff_true.real
+                    and arb(0) in diff_true.imag
+                    and abs(diff_true) < arb("1e-62")
+                )
+                assert bool(abs(i_n - rhs_retired) > arb("1e-2"))
+                if n_test > 1:
+                    ratio_n = i_n / i_1
+                    true_scale = acb(n_test) ** (-acb(1) / acb(2) - w_test)
+                    wrong_scale = acb(n_test) ** (-w_test - acb(3) / acb(2))
+                    assert bool(abs(ratio_n - true_scale) < arb("1e-60"))
+                    assert bool(abs(ratio_n - wrong_scale) > arb("1e-2"))
+
+        # Check hypothetical off-line zero coordinate mapping rho = x + i*y (1/2 < x < 1) -> w_rho = rho - 1/2
+        for x_num, x_den, y_im in ((3, 5, 21), (7, 8, -9)):
+            x_fr = Fraction(x_num, x_den)
+            u_fr = x_fr - Fraction(1, 2)
+            assert Fraction(0) < u_fr < Fraction(5, 2)
+            assert Fraction(1, 2) + u_fr == x_fr
+            assert Fraction(1) + 2 * u_fr == 2 * x_fr
+            rho_c = acb(arb(x_num) / arb(x_den), arb(y_im))
+            w_rho = rho_c - acb(arb(1) / arb(2))
+            assert bool(w_rho.real > arb(0) and arb(5) / arb(2) - w_rho.real > arb(0))
+            denom_diff = (acb(arb(1) / arb(2)) + w_rho) - rho_c
+            num_diff = (acb(1) + acb(2) * w_rho) - acb(2) * rho_c
+            assert bool(
+                arb(0) in denom_diff.real
+                and arb(0) in denom_diff.imag
+                and abs(denom_diff) < arb("1e-74")
+            )
+            assert bool(
+                arb(0) in num_diff.real
+                and arb(0) in num_diff.imag
+                and abs(num_diff) < arb("1e-74")
+            )
+            assert bool(abs((acb(arb(5) / arb(4)) - w_rho / acb(2)).gamma()) > arb(0))
+            assert bool(abs((acb(1) + acb(2) * w_rho).zeta()) > arb(0))
+    finally:
+        flint_ctx.prec = saved
+
+
+def test_tc059r_repair3_smooth_increment_jump_norm_and_cancellation_loss(
+    tc059_artifact: dict,
+) -> None:
+    """Verify Repair 3: unchanged cutoff L_d = floor(T/d) at both smooth endpoints, nontrivial
+    L_d != L_{d+1} jump separation, exact -sqrt(X) integral sign, direct window norm bound
+    (including T = 0 and sub-unit Y/(d+1) < 1), cutoff conversion, and adjacent-scale cancellation loss.
+    """
+    sec4 = tc059_artifact["section_4_dyadic_blocks_and_attempt_b"]
+    sm_rep = sec4["smooth_increment_endpoint_and_norm_repair_tc059r"]
+    assert sm_rep["verified"] is True
+    assert sm_rep["critical_line_crossing_required_for_direct_norm_bound"] is False
+    assert sm_rep["lean_theorem"] == "smooth_increment_window_norm_and_small_scale_tail_tc059r"
+    adj = sm_rep["adjacent_scale_cancellation_loss_Y64_T182"]
+    assert adj["verified"] is True
+    assert float(adj["minkowski_over_actual_ratio"]["lower_dec"]) > 1000.0
+
+    saved = flint_ctx.prec
+    try:
+        flint_ctx.prec = 256
+        tau = _tau_arb()
+        # Nontrivial floor jump at (T=5, d=2): L_2 = 2 != 1 = L_3
+        ev_5_2 = evaluate_smooth_increment_and_jump_arb(Fraction(7, 2), 5, 2, prec_bits=256)
+        assert bool(
+            arb(0) in (ev_5_2["g_d_minus_g_d1"] - (ev_5_2["delta_sm_endpoint"] + ev_5_2["delta_jump"]))
+        )
+        assert bool(abs(ev_5_2["delta_jump"]) > arb("1e-6"))
+        # Silently replacing L_2 by L_3 at the second endpoint changes delta_sm by delta_jump != 0!
+        assert bool(abs(ev_5_2["g_d_minus_g_d1"] - ev_5_2["delta_sm_endpoint"]) > arb("1e-6"))
+        # Sign check: delta_sm_endpoint == -sqrt(X)*int ... and strictly != +sqrt(X)*int ...
+        assert bool(
+            arb(0) in (ev_5_2["delta_sm_endpoint"] - ev_5_2["delta_sm_integral"])
+            and abs(ev_5_2["delta_sm_endpoint"] - ev_5_2["delta_sm_integral"]) < arb("1e-62")
+        )
+        assert bool(abs(ev_5_2["delta_sm_endpoint"] + ev_5_2["delta_sm_integral"]) > arb("1e-6"))
+
+        # Zero cutoff T = 0 edge case
+        ev_0 = evaluate_smooth_increment_and_jump_arb(Fraction(5, 1), 0, 1, prec_bits=256)
+        assert ev_0["delta_sm_endpoint"] == arb(0)
+        assert ev_0["delta_sm_integral"] == arb(0)
+        assert ev_0["delta_jump"] == arb(0)
+
+        # Cutoff conversion check: sqrt(E_{lambda, L_d}(Y/m)) <= sqrt(E(Y/m)) + sqrt(2*(tau^5 - 1)/5)
+        # on Y = 16, T = T(16) = 32, d in {1, 2, 3, 5}, m in {d, d + 1} (all Y/m >= 16/6 > 1):
+        c_cut_sharp = (arb(2) * (tau ** 5 - arb(1)) / arb(5)).sqrt()
+        c_cut_loose = arb(2) * ((tau ** 5 - arb(1)) / arb(5)).sqrt()
+        assert bool(c_cut_loose - c_cut_sharp > arb(0))
+        lam_32 = [0] + [liouville_lambda_int(q) for q in range(1, 40)]
+        for d_conv in (1, 2, 3, 5):
+            L_d_c = 32 // d_conv
+            for m_scale in (d_conv, d_conv + 1):
+                w_frac = Fraction(16, m_scale)
+                w_arb = _frac_to_arb(w_frac)
+                T_w = math.ceil(float(w_frac) ** 1.25)
+                while (T_w - 1) > 0 and ((T_w - 1) ** 4) * (m_scale ** 5) >= 16 ** 5:
+                    T_w -= 1
+                while (T_w ** 4) * (m_scale ** 5) < 16 ** 5:
+                    T_w += 1
+                e_inh = evaluate_bilinear_window_pairing_closed_arb(
+                    w_arb, L_d_c, lam_32, lam_32, prec_bits=256
+                ).sqrt()
+                e_can = evaluate_bilinear_window_pairing_closed_arb(
+                    w_arb, T_w, lam_32, lam_32, prec_bits=256
+                ).sqrt()
+                assert bool((e_can + c_cut_sharp) - e_inh > arb(0))
+    finally:
+        flint_ctx.prec = saved
+
+
+def test_tc059r_repair4_scope_small_scale_tail_and_arbitrary_window_base(
+    tc059_artifact: dict,
+) -> None:
+    """Verify Repair 4: auxiliary real-coordinate scope for K^*, stabilization_depth_J_T Lean vs
+    outside-Lean scope, small-scale u < 2 O(u^5) bound & O(1) tail on g > floor(Y/2), and
+    parameterized [Y, b*Y] scaling at an additional multiplier b = 3/2 outside {2, e, tau}.
+    """
+    sec2 = tc059_artifact["section_2_dyadic_power_lift_and_attempt_a"]
+    sec3 = tc059_artifact["section_3_primitive_pairs_and_diagonals"]
+    sec4 = tc059_artifact["section_4_dyadic_blocks_and_attempt_b"]
+    sec5 = tc059_artifact["section_5_tc_geometry_defect_and_murmurations"]
+
+    assert sec2["epistemic_scope"]["stabilization_minimality_inequalities_in_lean"] == (
+        "UNCONDITIONAL_FINITE_ARITHMETIC"
+    )
+    assert sec2["epistemic_scope"]["stabilization_depth_O_log_log_T_consequence"] == (
+        "ANALYTIC_PROVED_OUTSIDE_LEAN"
+    )
+    assert "a(g)^2 = 1" in sec3["generalized_coefficient_hypotheses_note"]
+    assert (
+        sec5["turn_chart_audit"]["K_star_scope_statement"]
+        == "treated as an auxiliary real coordinate; algebraic-grade admissibility is not established"
+    )
+
+    u5_sec = sec4["small_scale_u5_and_tail_control_tc059r"]
+    assert u5_sec["verified"] is True
+
+    saved = flint_ctx.prec
+    try:
+        flint_ctx.prec = 256
+        tau = _tau_arb()
+        C_u5 = arb(9) * (tau ** 5 - arb(1)) / arb(20)
+        C_tail = C_u5 * (arb(1024) / arb(5))
+        # Direct small-scale u < 2 check at u = 7/4 < 2, L = 12
+        u_7_4 = arb(7) / arb(4)
+        pi_7_4 = evaluate_primitive_coprime_sum_Pi_arb(u_7_4, 12, mode="liouville", prec_bits=256)
+        assert bool(C_u5 * (u_7_4 ** 5) - abs(pi_7_4) > arb(0))
+
+        # Tail check at Y = 8 (T = 14, M = 4): sum_{g=5}^{14} g^{-1}*|Pi_{lambda, floor(14/g)}(8/g)| < C_tail
+        tail_8 = arb(0)
+        for g_v in range(5, 15):
+            pi_g = evaluate_primitive_coprime_sum_Pi_arb(
+                arb(8) / arb(g_v), 14 // g_v, mode="liouville", prec_bits=256
+            )
+            tail_8 += abs(pi_g) / arb(g_v)
+        assert bool(C_tail - tail_8 > arb(0))
+
+        # Parameterized [Y, b*Y] scaling check at b = 3/2 (outside {2, e, tau}) for Y = 6, T = 10:
+        b_3_2 = arb(3) / arb(2)
+        lam_10 = [0] + [liouville_lambda_int(n) for n in range(1, 11)]
+        e_b = evaluate_bilinear_window_pairing_closed_arb(
+            arb(6), 10, lam_10, lam_10, base_mult=b_3_2, prec_bits=256
+        )
+        e_b_prim = arb(0)
+        for g_b in range(1, 11):
+            L_gb = 10 // g_b
+            for r_b in range(1, L_gb + 1):
+                for s_b in range(1, L_gb + 1):
+                    if math.gcd(r_b, s_b) == 1:
+                        e_b_prim += (
+                            arb(liouville_lambda_int(r_b * s_b))
+                            * evaluate_window_kernel_K_closed_arb(
+                                arb(6) / arb(g_b), r_b, s_b, base_mult=b_3_2, prec_bits=256
+                            )
+                            / arb(g_b)
+                        )
+        res_b = e_b - e_b_prim
+        assert bool(arb(0) in res_b and abs(res_b) < arb("1e-66"))
+    finally:
+        flint_ctx.prec = saved
