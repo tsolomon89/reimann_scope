@@ -67,6 +67,7 @@ FORMAL_SOURCE_FILES = [
     "formal/RiemannScope/QuartetRemainderConnection.lean",
     "formal/RiemannScope/CanonicalThetaCorrelationBound.lean",
     "formal/RiemannScope/LiouvilleSquareDilation.lean",
+    "formal/RiemannScope/DyadicPowerLiftPrimitiveCorrelation.lean",
 ]
 
 
