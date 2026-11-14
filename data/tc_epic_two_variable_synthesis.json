@@ -257,11 +257,11 @@
     "interval_enclosure": {
       "engine": "flint.arb",
       "zero_ordinate_provenance": "flint.acb.zeta_zero(1).imag (certified ball enclosure)",
-      "zero_ordinate_enclosure": "[14.13472514173469379045725198356247027078425711569924317568556746014996 +/- 3.46e-69]",
-      "enclosure_mid": 0.5444399924859572,
-      "enclosure_rad": 0.0011700457162078237,
-      "lower_bound": 0.5432699467697494,
-      "upper_bound": 0.545610038202165,
+      "zero_ordinate_enclosure": "[14.1347251417347 +/- 9.01e-15]",
+      "enclosure_mid": 0.544439992485636,
+      "enclosure_rad": 0.0011700457143888343,
+      "lower_bound": 0.5432699467712472,
+      "upper_bound": 0.5456100382000248,
       "strictly_positive": true,
       "certified_scope": "Rigorous positive enclosure away from zero disproves A0 = c * D_M identity on-line; does not settle the full TC bridge."
     },
@@ -495,10 +495,10 @@
       "A_eps_over_eps": 0.5437243335384386,
       "A_0_Gamma": 0.5444402513340928,
       "interval_enclosure": {
-        "mid": 0.5444399924859572,
-        "rad": 0.0011700457162078237,
-        "lower": 0.5432699467697494,
-        "upper": 0.545610038202165,
+        "mid": 0.544439992485636,
+        "rad": 0.0011700457143888343,
+        "lower": 0.5432699467712472,
+        "upper": 0.5456100382000248,
         "is_strictly_positive": true,
         "zero_ordinate_provenance": "flint.acb.zeta_zero(1).imag (certified ball enclosure)"
       }
@@ -520,8 +520,7 @@
       "quadrature_uncertainty": "< 1e-8 (30-dps mpmath adaptive tanh-sinh quadrature)",
       "rounding_uncertainty": "< 1e-30 (30 dps floating/interval precision)",
       "analytic_infinite_tail": "Majorized by C_p * eps^(1-p) * log^2(2+T) / T^(p-2)"
-    },
-    "cache_hit": true
+    }
   },
   "milestone_5_quadratic_form_obstruction": {
     "classification": "PROVED_AND_VERIFIED",
@@ -2944,7 +2943,7 @@
     }
   },
   "formal_lean_theorems": {
-    "total_compiled_theorems": 808,
+    "total_compiled_theorems": 814,
     "new_theorems": [
       "explicit_formula_remainder_cancellation_identity",
       "explicit_formula_remainder_triangle_bound",
