@@ -1,6 +1,7 @@
 {
-  "task_id": "TASK-TC-060R",
+  "task_id": "TASK-TC-060R2",
   "repaired_task_id": "TASK-TC-060",
+  "closed_out_repair_task_id": "TASK-TC-060R",
   "parent_epic": "EPIC-TC-042",
   "parent_subgate": "SUBGATE-TC-043A",
   "prior_tasks": [
@@ -21,7 +22,8 @@
     "TASK-TC-059",
     "TASK-TC-059R",
     "TASK-TC-059R2",
-    "TASK-TC-060"
+    "TASK-TC-060",
+    "TASK-TC-060R"
   ],
   "reviewed_merged_main_baseline": "2c784c9433edcf37d3f666b75e7ac0d83abc919a",
   "accepted_tc059r2_branch": "task/tc-059r2-numerical-assertion-and-report-closeout",
@@ -31,7 +33,11 @@
   "reviewed_tc060_branch": "task/tc-060-signed-dilation-multiplier-and-arithmetic-energy",
   "reviewed_tc060_implementation_commit": "f95dd15825b4637ff2ec7f22c6e987b9fe6ea6b4",
   "reviewed_tc060_head_commit": "240307a593b08ab43ffe975ffeb5d7789e5b9a51",
-  "branch": "task/tc-060r-full-core-counterexample-and-proof-scope-repair",
+  "reviewed_tc060r_branch": "task/tc-060r-full-core-counterexample-and-proof-scope-repair",
+  "reviewed_tc060r_implementation_commit": "aedea63aeb5c028dff63a50e7178b2d69cf416a4",
+  "reviewed_tc060r_head_commit": "d67932bb453649b93831c76ab2a7ddb50b4d045d",
+  "inherited_tc060r_formal_producing_commit": "aedea63aeb5c028dff63a50e7178b2d69cf416a4",
+  "branch": "task/tc-060r2-certificate-scope-and-report-closeout",
   "epistemic_categories_enforced": [
     "UNCONDITIONAL_FINITE_ARITHMETIC",
     "ANALYTIC_PROVED_OUTSIDE_LEAN",
@@ -47,14 +53,24 @@
     "ALL_POSITIVE_EXPONENTS_CLOSURE"
   ],
   "completion_outcome_code": "OUTCOME_B_AND_C_REPAIRED_FULL_CORE_QUANTIFIED_OBSTRUCTIONS_AND_DRIFT_CONTRACTION",
-  "research_outcome_class": "Repaired Full-Core Scope, Quantified Counterexamples, Certified Cutoffs, & Partial Arithmetic Relative-Contraction Theorem (TASK-TC-060R repairing TASK-TC-060, Outcome B/C) — Preserves exact finite-L Fourier block-multiplier representation (outside Lean) and real-space signed / (log X)^{-4}-weighted Gram kernels H_{Y,b}, H_{Y,b}^{wt}; proves in Lean 4 (0 sorry, 0 custom axioms, 7 public theorems in SignedDilationArithmeticEnergy.lean) non-circular reassembly & 2T basis spillover, sharp unrestricted-frequency multiplier attainment (obstructing only a frequency-independent relative O(1/d) saving while retaining the all-v (1+|v|) derivative bound) and sqrt(T) cutoff-block lower bound, weighted Gram quadratic forms & log sandwiches, Gaussian window majorants & Gauss-product Gamma monotonicity, discrete Abel re-summation of M_{sq,2}(d) & finite small-divisor weighted bounds, R-independent complete-energy feedback transfer, and TC-060R's full-core intermediate/tail retention, singleton-block I_T(T)={1} Candidate A1 refutation at v=0, arbitrary-coefficient d=1/e_1 Candidate B1 exponential lower bound, w_{2,lambda}(p)/w_{2,lambda}(6p) unconditional support, and drift-jump floor(T/q) reindexing; proves outside Lean all-eps relative contraction of r_{sm,T(Y)}^{drift}/(log X)^2 (with corrected O(log Y) sub-unit and jump sums) and 1 <= d <= min(D_0(Y), T(Y)-1) (with certified D_0(2) = 0); and retains the full remaining open core min(D_0(Y), T(Y)-1) < d <= T(Y)-1 inside D_{2,core,T(Y)} (including d >= ceil(tau*Y)) alongside signed 8*X_tilde(Y) + 4*||D_{2,core,T(Y)}||_Y^2, keeping SUBGATE-TC-043A OPEN and rh_proved False.",
+  "research_outcome_class": "Repaired Full-Core Scope, Quantified Counterexamples, Certified Cutoffs, Certificate/Epistemic Scope Closeout, & Partial Arithmetic Relative-Contraction Theorem (TASK-TC-060R2 closing out TASK-TC-060R / TASK-TC-060, Outcome B/C) — Preserves exact finite-L Fourier block-multiplier representation (outside Lean) and real-space signed / (log X)^{-4}-weighted Gram kernels H_{Y,b}, H_{Y,b}^{wt}; inherits unchanged Lean 4 formal build at aedea63aeb5c028dff63a50e7178b2d69cf416a4 (0 sorry, 0 custom axioms, 7 public theorems in SignedDilationArithmeticEnergy.lean, 815 total public theorems) proving non-circular reassembly & 2T basis spillover, sharp unrestricted-frequency multiplier attainment (obstructing only a frequency-independent relative O(1/d) saving while retaining the all-v (1+|v|) derivative bound) and sqrt(T) cutoff-block lower bound, weighted Gram quadratic forms & log sandwiches, Gaussian window majorants & Gauss-product Gamma monotonicity, discrete Abel re-summation of M_{sq,2}(d) & finite small-divisor weighted bounds, R-independent complete-energy feedback transfer, and TC-060R's full-core intermediate/tail retention, singleton-block I_T(T)={1} Candidate A1 refutation at v=0 (given external c_lambda != 0), arbitrary-coefficient d=1/e_1 Candidate B1 exponential lower bound, w_{2,lambda}(p)/w_{2,lambda}(6p) unconditional support, and drift-jump floor(T/q) reindexing; proves outside Lean the constant-1 Liouville bound |S_L(a)| <= 1 (L >= 0, a >= 0), exact square-Gaussian scaling Q_{1_sq,T}(X) = sum_{m^2<=T} m^{-1} phi_1(X/m^2), and all-eps relative contraction of r_{sm,T(Y)}^{drift}/(log X)^2 (with corrected O(log Y) sub-unit and jump sums, explicitly distinguishing certified finite S_{Y,T(Y)} on floor(Y) < d <= T(Y) from S_{Y,inf} on d > floor(Y)) and 1 <= d <= min(D_0(Y), T(Y)-1) (with certified D_0(2) = 0); and retains the full remaining open core min(D_0(Y), T(Y)-1) < d <= T(Y)-1 inside D_{2,core,T(Y)} (including d >= ceil(tau*Y)) alongside signed 8*X_tilde(Y) + 4*||D_{2,core,T(Y)}||_Y^2, keeping SUBGATE-TC-043A OPEN and rh_proved False.",
   "subgate_tc043a_status": "OPEN",
   "rh_proved": false,
   "precision_bits": 256,
   "circle_constant_convention": "tau (sole circle constant)",
   "complex_coordinate_convention": "z = x + i*y (x, y real; critical line x = 1/2; displacement delta = x - 1/2); Fourier/Mellin w = u + i*v (u, v real); real algebraic grades K distinct from auxiliary log scales t = log X, frequencies v, and divisor shifts log d",
   "section_1_exact_object_and_noncircular_reassembly": {
-    "epistemic_status": "CONCRETE_ANALYTIC_IN_LEAN",
+    "epistemic_statuses": [
+      "UNCONDITIONAL_FINITE_ARITHMETIC",
+      "CONCRETE_ANALYTIC_IN_LEAN",
+      "CERTIFIED_FINITE_OBSERVATION"
+    ],
+    "section_epistemic_scope_note": "Mixed formal/arithmetic/numerical section: source endpoint conventions, T=0/1 safe guards, Selberg non-circular reassembly, return to D_{2,T} = P_T - R_T, and exact 2T basis spillover are formalized in Lean Theorem 1; finite sample evaluations and 256-bit Arb residuals are CERTIFIED_FINITE_OBSERVATION.",
+    "component_epistemic_map": {
+      "selberg_source_conventions_and_T_0_1_boundary_guards": "UNCONDITIONAL_FINITE_ARITHMETIC",
+      "noncircular_reassembly_D2_return_and_2T_basis_spillover": "CONCRETE_ANALYTIC_IN_LEAN",
+      "sample_reassembly_and_stratification_evaluations": "CERTIFIED_FINITE_OBSERVATION"
+    },
     "lean_theorem": "noncircular_reassembly_and_basis_stratification_tc060",
     "c_lambda": {
       "mid_float": -3.434275302181197,
@@ -539,8 +555,13 @@
     "all_section_1_checks_pass": true
   },
   "section_2_signed_dilation_fourier_and_gram_kernel": {
-    "epistemic_status": "CONCRETE_ANALYTIC_IN_LEAN",
-    "section_epistemic_scope_note": "Mixed analytic/formal/numerical section: finite-cutoff qhat_L(v) Gamma substitution and improper tail bounds are ANALYTIC_PROVED_OUTSIDE_LEAN; multiplier benchmark/attainment, cutoff-block partition/sqrt(T) count, and unweighted/log-weighted Gram quadratic forms are formalized in Lean Theorems 2 & 3; quadrature cross-checks are CERTIFIED_FINITE_OBSERVATION.",
+    "epistemic_statuses": [
+      "ANALYTIC_PROVED_OUTSIDE_LEAN",
+      "CONCRETE_ANALYTIC_IN_LEAN",
+      "UNCONDITIONAL_FINITE_ARITHMETIC",
+      "CERTIFIED_FINITE_OBSERVATION"
+    ],
+    "section_epistemic_scope_note": "Mixed analytic/formal/numerical section (no blanket Lean claim): finite-cutoff qhat_L(v) Gamma substitution and improper real-line tail bounds are ANALYTIC_PROVED_OUTSIDE_LEAN; multiplier benchmark/attainment, cutoff-block partition/sqrt(T) count, and unweighted/log-weighted Gram quadratic forms are formalized in Lean Theorems 2 & 3; quadrature and sample cross-checks are CERTIFIED_FINITE_OBSERVATION.",
     "component_epistemic_map": {
       "qhat_L_finite_cutoff_gamma_identity_and_improper_tails": "ANALYTIC_PROVED_OUTSIDE_LEAN",
       "adjacent_dilation_multiplier_benchmark_and_odd_harmonic_attainment": "CONCRETE_ANALYTIC_IN_LEAN",
@@ -1581,18 +1602,28 @@
     "all_section_2_checks_pass": true
   },
   "section_3_attempts_a_and_b_obstructions_and_drift_theorem": {
-    "epistemic_status": "ANALYTIC_PROVED_OUTSIDE_LEAN",
-    "section_epistemic_scope_note": "Mixed section: Gaussian window majorant, local low/high cross-term split, Gauss-product polynomial inequality, discrete Abel identity, |delta_{sq,2}(d)| <= 12*log(d+1)/sqrt(d), finite small-divisor weighted bound, singleton-block A1 obstruction, d=1/e_1 B1 lower bound, w_{2,lambda}(p)/w_{2,lambda}(6p) support, and drift-jump reindexing are formalized in Lean Theorems 4, 5, & 7; Euler reflection/Gauss product Gamma majorant, z=1/2 Laurent residue derivation of M_{sq,2}(d), and all-eps summation/cutoff contractions of r_sm^{drift} and r_{sm,<=D_0}^{osc} are ANALYTIC_PROVED_OUTSIDE_LEAN; finite R(d)/R_osc(d) sign counts and finite B1 sample ratios are CERTIFIED_FINITE_OBSERVATION.",
+    "epistemic_statuses": [
+      "CONCRETE_ANALYTIC_IN_LEAN",
+      "UNCONDITIONAL_FINITE_ARITHMETIC",
+      "ANALYTIC_PROVED_OUTSIDE_LEAN",
+      "CERTIFIED_FINITE_OBSERVATION",
+      "OPEN_CONJECTURE_OR_FAILED_CANDIDATE"
+    ],
+    "section_epistemic_scope_note": "Mixed section (no blanket Lean claim): Gaussian window majorant, local low/high cross-term split, Gauss-product polynomial inequality, discrete Abel identity, |delta_{sq,2}(d)| <= 12*log(d+1)/sqrt(d), finite small-divisor weighted bound, singleton-block A1 obstruction (taking c_lam != 0), d=1/e_1 B1 lower bound, w_{2,lambda}(p)/w_{2,lambda}(6p) support, and drift-jump reindexing are formalized in Lean Theorems 4, 5, & 7; Euler reflection/Gauss product Gamma majorant, z=1/2 Laurent residue derivation of M_{sq,2}(d), the constant-1 Liouville bound |S_L(a)| <= 1 for ||g_d||_Y <= sqrt((tau^5-1)/5)*Y^(5/2)*d^(-3), external nonvanishing c_lambda < 0, and all-eps summation/cutoff contractions of r_sm^{drift} and r_{sm,<=D_0}^{osc} are ANALYTIC_PROVED_OUTSIDE_LEAN; finite R(d)/R_osc(d) sign counts, finite S_{Y,T(Y)} certificates, and finite B1 sample ratios are CERTIFIED_FINITE_OBSERVATION; Candidates A1 and B1 are refuted within scope (OPEN_CONJECTURE_OR_FAILED_CANDIDATE).",
     "component_epistemic_map": {
       "gaussian_window_majorant_and_local_frequency_split": "CONCRETE_ANALYTIC_IN_LEAN",
       "all_v_closed_form_gamma_majorant": "ANALYTIC_PROVED_OUTSIDE_LEAN",
       "z_half_laurent_residue_drift_model_M_sq_2": "ANALYTIC_PROVED_OUTSIDE_LEAN",
       "candidate_a1_singleton_block_I_T_T_v0_refutation": "CONCRETE_ANALYTIC_IN_LEAN",
+      "external_c_lambda_nonvanishing_input_for_a1": "ANALYTIC_PROVED_OUTSIDE_LEAN",
       "finite_R_d_positivity_and_R_osc_sign_flips_1_to_2000": "CERTIFIED_FINITE_OBSERVATION",
       "candidate_b1_unbounded_family_d1_e1_refutation": "CONCRETE_ANALYTIC_IN_LEAN",
       "candidate_b1_finite_diagnostics_and_liouville_constant_exclusions": "CERTIFIED_FINITE_OBSERVATION",
+      "candidates_a1_and_b1_refuted_within_scope": "OPEN_CONJECTURE_OR_FAILED_CANDIDATE",
       "w2_prime_and_6p_unconditional_support": "UNCONDITIONAL_FINITE_ARITHMETIC",
       "drift_abel_split_and_increment_bound": "CONCRETE_ANALYTIC_IN_LEAN",
+      "liouville_constant_1_S_L_bound_for_subunit_g_d": "ANALYTIC_PROVED_OUTSIDE_LEAN",
+      "finite_subunit_S_Y_T_and_jump_certificates": "CERTIFIED_FINITE_OBSERVATION",
       "all_eps_drift_and_small_divisor_relative_contractions": "ANALYTIC_PROVED_OUTSIDE_LEAN"
     },
     "lean_theorems": [
@@ -2673,7 +2704,19 @@
         "Y_fraction": "2/1",
         "floor_Y": 2,
         "T_Y": 3,
-        "subunit_weighted_sum_lhs": {
+        "subunit_sum_kind": "FINITE_T_TRUNCATED_SUM_S_Y_T",
+        "subunit_sum_symbol": "S_{Y,T(Y)}",
+        "subunit_sum_formula": "Y^(5/2) * sum_{floor(Y) < d <= T(Y)} log(d + 1) / d^(7/2)",
+        "subunit_d_lower_exclusive": 2,
+        "subunit_d_upper_inclusive": 3,
+        "subunit_d_range_inclusive": [
+          3,
+          3
+        ],
+        "subunit_d_term_count": 1,
+        "certified_inequality_scope": "Certifies 0 <= S_{Y,T(Y)} < (3/2)^(5/2)*((2/5)*log(Y) + 1/2) on the finite range floor(Y) < d <= T(Y); the analytic integral step bounds the infinite tail sum S_{Y,inf} = Y^(5/2)*sum_{d > floor(Y)} log(d+1)/d^(7/2), and 0 <= S_{Y,T(Y)} <= S_{Y,inf} holds by termwise nonnegativity log(d+1)/d^(7/2) >= 0 without certifying S_{Y,inf} itself from the truncated sum.",
+        "liouville_constant_1_S_L_bound_status": "ANALYTIC_PROVED_OUTSIDE_LEAN",
+        "subunit_finite_weighted_sum_S_Y_T": {
           "mid_float": 0.1676895712613003,
           "rad_float_outward": 4.013013989513967e-18,
           "lower_dec": "1.676895712613003004582986194676421893150e-1",
@@ -2716,7 +2759,19 @@
         "Y_fraction": "299/100",
         "floor_Y": 2,
         "T_Y": 4,
-        "subunit_weighted_sum_lhs": {
+        "subunit_sum_kind": "FINITE_T_TRUNCATED_SUM_S_Y_T",
+        "subunit_sum_symbol": "S_{Y,T(Y)}",
+        "subunit_sum_formula": "Y^(5/2) * sum_{floor(Y) < d <= T(Y)} log(d + 1) / d^(7/2)",
+        "subunit_d_lower_exclusive": 2,
+        "subunit_d_upper_inclusive": 4,
+        "subunit_d_range_inclusive": [
+          3,
+          4
+        ],
+        "subunit_d_term_count": 2,
+        "certified_inequality_scope": "Certifies 0 <= S_{Y,T(Y)} < (3/2)^(5/2)*((2/5)*log(Y) + 1/2) on the finite range floor(Y) < d <= T(Y); the analytic integral step bounds the infinite tail sum S_{Y,inf} = Y^(5/2)*sum_{d > floor(Y)} log(d+1)/d^(7/2), and 0 <= S_{Y,T(Y)} <= S_{Y,inf} holds by termwise nonnegativity log(d+1)/d^(7/2) >= 0 without certifying S_{Y,inf} itself from the truncated sum.",
+        "liouville_constant_1_S_L_bound_status": "ANALYTIC_PROVED_OUTSIDE_LEAN",
+        "subunit_finite_weighted_sum_S_Y_T": {
           "mid_float": 0.6526327399890506,
           "rad_float_outward": 5.187062193973596e-17,
           "lower_dec": "6.526327399890505290603851219997727009945e-1",
@@ -2759,7 +2814,19 @@
         "Y_fraction": "4/1",
         "floor_Y": 4,
         "T_Y": 6,
-        "subunit_weighted_sum_lhs": {
+        "subunit_sum_kind": "FINITE_T_TRUNCATED_SUM_S_Y_T",
+        "subunit_sum_symbol": "S_{Y,T(Y)}",
+        "subunit_sum_formula": "Y^(5/2) * sum_{floor(Y) < d <= T(Y)} log(d + 1) / d^(7/2)",
+        "subunit_d_lower_exclusive": 4,
+        "subunit_d_upper_inclusive": 6,
+        "subunit_d_range_inclusive": [
+          5,
+          6
+        ],
+        "subunit_d_term_count": 2,
+        "certified_inequality_scope": "Certifies 0 <= S_{Y,T(Y)} < (3/2)^(5/2)*((2/5)*log(Y) + 1/2) on the finite range floor(Y) < d <= T(Y); the analytic integral step bounds the infinite tail sum S_{Y,inf} = Y^(5/2)*sum_{d > floor(Y)} log(d+1)/d^(7/2), and 0 <= S_{Y,T(Y)} <= S_{Y,inf} holds by termwise nonnegativity log(d+1)/d^(7/2) >= 0 without certifying S_{Y,inf} itself from the truncated sum.",
+        "liouville_constant_1_S_L_bound_status": "ANALYTIC_PROVED_OUTSIDE_LEAN",
+        "subunit_finite_weighted_sum_S_Y_T": {
           "mid_float": 0.32282362960770633,
           "rad_float_outward": 1.2596609900000111e-17,
           "lower_dec": "3.228236296077063179388116572150488645360e-1",
@@ -2802,7 +2869,19 @@
         "Y_fraction": "16/1",
         "floor_Y": 16,
         "T_Y": 32,
-        "subunit_weighted_sum_lhs": {
+        "subunit_sum_kind": "FINITE_T_TRUNCATED_SUM_S_Y_T",
+        "subunit_sum_symbol": "S_{Y,T(Y)}",
+        "subunit_sum_formula": "Y^(5/2) * sum_{floor(Y) < d <= T(Y)} log(d + 1) / d^(7/2)",
+        "subunit_d_lower_exclusive": 16,
+        "subunit_d_upper_inclusive": 32,
+        "subunit_d_range_inclusive": [
+          17,
+          32
+        ],
+        "subunit_d_term_count": 16,
+        "certified_inequality_scope": "Certifies 0 <= S_{Y,T(Y)} < (3/2)^(5/2)*((2/5)*log(Y) + 1/2) on the finite range floor(Y) < d <= T(Y); the analytic integral step bounds the infinite tail sum S_{Y,inf} = Y^(5/2)*sum_{d > floor(Y)} log(d+1)/d^(7/2), and 0 <= S_{Y,T(Y)} <= S_{Y,inf} holds by termwise nonnegativity log(d+1)/d^(7/2) >= 0 without certifying S_{Y,inf} itself from the truncated sum.",
+        "liouville_constant_1_S_L_bound_status": "ANALYTIC_PROVED_OUTSIDE_LEAN",
+        "subunit_finite_weighted_sum_S_Y_T": {
           "mid_float": 0.9354399555629695,
           "rad_float_outward": 5.035735076725968e-17,
           "lower_dec": "9.354399555629695998758213250736673933829e-1",
@@ -2845,7 +2924,19 @@
         "Y_fraction": "64/1",
         "floor_Y": 64,
         "T_Y": 182,
-        "subunit_weighted_sum_lhs": {
+        "subunit_sum_kind": "FINITE_T_TRUNCATED_SUM_S_Y_T",
+        "subunit_sum_symbol": "S_{Y,T(Y)}",
+        "subunit_sum_formula": "Y^(5/2) * sum_{floor(Y) < d <= T(Y)} log(d + 1) / d^(7/2)",
+        "subunit_d_lower_exclusive": 64,
+        "subunit_d_upper_inclusive": 182,
+        "subunit_d_range_inclusive": [
+          65,
+          182
+        ],
+        "subunit_d_term_count": 118,
+        "certified_inequality_scope": "Certifies 0 <= S_{Y,T(Y)} < (3/2)^(5/2)*((2/5)*log(Y) + 1/2) on the finite range floor(Y) < d <= T(Y); the analytic integral step bounds the infinite tail sum S_{Y,inf} = Y^(5/2)*sum_{d > floor(Y)} log(d+1)/d^(7/2), and 0 <= S_{Y,T(Y)} <= S_{Y,inf} holds by termwise nonnegativity log(d+1)/d^(7/2) >= 0 without certifying S_{Y,inf} itself from the truncated sum.",
+        "liouville_constant_1_S_L_bound_status": "ANALYTIC_PROVED_OUTSIDE_LEAN",
+        "subunit_finite_weighted_sum_S_Y_T": {
           "mid_float": 1.6322139638498965,
           "rad_float_outward": 5.736152169983413e-17,
           "lower_dec": "1.632213963849896419070855612614690535191e+0",
@@ -2888,13 +2979,22 @@
     "all_section_3_checks_pass": true
   },
   "section_4_complete_energy_bridge_and_global_consequence": {
-    "epistemic_status": "CONDITIONAL_IMPLICATION",
-    "section_epistemic_scope_note": "Mixed section: the lossless decomposition Q_{lambda,T} = 2*P_T - D_{2,known,T} - D_{2,core,T} and (8, 4, 4) window energy inequality are unconditional in Lean Theorem 6(1)-(2), and full-core intermediate/tail retention is unconditional in Lean Theorem 7(1); the R-independent finite-horizon absorption is a CONDITIONAL_IMPLICATION in Lean Theorem 6(3) assuming the Route D diagonal, known-D_2, and open-core hypotheses.",
+    "epistemic_statuses": [
+      "CONCRETE_ANALYTIC_IN_LEAN",
+      "UNCONDITIONAL_FINITE_ARITHMETIC",
+      "ANALYTIC_PROVED_OUTSIDE_LEAN",
+      "CONDITIONAL_IMPLICATION",
+      "CERTIFIED_FINITE_OBSERVATION",
+      "OPEN_CONJECTURE_OR_FAILED_CANDIDATE"
+    ],
+    "section_epistemic_scope_note": "Mixed section (no blanket Lean claim): the lossless decomposition Q_{lambda,T} = 2*P_T - D_{2,known,T} - D_{2,core,T} and (8, 4, 4) window energy inequality are unconditional in Lean Theorem 6(1)-(2), and full-core intermediate/tail retention is unconditional in Lean Theorem 7(1); known-D_2 component bounds (including Q_{1_sq,T}(X) = sum_{m^2 <= T} m^{-1} phi_1(X/m^2)) are ANALYTIC_PROVED_OUTSIDE_LEAN; the R-independent finite-horizon absorption is a CONDITIONAL_IMPLICATION in Lean Theorem 6(3) assuming the Route D diagonal, known-D_2, and open-core hypotheses; sample reconstructions are CERTIFIED_FINITE_OBSERVATION; and the full open core 8*X_tilde(Y) + 4*||D_{2,core,T(Y)}||_Y^2 remains OPEN_CONJECTURE_OR_FAILED_CANDIDATE.",
     "component_epistemic_map": {
       "lossless_known_vs_full_core_decomposition_and_8_4_4_inequality": "CONCRETE_ANALYTIC_IN_LEAN",
       "full_core_intermediate_and_tail_partition_retention": "UNCONDITIONAL_FINITE_ARITHMETIC",
+      "known_D2_component_bounds_including_square_supported_phi1_scaling": "ANALYTIC_PROVED_OUTSIDE_LEAN",
       "R_independent_finite_horizon_feedback_absorption": "CONDITIONAL_IMPLICATION",
-      "complete_reconstruction_and_sample_threshold_evaluations": "CERTIFIED_FINITE_OBSERVATION"
+      "complete_reconstruction_and_sample_threshold_evaluations": "CERTIFIED_FINITE_OBSERVATION",
+      "remaining_full_open_core_target": "OPEN_CONJECTURE_OR_FAILED_CANDIDATE"
     },
     "lean_theorems": [
       "complete_reconstruction_drift_contraction_transfer_tc060",
@@ -3505,7 +3605,15 @@
     "all_section_4_checks_pass": true
   },
   "section_5_controls_schedule_and_directed_certificates": {
-    "epistemic_status": "CERTIFIED_FINITE_OBSERVATION",
+    "epistemic_statuses": [
+      "ANALYTIC_PROVED_OUTSIDE_LEAN",
+      "CERTIFIED_FINITE_OBSERVATION"
+    ],
+    "section_epistemic_scope_note": "Mixed analytic/numerical section: second-order Laurent compensations M_{2,a}(d) for multiplicative controls 1, a_2, and a_{3,5,7} are ANALYTIC_PROVED_OUTSIDE_LEAN; control cumulative remainders, smooth window norms, certified integer cutoff protocol checks, and directed interval certificate checks are CERTIFIED_FINITE_OBSERVATION.",
+    "component_epistemic_map": {
+      "control_laurent_compensations_M_2_a": "ANALYTIC_PROVED_OUTSIDE_LEAN",
+      "control_smooth_energies_cutoff_and_directed_interval_checks": "CERTIFIED_FINITE_OBSERVATION"
+    },
     "control_cumulative_remainder_rows": [
       {
         "d": 50,
@@ -3812,6 +3920,7 @@
     "formal_build_report_provenance": {
       "status": "passed",
       "producing_git_commit": "aedea63aeb5c028dff63a50e7178b2d69cf416a4",
+      "formal_build_status_in_tc060r2": "INHERITED_UNCHANGED_FROM_TC060R_FORMAL_COMMIT",
       "project_theorem_declarations_compiled": 815,
       "total_theorems": 815,
       "module_sha256_in_build_report": "741760da7d401ea8cf9bc6becba1bb892a1c3c655d95f17f68e3c140aa370b0f",
@@ -4201,27 +4310,27 @@
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.informed_replacement_drift_and_small_divisor_rows[5].r_sm_drift_weighted_upper_bound_over_logY4",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.informed_replacement_drift_and_small_divisor_rows[5].r_sm_osc_small_d_le_D0_norm_sq",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.informed_replacement_drift_and_small_divisor_rows[5].r_sm_osc_core_d_gt_D0_norm_sq",
-      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[0].subunit_weighted_sum_lhs",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[0].subunit_finite_weighted_sum_S_Y_T",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[0].subunit_uniform_O_logY_rhs",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[0].drift_jump_reindexing_residual_at_Y",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[0].drift_jump_window_norm",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[0].drift_jump_O_logY_upper_bound",
-      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[1].subunit_weighted_sum_lhs",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[1].subunit_finite_weighted_sum_S_Y_T",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[1].subunit_uniform_O_logY_rhs",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[1].drift_jump_reindexing_residual_at_Y",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[1].drift_jump_window_norm",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[1].drift_jump_O_logY_upper_bound",
-      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[2].subunit_weighted_sum_lhs",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[2].subunit_finite_weighted_sum_S_Y_T",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[2].subunit_uniform_O_logY_rhs",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[2].drift_jump_reindexing_residual_at_Y",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[2].drift_jump_window_norm",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[2].drift_jump_O_logY_upper_bound",
-      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[3].subunit_weighted_sum_lhs",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[3].subunit_finite_weighted_sum_S_Y_T",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[3].subunit_uniform_O_logY_rhs",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[3].drift_jump_reindexing_residual_at_Y",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[3].drift_jump_window_norm",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[3].drift_jump_O_logY_upper_bound",
-      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[4].subunit_weighted_sum_lhs",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[4].subunit_finite_weighted_sum_S_Y_T",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[4].subunit_uniform_O_logY_rhs",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[4].drift_jump_reindexing_residual_at_Y",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[4].drift_jump_window_norm",

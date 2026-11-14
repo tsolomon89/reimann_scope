@@ -1,10 +1,12 @@
 """Focused mathematical, falsification, formalization, and 256-bit Arb certification test suite
-for TASK-TC-060 / TASK-TC-060R: Signed Dilation Multipliers, Full-Core Scope, Quantified
-Counterexamples, and Arithmetic Control of the Complete Reconstruction.
+for TASK-TC-060 / TASK-TC-060R / TASK-TC-060R2: Signed Dilation Multipliers, Full-Core Scope,
+Quantified Counterexamples, Certificate Scope, Analytic Justification, and Arithmetic Control of
+the Complete Reconstruction.
 """
 
 from __future__ import annotations
 
+import copy
 from fractions import Fraction
 import json
 from pathlib import Path
@@ -34,6 +36,7 @@ import tc.signed_dilation_arithmetic_energy as tc060_mod
 from tc.signed_dilation_arithmetic_energy import (
     ACCEPTED_TC059R2_BRANCH,
     AmbiguousCutoffError,
+    CLOSEOUT_TC060R2_BRANCH,
     EXPECTED_TC060_THEOREMS,
     GLOBAL_CONSEQUENCE_CLASSES,
     INHERITED_FORMAL_PRODUCING_COMMIT,
@@ -43,9 +46,12 @@ from tc.signed_dilation_arithmetic_energy import (
     REVIEWED_TC059R2_IMPLEMENTATION,
     REVIEWED_TC060_HEAD,
     REVIEWED_TC060_IMPLEMENTATION,
+    REVIEWED_TC060R_HEAD,
+    REVIEWED_TC060R_IMPLEMENTATION,
     SIGNED_DILATION_ARITHMETIC_ENERGY_ARTIFACT_PATH,
     TASK_TC_060_ID,
     TASK_TC_060R_ID,
+    TASK_TC_060R2_ID,
     TC_060_LEAN_MODULE_PATH,
     TC_060_REVIEW_DOC_PATH,
     certify_D0_small_divisor_cutoff,
@@ -63,12 +69,15 @@ from tc.signed_dilation_arithmetic_energy import (
     cutoff_level_blocks_exact,
     evaluate_adjacent_multiplier_m_d_acb,
     evaluate_c_half_square_pole_arb,
+    evaluate_liouville_S_L_sum_arb,
     evaluate_qhat_L_closed_acb,
     evaluate_qhat_L_direct_quadrature_acb,
     evaluate_signed_gram_H_closed_arb,
     evaluate_smooth_jump_endpoint_reconstruction_arb,
     evaluate_square_pole_drift_M_arb,
     evaluate_weighted_window_kernel_K_quadrature_arb,
+    verify_section_epistemic_scope_metadata,
+    verify_subunit_finite_sum_row_metadata,
     verify_tc060_review_displayed_enclosures,
 )
 
@@ -87,7 +96,8 @@ def test_artifact_metadata_provenance_and_epistemic_hygiene(tc060_artifact: dict
     """Verify baseline provenance SHAs, gate status, tau-only convention, global consequence
     classes, and 256-bit Arb serialization self-check.
     """
-    assert tc060_artifact["task_id"] == TASK_TC_060R_ID
+    assert tc060_artifact["task_id"] == TASK_TC_060R2_ID
+    assert tc060_artifact["closed_out_repair_task_id"] == TASK_TC_060R_ID
     assert tc060_artifact["repaired_task_id"] == TASK_TC_060_ID
     assert tc060_artifact["parent_subgate"] == PARENT_SUBGATE_ID
     assert tc060_artifact["reviewed_merged_main_baseline"] == REVIEWED_MERGED_MAIN_BASELINE
@@ -98,7 +108,14 @@ def test_artifact_metadata_provenance_and_epistemic_hygiene(tc060_artifact: dict
     assert tc060_artifact["reviewed_tc060_branch"] == PROPOSED_TC060_BRANCH
     assert tc060_artifact["reviewed_tc060_implementation_commit"] == REVIEWED_TC060_IMPLEMENTATION
     assert tc060_artifact["reviewed_tc060_head_commit"] == REVIEWED_TC060_HEAD
-    assert tc060_artifact["branch"] == REPAIR_TC060R_BRANCH
+    assert tc060_artifact["reviewed_tc060r_branch"] == REPAIR_TC060R_BRANCH
+    assert tc060_artifact["reviewed_tc060r_implementation_commit"] == REVIEWED_TC060R_IMPLEMENTATION
+    assert tc060_artifact["reviewed_tc060r_head_commit"] == REVIEWED_TC060R_HEAD
+    assert tc060_artifact["inherited_tc060r_formal_producing_commit"] == REVIEWED_TC060R_IMPLEMENTATION
+    assert tc060_artifact["branch"] == CLOSEOUT_TC060R2_BRANCH
+    fp = tc060_artifact["section_6_lean_formalization_audit"]["formal_build_report_provenance"]
+    assert fp["producing_git_commit"] == REVIEWED_TC060R_IMPLEMENTATION
+    assert fp["formal_build_status_in_tc060r2"] == "INHERITED_UNCHANGED_FROM_TC060R_FORMAL_COMMIT"
     assert tc060_artifact["subgate_tc043a_status"] == "OPEN"
     assert tc060_artifact["rh_proved"] is False
     assert tc060_artifact["precision_bits"] == 256
@@ -623,11 +640,12 @@ def test_tc060r_corrected_subunit_and_jump_log_Y_bounds(tc060_artifact: dict) ->
     sj_rows = sec3["drift_subunit_and_jump_reindexing_checks"]
     assert [r["Y_fraction"] for r in sj_rows] == ["2/1", "299/100", "4/1", "16/1", "64/1"]
     for row in sj_rows:
+        assert "subunit_weighted_sum_lhs" not in row
         assert row["subunit_bound_certified"] is True
         assert row["drift_jump_bound_certified"] is True
         assert row["verified"] is True
         assert float(row["subunit_uniform_O_logY_rhs"]["lower_dec"]) > float(
-            row["subunit_weighted_sum_lhs"]["upper_dec"]
+            row["subunit_finite_weighted_sum_S_Y_T"]["upper_dec"]
         )
         assert float(row["drift_jump_O_logY_upper_bound"]["lower_dec"]) > float(
             row["drift_jump_window_norm"]["upper_dec"]
@@ -755,4 +773,251 @@ def test_tc060r_deleted_claims_absent_across_code_json_and_docs() -> None:
         txt = path.read_text(encoding="utf-8")
         for bad in forbidden_substrings:
             assert bad not in txt, f"Deleted TC-060 claim {bad!r} still present in {path}"
+
+
+def test_tc060r2_subunit_finite_sum_metadata_and_adversarial_rejection(
+    tc060_artifact: dict,
+) -> None:
+    """Verify TASK-TC-060R2 Correction 1:
+    - S_{Y,T(Y)} is explicitly labeled as a finite sum with lower-exclusive floor(Y) and
+      upper-inclusive T(Y) cutoff metadata.
+    - At Y = 64, T(64) = 182, S_{64,182} sums 118 terms (65 <= d <= 182).
+    - The non-certified infinite-tail evaluation (~1.7956554120163753) is never exported as an
+      Arb certificate in JSON or backticked Arb ball in the review document.
+    - verify_subunit_finite_sum_row_metadata fails closed on legacy keys, infinite-sum relabeling,
+      or mismatched cutoff bounds.
+    """
+    sec3 = tc060_artifact["section_3_attempts_a_and_b_obstructions_and_drift_theorem"]
+    sj_rows = sec3["drift_subunit_and_jump_reindexing_checks"]
+    for row in sj_rows:
+        ok_meta, msg_meta = verify_subunit_finite_sum_row_metadata(row)
+        assert ok_meta is True, msg_meta
+        assert row["subunit_sum_kind"] == "FINITE_T_TRUNCATED_SUM_S_Y_T"
+        assert row["subunit_sum_symbol"] == "S_{Y,T(Y)}"
+        assert row["subunit_d_lower_exclusive"] == row["floor_Y"]
+        assert row["subunit_d_upper_inclusive"] == row["T_Y"]
+        assert row["subunit_d_term_count"] == row["T_Y"] - row["floor_Y"]
+        assert row["subunit_d_range_inclusive"] == [row["floor_Y"] + 1, row["T_Y"]]
+
+    r64 = sj_rows[4]
+    assert r64["Y_fraction"] == "64/1"
+    assert r64["subunit_d_lower_exclusive"] == 64
+    assert r64["subunit_d_upper_inclusive"] == 182
+    assert r64["subunit_d_term_count"] == 118
+    assert r64["subunit_d_range_inclusive"] == [65, 182]
+
+    json_txt = SIGNED_DILATION_ARITHMETIC_ENERGY_ARTIFACT_PATH.read_text(encoding="utf-8")
+    assert "1.795655" not in json_txt
+    assert "subunit_weighted_sum_lhs" not in json_txt
+
+    rev_txt = TC_060_REVIEW_DOC_PATH.read_text(encoding="utf-8")
+    assert "S_{64,\\infty}" in rev_txt
+    assert "1.7956554120163753" in rev_txt
+    assert "`[1.795655" not in rev_txt
+
+    # Adversarial fail-closed rejection checks:
+    bad_legacy = copy.deepcopy(r64)
+    bad_legacy["subunit_weighted_sum_lhs"] = bad_legacy["subunit_finite_weighted_sum_S_Y_T"]
+    ok_leg, msg_leg = verify_subunit_finite_sum_row_metadata(bad_legacy)
+    assert ok_leg is False and "Forbidden ambiguous" in msg_leg
+
+    bad_inf = copy.deepcopy(r64)
+    bad_inf["subunit_sum_symbol"] = "S_{Y,\\infty}"
+    ok_inf, msg_inf = verify_subunit_finite_sum_row_metadata(bad_inf)
+    assert ok_inf is False and "subunit_sum_symbol" in msg_inf
+
+    bad_upper = copy.deepcopy(r64)
+    bad_upper["subunit_d_upper_inclusive"] = 999
+    ok_up, msg_up = verify_subunit_finite_sum_row_metadata(bad_upper)
+    assert ok_up is False and "Cutoff mismatch" in msg_up
+
+    bad_count = copy.deepcopy(r64)
+    bad_count["subunit_d_term_count"] = 119
+    ok_cnt, msg_cnt = verify_subunit_finite_sum_row_metadata(bad_count)
+    assert ok_cnt is False and "Range/count mismatch" in msg_cnt
+
+
+def test_tc060r2_section_epistemic_scope_and_no_invented_mixed_category(
+    tc060_artifact: dict,
+) -> None:
+    """Verify TASK-TC-060R2 Correction 2:
+    - Exactly the 6 established EPISTEMIC_CATEGORIES remain enforced (no 7th 'MIXED' category).
+    - Blanket singular 'epistemic_status' is removed from Sections 1-5 and replaced by
+      'epistemic_statuses' matching 'component_epistemic_map'.
+    - verify_section_epistemic_scope_metadata rejects blanket 'CONCRETE_ANALYTIC_IN_LEAN' on
+      mixed sections, invented 'MIXED' categories, and list/map mismatches.
+    """
+    assert len(EPISTEMIC_CATEGORIES) == 6
+    assert "MIXED" not in EPISTEMIC_CATEGORIES
+
+    section_keys = (
+        "section_1_exact_object_and_noncircular_reassembly",
+        "section_2_signed_dilation_fourier_and_gram_kernel",
+        "section_3_attempts_a_and_b_obstructions_and_drift_theorem",
+        "section_4_complete_energy_bridge_and_global_consequence",
+        "section_5_controls_schedule_and_directed_certificates",
+    )
+    for sk in section_keys:
+        sec_obj = tc060_artifact[sk]
+        assert "epistemic_status" not in sec_obj
+        ok_sec, msg_sec = verify_section_epistemic_scope_metadata(sec_obj)
+        assert ok_sec is True, f"{sk}: {msg_sec}"
+
+    sec2 = tc060_artifact["section_2_signed_dilation_fourier_and_gram_kernel"]
+    assert set(sec2["epistemic_statuses"]) == {
+        "UNCONDITIONAL_FINITE_ARITHMETIC",
+        "CONCRETE_ANALYTIC_IN_LEAN",
+        "ANALYTIC_PROVED_OUTSIDE_LEAN",
+        "CERTIFIED_FINITE_OBSERVATION",
+    }
+    assert (
+        sec2["component_epistemic_map"]["qhat_L_finite_cutoff_gamma_identity_and_improper_tails"]
+        == "ANALYTIC_PROVED_OUTSIDE_LEAN"
+    )
+    assert (
+        sec2["component_epistemic_map"][
+            "adjacent_dilation_multiplier_benchmark_and_odd_harmonic_attainment"
+        ]
+        == "CONCRETE_ANALYTIC_IN_LEAN"
+    )
+
+    # Adversarial fail-closed rejection checks:
+    bad_blanket = copy.deepcopy(sec2)
+    bad_blanket["epistemic_status"] = "CONCRETE_ANALYTIC_IN_LEAN"
+    ok_bl, msg_bl = verify_section_epistemic_scope_metadata(bad_blanket)
+    assert ok_bl is False and "Mixed section cannot claim blanket" in msg_bl
+
+    bad_mixed = copy.deepcopy(sec2)
+    bad_mixed["epistemic_statuses"] = [*sec2["epistemic_statuses"], "MIXED"]
+    ok_mx, msg_mx = verify_section_epistemic_scope_metadata(bad_mixed)
+    assert ok_mx is False and "Invalid epistemic category" in msg_mx
+
+    bad_mismatch = copy.deepcopy(sec2)
+    bad_mismatch["epistemic_statuses"] = ["CONCRETE_ANALYTIC_IN_LEAN"]
+    ok_mm, msg_mm = verify_section_epistemic_scope_metadata(bad_mismatch)
+    assert ok_mm is False and "does not match component_epistemic_map" in msg_mm
+
+
+def test_tc060r2_square_supported_gaussian_phi1_identity_and_review_hygiene() -> None:
+    """Verify TASK-TC-060R2 Correction 3:
+    - phi_{m^2}(X) = m^{-1} * phi_1(X / m^2), so Q_{1_sq,T}(X) = sum_{m^2 <= T} m^{-1}*phi_1(X/m^2).
+    - For T >= 4, the erroneous substitution sum_{m^2 <= T} m^{-1}*phi_m(X/m^2) strictly disagrees.
+    - No occurrence of varphi_m(X/m^2) or varphi_m(X / m^2) remains in the review report.
+    """
+    rev_txt = TC_060_REVIEW_DOC_PATH.read_text(encoding="utf-8")
+    assert "\\varphi_m(X / m^2)" not in rev_txt
+    assert "\\varphi_m(X/m^2)" not in rev_txt
+    assert "\\varphi_1(X/m^2)" in rev_txt
+
+    saved = flint_ctx.prec
+    try:
+        flint_ctx.prec = 256
+        for T_val, x_frac in (
+            (1, Fraction(7, 3)),
+            (4, Fraction(5, 2)),
+            (9, Fraction(11, 3)),
+            (16, Fraction(13, 2)),
+            (25, Fraction(19, 2)),
+        ):
+            x_a = _frac_to_arb(x_frac)
+            q_sq_direct = arb(0)
+            for n in range(1, T_val + 1):
+                if is_perfect_square_int(n):
+                    q_sq_direct += evaluate_phi_n_arb(x_a, n, prec_bits=256)
+
+            q_sq_phi1 = arb(0)
+            q_sq_buggy_phim = arb(0)
+            m = 1
+            while m * m <= T_val:
+                m_a = arb(m)
+                x_scaled = x_a / (m_a * m_a)
+                phi_m2 = evaluate_phi_n_arb(x_a, m * m, prec_bits=256)
+                term_phi1 = evaluate_phi_n_arb(x_scaled, 1, prec_bits=256) / m_a
+                assert bool(arb(0) in (phi_m2 - term_phi1) and abs(phi_m2 - term_phi1) < arb("1e-70"))
+                q_sq_phi1 += term_phi1
+                q_sq_buggy_phim += evaluate_phi_n_arb(x_scaled, m, prec_bits=256) / m_a
+                m += 1
+
+            diff_ok = q_sq_direct - q_sq_phi1
+            assert bool(arb(0) in diff_ok and abs(diff_ok) < arb("1e-70"))
+            if T_val >= 4:
+                diff_bug = q_sq_direct - q_sq_buggy_phim
+                assert bool(abs(diff_bug).lower() > arb("1e-6"))
+    finally:
+        flint_ctx.prec = saved
+
+
+def test_tc060r2_constant_1_liouville_S_L_bound_and_subunit_gd_window_norm() -> None:
+    """Verify TASK-TC-060R2 Correction 4:
+    - S_L(a) = sum_{1 <= q <= L} lambda(q) q^{-3} exp(-a/q^2) satisfies -1/2 <= S_L(a) <= 1,
+      hence |S_L(a)| <= 1 across all L >= 0 and a >= 0.
+    - g_d(X) = d^{-1/2} Q_{lambda,L_d}(X/d) = X^{5/2} d^{-3} S_{L_d}((X/d)^2) satisfies
+      ||g_d||_Y <= sqrt((tau^5 - 1)/5) * Y^{5/2} * d^{-3} on sub-unit scales d > floor(Y).
+    """
+    saved = flint_ctx.prec
+    try:
+        flint_ctx.prec = 256
+        tau = _tau_arb()
+        half = arb(1) / arb(2)
+        for L_val in (0, 1, 2, 3, 4, 10, 50):
+            for a_frac in (
+                Fraction(0, 1),
+                Fraction(1, 16),
+                Fraction(1, 4),
+                Fraction(1, 1),
+                Fraction(4, 1),
+                Fraction(25, 1),
+            ):
+                s_val = evaluate_liouville_S_L_sum_arb(L_val, a_frac, prec_bits=256)
+                if L_val == 1 and a_frac == 0:
+                    assert s_val == arb(1)
+                elif L_val == 0:
+                    assert s_val == arb(0)
+                else:
+                    assert bool(s_val.upper() < arb(1))
+                    assert bool(s_val.lower() > -half)
+                    assert bool(abs(s_val).upper() < arb(1))
+
+        # Direct sub-unit g_d(X) identity and window norm check at (Y=4, T=6, d=5) and (Y=16, T=32, d=17):
+        pref_norm = ((tau ** 5 - arb(1)) / arb(5)).sqrt()
+        for Y_int, T_int, d_int in ((4, 6, 5), (16, 32, 17)):
+            L_d = T_int // d_int
+            x_probe = arb(Y_int) * arb(3) / arb(2)
+            gd_direct = (
+                evaluate_Q_general_arb(
+                    x_probe / arb(d_int), L_d, coeff_fn=liouville_lambda_int, prec_bits=256
+                )
+                / arb(d_int).sqrt()
+            )
+            gd_via_SL = (
+                (x_probe ** (arb(5) / arb(2)))
+                * (arb(d_int) ** (-3))
+                * evaluate_liouville_S_L_sum_arb(
+                    L_d, (x_probe / arb(d_int)) ** 2, prec_bits=256
+                )
+            )
+            assert bool(arb(0) in (gd_direct - gd_via_SL) and abs(gd_direct - gd_via_SL) < arb("1e-68"))
+
+            def _gd_sq_integrand(z_var: acb, _analytic: bool) -> acb:
+                # z_var in [0, 1], X = Y * exp(z_var * log(tau))
+                lg_tau = tau.log()
+                x_c = acb(Y_int) * (z_var * acb(lg_tau)).exp()
+                tot = acb(0)
+                for q in range(1, L_d + 1):
+                    n_q = d_int * q
+                    tot += (
+                        acb(liouville_lambda_int(q))
+                        * (x_c ** acb(arb(5) / arb(2)))
+                        * acb(arb(n_q) ** (-3))
+                        * (-(x_c * x_c) / acb(n_q * n_q)).exp()
+                    )
+                return tot * tot * acb(lg_tau)
+
+            gd_norm_sq = acb.integral(_gd_sq_integrand, acb(0), acb(1), rel_tol=2 ** (-220)).real
+            gd_norm = gd_norm_sq.sqrt()
+            rhs_bound = pref_norm * (arb(Y_int) ** (arb(5) / arb(2))) * (arb(d_int) ** (-3))
+            assert bool(rhs_bound.lower() > gd_norm.upper())
+    finally:
+        flint_ctx.prec = saved
+
 

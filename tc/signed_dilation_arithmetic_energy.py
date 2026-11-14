@@ -1,6 +1,7 @@
 r"""
-TASK-TC-060 / TASK-TC-060R: Signed Dilation Multipliers, Arithmetic Control of the Complete
-Reconstruction, and Full-Core / Quantified Counterexample / Certificate Repair toward SUBGATE-TC-043A.
+TASK-TC-060 / TASK-TC-060R / TASK-TC-060R2: Signed Dilation Multipliers, Arithmetic Control of the
+Complete Reconstruction, Full-Core / Quantified Counterexample / Certificate Repair, and Certificate
+Scope / Analytic Justification / Final Report Closeout toward SUBGATE-TC-043A.
 
 Implements, tests, falsifies, and certifies in 256-bit FLINT/Arb ball arithmetic (using tau
 strictly via `_tau_arb()` as the sole circle constant, complex variable z = x + i*y with real x, y,
@@ -58,8 +59,11 @@ from auxiliary real log scales t = log X, frequencies v, and divisor shifts log 
      `w_{2,lambda}(6p) = 0` for prime `p >= 5`); and proves the **Informed Replacement Split**
      `r_{sm,T} = r_{sm,T}^{drift} + r_{sm,<=min(D_0,T-1)}^{osc} + r_{sm,>min(D_0,T-1)}^{osc}` with certified floor
      determination (`D_0(Y) = floor(log Y)` at `kappa = 1`, so `D_0(2) = 0` gives an empty small-divisor slice),
-     corrected `O(log Y)` sub-unit (`d > floor(Y)`) and reindexed drift-jump (`d = floor(T/q)`, `2 <= q <= T`)
-     summations, and unconditional all-`eps` relative contraction on `r_{sm,T(Y)}^{drift}/(log X)^2` and `1 <= d <= min(D_0(Y), T(Y)-1)`.
+     outside-Lean constant-`1` Liouville bound `|S_L(a)| <= 1` (`L >= 0`, `a >= 0`), corrected `O(log Y)`
+     sub-unit (`d > floor(Y)`, explicitly distinguishing the certified finite sum `S_{Y,T(Y)}` on
+     `floor(Y) < d <= T(Y)` from the infinite tail sum `S_{Y,inf}` on `d > floor(Y)`) and reindexed
+     drift-jump (`d = floor(T/q)`, `2 <= q <= T`) summations, and unconditional all-`eps` relative
+     contraction on `r_{sm,T(Y)}^{drift}/(log X)^2` and `1 <= d <= min(D_0(Y), T(Y)-1)`.
 
 4. Section 4 — Complete Reconstruction Energy Bridge & Full-Core Global Consequence Classification
    (`Lean Theorems 6 & 7`):
@@ -160,6 +164,7 @@ from tc.simultaneous_compatibility_combined_energy import (
 
 TASK_TC_060_ID = "TASK-TC-060"
 TASK_TC_060R_ID = "TASK-TC-060R"
+TASK_TC_060R2_ID = "TASK-TC-060R2"
 ACCEPTED_TC059R2_BRANCH = "task/tc-059r2-numerical-assertion-and-report-closeout"
 REVIEWED_TC059R2_IMPLEMENTATION = "25099194f7e951b0cea8ec9c4829249f7221ca56"
 REVIEWED_TC059R2_HEAD = "779be2f9e68765815ceb54e4cfb9239596c5e06d"
@@ -167,6 +172,9 @@ PROPOSED_TC060_BRANCH = "task/tc-060-signed-dilation-multiplier-and-arithmetic-e
 REVIEWED_TC060_IMPLEMENTATION = "f95dd15825b4637ff2ec7f22c6e987b9fe6ea6b4"
 REVIEWED_TC060_HEAD = "240307a593b08ab43ffe975ffeb5d7789e5b9a51"
 REPAIR_TC060R_BRANCH = "task/tc-060r-full-core-counterexample-and-proof-scope-repair"
+REVIEWED_TC060R_IMPLEMENTATION = "aedea63aeb5c028dff63a50e7178b2d69cf416a4"
+REVIEWED_TC060R_HEAD = "d67932bb453649b93831c76ab2a7ddb50b4d045d"
+CLOSEOUT_TC060R2_BRANCH = "task/tc-060r2-certificate-scope-and-report-closeout"
 
 SIGNED_DILATION_ARITHMETIC_ENERGY_ARTIFACT_PATH = (
     REPO_ROOT / "data" / "tc_signed_dilation_arithmetic_energy.json"
@@ -650,6 +658,164 @@ def _to_arb_val(x: Union[int, Fraction, arb], prec_bits: int = 256) -> arb:
         return arb(x)
     finally:
         flint_ctx.prec = saved
+
+
+def evaluate_liouville_S_L_sum_arb(
+    L: int,
+    a: Union[int, Fraction, arb],
+    prec_bits: int = 256,
+) -> arb:
+    """Evaluate `S_L(a) := sum_{1 <= q <= L} lambda(q) * q^{-3} * exp(-a / q^2)` in Arb (`L >= 0`, `a >= 0`).
+
+    Analytically proved outside Lean (`ANALYTIC_PROVED_OUTSIDE_LEAN`):
+    - `L = 0`: `S_0(a) = 0`;
+    - `L = 1`: `S_1(a) = exp(-a) in (0, 1]`;
+    - `L >= 2`: since `lambda(1) = 1`, `lambda(2) = -1`, and `|lambda(q)| = 1`,
+      `S_L(a) <= exp(-a) - (1/8)*exp(-a/4) + sum_{q>=3} q^{-3} <= (7/8)*exp(-a/4) + 1/8 <= 1`
+      (`sum_{q>=3} q^{-3} <= int_2^inf t^{-3} dt = 1/8`) and
+      `S_L(a) >= -sum_{q>=2} q^{-3} >= -int_1^inf t^{-3} dt = -1/2`, so `|S_L(a)| <= 1`.
+    """
+    if isinstance(L, bool) or not isinstance(L, int) or L < 0:
+        raise ValueError(f"L must be a nonnegative integer, got {L!r}")
+    if isinstance(a, float):
+        raise TypeError("Float inputs are forbidden in evaluate_liouville_S_L_sum_arb")
+    saved = flint_ctx.prec
+    try:
+        flint_ctx.prec = prec_bits
+        a_arb = _to_arb_val(a, prec_bits=prec_bits)
+        lo_a, _ = _exact_arb_endpoints_as_fractions(a_arb)
+        if lo_a < Fraction(0, 1):
+            raise ValueError(f"a = {a_arb} must have nonnegative lower endpoint")
+        if L == 0:
+            return arb(0)
+        acc = arb(0)
+        for q in range(1, L + 1):
+            q_arb = arb(q)
+            acc += arb(liouville_lambda_int(q)) * ((-a_arb / (q_arb * q_arb)).exp()) / (q_arb ** 3)
+        return acc
+    finally:
+        flint_ctx.prec = saved
+
+
+def verify_subunit_finite_sum_row_metadata(row: Dict[str, Any]) -> Tuple[bool, str]:
+    """Fail-closed check that a sub-unit drift tail certificate row explicitly scopes its certified
+    LHS to the finite sum `S_{Y,T(Y)} = Y^{5/2} * sum_{floor(Y) < d <= T(Y)} log(d + 1) / d^{7/2}`,
+    records exact integer lower/upper cutoffs, and never relabels the finite certificate as `S_{Y,inf}`.
+    """
+    if not isinstance(row, dict):
+        return False, "Sub-unit certificate row must be a dict"
+    forbidden_keys = (
+        "subunit_weighted_sum_lhs",
+        "subunit_infinite_weighted_sum_S_Y_inf",
+        "subunit_infinite_sum_lhs",
+        "S_Y_inf_certified",
+    )
+    for bad_key in forbidden_keys:
+        if bad_key in row:
+            return False, f"Forbidden ambiguous or infinite-sum certificate key present: {bad_key!r}"
+    if row.get("subunit_sum_kind") != "FINITE_T_TRUNCATED_SUM_S_Y_T":
+        return False, f"Invalid subunit_sum_kind: {row.get('subunit_sum_kind')!r}"
+    if row.get("subunit_sum_symbol") != "S_{Y,T(Y)}":
+        return False, f"Invalid subunit_sum_symbol: {row.get('subunit_sum_symbol')!r}"
+    formula_str = str(row.get("subunit_sum_formula", ""))
+    if "T(Y)" not in formula_str or "inf" in formula_str.lower() or "∞" in formula_str:
+        return False, f"Sub-unit sum formula must specify finite T(Y) cutoff, got {formula_str!r}"
+
+    for int_key in (
+        "floor_Y",
+        "T_Y",
+        "subunit_d_lower_exclusive",
+        "subunit_d_upper_inclusive",
+        "subunit_d_term_count",
+    ):
+        val = row.get(int_key)
+        if isinstance(val, bool) or not isinstance(val, int):
+            return False, f"Missing or non-integer cutoff metadata {int_key!r}: {val!r}"
+
+    m_fl = row["floor_Y"]
+    T_s = row["T_Y"]
+    d_lo_excl = row["subunit_d_lower_exclusive"]
+    d_hi_incl = row["subunit_d_upper_inclusive"]
+    d_cnt = row["subunit_d_term_count"]
+    d_rng = row.get("subunit_d_range_inclusive")
+
+    if m_fl < 2 or T_s < m_fl:
+        return False, f"Invalid floor_Y={m_fl}, T_Y={T_s}"
+    if d_lo_excl != m_fl or d_hi_incl != T_s:
+        return (
+            False,
+            f"Cutoff mismatch: lower_exclusive={d_lo_excl} (expected {m_fl}), upper_inclusive={d_hi_incl} (expected {T_s})",
+        )
+    expected_cnt = max(0, T_s - m_fl)
+    expected_rng = [m_fl + 1, T_s] if expected_cnt > 0 else []
+    if d_cnt != expected_cnt or d_rng != expected_rng:
+        return (
+            False,
+            f"Range/count mismatch: range={d_rng!r} (expected {expected_rng!r}), count={d_cnt} (expected {expected_cnt})",
+        )
+
+    lhs_node = row.get("subunit_finite_weighted_sum_S_Y_T")
+    rhs_node = row.get("subunit_uniform_O_logY_rhs")
+    if not isinstance(lhs_node, dict) or not isinstance(rhs_node, dict):
+        return False, "Missing serialized Arb balls for subunit_finite_weighted_sum_S_Y_T or RHS"
+    if "upper_dec" not in lhs_node or "lower_dec" not in rhs_node:
+        return False, "Serialized Arb dicts missing endpoint fields"
+    st_le, ok_le = classify_interval_endpoints_le(
+        Fraction(lhs_node["lower_dec"]),
+        Fraction(lhs_node["upper_dec"]),
+        Fraction(rhs_node["lower_dec"]),
+        Fraction(rhs_node["upper_dec"]),
+    )
+    if not ok_le:
+        return False, f"Directed finite-sum inequality failed ({st_le})"
+    return True, "CERTIFIED_FINITE_SUM_S_Y_T_METADATA_VALID"
+
+
+def verify_section_epistemic_scope_metadata(section: Dict[str, Any]) -> Tuple[bool, str]:
+    """Verify that a section uses only the repository's 6 canonical `EPISTEMIC_CATEGORIES`,
+    supplies an explicit `component_epistemic_map` and `epistemic_statuses` list, and never
+    carries a blanket single-string `epistemic_status` across mixed proof/evidence components.
+    """
+    if not isinstance(section, dict):
+        return False, "Section must be a dict"
+    allowed = set(EPISTEMIC_CATEGORIES)
+    comp_map = section.get("component_epistemic_map")
+    if not isinstance(comp_map, dict) or len(comp_map) == 0:
+        return False, "Missing or empty component_epistemic_map"
+    for comp_name, st in comp_map.items():
+        if st not in allowed:
+            return False, f"Invalid epistemic category {st!r} on component {comp_name!r}"
+
+    statuses = section.get("epistemic_statuses")
+    if not isinstance(statuses, list) or len(statuses) == 0:
+        return False, "Missing or empty epistemic_statuses list"
+    if len(statuses) != len(set(statuses)):
+        return False, f"Duplicate entries in epistemic_statuses: {statuses!r}"
+    for st in statuses:
+        if st not in allowed:
+            return False, f"Invalid epistemic category {st!r} in epistemic_statuses"
+
+    map_status_set = set(comp_map.values())
+    if set(statuses) != map_status_set:
+        return (
+            False,
+            f"epistemic_statuses {statuses!r} does not match component_epistemic_map values {sorted(map_status_set)!r}",
+        )
+
+    if "epistemic_status" in section:
+        single_st = section["epistemic_status"]
+        if single_st not in allowed:
+            return False, f"Invalid single epistemic_status {single_st!r}"
+        if len(map_status_set) > 1 or single_st not in map_status_set:
+            return (
+                False,
+                f"Mixed section cannot claim blanket epistemic_status={single_st!r} when components span {sorted(map_status_set)!r}",
+            )
+
+    note = str(section.get("section_epistemic_scope_note", "")).strip()
+    if not note:
+        return False, "Missing section_epistemic_scope_note"
+    return True, "SECTION_EPISTEMIC_SCOPE_VALID"
 
 
 def evaluate_c_half_square_pole_arb(prec_bits: int = 256) -> arb:
@@ -1201,7 +1367,22 @@ def verify_section_1_exact_object_and_noncircular_reassembly(prec_bits: int = 25
 
         all_sec1 = bool(inc_ok and phi0_guard_ok and t1_ok and reassembly_ok and strat_ok)
         return {
-            "epistemic_status": "CONCRETE_ANALYTIC_IN_LEAN",
+            "epistemic_statuses": [
+                "UNCONDITIONAL_FINITE_ARITHMETIC",
+                "CONCRETE_ANALYTIC_IN_LEAN",
+                "CERTIFIED_FINITE_OBSERVATION",
+            ],
+            "section_epistemic_scope_note": (
+                "Mixed formal/arithmetic/numerical section: source endpoint conventions, T=0/1 safe "
+                "guards, Selberg non-circular reassembly, return to D_{2,T} = P_T - R_T, and exact "
+                "2T basis spillover are formalized in Lean Theorem 1; finite sample evaluations and "
+                "256-bit Arb residuals are CERTIFIED_FINITE_OBSERVATION."
+            ),
+            "component_epistemic_map": {
+                "selberg_source_conventions_and_T_0_1_boundary_guards": "UNCONDITIONAL_FINITE_ARITHMETIC",
+                "noncircular_reassembly_D2_return_and_2T_basis_spillover": "CONCRETE_ANALYTIC_IN_LEAN",
+                "sample_reassembly_and_stratification_evaluations": "CERTIFIED_FINITE_OBSERVATION",
+            },
             "lean_theorem": "noncircular_reassembly_and_basis_stratification_tc060",
             "c_lambda": serialize_arb_certified(c_lam),
             "R_0_is_exact_zero": r0_exact,
@@ -1538,12 +1719,19 @@ def verify_section_2_signed_dilation_fourier_and_gram_kernel(prec_bits: int = 25
                 )
 
         return {
-            "epistemic_status": "CONCRETE_ANALYTIC_IN_LEAN",
+            "epistemic_statuses": [
+                "ANALYTIC_PROVED_OUTSIDE_LEAN",
+                "CONCRETE_ANALYTIC_IN_LEAN",
+                "UNCONDITIONAL_FINITE_ARITHMETIC",
+                "CERTIFIED_FINITE_OBSERVATION",
+            ],
             "section_epistemic_scope_note": (
-                "Mixed analytic/formal/numerical section: finite-cutoff qhat_L(v) Gamma substitution and "
-                "improper tail bounds are ANALYTIC_PROVED_OUTSIDE_LEAN; multiplier benchmark/attainment, "
-                "cutoff-block partition/sqrt(T) count, and unweighted/log-weighted Gram quadratic forms "
-                "are formalized in Lean Theorems 2 & 3; quadrature cross-checks are CERTIFIED_FINITE_OBSERVATION."
+                "Mixed analytic/formal/numerical section (no blanket Lean claim): finite-cutoff "
+                "qhat_L(v) Gamma substitution and improper real-line tail bounds are "
+                "ANALYTIC_PROVED_OUTSIDE_LEAN; multiplier benchmark/attainment, cutoff-block "
+                "partition/sqrt(T) count, and unweighted/log-weighted Gram quadratic forms are "
+                "formalized in Lean Theorems 2 & 3; quadrature and sample cross-checks are "
+                "CERTIFIED_FINITE_OBSERVATION."
             ),
             "component_epistemic_map": {
                 "qhat_L_finite_cutoff_gamma_identity_and_improper_tails": "ANALYTIC_PROVED_OUTSIDE_LEAN",
@@ -2062,48 +2250,78 @@ def verify_section_3_attempts_a_and_b_obstructions_and_drift_theorem(
                 / arb(T_s * T_s)
             )
             _, ok_jmp = classify_arb_le_certificate(jump_win_norm, jump_olog_rhs)
+            row_obj: Dict[str, Any] = {
+                "Y_fraction": f"{y_sub_frac.numerator}/{y_sub_frac.denominator}",
+                "floor_Y": m_fl,
+                "T_Y": T_s,
+                "subunit_sum_kind": "FINITE_T_TRUNCATED_SUM_S_Y_T",
+                "subunit_sum_symbol": "S_{Y,T(Y)}",
+                "subunit_sum_formula": "Y^(5/2) * sum_{floor(Y) < d <= T(Y)} log(d + 1) / d^(7/2)",
+                "subunit_d_lower_exclusive": m_fl,
+                "subunit_d_upper_inclusive": T_s,
+                "subunit_d_range_inclusive": [m_fl + 1, T_s] if T_s > m_fl else [],
+                "subunit_d_term_count": max(0, T_s - m_fl),
+                "certified_inequality_scope": (
+                    "Certifies 0 <= S_{Y,T(Y)} < (3/2)^(5/2)*((2/5)*log(Y) + 1/2) on the finite "
+                    "range floor(Y) < d <= T(Y); the analytic integral step bounds the infinite "
+                    "tail sum S_{Y,inf} = Y^(5/2)*sum_{d > floor(Y)} log(d+1)/d^(7/2), and "
+                    "0 <= S_{Y,T(Y)} <= S_{Y,inf} holds by termwise nonnegativity log(d+1)/d^(7/2) >= 0 "
+                    "without certifying S_{Y,inf} itself from the truncated sum."
+                ),
+                "liouville_constant_1_S_L_bound_status": "ANALYTIC_PROVED_OUTSIDE_LEAN",
+                "subunit_finite_weighted_sum_S_Y_T": serialize_arb_certified(sub_lhs),
+                "subunit_uniform_O_logY_rhs": serialize_arb_certified(sub_rhs),
+                "subunit_bound_certified": ok_sub,
+                "drift_jump_reindexing_residual_at_Y": serialize_arb_certified(reidx_res),
+                "drift_jump_window_norm": serialize_arb_certified(jump_win_norm),
+                "drift_jump_O_logY_upper_bound": serialize_arb_certified(jump_olog_rhs),
+                "drift_jump_bound_certified": ok_jmp,
+                "verified": False,
+            }
+            meta_ok, _ = verify_subunit_finite_sum_row_metadata(row_obj)
             ok_sj_row = bool(
-                ok_sub and arb(0) in reidx_res and abs(reidx_res) < arb("1e-68") and ok_jmp
+                meta_ok and ok_sub and arb(0) in reidx_res and abs(reidx_res) < arb("1e-68") and ok_jmp
             )
+            row_obj["verified"] = ok_sj_row
             sub_jump_ok = sub_jump_ok and ok_sj_row
-            subunit_and_jump_rows.append(
-                {
-                    "Y_fraction": f"{y_sub_frac.numerator}/{y_sub_frac.denominator}",
-                    "floor_Y": m_fl,
-                    "T_Y": T_s,
-                    "subunit_weighted_sum_lhs": serialize_arb_certified(sub_lhs),
-                    "subunit_uniform_O_logY_rhs": serialize_arb_certified(sub_rhs),
-                    "subunit_bound_certified": ok_sub,
-                    "drift_jump_reindexing_residual_at_Y": serialize_arb_certified(reidx_res),
-                    "drift_jump_window_norm": serialize_arb_certified(jump_win_norm),
-                    "drift_jump_O_logY_upper_bound": serialize_arb_certified(jump_olog_rhs),
-                    "drift_jump_bound_certified": ok_jmp,
-                    "verified": ok_sj_row,
-                }
-            )
+            subunit_and_jump_rows.append(row_obj)
 
         return {
-            "epistemic_status": "ANALYTIC_PROVED_OUTSIDE_LEAN",
+            "epistemic_statuses": [
+                "CONCRETE_ANALYTIC_IN_LEAN",
+                "UNCONDITIONAL_FINITE_ARITHMETIC",
+                "ANALYTIC_PROVED_OUTSIDE_LEAN",
+                "CERTIFIED_FINITE_OBSERVATION",
+                "OPEN_CONJECTURE_OR_FAILED_CANDIDATE",
+            ],
             "section_epistemic_scope_note": (
-                "Mixed section: Gaussian window majorant, local low/high cross-term split, Gauss-product "
-                "polynomial inequality, discrete Abel identity, |delta_{sq,2}(d)| <= 12*log(d+1)/sqrt(d), "
-                "finite small-divisor weighted bound, singleton-block A1 obstruction, d=1/e_1 B1 lower bound, "
-                "w_{2,lambda}(p)/w_{2,lambda}(6p) support, and drift-jump reindexing are formalized in Lean "
-                "Theorems 4, 5, & 7; Euler reflection/Gauss product Gamma majorant, z=1/2 Laurent residue "
-                "derivation of M_{sq,2}(d), and all-eps summation/cutoff contractions of r_sm^{drift} and "
-                "r_{sm,<=D_0}^{osc} are ANALYTIC_PROVED_OUTSIDE_LEAN; finite R(d)/R_osc(d) sign counts and "
-                "finite B1 sample ratios are CERTIFIED_FINITE_OBSERVATION."
+                "Mixed section (no blanket Lean claim): Gaussian window majorant, local low/high "
+                "cross-term split, Gauss-product polynomial inequality, discrete Abel identity, "
+                "|delta_{sq,2}(d)| <= 12*log(d+1)/sqrt(d), finite small-divisor weighted bound, "
+                "singleton-block A1 obstruction (taking c_lam != 0), d=1/e_1 B1 lower bound, "
+                "w_{2,lambda}(p)/w_{2,lambda}(6p) support, and drift-jump reindexing are formalized "
+                "in Lean Theorems 4, 5, & 7; Euler reflection/Gauss product Gamma majorant, z=1/2 "
+                "Laurent residue derivation of M_{sq,2}(d), the constant-1 Liouville bound |S_L(a)| <= 1 "
+                "for ||g_d||_Y <= sqrt((tau^5-1)/5)*Y^(5/2)*d^(-3), external nonvanishing c_lambda < 0, "
+                "and all-eps summation/cutoff contractions of r_sm^{drift} and r_{sm,<=D_0}^{osc} are "
+                "ANALYTIC_PROVED_OUTSIDE_LEAN; finite R(d)/R_osc(d) sign counts, finite S_{Y,T(Y)} "
+                "certificates, and finite B1 sample ratios are CERTIFIED_FINITE_OBSERVATION; "
+                "Candidates A1 and B1 are refuted within scope (OPEN_CONJECTURE_OR_FAILED_CANDIDATE)."
             ),
             "component_epistemic_map": {
                 "gaussian_window_majorant_and_local_frequency_split": "CONCRETE_ANALYTIC_IN_LEAN",
                 "all_v_closed_form_gamma_majorant": "ANALYTIC_PROVED_OUTSIDE_LEAN",
                 "z_half_laurent_residue_drift_model_M_sq_2": "ANALYTIC_PROVED_OUTSIDE_LEAN",
                 "candidate_a1_singleton_block_I_T_T_v0_refutation": "CONCRETE_ANALYTIC_IN_LEAN",
+                "external_c_lambda_nonvanishing_input_for_a1": "ANALYTIC_PROVED_OUTSIDE_LEAN",
                 "finite_R_d_positivity_and_R_osc_sign_flips_1_to_2000": "CERTIFIED_FINITE_OBSERVATION",
                 "candidate_b1_unbounded_family_d1_e1_refutation": "CONCRETE_ANALYTIC_IN_LEAN",
                 "candidate_b1_finite_diagnostics_and_liouville_constant_exclusions": "CERTIFIED_FINITE_OBSERVATION",
+                "candidates_a1_and_b1_refuted_within_scope": "OPEN_CONJECTURE_OR_FAILED_CANDIDATE",
                 "w2_prime_and_6p_unconditional_support": "UNCONDITIONAL_FINITE_ARITHMETIC",
                 "drift_abel_split_and_increment_bound": "CONCRETE_ANALYTIC_IN_LEAN",
+                "liouville_constant_1_S_L_bound_for_subunit_g_d": "ANALYTIC_PROVED_OUTSIDE_LEAN",
+                "finite_subunit_S_Y_T_and_jump_certificates": "CERTIFIED_FINITE_OBSERVATION",
                 "all_eps_drift_and_small_divisor_relative_contractions": "ANALYTIC_PROVED_OUTSIDE_LEAN",
             },
             "lean_theorems": [
@@ -2487,19 +2705,32 @@ def verify_section_4_complete_energy_bridge_and_global_consequence(
         ]
 
         return {
-            "epistemic_status": "CONDITIONAL_IMPLICATION",
+            "epistemic_statuses": [
+                "CONCRETE_ANALYTIC_IN_LEAN",
+                "UNCONDITIONAL_FINITE_ARITHMETIC",
+                "ANALYTIC_PROVED_OUTSIDE_LEAN",
+                "CONDITIONAL_IMPLICATION",
+                "CERTIFIED_FINITE_OBSERVATION",
+                "OPEN_CONJECTURE_OR_FAILED_CANDIDATE",
+            ],
             "section_epistemic_scope_note": (
-                "Mixed section: the lossless decomposition Q_{lambda,T} = 2*P_T - D_{2,known,T} - D_{2,core,T} "
-                "and (8, 4, 4) window energy inequality are unconditional in Lean Theorem 6(1)-(2), and full-core "
-                "intermediate/tail retention is unconditional in Lean Theorem 7(1); the R-independent finite-horizon "
-                "absorption is a CONDITIONAL_IMPLICATION in Lean Theorem 6(3) assuming the Route D diagonal, "
-                "known-D_2, and open-core hypotheses."
+                "Mixed section (no blanket Lean claim): the lossless decomposition "
+                "Q_{lambda,T} = 2*P_T - D_{2,known,T} - D_{2,core,T} and (8, 4, 4) window energy "
+                "inequality are unconditional in Lean Theorem 6(1)-(2), and full-core intermediate/tail "
+                "retention is unconditional in Lean Theorem 7(1); known-D_2 component bounds (including "
+                "Q_{1_sq,T}(X) = sum_{m^2 <= T} m^{-1} phi_1(X/m^2)) are ANALYTIC_PROVED_OUTSIDE_LEAN; "
+                "the R-independent finite-horizon absorption is a CONDITIONAL_IMPLICATION in Lean "
+                "Theorem 6(3) assuming the Route D diagonal, known-D_2, and open-core hypotheses; "
+                "sample reconstructions are CERTIFIED_FINITE_OBSERVATION; and the full open core "
+                "8*X_tilde(Y) + 4*||D_{2,core,T(Y)}||_Y^2 remains OPEN_CONJECTURE_OR_FAILED_CANDIDATE."
             ),
             "component_epistemic_map": {
                 "lossless_known_vs_full_core_decomposition_and_8_4_4_inequality": "CONCRETE_ANALYTIC_IN_LEAN",
                 "full_core_intermediate_and_tail_partition_retention": "UNCONDITIONAL_FINITE_ARITHMETIC",
+                "known_D2_component_bounds_including_square_supported_phi1_scaling": "ANALYTIC_PROVED_OUTSIDE_LEAN",
                 "R_independent_finite_horizon_feedback_absorption": "CONDITIONAL_IMPLICATION",
                 "complete_reconstruction_and_sample_threshold_evaluations": "CERTIFIED_FINITE_OBSERVATION",
+                "remaining_full_open_core_target": "OPEN_CONJECTURE_OR_FAILED_CANDIDATE",
             },
             "lean_theorems": [
                 "complete_reconstruction_drift_contraction_transfer_tc060",
@@ -2730,7 +2961,20 @@ def verify_section_5_controls_schedule_and_directed_certificates(
         )
 
         return {
-            "epistemic_status": "CERTIFIED_FINITE_OBSERVATION",
+            "epistemic_statuses": [
+                "ANALYTIC_PROVED_OUTSIDE_LEAN",
+                "CERTIFIED_FINITE_OBSERVATION",
+            ],
+            "section_epistemic_scope_note": (
+                "Mixed analytic/numerical section: second-order Laurent compensations M_{2,a}(d) for "
+                "multiplicative controls 1, a_2, and a_{3,5,7} are ANALYTIC_PROVED_OUTSIDE_LEAN; "
+                "control cumulative remainders, smooth window norms, certified integer cutoff "
+                "protocol checks, and directed interval certificate checks are CERTIFIED_FINITE_OBSERVATION."
+            ),
+            "component_epistemic_map": {
+                "control_laurent_compensations_M_2_a": "ANALYTIC_PROVED_OUTSIDE_LEAN",
+                "control_smooth_energies_cutoff_and_directed_interval_checks": "CERTIFIED_FINITE_OBSERVATION",
+            },
             "control_cumulative_remainder_rows": control_cum_rows,
             "control_window_smooth_norms_Y16_T32": {
                 "actual_liouville_matching_R_lambda": {
@@ -2910,6 +3154,11 @@ def verify_tc060_lean_theorems_live() -> Dict[str, Any]:
             formal_provenance = {
                 "status": br.get("status"),
                 "producing_git_commit": br.get("producing_git_commit"),
+                "formal_build_status_in_tc060r2": (
+                    "INHERITED_UNCHANGED_FROM_TC060R_FORMAL_COMMIT"
+                    if br.get("producing_git_commit") == REVIEWED_TC060R_IMPLEMENTATION
+                    else "REBUILT_AT_NEW_FORMAL_COMMIT"
+                ),
                 "project_theorem_declarations_compiled": br.get(
                     "project_theorem_declarations_compiled"
                 ),
@@ -3080,7 +3329,7 @@ def execute_task_tc060_signed_dilation_audit(
     verify_lean_live: bool = True,
     verify_review_doc: bool = True,
 ) -> Dict[str, Any]:
-    """Execute the complete TASK-TC-060 / TASK-TC-060R mathematical, falsification, Lean, and 256-bit Arb audit."""
+    """Execute the complete TASK-TC-060 / TASK-TC-060R / TASK-TC-060R2 mathematical, falsification, Lean, and 256-bit Arb audit."""
     sec1 = verify_section_1_exact_object_and_noncircular_reassembly(prec_bits=prec_bits)
     sec2 = verify_section_2_signed_dilation_fourier_and_gram_kernel(prec_bits=prec_bits)
     sec3 = verify_section_3_attempts_a_and_b_obstructions_and_drift_theorem(prec_bits=prec_bits)
@@ -3093,9 +3342,20 @@ def execute_task_tc060_signed_dilation_audit(
     assert sec4["all_section_4_checks_pass"] is True
     assert sec5["all_section_5_checks_pass"] is True
 
+    for sec_name, sec_obj in (
+        ("section_1", sec1),
+        ("section_2", sec2),
+        ("section_3", sec3),
+        ("section_4", sec4),
+        ("section_5", sec5),
+    ):
+        ep_ok, ep_msg = verify_section_epistemic_scope_metadata(sec_obj)
+        assert ep_ok is True, f"{sec_name} epistemic scope metadata check failed: {ep_msg}"
+
     report: Dict[str, Any] = {
-        "task_id": TASK_TC_060R_ID,
+        "task_id": TASK_TC_060R2_ID,
         "repaired_task_id": TASK_TC_060_ID,
+        "closed_out_repair_task_id": TASK_TC_060R_ID,
         "parent_epic": EPIC_TC_042_ID,
         "parent_subgate": PARENT_SUBGATE_ID,
         "prior_tasks": [
@@ -3117,6 +3377,7 @@ def execute_task_tc060_signed_dilation_audit(
             TASK_TC_059R_ID,
             TASK_TC_059R2_ID,
             TASK_TC_060_ID,
+            TASK_TC_060R_ID,
         ],
         "reviewed_merged_main_baseline": REVIEWED_MERGED_MAIN_BASELINE,
         "accepted_tc059r2_branch": ACCEPTED_TC059R2_BRANCH,
@@ -3126,26 +3387,35 @@ def execute_task_tc060_signed_dilation_audit(
         "reviewed_tc060_branch": PROPOSED_TC060_BRANCH,
         "reviewed_tc060_implementation_commit": REVIEWED_TC060_IMPLEMENTATION,
         "reviewed_tc060_head_commit": REVIEWED_TC060_HEAD,
-        "branch": REPAIR_TC060R_BRANCH,
+        "reviewed_tc060r_branch": REPAIR_TC060R_BRANCH,
+        "reviewed_tc060r_implementation_commit": REVIEWED_TC060R_IMPLEMENTATION,
+        "reviewed_tc060r_head_commit": REVIEWED_TC060R_HEAD,
+        "inherited_tc060r_formal_producing_commit": REVIEWED_TC060R_IMPLEMENTATION,
+        "branch": CLOSEOUT_TC060R2_BRANCH,
         "epistemic_categories_enforced": list(EPISTEMIC_CATEGORIES),
         "global_consequence_classes_enforced": list(GLOBAL_CONSEQUENCE_CLASSES),
         "completion_outcome_code": "OUTCOME_B_AND_C_REPAIRED_FULL_CORE_QUANTIFIED_OBSTRUCTIONS_AND_DRIFT_CONTRACTION",
         "research_outcome_class": (
-            "Repaired Full-Core Scope, Quantified Counterexamples, Certified Cutoffs, & Partial Arithmetic "
-            "Relative-Contraction Theorem (TASK-TC-060R repairing TASK-TC-060, Outcome B/C) — Preserves "
-            "exact finite-L Fourier block-multiplier representation (outside Lean) and real-space signed / "
-            "(log X)^{-4}-weighted Gram kernels H_{Y,b}, H_{Y,b}^{wt}; proves in Lean 4 (0 sorry, 0 custom "
-            "axioms, 7 public theorems in SignedDilationArithmeticEnergy.lean) non-circular reassembly & "
-            "2T basis spillover, sharp unrestricted-frequency multiplier attainment (obstructing only a "
+            "Repaired Full-Core Scope, Quantified Counterexamples, Certified Cutoffs, Certificate/Epistemic "
+            "Scope Closeout, & Partial Arithmetic Relative-Contraction Theorem (TASK-TC-060R2 closing out "
+            "TASK-TC-060R / TASK-TC-060, Outcome B/C) — Preserves exact finite-L Fourier block-multiplier "
+            "representation (outside Lean) and real-space signed / (log X)^{-4}-weighted Gram kernels "
+            "H_{Y,b}, H_{Y,b}^{wt}; inherits unchanged Lean 4 formal build at aedea63aeb5c028dff63a50e7178b2d69cf416a4 "
+            "(0 sorry, 0 custom axioms, 7 public theorems in SignedDilationArithmeticEnergy.lean, 815 total "
+            "public theorems) proving non-circular reassembly & 2T basis spillover, sharp unrestricted-frequency "
+            "multiplier attainment (obstructing only a "
             "frequency-independent relative O(1/d) saving while retaining the all-v (1+|v|) derivative bound) "
             "and sqrt(T) cutoff-block lower bound, weighted Gram quadratic forms & log sandwiches, Gaussian "
             "window majorants & Gauss-product Gamma monotonicity, discrete Abel re-summation of M_{sq,2}(d) & "
             "finite small-divisor weighted bounds, R-independent complete-energy feedback transfer, and "
             "TC-060R's full-core intermediate/tail retention, singleton-block I_T(T)={1} Candidate A1 "
-            "refutation at v=0, arbitrary-coefficient d=1/e_1 Candidate B1 exponential lower bound, "
-            "w_{2,lambda}(p)/w_{2,lambda}(6p) unconditional support, and drift-jump floor(T/q) reindexing; "
-            "proves outside Lean all-eps relative contraction of r_{sm,T(Y)}^{drift}/(log X)^2 (with corrected "
-            "O(log Y) sub-unit and jump sums) and 1 <= d <= min(D_0(Y), T(Y)-1) (with certified D_0(2) = 0); "
+            "refutation at v=0 (given external c_lambda != 0), arbitrary-coefficient d=1/e_1 Candidate B1 "
+            "exponential lower bound, w_{2,lambda}(p)/w_{2,lambda}(6p) unconditional support, and drift-jump "
+            "floor(T/q) reindexing; proves outside Lean the constant-1 Liouville bound |S_L(a)| <= 1 (L >= 0, "
+            "a >= 0), exact square-Gaussian scaling Q_{1_sq,T}(X) = sum_{m^2<=T} m^{-1} phi_1(X/m^2), and "
+            "all-eps relative contraction of r_{sm,T(Y)}^{drift}/(log X)^2 (with corrected O(log Y) sub-unit "
+            "and jump sums, explicitly distinguishing certified finite S_{Y,T(Y)} on floor(Y) < d <= T(Y) from "
+            "S_{Y,inf} on d > floor(Y)) and 1 <= d <= min(D_0(Y), T(Y)-1) (with certified D_0(2) = 0); "
             "and retains the full remaining open core min(D_0(Y), T(Y)-1) < d <= T(Y)-1 inside D_{2,core,T(Y)} "
             "(including d >= ceil(tau*Y)) alongside signed 8*X_tilde(Y) + 4*||D_{2,core,T(Y)}||_Y^2, keeping "
             "SUBGATE-TC-043A OPEN and rh_proved False."
