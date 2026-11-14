@@ -42,3 +42,4 @@ import RiemannScope.QuartetRemainderConnection
 import RiemannScope.CanonicalThetaCorrelationBound
 import RiemannScope.LiouvilleSquareDilation
 import RiemannScope.DyadicPowerLiftPrimitiveCorrelation
+import RiemannScope.SignedDilationArithmeticEnergy

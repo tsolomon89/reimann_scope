@@ -144,6 +144,7 @@ REQUIRED_FORMAL_SOURCES = [
     "formal/RiemannScope/CanonicalThetaCorrelationBound.lean",
     "formal/RiemannScope/LiouvilleSquareDilation.lean",
     "formal/RiemannScope/DyadicPowerLiftPrimitiveCorrelation.lean",
+    "formal/RiemannScope/SignedDilationArithmeticEnergy.lean",
 ]
 
 

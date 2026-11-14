@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": "TASK-TC-059R2",
+  "active_task_id": "TASK-TC-060",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -1915,8 +1915,8 @@
       "epic_id": "EPIC-TC-042",
       "priority": 74,
       "objective": "Numerical Assertion and Report Closeout for TC-059R toward SUBGATE-TC-043A (TASK-TC-059R2)",
-      "status": "OPEN",
-      "review_status": "AWAITING_INDEPENDENT_REVIEW",
+      "status": "ACCEPTED",
+      "review_status": "ACCEPTED",
       "open_implication": "SUBGATE-TC-043A remains OPEN (rh_proved = False): establish unconditionally either (i) the subpower primitive-correlation bound |Pi_{lambda,floor(T(Y)/g)}(Y/g)| = O_eps((Y/g)^eps) for every eps > 0 uniformly across 1 <= g <= floor(Y/2) (u = Y/g >= 2, paired with Theorem 7(4)'s proved O(1) tail on g > floor(Y/2)), OR (ii) the logarithmic-saving closure contract E(Y) <= A_eta*Y^eta + B_eta*(log Y)^{2-kappa_eta}*D_tilde(Y) (kappa_eta in (0, 2]), which transfers to E(Y) = O_eps(Y^eps) via repaired Theorem 6.",
       "planned_calculation": "1) Replace the overlapping-interval endpoint check in tests/test_tc_dyadic_power_lift_primitive_correlation.py with two-sided discrete grid maxima enclosures F_grid and G_grid on S_64 = {2, 4, 8, 16, 32, 64} (distinct from continuous suprema F and G_eps proved in Lean Theorem 6), directed separation upper(LHS) <= lower(RHS) (handling the r_div = 16, u_sub = 2 exact tie via verified finite-set maximizer + real algebraic identity rather than 0-containment alone), and an adversarial regression test confirming LHS = [2, 4] and RHS = [1, 3] are rejected as NOT_NUMERICALLY_CERTIFIED_OVERLAP. 2) Replace the underspecified extra d^{-1-alpha} (alpha > 0) closure claim with an accurately labeled research target (noting the scalar-majorant weights d^{-1/2-alpha}*exp(-c_W*sqrt(log d)) converge only for alpha >= 1/2 and diverge for 0 < alpha < 1/2, which is neither sufficient by itself nor necessary for signed aggregation). 3) Replace the two-sided \\asymp summand phrase in Review §4.2 with the PNT-backed upper bound << d^{1/2}*exp(-c_W*sqrt(log d))*sqrt(F(Y/d)) and available aggregate upper bound O(Y^{3/2}*exp(-c'_W*sqrt(log Y))), and cite inherited_vs_canonical_cutoff_comparison_and_counterexample_tc057 (LiouvilleSquareDilation.lean, Theorem 25, first main conjunct, third item) accurately. 4) Regenerate data/tc_dyadic_power_lift_primitive_correlation.json preserving all 535 Arb balls (including all 448 original TC-059 balls), 85/85 review intervals, and inherited formal build provenance 501e520144526d51e43c189a6d4a2d605a58e949.",
       "dependencies": [
@@ -1937,6 +1937,37 @@
       ],
       "acceptance_criterion": "All 12 tests in tests/test_tc_dyadic_power_lift_primitive_correlation.py and all 147 tests across the 8 EPIC-TC-042 TC suites passing; all 535 serialized 256-bit Arb balls (including all 448 original TC-059 balls) and 85/85 displayed review intervals preserved and verified; formal/RiemannScope/*.lean unchanged with inherited formal build provenance 501e520144526d51e43c189a6d4a2d605a58e949 (808 compiled public theorems, 0 sorry, 0 custom axioms); SUBGATE-TC-043A kept OPEN and rh_proved = False.",
       "resolution": "TASK-TC-059R2 completed all 4 bounded closeout items while leaving accepted Lean sources and all 535 certified 256-bit Arb balls unchanged: (1) repaired the discrete grid normalization check in tests/test_tc_dyadic_power_lift_primitive_correlation.py to enclose F_grid and G_grid two-sidedly on S_64 = {2, 4, 8, 16, 32, 64}, require directed separation upper(LHS) <= lower(RHS) on non-tie cases, prove the r_div = 16 (u_sub = 2) tie via strict finite-set maximizer separation + exact real identity 2^eps * (E(2)/2^eps) = E(2), and added adversarial regression test_tc059r2_adversarial_interval_inequality_semantics rejecting LHS = [2, 4] vs RHS = [1, 3]; (2) replaced the underspecified extra d^{-1-alpha} (alpha > 0) closure promise in generator, JSON, and Review §4.2 with an accurately labeled research target; (3) replaced the unsupported \\asymp summand symbol in Review §4.2 with the PNT-backed upper bound << d^{1/2}*exp(-c_W*sqrt(log d))*sqrt(F(Y/d)) and available aggregate upper bound O(Y^{3/2}*exp(-c'_W*sqrt(log Y))), and corrected the inherited-cutoff lower-bound citation to inherited_vs_canonical_cutoff_comparison_and_counterexample_tc057 (LiouvilleSquareDilation.lean#L5230-L5243, Theorem 25, first main conjunct, third item) plus TC-057R Theorem 6.1 in H3; (4) regenerated data/tc_dyadic_power_lift_primitive_correlation.json (535/535 Arb balls unchanged, 85/85 review intervals verified), preserved inherited formal build provenance 501e520144526d51e43c189a6d4a2d605a58e949 (808 public theorems), and passed 12/12 focused tests (147/147 EPIC-TC-042 tests); SUBGATE-TC-043A remains OPEN and rh_proved = False."
+    },
+    {
+      "task_id": "TASK-TC-060",
+      "epic_id": "EPIC-TC-042",
+      "priority": 75,
+      "objective": "Signed Dilation Multipliers and Arithmetic Control of the Complete Reconstruction toward SUBGATE-TC-043A (TASK-TC-060)",
+      "status": "OPEN",
+      "review_status": "AWAITING_INDEPENDENT_REVIEW",
+      "open_implication": "SUBGATE-TC-043A remains OPEN (rh_proved = False): after TC-060's unconditional all-epsilon relative-contraction theorem removes the z = 1/2 square-pole drift r_{sm,T(Y)}^{drift} / (log X)^2, the small-divisor slice d <= D_0(Y), and D_{2,known,Y} (square term, floor-jump r_{jump,T}, endpoint R(T)*phi_T), establish unconditionally on the zero-driven core D_0(Y) < d < ceil(tau*Y) that for every eta > 0 there exist A_eta, B_eta >= 0, kappa_eta in (0, 2], and Y_eta >= 2 such that 8*X_tilde(Y) + 4*||D_{2,core,Y}||_Y^2 <= A_eta*Y^eta + B_eta*(log Y)^{2-kappa_eta}*D_tilde(Y) for all Y >= Y_eta (where D_{2,core,Y} = (r_{sm,>D_0(Y)}^{osc} - Q_{lambda,T(Y)}^{[2]}) / (log X)^2).",
+      "planned_calculation": "1) Formalize SignedDilationArithmeticEnergy.lean (18 def + 6 public theorems + 20 private helper theorems = 44 declarations, 814 total compiled project theorems across 40 local modules + umbrella = 41 formal source files, 0 sorry, 0 admit, 0 custom axioms): noncircular_reassembly_and_basis_stratification_tc060, adjacent_dilation_multiplier_and_cutoff_blocks_tc060, signed_gram_kernel_and_log_weighted_quadratic_form_tc060, gaussian_window_majorant_and_local_frequency_split_tc060, second_order_drift_abel_and_small_divisor_contraction_tc060, and complete_reconstruction_drift_contraction_transfer_tc060. 2) Prove analytically and certify in 256-bit Arb ball arithmetic (336 Arb balls in data/tc_signed_dilation_arithmetic_energy.json without sampled zeta-zero inputs; 74/74 verified displayed enclosures in docs/reviews/TC_060_SIGNED_DILATION_ARITHMETIC_ENERGY.md) the finite-L Fourier identity, sharp odd-harmonic multiplier attainment, non-logarithmic cutoff block count, all-v cosh(tau*v/2)^{-1/4} Gamma majorant, Candidate A1 z = 1/2 square-pole drift obstruction (R(d) > 0 across 1 <= d <= 2000 with 0 sign flips vs 178 sign flips of R_{osc}(d)), Candidate B1 rational & Liouville counterexamples, unconditional discrete Abel relative contraction on r_{sm,T}^{drift}/(log X)^2 and r_{sm,<=D_0}^{osc}/(log X)^2, and complete-energy feedback transfer with R-independent threshold Y_* (1/4 + 1/4 + 1/4 = 3/4 < 1).",
+      "dependencies": [
+        "TASK-TC-057R",
+        "TASK-TC-058R2",
+        "TASK-TC-059",
+        "TASK-TC-059R",
+        "TASK-TC-059R2"
+      ],
+      "evidence": [
+        "formal/RiemannScope/SignedDilationArithmeticEnergy.lean",
+        "formal/RiemannScope/README.md",
+        "tc/signed_dilation_arithmetic_energy.py",
+        "data/tc_signed_dilation_arithmetic_energy.json",
+        "docs/reviews/TC_060_SIGNED_DILATION_ARITHMETIC_ENERGY.md",
+        "tests/test_tc_signed_dilation_arithmetic_energy.py",
+        "tests/test_tc_liouville_square_dilation.py",
+        "TRANSCENDENTAL_CONTINUATION.md",
+        "RESEARCH_LEDGER.md",
+        ".agents/corpus_map/obligation_register.md"
+      ],
+      "acceptance_criterion": "All 7 tests in tests/test_tc_signed_dilation_arithmetic_energy.py and all 154 tests across the 9 EPIC-TC-042 TC suites passing; formal/RiemannScope/SignedDilationArithmeticEnergy.lean compiled with 44 declarations (18 def + 6 public theorems + 20 private helper theorems, 814 total compiled public theorems across 40 local modules + umbrella = 41 files, 0 sorry, 0 admit, 0 custom axioms, 0 pi tokens); data/tc_signed_dilation_arithmetic_energy.json (336 certified 256-bit Arb balls) and docs/reviews/TC_060_SIGNED_DILATION_ARITHMETIC_ENERGY.md (74/74 displayed intervals verified, 0 pi tokens) synchronized; SUBGATE-TC-043A kept OPEN and rh_proved = False.",
+      "resolution": "TASK-TC-060 completed Outcome B + C: (1) verified source-exact non-circular reassembly r_{sm,T} + r_{jump,T} + R(T)*phi_T = sum_{n<=T} lambda(n)(log n)^2 phi_n - c_lambda Q_{1_sq,T} (with T = 0, 1 safe guards never evaluating phi_0) and proved exact 2T basis spillover alpha_T(2T) = c_lambda*lambda(T) != 0 (Theorem 1); (2) derived the finite-L Fourier identity qhat_L(v) = (1/2) Gamma(5/4 - i*v/2) sum_{n<=L} lambda(n) n^{-1/2-i*v} without RH or critical-line continuation, proved sharp multiplier benchmark attainment at odd harmonics v_k(d) = (2k+1)*tau/(2*log(1+1/d)), proved level-set cutoff block decomposition with N_blocks(T) >= floor(sqrt(T)) - 1 (Theorem 2), and proved equivalent real-space signed and (log X)^{-4}-weighted Gram kernels on [Y, b*Y] (Theorem 3); (3) proved local-window Gaussian Schwartz majorant and all-v cosh(tau*v/2)^{-1/4} Gamma majorant (Theorem 4), refuted Candidate A1 via the z = 1/2 square-pole drift M_{sq,2}(d) = 4*sqrt(d)*log d + c_{1/2,lambda}*sqrt(d) > 0 (R(d) > 0 across 1 <= d <= 2000 with 0 sign flips vs 178 sign flips of R_{osc}(d)), and refuted Candidate B1 via certified rational and actual Liouville counterexamples while proving unconditionally via discrete Abel summation by parts (Theorem 5) that ||r_{sm,T(Y)}^{drift}/(log X)^2||_Y^2 and ||r_{sm,<=D_0(Y)}^{osc}/(log X)^2||_Y^2 satisfy all-epsilon relative contraction O_epsilon((log Y)^{-4}) G_epsilon(R) Y^epsilon + O_epsilon(1) and O((log Y)^{-kappa}) G_epsilon(R) Y^epsilon + O_epsilon(1); (4) formalized complete-energy feedback transfer (Theorem 6) with R-independent threshold Y_* (1/4 + 1/4 + 1/4 = 3/4 < 1), certified controls and explicitly labeled hybrid diagnostics across 336 256-bit Arb balls and 74/74 review intervals, keeping SUBGATE-TC-043A OPEN and rh_proved = False."
     }
   ]
 }
