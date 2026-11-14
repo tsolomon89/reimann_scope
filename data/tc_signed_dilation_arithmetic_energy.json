@@ -2938,10 +2938,10 @@
     "lean_exit_code": 0,
     "formal_build_report_provenance": {
       "status": "passed",
-      "producing_git_commit": "501e520144526d51e43c189a6d4a2d605a58e949",
-      "project_theorem_declarations_compiled": 808,
-      "total_theorems": 808,
-      "report_hash": "cbd6ba5202443d1879a5d28ea250cbcffca032138af396e359f52f8b6c37c662"
+      "producing_git_commit": "f95dd15825b4637ff2ec7f22c6e987b9fe6ea6b4",
+      "project_theorem_declarations_compiled": 814,
+      "total_theorems": 814,
+      "report_hash": "804ae978599bf1e02208683dd73f059b3699a3897f2ccfdf91eaee5ec37ae99d"
     },
     "per_theorem": {
       "noncircular_reassembly_and_basis_stratification_tc060": {
