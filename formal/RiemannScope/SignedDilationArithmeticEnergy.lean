@@ -1,7 +1,7 @@
 /-
 RiemannScope.SignedDilationArithmeticEnergy
-TASK-TC-060: Signed Dilation Multipliers and Arithmetic Control of the Complete Reconstruction
-toward SUBGATE-TC-043A.
+TASK-TC-060 / TASK-TC-060R: Signed Dilation Multipliers, Arithmetic Control of the Complete
+Reconstruction, and Quantified Open-Core Obstruction Repairs toward SUBGATE-TC-043A.
 
 Formalizes in Lean 4 (complete machine-checked proofs with canonical circle constant
 RiemannScope.tau throughout):
@@ -34,6 +34,15 @@ RiemannScope.tau throughout):
    and `Q_T = 2 P_T - K_known - R_open`, complete `(8, 4, 4)` window energy inequality, and
    `R`-independent threshold `Y_star` finite-horizon feedback contraction (`1/4 + 1/4 + 1/4 = 3/4`)
    transferring conditional open-core control to `E(Y) ≤ C_tot * Y^ε`.
+7. `full_core_quantified_obstructions_and_w2_support_tc060r`:
+   Full open-core range split `min D0 (T - 1) + 1 ≤ d ≤ T - 1` with nonempty tail witness at
+   `Y = 4096` (`canonicalCutoffT 4096 = 32768`, `⌈RiemannScope.tau * 4096⌉ ≤ 32767`) and signed
+   `8 * X_tilde + 4 * ‖openCoreOscShiftD2Part‖_Y^2` window closure instantiation, singleton-block
+   `cutoffLevelBlock T T = {1}` obstruction refuting uniform all-block decay Candidate A1,
+   arbitrary-coefficient `unitFirstSupportCoeff` exponential growth refuting Candidate B1 on
+   `[Y, RiemannScope.tau * Y]`, exact `selbergLiouvilleWeight2` prime formula and three-distinct-prime
+   support vanishing with `6 * p` residual-increment specialization, and exact `d = ⌊T / q⌋`
+   drift-jump reindexing, `Nat.floor (Real.log 2) = 0`, and repaired `sinh` multiplier lower bound.
 -/
 
 import RiemannScope.DyadicPowerLiftPrimitiveCorrelation
@@ -3013,6 +3022,1199 @@ theorem complete_reconstruction_drift_contraction_transfer_tc060 :
       · push_neg at hYYs
         exact h_R_ge Y (le_of_lt hYYs)
     exact (div_le_iff hY_pow_pos).mp (le_trans h_div_le_GY hGY_le_C)
+
+/-! ### Section 7: Full Open-Core Quantified Obstructions, `w_{2,λ}` Support Vanishing, and Repaired Jump/Multiplier Identities (`TASK-TC-060R`) -/
+
+/-- Unit first-index support coefficient `e_1(q) := 1` if `q = 1`, else `0`
+    (`TASK-TC-060R` Item 3 counterexample family `a = e_1` at `d = 1`). -/
+def unitFirstSupportCoeff (q : ℕ) : ℝ :=
+  if q = 1 then 1 else 0
+
+private theorem one_add_add_sq_div_two_le_exp_tc060r_aux {x : ℝ} (hx : 0 ≤ x) :
+    1 + x + x ^ 2 / 2 ≤ Real.exp x := by
+  let f : ℝ → ℝ := fun t => Real.exp t - 1 - t - t ^ 2 / 2
+  have hf_deriv : ∀ t : ℝ, HasDerivAt f (Real.exp t - 1 - t) t := by
+    intro t
+    have h1 : HasDerivAt Real.exp (Real.exp t) t := Real.hasDerivAt_exp t
+    have h2 : HasDerivAt (fun y : ℝ => y ^ 2 / 2) t t := by
+      convert (hasDerivAt_pow 2 t).div_const (2 : ℝ) using 1
+      ring
+    convert ((h1.sub (hasDerivAt_const t (1 : ℝ))).sub (hasDerivAt_id t)).sub h2 using 1
+    ring
+  have hf_cont : Continuous f := by continuity
+  have hf_mono : MonotoneOn f (Set.Ici 0) := by
+    apply monotoneOn_of_deriv_nonneg (convex_Ici 0) hf_cont.continuousOn
+    · intro t _; exact (hf_deriv t).differentiableAt.differentiableWithinAt
+    · intro t _
+      rw [(hf_deriv t).deriv]
+      linarith [Real.add_one_le_exp t]
+  have hf0 : f 0 = 0 := by simp [f]
+  have hfx : 0 ≤ f x := by
+    rw [← hf0]
+    exact hf_mono Set.left_mem_Ici hx hx
+  dsimp [f] at hfx
+  linarith
+
+private theorem tau_lt_seven_tc060r_aux : RiemannScope.tau < 7 := by
+  have h_cos_bd : ∀ t : ℝ, -1 ≤ Real.cos t ∧ Real.cos t ≤ 1 := by
+    intro t
+    have hsq : (Real.cos t) ^ 2 ≤ 1 := by
+      linarith [Real.sin_sq_add_cos_sq t, sq_nonneg (Real.sin t)]
+    exact abs_le.mp
+      (by rw [← Real.sqrt_sq_eq_abs]; exact le_trans (Real.sqrt_le_sqrt hsq) (by norm_num))
+  have h_sin_ub : ∀ x ∈ Set.Ici (0 : ℝ), Real.sin x ≤ x := by
+    intro x hx
+    let g0 : ℝ → ℝ := fun t => t - Real.sin t
+    have hg0_cont : Continuous g0 := by continuity
+    have hg0_deriv : ∀ t : ℝ, HasDerivAt g0 (1 - Real.cos t) t :=
+      fun t => (hasDerivAt_id t).sub (Real.hasDerivAt_sin t)
+    have hg0_mono : MonotoneOn g0 (Set.Ici 0) := by
+      apply monotoneOn_of_deriv_nonneg (convex_Ici 0) hg0_cont.continuousOn
+      · intro t _; exact (hg0_deriv t).differentiableAt.differentiableWithinAt
+      · intro t _; rw [(hg0_deriv t).deriv]; linarith [(h_cos_bd t).2]
+    have h := hg0_mono Set.left_mem_Ici hx hx
+    dsimp [g0] at h
+    rw [Real.sin_zero] at h
+    linarith
+  have h_cos_lb : ∀ x ∈ Set.Ici (0 : ℝ), 1 - x ^ 2 / 2 ≤ Real.cos x := by
+    intro x hx
+    let g1 : ℝ → ℝ := fun t => Real.cos t - (1 - t ^ 2 / 2)
+    have hg1_cont : Continuous g1 := by continuity
+    have hg1_deriv : ∀ t : ℝ, HasDerivAt g1 (t - Real.sin t) t := by
+      intro t
+      have hp : HasDerivAt (fun y : ℝ => 1 - y ^ 2 / 2) (-t) t := by
+        convert (hasDerivAt_const t (1 : ℝ)).sub ((hasDerivAt_pow 2 t).div_const (2 : ℝ)) using 1
+        ring
+      convert (Real.hasDerivAt_cos t).sub hp using 1
+      ring
+    have hg1_mono : MonotoneOn g1 (Set.Ici 0) := by
+      apply monotoneOn_of_deriv_nonneg (convex_Ici 0) hg1_cont.continuousOn
+      · intro t _; exact (hg1_deriv t).differentiableAt.differentiableWithinAt
+      · intro t ht; rw [(hg1_deriv t).deriv]; linarith [h_sin_ub t (interior_subset ht)]
+    have h := hg1_mono Set.left_mem_Ici hx hx
+    dsimp [g1] at h
+    rw [Real.cos_zero] at h
+    linarith
+  have h_sin_lb : ∀ x ∈ Set.Ici (0 : ℝ), x - x ^ 3 / 6 ≤ Real.sin x := by
+    intro x hx
+    let g2 : ℝ → ℝ := fun t => Real.sin t - (t - t ^ 3 / 6)
+    have hg2_cont : Continuous g2 := by continuity
+    have hg2_deriv : ∀ t : ℝ, HasDerivAt g2 (Real.cos t - (1 - t ^ 2 / 2)) t := by
+      intro t
+      have hp : HasDerivAt (fun y : ℝ => y - y ^ 3 / 6) (1 - t ^ 2 / 2) t := by
+        convert (hasDerivAt_id t).sub ((hasDerivAt_pow 3 t).div_const (6 : ℝ)) using 1
+        ring
+      exact (Real.hasDerivAt_sin t).sub hp
+    have hg2_mono : MonotoneOn g2 (Set.Ici 0) := by
+      apply monotoneOn_of_deriv_nonneg (convex_Ici 0) hg2_cont.continuousOn
+      · intro t _; exact (hg2_deriv t).differentiableAt.differentiableWithinAt
+      · intro t ht; rw [(hg2_deriv t).deriv]; linarith [h_cos_lb t (interior_subset ht)]
+    have h := hg2_mono Set.left_mem_Ici hx hx
+    dsimp [g2] at h
+    rw [Real.sin_zero] at h
+    linarith
+  have h_cos_ub : ∀ x ∈ Set.Ici (0 : ℝ), Real.cos x ≤ 1 - x ^ 2 / 2 + x ^ 4 / 24 := by
+    intro x hx
+    let g3 : ℝ → ℝ := fun t => (1 - t ^ 2 / 2 + t ^ 4 / 24) - Real.cos t
+    have hg3_cont : Continuous g3 := by continuity
+    have hg3_deriv : ∀ t : ℝ, HasDerivAt g3 (Real.sin t - (t - t ^ 3 / 6)) t := by
+      intro t
+      have hp : HasDerivAt (fun y : ℝ => 1 - y ^ 2 / 2 + y ^ 4 / 24) (-t + t ^ 3 / 6) t := by
+        convert ((hasDerivAt_const t (1 : ℝ)).sub ((hasDerivAt_pow 2 t).div_const (2 : ℝ))).add
+          ((hasDerivAt_pow 4 t).div_const (24 : ℝ)) using 1
+        ring
+      convert hp.sub (Real.hasDerivAt_cos t) using 1
+      ring
+    have hg3_mono : MonotoneOn g3 (Set.Ici 0) := by
+      apply monotoneOn_of_deriv_nonneg (convex_Ici 0) hg3_cont.continuousOn
+      · intro t _; exact (hg3_deriv t).differentiableAt.differentiableWithinAt
+      · intro t ht; rw [(hg3_deriv t).deriv]; linarith [h_sin_lb t (interior_subset ht)]
+    have h := hg3_mono Set.left_mem_Ici hx hx
+    dsimp [g3] at h
+    rw [Real.cos_zero] at h
+    linarith
+  have h_cos_74_neg : Real.cos (7 / 4 : ℝ) < 0 := by
+    have h1 := h_cos_ub (7 / 4 : ℝ) (by norm_num)
+    have h2 : (1 - (7 / 4 : ℝ) ^ 2 / 2 + (7 / 4 : ℝ) ^ 4 / 24) < 0 := by norm_num
+    exact lt_of_le_of_lt h1 h2
+  have hdiv : ∀ y : ℝ, 2 * y / 4 = y / 2 := fun y => by ring
+  by_contra h_ge
+  push_neg at h_ge
+  rcases eq_or_lt_of_le h_ge with h_eq | h_gt
+  · have h_cos_zero : Real.cos (RiemannScope.tau / 4) = 0 := by
+      unfold RiemannScope.tau
+      rw [hdiv]
+      simp
+    rw [← h_eq] at h_cos_zero
+    linarith
+  · have h_lt_q : (7 / 4 : ℝ) < RiemannScope.tau / 4 := by linarith
+    have h_cos_pos : 0 < Real.cos (7 / 4 : ℝ) := by
+      unfold RiemannScope.tau at h_lt_q
+      rw [hdiv] at h_lt_q
+      exact Real.cos_pos_of_mem_Ioo ⟨by linarith, h_lt_q⟩
+    linarith
+
+private theorem liouvilleVonMangoldt_eq_zero_of_two_primes_tc060r_aux
+    {m p₁ p₂ : ℕ} (hp₁ : p₁.Prime) (hp₂ : p₂.Prime) (hne : p₁ ≠ p₂)
+    (hd₁ : p₁ ∣ m) (hd₂ : p₂ ∣ m) :
+    liouvilleVonMangoldt m = 0 := by
+  obtain ⟨_, _, _, _, ⟨h_lv_mul, _, _, _⟩⟩ :=
+    liouville_square_divisor_indicator_and_compensated_selberg_tc058 0 0
+  rw [h_lv_mul m]
+  have h_not_pp : ¬ IsPrimePow m := by
+    intro hpp
+    obtain ⟨q, k, hq_prime, _, rfl⟩ := hpp
+    have hq_nat : q.Prime := Nat.prime_iff.mpr hq_prime
+    have h1 : p₁ = q :=
+      (Nat.dvd_prime hq_nat).mp (hp₁.dvd_of_dvd_pow hd₁) |>.resolve_left hp₁.ne_one
+    have h2 : p₂ = q :=
+      (Nat.dvd_prime hq_nat).mp (hp₂.dvd_of_dvd_pow hd₂) |>.resolve_left hp₂.ne_one
+    exact hne (h1.trans h2.symm)
+  rw [ArithmeticFunction.vonMangoldt_eq_zero_iff.mpr h_not_pp, mul_zero]
+
+private theorem open_core_range_and_witness_tc060r_aux :
+    (∀ T D0 C_tail : ℕ,
+      Disjoint
+          ((Finset.Icc (min D0 (T - 1) + 1) (T - 1)).filter (fun d => d < C_tail))
+          ((Finset.Icc (min D0 (T - 1) + 1) (T - 1)).filter (fun d => C_tail ≤ d)) ∧
+        Finset.Icc (min D0 (T - 1) + 1) (T - 1) =
+          (Finset.Icc (min D0 (T - 1) + 1) (T - 1)).filter (fun d => d < C_tail) ∪
+            (Finset.Icc (min D0 (T - 1) + 1) (T - 1)).filter (fun d => C_tail ≤ d) ∧
+        (∀ c_lam c_half X : ℝ,
+          openCoreOscShiftD2Part c_lam c_half T D0 X =
+            (((∑ d ∈ (Finset.Icc (min D0 (T - 1) + 1) (T - 1)).filter (fun d => d < C_tail),
+                (selbergCenteredRemainderInt c_lam d - squarePoleDriftM c_half d) *
+                  scaledFiberSmoothStep T d X) +
+              (∑ d ∈ (Finset.Icc (min D0 (T - 1) + 1) (T - 1)).filter (fun d => C_tail ≤ d),
+                (selbergCenteredRemainderInt c_lam d - squarePoleDriftM c_half d) *
+                  scaledFiberSmoothStep T d X)) -
+              finiteQShifted (fun n => (liouvilleLambda n : ℝ)) 2 T X) / (Real.log X) ^ 2)) ∧
+    (canonicalCutoffT (4096 : ℝ) = 32768 ∧
+      Nat.ceil (RiemannScope.tau * (4096 : ℝ)) ≤ 32767 ∧
+      ((Finset.Icc
+          (min (Nat.floor (Real.log (4096 : ℝ))) (canonicalCutoffT (4096 : ℝ) - 1) + 1)
+          (canonicalCutoffT (4096 : ℝ) - 1)).filter
+        (fun d => Nat.ceil (RiemannScope.tau * (4096 : ℝ)) ≤ d)).Nonempty) ∧
+    ((∀ {Y : ℝ}, 2 ≤ Y → ∀ T : ℕ,
+        windowEnergyNormSq Y (normalizedPrimePowerTermP T) =
+          (∫ X in Y..(RiemannScope.tau * Y), pointwisePrimePowerDiagNorm T X / X) +
+            (∫ X in Y..(RiemannScope.tau * Y), pointwisePrimePowerOffDiagNorm T X / X)) ∧
+      (∀ {Y : ℝ}, 2 ≤ Y → ∀ {T : ℕ}, 1 ≤ T →
+        ∀ (D0 : ℕ) (c_lam c_half D_tilde X_tilde : ℝ),
+          windowEnergyNormSq Y (normalizedPrimePowerTermP T) = D_tilde + X_tilde →
+          actualWindowEnergyE (fun n => (liouvilleLambda n : ℝ)) T Y ≤
+            8 * D_tilde +
+              4 * windowEnergyNormSq Y (knownCompensatedD2Part c_lam c_half T D0) +
+              (8 * X_tilde +
+                4 * windowEnergyNormSq Y (openCoreOscShiftD2Part c_lam c_half T D0)))) := by
+  have htau_gt1 : (1 : ℝ) < RiemannScope.tau := tau_gt_one_tc060_aux
+  have he_ge_52 : (5 / 2 : ℝ) ≤ Real.exp 1 := by
+    linarith [one_add_add_sq_div_two_le_exp_tc060r_aux (zero_le_one : (0 : ℝ) ≤ 1)]
+  refine ⟨?_, ?_, ?_⟩
+  · intro T D0 C_tail
+    let S := Finset.Icc (min D0 (T - 1) + 1) (T - 1)
+    have h_disj :
+        Disjoint (S.filter (fun d => d < C_tail)) (S.filter (fun d => C_tail ≤ d)) := by
+      rw [Finset.disjoint_left]
+      intro d h1 h2
+      simp only [Finset.mem_filter] at h1 h2
+      omega
+    have h_union :
+        S = S.filter (fun d => d < C_tail) ∪ S.filter (fun d => C_tail ≤ d) := by
+      ext d
+      simp only [Finset.mem_union, Finset.mem_filter]
+      constructor
+      · intro hd
+        by_cases h : d < C_tail
+        · exact Or.inl ⟨hd, h⟩
+        · exact Or.inr ⟨hd, by omega⟩
+      · rintro (⟨hd, _⟩ | ⟨hd, _⟩) <;> exact hd
+    refine ⟨h_disj, h_union, ?_⟩
+    intro c_lam c_half X
+    unfold openCoreOscShiftD2Part
+    change ((∑ d ∈ S,
+        (selbergCenteredRemainderInt c_lam d - squarePoleDriftM c_half d) *
+          scaledFiberSmoothStep T d X) -
+      finiteQShifted (fun n => (liouvilleLambda n : ℝ)) 2 T X) / (Real.log X) ^ 2 = _
+    conv_lhs => rw [h_union, Finset.sum_union h_disj]
+  · have h_pow_4096 : (4096 : ℝ) ^ (5 / 4 : ℝ) = ((32768 : ℕ) : ℝ) := by
+      have h8_4 : (4096 : ℝ) = (8 : ℝ) ^ ((4 : ℕ) : ℝ) := by
+        rw [Real.rpow_natCast]; norm_num
+      rw [h8_4, ← Real.rpow_mul (by norm_num : (0 : ℝ) ≤ 8)]
+      have hexp : ((4 : ℕ) : ℝ) * (5 / 4 : ℝ) = ((5 : ℕ) : ℝ) := by norm_num
+      rw [hexp, Real.rpow_natCast]; norm_num
+    have hT_4096 : canonicalCutoffT (4096 : ℝ) = 32768 := by
+      unfold canonicalCutoffT
+      rw [h_pow_4096, Nat.ceil_natCast]
+    have h_ceil_tau : Nat.ceil (RiemannScope.tau * (4096 : ℝ)) ≤ 32767 := by
+      apply Nat.ceil_le.mpr
+      push_cast
+      linarith [tau_lt_seven_tc060r_aux]
+    have h_fl_log : Nat.floor (Real.log (4096 : ℝ)) ≤ 12 := by
+      have h2_le_e : (2 : ℝ) ≤ Real.exp 1 := by linarith
+      have h_strict : (4096 : ℝ) < Real.exp 13 := by
+        calc
+          (4096 : ℝ) < (2 : ℝ) ^ 13 := by norm_num
+          _ ≤ (Real.exp 1) ^ 13 := pow_le_pow_left (by norm_num) h2_le_e 13
+          _ = Real.exp 13 := by rw [← Real.exp_nat_mul]; norm_num
+      have h_lt13 : Real.log (4096 : ℝ) < ((13 : ℕ) : ℝ) := by
+        have h := Real.log_lt_log (by norm_num) h_strict
+        rw [Real.log_exp] at h
+        exact_mod_cast h
+      have h_nn : 0 ≤ Real.log (4096 : ℝ) := Real.log_nonneg (by norm_num)
+      have h_fl_lt : Nat.floor (Real.log (4096 : ℝ)) < 13 := (Nat.floor_lt h_nn).mpr h_lt13
+      omega
+    refine ⟨hT_4096, h_ceil_tau, ⟨32767, ?_⟩⟩
+    simp only [Finset.mem_filter, Finset.mem_Icc, hT_4096]
+    refine ⟨⟨?_, by decide⟩, h_ceil_tau⟩
+    have h_min_le : min (Nat.floor (Real.log (4096 : ℝ))) (32768 - 1) ≤ 12 :=
+      le_trans (min_le_left _ _) h_fl_log
+    omega
+  · refine ⟨?_, ?_⟩
+    · intro Y hY2 T
+      have hle : Y ≤ RiemannScope.tau * Y := by nlinarith
+      have hpos : ∀ X ∈ Set.uIcc Y (RiemannScope.tau * Y), 0 < X := by
+        intro X hX; rw [Set.uIcc_of_le hle, Set.mem_Icc] at hX; linarith
+      have h_log_ne : ∀ X ∈ Set.uIcc Y (RiemannScope.tau * Y), Real.log X ≠ 0 := by
+        intro X hX
+        rw [Set.uIcc_of_le hle, Set.mem_Icc] at hX
+        exact ne_of_gt (Real.log_pos (by linarith))
+      have h_log_sq_ne : ∀ X ∈ Set.uIcc Y (RiemannScope.tau * Y), (Real.log X) ^ 2 ≠ 0 :=
+        fun X hX => pow_ne_zero 2 (h_log_ne X hX)
+      have h_log_cont : ContinuousOn Real.log (Set.uIcc Y (RiemannScope.tau * Y)) :=
+        ContinuousOn.log continuousOn_id (fun X hX => ne_of_gt (hpos X hX))
+      have h_Q_scaled_cont : ∀ (L : ℕ) (m : ℝ),
+          ContinuousOn (fun X => finiteQLambda L (X / m)) (Set.uIcc Y (RiemannScope.tau * Y)) := by
+        intro L m
+        have h_fn : (fun X => finiteQLambda L (X / m)) =
+            fun X => ∑ q ∈ Finset.Icc 1 L, (liouvilleLambda q : ℝ) * gaussianTermPhi q (X / m) := by
+          ext X; dsimp [finiteQLambda, gaussianTermPhi]
+          rw [Finset.mul_sum]; apply Finset.sum_congr rfl; intro q _; ring
+        rw [h_fn]
+        refine continuousOn_finset_sum _ (fun q _ => continuousOn_const.mul ?_)
+        unfold gaussianTermPhi
+        have hr : ContinuousOn (fun X : ℝ => (X / m) ^ (5 / 2 : ℝ))
+            (Set.uIcc Y (RiemannScope.tau * Y)) := by
+          apply ContinuousOn.rpow_const (continuousOn_id.div_const m)
+          intro _ _; right; norm_num
+        have he : Continuous (fun X : ℝ =>
+            (((q : ℝ) ^ 3)⁻¹ * Real.exp (-((X / m) ^ 2) / (q : ℝ) ^ 2))) := by continuity
+        exact hr.mul he.continuousOn
+      have h_pp_cont : ∀ pk : ℕ × ℕ,
+          ContinuousOn (liouvillePrimePowerTerm T pk) (Set.uIcc Y (RiemannScope.tau * Y)) := by
+        intro pk
+        unfold liouvillePrimePowerTerm
+        exact continuousOn_const.mul (h_Q_scaled_cont _ _)
+      have h_diag_cont :
+          ContinuousOn (fun X => pointwisePrimePowerDiagNorm T X / X)
+            (Set.uIcc Y (RiemannScope.tau * Y)) := by
+        unfold pointwisePrimePowerDiagNorm
+        refine ((continuousOn_finset_sum _ (fun pk _ => continuousOn_const.mul
+          ((h_Q_scaled_cont _ _).pow 2))).div
+          (h_log_cont.pow 2) h_log_sq_ne).div continuousOn_id (fun X hX => ne_of_gt (hpos X hX))
+      have h_off_cont :
+          ContinuousOn (fun X => pointwisePrimePowerOffDiagNorm T X / X)
+            (Set.uIcc Y (RiemannScope.tau * Y)) := by
+        unfold pointwisePrimePowerOffDiagNorm
+        refine ((continuousOn_finset_sum _ (fun pk1 _ => continuousOn_finset_sum _
+          (fun pk2 _ => (h_pp_cont pk1).mul (h_pp_cont pk2)))).div
+          (h_log_cont.pow 2) h_log_sq_ne).div continuousOn_id (fun X hX => ne_of_gt (hpos X hX))
+      unfold windowEnergyNormSq windowPairing
+      rw [← intervalIntegral.integral_add h_diag_cont.intervalIntegrable
+        h_off_cont.intervalIntegrable]
+      apply intervalIntegral.integral_congr
+      intro X _
+      have h_split :
+          (∑ pk ∈ primePowerPairsUpTo T, liouvillePrimePowerTerm T pk X) ^ 2 =
+            (∑ pk ∈ primePowerPairsUpTo T,
+              ((Real.log (pk.1 : ℝ)) ^ 2 / ((pk.1 ^ pk.2 : ℕ) : ℝ)) *
+                (finiteQLambda (T / pk.1 ^ pk.2) (X / ((pk.1 ^ pk.2 : ℕ) : ℝ))) ^ 2) +
+              ∑ pk1 ∈ primePowerPairsUpTo T,
+                ∑ pk2 ∈ (primePowerPairsUpTo T).erase pk1,
+                  liouvillePrimePowerTerm T pk1 X * liouvillePrimePowerTerm T pk2 X := by
+        rw [sq, Finset.sum_mul_sum]
+        have hs :
+            (∑ pk1 ∈ primePowerPairsUpTo T, ∑ pk2 ∈ primePowerPairsUpTo T,
+                liouvillePrimePowerTerm T pk1 X * liouvillePrimePowerTerm T pk2 X) =
+              (∑ pk ∈ primePowerPairsUpTo T,
+                liouvillePrimePowerTerm T pk X * liouvillePrimePowerTerm T pk X) +
+                ∑ pk1 ∈ primePowerPairsUpTo T,
+                  ∑ pk2 ∈ (primePowerPairsUpTo T).erase pk1,
+                    liouvillePrimePowerTerm T pk1 X * liouvillePrimePowerTerm T pk2 X := by
+          rw [← Finset.sum_add_distrib]
+          apply Finset.sum_congr rfl
+          intro pk1 hpk1
+          exact (Finset.add_sum_erase (primePowerPairsUpTo T)
+            (fun pk2 => liouvillePrimePowerTerm T pk1 X * liouvillePrimePowerTerm T pk2 X)
+            hpk1).symm
+        rw [hs]
+        congr 1
+        apply Finset.sum_congr rfl
+        rintro ⟨p, k⟩ _
+        have h_sign_sq : ((-1 : ℝ) ^ k) * ((-1 : ℝ) ^ k) = 1 := by
+          rw [← pow_add, show k + k = 2 * k by omega, pow_mul]; norm_num
+        have h_sq_sqrt : (Real.sqrt ((p ^ k : ℕ) : ℝ)) ^ 2 = ((p ^ k : ℕ) : ℝ) :=
+          Real.sq_sqrt (Nat.cast_nonneg _)
+        dsimp [liouvillePrimePowerTerm]
+        calc
+          ((-1 : ℝ) ^ k * Real.log (p : ℝ) * (1 / Real.sqrt ((p ^ k : ℕ) : ℝ)) *
+              finiteQLambda (T / p ^ k) (X / ((p ^ k : ℕ) : ℝ))) *
+            ((-1 : ℝ) ^ k * Real.log (p : ℝ) * (1 / Real.sqrt ((p ^ k : ℕ) : ℝ)) *
+              finiteQLambda (T / p ^ k) (X / ((p ^ k : ℕ) : ℝ)))
+            = (((-1 : ℝ) ^ k) * ((-1 : ℝ) ^ k)) *
+                ((Real.log (p : ℝ)) ^ 2 / (Real.sqrt ((p ^ k : ℕ) : ℝ)) ^ 2) *
+                (finiteQLambda (T / p ^ k) (X / ((p ^ k : ℕ) : ℝ))) ^ 2 := by ring
+          _ = ((Real.log (p : ℝ)) ^ 2 / ((p ^ k : ℕ) : ℝ)) *
+                (finiteQLambda (T / p ^ k) (X / ((p ^ k : ℕ) : ℝ))) ^ 2 := by
+                rw [h_sign_sq, one_mul, h_sq_sqrt]
+      unfold normalizedPrimePowerTermP pointwisePrimePowerDiagNorm pointwisePrimePowerOffDiagNorm
+      have h_num :
+          ((∑ pk ∈ primePowerPairsUpTo T, liouvillePrimePowerTerm T pk X) / Real.log X) *
+            ((∑ pk ∈ primePowerPairsUpTo T, liouvillePrimePowerTerm T pk X) / Real.log X) =
+            (∑ pk ∈ primePowerPairsUpTo T, liouvillePrimePowerTerm T pk X) ^ 2 /
+              (Real.log X) ^ 2 := by ring
+      dsimp only
+      rw [h_num, h_split, add_div, add_div]
+    · intro Y hY2 T hT D0 c_lam c_half D_tilde X_tilde h_sum
+      obtain ⟨_, h_energy, _⟩ := complete_reconstruction_drift_contraction_transfer_tc060
+      have hE := h_energy hY2 hT D0 c_lam c_half
+      rw [h_sum] at hE
+      linarith
+
+private theorem singleton_block_a1_refutation_tc060r_aux :
+    (∀ {T : ℕ}, 2 ≤ T → cutoffLevelBlock T T = {1}) ∧
+      ((∀ c_lam : ℝ, selbergCenteredRemainderInt c_lam 1 = -c_lam) ∧
+        adjacentDilationMultiplier 1 0 = ((1 - 1 / Real.sqrt 2 : ℝ) : ℂ) ∧
+        0 < 1 - 1 / Real.sqrt 2) ∧
+      (∀ {T : ℕ}, 2 ≤ T → ∀ {c_lam : ℝ}, c_lam ≠ 0 →
+        0 < ‖blockSignedMultiplier c_lam T T 0‖ ∧
+          ‖blockSignedMultiplier c_lam T T 0‖ =
+            ∑ d ∈ cutoffLevelBlock T T,
+              |selbergCenteredRemainderInt c_lam d| * ‖adjacentDilationMultiplier d 0‖) ∧
+      (∀ {c_lam : ℝ}, c_lam ≠ 0 → ∀ {C δ : ℝ}, 0 ≤ C → 0 < δ → ∀ T0 : ℕ,
+        ∃ T : ℕ,
+          max 2 T0 ≤ T ∧
+            T ∈ Finset.Icc 1 T ∧
+            C * (Real.log (T : ℝ)) ^ (-(1 + δ)) *
+                (∑ d ∈ cutoffLevelBlock T T,
+                  |selbergCenteredRemainderInt c_lam d| * ‖adjacentDilationMultiplier d 0‖) <
+              ‖blockSignedMultiplier c_lam T T 0‖) ∧
+      (∀ {c_lam : ℝ}, c_lam ≠ 0 → ∀ {C δ Y0 : ℝ}, 0 ≤ C → 0 < δ → 2 ≤ Y0 →
+        ∃ Y : ℝ,
+          Y0 ≤ Y ∧
+            2 ≤ canonicalCutoffT Y ∧
+            canonicalCutoffT Y ∈ Finset.Icc 1 (canonicalCutoffT Y) ∧
+            C * (Real.log (canonicalCutoffT Y : ℝ)) ^ (-(1 + δ)) *
+                (∑ d ∈ cutoffLevelBlock (canonicalCutoffT Y) (canonicalCutoffT Y),
+                  |selbergCenteredRemainderInt c_lam d| * ‖adjacentDilationMultiplier d 0‖) <
+              ‖blockSignedMultiplier c_lam (canonicalCutoffT Y) (canonicalCutoffT Y) 0‖) := by
+  have h_block_T : ∀ {T : ℕ}, 2 ≤ T → cutoffLevelBlock T T = {1} := by
+    intro T hT2
+    ext d
+    simp only [cutoffLevelBlock, Finset.mem_filter, Finset.mem_Icc, Finset.mem_singleton]
+    constructor
+    · rintro ⟨⟨hd1, _⟩, hdiv⟩
+      by_contra hd_ne1
+      have hd2 : 2 ≤ d := by omega
+      have h1 : 2 * (T / d) ≤ d * (T / d) := Nat.mul_le_mul_right (T / d) hd2
+      have h2 : d * (T / d) ≤ T := Nat.mul_div_le T d
+      omega
+    · rintro rfl
+      exact ⟨⟨le_refl 1, by omega⟩, Nat.div_one T⟩
+  have hR1 : ∀ c_lam : ℝ, selbergCenteredRemainderInt c_lam 1 = -c_lam :=
+    fun c_lam => (noncircular_reassembly_and_basis_stratification_tc060 c_lam).1.2.1
+  have hm1_0 : adjacentDilationMultiplier 1 0 = ((1 - 1 / Real.sqrt 2 : ℝ) : ℂ) := by
+    unfold adjacentDilationMultiplier
+    simp
+  have hm1_pos : 0 < 1 - 1 / Real.sqrt 2 := by
+    have hsq2 : 1 < Real.sqrt 2 := by
+      have h := Real.sqrt_lt_sqrt (by norm_num : (0 : ℝ) ≤ 1) (by norm_num : (1 : ℝ) < 2)
+      rwa [Real.sqrt_one] at h
+    have hdiv_lt : 1 / Real.sqrt 2 < 1 := (div_lt_one (by linarith)).mpr hsq2
+    linarith
+  have h_norm_T :
+      ∀ {T : ℕ}, 2 ≤ T → ∀ {c_lam : ℝ}, c_lam ≠ 0 →
+        0 < ‖blockSignedMultiplier c_lam T T 0‖ ∧
+          ‖blockSignedMultiplier c_lam T T 0‖ =
+            ∑ d ∈ cutoffLevelBlock T T,
+              |selbergCenteredRemainderInt c_lam d| * ‖adjacentDilationMultiplier d 0‖ := by
+    intro T hT2 c_lam hc_ne
+    have hb := h_block_T hT2
+    unfold blockSignedMultiplier
+    rw [hb, Finset.sum_singleton, Finset.sum_singleton, norm_mul, Complex.norm_real,
+      Real.norm_eq_abs]
+    refine ⟨?_, rfl⟩
+    rw [hR1 c_lam, abs_neg, hm1_0, Complex.norm_real,
+      Real.norm_of_nonneg (le_of_lt hm1_pos)]
+    exact mul_pos (abs_pos.mpr hc_ne) hm1_pos
+  have h_decay_lt_one :
+      ∀ {C δ : ℝ}, 0 ≤ C → 0 < δ → ∀ {T : ℕ},
+        Real.exp ((C + 1) ^ (1 / (1 + δ)) + 1) ≤ (T : ℝ) →
+          2 ≤ T ∧ C * (Real.log (T : ℝ)) ^ (-(1 + δ)) < 1 := by
+    intro C δ hC hδ T hT_exp
+    let B := (C + 1) ^ (1 / (1 + δ))
+    have h1d_pos : 0 < 1 + δ := by linarith
+    have hB_ge1 : 1 ≤ B := Real.one_le_rpow (by linarith) (by positivity)
+    have hexp_ge3 : (3 : ℝ) ≤ Real.exp (B + 1) := by
+      linarith [Real.add_one_le_exp (B + 1)]
+    have hT2 : 2 ≤ T := by
+      exact_mod_cast (by linarith [le_trans hexp_ge3 hT_exp] : (2 : ℝ) ≤ (T : ℝ))
+    have hlogT_ge : B + 1 ≤ Real.log (T : ℝ) := by
+      have h := Real.log_le_log (Real.exp_pos _) hT_exp
+      rwa [Real.log_exp] at h
+    have hB_lt_log : B < Real.log (T : ℝ) := by linarith
+    have hlog_pos : 0 < Real.log (T : ℝ) := by linarith
+    have h_pow_lt : C + 1 < (Real.log (T : ℝ)) ^ (1 + δ) := by
+      have h1 : B ^ (1 + δ) < (Real.log (T : ℝ)) ^ (1 + δ) :=
+        Real.rpow_lt_rpow (by linarith) hB_lt_log h1d_pos
+      have h2 : B ^ (1 + δ) = C + 1 := by
+        dsimp [B]
+        rw [← Real.rpow_mul (by linarith), one_div_mul_cancel (ne_of_gt h1d_pos),
+          Real.rpow_one]
+      linarith
+    have h_pow_pos : 0 < (Real.log (T : ℝ)) ^ (1 + δ) :=
+      Real.rpow_pos_of_pos hlog_pos (1 + δ)
+    refine ⟨hT2, ?_⟩
+    rw [Real.rpow_neg (le_of_lt hlog_pos)]
+    have h_mul := mul_lt_mul_of_pos_right (by linarith : C < (Real.log (T : ℝ)) ^ (1 + δ))
+      (inv_pos.mpr h_pow_pos)
+    rwa [mul_inv_cancel (ne_of_gt h_pow_pos)] at h_mul
+  refine ⟨h_block_T, ⟨hR1, hm1_0, hm1_pos⟩, h_norm_T, ?_, ?_⟩
+  · intro c_lam hc_ne C δ hC hδ T0
+    let X0 := max ((max 2 T0 : ℕ) : ℝ) (Real.exp ((C + 1) ^ (1 / (1 + δ)) + 1))
+    let T := Nat.ceil X0
+    have h_ge_nat : max 2 T0 ≤ T := by
+      exact_mod_cast le_trans (le_max_left _ _) (Nat.le_ceil X0)
+    have h_exp_le : Real.exp ((C + 1) ^ (1 / (1 + δ)) + 1) ≤ (T : ℝ) :=
+      le_trans (le_max_right _ _) (Nat.le_ceil X0)
+    obtain ⟨hT2, h_lt1⟩ := h_decay_lt_one hC hδ h_exp_le
+    obtain ⟨h_pos_M, h_eq_M⟩ := h_norm_T hT2 hc_ne
+    refine ⟨T, h_ge_nat, Finset.mem_Icc.mpr ⟨by omega, le_refl T⟩, ?_⟩
+    rw [← h_eq_M]
+    have hm := mul_lt_mul_of_pos_right h_lt1 h_pos_M
+    rwa [one_mul] at hm
+  · intro c_lam hc_ne C δ Y0 hC hδ hY0
+    let Y := max Y0 (Real.exp ((C + 1) ^ (1 / (1 + δ)) + 1))
+    have hY0_le : Y0 ≤ Y := le_max_left _ _
+    have hY_ge1 : 1 ≤ Y := by linarith
+    have hY_le_T : Y ≤ (canonicalCutoffT Y : ℝ) := by
+      unfold canonicalCutoffT
+      have h_pow_ge : Y ≤ Y ^ (5 / 4 : ℝ) := by
+        conv_lhs => rw [← Real.rpow_one Y]
+        exact Real.rpow_le_rpow_of_exponent_le hY_ge1 (by norm_num)
+      exact le_trans h_pow_ge (Nat.le_ceil _)
+    have h_exp_le : Real.exp ((C + 1) ^ (1 / (1 + δ)) + 1) ≤ (canonicalCutoffT Y : ℝ) :=
+      le_trans (le_max_right _ _) hY_le_T
+    obtain ⟨hT2, h_lt1⟩ := h_decay_lt_one hC hδ h_exp_le
+    obtain ⟨h_pos_M, h_eq_M⟩ := h_norm_T hT2 hc_ne
+    refine ⟨Y, hY0_le, hT2, Finset.mem_Icc.mpr ⟨by omega, le_refl _⟩, ?_⟩
+    rw [← h_eq_M]
+    have hm := mul_lt_mul_of_pos_right h_lt1 h_pos_M
+    rwa [one_mul] at hm
+
+private theorem phi2_growth_b1_refutation_tc060r_aux :
+    (∀ X : ℝ, 0 < X →
+      gaussianTermPhi 2 X = (Real.exp (3 * X ^ 2 / 4) / 8) * gaussianTermPhi 1 X) ∧
+    (∀ {Y b : ℝ}, 2 ≤ Y → 1 < b →
+      0 < Real.exp (3 * Y ^ 2 / 4) / 8 - 1 ∧
+        (∀ X ∈ Set.Icc Y (b * Y),
+          (Real.exp (3 * Y ^ 2 / 4) / 8 - 1) * gaussianTermPhi 1 X ≤
+            gaussianTermPhi 2 X - gaussianTermPhi 1 X) ∧
+        0 < paramWindowNormSq Y b (gaussianTermPhi 1) ∧
+        (Real.exp (3 * Y ^ 2 / 4) / 8 - 1) ^ 2 * paramWindowNormSq Y b (gaussianTermPhi 1) ≤
+          paramWindowNormSq Y b (fun X => gaussianTermPhi 1 X - gaussianTermPhi 2 X)) ∧
+    (∀ C : ℝ, 0 ≤ C →
+      ∃ Y : ℝ,
+        2 ≤ Y ∧
+          1 < canonicalCutoffT Y ∧
+          0 <
+            Real.sqrt
+              (windowEnergyNormSq Y
+                (fun X =>
+                  ∑ q ∈ Finset.Icc 1 (canonicalCutoffT Y),
+                    unitFirstSupportCoeff q * gaussianTermPhi (1 * q) X)) ∧
+          C *
+              Real.sqrt
+                (windowEnergyNormSq Y
+                  (fun X =>
+                    ∑ q ∈ Finset.Icc 1 (canonicalCutoffT Y),
+                      unitFirstSupportCoeff q * gaussianTermPhi (1 * q) X)) <
+            (1 : ℝ) *
+              Real.sqrt
+                (windowEnergyNormSq Y
+                  (fun X =>
+                    ∑ q ∈ Finset.Icc 1 (canonicalCutoffT Y),
+                      unitFirstSupportCoeff q *
+                        (gaussianTermPhi (1 * q) X - gaussianTermPhi (2 * q) X)))) := by
+  have htau_gt1 : (1 : ℝ) < RiemannScope.tau := tau_gt_one_tc060_aux
+  have he_ge_52 : (5 / 2 : ℝ) ≤ Real.exp 1 := by
+    linarith [one_add_add_sq_div_two_le_exp_tc060r_aux (zero_le_one : (0 : ℝ) ≤ 1)]
+  have h_phi2_eq :
+      ∀ X : ℝ, 0 < X →
+        gaussianTermPhi 2 X = (Real.exp (3 * X ^ 2 / 4) / 8) * gaussianTermPhi 1 X := by
+    intro X _
+    unfold gaussianTermPhi
+    have h_exp_sum :
+        Real.exp (3 * X ^ 2 / 4) * Real.exp (-(X ^ 2) / ((1 : ℕ) : ℝ) ^ 2) =
+          Real.exp (-(X ^ 2) / ((2 : ℕ) : ℝ) ^ 2) := by
+      rw [← Real.exp_add]
+      congr 1
+      push_cast
+      ring
+    have h_rearranged :
+        (Real.exp (3 * X ^ 2 / 4) / 8) *
+            (X ^ (5 / 2 : ℝ) *
+              ((((1 : ℕ) : ℝ) ^ 3)⁻¹ * Real.exp (-(X ^ 2) / ((1 : ℕ) : ℝ) ^ 2))) =
+          X ^ (5 / 2 : ℝ) *
+            ((((2 : ℕ) : ℝ) ^ 3)⁻¹ *
+              (Real.exp (3 * X ^ 2 / 4) * Real.exp (-(X ^ 2) / ((1 : ℕ) : ℝ) ^ 2))) := by
+      push_cast; ring
+    rw [h_rearranged, h_exp_sum]
+  have h_param_bds :
+      ∀ {Y b : ℝ}, 2 ≤ Y → 1 < b →
+        0 < Real.exp (3 * Y ^ 2 / 4) / 8 - 1 ∧
+          (∀ X ∈ Set.Icc Y (b * Y),
+            (Real.exp (3 * Y ^ 2 / 4) / 8 - 1) * gaussianTermPhi 1 X ≤
+              gaussianTermPhi 2 X - gaussianTermPhi 1 X) ∧
+          0 < paramWindowNormSq Y b (gaussianTermPhi 1) ∧
+          (Real.exp (3 * Y ^ 2 / 4) / 8 - 1) ^ 2 * paramWindowNormSq Y b (gaussianTermPhi 1) ≤
+            paramWindowNormSq Y b (fun X => gaussianTermPhi 1 X - gaussianTermPhi 2 X) := by
+    intro Y b hY2 hb
+    have hY_pos : 0 < Y := by linarith
+    have hY_lt_bY : Y < b * Y := by
+      have h1 : 1 * Y < b * Y := mul_lt_mul_of_pos_right hb hY_pos
+      linarith
+    have hle : Y ≤ b * Y := le_of_lt hY_lt_bY
+    have he3_ge : (125 / 8 : ℝ) ≤ Real.exp 3 := by
+      have h1 : (5 / 2 : ℝ) ^ 3 ≤ (Real.exp 1) ^ 3 :=
+        pow_le_pow_left (by norm_num) he_ge_52 3
+      have h2 : (Real.exp 1) ^ 3 = Real.exp 3 := by
+        rw [← Real.exp_nat_mul]; norm_num
+      rw [h2] at h1
+      linarith [show ((5 / 2 : ℝ) ^ 3) = 125 / 8 by norm_num]
+    have hY_sq_ge4 : 4 ≤ Y ^ 2 := by
+      have h := pow_le_pow_left (by norm_num : (0 : ℝ) ≤ 2) hY2 2
+      linarith
+    have h3Y_ge3 : 3 ≤ 3 * Y ^ 2 / 4 := by linarith
+    have hexpY_ge : Real.exp 3 ≤ Real.exp (3 * Y ^ 2 / 4) := Real.exp_le_exp.mpr h3Y_ge3
+    have h_kappa_pos : 0 < Real.exp (3 * Y ^ 2 / 4) / 8 - 1 := by linarith
+    have h_pt_diff :
+        ∀ X ∈ Set.Icc Y (b * Y),
+          (Real.exp (3 * Y ^ 2 / 4) / 8 - 1) * gaussianTermPhi 1 X ≤
+            gaussianTermPhi 2 X - gaussianTermPhi 1 X := by
+      intro X hX
+      rw [Set.mem_Icc] at hX
+      have hX_pos : 0 < X := lt_of_lt_of_le hY_pos hX.1
+      have h_phi1_nn : 0 ≤ gaussianTermPhi 1 X := by
+        unfold gaussianTermPhi; positivity
+      have h_exp_mono :
+          Real.exp (3 * Y ^ 2 / 4) / 8 - 1 ≤ Real.exp (3 * X ^ 2 / 4) / 8 - 1 := by
+        have hsq : Y ^ 2 ≤ X ^ 2 := pow_le_pow_left (le_of_lt hY_pos) hX.1 2
+        have hexp_le : Real.exp (3 * Y ^ 2 / 4) ≤ Real.exp (3 * X ^ 2 / 4) :=
+          Real.exp_le_exp.mpr (by linarith)
+        linarith
+      rw [h_phi2_eq X hX_pos]
+      calc
+        (Real.exp (3 * Y ^ 2 / 4) / 8 - 1) * gaussianTermPhi 1 X
+          ≤ (Real.exp (3 * X ^ 2 / 4) / 8 - 1) * gaussianTermPhi 1 X :=
+            mul_le_mul_of_nonneg_right h_exp_mono h_phi1_nn
+        _ = (Real.exp (3 * X ^ 2 / 4) / 8) * gaussianTermPhi 1 X - gaussianTermPhi 1 X := by
+            ring
+    have h_phi_cont : ∀ m : ℕ, ContinuousOn (gaussianTermPhi m) (Set.uIcc Y (b * Y)) :=
+      continuousOn_gaussianTermPhi_param_tc060_aux hY_pos hb
+    have h_int_phi1 :
+        IntervalIntegrable (fun X => gaussianTermPhi 1 X * gaussianTermPhi 1 X / X)
+          volume Y (b * Y) :=
+      intervalIntegrable_param_tc060_aux hY_pos hb (h_phi_cont 1) (h_phi_cont 1)
+    have h_diff_cont :
+        ContinuousOn (fun X => gaussianTermPhi 1 X - gaussianTermPhi 2 X) (Set.uIcc Y (b * Y)) :=
+      (h_phi_cont 1).sub (h_phi_cont 2)
+    have h_int_diff :
+        IntervalIntegrable
+          (fun X =>
+            (gaussianTermPhi 1 X - gaussianTermPhi 2 X) *
+              (gaussianTermPhi 1 X - gaussianTermPhi 2 X) / X)
+          volume Y (b * Y) :=
+      intervalIntegrable_param_tc060_aux hY_pos hb h_diff_cont h_diff_cont
+    have h_norm1_pos : 0 < paramWindowNormSq Y b (gaussianTermPhi 1) := by
+      let m_min := Y ^ (5 / 2 : ℝ) * Real.exp (-((b * Y) ^ 2))
+      let c_min := m_min ^ 2 / (b * Y)
+      have hm_pos : 0 < m_min := by dsimp [m_min]; positivity
+      have hc_pos : 0 < c_min := div_pos (sq_pos_of_pos hm_pos) (by linarith)
+      have h_c_le :
+          ∀ X ∈ Set.Icc Y (b * Y),
+            c_min ≤ gaussianTermPhi 1 X * gaussianTermPhi 1 X / X := by
+        intro X hX
+        rw [Set.mem_Icc] at hX
+        have hX_pos : 0 < X := lt_of_lt_of_le hY_pos hX.1
+        have hm_le_phi : m_min ≤ gaussianTermPhi 1 X := by
+          unfold gaussianTermPhi
+          have hrp : Y ^ (5 / 2 : ℝ) ≤ X ^ (5 / 2 : ℝ) :=
+            Real.rpow_le_rpow (le_of_lt hY_pos) hX.1 (by norm_num)
+          have hexp_le : Real.exp (-((b * Y) ^ 2)) ≤ Real.exp (-(X ^ 2) / ((1 : ℕ) : ℝ) ^ 2) := by
+            apply Real.exp_le_exp.mpr
+            have h1_sq : ((1 : ℕ) : ℝ) ^ 2 = 1 := by norm_num
+            rw [h1_sq, div_one]
+            have hsq : X ^ 2 ≤ (b * Y) ^ 2 := pow_le_pow_left (le_of_lt hX_pos) hX.2 2
+            linarith
+          have h1_inv : (((1 : ℕ) : ℝ) ^ 3)⁻¹ = 1 := by norm_num
+          rw [h1_inv, one_mul]
+          exact mul_le_mul hrp hexp_le (le_of_lt (Real.exp_pos _)) (by positivity)
+        have h_sq_le : m_min ^ 2 ≤ gaussianTermPhi 1 X * gaussianTermPhi 1 X := by
+          rw [← sq]
+          exact pow_le_pow_left (le_of_lt hm_pos) hm_le_phi 2
+        have h_inv_X : 1 / (b * Y) ≤ 1 / X := one_div_le_one_div_of_le hX_pos hX.2
+        dsimp [c_min]
+        calc
+          m_min ^ 2 / (b * Y) = m_min ^ 2 * (1 / (b * Y)) := by ring
+          _ ≤ (gaussianTermPhi 1 X * gaussianTermPhi 1 X) * (1 / X) :=
+              mul_le_mul h_sq_le h_inv_X (by positivity)
+                (mul_self_nonneg (gaussianTermPhi 1 X))
+          _ = gaussianTermPhi 1 X * gaussianTermPhi 1 X / X := by ring
+      have h_int_lb :=
+        intervalIntegral.integral_mono_on hle intervalIntegrable_const h_int_phi1 h_c_le
+      rw [intervalIntegral.integral_const, smul_eq_mul] at h_int_lb
+      have h_pos_lhs : 0 < (b * Y - Y) * c_min := mul_pos (by linarith) hc_pos
+      unfold paramWindowNormSq paramWindowPairing
+      linarith
+    refine ⟨h_kappa_pos, h_pt_diff, h_norm1_pos, ?_⟩
+    unfold paramWindowNormSq paramWindowPairing
+    rw [← intervalIntegral.integral_const_mul]
+    apply intervalIntegral.integral_mono_on hle
+      (h_int_phi1.const_mul ((Real.exp (3 * Y ^ 2 / 4) / 8 - 1) ^ 2)) h_int_diff
+    intro X hX
+    have hX_pos : 0 < X := lt_of_lt_of_le hY_pos (Set.mem_Icc.mp hX).1
+    have h_phi1_nn : 0 ≤ gaussianTermPhi 1 X := by unfold gaussianTermPhi; positivity
+    have h_pt := h_pt_diff X hX
+    have h_lhs_nn : 0 ≤ (Real.exp (3 * Y ^ 2 / 4) / 8 - 1) * gaussianTermPhi 1 X :=
+      mul_nonneg (le_of_lt h_kappa_pos) h_phi1_nn
+    have h_sq_pt :
+        ((Real.exp (3 * Y ^ 2 / 4) / 8 - 1) * gaussianTermPhi 1 X) ^ 2 ≤
+          (gaussianTermPhi 2 X - gaussianTermPhi 1 X) ^ 2 :=
+      pow_le_pow_left h_lhs_nn h_pt 2
+    calc
+      (Real.exp (3 * Y ^ 2 / 4) / 8 - 1) ^ 2 * (gaussianTermPhi 1 X * gaussianTermPhi 1 X / X)
+        = ((Real.exp (3 * Y ^ 2 / 4) / 8 - 1) * gaussianTermPhi 1 X) ^ 2 / X := by ring
+      _ ≤ (gaussianTermPhi 2 X - gaussianTermPhi 1 X) ^ 2 / X :=
+          div_le_div_of_nonneg_right h_sq_pt (le_of_lt hX_pos)
+      _ = (gaussianTermPhi 1 X - gaussianTermPhi 2 X) *
+            (gaussianTermPhi 1 X - gaussianTermPhi 2 X) / X := by ring
+  refine ⟨h_phi2_eq, h_param_bds, ?_⟩
+  intro C hC
+  let Y : ℝ := 4 * (C + 2)
+  have hY_ge8 : 8 ≤ Y := by dsimp [Y]; linarith
+  have hY2 : 2 ≤ Y := by linarith
+  have hT_gt1 : 1 < canonicalCutoffT Y := by
+    have hY_le_T : Y ≤ (canonicalCutoffT Y : ℝ) := by
+      unfold canonicalCutoffT
+      have h_pow_ge : Y ≤ Y ^ (5 / 4 : ℝ) := by
+        conv_lhs => rw [← Real.rpow_one Y]
+        exact Real.rpow_le_rpow_of_exponent_le (by linarith) (by norm_num)
+      exact le_trans h_pow_ge (Nat.le_ceil _)
+    exact_mod_cast (by linarith : (1 : ℝ) < (canonicalCutoffT Y : ℝ))
+  have h1_mem : 1 ∈ Finset.Icc 1 (canonicalCutoffT Y) :=
+    Finset.mem_Icc.mpr ⟨le_refl 1, by omega⟩
+  have h_sum1 :
+      (fun X =>
+        ∑ q ∈ Finset.Icc 1 (canonicalCutoffT Y),
+          unitFirstSupportCoeff q * gaussianTermPhi (1 * q) X) =
+        gaussianTermPhi 1 := by
+    ext X
+    rw [Finset.sum_eq_single 1]
+    · simp [unitFirstSupportCoeff]
+    · intro q _ hq_ne
+      simp [unitFirstSupportCoeff, hq_ne]
+    · intro h_not; exact False.elim (h_not h1_mem)
+  have h_sum2 :
+      (fun X =>
+        ∑ q ∈ Finset.Icc 1 (canonicalCutoffT Y),
+          unitFirstSupportCoeff q *
+            (gaussianTermPhi (1 * q) X - gaussianTermPhi (2 * q) X)) =
+        fun X => gaussianTermPhi 1 X - gaussianTermPhi 2 X := by
+    ext X
+    rw [Finset.sum_eq_single 1]
+    · simp [unitFirstSupportCoeff]
+    · intro q _ hq_ne
+      simp [unitFirstSupportCoeff, hq_ne]
+    · intro h_not; exact False.elim (h_not h1_mem)
+  obtain ⟨h_kappa_pos, _, h_n1_pos, h_sq_bd⟩ := h_param_bds hY2 htau_gt1
+  have h_param_eq :
+      ∀ g : ℝ → ℝ, paramWindowNormSq Y RiemannScope.tau g = windowEnergyNormSq Y g :=
+    fun _ => rfl
+  rw [h_param_eq] at h_n1_pos
+  rw [h_param_eq, h_param_eq] at h_sq_bd
+  have h_sqrt_n1_pos : 0 < Real.sqrt (windowEnergyNormSq Y (gaussianTermPhi 1)) :=
+    Real.sqrt_pos.mpr h_n1_pos
+  have h_sqrt_bd :
+      (Real.exp (3 * Y ^ 2 / 4) / 8 - 1) *
+          Real.sqrt (windowEnergyNormSq Y (gaussianTermPhi 1)) ≤
+        Real.sqrt
+          (windowEnergyNormSq Y (fun X => gaussianTermPhi 1 X - gaussianTermPhi 2 X)) := by
+    calc
+      (Real.exp (3 * Y ^ 2 / 4) / 8 - 1) *
+          Real.sqrt (windowEnergyNormSq Y (gaussianTermPhi 1))
+        = Real.sqrt ((Real.exp (3 * Y ^ 2 / 4) / 8 - 1) ^ 2) *
+            Real.sqrt (windowEnergyNormSq Y (gaussianTermPhi 1)) := by
+            rw [Real.sqrt_sq (le_of_lt h_kappa_pos)]
+      _ = Real.sqrt
+            ((Real.exp (3 * Y ^ 2 / 4) / 8 - 1) ^ 2 *
+              windowEnergyNormSq Y (gaussianTermPhi 1)) :=
+          (Real.sqrt_mul (sq_nonneg _) _).symm
+      _ ≤ Real.sqrt
+            (windowEnergyNormSq Y (fun X => gaussianTermPhi 1 X - gaussianTermPhi 2 X)) :=
+          Real.sqrt_le_sqrt h_sq_bd
+  have h_C_lt_kappa : C < Real.exp (3 * Y ^ 2 / 4) / 8 - 1 := by
+    have hY_sq : 8 * Y ≤ Y ^ 2 := by
+      have hm := mul_le_mul_of_nonneg_right hY_ge8 (by linarith : 0 ≤ Y)
+      rwa [← sq] at hm
+    have h_3Y4 : 24 * (C + 2) ≤ 3 * Y ^ 2 / 4 := by dsimp [Y] at hY_sq ⊢; linarith
+    have hexp_lin := Real.add_one_le_exp (3 * Y ^ 2 / 4)
+    linarith
+  refine ⟨Y, hY2, hT_gt1, ?_, ?_⟩
+  · rw [h_sum1]; exact h_sqrt_n1_pos
+  · rw [h_sum1, h_sum2, one_mul]
+    exact lt_of_lt_of_le (mul_lt_mul_of_pos_right h_C_lt_kappa h_sqrt_n1_pos) h_sqrt_bd
+
+private theorem selbergWeight2_prime_and_three_prime_vanishing_tc060r_aux :
+    (∀ (n : ℕ), 1 ≤ n → ∀ c_lam c_half : ℝ,
+      ((selbergCenteredRemainderInt c_lam n - squarePoleDriftM c_half n) -
+          (selbergCenteredRemainderInt c_lam (n - 1) - squarePoleDriftM c_half (n - 1))) =
+        selbergLiouvilleWeight2 n - c_lam -
+          (squarePoleDriftM c_half n - squarePoleDriftM c_half (n - 1))) ∧
+    (∀ {p : ℕ}, p.Prime → selbergLiouvilleWeight2 p = -(Real.log (p : ℝ)) ^ 2) ∧
+    (∀ {n q₁ q₂ q₃ : ℕ},
+      q₁.Prime → q₂.Prime → q₃.Prime →
+      q₁ ≠ q₂ → q₁ ≠ q₃ → q₂ ≠ q₃ →
+      q₁ ∣ n → q₂ ∣ n → q₃ ∣ n →
+      selbergLiouvilleWeight2 n = 0) ∧
+    (∀ {p : ℕ}, p.Prime → 5 ≤ p →
+      selbergLiouvilleWeight2 (6 * p) = 0 ∧
+        (∀ (c_lam : ℝ) {c_half : ℝ}, -2 ≤ c_half → c_half ≤ 0 →
+          |((selbergCenteredRemainderInt c_lam (6 * p) - squarePoleDriftM c_half (6 * p)) -
+              (selbergCenteredRemainderInt c_lam (6 * p - 1) -
+                squarePoleDriftM c_half (6 * p - 1))) - (-c_lam)| ≤
+            12 * Real.log ((6 * p + 1 : ℕ) : ℝ) / Real.sqrt ((6 * p : ℕ) : ℝ))) := by
+  obtain ⟨_, _, _, _, ⟨h_lv_mul, _, _, _⟩⟩ :=
+    liouville_square_divisor_indicator_and_compensated_selberg_tc058 0 0
+  have h_res_diff :
+      ∀ (n : ℕ), 1 ≤ n → ∀ c_lam c_half : ℝ,
+        ((selbergCenteredRemainderInt c_lam n - squarePoleDriftM c_half n) -
+            (selbergCenteredRemainderInt c_lam (n - 1) - squarePoleDriftM c_half (n - 1))) =
+          selbergLiouvilleWeight2 n - c_lam -
+            (squarePoleDriftM c_half n - squarePoleDriftM c_half (n - 1)) := by
+    intro n hn c_lam c_half
+    have hR_inc := (selbergCenteredRemainderInt_props_tc060_aux c_lam).2.2 n hn
+    linarith
+  have h_w2_prime :
+      ∀ {p : ℕ}, p.Prime → selbergLiouvilleWeight2 p = -(Real.log (p : ℝ)) ^ 2 := by
+    intro p hp
+    have h_lv1 : liouvilleVonMangoldt 1 = 0 := by
+      rw [h_lv_mul 1, ArithmeticFunction.vonMangoldt_apply_one, mul_zero]
+    have h_lvp : liouvilleVonMangoldt p = -Real.log (p : ℝ) := by
+      have hop : natOmega p = 1 := ArithmeticFunction.cardFactors_eq_one_iff_prime.mpr hp
+      have h_lamp : (liouvilleLambda p : ℝ) = -1 := by
+        simp [liouvilleLambda, hp.ne_zero, hop, liouvilleSignFromOmega]
+      rw [h_lv_mul p, h_lamp, ArithmeticFunction.vonMangoldt_apply_prime hp]
+      ring
+    have h_conv0 : (liouvilleVonMangoldt * liouvilleVonMangoldt) p = 0 := by
+      rw [ArithmeticFunction.mul_apply]
+      apply Finset.sum_eq_zero
+      intro x hx
+      rw [Nat.mem_divisorsAntidiagonal] at hx
+      rcases hp.eq_one_or_self_of_dvd x.1 ⟨x.2, hx.1.symm⟩ with hx1 | hx1
+      · rw [hx1, h_lv1, zero_mul]
+      · have hp_mul : p * x.2 = p * 1 := by
+          calc
+            p * x.2 = x.1 * x.2 := by rw [hx1]
+            _ = p := hx.1
+            _ = p * 1 := (mul_one p).symm
+        have hx2 : x.2 = 1 := Nat.eq_of_mul_eq_mul_left hp.pos hp_mul
+        rw [hx2, h_lv1, mul_zero]
+    unfold selbergLiouvilleWeight2
+    rw [h_lvp, h_conv0]
+    ring
+  have h_w2_three :
+      ∀ {n q₁ q₂ q₃ : ℕ},
+        q₁.Prime → q₂.Prime → q₃.Prime →
+        q₁ ≠ q₂ → q₁ ≠ q₃ → q₂ ≠ q₃ →
+        q₁ ∣ n → q₂ ∣ n → q₃ ∣ n →
+        selbergLiouvilleWeight2 n = 0 := by
+    intro n q₁ q₂ q₃ hq₁ hq₂ hq₃ h12 h13 h23 hd₁ hd₂ hd₃
+    have h_lvn : liouvilleVonMangoldt n = 0 :=
+      liouvilleVonMangoldt_eq_zero_of_two_primes_tc060r_aux hq₁ hq₂ h12 hd₁ hd₂
+    have h_conv_n : (liouvilleVonMangoldt * liouvilleVonMangoldt) n = 0 := by
+      rw [ArithmeticFunction.mul_apply]
+      apply Finset.sum_eq_zero
+      intro x hx
+      rw [Nat.mem_divisorsAntidiagonal] at hx
+      have hm1 : q₁ ∣ x.1 ∨ q₁ ∣ x.2 := hq₁.dvd_mul.mp (hx.1.symm ▸ hd₁)
+      have hm2 : q₂ ∣ x.1 ∨ q₂ ∣ x.2 := hq₂.dvd_mul.mp (hx.1.symm ▸ hd₂)
+      have hm3 : q₃ ∣ x.1 ∨ q₃ ∣ x.2 := hq₃.dvd_mul.mp (hx.1.symm ▸ hd₃)
+      by_cases hc1 : q₁ ∣ x.1 <;> by_cases hc2 : q₂ ∣ x.1
+      · rw [liouvilleVonMangoldt_eq_zero_of_two_primes_tc060r_aux hq₁ hq₂ h12 hc1 hc2, zero_mul]
+      · by_cases hc3 : q₃ ∣ x.1
+        · rw [liouvilleVonMangoldt_eq_zero_of_two_primes_tc060r_aux hq₁ hq₃ h13 hc1 hc3,
+            zero_mul]
+        · rw [liouvilleVonMangoldt_eq_zero_of_two_primes_tc060r_aux hq₂ hq₃ h23
+            (hm2.resolve_left hc2) (hm3.resolve_left hc3), mul_zero]
+      · by_cases hc3 : q₃ ∣ x.1
+        · rw [liouvilleVonMangoldt_eq_zero_of_two_primes_tc060r_aux hq₂ hq₃ h23 hc2 hc3,
+            zero_mul]
+        · rw [liouvilleVonMangoldt_eq_zero_of_two_primes_tc060r_aux hq₁ hq₃ h13
+            (hm1.resolve_left hc1) (hm3.resolve_left hc3), mul_zero]
+      · rw [liouvilleVonMangoldt_eq_zero_of_two_primes_tc060r_aux hq₁ hq₂ h12
+          (hm1.resolve_left hc1) (hm2.resolve_left hc2), mul_zero]
+    unfold selbergLiouvilleWeight2
+    rw [h_lvn, h_conv_n, zero_mul, add_zero]
+  refine ⟨h_res_diff, h_w2_prime, h_w2_three, ?_⟩
+  intro p hp hp5
+  have h_6p_zero : selbergLiouvilleWeight2 (6 * p) = 0 :=
+    h_w2_three Nat.prime_two Nat.prime_three hp
+      (by decide) (by omega) (by omega)
+      ⟨3 * p, by ring⟩ ⟨2 * p, by ring⟩ ⟨6, by ring⟩
+  refine ⟨h_6p_zero, ?_⟩
+  intro c_lam c_half hc_lo hc_hi
+  obtain ⟨_, _, h_M_props, _⟩ := second_order_drift_abel_and_small_divisor_contraction_tc060
+  have hM_diff := (h_M_props hc_lo hc_hi).2.2.1 (6 * p) (by omega)
+  have h_id := h_res_diff (6 * p) (by omega : 1 ≤ 6 * p) c_lam c_half
+  have h_eq :
+      ((selbergCenteredRemainderInt c_lam (6 * p) - squarePoleDriftM c_half (6 * p)) -
+          (selbergCenteredRemainderInt c_lam (6 * p - 1) - squarePoleDriftM c_half (6 * p - 1))) -
+        (-c_lam) =
+        -(squarePoleDriftM c_half (6 * p) - squarePoleDriftM c_half (6 * p - 1)) := by
+    rw [h_id, h_6p_zero]
+    ring
+  rw [h_eq, abs_neg]
+  exact hM_diff
+
+private theorem drift_jump_reindexing_and_sinh_step_tc060r_aux :
+    (∀ {T : ℕ}, 2 ≤ T → ∀ (M : ℕ → ℝ) {X : ℝ}, 0 ≤ X →
+      (∑ d ∈ Finset.Icc 1 (T - 1), M d * scaledFiberCutoffJump T d X) =
+          ∑ q ∈ Finset.Icc 2 T,
+            M (T / q) * (liouvilleLambda q : ℝ) * gaussianTermPhi ((T / q + 1) * q) X ∧
+        (∀ q ∈ Finset.Icc 2 T, 1 ≤ T / q ∧ T / q ≤ T - 1 ∧ T < (T / q + 1) * q)) ∧
+    (Nat.floor (Real.log (2 : ℝ)) = 0 ∧
+      (∀ T : ℕ, Finset.Icc 1 (min (Nat.floor (Real.log (2 : ℝ))) (T - 1)) = ∅)) ∧
+    (∀ d : ℕ, 1 ≤ d →
+      let u := (1 / 2 : ℝ) * Real.log (((d + 1 : ℕ) : ℝ) / (d : ℝ))
+      (1 / Real.sqrt ((d : ℝ) * ((d + 1 : ℕ) : ℝ))) * u ^ 2 ≤
+        (1 / Real.sqrt (d : ℝ) - 1 / Real.sqrt ((d + 1 : ℕ) : ℝ)) ^ 2) := by
+  have he_ge_52 : (5 / 2 : ℝ) ≤ Real.exp 1 := by
+    linarith [one_add_add_sq_div_two_le_exp_tc060r_aux (zero_le_one : (0 : ℝ) ≤ 1)]
+  refine ⟨?_, ?_, ?_⟩
+  · intro T hT2 M X hX
+    have h_q_props :
+        ∀ q ∈ Finset.Icc 2 T, 1 ≤ T / q ∧ T / q ≤ T - 1 ∧ T < (T / q + 1) * q := by
+      intro q hq
+      rw [Finset.mem_Icc] at hq
+      have hq_pos : 0 < q := by omega
+      have h1 : 1 ≤ T / q := Nat.div_pos hq.2 hq_pos
+      have h2 : T / q ≤ T - 1 := by
+        have hm1 : 2 * (T / q) ≤ q * (T / q) := Nat.mul_le_mul_right (T / q) hq.1
+        have hm2 : q * (T / q) ≤ T := Nat.mul_div_le T q
+        omega
+      have h3 : T < (T / q + 1) * q := by
+        have h_div_mod := Nat.div_add_mod T q
+        have h_mod_lt : T % q < q := Nat.mod_lt T hq_pos
+        have h_exp : (T / q + 1) * q = q * (T / q) + q := by ring
+        omega
+      exact ⟨h1, h2, h3⟩
+    refine ⟨?_, h_q_props⟩
+    have h_jump_step :
+        ∀ d ∈ Finset.Icc 1 (T - 1),
+          M d * scaledFiberCutoffJump T d X =
+            ∑ q ∈ Finset.Icc (T / (d + 1) + 1) (T / d),
+              M d * (liouvilleLambda q : ℝ) * gaussianTermPhi ((d + 1) * q) X := by
+      intro d hd
+      rw [Finset.mem_Icc] at hd
+      have hd1_pos : 0 < d + 1 := by omega
+      let L1 : ℕ := T / (d + 1)
+      let L0 : ℕ := T / d
+      have h1_L1 : 1 ≤ L1 := Nat.div_pos (by omega) hd1_pos
+      have h_le_div : L1 ≤ L0 := Nat.div_le_div_left (by omega) (by omega)
+      have h_icc_u :
+          Finset.Icc 1 L0 = Finset.Icc 1 L1 ∪ Finset.Icc (L1 + 1) L0 := by
+        ext q; simp only [Finset.mem_Icc, Finset.mem_union]; omega
+      have h_icc_d :
+          Disjoint (Finset.Icc 1 L1) (Finset.Icc (L1 + 1) L0) := by
+        rw [Finset.disjoint_left]; intro q h1 h2; simp only [Finset.mem_Icc] at h1 h2; omega
+      have hQ_eq : ∀ L : ℕ,
+          finiteQLambda L (X / ((d + 1 : ℕ) : ℝ)) =
+            ∑ q ∈ Finset.Icc 1 L,
+              (liouvilleLambda q : ℝ) * gaussianTermPhi q (X / ((d + 1 : ℕ) : ℝ)) := by
+        intro L; dsimp [finiteQLambda, gaussianTermPhi]
+        rw [Finset.mul_sum]; apply Finset.sum_congr rfl; intro q _; ring
+      unfold scaledFiberCutoffJump
+      rw [hQ_eq L0, hQ_eq L1, h_icc_u, Finset.sum_union h_icc_d,
+        add_sub_cancel_left, Finset.mul_sum, Finset.mul_sum]
+      apply Finset.sum_congr rfl
+      intro q _
+      rw [gaussianTermPhi_mul_scale_tc060_aux hd1_pos q hX]
+      ring
+    have h_sigma :
+        (∑ d ∈ Finset.Icc 1 (T - 1), M d * scaledFiberCutoffJump T d X) =
+          ∑ dq ∈ (Finset.Icc 1 (T - 1)).sigma (fun d => Finset.Icc (T / (d + 1) + 1) (T / d)),
+            M dq.1 * (liouvilleLambda dq.2 : ℝ) * gaussianTermPhi ((dq.1 + 1) * dq.2) X := by
+      rw [Finset.sum_sigma]
+      exact Finset.sum_congr rfl h_jump_step
+    have h_d_eq :
+        ∀ {d q : ℕ}, 1 ≤ d → d ≤ T - 1 → T / (d + 1) + 1 ≤ q → q ≤ T / d → d = T / q := by
+      intro d q hd1 hdT1 hq_lo hq_hi
+      have hd_pos : 0 < d := by omega
+      have hd1_pos : 0 < d + 1 := by omega
+      have h1_le_div : 1 ≤ T / (d + 1) := Nat.div_pos (by omega) hd1_pos
+      have hq_pos : 0 < q := by omega
+      have hdq_le : d * q ≤ T := by
+        rw [mul_comm]
+        exact (Nat.le_div_iff_mul_le hd_pos).mp hq_hi
+      have hd_le_Tq : d ≤ T / q :=
+        (Nat.le_div_iff_mul_le hq_pos).mpr hdq_le
+      have hT_lt_d1q : T < (d + 1) * q := by
+        by_contra h_not
+        push_neg at h_not
+        have hq_le : q ≤ T / (d + 1) :=
+          (Nat.le_div_iff_mul_le hd1_pos).mpr (by rw [mul_comm]; exact h_not)
+        omega
+      have hTq_lt_d1 : T / q < d + 1 := by
+        by_contra h_ge
+        push_neg at h_ge
+        have h1 : (d + 1) * q ≤ (T / q) * q := Nat.mul_le_mul_right q h_ge
+        have h2 : (T / q) * q ≤ T := by rw [mul_comm]; exact Nat.mul_div_le T q
+        omega
+      omega
+    rw [h_sigma]
+    apply Finset.sum_bij (fun dq _ => dq.2)
+    · rintro ⟨d, q⟩ hdq
+      simp only [Finset.mem_sigma, Finset.mem_Icc] at hdq ⊢
+      rcases hdq with ⟨⟨hd1, hdT1⟩, ⟨hq_lo, hq_hi⟩⟩
+      have h1_le_div : 1 ≤ T / (d + 1) := Nat.div_pos (by omega) (by omega)
+      have h_le_T : T / d ≤ T := Nat.div_le_self T d
+      omega
+    · rintro ⟨d1, q1⟩ h1 ⟨d2, q2⟩ h2 h_eq
+      dsimp only at h_eq
+      subst h_eq
+      simp only [Finset.mem_sigma, Finset.mem_Icc] at h1 h2
+      have hd1_eq := h_d_eq h1.1.1 h1.1.2 h1.2.1 h1.2.2
+      have hd2_eq := h_d_eq h2.1.1 h2.1.2 h2.2.1 h2.2.2
+      have hd_eq : d1 = d2 := hd1_eq.trans hd2_eq.symm
+      subst hd_eq; rfl
+    · intro q hq
+      obtain ⟨hd1, hdT1, hT_lt⟩ := h_q_props q hq
+      let d := T / q
+      have hd_pos : 0 < d := by omega
+      have hd1_pos : 0 < d + 1 := by omega
+      have hq_le_Td : q ≤ T / d := by
+        apply (Nat.le_div_iff_mul_le hd_pos).mpr
+        dsimp [d]
+        exact Nat.mul_div_le T q
+      have hq_ge_Td1 : T / (d + 1) + 1 ≤ q := by
+        by_contra h_lt
+        have hq_le : q ≤ T / (d + 1) := by omega
+        have hm : q * (d + 1) ≤ T := (Nat.le_div_iff_mul_le hd1_pos).mp hq_le
+        have hm' : (d + 1) * q ≤ T := by rwa [mul_comm]
+        dsimp [d] at hm'
+        omega
+      exact ⟨⟨d, q⟩, Finset.mem_sigma.mpr ⟨Finset.mem_Icc.mpr ⟨hd1, hdT1⟩,
+        Finset.mem_Icc.mpr ⟨hq_ge_Td1, hq_le_Td⟩⟩, rfl⟩
+    · rintro ⟨d, q⟩ hdq
+      simp only [Finset.mem_sigma, Finset.mem_Icc] at hdq
+      have hd_eq := h_d_eq hdq.1.1 hdq.1.2 hdq.2.1 hdq.2.2
+      dsimp only
+      rw [hd_eq]
+  · have h_two_lt_e : (2 : ℝ) < Real.exp 1 := by linarith
+    have h_log2_lt1 : Real.log (2 : ℝ) < 1 := by
+      have h := Real.log_lt_log (by norm_num) h_two_lt_e
+      rwa [Real.log_exp] at h
+    have h_fl0 : Nat.floor (Real.log (2 : ℝ)) = 0 :=
+      Nat.floor_eq_zero.mpr h_log2_lt1
+    refine ⟨h_fl0, ?_⟩
+    intro T
+    rw [h_fl0]
+    simp
+  · intro d hd
+    dsimp only
+    let u := (1 / 2 : ℝ) * Real.log (((d + 1 : ℕ) : ℝ) / (d : ℝ))
+    let a := 1 / Real.sqrt (d : ℝ)
+    let b := 1 / Real.sqrt ((d + 1 : ℕ) : ℝ)
+    have hd_pos : (0 : ℝ) < (d : ℝ) := Nat.cast_pos.mpr hd
+    have hd1_pos : (0 : ℝ) < ((d + 1 : ℕ) : ℝ) := by positivity
+    have hd_le_d1 : (d : ℝ) ≤ ((d + 1 : ℕ) : ℝ) := by exact_mod_cast (Nat.le_succ d)
+    have ha_pos : 0 < a := by dsimp [a]; positivity
+    have hb_pos : 0 < b := by dsimp [b]; positivity
+    have hu_nn : 0 ≤ u := by
+      dsimp [u]
+      exact mul_nonneg (by norm_num) (Real.log_nonneg ((one_le_div hd_pos).mpr hd_le_d1))
+    have h_exp_u : Real.exp u = a / b := by
+      have h_2u : 2 * u = Real.log (((d + 1 : ℕ) : ℝ) / (d : ℝ)) := by dsimp [u]; ring
+      have h_ab_pos : 0 < a / b := div_pos ha_pos hb_pos
+      have h_sq_eq : (Real.exp u) ^ 2 = (a / b) ^ 2 := by
+        rw [sq, ← Real.exp_add, show u + u = 2 * u by ring, h_2u,
+          Real.exp_log (div_pos hd1_pos hd_pos)]
+        dsimp [a, b]
+        have hab_simp :
+            (1 / Real.sqrt (d : ℝ)) / (1 / Real.sqrt ((d + 1 : ℕ) : ℝ)) =
+              Real.sqrt ((d + 1 : ℕ) : ℝ) / Real.sqrt (d : ℝ) := by
+          field_simp [ne_of_gt (Real.sqrt_pos.mpr hd_pos),
+            ne_of_gt (Real.sqrt_pos.mpr hd1_pos)]
+        rw [hab_simp, div_pow, Real.sq_sqrt (le_of_lt hd1_pos),
+          Real.sq_sqrt (le_of_lt hd_pos)]
+      rw [← Real.sqrt_sq (le_of_lt (Real.exp_pos u)),
+        ← Real.sqrt_sq (le_of_lt h_ab_pos), h_sq_eq]
+    have h_exp_neg_u : Real.exp (-u) = b / a := by
+      rw [Real.exp_neg, h_exp_u, inv_div]
+    have h_ab_cosh : a * b * (Real.exp u + Real.exp (-u) - 2) = (a - b) ^ 2 := by
+      rw [h_exp_u, h_exp_neg_u]
+      field_simp [ne_of_gt ha_pos, ne_of_gt hb_pos]
+      ring
+    have h_ab_eq : 1 / Real.sqrt ((d : ℝ) * ((d + 1 : ℕ) : ℝ)) = a * b := by
+      dsimp [a, b]
+      rw [Real.sqrt_mul (le_of_lt hd_pos)]
+      ring
+    rw [h_ab_eq, ← h_ab_cosh]
+    exact mul_le_mul_of_nonneg_left (sq_le_cosh_two_sub_two_tc060_aux hu_nn)
+      (mul_nonneg (le_of_lt ha_pos) (le_of_lt hb_pos))
+
+/-- **Theorem 7 (`TASK-TC-060R`, Full Open-Core Quantified Obstructions, `w_{2,λ}` Support Vanishing, and Repaired Jump/Multiplier Identities)**:
+    1. *Full open-core range split, nonempty tail witness at `Y = 4096`, and signed `8 * X_tilde + 4 * ‖D2_core‖_Y^2` window closure instantiation (`TASK-TC-060R` Item 1)*:
+       - `Finset.Icc (min D0 (T - 1) + 1) (T - 1)` partitions disjointly into `d < C_tail` and `C_tail ≤ d`, splitting `openCoreOscShiftD2Part c_lam c_half T D0 X`;
+       - At `Y = 4096`: `canonicalCutoffT 4096 = 32768`, `Nat.ceil (RiemannScope.tau * 4096) ≤ 32767`, and the `C_tail = ⌈RiemannScope.tau * 4096⌉` tail slice is nonempty;
+       - For `2 ≤ Y`, `windowEnergyNormSq Y (normalizedPrimePowerTermP T)` splits into the diagonal and signed off-diagonal window integrals on `[Y, RiemannScope.tau * Y]`, instantiating the `(8, 4, 8, 4)` window energy bound;
+    2. *Singleton-block `cutoffLevelBlock T T = {1}` obstruction refuting all-block uniform Candidate A1 (`TASK-TC-060R` Item 2)*:
+       - For `2 ≤ T`, `cutoffLevelBlock T T = {1}`, `selbergCenteredRemainderInt c_lam 1 = -c_lam`, and `adjacentDilationMultiplier 1 0 = 1 - 1 / √2 > 0`;
+       - For `c_lam ≠ 0`, `‖blockSignedMultiplier c_lam T T 0‖ > 0` attains the trivial triangle sum and refutes `C * (log T)^(-(1 + δ))` decay both in `T` and along `T = canonicalCutoffT Y`;
+    3. *Quantified arbitrary-coefficient counterexample (`d = 1, a = unitFirstSupportCoeff, Y ≥ 2`) refuting Candidate B1 (`TASK-TC-060R` Item 3)*:
+       - `gaussianTermPhi 2 X = (exp (3 * X^2 / 4) / 8) * gaussianTermPhi 1 X` (`X > 0`), giving `(exp (3 * Y^2 / 4) / 8 - 1)^2 * ‖φ_1‖_{Y,b}^2 ≤ ‖φ_1 - φ_2‖_{Y,b}^2` on `[Y, b * Y]` (`Y ≥ 2, b > 1`) and refuting every fixed constant `C ≥ 0` on `[Y, RiemannScope.tau * Y]`;
+    4. *Exact `selbergLiouvilleWeight2` prime formula, three-distinct-prime vanishing, and `6 * p` residual-increment specialization (`TASK-TC-060R` Item 4)*:
+       - Exact residual difference `(R_2^{int}(n) - M_sq(n)) - (R_2^{int}(n - 1) - M_sq(n - 1)) = w_{2,λ}(n) - c_lam - (M_sq(n) - M_sq(n - 1))` (`n ≥ 1`), `w_{2,λ}(p) = -(log p)^2` for prime `p`, `w_{2,λ}(n) = 0` whenever three distinct primes divide `n`, and specialization at `n = 6 * p` (`p ≥ 5` prime);
+    5. *Exact `d = ⌊T / q⌋` drift-jump reindexing, `Nat.floor (Real.log 2) = 0`, and repaired `sinh` multiplier lower bound (`TASK-TC-060R` Items 5, 6, 7)*. -/
+theorem full_core_quantified_obstructions_and_w2_support_tc060r :
+    ((∀ T D0 C_tail : ℕ,
+        Disjoint
+            ((Finset.Icc (min D0 (T - 1) + 1) (T - 1)).filter (fun d => d < C_tail))
+            ((Finset.Icc (min D0 (T - 1) + 1) (T - 1)).filter (fun d => C_tail ≤ d)) ∧
+          Finset.Icc (min D0 (T - 1) + 1) (T - 1) =
+            (Finset.Icc (min D0 (T - 1) + 1) (T - 1)).filter (fun d => d < C_tail) ∪
+              (Finset.Icc (min D0 (T - 1) + 1) (T - 1)).filter (fun d => C_tail ≤ d) ∧
+          (∀ c_lam c_half X : ℝ,
+            openCoreOscShiftD2Part c_lam c_half T D0 X =
+              (((∑ d ∈ (Finset.Icc (min D0 (T - 1) + 1) (T - 1)).filter (fun d => d < C_tail),
+                  (selbergCenteredRemainderInt c_lam d - squarePoleDriftM c_half d) *
+                    scaledFiberSmoothStep T d X) +
+                (∑ d ∈ (Finset.Icc (min D0 (T - 1) + 1) (T - 1)).filter (fun d => C_tail ≤ d),
+                  (selbergCenteredRemainderInt c_lam d - squarePoleDriftM c_half d) *
+                    scaledFiberSmoothStep T d X)) -
+                finiteQShifted (fun n => (liouvilleLambda n : ℝ)) 2 T X) / (Real.log X) ^ 2)) ∧
+      (canonicalCutoffT (4096 : ℝ) = 32768 ∧
+        Nat.ceil (RiemannScope.tau * (4096 : ℝ)) ≤ 32767 ∧
+        ((Finset.Icc
+            (min (Nat.floor (Real.log (4096 : ℝ))) (canonicalCutoffT (4096 : ℝ) - 1) + 1)
+            (canonicalCutoffT (4096 : ℝ) - 1)).filter
+          (fun d => Nat.ceil (RiemannScope.tau * (4096 : ℝ)) ≤ d)).Nonempty) ∧
+      ((∀ {Y : ℝ}, 2 ≤ Y → ∀ T : ℕ,
+          windowEnergyNormSq Y (normalizedPrimePowerTermP T) =
+            (∫ X in Y..(RiemannScope.tau * Y), pointwisePrimePowerDiagNorm T X / X) +
+              (∫ X in Y..(RiemannScope.tau * Y), pointwisePrimePowerOffDiagNorm T X / X)) ∧
+        (∀ {Y : ℝ}, 2 ≤ Y → ∀ {T : ℕ}, 1 ≤ T →
+          ∀ (D0 : ℕ) (c_lam c_half D_tilde X_tilde : ℝ),
+            windowEnergyNormSq Y (normalizedPrimePowerTermP T) = D_tilde + X_tilde →
+            actualWindowEnergyE (fun n => (liouvilleLambda n : ℝ)) T Y ≤
+              8 * D_tilde +
+                4 * windowEnergyNormSq Y (knownCompensatedD2Part c_lam c_half T D0) +
+                (8 * X_tilde +
+                  4 * windowEnergyNormSq Y (openCoreOscShiftD2Part c_lam c_half T D0))))) ∧
+    ((∀ {T : ℕ}, 2 ≤ T → cutoffLevelBlock T T = {1}) ∧
+      ((∀ c_lam : ℝ, selbergCenteredRemainderInt c_lam 1 = -c_lam) ∧
+        adjacentDilationMultiplier 1 0 = ((1 - 1 / Real.sqrt 2 : ℝ) : ℂ) ∧
+        0 < 1 - 1 / Real.sqrt 2) ∧
+      (∀ {T : ℕ}, 2 ≤ T → ∀ {c_lam : ℝ}, c_lam ≠ 0 →
+        0 < ‖blockSignedMultiplier c_lam T T 0‖ ∧
+          ‖blockSignedMultiplier c_lam T T 0‖ =
+            ∑ d ∈ cutoffLevelBlock T T,
+              |selbergCenteredRemainderInt c_lam d| * ‖adjacentDilationMultiplier d 0‖) ∧
+      (∀ {c_lam : ℝ}, c_lam ≠ 0 → ∀ {C δ : ℝ}, 0 ≤ C → 0 < δ → ∀ T0 : ℕ,
+        ∃ T : ℕ,
+          max 2 T0 ≤ T ∧
+            T ∈ Finset.Icc 1 T ∧
+            C * (Real.log (T : ℝ)) ^ (-(1 + δ)) *
+                (∑ d ∈ cutoffLevelBlock T T,
+                  |selbergCenteredRemainderInt c_lam d| * ‖adjacentDilationMultiplier d 0‖) <
+              ‖blockSignedMultiplier c_lam T T 0‖) ∧
+      (∀ {c_lam : ℝ}, c_lam ≠ 0 → ∀ {C δ Y0 : ℝ}, 0 ≤ C → 0 < δ → 2 ≤ Y0 →
+        ∃ Y : ℝ,
+          Y0 ≤ Y ∧
+            2 ≤ canonicalCutoffT Y ∧
+            canonicalCutoffT Y ∈ Finset.Icc 1 (canonicalCutoffT Y) ∧
+            C * (Real.log (canonicalCutoffT Y : ℝ)) ^ (-(1 + δ)) *
+                (∑ d ∈ cutoffLevelBlock (canonicalCutoffT Y) (canonicalCutoffT Y),
+                  |selbergCenteredRemainderInt c_lam d| * ‖adjacentDilationMultiplier d 0‖) <
+              ‖blockSignedMultiplier c_lam (canonicalCutoffT Y) (canonicalCutoffT Y) 0‖)) ∧
+    ((∀ X : ℝ, 0 < X →
+        gaussianTermPhi 2 X = (Real.exp (3 * X ^ 2 / 4) / 8) * gaussianTermPhi 1 X) ∧
+      (∀ {Y b : ℝ}, 2 ≤ Y → 1 < b →
+        0 < Real.exp (3 * Y ^ 2 / 4) / 8 - 1 ∧
+          (∀ X ∈ Set.Icc Y (b * Y),
+            (Real.exp (3 * Y ^ 2 / 4) / 8 - 1) * gaussianTermPhi 1 X ≤
+              gaussianTermPhi 2 X - gaussianTermPhi 1 X) ∧
+          0 < paramWindowNormSq Y b (gaussianTermPhi 1) ∧
+          (Real.exp (3 * Y ^ 2 / 4) / 8 - 1) ^ 2 * paramWindowNormSq Y b (gaussianTermPhi 1) ≤
+            paramWindowNormSq Y b (fun X => gaussianTermPhi 1 X - gaussianTermPhi 2 X)) ∧
+      (∀ C : ℝ, 0 ≤ C →
+        ∃ Y : ℝ,
+          2 ≤ Y ∧
+            1 < canonicalCutoffT Y ∧
+            0 <
+              Real.sqrt
+                (windowEnergyNormSq Y
+                  (fun X =>
+                    ∑ q ∈ Finset.Icc 1 (canonicalCutoffT Y),
+                      unitFirstSupportCoeff q * gaussianTermPhi (1 * q) X)) ∧
+            C *
+                Real.sqrt
+                  (windowEnergyNormSq Y
+                    (fun X =>
+                      ∑ q ∈ Finset.Icc 1 (canonicalCutoffT Y),
+                        unitFirstSupportCoeff q * gaussianTermPhi (1 * q) X)) <
+              (1 : ℝ) *
+                Real.sqrt
+                  (windowEnergyNormSq Y
+                    (fun X =>
+                      ∑ q ∈ Finset.Icc 1 (canonicalCutoffT Y),
+                        unitFirstSupportCoeff q *
+                          (gaussianTermPhi (1 * q) X - gaussianTermPhi (2 * q) X))))) ∧
+    ((∀ (n : ℕ), 1 ≤ n → ∀ c_lam c_half : ℝ,
+        ((selbergCenteredRemainderInt c_lam n - squarePoleDriftM c_half n) -
+            (selbergCenteredRemainderInt c_lam (n - 1) - squarePoleDriftM c_half (n - 1))) =
+          selbergLiouvilleWeight2 n - c_lam -
+            (squarePoleDriftM c_half n - squarePoleDriftM c_half (n - 1))) ∧
+      (∀ {p : ℕ}, p.Prime → selbergLiouvilleWeight2 p = -(Real.log (p : ℝ)) ^ 2) ∧
+      (∀ {n q₁ q₂ q₃ : ℕ},
+        q₁.Prime → q₂.Prime → q₃.Prime →
+        q₁ ≠ q₂ → q₁ ≠ q₃ → q₂ ≠ q₃ →
+        q₁ ∣ n → q₂ ∣ n → q₃ ∣ n →
+        selbergLiouvilleWeight2 n = 0) ∧
+      (∀ {p : ℕ}, p.Prime → 5 ≤ p →
+        selbergLiouvilleWeight2 (6 * p) = 0 ∧
+          (∀ (c_lam : ℝ) {c_half : ℝ}, -2 ≤ c_half → c_half ≤ 0 →
+            |((selbergCenteredRemainderInt c_lam (6 * p) - squarePoleDriftM c_half (6 * p)) -
+                (selbergCenteredRemainderInt c_lam (6 * p - 1) -
+                  squarePoleDriftM c_half (6 * p - 1))) - (-c_lam)| ≤
+              12 * Real.log ((6 * p + 1 : ℕ) : ℝ) / Real.sqrt ((6 * p : ℕ) : ℝ)))) ∧
+    ((∀ {T : ℕ}, 2 ≤ T → ∀ (M : ℕ → ℝ) {X : ℝ}, 0 ≤ X →
+        (∑ d ∈ Finset.Icc 1 (T - 1), M d * scaledFiberCutoffJump T d X) =
+            ∑ q ∈ Finset.Icc 2 T,
+              M (T / q) * (liouvilleLambda q : ℝ) * gaussianTermPhi ((T / q + 1) * q) X ∧
+          (∀ q ∈ Finset.Icc 2 T, 1 ≤ T / q ∧ T / q ≤ T - 1 ∧ T < (T / q + 1) * q)) ∧
+      (Nat.floor (Real.log (2 : ℝ)) = 0 ∧
+        (∀ T : ℕ, Finset.Icc 1 (min (Nat.floor (Real.log (2 : ℝ))) (T - 1)) = ∅)) ∧
+      (∀ d : ℕ, 1 ≤ d →
+        let u := (1 / 2 : ℝ) * Real.log (((d + 1 : ℕ) : ℝ) / (d : ℝ))
+        (1 / Real.sqrt ((d : ℝ) * ((d + 1 : ℕ) : ℝ))) * u ^ 2 ≤
+          (1 / Real.sqrt (d : ℝ) - 1 / Real.sqrt ((d + 1 : ℕ) : ℝ)) ^ 2)) :=
+  ⟨open_core_range_and_witness_tc060r_aux,
+    singleton_block_a1_refutation_tc060r_aux,
+    phi2_growth_b1_refutation_tc060r_aux,
+    selbergWeight2_prime_and_three_prime_vanishing_tc060r_aux,
+    drift_jump_reindexing_and_sinh_step_tc060r_aux⟩
 
 end SignedDilationArithmeticEnergy
 end RiemannScope

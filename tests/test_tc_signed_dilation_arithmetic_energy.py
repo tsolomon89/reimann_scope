@@ -1,5 +1,6 @@
 """Focused mathematical, falsification, formalization, and 256-bit Arb certification test suite
-for TASK-TC-060: Signed Dilation Multipliers and Arithmetic Control of the Complete Reconstruction.
+for TASK-TC-060 / TASK-TC-060R: Signed Dilation Multipliers, Full-Core Scope, Quantified
+Counterexamples, and Arithmetic Control of the Complete Reconstruction.
 """
 
 from __future__ import annotations
@@ -32,17 +33,30 @@ from tc.prime_chain_contraction import evaluate_phi_n_arb
 import tc.signed_dilation_arithmetic_energy as tc060_mod
 from tc.signed_dilation_arithmetic_energy import (
     ACCEPTED_TC059R2_BRANCH,
+    AmbiguousCutoffError,
     EXPECTED_TC060_THEOREMS,
     GLOBAL_CONSEQUENCE_CLASSES,
     INHERITED_FORMAL_PRODUCING_COMMIT,
     PROPOSED_TC060_BRANCH,
+    REPAIR_TC060R_BRANCH,
     REVIEWED_TC059R2_HEAD,
     REVIEWED_TC059R2_IMPLEMENTATION,
+    REVIEWED_TC060_HEAD,
+    REVIEWED_TC060_IMPLEMENTATION,
     SIGNED_DILATION_ARITHMETIC_ENERGY_ARTIFACT_PATH,
     TASK_TC_060_ID,
+    TASK_TC_060R_ID,
     TC_060_LEAN_MODULE_PATH,
     TC_060_REVIEW_DOC_PATH,
+    certify_D0_small_divisor_cutoff,
+    certify_T_canonical_cutoff,
+    certify_ceil_from_arb_enclosure,
+    certify_ceil_tau_Y_cutoff,
+    certify_floor_from_arb_enclosure,
+    certify_open_core_divisor_partition,
     classify_arb_le_certificate,
+    classify_ceil_from_arb_enclosure,
+    classify_floor_from_arb_enclosure,
     classify_interval_endpoints_le,
     compute_selberg_centered_remainder_table_arb,
     compute_smooth_basis_coefficients_arb,
@@ -73,14 +87,18 @@ def test_artifact_metadata_provenance_and_epistemic_hygiene(tc060_artifact: dict
     """Verify baseline provenance SHAs, gate status, tau-only convention, global consequence
     classes, and 256-bit Arb serialization self-check.
     """
-    assert tc060_artifact["task_id"] == TASK_TC_060_ID
+    assert tc060_artifact["task_id"] == TASK_TC_060R_ID
+    assert tc060_artifact["repaired_task_id"] == TASK_TC_060_ID
     assert tc060_artifact["parent_subgate"] == PARENT_SUBGATE_ID
     assert tc060_artifact["reviewed_merged_main_baseline"] == REVIEWED_MERGED_MAIN_BASELINE
     assert tc060_artifact["accepted_tc059r2_branch"] == ACCEPTED_TC059R2_BRANCH
     assert tc060_artifact["reviewed_tc059r2_implementation_commit"] == REVIEWED_TC059R2_IMPLEMENTATION
     assert tc060_artifact["reviewed_tc059r2_head_commit"] == REVIEWED_TC059R2_HEAD
-    assert tc060_artifact["inherited_formal_producing_commit"] == INHERITED_FORMAL_PRODUCING_COMMIT
-    assert tc060_artifact["branch"] == PROPOSED_TC060_BRANCH
+    assert tc060_artifact["prior_tc059r_formal_producing_commit"] == INHERITED_FORMAL_PRODUCING_COMMIT
+    assert tc060_artifact["reviewed_tc060_branch"] == PROPOSED_TC060_BRANCH
+    assert tc060_artifact["reviewed_tc060_implementation_commit"] == REVIEWED_TC060_IMPLEMENTATION
+    assert tc060_artifact["reviewed_tc060_head_commit"] == REVIEWED_TC060_HEAD
+    assert tc060_artifact["branch"] == REPAIR_TC060R_BRANCH
     assert tc060_artifact["subgate_tc043a_status"] == "OPEN"
     assert tc060_artifact["rh_proved"] is False
     assert tc060_artifact["precision_bits"] == 256
@@ -91,7 +109,7 @@ def test_artifact_metadata_provenance_and_epistemic_hygiene(tc060_artifact: dict
 
     arb_self = tc060_artifact["serialized_arb_self_check"]
     assert arb_self["all_enclose_original_256bit_arb_ball"] is True
-    assert arb_self["total_certified_arb_balls_checked"] >= 330
+    assert arb_self["total_certified_arb_balls_checked"] == 398
 
     for chk_path in (
         TC_060_LEAN_MODULE_PATH,
@@ -361,18 +379,25 @@ def test_section_4_complete_energy_bridge_feedback_threshold_and_consequence_tie
         assert th_row["both_feedbacks_le_quarter_certified"] is True
         assert (
             th_row["B_drift_sample_role"]
-            == "ILLUSTRATIVE_SAMPLE_INSTANTIATION_OF_THEOREM_6_ABSTRACT_B_DRIFT"
+            == "ILLUSTRATIVE_SAMPLE_INSTANTIATION_OF_THEOREM_6_ABSTRACT_PARAMETER_NOT_FULL_KNOWN_BOUND"
         )
         assert float(th_row["B_pure_drift_analytic_upper"]["lower_dec"]) > float(
             th_row["B_drift_sample"]["upper_dec"]
         )
-    assert tc060_artifact["serialized_arb_self_check"]["total_certified_arb_balls_checked"] == 336
+        assert (
+            th_row["B_known_full_analytic_role"]
+            == "COMBINES_B_DRIFT_AND_B_SMALL_VIA_UNCONDITIONAL_PNT_SUPREMUM_C_OSC_DISTINCT_FROM_B_SAMPLE"
+        )
+    assert tc060_artifact["serialized_arb_self_check"]["total_certified_arb_balls_checked"] == 398
 
     tiers = {r["consequence_class"]: r for r in sec4["global_consequence_classification"]}
     assert set(tiers.keys()) == set(GLOBAL_CONSEQUENCE_CLASSES)
     assert tiers["RELATIVE_CONTRACTION"]["status"] == (
         "PROVED_UNCONDITIONALLY_ON_SQUARE_POLE_DRIFT_AND_SMALL_DIVISORS"
     )
+    assert "iff " not in tiers["FIXED_POWER_SAVING"]["scope"]
+    assert "No exact-boundary converse" in tiers["FIXED_POWER_SAVING"]["scope"]
+    assert "min(D_0(Y), T(Y)-1) < d <= T(Y)-1" in tiers["ALL_POSITIVE_EXPONENTS_CLOSURE"]["scope"]
     assert tiers["ALL_POSITIVE_EXPONENTS_CLOSURE"]["status"] == "OPEN"
 
 
@@ -449,11 +474,12 @@ def test_lean_module_wiring_axioms_and_review_doc_enclosures(
     assert lean_audit["custom_axiom_count"] == 0
     assert lean_audit["pi_token_count"] == 0
     assert lean_audit["expected_tc060_theorems"] == EXPECTED_TC060_THEOREMS
-    assert len(EXPECTED_TC060_THEOREMS) == 6
+    assert len(EXPECTED_TC060_THEOREMS) == 7
+    assert "full_core_quantified_obstructions_and_w2_support_tc060r" in EXPECTED_TC060_THEOREMS
     assert lean_audit["formal_build_report_provenance"]["status"] == "passed"
     assert (
         lean_audit["formal_build_report_provenance"]["project_theorem_declarations_compiled"]
-        >= 808
+        >= 815
     )
 
     assert TC_060_REVIEW_DOC_PATH.exists(), f"Missing {TC_060_REVIEW_DOC_PATH}"
@@ -462,7 +488,7 @@ def test_lean_module_wiring_axioms_and_review_doc_enclosures(
     assert rev_check["pi_glyph_count"] == 0
     assert rev_check["untagged_count"] == 0
     assert rev_check["failed_count"] == 0
-    assert rev_check["total_displayed_intervals_found"] >= 70
+    assert rev_check["total_displayed_intervals_found"] >= 75
     assert rev_check["all_displayed_intervals_contain_generated_enclosures"] is True
 
     # Adversarial tampering controls on review doc verifier:
@@ -504,3 +530,229 @@ def test_lean_module_wiring_axioms_and_review_doc_enclosures(
     res_corrupt = verify_tc060_review_displayed_enclosures(tc060_artifact, corrupt_md)
     assert res_corrupt["failed_count"] >= 1
     assert res_corrupt["all_displayed_intervals_contain_generated_enclosures"] is False
+
+
+def test_tc060r_full_open_core_scope_and_Y4096_nonempty_tail(tc060_artifact: dict) -> None:
+    """Verify Repair 1: full open core min(D_0(Y), T(Y)-1) < d <= T(Y)-1 retains both the
+    intermediate band and the sub-unit tail d >= ceil(tau*Y) (nonempty at Y = 4096 with 7032
+    divisors [25736, 32767]), and Lemma B2's absolute majorant divided by Y^eps (0 < eps < 1)
+    diverges as Y -> infinity.
+    """
+    sec4 = tc060_artifact["section_4_complete_energy_bridge_and_global_consequence"]
+    part_rows = {r["Y"]: r for r in sec4["full_open_core_partition_checks"]}
+    assert set(part_rows.keys()) == {2, 4, 16, 64, 4096}
+    r4096 = part_rows[4096]
+    assert r4096["T_Y"] == 32768
+    assert r4096["D_0_raw"] == 8
+    assert r4096["ceil_tau_Y"] == 25736
+    assert r4096["full_open_core_range_inclusive"] == [9, 32767]
+    assert r4096["full_open_core_count"] == 32759
+    assert r4096["intermediate_band_within_open_core_inclusive"] == [9, 25735]
+    assert r4096["intermediate_band_count"] == 25727
+    assert r4096["sub_unit_tail_ge_ceil_tau_Y_within_open_core_inclusive"] == [25736, 32767]
+    assert r4096["sub_unit_tail_count"] == 7032
+    assert r4096["sub_unit_tail_nonempty"] is True
+    assert r4096["both_intermediate_and_tail_retained_in_open_core"] is True
+
+    # Independent Arb check that Y*(log Y)^{-4}*exp(-2*c_W*sqrt(log Y)) / Y^eps grows at eps = 1/4:
+    saved = flint_ctx.prec
+    try:
+        flint_ctx.prec = 256
+        c_W = arb(1) / arb(10)
+        eps = arb(1) / arb(4)
+        vals = []
+        for k_exp in (10, 20, 40):
+            lg_y = arb(k_exp * k_exp)
+            y_val = lg_y.exp()
+            b2_over_y_eps = (
+                (y_val ** (arb(1) - eps))
+                * (lg_y ** (-4))
+                * (-arb(2) * c_W * lg_y.sqrt()).exp()
+            )
+            vals.append(b2_over_y_eps)
+        assert bool(vals[0].upper() < vals[1].lower() < vals[2].lower())
+    finally:
+        flint_ctx.prec = saved
+
+
+def test_tc060r_singleton_block_a1_obstruction_w2_support_and_b1_unbounded_family(
+    tc060_artifact: dict,
+) -> None:
+    """Verify Repairs 2, 3, and 4:
+    - Exact singleton block I_T(T) = {1} at v = 0 gives ratio = 1 for all T >= 2.
+    - Unconditional prime-power support: w_{2,lambda}(p) = -(log p)^2 and w_{2,lambda}(6p) = 0 (p >= 5).
+    - Arbitrary-coefficient family d = 1, a = e_1 gives ||phi_1 - phi_2||_Y / ||phi_1||_Y >= exp(3Y^2/4)/8 - 1 -> inf.
+    - Liouville finite witnesses are explicitly scoped to excluding C = 1 and C = 3.
+    """
+    sec3 = tc060_artifact["section_3_attempts_a_and_b_obstructions_and_drift_theorem"]
+    obs_a1 = sec3["candidate_a1_obstruction_and_square_pole_drift"]
+    sing = obs_a1["singleton_block_I_T_T_v0_obstruction"]
+    assert sing["verified"] is True
+    assert sing["all_I_T_T_equal_singleton_1"] is True
+    assert sing["exact_singleton_ratio_at_v_0"] == 1
+
+    w2_chk = obs_a1["unconditional_w2_prime_and_6p_support_checks"]
+    assert w2_chk["exact_increment_identity_verified_1_to_2000"] is True
+    assert w2_chk["prime_w2_equals_minus_log_p_sq_verified"] is True
+    assert w2_chk["six_p_three_distinct_primes_w2_zero_verified"] is True
+
+    b1 = sec3["attempt_b_product_compensation_and_candidate_b1_counterexamples"]
+    fam_rows = b1["unbounded_arbitrary_coefficient_family_d1_e1_rows"]
+    assert [r["Y"] for r in fam_rows] == [2, 3, 4, 8]
+    for r in fam_rows:
+        assert r["phi_1_window_norm_sq_positive"] is True
+        assert r["directed_lower_bound_certified"] is True
+        assert float(r["actual_scaled_ratio_norm_phi1_minus_phi2_over_norm_phi1"]["lower_dec"]) > float(
+            r["analytic_lower_bound_exp_3Y2_4_over_8_minus_1"]["upper_dec"]
+        )
+    assert (
+        b1["finite_diagnostics_role"]
+        == "FINITE_DIAGNOSTIC_NOT_UNIVERSAL_CONSTANT_REFUTATION"
+    )
+    assert (
+        b1["actual_liouville_witness_scope"]
+        == "EXCLUDES_TESTED_CONSTANTS_C_EQ_1_AT_Y4_D1_T6_AND_C_EQ_3_AT_Y16_D5_T32_ONLY"
+    )
+
+
+def test_tc060r_corrected_subunit_and_jump_log_Y_bounds(tc060_artifact: dict) -> None:
+    """Verify Repair 5: uniform O(log Y) sub-unit tail bound and exact d = floor(T/q) reindexed
+    drift-jump O(log Y) bound across Y in {2, 299/100, 4, 16, 64}.
+    """
+    sec3 = tc060_artifact["section_3_attempts_a_and_b_obstructions_and_drift_theorem"]
+    sj_rows = sec3["drift_subunit_and_jump_reindexing_checks"]
+    assert [r["Y_fraction"] for r in sj_rows] == ["2/1", "299/100", "4/1", "16/1", "64/1"]
+    for row in sj_rows:
+        assert row["subunit_bound_certified"] is True
+        assert row["drift_jump_bound_certified"] is True
+        assert row["verified"] is True
+        assert float(row["subunit_uniform_O_logY_rhs"]["lower_dec"]) > float(
+            row["subunit_weighted_sum_lhs"]["upper_dec"]
+        )
+        assert float(row["drift_jump_O_logY_upper_bound"]["lower_dec"]) > float(
+            row["drift_jump_window_norm"]["upper_dec"]
+        )
+
+
+def test_tc060r_certified_cutoff_protocol_D0_2_and_straddling_rejection(
+    tc060_artifact: dict,
+) -> None:
+    """Verify Repair 6: certified cutoff protocol, D_0(2) = 0 in both Section 3 and Section 4,
+    transitions across e, e^2, and 16, and explicit AmbiguousCutoffError on straddling enclosures.
+    """
+    sec3 = tc060_artifact["section_3_attempts_a_and_b_obstructions_and_drift_theorem"]
+    repl_rows = {r["Y"]: r for r in sec3["informed_replacement_drift_and_small_divisor_rows"]}
+    assert repl_rows[2]["D_0_Y"] == 0
+    assert repl_rows[2]["small_divisor_slice_empty"] is True
+    assert repl_rows[2]["r_sm_osc_small_d_le_D0_norm_sq"]["arb_ball_str"] == "0"
+
+    sec4 = tc060_artifact["section_4_complete_energy_bridge_and_global_consequence"]
+    comp_rows = {r["Y"]: r for r in sec4["complete_reconstruction_rows"]}
+    assert comp_rows[2]["D_0_Y"] == 0
+    assert comp_rows[2]["small_divisor_slice_empty"] is True
+    assert comp_rows[2]["full_open_core_divisor_range_inclusive"] == [1, 2]
+
+    sec5 = tc060_artifact["section_5_controls_schedule_and_directed_certificates"]
+    cut_chk = sec5["certified_cutoff_protocol_checks"]
+    assert cut_chk["verified"] is True
+    assert cut_chk["D_0_at_Y_2"] == 0
+    assert cut_chk["transition_around_e"] == {
+        "below_e_27182818_over_1e7": 0,
+        "symbolic_exact_e": 1,
+        "above_e_27182819_over_1e7": 1,
+    }
+    assert cut_chk["transition_around_e_sq"] == {
+        "below_e2_73890560_over_1e7": 1,
+        "symbolic_exact_e2": 2,
+        "above_e2_73890561_over_1e7": 2,
+    }
+    assert cut_chk["transition_around_Y_16_T"] == {
+        "below_16_16383_over_1024": 32,
+        "exact_16": 32,
+        "above_16_16385_over_1024": 33,
+    }
+
+    saved = flint_ctx.prec
+    try:
+        flint_ctx.prec = 256
+        assert certify_D0_small_divisor_cutoff(2) == 0
+        assert certify_D0_small_divisor_cutoff(Fraction(5, 2)) == 0
+        assert certify_D0_small_divisor_cutoff(None, exact_log_Y=1) == 1
+        assert certify_D0_small_divisor_cutoff(None, exact_log_Y=2) == 2
+        assert certify_D0_small_divisor_cutoff(None, exact_log_Y=Fraction(7, 10), require_Y_ge_2=True) == 0
+        assert certify_D0_small_divisor_cutoff(None, exact_log_Y=Fraction(1, 2), require_Y_ge_2=False) == 0
+        with pytest.raises(ValueError):
+            certify_D0_small_divisor_cutoff(None, exact_log_Y=Fraction(1, 2), require_Y_ge_2=True)
+        with pytest.raises(ValueError):
+            certify_D0_small_divisor_cutoff(None)
+        with pytest.raises(ValueError):
+            certify_D0_small_divisor_cutoff(3, exact_log_Y=1)
+        assert certify_T_canonical_cutoff(Fraction(16383, 1024)) == 32
+        assert certify_T_canonical_cutoff(16) == 32
+        assert certify_T_canonical_cutoff(Fraction(16385, 1024)) == 33
+        assert certify_ceil_tau_Y_cutoff(4096) == 25736
+        p4096 = certify_open_core_divisor_partition(4096)
+        assert p4096["sub_unit_tail_nonempty"] is True
+
+        # Straddling balls must be classified as ambiguous and raise AmbiguousCutoffError:
+        strad_floor = arb("4.9999").union(arb("5.0001"))
+        assert classify_floor_from_arb_enclosure(strad_floor) == (
+            "AMBIGUOUS_STRADDLING_ENCLOSURE",
+            None,
+            (4, 5),
+        )
+        with pytest.raises(AmbiguousCutoffError):
+            certify_floor_from_arb_enclosure(strad_floor)
+
+        strad_ceil = arb("31.9999").union(arb("32.0001"))
+        assert classify_ceil_from_arb_enclosure(strad_ceil) == (
+            "AMBIGUOUS_STRADDLING_ENCLOSURE",
+            None,
+            (32, 33),
+        )
+        with pytest.raises(AmbiguousCutoffError):
+            certify_ceil_from_arb_enclosure(strad_ceil)
+
+        with pytest.raises(AmbiguousCutoffError):
+            certify_D0_small_divisor_cutoff(arb(1).exp())
+    finally:
+        flint_ctx.prec = saved
+
+
+def test_tc060r_deleted_claims_absent_across_code_json_and_docs() -> None:
+    """Verify none of the deleted/unsupported TC-060 claims survive as active assertions across
+    Python, Lean, JSON, review report, and shared research registers.
+    """
+    forbidden_substrings = (
+        "diverging as O((Y/d)^2)",
+        "diverging as $O((Y/d)^2)$",
+        "R(d) \\sim 4\\sqrt{d}\\log d",
+        "R(d) ~ 4*sqrt(d)*log d",
+        "= O(Y^{-1/2} \\log Y)",
+        "= O(Y^{-1/2} log Y)",
+        "= O(Y^{-5/8} \\log Y)",
+        "= O(Y^{-5/8} log Y)",
+        "has order $-1$ at $z = 1$ and order $+1$ at $z = 1/2$",
+        "and Theorem 7 proves relative contraction",
+        "zero-driven open core on D_0(Y) < d < ceil(tau*Y)",
+        "zero-driven core on D_0(Y) < d < ceil(tau*Y)",
+        "zero-driven core on $D_0(Y) < d < \\lceil\\tau Y\\rceil$",
+        "zero-driven open core on $D_0(Y) < d < \\lceil\\tau Y\\rceil$",
+    )
+    checked_paths = (
+        TC_060_LEAN_MODULE_PATH,
+        REPO_ROOT / "tc" / "signed_dilation_arithmetic_energy.py",
+        SIGNED_DILATION_ARITHMETIC_ENERGY_ARTIFACT_PATH,
+        TC_060_REVIEW_DOC_PATH,
+        REPO_ROOT / "formal" / "RiemannScope" / "README.md",
+        REPO_ROOT / ".agents" / "research" / "queue.json",
+        REPO_ROOT / ".agents" / "research" / "state.json",
+        REPO_ROOT / ".agents" / "corpus_map" / "obligation_register.md",
+        REPO_ROOT / "TRANSCENDENTAL_CONTINUATION.md",
+        REPO_ROOT / "RESEARCH_LEDGER.md",
+    )
+    for path in checked_paths:
+        txt = path.read_text(encoding="utf-8")
+        for bad in forbidden_substrings:
+            assert bad not in txt, f"Deleted TC-060 claim {bad!r} still present in {path}"
+

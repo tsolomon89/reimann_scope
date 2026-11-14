@@ -1,5 +1,6 @@
 {
-  "task_id": "TASK-TC-060",
+  "task_id": "TASK-TC-060R",
+  "repaired_task_id": "TASK-TC-060",
   "parent_epic": "EPIC-TC-042",
   "parent_subgate": "SUBGATE-TC-043A",
   "prior_tasks": [
@@ -19,14 +20,18 @@
     "TASK-TC-058R2",
     "TASK-TC-059",
     "TASK-TC-059R",
-    "TASK-TC-059R2"
+    "TASK-TC-059R2",
+    "TASK-TC-060"
   ],
   "reviewed_merged_main_baseline": "2c784c9433edcf37d3f666b75e7ac0d83abc919a",
   "accepted_tc059r2_branch": "task/tc-059r2-numerical-assertion-and-report-closeout",
   "reviewed_tc059r2_implementation_commit": "25099194f7e951b0cea8ec9c4829249f7221ca56",
   "reviewed_tc059r2_head_commit": "779be2f9e68765815ceb54e4cfb9239596c5e06d",
-  "inherited_formal_producing_commit": "501e520144526d51e43c189a6d4a2d605a58e949",
-  "branch": "task/tc-060-signed-dilation-multiplier-and-arithmetic-energy",
+  "prior_tc059r_formal_producing_commit": "501e520144526d51e43c189a6d4a2d605a58e949",
+  "reviewed_tc060_branch": "task/tc-060-signed-dilation-multiplier-and-arithmetic-energy",
+  "reviewed_tc060_implementation_commit": "f95dd15825b4637ff2ec7f22c6e987b9fe6ea6b4",
+  "reviewed_tc060_head_commit": "240307a593b08ab43ffe975ffeb5d7789e5b9a51",
+  "branch": "task/tc-060r-full-core-counterexample-and-proof-scope-repair",
   "epistemic_categories_enforced": [
     "UNCONDITIONAL_FINITE_ARITHMETIC",
     "ANALYTIC_PROVED_OUTSIDE_LEAN",
@@ -41,8 +46,8 @@
     "RELATIVE_CONTRACTION",
     "ALL_POSITIVE_EXPONENTS_CLOSURE"
   ],
-  "completion_outcome_code": "OUTCOME_B_AND_C_PARTIAL_THEOREM_AND_PROVED_CANDIDATE_OBSTRUCTIONS",
-  "research_outcome_class": "Partial Unconditional Arithmetic Relative-Contraction Theorem + Proved Candidate Obstructions (TASK-TC-060, Outcome B/C) — Derives and certifies the exact Fourier block-multiplier representation Fourier[r_{sm,T}(exp t)](v) = sum_{L=1}^T M_{L,T}(v)*qhat_L(v) and real-space signed/log-weighted Gram kernels H_{Y,b}, H_{Y,b}^{wt}; proves in Lean 4 (0 sorry, 0 custom axioms, 6 public theorems in SignedDilationArithmeticEnergy.lean) non-circular reassembly & 2T basis spillover, sharp unrestricted-frequency multiplier attainment |m_d(v_k(d))| = d^{-1/2}+(d+1)^{-1/2} and sqrt(T) cutoff-block lower bound, weighted Gram quadratic forms & log sandwiches, Gaussian window majorants & Gauss-product Gamma monotonicity, second-order drift Abel re-summation & small-divisor contraction, and R-independent complete-energy feedback transfer; refutes Candidate A1 (intra-block sign cancellation of R(d)) by isolating the deterministic z = 1/2 square-pole drift M_{sq,2}(d) = 4*sqrt(d)*log(d) + c_{1/2,lambda}*sqrt(d) (R(d) > 0 for all 1 <= d <= 2000 vs 178 sign flips of R_{osc}(d)) and refutes Candidate B1 (unqualified ||Delta_d^{sm}(a)||_Y <= (C/d)*||g_{a,d}||_Y) by certified rational counterexamples; proves unconditional all-eps relative contraction ||r_{sm,T(Y)}^{drift}/(log X)^2||_Y^2 <= Theta_eps^{drift}(Y)*G_eps(R)*Y^eps + C_{drift}(eps) with Theta_eps^{drift}(Y) = O_eps((log Y)^{-4}) -> 0 plus small-divisor relative contraction on 1 <= d <= D_0(Y); and locates the smallest open core assertion on D_0(Y) < d < ceil(tau*Y) (r_{sm,core}^{osc}), -Q_{lambda,T}^{[2]}/(log X)^2, and X_tilde(Y), keeping SUBGATE-TC-043A OPEN and rh_proved False.",
+  "completion_outcome_code": "OUTCOME_B_AND_C_REPAIRED_FULL_CORE_QUANTIFIED_OBSTRUCTIONS_AND_DRIFT_CONTRACTION",
+  "research_outcome_class": "Repaired Full-Core Scope, Quantified Counterexamples, Certified Cutoffs, & Partial Arithmetic Relative-Contraction Theorem (TASK-TC-060R repairing TASK-TC-060, Outcome B/C) — Preserves exact finite-L Fourier block-multiplier representation (outside Lean) and real-space signed / (log X)^{-4}-weighted Gram kernels H_{Y,b}, H_{Y,b}^{wt}; proves in Lean 4 (0 sorry, 0 custom axioms, 7 public theorems in SignedDilationArithmeticEnergy.lean) non-circular reassembly & 2T basis spillover, sharp unrestricted-frequency multiplier attainment (obstructing only a frequency-independent relative O(1/d) saving while retaining the all-v (1+|v|) derivative bound) and sqrt(T) cutoff-block lower bound, weighted Gram quadratic forms & log sandwiches, Gaussian window majorants & Gauss-product Gamma monotonicity, discrete Abel re-summation of M_{sq,2}(d) & finite small-divisor weighted bounds, R-independent complete-energy feedback transfer, and TC-060R's full-core intermediate/tail retention, singleton-block I_T(T)={1} Candidate A1 refutation at v=0, arbitrary-coefficient d=1/e_1 Candidate B1 exponential lower bound, w_{2,lambda}(p)/w_{2,lambda}(6p) unconditional support, and drift-jump floor(T/q) reindexing; proves outside Lean all-eps relative contraction of r_{sm,T(Y)}^{drift}/(log X)^2 (with corrected O(log Y) sub-unit and jump sums) and 1 <= d <= min(D_0(Y), T(Y)-1) (with certified D_0(2) = 0); and retains the full remaining open core min(D_0(Y), T(Y)-1) < d <= T(Y)-1 inside D_{2,core,T(Y)} (including d >= ceil(tau*Y)) alongside signed 8*X_tilde(Y) + 4*||D_{2,core,T(Y)}||_Y^2, keeping SUBGATE-TC-043A OPEN and rh_proved False.",
   "subgate_tc043a_status": "OPEN",
   "rh_proved": false,
   "precision_bits": 256,
@@ -535,10 +540,19 @@
   },
   "section_2_signed_dilation_fourier_and_gram_kernel": {
     "epistemic_status": "CONCRETE_ANALYTIC_IN_LEAN",
+    "section_epistemic_scope_note": "Mixed analytic/formal/numerical section: finite-cutoff qhat_L(v) Gamma substitution and improper tail bounds are ANALYTIC_PROVED_OUTSIDE_LEAN; multiplier benchmark/attainment, cutoff-block partition/sqrt(T) count, and unweighted/log-weighted Gram quadratic forms are formalized in Lean Theorems 2 & 3; quadrature cross-checks are CERTIFIED_FINITE_OBSERVATION.",
+    "component_epistemic_map": {
+      "qhat_L_finite_cutoff_gamma_identity_and_improper_tails": "ANALYTIC_PROVED_OUTSIDE_LEAN",
+      "adjacent_dilation_multiplier_benchmark_and_odd_harmonic_attainment": "CONCRETE_ANALYTIC_IN_LEAN",
+      "level_set_cutoff_blocks_and_sqrt_T_lower_bound": "UNCONDITIONAL_FINITE_ARITHMETIC",
+      "signed_and_log_weighted_gram_kernels_and_log_sandwich": "CONCRETE_ANALYTIC_IN_LEAN",
+      "quadrature_and_sample_cross_checks": "CERTIFIED_FINITE_OBSERVATION"
+    },
     "lean_theorems": [
       "adjacent_dilation_multiplier_and_cutoff_blocks_tc060",
       "signed_gram_kernel_and_log_weighted_quadratic_form_tc060"
     ],
+    "multiplier_frequency_scope_note": "The derivative-form bound |m_d(v)| <= sqrt(1/4 + v^2) * int_d^{d+1} t^{-3/2} dt retains its explicit (1 + |v|) / sqrt(1/4 + v^2) factor and holds for ALL real frequencies v; odd-harmonic attainment |m_d(v_k(d))| = d^{-1/2} + (d+1)^{-1/2} obstructs only a frequency-independent relative O(1/d) saving.",
     "qhat_finite_cutoff_checks": [
       {
         "L": 1,
@@ -1568,9 +1582,23 @@
   },
   "section_3_attempts_a_and_b_obstructions_and_drift_theorem": {
     "epistemic_status": "ANALYTIC_PROVED_OUTSIDE_LEAN",
+    "section_epistemic_scope_note": "Mixed section: Gaussian window majorant, local low/high cross-term split, Gauss-product polynomial inequality, discrete Abel identity, |delta_{sq,2}(d)| <= 12*log(d+1)/sqrt(d), finite small-divisor weighted bound, singleton-block A1 obstruction, d=1/e_1 B1 lower bound, w_{2,lambda}(p)/w_{2,lambda}(6p) support, and drift-jump reindexing are formalized in Lean Theorems 4, 5, & 7; Euler reflection/Gauss product Gamma majorant, z=1/2 Laurent residue derivation of M_{sq,2}(d), and all-eps summation/cutoff contractions of r_sm^{drift} and r_{sm,<=D_0}^{osc} are ANALYTIC_PROVED_OUTSIDE_LEAN; finite R(d)/R_osc(d) sign counts and finite B1 sample ratios are CERTIFIED_FINITE_OBSERVATION.",
+    "component_epistemic_map": {
+      "gaussian_window_majorant_and_local_frequency_split": "CONCRETE_ANALYTIC_IN_LEAN",
+      "all_v_closed_form_gamma_majorant": "ANALYTIC_PROVED_OUTSIDE_LEAN",
+      "z_half_laurent_residue_drift_model_M_sq_2": "ANALYTIC_PROVED_OUTSIDE_LEAN",
+      "candidate_a1_singleton_block_I_T_T_v0_refutation": "CONCRETE_ANALYTIC_IN_LEAN",
+      "finite_R_d_positivity_and_R_osc_sign_flips_1_to_2000": "CERTIFIED_FINITE_OBSERVATION",
+      "candidate_b1_unbounded_family_d1_e1_refutation": "CONCRETE_ANALYTIC_IN_LEAN",
+      "candidate_b1_finite_diagnostics_and_liouville_constant_exclusions": "CERTIFIED_FINITE_OBSERVATION",
+      "w2_prime_and_6p_unconditional_support": "UNCONDITIONAL_FINITE_ARITHMETIC",
+      "drift_abel_split_and_increment_bound": "CONCRETE_ANALYTIC_IN_LEAN",
+      "all_eps_drift_and_small_divisor_relative_contractions": "ANALYTIC_PROVED_OUTSIDE_LEAN"
+    },
     "lean_theorems": [
       "gaussian_window_majorant_and_local_frequency_split_tc060",
-      "second_order_drift_abel_and_small_divisor_contraction_tc060"
+      "second_order_drift_abel_and_small_divisor_contraction_tc060",
+      "full_core_quantified_obstructions_and_w2_support_tc060r"
     ],
     "attempt_a_gamma_closed_form_checks": [
       {
@@ -1927,8 +1955,52 @@
       }
     ],
     "candidate_a1_obstruction_and_square_pole_drift": {
-      "candidate_statement": "Candidate A1: Intra-block sign cancellation of R(d) = W_2(d) - c_lambda*d across level-set or dyadic blocks yields o(sum |R(d)| |m_d(v)|) without subtracting a deterministic z = 1/2 drift.",
-      "verdict": "REFUTED_UNCONDITIONALLY_AND_UNDER_RH",
+      "candidate_statement": "Candidate A1 (as stated): Uniformly over all T >= T_0, level-set blocks 1 <= L <= T, and low frequencies |v| <= Omega(Y), intra-block sign cancellation of R(d) = W_2(d) - c_lambda*d across I_L(T) satisfies |M_{L,T}(v)| <= C*(log T)^{-1-delta} * sum_{d in I_L(T)} |R(d)|*|m_d(v)| for fixed C >= 0, delta > 0 without subtracting M_{sq,2}(d).",
+      "verdict": "REFUTED_AS_STATED_UNIFORMLY_OVER_ALL_BLOCKS_BY_SINGLETON_I_T_T_AT_V_ZERO",
+      "obstruction_scope": "For every T >= 2 (including along canonical T(Y) -> infty), I_T(T) = {1} is a singleton block; at v = 0 (always in |v| <= Omega(Y)), R(1) = -c_lambda > 0 and m_1(0) = 1 - 1/sqrt(2) > 0, so |M_{T,T}(0)| / sum_{d in I_T(T)} |R(d)|*|m_d(0)| = 1 identically, contradicting C*(log T)^{-1-delta} -> 0. Refutes the all-block uniform candidate as stated, not every estimate on selected multi-element blocks or the complete signed sum.",
+      "M_sq_2_model_role": "RESIDUE_DEFINED_Z_HALF_DRIFT_MODEL (D_lambda(z) = zeta(2z)/zeta(z) has a simple zero at z = 1 and a simple pole at z = 1/2; local residue does not by itself establish a global Perron asymptotic or eventual positivity of R(d))",
+      "R_osc_residual_role": "EXACT_DRIFT_SUBTRACTED_RESIDUAL_R_MINUS_M_SQ_2",
+      "singleton_block_I_T_T_v0_obstruction": {
+        "tested_T_values": [
+          2,
+          3,
+          6,
+          32,
+          182,
+          1024
+        ],
+        "all_I_T_T_equal_singleton_1": true,
+        "R_1_equals_minus_c_lambda": {
+          "mid_float": 3.434275302181197,
+          "rad_float_outward": 2.6297887380595297e-17,
+          "lower_dec": "3.434275302181196946812481620243724871697e+0",
+          "upper_dec": "3.434275302181196946812481620243724871700e+0",
+          "arb_ball_str": "[3.434275302181196946812481620243724871698 +/- 2.48e-40]"
+        },
+        "m_1_at_v_0": {
+          "mid_float": 0.2928932188134525,
+          "rad_float_outward": 7.174684663993263e-18,
+          "lower_dec": "2.928932188134524755991556378951509607150e-1",
+          "upper_dec": "2.928932188134524755991556378951509607153e-1",
+          "arb_ball_str": "[0.2928932188134524755991556378951509607152 +/- 3.60e-41]"
+        },
+        "M_T_T_at_v_0": {
+          "mid_float": 1.0058759475473928,
+          "rad_float_outward": 9.354305635932938e-17,
+          "lower_dec": "1.005875947547392939292015548552032439054e+0",
+          "upper_dec": "1.005875947547392939292015548552032439057e+0",
+          "arb_ball_str": "[1.005875947547392939292015548552032439055 +/- 3.52e-40]"
+        },
+        "exact_singleton_ratio_at_v_0": 1,
+        "singleton_ratio_ball_check": {
+          "mid_float": 1.0,
+          "rad_float_outward": 1.8967798963302915e-76,
+          "lower_dec": "9.999999999999999999999999999999999999998e-1",
+          "upper_dec": "1.000000000000000000000000000000000000002e+0",
+          "arb_ball_str": "[1.000000000000000000000000000000000000000 +/- 1e-44]"
+        },
+        "verified": true
+      },
       "c_half_lambda": {
         "mid_float": -1.8733584807609318,
         "rad_float_outward": 8.975227706048153e-17,
@@ -1936,6 +2008,7 @@
         "upper_dec": "-1.873358480760931720386181725759734870307e+0",
         "arb_ball_str": "[-1.873358480760931720386181725759734870308 +/- 1.97e-40]"
       },
+      "finite_observation_scope": "CERTIFIED_FINITE_OBSERVATION_ON_INTEGERS_1_TO_2000_ONLY",
       "all_R_d_strictly_positive_1_to_2000": true,
       "min_R_d_on_1_to_2000": {
         "mid_float": 3.434275302181197,
@@ -1975,6 +2048,134 @@
         "upper_dec": "4.048552432477060015220276568177108923520e+0",
         "arb_ball_str": "[4.048552432477060015220276568177108923518 +/- 2.94e-40]"
       },
+      "unconditional_w2_prime_and_6p_support_checks": {
+        "exact_increment_identity_verified_1_to_2000": true,
+        "prime_w2_equals_minus_log_p_sq_verified": true,
+        "six_p_three_distinct_primes_w2_zero_verified": true,
+        "sample_rows": [
+          {
+            "p": 5,
+            "six_p": 30,
+            "w2_at_p": {
+              "mid_float": -2.590290393980235,
+              "rad_float_outward": 1.3893466716827107e-16,
+              "lower_dec": "-2.590290393980234945180171004992654895394e+0",
+              "upper_dec": "-2.590290393980234945180171004992654895391e+0",
+              "arb_ball_str": "[-2.590290393980234945180171004992654895392 +/- 4.55e-40]"
+            },
+            "w2_at_p_plus_log_p_sq_residual": {
+              "mid_float": 0.0,
+              "rad_float_outward": 1.8028436595735875e-76,
+              "lower_dec": "-1.802843659573587167787629093880164465621e-76",
+              "upper_dec": "1.802843659573587167787629093880164465621e-76",
+              "arb_ball_str": "[+/- 1.81e-76]"
+            },
+            "w2_at_6p_exact_zero": true,
+            "Delta_R_osc_at_p": {
+              "mid_float": -2.018670566226611,
+              "rad_float_outward": 8.447659029132986e-17,
+              "lower_dec": "-2.018670566226611033833484452601337421288e+0",
+              "upper_dec": "-2.018670566226611033833484452601337421285e+0",
+              "arb_ball_str": "[-2.018670566226611033833484452601337421286 +/- 3.19e-40]"
+            },
+            "Delta_R_osc_at_6p": {
+              "mid_float": 1.624008979365075,
+              "rad_float_outward": 9.845253482323304e-17,
+              "lower_dec": "1.624008979365074835456806047508269872768e+0",
+              "upper_dec": "1.624008979365074835456806047508269872771e+0",
+              "arb_ball_str": "[1.624008979365074835456806047508269872770 +/- 4.76e-40]"
+            },
+            "Delta_R_osc_at_6p_minus_neg_c_lambda": {
+              "mid_float": -1.8102663228161222,
+              "rad_float_outward": 9.7294182721203e-17,
+              "lower_dec": "-1.810266322816122111355675572735454998930e+0",
+              "upper_dec": "-1.810266322816122111355675572735454998927e+0",
+              "arb_ball_str": "[-1.810266322816122111355675572735454998929 +/- 2.78e-40]"
+            }
+          },
+          {
+            "p": 97,
+            "six_p": 582,
+            "w2_at_p": {
+              "mid_float": -20.927980536839378,
+              "rad_float_outward": 2.3964830410078004e-16,
+              "lower_dec": "-2.092798053683937832920136946596034843918e+1",
+              "upper_dec": "-2.092798053683937832920136946596034843915e+1",
+              "arb_ball_str": "[-20.92798053683937832920136946596034843916 +/- 3.82e-39]"
+            },
+            "w2_at_p_plus_log_p_sq_residual": {
+              "mid_float": 0.0,
+              "rad_float_outward": 1.8169700014889915e-75,
+              "lower_dec": "-1.816970001488991284921113916620255438960e-75",
+              "upper_dec": "1.816970001488991284921113916620255438960e-75",
+              "arb_ball_str": "[+/- 1.82e-75]"
+            },
+            "w2_at_6p_exact_zero": true,
+            "Delta_R_osc_at_p": {
+              "mid_float": -18.735879885092807,
+              "rad_float_outward": 1.7181769660032473e-15,
+              "lower_dec": "-1.873587988509280849180463764920138440453e+1",
+              "upper_dec": "-1.873587988509280849180463764920138440450e+1",
+              "arb_ball_str": "[-18.73587988509280849180463764920138440451 +/- 2.75e-39]"
+            },
+            "Delta_R_osc_at_6p": {
+              "mid_float": 2.7792889912520655,
+              "rad_float_outward": 1.386047176626619e-17,
+              "lower_dec": "2.779288991252065507703946538212561821604e+0",
+              "upper_dec": "2.779288991252065507703946538212561821607e+0",
+              "arb_ball_str": "[2.779288991252065507703946538212561821605 +/- 8.05e-41]"
+            },
+            "Delta_R_osc_at_6p_minus_neg_c_lambda": {
+              "mid_float": -0.6549863109291314,
+              "rad_float_outward": 4.015835914686149e-17,
+              "lower_dec": "-6.549863109291314391085350820311630500933e-1",
+              "upper_dec": "-6.549863109291314391085350820311630500930e-1",
+              "arb_ball_str": "[-0.6549863109291314391085350820311630500932 +/- 3.27e-41]"
+            }
+          },
+          {
+            "p": 331,
+            "six_p": 1986,
+            "w2_at_p": {
+              "mid_float": -33.664577641888165,
+              "rad_float_outward": 2.5351909481608433e-15,
+              "lower_dec": "-3.366457764188816779548863099563217307615e+1",
+              "upper_dec": "-3.366457764188816779548863099563217307612e+1",
+              "arb_ball_str": "[-33.66457764188816779548863099563217307613 +/- 1.47e-39]"
+            },
+            "w2_at_p_plus_log_p_sq_residual": {
+              "mid_float": 0.0,
+              "rad_float_outward": 2.7088879000737745e-75,
+              "lower_dec": "-2.708887900073773998071193096580566239878e-75",
+              "upper_dec": "2.708887900073773998071193096580566239878e-75",
+              "arb_ball_str": "[+/- 2.71e-75]"
+            },
+            "w2_at_6p_exact_zero": true,
+            "Delta_R_osc_at_p": {
+              "mid_float": -31.036947655655155,
+              "rad_float_outward": 1.7073802848181079e-15,
+              "lower_dec": "-3.103694765565515638380427498578515597697e+1",
+              "upper_dec": "-3.103694765565515638380427498578515597694e+1",
+              "arb_ball_str": "[-31.03694765565515638380427498578515597695 +/- 2.64e-39]"
+            },
+            "Delta_R_osc_at_6p": {
+              "mid_float": 3.024692646429039,
+              "rad_float_outward": 1.0755495529729875e-16,
+              "lower_dec": "3.024692646429039014769456139849489674713e+0",
+              "upper_dec": "3.024692646429039014769456139849489674716e+0",
+              "arb_ball_str": "[3.024692646429039014769456139849489674714 +/- 2.43e-40]"
+            },
+            "Delta_R_osc_at_6p_minus_neg_c_lambda": {
+              "mid_float": -0.4095826557521579,
+              "rad_float_outward": 2.283054021537838e-17,
+              "lower_dec": "-4.095826557521579320430254803942351969842e-1",
+              "upper_dec": "-4.095826557521579320430254803942351969839e-1",
+              "arb_ball_str": "[-0.4095826557521579320430254803942351969840 +/- 4.91e-42]"
+            }
+          }
+        ],
+        "unconditional_scope_note": "Delta R_osc(n) = w_{2,lambda}(n) - c_lambda - delta_{sq,2}(n) has Delta R_osc(p) ~ -(log p)^2 on primes p and Delta R_osc(6p) -> -c_lambda != 0 on n = 6p (prime p >= 5) unconditionally from prime-power support of Lambda_lambda; these pointwise discrete increment sizes do not diagnose off-critical zeros."
+      },
       "verified": true
     },
     "attempt_b_product_compensation_and_candidate_b1_counterexamples": {
@@ -2000,8 +2201,132 @@
         "arb_ball_str": "[2.266547799712098667898406429123030199087 +/- 3.32e-40]"
       },
       "product_compensation_ratio_gt_2_certified": true,
-      "candidate_b1_statement": "Candidate B1: Uniform relative derivative gain ||Delta_d^{sm}(a)||_Y <= (C / d) * ||g_{a, d}||_Y for an absolute constant C > 0 independent of Y, d, L, and coefficients a.",
-      "candidate_b1_verdict": "REFUTED_BY_CERTIFIED_COUNTEREXAMPLES",
+      "candidate_b1_statement": "Candidate B1: Uniform relative derivative gain ||Delta_d^{sm}(a)||_Y <= (C / d) * ||g_{a, d}||_Y for an absolute constant C > 0 independent of Y >= 2, 1 <= d < T(Y), L >= 1, and coefficients a.",
+      "candidate_b1_verdict": "REFUTED_FOR_EVERY_FIXED_C_ON_ARBITRARY_COEFFICIENTS_BY_UNBOUNDED_D1_E1_FAMILY",
+      "candidate_b1_refutation_scope": "At d = 1 < T(Y) (Y >= 2) and a = e_1 (supported at q = 1 on 1 <= q <= L_1), phi_2(X)/phi_1(X) = exp(3*X^2/4)/8 gives ||phi_1 - phi_2||_Y / ||phi_1||_Y >= exp(3*Y^2/4)/8 - 1 -> infty as Y -> infty, refuting every fixed C in the stated geometry-only inequality. Finite steep-tail/resonant-bulk ratios are retained strictly as finite diagnostics, and actual Liouville witnesses are scoped strictly to excluding the tested constants C = 1 and C = 3 on their stated domains (not refuting a Liouville-specific inequality with controlled arithmetic forcing).",
+      "unbounded_arbitrary_coefficient_family_d1_e1_rows": [
+        {
+          "Y": 2,
+          "d": 1,
+          "T_Y": 3,
+          "L_1_inherited_length": 3,
+          "phi_1_window_norm_sq_positive": true,
+          "phi_1_window_norm_sq": {
+            "mid_float": 0.0008041663691064257,
+            "rad_float_outward": 3.890248321480498e-20,
+            "lower_dec": "8.041663691064257316154415344794683351146e-4",
+            "upper_dec": "8.041663691064257316154415344794683351149e-4",
+            "arb_ball_str": "[0.0008041663691064257316154415344794683351148 +/- 2.70e-44]"
+          },
+          "analytic_lower_bound_exp_3Y2_4_over_8_minus_1": {
+            "mid_float": 1.5106921153984585,
+            "rad_float_outward": 2.2844531906891076e-17,
+            "lower_dec": "1.510692115398458467616066206822714737122e+0",
+            "upper_dec": "1.510692115398458467616066206822714737125e+0",
+            "arb_ball_str": "[1.510692115398458467616066206822714737123 +/- 4.89e-40]"
+          },
+          "actual_scaled_ratio_norm_phi1_minus_phi2_over_norm_phi1": {
+            "mid_float": 5.677936903716641,
+            "rad_float_outward": 1.272047538801915e-16,
+            "lower_dec": "5.677936903716640821198228877933827703914e+0",
+            "upper_dec": "5.677936903716640821198228877933827703917e+0",
+            "arb_ball_str": "[5.677936903716640821198228877933827703915 +/- 3.98e-40]"
+          },
+          "directed_lower_bound_certified": true,
+          "verified": true
+        },
+        {
+          "Y": 3,
+          "d": 1,
+          "T_Y": 4,
+          "L_1_inherited_length": 4,
+          "phi_1_window_norm_sq_positive": true,
+          "phi_1_window_norm_sq": {
+            "mid_float": 1.1160107142881607e-07,
+            "rad_float_outward": 5.943215679332585e-24,
+            "lower_dec": "1.116010714288160742444104128737935592823e-7",
+            "upper_dec": "1.116010714288160742444104128737935592826e-7",
+            "arb_ball_str": "[1.116010714288160742444104128737935592825e-7 +/- 3.66e-47]"
+          },
+          "analytic_lower_bound_exp_3Y2_4_over_8_minus_1": {
+            "mid_float": 105.75734531576894,
+            "rad_float_outward": 1.6295884565650777e-16,
+            "lower_dec": "1.057573453157689440975671953781013237675e+2",
+            "upper_dec": "1.057573453157689440975671953781013237678e+2",
+            "arb_ball_str": "[105.7573453157689440975671953781013237677 +/- 3.99e-38]"
+          },
+          "actual_scaled_ratio_norm_phi1_minus_phi2_over_norm_phi1": {
+            "mid_float": 238.8643492699191,
+            "rad_float_outward": 5.550818525758294e-15,
+            "lower_dec": "2.388643492699190973297031516761507383933e+2",
+            "upper_dec": "2.388643492699190973297031516761507383936e+2",
+            "arb_ball_str": "[238.8643492699190973297031516761507383934 +/- 2.83e-38]"
+          },
+          "directed_lower_bound_certified": true,
+          "verified": true
+        },
+        {
+          "Y": 4,
+          "d": 1,
+          "T_Y": 6,
+          "L_1_inherited_length": 6,
+          "phi_1_window_norm_sq_positive": true,
+          "phi_1_window_norm_sq": {
+            "mid_float": 2.122709632817415e-13,
+            "rad_float_outward": 9.514252553340078e-30,
+            "lower_dec": "2.122709632817415154900154914746234113798e-13",
+            "upper_dec": "2.122709632817415154900154914746234113801e-13",
+            "arb_ball_str": "[2.122709632817415154900154914746234113800e-13 +/- 4.31e-53]"
+          },
+          "analytic_lower_bound_exp_3Y2_4_over_8_minus_1": {
+            "mid_float": 20343.34892737549,
+            "rad_float_outward": 6.625823516525789e-13,
+            "lower_dec": "2.034334892737549010100065061231084789626e+4",
+            "upper_dec": "2.034334892737549010100065061231084789629e+4",
+            "arb_ball_str": "[20343.34892737549010100065061231084789628 +/- 3.84e-36]"
+          },
+          "actual_scaled_ratio_norm_phi1_minus_phi2_over_norm_phi1": {
+            "mid_float": 43521.61358304245,
+            "rad_float_outward": 3.090472286182358e-12,
+            "lower_dec": "4.352161358304244949796176477046185714038e+4",
+            "upper_dec": "4.352161358304244949796176477046185714041e+4",
+            "arb_ball_str": "[43521.61358304244949796176477046185714040 +/- 5.52e-37]"
+          },
+          "directed_lower_bound_certified": true,
+          "verified": true
+        },
+        {
+          "Y": 8,
+          "d": 1,
+          "T_Y": 14,
+          "L_1_inherited_length": 14,
+          "phi_1_window_norm_sq_positive": true,
+          "phi_1_window_norm_sq": {
+            "mid_float": 3.331161271000865e-54,
+            "rad_float_outward": 1.7296151651496384e-70,
+            "lower_dec": "3.331161271000865281984980024959382351277e-54",
+            "upper_dec": "3.331161271000865281984980024959382351280e-54",
+            "arb_ball_str": "[3.331161271000865281984980024959382351278e-54 +/- 1.69e-94]"
+          },
+          "analytic_lower_bound_exp_3Y2_4_over_8_minus_1": {
+            "mid_float": 8.77091989012204e+19,
+            "rad_float_outward": 3772.183949985765,
+            "lower_dec": "8.770919890122039673218394998576467568198e+19",
+            "upper_dec": "8.770919890122039673218394998576467568201e+19",
+            "arb_ball_str": "[87709198901220396732.18394998576467568199 +/- 2.26e-21]"
+          },
+          "actual_scaled_ratio_norm_phi1_minus_phi2_over_norm_phi1": {
+            "mid_float": 1.784976357832169e+20,
+            "rad_float_outward": 14768.173888309691,
+            "lower_dec": "1.784976357832168750878261116903105248180e+20",
+            "upper_dec": "1.784976357832168750878261116903105248183e+20",
+            "arb_ball_str": "[178497635783216875087.8261116903105248182 +/- 4.33e-20]"
+          },
+          "directed_lower_bound_certified": true,
+          "verified": true
+        }
+      ],
+      "finite_diagnostics_role": "FINITE_DIAGNOSTIC_NOT_UNIVERSAL_CONSTANT_REFUTATION",
       "steep_tail_Y16_d4_L2_a_1_0_scaled_ratio": {
         "mid_float": 819.0738533463688,
         "rad_float_outward": 4.4017700528722166e-14,
@@ -2030,6 +2355,7 @@
         "upper_dec": "5.295177169601176509855910425275023405625e+0",
         "arb_ball_str": "[5.295177169601176509855910425275023405623 +/- 4.06e-40]"
       },
+      "actual_liouville_witness_scope": "EXCLUDES_TESTED_CONSTANTS_C_EQ_1_AT_Y4_D1_T6_AND_C_EQ_3_AT_Y16_D5_T32_ONLY",
       "actual_liouville_Y4_d1_T6_scaled_ratio": {
         "mid_float": 2.9752467920354015,
         "rad_float_outward": 4.5775245308816433e-17,
@@ -2048,9 +2374,59 @@
     },
     "informed_replacement_drift_and_small_divisor_rows": [
       {
+        "Y": 2,
+        "T_Y": 3,
+        "D_0_Y": 0,
+        "small_divisor_slice_empty": true,
+        "drift_abel_pointwise_residual_at_Y": {
+          "mid_float": 0.0,
+          "rad_float_outward": 1.204093389954896e-75,
+          "lower_dec": "-1.204093389954895678529872733565607305784e-75",
+          "upper_dec": "1.204093389954895678529872733565607305784e-75",
+          "arb_ball_str": "[+/- 1.21e-75]"
+        },
+        "r_sm_total_norm_sq": {
+          "mid_float": 1.483211407411646,
+          "rad_float_outward": 6.787288416036388e-17,
+          "lower_dec": "1.483211407411645964399872041200461022910e+0",
+          "upper_dec": "1.483211407411645964399872041200461022913e+0",
+          "arb_ball_str": "[1.483211407411645964399872041200461022912 +/- 4.76e-40]"
+        },
+        "r_sm_drift_norm_sq": {
+          "mid_float": 0.6492453114598534,
+          "rad_float_outward": 3.266653538897701e-17,
+          "lower_dec": "6.492453114598534573957958849281710839803e-1",
+          "upper_dec": "6.492453114598534573957958849281710839806e-1",
+          "arb_ball_str": "[0.6492453114598534573957958849281710839805 +/- 2.88e-41]"
+        },
+        "r_sm_drift_weighted_upper_bound_over_logY4": {
+          "mid_float": 2.8125935589737603,
+          "rad_float_outward": 1.7018581914216415e-16,
+          "lower_dec": "2.812593558973760118025177662827604163242e+0",
+          "upper_dec": "2.812593558973760118025177662827604163245e+0",
+          "arb_ball_str": "[2.812593558973760118025177662827604163244 +/- 1.21e-41]"
+        },
+        "r_sm_osc_small_d_le_D0_norm_sq": {
+          "mid_float": 0.0,
+          "rad_float_outward": 5e-324,
+          "lower_dec": "0",
+          "upper_dec": "0",
+          "arb_ball_str": "0"
+        },
+        "r_sm_osc_core_d_gt_D0_norm_sq": {
+          "mid_float": 3.7011510180862524,
+          "rad_float_outward": 4.225428990615337e-17,
+          "lower_dec": "3.701151018086252311101968120752920797702e+0",
+          "upper_dec": "3.701151018086252311101968120752920797705e+0",
+          "arb_ball_str": "[3.701151018086252311101968120752920797703 +/- 1.44e-40]"
+        },
+        "verified": true
+      },
+      {
         "Y": 4,
         "T_Y": 6,
         "D_0_Y": 1,
+        "small_divisor_slice_empty": false,
         "drift_abel_pointwise_residual_at_Y": {
           "mid_float": 2.159042138773611e-77,
           "rad_float_outward": 3.783707182122268e-75,
@@ -2099,6 +2475,7 @@
         "Y": 8,
         "T_Y": 14,
         "D_0_Y": 2,
+        "small_divisor_slice_empty": false,
         "drift_abel_pointwise_residual_at_Y": {
           "mid_float": 6.908934844075556e-77,
           "rad_float_outward": 1.665000586432493e-74,
@@ -2147,6 +2524,7 @@
         "Y": 16,
         "T_Y": 32,
         "D_0_Y": 2,
+        "small_divisor_slice_empty": false,
         "drift_abel_pointwise_residual_at_Y": {
           "mid_float": 2.2454038243245556e-76,
           "rad_float_outward": 6.0262888468796735e-74,
@@ -2195,6 +2573,7 @@
         "Y": 32,
         "T_Y": 77,
         "D_0_Y": 3,
+        "small_divisor_slice_empty": false,
         "drift_abel_pointwise_residual_at_Y": {
           "mid_float": 3.670371635915139e-76,
           "rad_float_outward": 1.9104001886744413e-73,
@@ -2243,6 +2622,7 @@
         "Y": 64,
         "T_Y": 182,
         "D_0_Y": 4,
+        "small_divisor_slice_empty": false,
         "drift_abel_pointwise_residual_at_Y": {
           "mid_float": 9.240700353951056e-76,
           "rad_float_outward": 5.606631456625199e-73,
@@ -2288,16 +2668,249 @@
         "verified": true
       }
     ],
+    "drift_subunit_and_jump_reindexing_checks": [
+      {
+        "Y_fraction": "2/1",
+        "floor_Y": 2,
+        "T_Y": 3,
+        "subunit_weighted_sum_lhs": {
+          "mid_float": 0.1676895712613003,
+          "rad_float_outward": 4.013013989513967e-18,
+          "lower_dec": "1.676895712613003004582986194676421893150e-1",
+          "upper_dec": "1.676895712613003004582986194676421893153e-1",
+          "arb_ball_str": "[0.1676895712613003004582986194676421893151 +/- 1.87e-41]"
+        },
+        "subunit_uniform_O_logY_rhs": {
+          "mid_float": 2.1418735893748373,
+          "rad_float_outward": 1.2028649195868583e-16,
+          "lower_dec": "2.141873589374837174199095376971508633046e+0",
+          "upper_dec": "2.141873589374837174199095376971508633049e+0",
+          "arb_ball_str": "[2.141873589374837174199095376971508633048 +/- 1.46e-40]"
+        },
+        "subunit_bound_certified": true,
+        "drift_jump_reindexing_residual_at_Y": {
+          "mid_float": 0.0,
+          "rad_float_outward": 7.335804190323185e-77,
+          "lower_dec": "-7.335804190323183357831444758769893549885e-77",
+          "upper_dec": "7.335804190323183357831444758769893549885e-77",
+          "arb_ball_str": "[+/- 7.34e-77]"
+        },
+        "drift_jump_window_norm": {
+          "mid_float": 0.5500825088284285,
+          "rad_float_outward": 1.0976130587641153e-17,
+          "lower_dec": "5.500825088284284734978729912648000850114e-1",
+          "upper_dec": "5.500825088284284734978729912648000850117e-1",
+          "arb_ball_str": "[0.5500825088284284734978729912648000850116 +/- 4.96e-42]"
+        },
+        "drift_jump_O_logY_upper_bound": {
+          "mid_float": 244.46090337995346,
+          "rad_float_outward": 5.156044986512081e-15,
+          "lower_dec": "2.444609033799534591533925631609407158082e+2",
+          "upper_dec": "2.444609033799534591533925631609407158085e+2",
+          "arb_ball_str": "[244.4609033799534591533925631609407158084 +/- 2.74e-38]"
+        },
+        "drift_jump_bound_certified": true,
+        "verified": true
+      },
+      {
+        "Y_fraction": "299/100",
+        "floor_Y": 2,
+        "T_Y": 4,
+        "subunit_weighted_sum_lhs": {
+          "mid_float": 0.6526327399890506,
+          "rad_float_outward": 5.187062193973596e-17,
+          "lower_dec": "6.526327399890505290603851219997727009945e-1",
+          "upper_dec": "6.526327399890505290603851219997727009948e-1",
+          "arb_ball_str": "[0.6526327399890505290603851219997727009947 +/- 4.31e-41]"
+        },
+        "subunit_uniform_O_logY_rhs": {
+          "mid_float": 2.5851253979092568,
+          "rad_float_outward": 1.4490909950011232e-16,
+          "lower_dec": "2.585125397909256917430857239126276022654e+0",
+          "upper_dec": "2.585125397909256917430857239126276022657e+0",
+          "arb_ball_str": "[2.585125397909256917430857239126276022655 +/- 5.79e-41]"
+        },
+        "subunit_bound_certified": true,
+        "drift_jump_reindexing_residual_at_Y": {
+          "mid_float": 0.0,
+          "rad_float_outward": 1.5529187434219036e-76,
+          "lower_dec": "-1.552918743421903260102213821056271430668e-76",
+          "upper_dec": "1.552918743421903260102213821056271430668e-76",
+          "arb_ball_str": "[+/- 1.56e-76]"
+        },
+        "drift_jump_window_norm": {
+          "mid_float": 0.1550501679537084,
+          "rad_float_outward": 9.131469480311355e-18,
+          "lower_dec": "1.550501679537083974115313391994274592560e-1",
+          "upper_dec": "1.550501679537083974115313391994274592563e-1",
+          "arb_ball_str": "[0.1550501679537083974115313391994274592561 +/- 3.39e-41]"
+        },
+        "drift_jump_O_logY_upper_bound": {
+          "mid_float": 474.18293986446383,
+          "rad_float_outward": 7.924049104405387e-15,
+          "lower_dec": "4.741829398644638252220973942151252439134e+2",
+          "upper_dec": "4.741829398644638252220973942151252439137e+2",
+          "arb_ball_str": "[474.1829398644638252220973942151252439135 +/- 4.72e-38]"
+        },
+        "drift_jump_bound_certified": true,
+        "verified": true
+      },
+      {
+        "Y_fraction": "4/1",
+        "floor_Y": 4,
+        "T_Y": 6,
+        "subunit_weighted_sum_lhs": {
+          "mid_float": 0.32282362960770633,
+          "rad_float_outward": 1.2596609900000111e-17,
+          "lower_dec": "3.228236296077063179388116572150488645360e-1",
+          "upper_dec": "3.228236296077063179388116572150488645363e-1",
+          "arb_ball_str": "[0.3228236296077063179388116572150488645362 +/- 1.94e-41]"
+        },
+        "subunit_uniform_O_logY_rhs": {
+          "mid_float": 2.9059091984341365,
+          "rad_float_outward": 1.3704269802064123e-16,
+          "lower_dec": "2.905909198434136668162218461920953358113e+0",
+          "upper_dec": "2.905909198434136668162218461920953358116e+0",
+          "arb_ball_str": "[2.905909198434136668162218461920953358115 +/- 1.37e-40]"
+        },
+        "subunit_bound_certified": true,
+        "drift_jump_reindexing_residual_at_Y": {
+          "mid_float": 0.0,
+          "rad_float_outward": 1.974396079717697e-76,
+          "lower_dec": "-1.974396079717696641481144636712607637652e-76",
+          "upper_dec": "1.974396079717696641481144636712607637652e-76",
+          "arb_ball_str": "[+/- 1.98e-76]"
+        },
+        "drift_jump_window_norm": {
+          "mid_float": 0.8475821273901628,
+          "rad_float_outward": 5.4851831628737147e-17,
+          "lower_dec": "8.475821273901628643067526178200343972729e-1",
+          "upper_dec": "8.475821273901628643067526178200343972732e-1",
+          "arb_ball_str": "[0.8475821273901628643067526178200343972731 +/- 3.65e-41]"
+        },
+        "drift_jump_O_logY_upper_bound": {
+          "mid_float": 563.8449121337721,
+          "rad_float_outward": 4.133484045683496e-14,
+          "lower_dec": "5.638449121337721821402171504413305712953e+2",
+          "upper_dec": "5.638449121337721821402171504413305712956e+2",
+          "arb_ball_str": "[563.8449121337721821402171504413305712955 +/- 1.43e-38]"
+        },
+        "drift_jump_bound_certified": true,
+        "verified": true
+      },
+      {
+        "Y_fraction": "16/1",
+        "floor_Y": 16,
+        "T_Y": 32,
+        "subunit_weighted_sum_lhs": {
+          "mid_float": 0.9354399555629695,
+          "rad_float_outward": 5.035735076725968e-17,
+          "lower_dec": "9.354399555629695998758213250736673933829e-1",
+          "upper_dec": "9.354399555629695998758213250736673933832e-1",
+          "arb_ball_str": "[0.9354399555629695998758213250736673933831 +/- 2.33e-41]"
+        },
+        "subunit_uniform_O_logY_rhs": {
+          "mid_float": 4.4339804165527354,
+          "rad_float_outward": 2.0761186812923268e-16,
+          "lower_dec": "4.433980416552735656088464631819842808247e+0",
+          "upper_dec": "4.433980416552735656088464631819842808250e+0",
+          "arb_ball_str": "[4.433980416552735656088464631819842808249 +/- 1.19e-40]"
+        },
+        "subunit_bound_certified": true,
+        "drift_jump_reindexing_residual_at_Y": {
+          "mid_float": -2.5908505665283334e-76,
+          "rad_float_outward": 1.3354177309277457e-75,
+          "lower_dec": "-1.594502787580578794371791394897406425899e-75",
+          "upper_dec": "1.076332674274912116848610283129382451633e-75",
+          "arb_ball_str": "[+/- 1.60e-75]"
+        },
+        "drift_jump_window_norm": {
+          "mid_float": 2.593885239117776,
+          "rad_float_outward": 7.732517129928482e-17,
+          "lower_dec": "2.593885239117776097704040660878200427841e+0",
+          "upper_dec": "2.593885239117776097704040660878200427844e+0",
+          "arb_ball_str": "[2.593885239117776097704040660878200427842 +/- 9.12e-41]"
+        },
+        "drift_jump_O_logY_upper_bound": {
+          "mid_float": 1226.9530524592305,
+          "rad_float_outward": 1.0953289207943336e-16,
+          "lower_dec": "1.226953052459230548375155820818027402063e+3",
+          "upper_dec": "1.226953052459230548375155820818027402066e+3",
+          "arb_ball_str": "[1226.953052459230548375155820818027402064 +/- 4.02e-37]"
+        },
+        "drift_jump_bound_certified": true,
+        "verified": true
+      },
+      {
+        "Y_fraction": "64/1",
+        "floor_Y": 64,
+        "T_Y": 182,
+        "subunit_weighted_sum_lhs": {
+          "mid_float": 1.6322139638498965,
+          "rad_float_outward": 5.736152169983413e-17,
+          "lower_dec": "1.632213963849896419070855612614690535191e+0",
+          "upper_dec": "1.632213963849896419070855612614690535194e+0",
+          "arb_ball_str": "[1.632213963849896419070855612614690535193 +/- 2.58e-40]"
+        },
+        "subunit_uniform_O_logY_rhs": {
+          "mid_float": 5.962051634671335,
+          "rad_float_outward": 1.6590817161223857e-16,
+          "lower_dec": "5.962051634671334644014710801718732258381e+0",
+          "upper_dec": "5.962051634671334644014710801718732258384e+0",
+          "arb_ball_str": "[5.962051634671334644014710801718732258383 +/- 9.99e-41]"
+        },
+        "subunit_bound_certified": true,
+        "drift_jump_reindexing_residual_at_Y": {
+          "mid_float": -1.5372380028068111e-75,
+          "rad_float_outward": 4.660261217045342e-75,
+          "lower_dec": "-6.197499219852151860718982353869186377238e-75",
+          "upper_dec": "3.123023214238529574081441090712244129920e-75",
+          "arb_ball_str": "[+/- 6.20e-75]"
+        },
+        "drift_jump_window_norm": {
+          "mid_float": 7.052871154525408,
+          "rad_float_outward": 3.750878312944661e-16,
+          "lower_dec": "7.052871154525408512291443863021438953642e+0",
+          "upper_dec": "7.052871154525408512291443863021438953645e+0",
+          "arb_ball_str": "[7.052871154525408512291443863021438953643 +/- 4.58e-40]"
+        },
+        "drift_jump_O_logY_upper_bound": {
+          "mid_float": 1822.541746794548,
+          "rad_float_outward": 2.87821069006371e-14,
+          "lower_dec": "1.822541746794548118165276909296452289045e+3",
+          "upper_dec": "1.822541746794548118165276909296452289048e+3",
+          "arb_ball_str": "[1822.541746794548118165276909296452289047 +/- 1.23e-37]"
+        },
+        "drift_jump_bound_certified": true,
+        "verified": true
+      }
+    ],
     "all_section_3_checks_pass": true
   },
   "section_4_complete_energy_bridge_and_global_consequence": {
     "epistemic_status": "CONDITIONAL_IMPLICATION",
-    "lean_theorem": "complete_reconstruction_drift_contraction_transfer_tc060",
+    "section_epistemic_scope_note": "Mixed section: the lossless decomposition Q_{lambda,T} = 2*P_T - D_{2,known,T} - D_{2,core,T} and (8, 4, 4) window energy inequality are unconditional in Lean Theorem 6(1)-(2), and full-core intermediate/tail retention is unconditional in Lean Theorem 7(1); the R-independent finite-horizon absorption is a CONDITIONAL_IMPLICATION in Lean Theorem 6(3) assuming the Route D diagonal, known-D_2, and open-core hypotheses.",
+    "component_epistemic_map": {
+      "lossless_known_vs_full_core_decomposition_and_8_4_4_inequality": "CONCRETE_ANALYTIC_IN_LEAN",
+      "full_core_intermediate_and_tail_partition_retention": "UNCONDITIONAL_FINITE_ARITHMETIC",
+      "R_independent_finite_horizon_feedback_absorption": "CONDITIONAL_IMPLICATION",
+      "complete_reconstruction_and_sample_threshold_evaluations": "CERTIFIED_FINITE_OBSERVATION"
+    },
+    "lean_theorems": [
+      "complete_reconstruction_drift_contraction_transfer_tc060",
+      "full_core_quantified_obstructions_and_w2_support_tc060r"
+    ],
+    "full_open_core_formula": "D_{2,core,T(Y)}(X) = [sum_{min(D_0(Y), T(Y)-1) < d <= T(Y)-1} R_{osc}(d)*Delta_d^{sm}(X) - Q_{lambda,T(Y)}^{[2]}(X)] / (log X)^2, T(Y) = ceil(Y^{5/4}), Y >= 2; sufficient open closure target retains signed 8*X_tilde(Y) + 4*||D_{2,core,T(Y)}||_Y^2.",
     "complete_reconstruction_rows": [
       {
         "Y": 2,
         "T_Y": 3,
-        "D_0_Y": 1,
+        "D_0_Y": 0,
+        "small_divisor_slice_empty": true,
+        "full_open_core_divisor_range_inclusive": [
+          1,
+          2
+        ],
         "E_Y": {
           "mid_float": 0.11237427864768398,
           "rad_float_outward": 3.679929483816847e-18,
@@ -2320,25 +2933,25 @@
           "arb_ball_str": "[0.04522784840732837350431689006979992795121 +/- 3.22e-42]"
         },
         "D2_known_norm_sq": {
-          "mid_float": 0.5189509412688893,
-          "rad_float_outward": 4.546811784238973e-17,
-          "lower_dec": "5.189509412688893441090606400365833246376e-1",
-          "upper_dec": "5.189509412688893441090606400365833246379e-1",
-          "arb_ball_str": "[0.5189509412688893441090606400365833246378 +/- 1.29e-41]"
+          "mid_float": 3.066940230561358,
+          "rad_float_outward": 1.6148656569913822e-16,
+          "lower_dec": "3.066940230561357621559084949862699720358e+0",
+          "upper_dec": "3.066940230561357621559084949862699720361e+0",
+          "arb_ball_str": "[3.066940230561357621559084949862699720360 +/- 2.39e-40]"
         },
         "D2_core_open_norm_sq": {
-          "mid_float": 0.2214020101664968,
-          "rad_float_outward": 1.1996887810230904e-17,
-          "lower_dec": "2.214020101664968107677954271576077156312e-1",
-          "upper_dec": "2.214020101664968107677954271576077156315e-1",
-          "arb_ball_str": "[0.2214020101664968107677954271576077156313 +/- 8.47e-42]"
+          "mid_float": 4.220191358133062,
+          "rad_float_outward": 9.421067535120729e-17,
+          "lower_dec": "4.220191358133061582272391197618886970793e+0",
+          "upper_dec": "4.220191358133061582272391197618886970796e+0",
+          "arb_ball_str": "[4.220191358133061582272391197618886970794 +/- 4.74e-40]"
         },
         "eight_P_sq_plus_four_D2_known_sq_plus_four_D2_core_sq": {
-          "mid_float": 3.7457300170789924,
-          "rad_float_outward": 3.256322276146162e-17,
-          "lower_dec": "3.745730017078992413936573880994587007226e+0",
-          "upper_dec": "3.745730017078992413936573880994587007229e+0",
-          "arb_ball_str": "[3.745730017078992413936573880994587007228 +/- 3.58e-40]"
+          "mid_float": 29.932844566115126,
+          "rad_float_outward": 1.063167604648295e-15,
+          "lower_dec": "2.993284456611512460975505420214416961075e+1",
+          "upper_dec": "2.993284456611512460975505420214416961078e+1",
+          "arb_ball_str": "[29.93284456611512460975505420214416961077 +/- 1.81e-39]"
         },
         "complete_upper_bound_certified": true
       },
@@ -2346,6 +2959,11 @@
         "Y": 4,
         "T_Y": 6,
         "D_0_Y": 1,
+        "small_divisor_slice_empty": false,
+        "full_open_core_divisor_range_inclusive": [
+          2,
+          5
+        ],
         "E_Y": {
           "mid_float": 0.004608633312722756,
           "rad_float_outward": 2.869350901878105e-19,
@@ -2394,6 +3012,11 @@
         "Y": 8,
         "T_Y": 14,
         "D_0_Y": 2,
+        "small_divisor_slice_empty": false,
+        "full_open_core_divisor_range_inclusive": [
+          3,
+          13
+        ],
         "E_Y": {
           "mid_float": 0.016280644236178577,
           "rad_float_outward": 1.14638474407536e-18,
@@ -2442,6 +3065,11 @@
         "Y": 16,
         "T_Y": 32,
         "D_0_Y": 2,
+        "small_divisor_slice_empty": false,
+        "full_open_core_divisor_range_inclusive": [
+          3,
+          31
+        ],
         "E_Y": {
           "mid_float": 0.07304028417222569,
           "rad_float_outward": 2.409422764444495e-18,
@@ -2490,6 +3118,11 @@
         "Y": 32,
         "T_Y": 77,
         "D_0_Y": 3,
+        "small_divisor_slice_empty": false,
+        "full_open_core_divisor_range_inclusive": [
+          4,
+          76
+        ],
         "E_Y": {
           "mid_float": 0.03136294235359265,
           "rad_float_outward": 3.3313428500365492e-18,
@@ -2538,6 +3171,11 @@
         "Y": 64,
         "T_Y": 182,
         "D_0_Y": 4,
+        "small_divisor_slice_empty": false,
+        "full_open_core_divisor_range_inclusive": [
+          5,
+          181
+        ],
         "E_Y": {
           "mid_float": 0.062151114898631475,
           "rad_float_outward": 2.848224509376618e-18,
@@ -2583,6 +3221,153 @@
         "complete_upper_bound_certified": true
       }
     ],
+    "full_open_core_partition_checks": [
+      {
+        "T_Y": 3,
+        "D_0_raw": 0,
+        "effective_D_0_min_D0_Tm1": 0,
+        "ceil_tau_Y": 13,
+        "full_divisor_count_1_to_Tm1": 2,
+        "small_slice_range_inclusive": [],
+        "small_slice_count": 0,
+        "small_slice_is_empty": true,
+        "full_open_core_range_inclusive": [
+          1,
+          2
+        ],
+        "full_open_core_count": 2,
+        "intermediate_band_within_open_core_inclusive": [
+          1,
+          2
+        ],
+        "intermediate_band_count": 2,
+        "sub_unit_tail_ge_ceil_tau_Y_within_open_core_inclusive": [],
+        "sub_unit_tail_count": 0,
+        "sub_unit_tail_nonempty": false,
+        "both_intermediate_and_tail_retained_in_open_core": true,
+        "partition_identities_verified": true,
+        "Y": 2
+      },
+      {
+        "T_Y": 6,
+        "D_0_raw": 1,
+        "effective_D_0_min_D0_Tm1": 1,
+        "ceil_tau_Y": 26,
+        "full_divisor_count_1_to_Tm1": 5,
+        "small_slice_range_inclusive": [
+          1,
+          1
+        ],
+        "small_slice_count": 1,
+        "small_slice_is_empty": false,
+        "full_open_core_range_inclusive": [
+          2,
+          5
+        ],
+        "full_open_core_count": 4,
+        "intermediate_band_within_open_core_inclusive": [
+          2,
+          5
+        ],
+        "intermediate_band_count": 4,
+        "sub_unit_tail_ge_ceil_tau_Y_within_open_core_inclusive": [],
+        "sub_unit_tail_count": 0,
+        "sub_unit_tail_nonempty": false,
+        "both_intermediate_and_tail_retained_in_open_core": true,
+        "partition_identities_verified": true,
+        "Y": 4
+      },
+      {
+        "T_Y": 32,
+        "D_0_raw": 2,
+        "effective_D_0_min_D0_Tm1": 2,
+        "ceil_tau_Y": 101,
+        "full_divisor_count_1_to_Tm1": 31,
+        "small_slice_range_inclusive": [
+          1,
+          2
+        ],
+        "small_slice_count": 2,
+        "small_slice_is_empty": false,
+        "full_open_core_range_inclusive": [
+          3,
+          31
+        ],
+        "full_open_core_count": 29,
+        "intermediate_band_within_open_core_inclusive": [
+          3,
+          31
+        ],
+        "intermediate_band_count": 29,
+        "sub_unit_tail_ge_ceil_tau_Y_within_open_core_inclusive": [],
+        "sub_unit_tail_count": 0,
+        "sub_unit_tail_nonempty": false,
+        "both_intermediate_and_tail_retained_in_open_core": true,
+        "partition_identities_verified": true,
+        "Y": 16
+      },
+      {
+        "T_Y": 182,
+        "D_0_raw": 4,
+        "effective_D_0_min_D0_Tm1": 4,
+        "ceil_tau_Y": 403,
+        "full_divisor_count_1_to_Tm1": 181,
+        "small_slice_range_inclusive": [
+          1,
+          4
+        ],
+        "small_slice_count": 4,
+        "small_slice_is_empty": false,
+        "full_open_core_range_inclusive": [
+          5,
+          181
+        ],
+        "full_open_core_count": 177,
+        "intermediate_band_within_open_core_inclusive": [
+          5,
+          181
+        ],
+        "intermediate_band_count": 177,
+        "sub_unit_tail_ge_ceil_tau_Y_within_open_core_inclusive": [],
+        "sub_unit_tail_count": 0,
+        "sub_unit_tail_nonempty": false,
+        "both_intermediate_and_tail_retained_in_open_core": true,
+        "partition_identities_verified": true,
+        "Y": 64
+      },
+      {
+        "T_Y": 32768,
+        "D_0_raw": 8,
+        "effective_D_0_min_D0_Tm1": 8,
+        "ceil_tau_Y": 25736,
+        "full_divisor_count_1_to_Tm1": 32767,
+        "small_slice_range_inclusive": [
+          1,
+          8
+        ],
+        "small_slice_count": 8,
+        "small_slice_is_empty": false,
+        "full_open_core_range_inclusive": [
+          9,
+          32767
+        ],
+        "full_open_core_count": 32759,
+        "intermediate_band_within_open_core_inclusive": [
+          9,
+          25735
+        ],
+        "intermediate_band_count": 25727,
+        "sub_unit_tail_ge_ceil_tau_Y_within_open_core_inclusive": [
+          25736,
+          32767
+        ],
+        "sub_unit_tail_count": 7032,
+        "sub_unit_tail_nonempty": true,
+        "both_intermediate_and_tail_retained_in_open_core": true,
+        "partition_identities_verified": true,
+        "Y": 4096
+      }
+    ],
     "R_independent_feedback_threshold_rows": [
       {
         "eps": "1/2",
@@ -2593,6 +3378,7 @@
           "upper_dec": "1.598955637122568674971889741320733647510e+1",
           "arb_ball_str": "[15.98955637122568674971889741320733647508 +/- 3.37e-39]"
         },
+        "B_pure_drift_analytic_upper_role": "ANALYTIC_PURE_DRIFT_CONSTANT_288_MINUS_ZETA_PRIME_PLUS_ZETA_SQ",
         "B_pure_drift_analytic_upper": {
           "mid_float": 121324.74159422913,
           "rad_float_outward": 1.7078927122232837e-12,
@@ -2600,7 +3386,7 @@
           "upper_dec": "1.213247415942291280569842420694748747119e+5",
           "arb_ball_str": "[121324.7415942291280569842420694748747117 +/- 6.08e-36]"
         },
-        "B_drift_sample_role": "ILLUSTRATIVE_SAMPLE_INSTANTIATION_OF_THEOREM_6_ABSTRACT_B_DRIFT",
+        "B_drift_sample_role": "ILLUSTRATIVE_SAMPLE_INSTANTIATION_OF_THEOREM_6_ABSTRACT_PARAMETER_NOT_FULL_KNOWN_BOUND",
         "B_drift_sample": {
           "mid_float": 12162.270350592962,
           "rad_float_outward": 8.92032423926729e-13,
@@ -2608,6 +3394,7 @@
           "upper_dec": "1.216227035059296123945385037527688540776e+4",
           "arb_ball_str": "[12162.27035059296123945385037527688540775 +/- 9.34e-37]"
         },
+        "B_known_full_analytic_role": "COMBINES_B_DRIFT_AND_B_SMALL_VIA_UNCONDITIONAL_PNT_SUPREMUM_C_OSC_DISTINCT_FROM_B_SAMPLE",
         "R_independent_log_Y_star": {
           "mid_float": 194597.3256094874,
           "rad_float_outward": 1.4272518782827664e-11,
@@ -2646,6 +3433,7 @@
           "upper_dec": "1.279898667453791441125686308011036895781e+2",
           "arb_ball_str": "[127.9898667453791441125686308011036895780 +/- 1.14e-39]"
         },
+        "B_pure_drift_analytic_upper_role": "ANALYTIC_PURE_DRIFT_CONSTANT_288_MINUS_ZETA_PRIME_PLUS_ZETA_SQ",
         "B_pure_drift_analytic_upper": {
           "mid_float": 1514411.931068144,
           "rad_float_outward": 2.0616162866269165e-11,
@@ -2653,7 +3441,7 @@
           "upper_dec": "1.514411931068144019566069990481325642560e+6",
           "arb_ball_str": "[1514411.931068144019566069990481325642559 +/- 4.25e-34]"
         },
-        "B_drift_sample_role": "ILLUSTRATIVE_SAMPLE_INSTANTIATION_OF_THEOREM_6_ABSTRACT_B_DRIFT",
+        "B_drift_sample_role": "ILLUSTRATIVE_SAMPLE_INSTANTIATION_OF_THEOREM_6_ABSTRACT_PARAMETER_NOT_FULL_KNOWN_BOUND",
         "B_drift_sample": {
           "mid_float": 42464.75879091378,
           "rad_float_outward": 3.5298506218053327e-12,
@@ -2661,6 +3449,7 @@
           "upper_dec": "4.246475879091377657358698071465661893560e+4",
           "arb_ball_str": "[42464.75879091377657358698071465661893558 +/- 3.50e-36]"
         },
+        "B_known_full_analytic_role": "COMBINES_B_DRIFT_AND_B_SMALL_VIA_UNCONDITIONAL_PNT_SUPREMUM_C_OSC_DISTINCT_FROM_B_SAMPLE",
         "R_independent_log_Y_star": {
           "mid_float": 679437.1406546205,
           "rad_float_outward": 5.647760994888532e-11,
@@ -2695,22 +3484,22 @@
       {
         "consequence_class": "ABSOLUTE_LOGARITHMIC_IMPROVEMENT",
         "status": "PROVED_UNCONDITIONALLY_AND_REFINED",
-        "scope": "All-order O_A(Y / (log Y)^A) control of ||r_{sm,T}||_Y^2 / (log Y)^4 established via Selberg PNT + C_{chi,var} (TC-059), now refined in TC-060 by isolating the exact z = 1/2 square-pole drift M_{sq,2}(d) from the zero-driven oscillatory remainder R_{osc}(d)."
+        "scope": "All-order O_A(Y / (log Y)^A) control of ||r_{sm,T}||_Y^2 / (log Y)^4 established via Selberg PNT + C_{chi,var} (TC-059), refined in TC-060/TC-060R by decomposing R(d) = M_{sq,2}(d) + R_{osc}(d) into the residue-defined z = 1/2 drift model M_{sq,2}(d) and the exact residual R_{osc}(d)."
       },
       {
         "consequence_class": "FIXED_POWER_SAVING",
         "status": "NOT_PROVED_UNCONDITIONALLY",
-        "scope": "Any pointwise power saving |R_{osc}(d)| = O(d^{1-delta}) (delta in (0, 1/2]) is equivalent to nonvanishing of zeta(z) on Re(z) > 1 - delta because zeta(2z)/zeta(z) retains an uncancelled pole of order k_0 at every zero rho_0 in Re(rho_0) > 1/2 (since Re(2*rho_0) > 1 implies zeta(2*rho_0) != 0)."
+        "scope": "Forward Abelian/continuation implication proved analytically outside Lean: if |R_{osc}(d)| = O(d^{1-delta}) for some delta in (0, 1/2], then on Re(z) > 1 - delta >= 1/2 both sum_{d>=1} delta_{sq,2}(d)*d^{-z} and sum_{d>=1} R_{osc}(d)*(d^{-z} - (d+1)^{-z}) converge absolutely and locally uniformly, extending D_lambda''(z)/D_lambda(z) - c_lambda*zeta(z) holomorphically to Re(z) > 1 - delta and ruling out zeros rho_0 of zeta(z) there (where Re(2*rho_0) > 1 => zeta(2*rho_0) != 0 would leave an uncancelled double pole m_{rho_0}*(m_{rho_0}+1)/(z - rho_0)^2). No exact-boundary converse is claimed from local poles alone."
       },
       {
         "consequence_class": "RELATIVE_CONTRACTION",
         "status": "PROVED_UNCONDITIONALLY_ON_SQUARE_POLE_DRIFT_AND_SMALL_DIVISORS",
-        "scope": "NEW IN TC-060: For every eps > 0, R >= 2, and 2 <= Y <= R, discrete Abel re-summation of M_{sq,2}(d) with sub-unit d > floor(Y) separation proves ||r_{sm,T(Y)}^{drift}/(log X)^2||_Y^2 <= Theta_eps^{drift}(Y)*G_eps(R)*Y^eps + C_{drift}(eps) with Theta_eps^{drift}(Y) = O_eps((log Y)^{-4}) -> 0, and Theorem 7 proves relative contraction O((log Y)^{-kappa})*G_eps(R)*Y^eps on 1 <= d <= D_0(Y) = floor((log Y)^{(4-kappa)/3})."
+        "scope": "Proved analytically outside Lean using TC-060 Theorem 5's discrete Abel identity, increment bound |delta_{sq,2}(d)| <= 12*log(d+1)/sqrt(d), and finite weighted small-divisor inequality together with TC-057 Theorem 25 (first main conjunct, third item) cutoff lower bounds, inherited TC-059R Theorem 7's smooth-increment window norm estimate, and TC-057R's PNT bound |R_{osc}(d)| <= C_{osc}*d: for every eps > 0, R >= 2, and 2 <= Y <= R, ||r_{sm,T(Y)}^{drift}/(log X)^2||_Y^2 <= (B_{drift}(eps)/(log Y)^4)*G_eps(R)*Y^eps + C_{drift}(eps) and ||r_{sm,<=min(D_0,T-1)}^{osc}/(log X)^2||_Y^2 <= O((log Y)^{-kappa})*G_eps(R)*Y^eps + C_{small}(eps)."
       },
       {
         "consequence_class": "ALL_POSITIVE_EXPONENTS_CLOSURE",
         "status": "OPEN",
-        "scope": "SUBGATE-TC-043A remains OPEN and rh_proved remains False: closing E(Y) = O_eps(Y^eps) requires controlling the remaining core oscillatory sum D_0(Y) < d < ceil(tau*Y) (r_{sm,core}^{osc}), -Q_{lambda,T}^{[2]}/(log X)^2, and prime-power off-diagonal X_tilde(Y)."
+        "scope": "SUBGATE-TC-043A remains OPEN and rh_proved remains False: closing E(Y) = O_eps(Y^eps) via Theorem 6 requires controlling the full signed open quantity 8*X_tilde(Y) + 4*||D_{2,core,T(Y)}||_Y^2, where D_{2,core,T(Y)}(X) = (sum_{min(D_0(Y), T(Y)-1) < d <= T(Y)-1} R_{osc}(d)*Delta_d^{sm}(X) - Q_{lambda,T(Y)}^{[2]}(X)) / (log X)^2 retains ALL d up to T(Y) - 1 (including d >= ceil(tau*Y), because Lemma B2's O(Y*(log Y)^{-4}*exp(-2*c_W*sqrt(log Y))) bound is only an absolute upper bound whose majorant divided by Y^eps grows without bound for fixed 0 < eps < 1)."
       }
     ],
     "all_section_4_checks_pass": true
@@ -2909,6 +3698,88 @@
       },
       "H_8_13_13_strictly_positive": true
     },
+    "certified_cutoff_protocol_checks": {
+      "D_0_at_Y_2": 0,
+      "Y_2_small_slice_empty": true,
+      "Y_2_full_open_core_range": [
+        1,
+        2
+      ],
+      "nonboundary_D_0_samples": {
+        "5/2": 0,
+        "3": 1,
+        "4": 1,
+        "8": 2,
+        "16": 2,
+        "32": 3,
+        "64": 4
+      },
+      "transition_around_e": {
+        "below_e_27182818_over_1e7": 0,
+        "symbolic_exact_e": 1,
+        "above_e_27182819_over_1e7": 1
+      },
+      "transition_around_e_sq": {
+        "below_e2_73890560_over_1e7": 1,
+        "symbolic_exact_e2": 2,
+        "above_e2_73890561_over_1e7": 2
+      },
+      "transition_around_Y_16_T": {
+        "below_16_16383_over_1024": 32,
+        "exact_16": 32,
+        "above_16_16385_over_1024": 33
+      },
+      "straddling_enclosure_rejections": {
+        "ball_around_5_status": "AMBIGUOUS_STRADDLING_ENCLOSURE",
+        "ball_around_5_candidates": [
+          4,
+          5
+        ],
+        "arb_exp_1_around_e_status": "AMBIGUOUS_STRADDLING_ENCLOSURE",
+        "arb_exp_1_candidates": [
+          0,
+          1
+        ],
+        "ball_around_16_T_status": "AMBIGUOUS_STRADDLING_ENCLOSURE",
+        "ball_around_16_T_candidates": [
+          32,
+          33
+        ],
+        "all_ambiguous_raise_AmbiguousCutoffError": true
+      },
+      "Y_4096_nonempty_tail_partition": {
+        "T_Y": 32768,
+        "D_0_raw": 8,
+        "effective_D_0_min_D0_Tm1": 8,
+        "ceil_tau_Y": 25736,
+        "full_divisor_count_1_to_Tm1": 32767,
+        "small_slice_range_inclusive": [
+          1,
+          8
+        ],
+        "small_slice_count": 8,
+        "small_slice_is_empty": false,
+        "full_open_core_range_inclusive": [
+          9,
+          32767
+        ],
+        "full_open_core_count": 32759,
+        "intermediate_band_within_open_core_inclusive": [
+          9,
+          25735
+        ],
+        "intermediate_band_count": 25727,
+        "sub_unit_tail_ge_ceil_tau_Y_within_open_core_inclusive": [
+          25736,
+          32767
+        ],
+        "sub_unit_tail_count": 7032,
+        "sub_unit_tail_nonempty": true,
+        "both_intermediate_and_tail_retained_in_open_core": true,
+        "partition_identities_verified": true
+      },
+      "verified": true
+    },
     "directed_interval_certificate_protocol_check": {
       "overlap_without_algebraic_proof_status": "NOT_NUMERICALLY_CERTIFIED_OVERLAP",
       "overlap_without_algebraic_proof_certified": false,
@@ -2922,13 +3793,15 @@
   },
   "section_6_lean_formalization_audit": {
     "module_path": "formal/RiemannScope/SignedDilationArithmeticEnergy.lean",
+    "module_sha256": "741760da7d401ea8cf9bc6becba1bb892a1c3c655d95f17f68e3c140aa370b0f",
     "expected_tc060_theorems": [
       "noncircular_reassembly_and_basis_stratification_tc060",
       "adjacent_dilation_multiplier_and_cutoff_blocks_tc060",
       "signed_gram_kernel_and_log_weighted_quadratic_form_tc060",
       "gaussian_window_majorant_and_local_frequency_split_tc060",
       "second_order_drift_abel_and_small_divisor_contraction_tc060",
-      "complete_reconstruction_drift_contraction_transfer_tc060"
+      "complete_reconstruction_drift_contraction_transfer_tc060",
+      "full_core_quantified_obstructions_and_w2_support_tc060r"
     ],
     "all_tc060_theorems_present": true,
     "sorry_count": 0,
@@ -2938,10 +3811,11 @@
     "lean_exit_code": 0,
     "formal_build_report_provenance": {
       "status": "passed",
-      "producing_git_commit": "f95dd15825b4637ff2ec7f22c6e987b9fe6ea6b4",
-      "project_theorem_declarations_compiled": 814,
-      "total_theorems": 814,
-      "report_hash": "804ae978599bf1e02208683dd73f059b3699a3897f2ccfdf91eaee5ec37ae99d"
+      "producing_git_commit": "240307a593b08ab43ffe975ffeb5d7789e5b9a51",
+      "project_theorem_declarations_compiled": 815,
+      "total_theorems": 815,
+      "module_sha256_in_build_report": "741760da7d401ea8cf9bc6becba1bb892a1c3c655d95f17f68e3c140aa370b0f",
+      "report_hash": "6416581a4d6d702a91c94d37bb89f366e66b2b882766c671b947d98e2969082a"
     },
     "per_theorem": {
       "noncircular_reassembly_and_basis_stratification_tc060": {
@@ -3003,13 +3877,23 @@
           "Quot.sound"
         ],
         "verified": true
+      },
+      "full_core_quantified_obstructions_and_w2_support_tc060r": {
+        "captured_check_output": "RiemannScope.SignedDilationArithmeticEnergy.full_core_quantified_obstructions_and_w2_support_tc060r :\n  ((∀ (T D0 C_tail : ℕ),\n        Disjoint (Finset.filter (fun d => d < C_tail) (Finset.Icc (min D0 (T - 1) + 1) (T - 1)))\n            (Finset.filter (fun d => C_tail ≤ d) (Finset.Icc (min D0 (T - 1) + 1) (T - 1))) ∧\n          Finset.Icc (min D0 (T - 1) + 1) (T - 1) =\n              Finset.filter (fun d => d < C_tail) (Finset.Icc (min D0 (T - 1) + 1) (T - 1)) ∪\n                Finset.filter (fun d => C_tail ≤ d) (Finset.Icc (min D0 (T - 1) + 1) (T - 1)) ∧\n            ∀ (c_lam c_half X : ℝ),\n              RiemannScope.SignedDilationArithmeticEnergy.openCoreOscShiftD2Part c_lam c_half T D0 X =\n                (∑ d ∈ Finset.filter (fun d => d < C_tail) (Finset.Icc (min D0 (T - 1) + 1) (T - 1)),\n                        (RiemannScope.LiouvilleSquareDilation.selbergCenteredRemainderInt c_lam d -\n                            RiemannScope.SignedDilationArithmeticEnergy.squarePoleDriftM c_half d) *\n                          RiemannScope.LiouvilleSquareDilation.scaledFiberSmoothStep T d X +\n                      ∑ d ∈ Finset.filter (fun d => C_tail ≤ d) (Finset.Icc (min D0 (T - 1) + 1) (T - 1)),\n                        (RiemannScope.LiouvilleSquareDilation.selbergCenteredRemainderInt c_lam d -\n                            RiemannScope.SignedDilationArithmeticEnergy.squarePoleDriftM c_half d) *\n                          RiemannScope.LiouvilleSquareDilation.scaledFiberSmoothStep T d X -\n                    RiemannScope.LiouvilleSquareDilation.finiteQShifted\n                      (fun n => ↑(RiemannScope.LiouvilleSquareDilation.liouvilleLambda n)) 2 T X) /\n                  X.log ^ 2) ∧\n      (RiemannScope.LiouvilleSquareDilation.canonicalCutoffT 4096 = 32768 ∧\n          ⌈RiemannScope.tau * 4096⌉₊ ≤ 32767 ∧\n            (Finset.filter (fun d => ⌈RiemannScope.tau * 4096⌉₊ ≤ d)\n                (Finset.Icc (min ⌊Real.log 4096⌋₊ (RiemannScope.LiouvilleSquareDilation.canonicalCutoffT 4096 - 1) + 1)\n                  (RiemannScope.LiouvilleSquareDilation.canonicalCutoffT 4096 - 1))).Nonempty) ∧\n        (∀ {Y : ℝ},\n            2 ≤ Y →\n              ∀ (T : ℕ),\n                RiemannScope.DyadicPowerLiftPrimitiveCorrelation.windowEnergyNormSq Y\n                    (RiemannScope.LiouvilleSquareDilation.normalizedPrimePowerTermP T) =\n                  (∫ (X : ℝ) in Y..RiemannScope.tau * Y,\n                      RiemannScope.LiouvilleSquareDilation.pointwisePrimePowerDiagNorm T X / X) +\n                    ∫ (X : ℝ) in Y..RiemannScope.tau * Y,\n                      RiemannScope.LiouvilleSquareDilation.pointwisePrimePowerOffDiagNorm T X / X) ∧\n          ∀ {Y : ℝ},\n            2 ≤ Y →\n              ∀ {T : ℕ},\n                1 ≤ T →\n                  ∀ (D0 : ℕ) (c_lam c_half D_tilde X_tilde : ℝ),\n                    RiemannScope.DyadicPowerLiftPrimitiveCorrelation.windowEnergyNormSq Y\n                          (RiemannScope.LiouvilleSquareDilation.normalizedPrimePowerTermP T) =\n                        D_tilde + X_tilde →\n                      RiemannScope.DyadicPowerLiftPrimitiveCorrelation.actualWindowEnergyE\n                          (fun n => ↑(RiemannScope.LiouvilleSquareDilation.liouvilleLambda n)) T Y ≤\n                        8 * D_tilde +\n                            4 *\n                              RiemannScope.DyadicPowerLiftPrimitiveCorrelation.windowEnergyNormSq Y\n                                (RiemannScope.SignedDilationArithmeticEnergy.knownCompensatedD2Part c_lam c_half T D0) +\n                          (8 * X_tilde +\n                            4 *\n                              RiemannScope.DyadicPowerLiftPrimitiveCorrelation.windowEnergyNormSq Y\n                                (RiemannScope.SignedDilationArithmeticEnergy.openCoreOscShiftD2Part c_lam c_half T\n                                  D0))) ∧\n    ((∀ {T : ℕ}, 2 ≤ T → RiemannScope.SignedDilationArithmeticEnergy.cutoffLevelBlock T T = {1}) ∧\n        ((∀ (c_lam : ℝ), RiemannScope.LiouvilleSquareDilation.selbergCenteredRemainderInt c_lam 1 = -c_lam) ∧\n            RiemannScope.SignedDilationArithmeticEnergy.adjacentDilationMultiplier 1 0 = ↑(1 - 1 / √2) ∧\n              0 < 1 - 1 / √2) ∧\n          (∀ {T : ℕ},\n              2 ≤ T →\n                ∀ {c_lam : ℝ},\n                  c_lam ≠ 0 →\n                    0 < ‖RiemannScope.SignedDilationArithmeticEnergy.blockSignedMultiplier c_lam T T 0‖ ∧\n                      ‖RiemannScope.SignedDilationArithmeticEnergy.blockSignedMultiplier c_lam T T 0‖ =\n                        ∑ d ∈ RiemannScope.SignedDilationArithmeticEnergy.cutoffLevelBlock T T,\n                          |RiemannScope.LiouvilleSquareDilation.selbergCenteredRemainderInt c_lam d| *\n                            ‖RiemannScope.SignedDilationArithmeticEnergy.adjacentDilationMultiplier d 0‖) ∧\n            (∀ {c_lam : ℝ},\n                c_lam ≠ 0 →\n                  ∀ {C δ : ℝ},\n                    0 ≤ C →\n                      0 < δ →\n                        ∀ (T0 : ℕ),\n                          ∃ T,\n                            max 2 T0 ≤ T ∧\n                              T ∈ Finset.Icc 1 T ∧\n                                C * (↑T).log ^ (-(1 + δ)) *\n                                    ∑ d ∈ RiemannScope.SignedDilationArithmeticEnergy.cutoffLevelBlock T T,\n                                      |RiemannScope.LiouvilleSquareDilation.selbergCenteredRemainderInt c_lam d| *\n                                        ‖RiemannScope.SignedDilationArithmeticEnergy.adjacentDilationMultiplier d 0‖ <\n                                  ‖RiemannScope.SignedDilationArithmeticEnergy.blockSignedMultiplier c_lam T T 0‖) ∧\n              ∀ {c_lam : ℝ},\n                c_lam ≠ 0 →\n                  ∀ {C δ Y0 : ℝ},\n                    0 ≤ C →\n                      0 < δ →\n                        2 ≤ Y0 →\n                          ∃ Y,\n                            Y0 ≤ Y ∧\n                              2 ≤ RiemannScope.LiouvilleSquareDilation.canonicalCutoffT Y ∧\n                                RiemannScope.LiouvilleSquareDilation.canonicalCutoffT Y ∈\n                                    Finset.Icc 1 (RiemannScope.LiouvilleSquareDilation.canonicalCutoffT Y) ∧\n                                  C * (↑(RiemannScope.LiouvilleSquareDilation.canonicalCutoffT Y)).log ^ (-(1 + δ)) *\n                                      ∑\n                                        d ∈\n                                          RiemannScope.SignedDilationArithmeticEnergy.cutoffLevelBlock\n                                            (RiemannScope.LiouvilleSquareDilation.canonicalCutoffT Y)\n                                            (RiemannScope.LiouvilleSquareDilation.canonicalCutoffT Y),\n                                        |RiemannScope.LiouvilleSquareDilation.selbergCenteredRemainderInt c_lam d| *\n                                          ‖RiemannScope.SignedDilationArithmeticEnergy.adjacentDilationMultiplier d 0‖ <\n                                    ‖RiemannScope.SignedDilationArithmeticEnergy.blockSignedMultiplier c_lam\n                                        (RiemannScope.LiouvilleSquareDilation.canonicalCutoffT Y)\n                                        (RiemannScope.LiouvilleSquareDilation.canonicalCutoffT Y) 0‖) ∧\n      ((∀ (X : ℝ),\n            0 < X →\n              RiemannScope.LiouvilleSquareDilation.gaussianTermPhi 2 X =\n                (3 * X ^ 2 / 4).exp / 8 * RiemannScope.LiouvilleSquareDilation.gaussianTermPhi 1 X) ∧\n          (∀ {Y b : ℝ},\n              2 ≤ Y →\n                1 < b →\n                  0 < (3 * Y ^ 2 / 4).exp / 8 - 1 ∧\n                    (∀ X ∈ Set.Icc Y (b * Y),\n                        ((3 * Y ^ 2 / 4).exp / 8 - 1) * RiemannScope.LiouvilleSquareDilation.gaussianTermPhi 1 X ≤\n                          RiemannScope.LiouvilleSquareDilation.gaussianTermPhi 2 X -\n                            RiemannScope.LiouvilleSquareDilation.gaussianTermPhi 1 X) ∧\n                      0 <\n                          RiemannScope.SignedDilationArithmeticEnergy.paramWindowNormSq Y b\n                            (RiemannScope.LiouvilleSquareDilation.gaussianTermPhi 1) ∧\n                        ((3 * Y ^ 2 / 4).exp / 8 - 1) ^ 2 *\n                            RiemannScope.SignedDilationArithmeticEnergy.paramWindowNormSq Y b\n                              (RiemannScope.LiouvilleSquareDilation.gaussianTermPhi 1) ≤\n                          RiemannScope.SignedDilationArithmeticEnergy.paramWindowNormSq Y b fun X =>\n                            RiemannScope.LiouvilleSquareDilation.gaussianTermPhi 1 X -\n                              RiemannScope.LiouvilleSquareDilation.gaussianTermPhi 2 X) ∧\n            ∀ (C : ℝ),\n              0 ≤ C →\n                ∃ Y,\n                  2 ≤ Y ∧\n                    1 < RiemannScope.LiouvilleSquareDilation.canonicalCutoffT Y ∧\n                      0 <\n                          √(RiemannScope.DyadicPowerLiftPrimitiveCorrelation.windowEnergyNormSq Y fun X =>\n                              ∑ q ∈ Finset.Icc 1 (RiemannScope.LiouvilleSquareDilation.canonicalCutoffT Y),\n                                RiemannScope.SignedDilationArithmeticEnergy.unitFirstSupportCoeff q *\n                                  RiemannScope.LiouvilleSquareDilation.gaussianTermPhi (1 * q) X) ∧\n                        C *\n                            √(RiemannScope.DyadicPowerLiftPrimitiveCorrelation.windowEnergyNormSq Y fun X =>\n                                ∑ q ∈ Finset.Icc 1 (RiemannScope.LiouvilleSquareDilation.canonicalCutoffT Y),\n                                  RiemannScope.SignedDilationArithmeticEnergy.unitFirstSupportCoeff q *\n                                    RiemannScope.LiouvilleSquareDilation.gaussianTermPhi (1 * q) X) <\n                          1 *\n                            √(RiemannScope.DyadicPowerLiftPrimitiveCorrelation.windowEnergyNormSq Y fun X =>\n                                ∑ q ∈ Finset.Icc 1 (RiemannScope.LiouvilleSquareDilation.canonicalCutoffT Y),\n                                  RiemannScope.SignedDilationArithmeticEnergy.unitFirstSupportCoeff q *\n                                    (RiemannScope.LiouvilleSquareDilation.gaussianTermPhi (1 * q) X -\n                                      RiemannScope.LiouvilleSquareDilation.gaussianTermPhi (2 * q) X))) ∧\n        ((∀ (n : ℕ),\n              1 ≤ n →\n                ∀ (c_lam c_half : ℝ),\n                  RiemannScope.LiouvilleSquareDilation.selbergCenteredRemainderInt c_lam n -\n                        RiemannScope.SignedDilationArithmeticEnergy.squarePoleDriftM c_half n -\n                      (RiemannScope.LiouvilleSquareDilation.selbergCenteredRemainderInt c_lam (n - 1) -\n                        RiemannScope.SignedDilationArithmeticEnergy.squarePoleDriftM c_half (n - 1)) =\n                    RiemannScope.LiouvilleSquareDilation.selbergLiouvilleWeight2 n - c_lam -\n                      (RiemannScope.SignedDilationArithmeticEnergy.squarePoleDriftM c_half n -\n                        RiemannScope.SignedDilationArithmeticEnergy.squarePoleDriftM c_half (n - 1))) ∧\n            (∀ {p : ℕ}, p.Prime → RiemannScope.LiouvilleSquareDilation.selbergLiouvilleWeight2 p = -(↑p).log ^ 2) ∧\n              (∀ {n q₁ q₂ q₃ : ℕ},\n                  q₁.Prime →\n                    q₂.Prime →\n                      q₃.Prime →\n                        q₁ ≠ q₂ →\n                          q₁ ≠ q₃ →\n                            q₂ ≠ q₃ →\n                              q₁ ∣ n →\n                                q₂ ∣ n → q₃ ∣ n → RiemannScope.LiouvilleSquareDilation.selbergLiouvilleWeight2 n = 0) ∧\n                ∀ {p : ℕ},\n                  p.Prime →\n                    5 ≤ p →\n                      RiemannScope.LiouvilleSquareDilation.selbergLiouvilleWeight2 (6 * p) = 0 ∧\n                        ∀ (c_lam : ℝ) {c_half : ℝ},\n                          -2 ≤ c_half →\n                            c_half ≤ 0 →\n                              |RiemannScope.LiouvilleSquareDilation.selbergCenteredRemainderInt c_lam (6 * p) -\n                                        RiemannScope.SignedDilationArithmeticEnergy.squarePoleDriftM c_half (6 * p) -\n                                      (RiemannScope.LiouvilleSquareDilation.selbergCenteredRemainderInt c_lam\n                                          (6 * p - 1) -\n                                        RiemannScope.SignedDilationArithmeticEnergy.squarePoleDriftM c_half\n                                          (6 * p - 1)) -\n                                    -c_lam| ≤\n                                12 * (↑(6 * p + 1)).log / √↑(6 * p)) ∧\n          (∀ {T : ℕ},\n              2 ≤ T →\n                ∀ (M : ℕ → ℝ) {X : ℝ},\n                  0 ≤ X →\n                    ∑ d ∈ Finset.Icc 1 (T - 1), M d * RiemannScope.LiouvilleSquareDilation.scaledFiberCutoffJump T d X =\n                        ∑ q ∈ Finset.Icc 2 T,\n                          M (T / q) * ↑(RiemannScope.LiouvilleSquareDilation.liouvilleLambda q) *\n                            RiemannScope.LiouvilleSquareDilation.gaussianTermPhi ((T / q + 1) * q) X ∧\n                      ∀ q ∈ Finset.Icc 2 T, 1 ≤ T / q ∧ T / q ≤ T - 1 ∧ T < (T / q + 1) * q) ∧\n            (⌊Real.log 2⌋₊ = 0 ∧ ∀ (T : ℕ), Finset.Icc 1 (min ⌊Real.log 2⌋₊ (T - 1)) = ∅) ∧\n              ∀ (d : ℕ),\n                1 ≤ d →\n                  let u := 1 / 2 * (↑(d + 1) / ↑d).log;\n                  1 / √(↑d * ↑(d + 1)) * u ^ 2 ≤ (1 / √↑d - 1 / √↑(d + 1)) ^ 2",
+        "captured_print_axioms_output": "'RiemannScope.SignedDilationArithmeticEnergy.full_core_quantified_obstructions_and_w2_support_tc060r' depends on axioms: [propext,\n Quot.sound,\n Classical.choice]",
+        "parsed_axioms": [
+          "propext",
+          "Quot.sound",
+          "Classical.choice"
+        ],
+        "verified": true
       }
     },
     "all_tc060_lean_checks_pass": true
   },
   "serialized_arb_self_check": {
-    "total_certified_arb_balls_checked": 336,
-    "compared_against_live_original_arb_count": 336,
+    "total_certified_arb_balls_checked": 398,
+    "compared_against_live_original_arb_count": 398,
     "live_original_count_matches_enumerated_total": true,
     "all_enclose_original_256bit_arb_ball": true,
     "failed_paths": [],
@@ -3235,15 +4119,46 @@
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.attempt_a_localization_vs_global_plancherel[5].schwartz_window_majorant_on_I_Y",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.attempt_a_localization_vs_global_plancherel[5].global_plancherel_L2_0_infty",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.attempt_a_localization_vs_global_plancherel[5].global_endpoint_R_T_phi_T_norm_sq",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.candidate_a1_obstruction_and_square_pole_drift.singleton_block_I_T_T_v0_obstruction.R_1_equals_minus_c_lambda",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.candidate_a1_obstruction_and_square_pole_drift.singleton_block_I_T_T_v0_obstruction.m_1_at_v_0",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.candidate_a1_obstruction_and_square_pole_drift.singleton_block_I_T_T_v0_obstruction.M_T_T_at_v_0",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.candidate_a1_obstruction_and_square_pole_drift.singleton_block_I_T_T_v0_obstruction.singleton_ratio_ball_check",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.candidate_a1_obstruction_and_square_pole_drift.c_half_lambda",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.candidate_a1_obstruction_and_square_pole_drift.min_R_d_on_1_to_2000",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.candidate_a1_obstruction_and_square_pole_drift.R_osc_at_10",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.candidate_a1_obstruction_and_square_pole_drift.R_osc_at_13",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.candidate_a1_obstruction_and_square_pole_drift.R_osc_at_2000",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.candidate_a1_obstruction_and_square_pole_drift.max_delta_drift_ratio_1_to_2000",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.candidate_a1_obstruction_and_square_pole_drift.unconditional_w2_prime_and_6p_support_checks.sample_rows[0].w2_at_p",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.candidate_a1_obstruction_and_square_pole_drift.unconditional_w2_prime_and_6p_support_checks.sample_rows[0].w2_at_p_plus_log_p_sq_residual",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.candidate_a1_obstruction_and_square_pole_drift.unconditional_w2_prime_and_6p_support_checks.sample_rows[0].Delta_R_osc_at_p",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.candidate_a1_obstruction_and_square_pole_drift.unconditional_w2_prime_and_6p_support_checks.sample_rows[0].Delta_R_osc_at_6p",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.candidate_a1_obstruction_and_square_pole_drift.unconditional_w2_prime_and_6p_support_checks.sample_rows[0].Delta_R_osc_at_6p_minus_neg_c_lambda",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.candidate_a1_obstruction_and_square_pole_drift.unconditional_w2_prime_and_6p_support_checks.sample_rows[1].w2_at_p",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.candidate_a1_obstruction_and_square_pole_drift.unconditional_w2_prime_and_6p_support_checks.sample_rows[1].w2_at_p_plus_log_p_sq_residual",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.candidate_a1_obstruction_and_square_pole_drift.unconditional_w2_prime_and_6p_support_checks.sample_rows[1].Delta_R_osc_at_p",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.candidate_a1_obstruction_and_square_pole_drift.unconditional_w2_prime_and_6p_support_checks.sample_rows[1].Delta_R_osc_at_6p",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.candidate_a1_obstruction_and_square_pole_drift.unconditional_w2_prime_and_6p_support_checks.sample_rows[1].Delta_R_osc_at_6p_minus_neg_c_lambda",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.candidate_a1_obstruction_and_square_pole_drift.unconditional_w2_prime_and_6p_support_checks.sample_rows[2].w2_at_p",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.candidate_a1_obstruction_and_square_pole_drift.unconditional_w2_prime_and_6p_support_checks.sample_rows[2].w2_at_p_plus_log_p_sq_residual",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.candidate_a1_obstruction_and_square_pole_drift.unconditional_w2_prime_and_6p_support_checks.sample_rows[2].Delta_R_osc_at_p",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.candidate_a1_obstruction_and_square_pole_drift.unconditional_w2_prime_and_6p_support_checks.sample_rows[2].Delta_R_osc_at_6p",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.candidate_a1_obstruction_and_square_pole_drift.unconditional_w2_prime_and_6p_support_checks.sample_rows[2].Delta_R_osc_at_6p_minus_neg_c_lambda",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.attempt_b_product_compensation_and_candidate_b1_counterexamples.H_16_8_1",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.attempt_b_product_compensation_and_candidate_b1_counterexamples.H_16_8_8",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.attempt_b_product_compensation_and_candidate_b1_counterexamples.abs_H_16_8_1_over_H_16_8_8",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.attempt_b_product_compensation_and_candidate_b1_counterexamples.unbounded_arbitrary_coefficient_family_d1_e1_rows[0].phi_1_window_norm_sq",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.attempt_b_product_compensation_and_candidate_b1_counterexamples.unbounded_arbitrary_coefficient_family_d1_e1_rows[0].analytic_lower_bound_exp_3Y2_4_over_8_minus_1",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.attempt_b_product_compensation_and_candidate_b1_counterexamples.unbounded_arbitrary_coefficient_family_d1_e1_rows[0].actual_scaled_ratio_norm_phi1_minus_phi2_over_norm_phi1",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.attempt_b_product_compensation_and_candidate_b1_counterexamples.unbounded_arbitrary_coefficient_family_d1_e1_rows[1].phi_1_window_norm_sq",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.attempt_b_product_compensation_and_candidate_b1_counterexamples.unbounded_arbitrary_coefficient_family_d1_e1_rows[1].analytic_lower_bound_exp_3Y2_4_over_8_minus_1",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.attempt_b_product_compensation_and_candidate_b1_counterexamples.unbounded_arbitrary_coefficient_family_d1_e1_rows[1].actual_scaled_ratio_norm_phi1_minus_phi2_over_norm_phi1",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.attempt_b_product_compensation_and_candidate_b1_counterexamples.unbounded_arbitrary_coefficient_family_d1_e1_rows[2].phi_1_window_norm_sq",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.attempt_b_product_compensation_and_candidate_b1_counterexamples.unbounded_arbitrary_coefficient_family_d1_e1_rows[2].analytic_lower_bound_exp_3Y2_4_over_8_minus_1",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.attempt_b_product_compensation_and_candidate_b1_counterexamples.unbounded_arbitrary_coefficient_family_d1_e1_rows[2].actual_scaled_ratio_norm_phi1_minus_phi2_over_norm_phi1",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.attempt_b_product_compensation_and_candidate_b1_counterexamples.unbounded_arbitrary_coefficient_family_d1_e1_rows[3].phi_1_window_norm_sq",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.attempt_b_product_compensation_and_candidate_b1_counterexamples.unbounded_arbitrary_coefficient_family_d1_e1_rows[3].analytic_lower_bound_exp_3Y2_4_over_8_minus_1",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.attempt_b_product_compensation_and_candidate_b1_counterexamples.unbounded_arbitrary_coefficient_family_d1_e1_rows[3].actual_scaled_ratio_norm_phi1_minus_phi2_over_norm_phi1",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.attempt_b_product_compensation_and_candidate_b1_counterexamples.steep_tail_Y16_d4_L2_a_1_0_scaled_ratio",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.attempt_b_product_compensation_and_candidate_b1_counterexamples.resonant_bulk_Y16_d16_L2_scaled_ratio",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.attempt_b_product_compensation_and_candidate_b1_counterexamples.resonant_bulk_Y16_d16_L3_scaled_ratio",
@@ -3280,6 +4195,37 @@
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.informed_replacement_drift_and_small_divisor_rows[4].r_sm_drift_weighted_upper_bound_over_logY4",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.informed_replacement_drift_and_small_divisor_rows[4].r_sm_osc_small_d_le_D0_norm_sq",
       "section_3_attempts_a_and_b_obstructions_and_drift_theorem.informed_replacement_drift_and_small_divisor_rows[4].r_sm_osc_core_d_gt_D0_norm_sq",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.informed_replacement_drift_and_small_divisor_rows[5].drift_abel_pointwise_residual_at_Y",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.informed_replacement_drift_and_small_divisor_rows[5].r_sm_total_norm_sq",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.informed_replacement_drift_and_small_divisor_rows[5].r_sm_drift_norm_sq",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.informed_replacement_drift_and_small_divisor_rows[5].r_sm_drift_weighted_upper_bound_over_logY4",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.informed_replacement_drift_and_small_divisor_rows[5].r_sm_osc_small_d_le_D0_norm_sq",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.informed_replacement_drift_and_small_divisor_rows[5].r_sm_osc_core_d_gt_D0_norm_sq",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[0].subunit_weighted_sum_lhs",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[0].subunit_uniform_O_logY_rhs",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[0].drift_jump_reindexing_residual_at_Y",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[0].drift_jump_window_norm",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[0].drift_jump_O_logY_upper_bound",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[1].subunit_weighted_sum_lhs",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[1].subunit_uniform_O_logY_rhs",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[1].drift_jump_reindexing_residual_at_Y",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[1].drift_jump_window_norm",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[1].drift_jump_O_logY_upper_bound",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[2].subunit_weighted_sum_lhs",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[2].subunit_uniform_O_logY_rhs",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[2].drift_jump_reindexing_residual_at_Y",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[2].drift_jump_window_norm",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[2].drift_jump_O_logY_upper_bound",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[3].subunit_weighted_sum_lhs",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[3].subunit_uniform_O_logY_rhs",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[3].drift_jump_reindexing_residual_at_Y",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[3].drift_jump_window_norm",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[3].drift_jump_O_logY_upper_bound",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[4].subunit_weighted_sum_lhs",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[4].subunit_uniform_O_logY_rhs",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[4].drift_jump_reindexing_residual_at_Y",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[4].drift_jump_window_norm",
+      "section_3_attempts_a_and_b_obstructions_and_drift_theorem.drift_subunit_and_jump_reindexing_checks[4].drift_jump_O_logY_upper_bound",
       "section_4_complete_energy_bridge_and_global_consequence.complete_reconstruction_rows[0].E_Y",
       "section_4_complete_energy_bridge_and_global_consequence.complete_reconstruction_rows[0].D_tilde_Y",
       "section_4_complete_energy_bridge_and_global_consequence.complete_reconstruction_rows[0].X_tilde_Y",
@@ -3356,8 +4302,8 @@
     "review_path": "docs/reviews/TC_060_SIGNED_DILATION_ARITHMETIC_ENERGY.md",
     "pi_macro_count": 0,
     "pi_glyph_count": 0,
-    "total_displayed_intervals_found": 74,
-    "tagged_and_checked_count": 74,
+    "total_displayed_intervals_found": 95,
+    "tagged_and_checked_count": 95,
     "untagged_count": 0,
     "failed_count": 0,
     "untagged_intervals": [],

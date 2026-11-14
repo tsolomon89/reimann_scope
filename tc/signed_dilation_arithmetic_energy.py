@@ -1,6 +1,6 @@
 r"""
-TASK-TC-060: Signed Dilation Multipliers and Arithmetic Control of the Complete Reconstruction
-toward SUBGATE-TC-043A.
+TASK-TC-060 / TASK-TC-060R: Signed Dilation Multipliers, Arithmetic Control of the Complete
+Reconstruction, and Full-Core / Quantified Counterexample / Certificate Repair toward SUBGATE-TC-043A.
 
 Implements, tests, falsifies, and certifies in 256-bit FLINT/Arb ball arithmetic (using tau
 strictly via `_tau_arb()` as the sole circle constant, complex variable z = x + i*y with real x, y,
@@ -23,57 +23,59 @@ from auxiliary real log scales t = log X, frequencies v, and divisor shifts log 
      `n = T`, and nonzero spillover onto `T + 1 <= n <= 2T` culminating in `alpha_T(2T) = c_lambda*lambda(T) != 0`.
 
 2. Section 2 — Signed Dilation Fourier Representation, Sharp Multiplier Attainment, Cutoff Blocks, & Gram Kernel
-   (`Lean Theorems 2 & 3`):
-   - Finite-cutoff Fourier transform (`t = log X`, `q_L(t) = Q_{lambda,L}(exp t)`):
+   (`Analytic outside Lean` for finite-`L` Fourier/Gamma substitution + `Lean Theorems 2 & 3` for multiplier, blocks, & Gram):
+   - Finite-cutoff Fourier transform (`t = log X`, `q_L(t) = Q_{lambda,L}(exp t)`), proved analytically outside Lean:
      `qhat_L(v) = (1/2) * Gamma(5/4 - i*v/2) * sum_{n<=L} lambda(n) * n^{-1/2 - i*v}`, cross-checked against
      direct real-line `acb.integral` quadrature with certified left/right improper analytic tail balls.
    - Adjacent dilation multiplier `m_d(v) = d^{-1/2} exp(-i*v*log d) - (d+1)^{-1/2} exp(-i*v*log(d+1))`:
      certifies elementary benchmark `|m_d(v)| <= min(d^{-1/2}+(d+1)^{-1/2}, sqrt(1/4+v^2) * int_d^{d+1} t^{-3/2} dt)`
-     and exact unrestricted-frequency supremum attainment `|m_d(v_k(d))| = d^{-1/2} + (d+1)^{-1/2}` at
-     `v_k(d) = (2k+1)*tau / (2*log(1 + 1/d))`.
+     (valid for ALL `v in R` when retaining `(1+|v|)` / `sqrt(1/4+v^2)`) and exact unrestricted-frequency supremum
+     attainment `|m_d(v_k(d))| = d^{-1/2} + (d+1)^{-1/2}` at `v_k(d) = (2k+1)*tau / (2*log(1 + 1/d))` (obstructing
+     only a frequency-independent relative `O(1/d)` saving).
    - Exact level-set cutoff blocks `I_L(T) = {1<=d<T : floor(T/d) = L}` (`1 <= L <= T`), including empty blocks
-     (`I_1(2) = empty`), singleton blocks for `d*(d+1) <= T`, `N_blocks(T) = 2*sqrt(T) + O(1)` (never logarithmic),
-     and `Fourier[r_{sm,T}(exp t)](v) = sum_{L=1}^T M_{L,T}(v)*qhat_L(v)` cross-checked against direct `t`-quadrature.
+     (`I_1(2) = empty`), singleton blocks for `d*(d+1) <= T` (and `I_T(T) = {1}` for all `T >= 2`),
+     `N_blocks(T) = 2*sqrt(T) + O(1)` (never logarithmic), and `Fourier[r_{sm,T}(exp t)](v) = sum_{L=1}^T M_{L,T}(v)*qhat_L(v)`.
    - Real-space signed Gram kernel `H_{Y,b}(d, e)` and `(log X)^{-4}`-weighted kernel `H_{Y,b}^{wt}(d, e)` (`Y >= 2`,
      keeping `(log X)^{-2}` inside the window integral), cross-checked against direct window quadrature across
      integer and noninteger window bases `Y` and `b in {2, e, tau}` with directed log-sandwich bounds.
 
-3. Section 3 — Quantitative Attempts A & B, Proved Obstructions, & Second-Order `z = 1/2` Square-Pole Drift Theorem
-   (`Lean Theorems 4 & 5` + Analytic Proofs):
-   - Attempt A: Gaussian Schwartz window majorant (`[log Y, log(bY)]`), global Plancherel vs local window energy
-     comparison (showing global Plancherel loses scale localization `t_0 = log Y` and integrates across `[T, 2T]`),
-     local-window low/high frequency cross-term non-orthogonality, exact all-`v` closed-form Gamma bound
-     `|Gamma(5/4 - i*v/2)| <= 2^{3/2} Gamma(5/4) (1/16 + v^2/4)^{3/8} / cosh(tau*v/2)^{1/4}` (`Omega(Y) = (32/tau)*log Y`),
-     and **proved obstruction to Candidate A1** (intra-block sign cancellation of `R(d)`): `D_lambda(z) = zeta(2z)/zeta(z)`
-     has a simple pole at `z = 1/2`, producing a strictly positive deterministic drift
-       `M_{sq,2}(d) = 4*sqrt(d)*log(d) + c_{1/2,lambda}*sqrt(d)` (`c_{1/2,lambda} = 4*zeta'(1/2)/zeta(1/2) - 8 - 8*gamma_E`),
-     with `R(d) > 0` certified across `1 <= d <= 2000` (`0` sign flips) whereas `R_{osc}(d) = R(d) - M_{sq,2}(d)`
-     exhibits `178` genuine sign flips on `1 <= d <= 2000`.
-   - Attempt B & Informed Replacement: certifies `dq = er` product compensation in `H_Y(d, e)` (`|H_{16}(8,1)| / H_{16}(8,8) > 2`),
-     refutes Candidate B1 (`||Delta_d^{sm}(a)||_Y <= (C/d)*||g_{a,d}||_Y`) by certified rational counterexamples in both
-     steep-tail (`(Y, d, L) = (16, 4, 2)`, ratio `> 800`), resonant-bulk near-cancelling (`Y = d = 16`, `L = 2, 3, 4`),
-     and actual Liouville (`(Y, d, T) = (16, 5, 32)`, ratio `> 3.08`, and `(4, 1, 6)`, ratio `> 2.97`) regimes, and proves the **Informed Replacement Split**
-     `r_{sm,T} = r_{sm,T}^{drift} + r_{sm,<=D_0}^{osc} + r_{sm,>D_0}^{osc}`:
-       * Unconditional all-`eps` relative contraction `||r_{sm,T(Y)}^{drift} / (log X)^2||_Y^2 <= Theta_eps^{drift}(Y)*G_eps(R)*Y^eps + C_{drift}(eps)`
-         with `Theta_eps^{drift}(Y) = O_eps((log Y)^{-4}) -> 0` via discrete Abel summation of `M_{sq,2}(d)` (`|delta_{sq,2}(d)| <= 12*log(d+1)/sqrt(d)`);
-       * Unconditional small-divisor relative contraction on `1 <= d <= D_0(Y) = floor((log Y)^{(4-kappa)/3})` (`kappa in (0, 1]`);
-       * Unconditional sub-unit tail control on `d >= ceil(tau*Y)`;
-       * Exact identification of the surviving zero-driven core obstruction on `D_0(Y) < d < ceil(tau*Y)`.
+3. Section 3 — Quantitative Attempts A & B, Quantified Obstructions, & Residue-Defined `z = 1/2` Drift Theorem
+   (`Lean Theorems 4, 5, & 7` + Outside-Lean Summation/Cutoff Proofs):
+   - Attempt A: Gaussian Schwartz window majorant (`[log Y, log(bY)]`), global Plancherel vs local window energy,
+     local-window low/high frequency cross-term non-orthogonality, closed-form all-`v` Gamma majorant,
+     residue-defined `z = 1/2` drift model `M_{sq,2}(d) = 4*sqrt(d)*log(d) + c_{1/2,lambda}*sqrt(d)` (where
+     `D_lambda(z) = zeta(2z)/zeta(z)` has a simple zero at `z = 1` and a simple pole at `z = 1/2`) and exact
+     residual `R_{osc}(d) := R(d) - M_{sq,2}(d)` (`R(d) > 0` certified finitely on `1 <= d <= 2000` with `0` sign flips
+     vs `178` sign flips of `R_{osc}`), and **exact singleton-block refutation of Candidate A1 as stated**
+     (`I_T(T) = {1}` for `T >= 2`, `v = 0`, `R(1) = -c_lambda > 0`, `m_1(0) = 1 - 2^{-1/2} > 0` giving ratio `= 1`,
+     refuting uniform `(log T)^{-1-delta}` decay across all `T >= T_0`, `L`, and allowed low frequencies).
+   - Attempt B & Informed Replacement: certifies `dq = er` product compensation (`|H_{16}(8,1)| / H_{16}(8,8) > 2`),
+     refutes Candidate B1 (`||Delta_d^{sm}(a)||_Y <= (C/d)*||g_{a,d}||_Y`) for **every fixed constant `C`** across
+     arbitrary coefficients via the unbounded family `d = 1 < T(Y)` (`Y >= 2`), `a = e_1` (`phi_2(X)/phi_1(X) = exp(3*X^2/4)/8`,
+     `||phi_1 - phi_2||_Y / ||phi_1||_Y >= exp(3*Y^2/4)/8 - 1 -> infty`), while keeping finite diagnostics (`819.07`,
+     `2.87 < 3.74 < 5.30`) and actual Liouville witnesses (`2.975`, `3.081`, excluding `C = 1` and `C = 3` on their
+     tested domains) strictly scoped; verifies unconditional `w_{2,lambda}` prime vs `6p` support (`w_{2,lambda}(p) = -(log p)^2`,
+     `w_{2,lambda}(6p) = 0` for prime `p >= 5`); and proves the **Informed Replacement Split**
+     `r_{sm,T} = r_{sm,T}^{drift} + r_{sm,<=min(D_0,T-1)}^{osc} + r_{sm,>min(D_0,T-1)}^{osc}` with certified floor
+     determination (`D_0(Y) = floor(log Y)` at `kappa = 1`, so `D_0(2) = 0` gives an empty small-divisor slice),
+     corrected `O(log Y)` sub-unit (`d > floor(Y)`) and reindexed drift-jump (`d = floor(T/q)`, `2 <= q <= T`)
+     summations, and unconditional all-`eps` relative contraction on `r_{sm,T(Y)}^{drift}/(log X)^2` and `1 <= d <= min(D_0(Y), T(Y)-1)`.
 
-4. Section 4 — Complete Reconstruction Energy Bridge & Global Consequence Classification
-   (`Lean Theorem 6: complete_reconstruction_drift_contraction_transfer_tc060`):
-   - Tracks the complete reconstruction `Q_{lambda,T} = 2*P_Y - D_{2,known,Y} - D_{2,core,Y}` (retaining `X_tilde(Y)`,
-     `c_lambda*Q_{1_sq,T}`, `R(T)*phi_T`, `r_{jump,T}`, `r_{sm,T}^{drift}`, `r_{sm,<=D_0}^{osc}`, `r_{sm,>D_0}^{osc}`,
-     and `-Q_{lambda,T}^{[2]}/(log X)^2`), certifies `R`-independent threshold contraction for `G_eps(R)` keeping
-     sub-unit scales separate, and classifies the global consequence across the four required tiers while keeping
-     `SUBGATE-TC-043A` `OPEN` and `rh_proved = False`.
+4. Section 4 — Complete Reconstruction Energy Bridge & Full-Core Global Consequence Classification
+   (`Lean Theorems 6 & 7`):
+   - Tracks the complete reconstruction `Q_{lambda,T} = 2*P_Y - D_{2,known,Y} - D_{2,core,Y}` retaining the **full open core**
+     `min(D_0(Y), T(Y)-1) < d <= T(Y)-1` inside `D_{2,core,Y} = (sum_{min(D_0,T-1)<d<=T-1} R_{osc}(d)*Delta_d^{sm} - Q_{lambda,T}^{[2]}) / (log X)^2`
+     (including `d >= ceil(tau*Y)`, since Lemma B2's `O(Y*(log Y)^{-4}*exp(-2*c_W*sqrt(log Y)))` bound is only an
+     absolute upper bound whose majorant divided by `Y^eps` grows without bound for `0 < eps < 1`, tested explicitly
+     where nonempty at `Y = 4096`) and the full signed `8*X_tilde(Y) + 4*||D_{2,core,Y}||_Y^2`, keeping `B_drift`,
+     `B_sample`, and `B_known` distinct, `SUBGATE-TC-043A` `OPEN`, and `rh_proved = False`.
 
-5. Section 5 — Controls, Boundary Schedules, & Directed Interval Certificates:
+5. Section 5 — Controls, Certified Cutoffs & Boundary Schedules, & Directed Interval Certificates:
    - Compares actual Liouville `lambda`, unsigned `1`, finite-prime parity controls `a_2` and `a_{3,5,7}` with their
-     own derived second-order Laurent compensations `M_{2,a}(d)`, geometry-only arbitrary coefficient/frequency controls,
-     and an explicitly labeled hybrid diagnostic (`inner = a_2` with `R_lambda(d)`).
-   - Enforces directed interval inequality certification (`upper(LHS) <= lower(RHS)`), rejects overlapping intervals
-     unless backed by deductive algebraic equality, and separates numerical matrix Rayleigh diagnostics from certificates.
+     own derived second-order Laurent compensations `M_{2,a}(d)`, geometry-only controls, and an explicitly labeled
+     hybrid diagnostic (`inner = a_2` with `R_lambda(d)`).
+   - Enforces certified integer floor/ceiling determination (rejecting straddling enclosures), directed interval
+     inequality certification (`upper(LHS) <= lower(RHS)`), and separation of numerical Rayleigh diagnostics.
 """
 
 from __future__ import annotations
@@ -157,10 +159,14 @@ from tc.simultaneous_compatibility_combined_energy import (
 )
 
 TASK_TC_060_ID = "TASK-TC-060"
+TASK_TC_060R_ID = "TASK-TC-060R"
 ACCEPTED_TC059R2_BRANCH = "task/tc-059r2-numerical-assertion-and-report-closeout"
 REVIEWED_TC059R2_IMPLEMENTATION = "25099194f7e951b0cea8ec9c4829249f7221ca56"
 REVIEWED_TC059R2_HEAD = "779be2f9e68765815ceb54e4cfb9239596c5e06d"
 PROPOSED_TC060_BRANCH = "task/tc-060-signed-dilation-multiplier-and-arithmetic-energy"
+REVIEWED_TC060_IMPLEMENTATION = "f95dd15825b4637ff2ec7f22c6e987b9fe6ea6b4"
+REVIEWED_TC060_HEAD = "240307a593b08ab43ffe975ffeb5d7789e5b9a51"
+REPAIR_TC060R_BRANCH = "task/tc-060r-full-core-counterexample-and-proof-scope-repair"
 
 SIGNED_DILATION_ARITHMETIC_ENERGY_ARTIFACT_PATH = (
     REPO_ROOT / "data" / "tc_signed_dilation_arithmetic_energy.json"
@@ -180,6 +186,7 @@ EXPECTED_TC060_THEOREMS: List[str] = [
     "gaussian_window_majorant_and_local_frequency_split_tc060",
     "second_order_drift_abel_and_small_divisor_contraction_tc060",
     "complete_reconstruction_drift_contraction_transfer_tc060",
+    "full_core_quantified_obstructions_and_w2_support_tc060r",
 ]
 
 GLOBAL_CONSEQUENCE_CLASSES: Tuple[str, ...] = (
@@ -188,6 +195,12 @@ GLOBAL_CONSEQUENCE_CLASSES: Tuple[str, ...] = (
     "RELATIVE_CONTRACTION",
     "ALL_POSITIVE_EXPONENTS_CLOSURE",
 )
+
+
+class AmbiguousCutoffError(ValueError):
+    """Raised when an interval enclosure straddles an integer cutoff boundary without an exact
+    symbolic identity, so neither floor nor ceiling is uniquely determined by the input enclosure.
+    """
 
 
 # ---------------------------------------------------------------------------
@@ -262,6 +275,368 @@ def classify_arb_le_certificate(
         if not bool(arb(0) in diff_ball):
             return ("INCONSISTENT_ALGEBRAIC_EQUALITY_CLAIM", False)
     return (status, certified)
+
+
+def classify_floor_from_arb_enclosure(
+    ball: arb,
+) -> Tuple[str, Optional[int], Tuple[int, int]]:
+    """Determine `floor(x)` from exact dyadic endpoints `[lo, hi]` of an `arb` ball.
+
+    Returns `("CERTIFIED_UNIQUE_FLOOR", fl, (fl, fl))` iff `floor(lo) == floor(hi)`; otherwise
+    returns `("AMBIGUOUS_STRADDLING_ENCLOSURE", None, (floor(lo), floor(hi)))` without ever picking
+    a midpoint or uncertified endpoint.
+    """
+    if not ball.is_finite():
+        raise AmbiguousCutoffError(f"Non-finite Arb ball in floor determination: {ball}")
+    lo_f, hi_f = _exact_arb_endpoints_as_fractions(ball)
+    fl_lo = lo_f.numerator // lo_f.denominator
+    fl_hi = hi_f.numerator // hi_f.denominator
+    if fl_lo == fl_hi:
+        return ("CERTIFIED_UNIQUE_FLOOR", fl_lo, (fl_lo, fl_hi))
+    return ("AMBIGUOUS_STRADDLING_ENCLOSURE", None, (fl_lo, fl_hi))
+
+
+def certify_floor_from_arb_enclosure(ball: arb) -> int:
+    """Return the unique certified floor of `ball`, or raise `AmbiguousCutoffError` if straddling."""
+    status, val, cand = classify_floor_from_arb_enclosure(ball)
+    if status != "CERTIFIED_UNIQUE_FLOOR" or val is None:
+        raise AmbiguousCutoffError(
+            f"Ambiguous floor for straddling Arb enclosure {ball}: candidate floors in [{cand[0]}, {cand[1]}]"
+        )
+    return val
+
+
+def classify_ceil_from_arb_enclosure(
+    ball: arb,
+) -> Tuple[str, Optional[int], Tuple[int, int]]:
+    """Determine `ceil(x)` from exact dyadic endpoints `[lo, hi]` of an `arb` ball."""
+    if not ball.is_finite():
+        raise AmbiguousCutoffError(f"Non-finite Arb ball in ceil determination: {ball}")
+    lo_f, hi_f = _exact_arb_endpoints_as_fractions(ball)
+    cl_lo = -((-lo_f.numerator) // lo_f.denominator)
+    cl_hi = -((-hi_f.numerator) // hi_f.denominator)
+    if cl_lo == cl_hi:
+        return ("CERTIFIED_UNIQUE_CEIL", cl_lo, (cl_lo, cl_hi))
+    return ("AMBIGUOUS_STRADDLING_ENCLOSURE", None, (cl_lo, cl_hi))
+
+
+def certify_ceil_from_arb_enclosure(ball: arb) -> int:
+    """Return the unique certified ceiling of `ball`, or raise `AmbiguousCutoffError` if straddling."""
+    status, val, cand = classify_ceil_from_arb_enclosure(ball)
+    if status != "CERTIFIED_UNIQUE_CEIL" or val is None:
+        raise AmbiguousCutoffError(
+            f"Ambiguous ceiling for straddling Arb enclosure {ball}: candidate ceilings in [{cand[0]}, {cand[1]}]"
+        )
+    return val
+
+
+def certify_D0_small_divisor_cutoff(
+    Y: Optional[Union[int, Fraction, arb]] = None,
+    *,
+    kappa: Union[int, Fraction] = 1,
+    exact_log_Y: Optional[Union[int, Fraction]] = None,
+    require_Y_ge_2: bool = True,
+    prec_bits: int = 256,
+    max_prec_bits: int = 4096,
+) -> int:
+    """Certify `D_0(Y) = floor((log Y)^{(4 - kappa) / 3})` (`kappa in (0, 1]`; `floor(log Y)` at `kappa = 1`)
+    without floating-point integer selection.
+
+    - Rejects `float` inputs (`TypeError`), missing inputs (`Y is None and exact_log_Y is None`),
+      and conflicting dual inputs (`Y is not None and exact_log_Y is not None`).
+    - If `exact_log_Y` is supplied (with `Y=None`, representing symbolic `Y = exp(exact_log_Y)` with
+      rational `log Y >= 0`), certifies `exact_log_Y >= log(2)` via iterative Arb ball separation when
+      `require_Y_ge_2=True`, then certifies `floor(exact_log_Y^{(4-kappa)/3})` via exact integer power bounds.
+    - For exact `int` / `Fraction` `Y`: uses `log(1) = 0` at `Y = 1`; for `Y in Q_{>1}` and `kappa in Q cap (0, 1]`,
+      `(log Y)^{(4-kappa)/3}` is never a positive integer (Lindemann-Weierstrass), so iterative Arb precision
+      refinement certifies the unique floor via `certify_floor_from_arb_enclosure`.
+    - For `arb` `Y`: preserves genuine input interval uncertainty `[lo, hi]` (`lo < hi`); refines working precision
+      only to reduce `.log()` rounding slack, and raises `AmbiguousCutoffError` if the image straddles an integer.
+    """
+    if isinstance(Y, float) or isinstance(kappa, float) or isinstance(exact_log_Y, float):
+        raise TypeError("Float inputs are forbidden in certified cutoff determination")
+    if Y is None and exact_log_Y is None:
+        raise ValueError("Must provide either Y or exact_log_Y in certify_D0_small_divisor_cutoff")
+    if Y is not None and exact_log_Y is not None:
+        raise ValueError("Pass Y=None when supplying exact_log_Y so Y and exact_log_Y cannot conflict")
+    kap_f = Fraction(kappa)
+    if not (Fraction(0, 1) < kap_f <= Fraction(1, 1)):
+        raise ValueError(f"kappa must lie in (0, 1], got {kappa}")
+    alpha = (Fraction(4, 1) - kap_f) / Fraction(3, 1)
+
+    if exact_log_Y is not None:
+        l_f = Fraction(exact_log_Y)
+        if l_f < Fraction(0, 1):
+            raise ValueError("exact_log_Y must be >= 0")
+        if require_Y_ge_2:
+            if l_f <= Fraction(0, 1):
+                raise ValueError("exact_log_Y must satisfy exact_log_Y >= log(2) when require_Y_ge_2=True")
+            p_cur = max(64, prec_bits)
+            saved = flint_ctx.prec
+            try:
+                separated = False
+                while p_cur <= max_prec_bits:
+                    flint_ctx.prec = p_cur
+                    l_b = _frac_to_arb(l_f)
+                    lg2_b = arb(2).log()
+                    if bool(l_b.upper() < lg2_b.lower()):
+                        raise ValueError(
+                            f"exact_log_Y = {l_f} < log(2) violates require_Y_ge_2=True (exp(exact_log_Y) < 2)"
+                        )
+                    if bool(l_b.lower() >= lg2_b.upper()):
+                        separated = True
+                        break
+                    p_cur *= 2
+                if not separated:
+                    raise AmbiguousCutoffError(
+                        f"Could not separate exact_log_Y = {l_f} from log(2) at {max_prec_bits} bits"
+                    )
+            finally:
+                flint_ctx.prec = saved
+        if l_f == Fraction(0, 1):
+            return 0
+        # Exact rational power (p / q) ** (a / b): k <= (p/q)^{a/b} < k + 1 <=> k^b q^a <= p^a < (k+1)^b q^a
+        p_a = l_f.numerator ** alpha.numerator
+        q_a = l_f.denominator ** alpha.numerator
+        b_exp = alpha.denominator
+        # Find k >= 0 with k^b * q_a <= p_a < (k + 1)^b * q_a via exact integer binary search:
+        n_ratio = p_a // q_a
+        lo_k, hi_k = 0, max(1, n_ratio)
+        while lo_k < hi_k:
+            mid_k = (lo_k + hi_k + 1) // 2
+            if (mid_k ** b_exp) * q_a <= p_a:
+                lo_k = mid_k
+            else:
+                hi_k = mid_k - 1
+        assert (lo_k ** b_exp) * q_a <= p_a < ((lo_k + 1) ** b_exp) * q_a
+        return lo_k
+
+    if isinstance(Y, arb):
+        if not Y.is_finite():
+            raise AmbiguousCutoffError(f"Non-finite Y in D_0 certification: {Y}")
+        lo_y, hi_y = _exact_arb_endpoints_as_fractions(Y)
+        if lo_y == hi_y:
+            return certify_D0_small_divisor_cutoff(
+                lo_y,
+                kappa=kap_f,
+                require_Y_ge_2=require_Y_ge_2,
+                prec_bits=prec_bits,
+                max_prec_bits=max_prec_bits,
+            )
+        min_req = Fraction(2, 1) if require_Y_ge_2 else Fraction(1, 1)
+        if lo_y < min_req:
+            raise ValueError(f"Y enclosure {Y} falls below required domain {min_req}")
+        p_cur = max(64, prec_bits)
+        saved = flint_ctx.prec
+        try:
+            last_ball = None
+            while p_cur <= max_prec_bits:
+                flint_ctx.prec = p_cur
+                lg_y = Y.log()
+                expr_b = lg_y if alpha == Fraction(1, 1) else (lg_y ** _frac_to_arb(alpha))
+                last_ball = expr_b
+                st, val, _ = classify_floor_from_arb_enclosure(expr_b)
+                if st == "CERTIFIED_UNIQUE_FLOOR" and val is not None:
+                    return val
+                p_cur *= 2
+            assert last_ball is not None
+            return certify_floor_from_arb_enclosure(last_ball)
+        finally:
+            flint_ctx.prec = saved
+
+    y_frac = Fraction(Y)
+    min_req = Fraction(2, 1) if require_Y_ge_2 else Fraction(1, 1)
+    if y_frac < min_req:
+        raise ValueError(f"Y = {y_frac} falls below required domain {min_req}")
+    if y_frac == Fraction(1, 1):
+        return 0
+    p_cur = max(64, prec_bits)
+    saved = flint_ctx.prec
+    try:
+        last_ball = None
+        while p_cur <= max_prec_bits:
+            flint_ctx.prec = p_cur
+            y_b = _frac_to_arb(y_frac)
+            lg_y = y_b.log()
+            expr_b = lg_y if alpha == Fraction(1, 1) else (lg_y ** _frac_to_arb(alpha))
+            last_ball = expr_b
+            st, val, _ = classify_floor_from_arb_enclosure(expr_b)
+            if st == "CERTIFIED_UNIQUE_FLOOR" and val is not None:
+                return val
+            p_cur *= 2
+        assert last_ball is not None
+        return certify_floor_from_arb_enclosure(last_ball)
+    finally:
+        flint_ctx.prec = saved
+
+
+def certify_T_canonical_cutoff(
+    Y: Union[int, Fraction, arb],
+    *,
+    prec_bits: int = 256,
+    max_prec_bits: int = 4096,
+) -> int:
+    """Certify `T(Y) = ceil(Y^{5/4})` without floating-point integer selection.
+
+    - Exact `int` / `Fraction` `Y >= 0`: uses pure integer arithmetic `(k - 1)^4 q^5 < p^5 <= k^4 q^5`
+      (certifying exact fourth-power boundaries such as `Y = 16 -> 32` and `Y = 4096 -> 32768`).
+    - Genuine `arb` ball `Y`: preserves input interval uncertainty and raises `AmbiguousCutoffError`
+      if `Y^{5/4}` straddles an integer.
+    """
+    if isinstance(Y, float):
+        raise TypeError("Float inputs are forbidden in certified cutoff determination")
+    if isinstance(Y, arb):
+        if not Y.is_finite():
+            raise AmbiguousCutoffError(f"Non-finite Y in T(Y) certification: {Y}")
+        lo_y, hi_y = _exact_arb_endpoints_as_fractions(Y)
+        if lo_y == hi_y:
+            return certify_T_canonical_cutoff(lo_y, prec_bits=prec_bits, max_prec_bits=max_prec_bits)
+        if lo_y < Fraction(0, 1):
+            raise ValueError(f"Y enclosure {Y} must be >= 0")
+        p_cur = max(64, prec_bits)
+        saved = flint_ctx.prec
+        try:
+            last_ball = None
+            while p_cur <= max_prec_bits:
+                flint_ctx.prec = p_cur
+                expr_b = Y ** (arb(5) / arb(4))
+                last_ball = expr_b
+                st, val, _ = classify_ceil_from_arb_enclosure(expr_b)
+                if st == "CERTIFIED_UNIQUE_CEIL" and val is not None:
+                    return val
+                p_cur *= 2
+            assert last_ball is not None
+            return certify_ceil_from_arb_enclosure(last_ball)
+        finally:
+            flint_ctx.prec = saved
+
+    y_frac = Fraction(Y)
+    if y_frac < Fraction(0, 1):
+        raise ValueError(f"Y = {y_frac} must be >= 0")
+    if y_frac == Fraction(0, 1):
+        return 0
+    p5 = y_frac.numerator ** 5
+    q5 = y_frac.denominator ** 5
+    n_floor = (p5 - 1) // q5
+    k = math.isqrt(math.isqrt(n_floor)) + 1
+    assert ((k - 1) ** 4) * q5 < p5 <= (k ** 4) * q5
+    return k
+
+
+def certify_ceil_tau_Y_cutoff(
+    Y: Union[int, Fraction, arb],
+    *,
+    prec_bits: int = 256,
+    max_prec_bits: int = 4096,
+) -> int:
+    """Certify `ceil(tau * Y)` without floating-point integer selection."""
+    if isinstance(Y, float):
+        raise TypeError("Float inputs are forbidden in certified cutoff determination")
+    if isinstance(Y, arb):
+        if not Y.is_finite():
+            raise AmbiguousCutoffError(f"Non-finite Y in ceil(tau*Y) certification: {Y}")
+        lo_y, hi_y = _exact_arb_endpoints_as_fractions(Y)
+        if lo_y == hi_y:
+            return certify_ceil_tau_Y_cutoff(lo_y, prec_bits=prec_bits, max_prec_bits=max_prec_bits)
+        if lo_y < Fraction(0, 1):
+            raise ValueError(f"Y enclosure {Y} must be >= 0")
+        p_cur = max(64, prec_bits)
+        saved = flint_ctx.prec
+        try:
+            last_ball = None
+            while p_cur <= max_prec_bits:
+                flint_ctx.prec = p_cur
+                expr_b = _tau_arb() * Y
+                last_ball = expr_b
+                st, val, _ = classify_ceil_from_arb_enclosure(expr_b)
+                if st == "CERTIFIED_UNIQUE_CEIL" and val is not None:
+                    return val
+                p_cur *= 2
+            assert last_ball is not None
+            return certify_ceil_from_arb_enclosure(last_ball)
+        finally:
+            flint_ctx.prec = saved
+
+    y_frac = Fraction(Y)
+    if y_frac < Fraction(0, 1):
+        raise ValueError(f"Y = {y_frac} must be >= 0")
+    if y_frac == Fraction(0, 1):
+        return 0
+    p_cur = max(64, prec_bits)
+    saved = flint_ctx.prec
+    try:
+        last_ball = None
+        while p_cur <= max_prec_bits:
+            flint_ctx.prec = p_cur
+            expr_b = _tau_arb() * _frac_to_arb(y_frac)
+            last_ball = expr_b
+            st, val, _ = classify_ceil_from_arb_enclosure(expr_b)
+            if st == "CERTIFIED_UNIQUE_CEIL" and val is not None:
+                return val
+            p_cur *= 2
+        assert last_ball is not None
+        return certify_ceil_from_arb_enclosure(last_ball)
+    finally:
+        flint_ctx.prec = saved
+
+
+def certify_open_core_divisor_partition(
+    Y: Union[int, Fraction, arb],
+    *,
+    kappa: Union[int, Fraction] = 1,
+    prec_bits: int = 256,
+) -> Dict[str, Any]:
+    """O(1) exact/certified partition of `{1, ..., T(Y)-1}` into the small-divisor slice
+    `1 <= d <= min(D_0(Y), T(Y)-1)` and the **full open core** `min(D_0(Y), T(Y)-1) < d <= T(Y)-1`
+    (matching Lean `openCoreOscShiftD2Part`), plus the internal intermediate-band / `d >= ceil(tau*Y)`
+    sub-partition within the open core without allocating O(T^2) Gram arrays.
+    """
+    T_y = certify_T_canonical_cutoff(Y, prec_bits=prec_bits)
+    D0_raw = certify_D0_small_divisor_cutoff(Y, kappa=kappa, require_Y_ge_2=True, prec_bits=prec_bits)
+    ceil_tau_y = certify_ceil_tau_Y_cutoff(Y, prec_bits=prec_bits)
+    max_d = max(0, T_y - 1)
+    eff_D0 = min(D0_raw, max_d)
+
+    small_lo, small_hi = 1, eff_D0
+    small_count = max(0, small_hi - small_lo + 1)
+
+    core_lo, core_hi = eff_D0 + 1, max_d
+    core_count = max(0, core_hi - core_lo + 1)
+
+    inter_lo = core_lo
+    inter_hi = min(max_d, ceil_tau_y - 1)
+    inter_count = max(0, inter_hi - inter_lo + 1)
+
+    tail_lo = max(core_lo, ceil_tau_y)
+    tail_hi = max_d
+    tail_count = max(0, tail_hi - tail_lo + 1)
+
+    partition_exact = bool(
+        small_count + core_count == max_d
+        and inter_count + tail_count == core_count
+        and (tail_count == 0 or (inter_hi + 1 == tail_lo or inter_count == 0))
+    )
+    return {
+        "T_Y": T_y,
+        "D_0_raw": D0_raw,
+        "effective_D_0_min_D0_Tm1": eff_D0,
+        "ceil_tau_Y": ceil_tau_y,
+        "full_divisor_count_1_to_Tm1": max_d,
+        "small_slice_range_inclusive": [small_lo, small_hi] if small_count > 0 else [],
+        "small_slice_count": small_count,
+        "small_slice_is_empty": small_count == 0,
+        "full_open_core_range_inclusive": [core_lo, core_hi] if core_count > 0 else [],
+        "full_open_core_count": core_count,
+        "intermediate_band_within_open_core_inclusive": [inter_lo, inter_hi] if inter_count > 0 else [],
+        "intermediate_band_count": inter_count,
+        "sub_unit_tail_ge_ceil_tau_Y_within_open_core_inclusive": (
+            [tail_lo, tail_hi] if tail_count > 0 else []
+        ),
+        "sub_unit_tail_count": tail_count,
+        "sub_unit_tail_nonempty": tail_count > 0,
+        "both_intermediate_and_tail_retained_in_open_core": True,
+        "partition_identities_verified": partition_exact,
+    }
 
 
 def _to_arb_val(x: Union[int, Fraction, arb], prec_bits: int = 256) -> arb:
@@ -1164,10 +1539,29 @@ def verify_section_2_signed_dilation_fourier_and_gram_kernel(prec_bits: int = 25
 
         return {
             "epistemic_status": "CONCRETE_ANALYTIC_IN_LEAN",
+            "section_epistemic_scope_note": (
+                "Mixed analytic/formal/numerical section: finite-cutoff qhat_L(v) Gamma substitution and "
+                "improper tail bounds are ANALYTIC_PROVED_OUTSIDE_LEAN; multiplier benchmark/attainment, "
+                "cutoff-block partition/sqrt(T) count, and unweighted/log-weighted Gram quadratic forms "
+                "are formalized in Lean Theorems 2 & 3; quadrature cross-checks are CERTIFIED_FINITE_OBSERVATION."
+            ),
+            "component_epistemic_map": {
+                "qhat_L_finite_cutoff_gamma_identity_and_improper_tails": "ANALYTIC_PROVED_OUTSIDE_LEAN",
+                "adjacent_dilation_multiplier_benchmark_and_odd_harmonic_attainment": "CONCRETE_ANALYTIC_IN_LEAN",
+                "level_set_cutoff_blocks_and_sqrt_T_lower_bound": "UNCONDITIONAL_FINITE_ARITHMETIC",
+                "signed_and_log_weighted_gram_kernels_and_log_sandwich": "CONCRETE_ANALYTIC_IN_LEAN",
+                "quadrature_and_sample_cross_checks": "CERTIFIED_FINITE_OBSERVATION",
+            },
             "lean_theorems": [
                 "adjacent_dilation_multiplier_and_cutoff_blocks_tc060",
                 "signed_gram_kernel_and_log_weighted_quadratic_form_tc060",
             ],
+            "multiplier_frequency_scope_note": (
+                "The derivative-form bound |m_d(v)| <= sqrt(1/4 + v^2) * int_d^{d+1} t^{-3/2} dt retains "
+                "its explicit (1 + |v|) / sqrt(1/4 + v^2) factor and holds for ALL real frequencies v; "
+                "odd-harmonic attainment |m_d(v_k(d))| = d^{-1/2} + (d+1)^{-1/2} obstructs only a "
+                "frequency-independent relative O(1/d) saving."
+            ),
             "qhat_finite_cutoff_checks": qhat_rows,
             "multiplier_benchmark_checks": mult_bench_rows,
             "multiplier_sharp_attainment_checks": attainment_rows,
@@ -1190,19 +1584,26 @@ def verify_section_3_attempts_a_and_b_obstructions_and_drift_theorem(
 ) -> Dict[str, Any]:
     """Execute Attempt A and Attempt B quantitatively:
     - Attempt A: Gaussian window localization vs global Plancherel, local low/high frequency split
-      cross term, closed-form all-`v` Gamma inequality, and refutation of Candidate A1 via the
-      `z = 1/2` square-pole drift `M_{sq,2}(d)` (`R(d) > 0` for `1 <= d <= 2000` vs `178` sign flips
-      of `R_{osc}(d)`).
-    - Attempt B & Informed Replacement: `dq = er` product compensation, certified counterexamples
-      refuting Candidate B1 (unqualified relative derivative gain), discrete Abel identity for
+      cross term, closed-form all-`v` Gamma inequality, residue-defined `z = 1/2` drift model `M_{sq,2}(d)`
+      and exact residual `R_{osc}(d) = R(d) - M_{sq,2}(d)` (`R(d) > 0` certified finitely on `1..2000`
+      vs `178` sign flips of `R_{osc}`), and exact singleton-block refutation of Candidate A1 as stated
+      (`I_T(T) = {1}` for `T >= 2` at `v = 0` giving exact ratio `= 1`).
+    - Attempt B & Informed Replacement: `dq = er` product compensation, unbounded arbitrary-coefficient
+      family `d = 1, a = e_1` refuting Candidate B1 for every fixed constant `C` (plus scoped finite
+      diagnostics and actual Liouville exclusions of `C = 1` and `C = 3`), unconditional `w_{2,lambda}`
+      prime vs `6p` support (`w_{2,lambda}(p) = -(log p)^2`, `w_{2,lambda}(6p) = 0` for prime `p >= 5`),
+      certified `O(log Y)` drift sub-unit and jump-reindexing checks, discrete Abel identity for
       `r_{sm,T}^{drift}`, directed increment bound `|delta_{sq,2}(d)| <= 12*log(d+1)/sqrt(d)`, and
-      evaluation of `r_{sm,T}^{drift}`, `r_{sm,<=D_0}^{osc}`, and `r_{sm,>D_0}^{osc}`.
+      evaluation of `r_{sm,T}^{drift}`, `r_{sm,<=min(D_0,T-1)}^{osc}`, and `r_{sm,>min(D_0,T-1)}^{osc}`
+      using certified canonical `D_0(Y) = floor(log Y)` (including `D_0(2) = 0` empty small slice).
     """
     saved = flint_ctx.prec
     try:
         flint_ctx.prec = prec_bits
         tau = _tau_arb()
         tbl = compute_selberg_centered_remainder_table_arb(2000, prec_bits=prec_bits)
+        c_lam = tbl["c_lambda"]
+        w2 = tbl["w2"]
         R = tbl["R"]
         M_drift = tbl["M_drift"]
         R_osc = tbl["R_osc"]
@@ -1251,7 +1652,7 @@ def verify_section_3_attempts_a_and_b_obstructions_and_drift_theorem(
         loc_ok = True
         for Y_int in (2, 4, 8, 16, 32, 64):
             y_arb = arb(Y_int)
-            T_y = exact_T_cutoff_ceil_Y_5_4(Y_int)
+            T_y = certify_T_canonical_cutoff(Y_int, prec_bits=prec_bits)
             alpha_y = compute_smooth_basis_coefficients_arb(T_y, R_table=R, prec_bits=prec_bits)
             nz = [m for m in range(1, 2 * T_y + 1) if not (alpha_y[m] == arb(0))]
             glob_sq = arb(0)
@@ -1315,14 +1716,33 @@ def verify_section_3_attempts_a_and_b_obstructions_and_drift_theorem(
                 }
             )
 
-        # 3A-3. Obstruction to Candidate A1: R(d) > 0 for ALL 1 <= d <= 2000 vs R_osc(d) sign changes
-        # + directed increment bound |M_{sq,2}(d) - M_{sq,2}(d-1)| <= 12 * log(d+1) / sqrt(d):
+        # 3A-3. Exact singleton-block obstruction to Candidate A1 as stated + finite certified
+        # observation of R(d) > 0 on 1 <= d <= 2000 vs R_osc(d) sign changes + directed increment bound:
+        m_1_at_0_c = evaluate_adjacent_multiplier_m_d_acb(1, 0, prec_bits=prec_bits)
+        m_1_at_0 = m_1_at_0_c.real
+        M_T_T_at_0 = R[1] * m_1_at_0
+        singleton_ratio_at_0 = abs(M_T_T_at_0) / (abs(R[1]) * abs(m_1_at_0))
+        singleton_T_samples = (2, 3, 6, 32, 182, 1024)
+        singleton_blocks_verified = all(
+            cutoff_level_blocks_exact(T_chk)[T_chk] == [1] for T_chk in singleton_T_samples
+        )
+        singleton_ratio_exact_1 = bool(
+            m_1_at_0_c.imag == arb(0)
+            and R[1] > arb(0)
+            and m_1_at_0 > arb(0)
+            and M_T_T_at_0 > arb(0)
+            and arb(1) in singleton_ratio_at_0
+            and abs(singleton_ratio_at_0 - arb(1)) < arb("1e-74")
+            and singleton_blocks_verified
+        )
+
         all_R_pos_2000 = True
         all_M_pos_from_2 = True
         all_delta_drift_le_12 = True
         max_delta_ratio_balls: List[arb] = []
         osc_sign_flips = 0
         prev_osc_sign = 0
+        delta_R_osc_id_ok = True
         for d_i in range(1, 2001):
             if not bool(R[d_i] > arb(0)):
                 all_R_pos_2000 = False
@@ -1334,6 +1754,11 @@ def verify_section_3_attempts_a_and_b_obstructions_and_drift_theorem(
             _, ok_dm = classify_arb_le_certificate(delta_m, arb(12) * scale_d)
             if not ok_dm:
                 all_delta_drift_le_12 = False
+            # Exact increment identity: Delta R_osc(d) = w_{2,lambda}(d) - c_lambda - delta_{sq,2}(d)
+            lhs_dro = R_osc[d_i] - R_osc[d_i - 1]
+            rhs_dro = w2[d_i] - c_lam - (M_drift[d_i] - M_drift[d_i - 1])
+            if not bool(arb(0) in (lhs_dro - rhs_dro) and abs(lhs_dro - rhs_dro) < arb("1e-65")):
+                delta_R_osc_id_ok = False
             ro = R_osc[d_i]
             s_cur = 1 if bool(ro > arb(0)) else (-1 if bool(ro < arb(0)) else 0)
             if s_cur != 0 and prev_osc_sign != 0 and s_cur != prev_osc_sign:
@@ -1345,10 +1770,46 @@ def verify_section_3_attempts_a_and_b_obstructions_and_drift_theorem(
         min_R_1_2000 = -enclose_discrete_grid_max([-R[d_i] for d_i in range(1, 2001)])
         osc_d10_pos = bool(R_osc[10] > arb(0))
         osc_d13_neg = bool(R_osc[13] < arb(0))
+
+        # 3A-4. Unconditional w_{2,lambda} prime vs 6*p support & Delta R_osc(n) arithmetic (Item 4):
+        prime_w2_ok = True
+        six_p_zero_ok = True
+        w2_support_rows: List[Dict[str, Any]] = []
+        for p_chk in (2, 3, 5, 7, 11, 13, 97, 331):
+            res_wp = w2[p_chk] + (arb(p_chk).log() ** 2)
+            if not bool(arb(0) in res_wp and abs(res_wp) < arb("1e-72")):
+                prime_w2_ok = False
+            if p_chk >= 5:
+                n_6p = 6 * p_chk
+                is_zero_6p = w2[n_6p] == arb(0)
+                if not is_zero_6p:
+                    six_p_zero_ok = False
+                if p_chk in (5, 97, 331):
+                    delta_ro_p = R_osc[p_chk] - R_osc[p_chk - 1]
+                    delta_ro_6p = R_osc[n_6p] - R_osc[n_6p - 1]
+                    w2_support_rows.append(
+                        {
+                            "p": p_chk,
+                            "six_p": n_6p,
+                            "w2_at_p": serialize_arb_certified(w2[p_chk]),
+                            "w2_at_p_plus_log_p_sq_residual": serialize_arb_certified(res_wp),
+                            "w2_at_6p_exact_zero": is_zero_6p,
+                            "Delta_R_osc_at_p": serialize_arb_certified(delta_ro_p),
+                            "Delta_R_osc_at_6p": serialize_arb_certified(delta_ro_6p),
+                            "Delta_R_osc_at_6p_minus_neg_c_lambda": serialize_arb_certified(
+                                delta_ro_6p - (-c_lam)
+                            ),
+                        }
+                    )
+
         drift_obs_ok = bool(
-            all_R_pos_2000
+            singleton_ratio_exact_1
+            and all_R_pos_2000
             and all_M_pos_from_2
             and all_delta_drift_le_12
+            and delta_R_osc_id_ok
+            and prime_w2_ok
+            and six_p_zero_ok
             and osc_d10_pos
             and osc_d13_neg
             and osc_sign_flips >= 150
@@ -1360,8 +1821,8 @@ def verify_section_3_attempts_a_and_b_obstructions_and_drift_theorem(
         comp_ratio_8_1 = abs(H_16_8_1) / H_16_8_8
         _, comp_gt_2 = classify_arb_le_certificate(arb(2), comp_ratio_8_1)
 
-        # 3B-2. Certified rational counterexamples refuting Candidate B1
-        # (unqualified ||Delta_d^{sm}(a)||_Y <= (C / d) * ||g_{a, d}||_Y):
+        # 3B-2. Certified unbounded arbitrary-coefficient family d = 1, a = e_1 refuting Candidate B1
+        # for EVERY fixed constant C, alongside scoped finite diagnostics and Liouville witnesses:
         def _eval_scaled_ratio_for_rational_vec(
             Y_val: int, d_val: int, rat_vec: Sequence[Fraction]
         ) -> arb:
@@ -1386,6 +1847,37 @@ def verify_section_3_attempts_a_and_b_obstructions_and_drift_theorem(
                     g_sq += w * k00
                     d_sq += w * (k00 - k10 - k01 + k11)
             return arb(d_val) * (d_sq / g_sq).sqrt()
+
+        unbounded_b1_family_rows: List[Dict[str, Any]] = []
+        unbounded_b1_ok = True
+        for Y_fam in (2, 3, 4, 8):
+            T_fam = certify_T_canonical_cutoff(Y_fam, prec_bits=prec_bits)
+            L_1_fam = T_fam // 1
+            e1_vec = [Fraction(1, 1)] + [Fraction(0, 1)] * (L_1_fam - 1)
+            y_fa = arb(Y_fam)
+            g_norm_sq = evaluate_window_kernel_K_closed_arb(y_fa, 1, 1, tau, prec_bits=prec_bits)
+            actual_ratio = _eval_scaled_ratio_for_rational_vec(Y_fam, 1, e1_vec)
+            analytic_lb = (arb(3 * Y_fam * Y_fam) / arb(4)).exp() / arb(8) - arb(1)
+            _, lb_cert = classify_arb_le_certificate(analytic_lb, actual_ratio)
+            denom_pos = bool(g_norm_sq > arb(0) and T_fam > 1 and L_1_fam >= 1 and analytic_lb > arb(0))
+            row_fb_ok = bool(denom_pos and lb_cert)
+            unbounded_b1_ok = unbounded_b1_ok and row_fb_ok
+            unbounded_b1_family_rows.append(
+                {
+                    "Y": Y_fam,
+                    "d": 1,
+                    "T_Y": T_fam,
+                    "L_1_inherited_length": L_1_fam,
+                    "phi_1_window_norm_sq_positive": bool(g_norm_sq > arb(0)),
+                    "phi_1_window_norm_sq": serialize_arb_certified(g_norm_sq),
+                    "analytic_lower_bound_exp_3Y2_4_over_8_minus_1": serialize_arb_certified(analytic_lb),
+                    "actual_scaled_ratio_norm_phi1_minus_phi2_over_norm_phi1": serialize_arb_certified(
+                        actual_ratio
+                    ),
+                    "directed_lower_bound_certified": lb_cert,
+                    "verified": row_fb_ok,
+                }
+            )
 
         ce_steep_16_4 = _eval_scaled_ratio_for_rational_vec(16, 4, [Fraction(1, 1), Fraction(0, 1)])
         ce_res_L2 = _eval_scaled_ratio_for_rational_vec(16, 16, [Fraction(1, 1), Fraction(-80917, 73927)])
@@ -1415,17 +1907,23 @@ def verify_section_3_attempts_a_and_b_obstructions_and_drift_theorem(
         _, ok_liouv4_gt29 = classify_arb_le_certificate(_frac_to_arb(Fraction(297, 100)), ce_liouville_Y4_d1)
         _, ok_liouv16_gt3 = classify_arb_le_certificate(_frac_to_arb(Fraction(308, 100)), ce_liouville_Y16_d5)
         cand_b1_refuted_ok = bool(
-            ok_steep and ok_res23 and ok_res34 and ok_res4_gt5 and ok_liouv4_gt29 and ok_liouv16_gt3
+            unbounded_b1_ok
+            and ok_steep
+            and ok_res23
+            and ok_res34
+            and ok_res4_gt5
+            and ok_liouv4_gt29
+            and ok_liouv16_gt3
         )
 
-        # 3B-3. Informed replacement within the same representation:
-        # r_{sm,T} = r_{sm,T}^{drift} + r_{sm,<=D_0}^{osc} + r_{sm,>D_0}^{osc}, plus Abel identity check!
+        # 3B-3. Informed replacement within the same representation (including Y = 2 with D_0(2) = 0):
+        # r_{sm,T} = r_{sm,T}^{drift} + r_{sm,<=min(D_0,T-1)}^{osc} + r_{sm,>min(D_0,T-1)}^{osc}!
         replacement_rows: List[Dict[str, Any]] = []
         repl_ok = True
-        for Y_int in (4, 8, 16, 32, 64):
+        for Y_int in (2, 4, 8, 16, 32, 64):
             y_arb = arb(Y_int)
-            T_y = exact_T_cutoff_ceil_Y_5_4(Y_int)
-            D0_y = max(1, int(math.floor(float(y_arb.log().lower()))))
+            T_y = certify_T_canonical_cutoff(Y_int, prec_bits=prec_bits)
+            D0_y = min(T_y - 1, certify_D0_small_divisor_cutoff(Y_int, kappa=1, prec_bits=prec_bits))
 
             # Verify pointwise Abel identity for r_{sm,T}^{drift} at X = Y:
             r_drift_direct = arb(0)
@@ -1464,6 +1962,8 @@ def verify_section_3_attempts_a_and_b_obstructions_and_drift_theorem(
             # Evaluate local unweighted window norms of r_sm, r_sm^{drift}, r_{sm,<=D_0}^{osc}, r_{sm,>D_0}^{osc}
             # via exact phi_n basis expansion and K_Y(m, n):
             def _norm_sq_from_outer_weights(weights_seq: Sequence[arb], d_lo: int, d_hi: int) -> arb:
+                if d_hi < d_lo:
+                    return arb(0)
                 coeff_m = [arb(0)] * (2 * T_y + 1)
                 for d_i in range(d_lo, min(d_hi + 1, T_y)):
                     wd = weights_seq[d_i]
@@ -1487,7 +1987,7 @@ def verify_section_3_attempts_a_and_b_obstructions_and_drift_theorem(
                 and abs(abel_res) < arb("1e-68")
                 and norm_tot >= arb(0)
                 and norm_drift >= arb(0)
-                and norm_osc_small >= arb(0)
+                and (norm_osc_small == arb(0) if D0_y == 0 else norm_osc_small >= arb(0))
                 and norm_osc_core >= arb(0)
             )
             repl_ok = repl_ok and ok_r
@@ -1496,6 +1996,7 @@ def verify_section_3_attempts_a_and_b_obstructions_and_drift_theorem(
                     "Y": Y_int,
                     "T_Y": T_y,
                     "D_0_Y": D0_y,
+                    "small_divisor_slice_empty": D0_y == 0,
                     "drift_abel_pointwise_residual_at_Y": serialize_arb_certified(abel_res),
                     "r_sm_total_norm_sq": serialize_arb_certified(norm_tot),
                     "r_sm_drift_norm_sq": serialize_arb_certified(norm_drift),
@@ -1508,22 +2009,143 @@ def verify_section_3_attempts_a_and_b_obstructions_and_drift_theorem(
                 }
             )
 
+        # 3B-4. Corrected O(log Y) sub-unit summation & drift-jump reindexing verification (Item 5):
+        c_win_5 = ((tau ** 5 - arb(1)) / arb(5)).sqrt()
+        subunit_and_jump_rows: List[Dict[str, Any]] = []
+        sub_jump_ok = True
+        for y_sub_frac in (
+            Fraction(2, 1),
+            Fraction(299, 100),
+            Fraction(4, 1),
+            Fraction(16, 1),
+            Fraction(64, 1),
+        ):
+            y_s = _frac_to_arb(y_sub_frac)
+            T_s = certify_T_canonical_cutoff(y_sub_frac, prec_bits=prec_bits)
+            m_fl = y_sub_frac.numerator // y_sub_frac.denominator
+            sub_lhs = (y_s ** (arb(5) / arb(2))) * sum(
+                (arb(d_s + 1).log() / (arb(d_s) ** (arb(7) / arb(2))) for d_s in range(m_fl + 1, T_s + 1)),
+                arb(0),
+            )
+            sub_rhs = ((arb(3) / arb(2)) ** (arb(5) / arb(2))) * (
+                (arb(2) / arb(5)) * y_s.log() + arb(1) / arb(2)
+            )
+            _, ok_sub = classify_arb_le_certificate(sub_lhs, sub_rhs)
+
+            # Exact drift-jump reindexing d = floor(T/q) for 2 <= q <= T:
+            jump_d_sum = arb(0)
+            for d_j in range(1, T_s):
+                L_d = T_s // d_j
+                L_d1 = T_s // (d_j + 1)
+                for q_j in range(L_d1 + 1, L_d + 1):
+                    jump_d_sum += (
+                        M_drift[d_j]
+                        * arb(liouville_lambda_int(q_j))
+                        * evaluate_phi_n_arb(y_s, (d_j + 1) * q_j, prec_bits=prec_bits)
+                    )
+            jump_q_reindexed = arb(0)
+            jump_coeff_vec = [arb(0)] * (2 * T_s + 1)
+            for q_j in range(2, T_s + 1):
+                d_adm = T_s // q_j
+                term_wt = M_drift[d_adm] * arb(liouville_lambda_int(q_j))
+                jump_q_reindexed += term_wt * evaluate_phi_n_arb(y_s, (d_adm + 1) * q_j, prec_bits=prec_bits)
+                jump_coeff_vec[(d_adm + 1) * q_j] += term_wt
+            reidx_res = jump_d_sum - jump_q_reindexed
+            jump_win_norm = evaluate_bilinear_window_pairing_closed_arb(
+                y_s, 2 * T_s, jump_coeff_vec, jump_coeff_vec, base_mult=tau, prec_bits=prec_bits
+            ).sqrt()
+            jump_olog_rhs = (
+                arb(8)
+                * c_win_5
+                * (y_s ** (arb(5) / arb(2)))
+                * arb(T_s).log()
+                / arb(T_s * T_s)
+            )
+            _, ok_jmp = classify_arb_le_certificate(jump_win_norm, jump_olog_rhs)
+            ok_sj_row = bool(
+                ok_sub and arb(0) in reidx_res and abs(reidx_res) < arb("1e-68") and ok_jmp
+            )
+            sub_jump_ok = sub_jump_ok and ok_sj_row
+            subunit_and_jump_rows.append(
+                {
+                    "Y_fraction": f"{y_sub_frac.numerator}/{y_sub_frac.denominator}",
+                    "floor_Y": m_fl,
+                    "T_Y": T_s,
+                    "subunit_weighted_sum_lhs": serialize_arb_certified(sub_lhs),
+                    "subunit_uniform_O_logY_rhs": serialize_arb_certified(sub_rhs),
+                    "subunit_bound_certified": ok_sub,
+                    "drift_jump_reindexing_residual_at_Y": serialize_arb_certified(reidx_res),
+                    "drift_jump_window_norm": serialize_arb_certified(jump_win_norm),
+                    "drift_jump_O_logY_upper_bound": serialize_arb_certified(jump_olog_rhs),
+                    "drift_jump_bound_certified": ok_jmp,
+                    "verified": ok_sj_row,
+                }
+            )
+
         return {
             "epistemic_status": "ANALYTIC_PROVED_OUTSIDE_LEAN",
+            "section_epistemic_scope_note": (
+                "Mixed section: Gaussian window majorant, local low/high cross-term split, Gauss-product "
+                "polynomial inequality, discrete Abel identity, |delta_{sq,2}(d)| <= 12*log(d+1)/sqrt(d), "
+                "finite small-divisor weighted bound, singleton-block A1 obstruction, d=1/e_1 B1 lower bound, "
+                "w_{2,lambda}(p)/w_{2,lambda}(6p) support, and drift-jump reindexing are formalized in Lean "
+                "Theorems 4, 5, & 7; Euler reflection/Gauss product Gamma majorant, z=1/2 Laurent residue "
+                "derivation of M_{sq,2}(d), and all-eps summation/cutoff contractions of r_sm^{drift} and "
+                "r_{sm,<=D_0}^{osc} are ANALYTIC_PROVED_OUTSIDE_LEAN; finite R(d)/R_osc(d) sign counts and "
+                "finite B1 sample ratios are CERTIFIED_FINITE_OBSERVATION."
+            ),
+            "component_epistemic_map": {
+                "gaussian_window_majorant_and_local_frequency_split": "CONCRETE_ANALYTIC_IN_LEAN",
+                "all_v_closed_form_gamma_majorant": "ANALYTIC_PROVED_OUTSIDE_LEAN",
+                "z_half_laurent_residue_drift_model_M_sq_2": "ANALYTIC_PROVED_OUTSIDE_LEAN",
+                "candidate_a1_singleton_block_I_T_T_v0_refutation": "CONCRETE_ANALYTIC_IN_LEAN",
+                "finite_R_d_positivity_and_R_osc_sign_flips_1_to_2000": "CERTIFIED_FINITE_OBSERVATION",
+                "candidate_b1_unbounded_family_d1_e1_refutation": "CONCRETE_ANALYTIC_IN_LEAN",
+                "candidate_b1_finite_diagnostics_and_liouville_constant_exclusions": "CERTIFIED_FINITE_OBSERVATION",
+                "w2_prime_and_6p_unconditional_support": "UNCONDITIONAL_FINITE_ARITHMETIC",
+                "drift_abel_split_and_increment_bound": "CONCRETE_ANALYTIC_IN_LEAN",
+                "all_eps_drift_and_small_divisor_relative_contractions": "ANALYTIC_PROVED_OUTSIDE_LEAN",
+            },
             "lean_theorems": [
                 "gaussian_window_majorant_and_local_frequency_split_tc060",
                 "second_order_drift_abel_and_small_divisor_contraction_tc060",
+                "full_core_quantified_obstructions_and_w2_support_tc060r",
             ],
             "attempt_a_gamma_closed_form_checks": gamma_rows,
             "attempt_a_localization_vs_global_plancherel": loc_vs_glob_rows,
             "candidate_a1_obstruction_and_square_pole_drift": {
                 "candidate_statement": (
-                    "Candidate A1: Intra-block sign cancellation of R(d) = W_2(d) - c_lambda*d across "
-                    "level-set or dyadic blocks yields o(sum |R(d)| |m_d(v)|) without subtracting a "
-                    "deterministic z = 1/2 drift."
+                    "Candidate A1 (as stated): Uniformly over all T >= T_0, level-set blocks 1 <= L <= T, "
+                    "and low frequencies |v| <= Omega(Y), intra-block sign cancellation of R(d) = W_2(d) - c_lambda*d "
+                    "across I_L(T) satisfies |M_{L,T}(v)| <= C*(log T)^{-1-delta} * sum_{d in I_L(T)} |R(d)|*|m_d(v)| "
+                    "for fixed C >= 0, delta > 0 without subtracting M_{sq,2}(d)."
                 ),
-                "verdict": "REFUTED_UNCONDITIONALLY_AND_UNDER_RH",
+                "verdict": "REFUTED_AS_STATED_UNIFORMLY_OVER_ALL_BLOCKS_BY_SINGLETON_I_T_T_AT_V_ZERO",
+                "obstruction_scope": (
+                    "For every T >= 2 (including along canonical T(Y) -> infty), I_T(T) = {1} is a singleton block; "
+                    "at v = 0 (always in |v| <= Omega(Y)), R(1) = -c_lambda > 0 and m_1(0) = 1 - 1/sqrt(2) > 0, "
+                    "so |M_{T,T}(0)| / sum_{d in I_T(T)} |R(d)|*|m_d(0)| = 1 identically, contradicting "
+                    "C*(log T)^{-1-delta} -> 0. Refutes the all-block uniform candidate as stated, not every "
+                    "estimate on selected multi-element blocks or the complete signed sum."
+                ),
+                "M_sq_2_model_role": (
+                    "RESIDUE_DEFINED_Z_HALF_DRIFT_MODEL (D_lambda(z) = zeta(2z)/zeta(z) has a simple zero at "
+                    "z = 1 and a simple pole at z = 1/2; local residue does not by itself establish a global "
+                    "Perron asymptotic or eventual positivity of R(d))"
+                ),
+                "R_osc_residual_role": "EXACT_DRIFT_SUBTRACTED_RESIDUAL_R_MINUS_M_SQ_2",
+                "singleton_block_I_T_T_v0_obstruction": {
+                    "tested_T_values": list(singleton_T_samples),
+                    "all_I_T_T_equal_singleton_1": singleton_blocks_verified,
+                    "R_1_equals_minus_c_lambda": serialize_arb_certified(R[1]),
+                    "m_1_at_v_0": serialize_arb_certified(m_1_at_0),
+                    "M_T_T_at_v_0": serialize_arb_certified(M_T_T_at_0),
+                    "exact_singleton_ratio_at_v_0": 1,
+                    "singleton_ratio_ball_check": serialize_arb_certified(singleton_ratio_at_0),
+                    "verified": singleton_ratio_exact_1,
+                },
                 "c_half_lambda": serialize_arb_certified(c_half),
+                "finite_observation_scope": "CERTIFIED_FINITE_OBSERVATION_ON_INTEGERS_1_TO_2000_ONLY",
                 "all_R_d_strictly_positive_1_to_2000": all_R_pos_2000,
                 "min_R_d_on_1_to_2000": serialize_arb_certified(min_R_1_2000),
                 "R_d_sign_flips_1_to_2000": 0,
@@ -1533,6 +2155,18 @@ def verify_section_3_attempts_a_and_b_obstructions_and_drift_theorem(
                 "R_osc_sign_flips_1_to_2000": osc_sign_flips,
                 "all_delta_drift_le_12_log_d1_over_sqrt_d_certified": all_delta_drift_le_12,
                 "max_delta_drift_ratio_1_to_2000": serialize_arb_certified(max_delta_ratio_enc),
+                "unconditional_w2_prime_and_6p_support_checks": {
+                    "exact_increment_identity_verified_1_to_2000": delta_R_osc_id_ok,
+                    "prime_w2_equals_minus_log_p_sq_verified": prime_w2_ok,
+                    "six_p_three_distinct_primes_w2_zero_verified": six_p_zero_ok,
+                    "sample_rows": w2_support_rows,
+                    "unconditional_scope_note": (
+                        "Delta R_osc(n) = w_{2,lambda}(n) - c_lambda - delta_{sq,2}(n) has "
+                        "Delta R_osc(p) ~ -(log p)^2 on primes p and Delta R_osc(6p) -> -c_lambda != 0 on "
+                        "n = 6p (prime p >= 5) unconditionally from prime-power support of Lambda_lambda; "
+                        "these pointwise discrete increment sizes do not diagnose off-critical zeros."
+                    ),
+                },
                 "verified": drift_obs_ok,
             },
             "attempt_b_product_compensation_and_candidate_b1_counterexamples": {
@@ -1542,20 +2176,43 @@ def verify_section_3_attempts_a_and_b_obstructions_and_drift_theorem(
                 "product_compensation_ratio_gt_2_certified": comp_gt_2,
                 "candidate_b1_statement": (
                     "Candidate B1: Uniform relative derivative gain ||Delta_d^{sm}(a)||_Y <= (C / d) * ||g_{a, d}||_Y "
-                    "for an absolute constant C > 0 independent of Y, d, L, and coefficients a."
+                    "for an absolute constant C > 0 independent of Y >= 2, 1 <= d < T(Y), L >= 1, and coefficients a."
                 ),
-                "candidate_b1_verdict": "REFUTED_BY_CERTIFIED_COUNTEREXAMPLES",
+                "candidate_b1_verdict": (
+                    "REFUTED_FOR_EVERY_FIXED_C_ON_ARBITRARY_COEFFICIENTS_BY_UNBOUNDED_D1_E1_FAMILY"
+                ),
+                "candidate_b1_refutation_scope": (
+                    "At d = 1 < T(Y) (Y >= 2) and a = e_1 (supported at q = 1 on 1 <= q <= L_1), "
+                    "phi_2(X)/phi_1(X) = exp(3*X^2/4)/8 gives ||phi_1 - phi_2||_Y / ||phi_1||_Y >= "
+                    "exp(3*Y^2/4)/8 - 1 -> infty as Y -> infty, refuting every fixed C in the stated "
+                    "geometry-only inequality. Finite steep-tail/resonant-bulk ratios are retained strictly "
+                    "as finite diagnostics, and actual Liouville witnesses are scoped strictly to excluding "
+                    "the tested constants C = 1 and C = 3 on their stated domains (not refuting a "
+                    "Liouville-specific inequality with controlled arithmetic forcing)."
+                ),
+                "unbounded_arbitrary_coefficient_family_d1_e1_rows": unbounded_b1_family_rows,
+                "finite_diagnostics_role": "FINITE_DIAGNOSTIC_NOT_UNIVERSAL_CONSTANT_REFUTATION",
                 "steep_tail_Y16_d4_L2_a_1_0_scaled_ratio": serialize_arb_certified(ce_steep_16_4),
                 "resonant_bulk_Y16_d16_L2_scaled_ratio": serialize_arb_certified(ce_res_L2),
                 "resonant_bulk_Y16_d16_L3_scaled_ratio": serialize_arb_certified(ce_res_L3),
                 "resonant_bulk_Y16_d16_L4_scaled_ratio": serialize_arb_certified(ce_res_L4),
+                "actual_liouville_witness_scope": (
+                    "EXCLUDES_TESTED_CONSTANTS_C_EQ_1_AT_Y4_D1_T6_AND_C_EQ_3_AT_Y16_D5_T32_ONLY"
+                ),
                 "actual_liouville_Y4_d1_T6_scaled_ratio": serialize_arb_certified(ce_liouville_Y4_d1),
                 "actual_liouville_Y16_d5_T32_scaled_ratio": serialize_arb_certified(ce_liouville_Y16_d5),
                 "verified": bool(comp_gt_2 and cand_b1_refuted_ok),
             },
             "informed_replacement_drift_and_small_divisor_rows": replacement_rows,
+            "drift_subunit_and_jump_reindexing_checks": subunit_and_jump_rows,
             "all_section_3_checks_pass": bool(
-                gamma_ok and loc_ok and drift_obs_ok and comp_gt_2 and cand_b1_refuted_ok and repl_ok
+                gamma_ok
+                and loc_ok
+                and drift_obs_ok
+                and comp_gt_2
+                and cand_b1_refuted_ok
+                and repl_ok
+                and sub_jump_ok
             ),
         }
     finally:
@@ -1570,9 +2227,10 @@ def verify_section_3_attempts_a_and_b_obstructions_and_drift_theorem(
 def verify_section_4_complete_energy_bridge_and_global_consequence(
     prec_bits: int = 256,
 ) -> Dict[str, Any]:
-    """Track the complete reconstruction `Q_{lambda,T} = 2*P_Y - D_{2,known,Y} - D_{2,core,Y}`,
-    certify the `R`-independent threshold contraction for `G_eps(R)` keeping sub-unit scales separate,
-    and classify global consequences across the four required tiers.
+    """Track the complete reconstruction `Q_{lambda,T} = 2*P_Y - D_{2,known,Y} - D_{2,core,Y}`
+    retaining the full open core `min(D_0(Y), T(Y)-1) < d <= T(Y)-1` (including `d >= ceil(tau*Y)`),
+    certify the `R`-independent threshold contraction for `G_eps(R)` keeping `B_drift`, `B_sample`,
+    and `B_known` distinct, and classify global consequences across the four required tiers.
     """
     saved = flint_ctx.prec
     try:
@@ -1588,8 +2246,9 @@ def verify_section_4_complete_energy_bridge_and_global_consequence(
         comp_ok = True
         for Y_int in (2, 4, 8, 16, 32, 64):
             y_arb = arb(Y_int)
-            T_y = exact_T_cutoff_ceil_Y_5_4(Y_int)
-            D0_y = max(1, min(T_y - 1, int(math.floor(float(y_arb.log().lower())))))
+            T_y = certify_T_canonical_cutoff(Y_int, prec_bits=prec_bits)
+            D0_raw = certify_D0_small_divisor_cutoff(Y_int, kappa=1, prec_bits=prec_bits)
+            D0_y = min(T_y - 1, D0_raw)
 
             E_tot = evaluate_E_L_scale_arb(y_arb, L=T_y, mode="liouville", prec_bits=prec_bits)
             rd = _evaluate_route_d_totals_arb(Y_int, mode="liouville", prec_bits=prec_bits)
@@ -1598,7 +2257,7 @@ def verify_section_4_complete_energy_bridge_and_global_consequence(
             P_norm_sq = D_tilde + X_tilde
 
             # Build phi_n coefficients (1 <= n <= 2*T_y) for the numerator of D_{2,known,Y}:
-            # c_lam*Q_{sq,T} + R(T)*phi_T + r_{jump,T} + r_{sm,T}^{drift} + r_{sm,<=D0}^{osc}
+            # c_lam*Q_{sq,T} + R(T)*phi_T + r_{jump,T} + r_{sm,T}^{drift} + r_{sm,<=min(D_0,T-1)}^{osc}
             known_num_coeff = [arb(0)] * (2 * T_y + 1)
             for n in range(1, T_y + 1):
                 if is_perfect_square_int(n):
@@ -1679,6 +2338,8 @@ def verify_section_4_complete_energy_bridge_and_global_consequence(
                     "Y": Y_int,
                     "T_Y": T_y,
                     "D_0_Y": D0_y,
+                    "small_divisor_slice_empty": D0_y == 0,
+                    "full_open_core_divisor_range_inclusive": [D0_y + 1, T_y - 1],
                     "E_Y": serialize_arb_certified(E_tot),
                     "D_tilde_Y": serialize_arb_certified(D_tilde),
                     "X_tilde_Y": serialize_arb_certified(X_tilde),
@@ -1691,18 +2352,41 @@ def verify_section_4_complete_energy_bridge_and_global_consequence(
                 }
             )
 
-        # R-independent feedback contraction threshold verification (matching Lean Theorem 6):
+        # Partition-only full-core checks including Y = 4096 where d >= ceil(tau*Y) is nonempty (Item 1):
+        partition_rows: List[Dict[str, Any]] = []
+        part_all_ok = True
+        for Y_part in (2, 4, 16, 64, 4096):
+            p_info = certify_open_core_divisor_partition(Y_part, kappa=1, prec_bits=prec_bits)
+            p_info["Y"] = Y_part
+            if Y_part <= 64:
+                part_all_ok = part_all_ok and (p_info["sub_unit_tail_nonempty"] is False)
+            if Y_part == 2:
+                part_all_ok = part_all_ok and (
+                    p_info["D_0_raw"] == 0 and p_info["small_slice_is_empty"] is True
+                )
+            if Y_part == 4096:
+                part_all_ok = part_all_ok and (
+                    p_info["T_Y"] == 32768
+                    and p_info["D_0_raw"] == 8
+                    and p_info["ceil_tau_Y"] == 25736
+                    and p_info["full_open_core_range_inclusive"] == [9, 32767]
+                    and p_info["intermediate_band_within_open_core_inclusive"] == [9, 25735]
+                    and p_info["sub_unit_tail_ge_ceil_tau_Y_within_open_core_inclusive"]
+                    == [25736, 32767]
+                    and p_info["sub_unit_tail_nonempty"] is True
+                    and p_info["sub_unit_tail_count"] == 7032
+                )
+            part_all_ok = part_all_ok and p_info["partition_identities_verified"]
+            partition_rows.append(p_info)
+
+        # R-independent feedback contraction threshold verification (matching Lean Theorem 6),
+        # keeping B_drift, B_sample, and B_known strictly distinct:
         horizon_rows: List[Dict[str, Any]] = []
         hor_ok = True
         for eps_num, eps_den in ((1, 2), (1, 4)):
             eps_c = arb(eps_num) / arb(eps_den)
             z_ser = acb_series([acb(arb(1) + eps_c), acb(1)], prec=prec_bits).zeta()
             zeta2_eps = arb(2) * z_ser[2].real
-            # Illustrative sample instantiation B_drift_sample := 576 * zeta(1 + eps/2)^2 of
-            # Lean Theorem 6's universally quantified feedback parameter B_drift >= 0, paired with
-            # the genuine analytic pure-drift constant B_pure_drift_analytic_upper :=
-            # 288 * (-zeta'(1 + eps/2) + zeta(1 + eps/2))^2 (note that combined B_known(eps) on
-            # D_{2,known,T} also incorporates B_small(eps) via the PNT constant C_osc = sup_d |R_osc(d)|/d):
             z_half_ser = acb_series([acb(arb(1) + eps_c / arb(2)), acb(1)], prec=prec_bits).zeta()
             z_1p_half_eps = z_half_ser[0].real
             minus_z_prime_half_eps = -z_half_ser[1].real
@@ -1724,13 +2408,19 @@ def verify_section_4_complete_energy_bridge_and_global_consequence(
                 {
                     "eps": f"{eps_num}/{eps_den}",
                     "zeta_double_prime_1_plus_eps": serialize_arb_certified(zeta2_eps),
+                    "B_pure_drift_analytic_upper_role": (
+                        "ANALYTIC_PURE_DRIFT_CONSTANT_288_MINUS_ZETA_PRIME_PLUS_ZETA_SQ"
+                    ),
                     "B_pure_drift_analytic_upper": serialize_arb_certified(
                         B_pure_drift_analytic_upper
                     ),
                     "B_drift_sample_role": (
-                        "ILLUSTRATIVE_SAMPLE_INSTANTIATION_OF_THEOREM_6_ABSTRACT_B_DRIFT"
+                        "ILLUSTRATIVE_SAMPLE_INSTANTIATION_OF_THEOREM_6_ABSTRACT_PARAMETER_NOT_FULL_KNOWN_BOUND"
                     ),
                     "B_drift_sample": serialize_arb_certified(B_drift_sample),
+                    "B_known_full_analytic_role": (
+                        "COMBINES_B_DRIFT_AND_B_SMALL_VIA_UNCONDITIONAL_PNT_SUPREMUM_C_OSC_DISTINCT_FROM_B_SAMPLE"
+                    ),
                     "R_independent_log_Y_star": serialize_arb_certified(lg_Y_star),
                     "diag_feedback_16_zeta2_over_logY2_at_Y_star": serialize_arb_certified(
                         fb_diag_at_star
@@ -1749,29 +2439,36 @@ def verify_section_4_complete_energy_bridge_and_global_consequence(
                 "status": "PROVED_UNCONDITIONALLY_AND_REFINED",
                 "scope": (
                     "All-order O_A(Y / (log Y)^A) control of ||r_{sm,T}||_Y^2 / (log Y)^4 established via "
-                    "Selberg PNT + C_{chi,var} (TC-059), now refined in TC-060 by isolating the exact "
-                    "z = 1/2 square-pole drift M_{sq,2}(d) from the zero-driven oscillatory remainder R_{osc}(d)."
+                    "Selberg PNT + C_{chi,var} (TC-059), refined in TC-060/TC-060R by decomposing R(d) = "
+                    "M_{sq,2}(d) + R_{osc}(d) into the residue-defined z = 1/2 drift model M_{sq,2}(d) "
+                    "and the exact residual R_{osc}(d)."
                 ),
             },
             {
                 "consequence_class": "FIXED_POWER_SAVING",
                 "status": "NOT_PROVED_UNCONDITIONALLY",
                 "scope": (
-                    "Any pointwise power saving |R_{osc}(d)| = O(d^{1-delta}) (delta in (0, 1/2]) is equivalent "
-                    "to nonvanishing of zeta(z) on Re(z) > 1 - delta because zeta(2z)/zeta(z) retains an "
-                    "uncancelled pole of order k_0 at every zero rho_0 in Re(rho_0) > 1/2 (since Re(2*rho_0) > 1 "
-                    "implies zeta(2*rho_0) != 0)."
+                    "Forward Abelian/continuation implication proved analytically outside Lean: if "
+                    "|R_{osc}(d)| = O(d^{1-delta}) for some delta in (0, 1/2], then on Re(z) > 1 - delta >= 1/2 "
+                    "both sum_{d>=1} delta_{sq,2}(d)*d^{-z} and sum_{d>=1} R_{osc}(d)*(d^{-z} - (d+1)^{-z}) "
+                    "converge absolutely and locally uniformly, extending D_lambda''(z)/D_lambda(z) - c_lambda*zeta(z) "
+                    "holomorphically to Re(z) > 1 - delta and ruling out zeros rho_0 of zeta(z) there (where "
+                    "Re(2*rho_0) > 1 => zeta(2*rho_0) != 0 would leave an uncancelled double pole "
+                    "m_{rho_0}*(m_{rho_0}+1)/(z - rho_0)^2). No exact-boundary converse is claimed from "
+                    "local poles alone."
                 ),
             },
             {
                 "consequence_class": "RELATIVE_CONTRACTION",
                 "status": "PROVED_UNCONDITIONALLY_ON_SQUARE_POLE_DRIFT_AND_SMALL_DIVISORS",
                 "scope": (
-                    "NEW IN TC-060: For every eps > 0, R >= 2, and 2 <= Y <= R, discrete Abel re-summation of "
-                    "M_{sq,2}(d) with sub-unit d > floor(Y) separation proves "
-                    "||r_{sm,T(Y)}^{drift}/(log X)^2||_Y^2 <= Theta_eps^{drift}(Y)*G_eps(R)*Y^eps + C_{drift}(eps) "
-                    "with Theta_eps^{drift}(Y) = O_eps((log Y)^{-4}) -> 0, and Theorem 7 proves relative "
-                    "contraction O((log Y)^{-kappa})*G_eps(R)*Y^eps on 1 <= d <= D_0(Y) = floor((log Y)^{(4-kappa)/3})."
+                    "Proved analytically outside Lean using TC-060 Theorem 5's discrete Abel identity, "
+                    "increment bound |delta_{sq,2}(d)| <= 12*log(d+1)/sqrt(d), and finite weighted small-divisor "
+                    "inequality together with TC-057 Theorem 25 (first main conjunct, third item) cutoff lower "
+                    "bounds, inherited TC-059R Theorem 7's smooth-increment window norm estimate, and TC-057R's "
+                    "PNT bound |R_{osc}(d)| <= C_{osc}*d: for every eps > 0, R >= 2, and 2 <= Y <= R, "
+                    "||r_{sm,T(Y)}^{drift}/(log X)^2||_Y^2 <= (B_{drift}(eps)/(log Y)^4)*G_eps(R)*Y^eps + C_{drift}(eps) "
+                    "and ||r_{sm,<=min(D_0,T-1)}^{osc}/(log X)^2||_Y^2 <= O((log Y)^{-kappa})*G_eps(R)*Y^eps + C_{small}(eps)."
                 ),
             },
             {
@@ -1779,19 +2476,45 @@ def verify_section_4_complete_energy_bridge_and_global_consequence(
                 "status": "OPEN",
                 "scope": (
                     "SUBGATE-TC-043A remains OPEN and rh_proved remains False: closing E(Y) = O_eps(Y^eps) "
-                    "requires controlling the remaining core oscillatory sum D_0(Y) < d < ceil(tau*Y) "
-                    "(r_{sm,core}^{osc}), -Q_{lambda,T}^{[2]}/(log X)^2, and prime-power off-diagonal X_tilde(Y)."
+                    "via Theorem 6 requires controlling the full signed open quantity "
+                    "8*X_tilde(Y) + 4*||D_{2,core,T(Y)}||_Y^2, where "
+                    "D_{2,core,T(Y)}(X) = (sum_{min(D_0(Y), T(Y)-1) < d <= T(Y)-1} R_{osc}(d)*Delta_d^{sm}(X) "
+                    "- Q_{lambda,T(Y)}^{[2]}(X)) / (log X)^2 retains ALL d up to T(Y) - 1 (including d >= ceil(tau*Y), "
+                    "because Lemma B2's O(Y*(log Y)^{-4}*exp(-2*c_W*sqrt(log Y))) bound is only an absolute upper "
+                    "bound whose majorant divided by Y^eps grows without bound for fixed 0 < eps < 1)."
                 ),
             },
         ]
 
         return {
             "epistemic_status": "CONDITIONAL_IMPLICATION",
-            "lean_theorem": "complete_reconstruction_drift_contraction_transfer_tc060",
+            "section_epistemic_scope_note": (
+                "Mixed section: the lossless decomposition Q_{lambda,T} = 2*P_T - D_{2,known,T} - D_{2,core,T} "
+                "and (8, 4, 4) window energy inequality are unconditional in Lean Theorem 6(1)-(2), and full-core "
+                "intermediate/tail retention is unconditional in Lean Theorem 7(1); the R-independent finite-horizon "
+                "absorption is a CONDITIONAL_IMPLICATION in Lean Theorem 6(3) assuming the Route D diagonal, "
+                "known-D_2, and open-core hypotheses."
+            ),
+            "component_epistemic_map": {
+                "lossless_known_vs_full_core_decomposition_and_8_4_4_inequality": "CONCRETE_ANALYTIC_IN_LEAN",
+                "full_core_intermediate_and_tail_partition_retention": "UNCONDITIONAL_FINITE_ARITHMETIC",
+                "R_independent_finite_horizon_feedback_absorption": "CONDITIONAL_IMPLICATION",
+                "complete_reconstruction_and_sample_threshold_evaluations": "CERTIFIED_FINITE_OBSERVATION",
+            },
+            "lean_theorems": [
+                "complete_reconstruction_drift_contraction_transfer_tc060",
+                "full_core_quantified_obstructions_and_w2_support_tc060r",
+            ],
+            "full_open_core_formula": (
+                "D_{2,core,T(Y)}(X) = [sum_{min(D_0(Y), T(Y)-1) < d <= T(Y)-1} R_{osc}(d)*Delta_d^{sm}(X) "
+                "- Q_{lambda,T(Y)}^{[2]}(X)] / (log X)^2, T(Y) = ceil(Y^{5/4}), Y >= 2; sufficient open "
+                "closure target retains signed 8*X_tilde(Y) + 4*||D_{2,core,T(Y)}||_Y^2."
+            ),
             "complete_reconstruction_rows": complete_rows,
+            "full_open_core_partition_checks": partition_rows,
             "R_independent_feedback_threshold_rows": horizon_rows,
             "global_consequence_classification": global_consequence_matrix,
-            "all_section_4_checks_pass": bool(comp_ok and hor_ok),
+            "all_section_4_checks_pass": bool(comp_ok and part_all_ok and hor_ok),
         }
     finally:
         flint_ctx.prec = saved
@@ -1908,12 +2631,83 @@ def verify_section_5_controls_schedule_and_directed_certificates(
         # Sub-unit d >= ceil(tau * Y) check at Y = 8 (T = 14): no sub-unit d >= ceil(8*tau)=51, whereas at
         # Y = 64 (T = 182), ceil(64*tau) = 403 > 182; check Y / d < 1 on d in [Y + 1, T - 1] (e.g. Y = 8, d = 13):
         y8 = arb(8)
-        T8 = exact_T_cutoff_ceil_Y_5_4(8)  # 14, d = 13 has Y/d = 8/13 < 1 and d = T - 1!
+        T8 = certify_T_canonical_cutoff(8, prec_bits=prec_bits)  # 14, d = 13 has Y/d = 8/13 < 1 and d = T - 1!
         H_8_13_13 = evaluate_signed_gram_H_closed_arb(y8, 13, 13, T8, base_mult=tau, prec_bits=prec_bits)
         sub_unit_arg_8_13 = y8 / arb(13)
         _, sub_unit_lt1 = classify_arb_le_certificate(sub_unit_arg_8_13, arb(1))
 
-        # 5D. Directed interval certification self-tests (overlap MUST return False unless algebraically justified):
+        # 5D. Certified cutoff determination protocol checks (Item 6: D_0(2)=0 empty slice, nonboundary
+        # samples, cutoff transitions on both sides of e, e^2, and 16, straddling enclosure rejection,
+        # and Y = 4096 nonempty d >= ceil(tau*Y) full-core partition):
+        d0_at_2 = certify_D0_small_divisor_cutoff(2, kappa=1, prec_bits=prec_bits)
+        part_at_2 = certify_open_core_divisor_partition(2, kappa=1, prec_bits=prec_bits)
+        part_at_4096 = certify_open_core_divisor_partition(4096, kappa=1, prec_bits=prec_bits)
+        d0_below_e = certify_D0_small_divisor_cutoff(Fraction(27182818, 10000000), kappa=1, prec_bits=prec_bits)
+        d0_above_e = certify_D0_small_divisor_cutoff(Fraction(27182819, 10000000), kappa=1, prec_bits=prec_bits)
+        d0_exact_e_sym = certify_D0_small_divisor_cutoff(None, kappa=1, exact_log_Y=1, prec_bits=prec_bits)
+        d0_below_e2 = certify_D0_small_divisor_cutoff(Fraction(73890560, 10000000), kappa=1, prec_bits=prec_bits)
+        d0_above_e2 = certify_D0_small_divisor_cutoff(Fraction(73890561, 10000000), kappa=1, prec_bits=prec_bits)
+        d0_exact_e2_sym = certify_D0_small_divisor_cutoff(None, kappa=1, exact_log_Y=2, prec_bits=prec_bits)
+        T_below_16 = certify_T_canonical_cutoff(Fraction(16383, 1024), prec_bits=prec_bits)
+        T_exact_16 = certify_T_canonical_cutoff(Fraction(16, 1), prec_bits=prec_bits)
+        T_above_16 = certify_T_canonical_cutoff(Fraction(16385, 1024), prec_bits=prec_bits)
+        d0_nonboundary = {
+            str(y_nb): certify_D0_small_divisor_cutoff(y_nb, kappa=1, prec_bits=prec_bits)
+            for y_nb in (Fraction(5, 2), 3, 4, 8, 16, 32, 64)
+        }
+
+        straddle_int_st, straddle_int_val, straddle_int_cand = classify_floor_from_arb_enclosure(
+            arb(5, arb("1e-10"))
+        )
+        straddle_e_ball = arb(1).exp()
+        straddle_e_st, straddle_e_val, straddle_e_cand = classify_floor_from_arb_enclosure(
+            straddle_e_ball.log()
+        )
+        straddle_16_ball = arb(16, arb("1e-12"))
+        straddle_16_st, straddle_16_val, straddle_16_cand = classify_ceil_from_arb_enclosure(
+            straddle_16_ball ** (arb(5) / arb(4))
+        )
+        straddle_exceptions_raised = True
+        for fn_call in (
+            lambda: certify_floor_from_arb_enclosure(arb(5, arb("1e-10"))),
+            lambda: certify_D0_small_divisor_cutoff(straddle_e_ball, kappa=1, prec_bits=prec_bits),
+            lambda: certify_T_canonical_cutoff(straddle_16_ball, prec_bits=prec_bits),
+        ):
+            try:
+                fn_call()
+                straddle_exceptions_raised = False
+            except AmbiguousCutoffError:
+                pass
+
+        cutoff_proto_ok = bool(
+            d0_at_2 == 0
+            and part_at_2["small_slice_is_empty"] is True
+            and part_at_2["full_open_core_range_inclusive"] == [1, 2]
+            and d0_nonboundary == {"5/2": 0, "3": 1, "4": 1, "8": 2, "16": 2, "32": 3, "64": 4}
+            and d0_below_e == 0
+            and d0_above_e == 1
+            and d0_exact_e_sym == 1
+            and d0_below_e2 == 1
+            and d0_above_e2 == 2
+            and d0_exact_e2_sym == 2
+            and T_below_16 == 32
+            and T_exact_16 == 32
+            and T_above_16 == 33
+            and straddle_int_st == "AMBIGUOUS_STRADDLING_ENCLOSURE"
+            and straddle_int_val is None
+            and straddle_int_cand == (4, 5)
+            and straddle_e_st == "AMBIGUOUS_STRADDLING_ENCLOSURE"
+            and straddle_e_val is None
+            and straddle_e_cand == (0, 1)
+            and straddle_16_st == "AMBIGUOUS_STRADDLING_ENCLOSURE"
+            and straddle_16_val is None
+            and straddle_16_cand == (32, 33)
+            and straddle_exceptions_raised
+            and part_at_4096["sub_unit_tail_nonempty"] is True
+            and part_at_4096["sub_unit_tail_ge_ceil_tau_Y_within_open_core_inclusive"] == [25736, 32767]
+        )
+
+        # 5E. Directed interval certification self-tests (overlap MUST return False unless algebraically justified):
         ov_ball_a = arb(10, arb("1e-20"))
         ov_ball_b = arb(10, arb("1e-20"))
         ov_status, ov_cert = classify_arb_le_certificate(
@@ -1969,6 +2763,38 @@ def verify_section_5_controls_schedule_and_directed_certificates(
                 "H_8_13_13": serialize_arb_certified(H_8_13_13),
                 "H_8_13_13_strictly_positive": bool(H_8_13_13 > arb(0)),
             },
+            "certified_cutoff_protocol_checks": {
+                "D_0_at_Y_2": d0_at_2,
+                "Y_2_small_slice_empty": part_at_2["small_slice_is_empty"],
+                "Y_2_full_open_core_range": part_at_2["full_open_core_range_inclusive"],
+                "nonboundary_D_0_samples": d0_nonboundary,
+                "transition_around_e": {
+                    "below_e_27182818_over_1e7": d0_below_e,
+                    "symbolic_exact_e": d0_exact_e_sym,
+                    "above_e_27182819_over_1e7": d0_above_e,
+                },
+                "transition_around_e_sq": {
+                    "below_e2_73890560_over_1e7": d0_below_e2,
+                    "symbolic_exact_e2": d0_exact_e2_sym,
+                    "above_e2_73890561_over_1e7": d0_above_e2,
+                },
+                "transition_around_Y_16_T": {
+                    "below_16_16383_over_1024": T_below_16,
+                    "exact_16": T_exact_16,
+                    "above_16_16385_over_1024": T_above_16,
+                },
+                "straddling_enclosure_rejections": {
+                    "ball_around_5_status": straddle_int_st,
+                    "ball_around_5_candidates": list(straddle_int_cand),
+                    "arb_exp_1_around_e_status": straddle_e_st,
+                    "arb_exp_1_candidates": list(straddle_e_cand),
+                    "ball_around_16_T_status": straddle_16_st,
+                    "ball_around_16_T_candidates": list(straddle_16_cand),
+                    "all_ambiguous_raise_AmbiguousCutoffError": straddle_exceptions_raised,
+                },
+                "Y_4096_nonempty_tail_partition": part_at_4096,
+                "verified": cutoff_proto_ok,
+            },
             "directed_interval_certificate_protocol_check": {
                 "overlap_without_algebraic_proof_status": ov_status,
                 "overlap_without_algebraic_proof_certified": ov_cert,
@@ -1987,6 +2813,7 @@ def verify_section_5_controls_schedule_and_directed_certificates(
                 and norm_hybrid_diag > arb(0)
                 and sub_unit_lt1
                 and H_8_13_13 > arb(0)
+                and cutoff_proto_ok
                 and cert_self_ok
             ),
         }
@@ -2000,10 +2827,14 @@ def verify_section_5_controls_schedule_and_directed_certificates(
 
 
 def verify_tc060_lean_theorems_live() -> Dict[str, Any]:
-    """Verify all 6 public theorems in `formal/RiemannScope/SignedDilationArithmeticEnergy.lean`
+    """Verify all 7 public theorems in `formal/RiemannScope/SignedDilationArithmeticEnergy.lean`
     via live `lake env lean --stdin` (`#check` and `#print axioms`) and source token checks.
     """
-    src = TC_060_LEAN_MODULE_PATH.read_text(encoding="utf-8")
+    import hashlib
+
+    raw_bytes = TC_060_LEAN_MODULE_PATH.read_bytes().replace(b"\r\n", b"\n")
+    module_sha256 = hashlib.sha256(raw_bytes).hexdigest()
+    src = raw_bytes.decode("utf-8")
     no_block = re.sub(r"/-.*?-/", "", src, flags=re.DOTALL)
     clean_src = re.sub(r"--[^\n]*", "", no_block)
 
@@ -2075,6 +2906,7 @@ def verify_tc060_lean_theorems_live() -> Dict[str, Any]:
     if FORMAL_BUILD_REPORT_PATH.exists():
         try:
             br = json.loads(FORMAL_BUILD_REPORT_PATH.read_text(encoding="utf-8"))
+            src_hashes = br.get("formal_source_hashes") or br.get("source_hashes") or {}
             formal_provenance = {
                 "status": br.get("status"),
                 "producing_git_commit": br.get("producing_git_commit"),
@@ -2082,6 +2914,9 @@ def verify_tc060_lean_theorems_live() -> Dict[str, Any]:
                     "project_theorem_declarations_compiled"
                 ),
                 "total_theorems": br.get("total_theorems"),
+                "module_sha256_in_build_report": src_hashes.get(
+                    "formal/RiemannScope/SignedDilationArithmeticEnergy.lean"
+                ),
                 "report_hash": br.get("report_hash"),
             }
         except Exception:  # noqa: BLE001
@@ -2089,6 +2924,7 @@ def verify_tc060_lean_theorems_live() -> Dict[str, Any]:
 
     return {
         "module_path": "formal/RiemannScope/SignedDilationArithmeticEnergy.lean",
+        "module_sha256": module_sha256,
         "expected_tc060_theorems": EXPECTED_TC060_THEOREMS,
         "all_tc060_theorems_present": present,
         "sorry_count": sorry_count,
@@ -2244,7 +3080,7 @@ def execute_task_tc060_signed_dilation_audit(
     verify_lean_live: bool = True,
     verify_review_doc: bool = True,
 ) -> Dict[str, Any]:
-    """Execute the complete TASK-TC-060 mathematical, falsification, Lean, and 256-bit Arb audit."""
+    """Execute the complete TASK-TC-060 / TASK-TC-060R mathematical, falsification, Lean, and 256-bit Arb audit."""
     sec1 = verify_section_1_exact_object_and_noncircular_reassembly(prec_bits=prec_bits)
     sec2 = verify_section_2_signed_dilation_fourier_and_gram_kernel(prec_bits=prec_bits)
     sec3 = verify_section_3_attempts_a_and_b_obstructions_and_drift_theorem(prec_bits=prec_bits)
@@ -2258,7 +3094,8 @@ def execute_task_tc060_signed_dilation_audit(
     assert sec5["all_section_5_checks_pass"] is True
 
     report: Dict[str, Any] = {
-        "task_id": TASK_TC_060_ID,
+        "task_id": TASK_TC_060R_ID,
+        "repaired_task_id": TASK_TC_060_ID,
         "parent_epic": EPIC_TC_042_ID,
         "parent_subgate": PARENT_SUBGATE_ID,
         "prior_tasks": [
@@ -2279,35 +3116,39 @@ def execute_task_tc060_signed_dilation_audit(
             TASK_TC_059_ID,
             TASK_TC_059R_ID,
             TASK_TC_059R2_ID,
+            TASK_TC_060_ID,
         ],
         "reviewed_merged_main_baseline": REVIEWED_MERGED_MAIN_BASELINE,
         "accepted_tc059r2_branch": ACCEPTED_TC059R2_BRANCH,
         "reviewed_tc059r2_implementation_commit": REVIEWED_TC059R2_IMPLEMENTATION,
         "reviewed_tc059r2_head_commit": REVIEWED_TC059R2_HEAD,
-        "inherited_formal_producing_commit": INHERITED_FORMAL_PRODUCING_COMMIT,
-        "branch": PROPOSED_TC060_BRANCH,
+        "prior_tc059r_formal_producing_commit": INHERITED_FORMAL_PRODUCING_COMMIT,
+        "reviewed_tc060_branch": PROPOSED_TC060_BRANCH,
+        "reviewed_tc060_implementation_commit": REVIEWED_TC060_IMPLEMENTATION,
+        "reviewed_tc060_head_commit": REVIEWED_TC060_HEAD,
+        "branch": REPAIR_TC060R_BRANCH,
         "epistemic_categories_enforced": list(EPISTEMIC_CATEGORIES),
         "global_consequence_classes_enforced": list(GLOBAL_CONSEQUENCE_CLASSES),
-        "completion_outcome_code": "OUTCOME_B_AND_C_PARTIAL_THEOREM_AND_PROVED_CANDIDATE_OBSTRUCTIONS",
+        "completion_outcome_code": "OUTCOME_B_AND_C_REPAIRED_FULL_CORE_QUANTIFIED_OBSTRUCTIONS_AND_DRIFT_CONTRACTION",
         "research_outcome_class": (
-            "Partial Unconditional Arithmetic Relative-Contraction Theorem + Proved Candidate Obstructions "
-            "(TASK-TC-060, Outcome B/C) — Derives and certifies the exact Fourier block-multiplier "
-            "representation Fourier[r_{sm,T}(exp t)](v) = sum_{L=1}^T M_{L,T}(v)*qhat_L(v) and real-space "
-            "signed/log-weighted Gram kernels H_{Y,b}, H_{Y,b}^{wt}; proves in Lean 4 (0 sorry, 0 custom "
-            "axioms, 6 public theorems in SignedDilationArithmeticEnergy.lean) non-circular reassembly & "
-            "2T basis spillover, sharp unrestricted-frequency multiplier attainment |m_d(v_k(d))| = d^{-1/2}+(d+1)^{-1/2} "
+            "Repaired Full-Core Scope, Quantified Counterexamples, Certified Cutoffs, & Partial Arithmetic "
+            "Relative-Contraction Theorem (TASK-TC-060R repairing TASK-TC-060, Outcome B/C) — Preserves "
+            "exact finite-L Fourier block-multiplier representation (outside Lean) and real-space signed / "
+            "(log X)^{-4}-weighted Gram kernels H_{Y,b}, H_{Y,b}^{wt}; proves in Lean 4 (0 sorry, 0 custom "
+            "axioms, 7 public theorems in SignedDilationArithmeticEnergy.lean) non-circular reassembly & "
+            "2T basis spillover, sharp unrestricted-frequency multiplier attainment (obstructing only a "
+            "frequency-independent relative O(1/d) saving while retaining the all-v (1+|v|) derivative bound) "
             "and sqrt(T) cutoff-block lower bound, weighted Gram quadratic forms & log sandwiches, Gaussian "
-            "window majorants & Gauss-product Gamma monotonicity, second-order drift Abel re-summation & "
-            "small-divisor contraction, and R-independent complete-energy feedback transfer; refutes "
-            "Candidate A1 (intra-block sign cancellation of R(d)) by isolating the deterministic z = 1/2 "
-            "square-pole drift M_{sq,2}(d) = 4*sqrt(d)*log(d) + c_{1/2,lambda}*sqrt(d) (R(d) > 0 for all "
-            "1 <= d <= 2000 vs 178 sign flips of R_{osc}(d)) and refutes Candidate B1 (unqualified "
-            "||Delta_d^{sm}(a)||_Y <= (C/d)*||g_{a,d}||_Y) by certified rational counterexamples; proves "
-            "unconditional all-eps relative contraction ||r_{sm,T(Y)}^{drift}/(log X)^2||_Y^2 <= "
-            "Theta_eps^{drift}(Y)*G_eps(R)*Y^eps + C_{drift}(eps) with Theta_eps^{drift}(Y) = O_eps((log Y)^{-4}) -> 0 "
-            "plus small-divisor relative contraction on 1 <= d <= D_0(Y); and locates the smallest open "
-            "core assertion on D_0(Y) < d < ceil(tau*Y) (r_{sm,core}^{osc}), -Q_{lambda,T}^{[2]}/(log X)^2, "
-            "and X_tilde(Y), keeping SUBGATE-TC-043A OPEN and rh_proved False."
+            "window majorants & Gauss-product Gamma monotonicity, discrete Abel re-summation of M_{sq,2}(d) & "
+            "finite small-divisor weighted bounds, R-independent complete-energy feedback transfer, and "
+            "TC-060R's full-core intermediate/tail retention, singleton-block I_T(T)={1} Candidate A1 "
+            "refutation at v=0, arbitrary-coefficient d=1/e_1 Candidate B1 exponential lower bound, "
+            "w_{2,lambda}(p)/w_{2,lambda}(6p) unconditional support, and drift-jump floor(T/q) reindexing; "
+            "proves outside Lean all-eps relative contraction of r_{sm,T(Y)}^{drift}/(log X)^2 (with corrected "
+            "O(log Y) sub-unit and jump sums) and 1 <= d <= min(D_0(Y), T(Y)-1) (with certified D_0(2) = 0); "
+            "and retains the full remaining open core min(D_0(Y), T(Y)-1) < d <= T(Y)-1 inside D_{2,core,T(Y)} "
+            "(including d >= ceil(tau*Y)) alongside signed 8*X_tilde(Y) + 4*||D_{2,core,T(Y)}||_Y^2, keeping "
+            "SUBGATE-TC-043A OPEN and rh_proved False."
         ),
         "subgate_tc043a_status": "OPEN",
         "rh_proved": False,
