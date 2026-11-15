@@ -13468,11 +13468,11 @@
     "lean_exit_code": 0,
     "formal_build_report_provenance": {
       "status": "passed",
-      "producing_git_commit": "aedea63aeb5c028dff63a50e7178b2d69cf416a4",
-      "project_theorem_declarations_compiled": 815,
-      "total_theorems": 815,
-      "module_sha256_in_build_report": null,
-      "report_hash": "c64a1806094004be03ea265bc5eb1a7254ea5f25ff8d97892f8a29ff6667ec91"
+      "producing_git_commit": "74e9df24d165619b0857cd37a895d599a93ba08e",
+      "project_theorem_declarations_compiled": 819,
+      "total_theorems": 819,
+      "module_sha256_in_build_report": "88328a1960cc2c5519a626ab631add0b1033598c5bc34f395bcee59d4c6d3648",
+      "report_hash": "77c0fa092719dccd91b768efdd5b587d74e59c15c2b8271e1544a10c77f8a3c7"
     },
     "per_theorem": {
       "mixed_covariance_identity_and_theta_energy_bound_tc061": {

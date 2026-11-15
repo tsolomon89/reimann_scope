@@ -6,7 +6,7 @@
   - **Merged `main` Baseline**: `71a101005f1ee073e981187bb7d07d90daef9c65`
   - **Accepted `TC-060R2` Tip**: `4bfb36ed7a62f207a6479dd932a997563a407ff8` (`TC-060R2` implementation `2812faad941301bde8b6dc09ac5d8c23957204ff`; inherited `TC-060R` formal producing commit `aedea63aeb5c028dff63a50e7178b2d69cf416a4`, preserved intact in [tc_signed_dilation_arithmetic_energy.json](file:///c:/Development/Projects/reimann_scope/data/tc_signed_dilation_arithmetic_energy.json))
   - **Immutable Frozen Protocol Registration Commit**: `bc2f9f709f868ef02981600873dfa0c05da0ba0c` (committed **before** any held-out $Y > 64$ evaluation; `protocol_id = TC061-MIXED-ARITHMETIC-COVARIANCE-PROTOCOL-V1`, `protocol_sha256 = c892c4c5a1ff2a60a11fa499b2d2bc017e01f0426e4aa8feef5880aaff8a70eb`)
-  - **Clean Implementation / Formal Producing Commit**: `<PENDING_CLEAN_IMPL_SHA>` (recorded in [build_report.json](file:///c:/Development/Projects/reimann_scope/formal/build_report.json) and [tc_mixed_arithmetic_covariance.json](file:///c:/Development/Projects/reimann_scope/data/tc_mixed_arithmetic_covariance.json))
+  - **Clean Implementation / Formal Producing Commit**: `74e9df24d165619b0857cd37a895d599a93ba08e` (recorded in [build_report.json](file:///c:/Development/Projects/reimann_scope/formal/build_report.json) and [tc_mixed_arithmetic_covariance.json](file:///c:/Development/Projects/reimann_scope/data/tc_mixed_arithmetic_covariance.json))
   - **Active Task Branch**: `task/tc-061-mixed-arithmetic-covariance-hypothesis-test`
 - **Notation & Variable Discipline**:
   - Circle constant $\tau$ exclusively (`0` circle-half macros or glyphs across all `TC-061` code, Lean, protocol, certificate, and review deliverables).
