@@ -37,6 +37,9 @@ from tc.liouville_square_dilation import (
 from tc.mixed_arithmetic_covariance import (
     ACCEPTED_TC060R2_IMPLEMENTATION,
     ACCEPTED_TC060R2_TIP,
+    ACCEPTED_TC061R_IMPLEMENTATION_AND_FORMAL_COMMIT,
+    CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME,
+    CERTIFICATION_INTEGRITY_CONFLICT_VERDICT,
     EXPECTED_TC061_THEOREMS,
     FROZEN_PROTOCOL_ID,
     FROZEN_PROTOCOL_REGISTRATION_COMMIT,
@@ -48,13 +51,21 @@ from tc.mixed_arithmetic_covariance import (
     PROBE_GLOBAL_OUTCOMES,
     PROPOSED_TC061_BRANCH,
     PROPOSED_TC061R_BRANCH,
+    PROPOSED_TC061R2_BRANCH,
+    RESOURCE_COMPLIANCE_STATUSES,
     REVIEWED_TC061_IMPLEMENTATION,
     REVIEWED_TC061_TIP,
+    REVIEWED_TC061R_TIP,
     TASK_TC_061_ID,
     TASK_TC_061R_ID,
+    TASK_TC_061R2_ID,
     TC_061_LEAN_MODULE_PATH,
     TC_061_REVIEW_DOC_PATH,
+    CertificationIntegrityError,
     ExactScaleSpec,
+    aggregate_holdout_rows_and_outcomes,
+    aggregate_section_resource_compliance,
+    build_holdout_point_artifact_row,
     calibrate_secondary_a_eta_exact,
     certified_ratio_with_positive_denominator,
     certify_exact_scale_cutoffs,
@@ -67,10 +78,12 @@ from tc.mixed_arithmetic_covariance import (
     evaluate_finite_prime_parity_convolution_formula,
     evaluate_interval_via_cutoff_case_split_arb,
     evaluate_mixed_covariance_point_arb,
+    evaluate_point_resource_compliance,
     evaluate_window_gram_G_Y_r_arb,
     execute_holdout_point_with_protocol_escalation,
     load_frozen_protocol_rules,
     resolve_protocol_quadrature_settings,
+    strip_enclosure_arb_for_json,
     verify_coarse_halfline_complement_bound_arb,
     verify_frozen_protocol_immutability,
     verify_self_collision_elementary_majorant_proof_arb,
@@ -103,6 +116,7 @@ def test_tc061_artifact_provenance_epistemic_scope_and_preserved_tc060r2(
     """
     assert tc061_artifact["task_id"] == TASK_TC_061_ID
     assert tc061_artifact["repair_task_id"] == TASK_TC_061R_ID
+    assert tc061_artifact["closeout_task_id"] == TASK_TC_061R2_ID
     assert tc061_artifact["parent_subgate"] == PARENT_SUBGATE_ID
     assert tc061_artifact["subgate_tc043a_status"] == "OPEN"
     assert tc061_artifact["rh_proved"] is False
@@ -113,8 +127,27 @@ def test_tc061_artifact_provenance_epistemic_scope_and_preserved_tc060r2(
     assert tc061_artifact["inherited_tc060r_formal_commit"] == REVIEWED_TC060R_IMPLEMENTATION
     assert tc061_artifact["reviewed_tc061_tip"] == REVIEWED_TC061_TIP
     assert tc061_artifact["reviewed_tc061_implementation"] == REVIEWED_TC061_IMPLEMENTATION
-    assert tc061_artifact["branch"] == PROPOSED_TC061R_BRANCH
+    assert tc061_artifact["reviewed_tc061r_tip"] == REVIEWED_TC061R_TIP
+    assert (
+        tc061_artifact["accepted_tc061r_implementation_and_formal_commit"]
+        == ACCEPTED_TC061R_IMPLEMENTATION_AND_FORMAL_COMMIT
+    )
+    assert tc061_artifact["branch"] == PROPOSED_TC061R2_BRANCH
+    assert tc061_artifact["previous_tc061r_branch"] == PROPOSED_TC061R_BRANCH
     assert tc061_artifact["original_tc061_branch"] == PROPOSED_TC061_BRANCH
+    prov_sep = tc061_artifact["provenance_separation"]
+    assert (
+        prov_sep["mathematical_certificate_execution_provenance"]["epistemic_experiment_role"]
+        == "REPEAT_OF_REGISTERED_EXPERIMENT_NOT_NEW_UNSEEN_EVIDENCE"
+    )
+    assert prov_sep["mathematical_certificate_execution_provenance"]["hand_edited_enclosures"] is False
+    assert prov_sep["mathematical_certificate_execution_provenance"]["restamped_prior_execution"] is False
+    assert prov_sep["synthetic_regression_evidence_provenance"]["included_in_production_artifact_verdicts"] is False
+    assert (
+        prov_sep["formal_build_provenance"]["inherited_formal_producing_commit"]
+        == ACCEPTED_TC061R_IMPLEMENTATION_AND_FORMAL_COMMIT
+    )
+    assert prov_sep["formal_build_provenance"]["formal_inputs_changed_in_tc061r2"] is False
     assert tc061_artifact["epistemic_categories_enforced"] == list(EPISTEMIC_CATEGORIES)
     assert tc061_artifact["probe_global_outcomes_enforced"] == list(PROBE_GLOBAL_OUTCOMES)
 
@@ -766,6 +799,22 @@ def test_tc061r_protocol_quadrature_boundary_selection_and_silent_override_rejec
     assert r_512_t2["used_settings"]["zone1_ratio_threshold_x_over_n"] == 22
     assert r_512_t2["used_settings"]["zone3_taylor_degree_M"] == 112
 
+    # 3b. Unsplit escalation (T = 431 < 512, tiers 1 & 2) DOES use registered 32/64 panel subdivisions
+    # and marks ONLY the three zone-specific parameters inactive:
+    r_431_t1 = resolve_protocol_quadrature_settings(rules, 431, 805, escalation_tier=1)
+    assert r_431_t1["quadrature_mode"] == "unsplit"
+    assert r_431_t1["used_settings"]["prec_bits"] == 512
+    assert r_431_t1["used_settings"]["quad_tol_bits"] == 240
+    assert r_431_t1["used_settings"]["n_panels"] == 32
+    assert r_431_t1["inactive_parameters"] == [
+        "zone1_ratio_threshold_x_over_n",
+        "zone3_cutoff_N1",
+        "zone3_taylor_degree_M",
+    ]
+    r_431_t2 = resolve_protocol_quadrature_settings(rules, 431, 805, escalation_tier=2)
+    assert r_431_t2["used_settings"]["n_panels"] == 64
+    assert "n_panels" not in r_431_t2["inactive_parameters"]
+
     # 4. Silent caller overrides at Y = 128 (T = 431) and Y = 256 (T = 1024) must raise ValueError:
     sp128 = ExactScaleSpec("128", "exact_rational", Fraction(128, 1))
     with pytest.raises(ValueError, match="Silent quad_tol_bits override"):
@@ -1148,4 +1197,926 @@ def test_tc061r_coarse_halfline_complement_bound_signed_F_S_and_headline_reconci
     r4096_ratio = rec["headline_holdout_values"]["HO_EXT_4096"]["J_over_log_Y_D_tilde"]["ratio"]
     lo_r, hi_r, _ = _parse_arb_ball_str_to_fractions(r4096_ratio["arb_ball_str"])
     assert Fraction(-1356, 10000) < lo_r <= hi_r < Fraction(-1355, 10000)
+
+
+def _make_tc061r2_stub_point_result(
+    rules: Dict[str, Any],
+    tier: int,
+    *,
+    Y_int: int = 256,
+    T_Y: int = 1024,
+    D0_raw: int = 5,
+    ceil_tau_Y: int = 1609,
+    J_ball: arb,
+    D_ball: Optional[arb] = None,
+    X_ball: arb = arb(0),
+    R_mix_ball: arb = arb(0),
+    elapsed_sec: Optional[float] = 0.05,
+    current_rss_mb: Optional[float] = 128.0,
+    peak_rss_mb: Optional[float] = 128.0,
+    peak_rss_semantics: Optional[str] = "PROCESS_LIFETIME_HIGH_WATER_MARK",
+) -> Dict[str, Any]:
+    resolved = resolve_protocol_quadrature_settings(rules, T_Y, ceil_tau_Y, escalation_tier=tier)
+    used = resolved["used_settings"]
+    prec = int(used["prec_bits"])
+    saved = flint_ctx.prec
+    try:
+        flint_ctx.prec = prec
+        y_b = arb(Y_int)
+        lg_y = y_b.log()
+        d_b = D_ball if D_ball is not None else arb(1)
+        return {
+            "cutoffs": {
+                "label": str(Y_int),
+                "kind": "exact_rational",
+                "T_Y": T_Y,
+                "D0_raw": D0_raw,
+                "D0_eff": min(D0_raw, max(0, T_Y - 1)),
+                "ceil_tau_Y": ceil_tau_Y,
+                "cutoff_prec_bits_used": prec,
+            },
+            "Y_arb": y_b,
+            "log_Y_arb": lg_y,
+            "D_tilde_Y": d_b,
+            "log_Y_times_D_tilde": lg_y * d_b,
+            "X_tilde_Y": X_ball,
+            "R_mix_Y": R_mix_ball,
+            "J_direct": J_ball,
+            "quadrature_mode": resolved["quadrature_mode"],
+            "escalation_tier": tier,
+            "requested_settings": resolved["requested_settings"],
+            "used_settings": used,
+            "inactive_parameters": resolved["inactive_parameters"],
+            "prec_bits": prec,
+            "quad_tol_bits": int(used["quad_tol_bits"]),
+            "panels_used": int(used["n_panels"]),
+            "elapsed_sec": elapsed_sec,
+            "current_rss_mb": current_rss_mb,
+            "peak_rss_mb": peak_rss_mb,
+            "peak_rss_measurement_semantics": peak_rss_semantics,
+        }
+    finally:
+        flint_ctx.prec = saved
+
+
+def test_tc061r2_decisive_witness_preservation_fail_pass_kl1_and_out_of_domain() -> None:
+    """Exercise production `execute_holdout_point_with_protocol_escalation`,
+    `build_holdout_point_artifact_row`, JSON round-trip, and `aggregate_holdout_rows_and_outcomes`
+    across `TASK-TC-061R2` §4 Cases 1, 2, 3, 4, 9, and 10.
+    """
+    proto = json.loads(MIXED_ARITHMETIC_COVARIANCE_PROTOCOL_PATH.read_text(encoding="utf-8"))
+    probes = proto["frozen_candidate_probes"]
+    rules = proto["numerical_settings_and_escalation_rules"]
+    entry_256 = next(
+        e for e in proto["preregistered_holdout_grid"] if e["point_id"] == "HO-BASE-256"
+    )
+    spec_256 = ExactScaleSpec.from_protocol_entry(entry_256)
+
+    saved = flint_ctx.prec
+    try:
+        flint_ctx.prec = 256
+        lg_256 = arb(256).log()
+        # At Y = 256, D_tilde = 1:
+        # P0 RHS   = log(256)              ~= 5.545177444479562
+        # P_1_8 RHS = (5/64)*256^(1/8)+lg  = 5/32 + log(256) ~= 5.701427444479562
+        # P_1_4 RHS = (3/64)*256^(1/4)+lg  = 3/16 + log(256) ~= 5.732677444479562
+        # P_1_2 RHS = (1/32)*256^(1/2)+lg  = 1/2  + log(256) ~= 6.045177444479562
+        rhs_p0 = lg_256
+        rhs_p18 = arb(5) / arb(32) + lg_256
+        rhs_offdiag = (arb(3) / arb(4)) * lg_256
+        rhs_rmix = (arb(1) / arb(4)) * lg_256
+    finally:
+        flint_ctx.prec = saved
+
+    # --- Case 1 & Case 9: P0 FAIL at Tier 0 while P_1_8 is UNRESOLVED; later P0 evaluations at
+    # Tiers 1 & 2 are UNRESOLVED while P_1_8 also stays UNRESOLVED through Tier 2.
+    # Reproduction of reviewed bug: without accumulator, P0: FAIL -> UNRESOLVED -> UNRESOLVED
+    # returned UNRESOLVED. With accumulator, P0 stays FAIL with Tier 0 margin & witness provenance!
+    def _eval_case1_p0_fail_then_unres(
+        sp, *, escalation_tier=0, protocol_rules=None, allow_nonprotocol_override=False, selberg_table=None
+    ):
+        assert allow_nonprotocol_override is False
+        saved_p = flint_ctx.prec
+        try:
+            flint_ctx.prec = 256
+            if escalation_tier == 0:
+                # J = log(256) + 5/32 + [+/- 1e-3]:
+                # -> M_{P0} = +5/32 +/- 1e-3 > 0 (certified FAIL!)
+                # -> M_{P_1_8} = 0 +/- 1e-3 (UNRESOLVED!)
+                # -> M_{P_1_4} = -1/32 +/- 1e-3 < 0 (certified PASS!)
+                # -> M_{P_1_2} = -11/32 +/- 1e-3 < 0 (certified PASS!)
+                j_b = rhs_p18 + arb(0, arb("1e-3"))
+            else:
+                # Wider enclosure straddling BOTH rhs_p0 and rhs_p18 -> P0 and P_1_8 UNRESOLVED!
+                j_b = rhs_p0 + arb("0.05") + arb(0, arb("0.20"))
+            return _make_tc061r2_stub_point_result(
+                rules, escalation_tier, J_ball=j_b, X_ball=arb(0), R_mix_ball=arb(0)
+            )
+        finally:
+            flint_ctx.prec = saved_p
+
+    out_c1 = execute_holdout_point_with_protocol_escalation(
+        spec_256, probes, rules, point_id="HO-BASE-256", evaluator_fn=_eval_case1_p0_fail_then_unres
+    )
+    assert out_c1["escalation_tier_used"] == 2
+    assert len(out_c1["escalation_history"]) == 3
+    assert out_c1["certification_integrity_ok"] is True
+    p0_c1 = out_c1["probe_evaluation"]["per_probe"]["TC061-P0"]
+    p18_c1 = out_c1["probe_evaluation"]["per_probe"]["TC061-P_1_8"]
+    assert p0_c1["point_verdict"] == "FAIL"
+    assert p0_c1["witness_tier"] == 0
+    assert p0_c1["witness_prec_bits"] == 256
+    assert p0_c1["differs_from_last_evaluated_tier"] is True
+    assert p0_c1["selected_witness"]["tier"] == 0
+    assert p0_c1["selected_witness"]["tier_verdict"] == "FAIL"
+    assert p0_c1["margin_M_Y"]["arb_ball_str"] == p0_c1["selected_witness"]["margin_enclosure"]["arb_ball_str"]
+    assert (
+        p0_c1["margin_M_Y"]["arb_ball_str"]
+        != p0_c1["last_evaluated_tier_observation"]["margin_enclosure"]["arb_ball_str"]
+    )
+    assert p0_c1["last_evaluated_tier_observation"]["tier"] == 2
+    assert p0_c1["last_evaluated_tier_observation"]["tier_verdict"] == "UNRESOLVED"
+    lo_m0, _, _ = _parse_arb_ball_str_to_fractions(p0_c1["margin_M_Y"]["arb_ball_str"])
+    assert lo_m0 > Fraction(0, 1)
+    assert p18_c1["point_verdict"] == "UNRESOLVED"
+    assert p18_c1["selected_witness"] is None
+
+    # Verify JSON serialization round-trip and global outcome aggregation (Case 9):
+    row_c1 = build_holdout_point_artifact_row(entry_256, out_c1, compute_divisor_partition=False)
+    assert row_c1["last_evaluated_observable_tier"] == 2
+    assert row_c1["any_candidate_witness_differs_from_last_tier"] is True
+    row_c1_json = json.loads(json.dumps(strip_enclosure_arb_for_json(row_c1)))
+    agg_c1 = aggregate_holdout_rows_and_outcomes([row_c1_json], probes, registered_count=1)
+    assert agg_c1["global_probe_outcomes"]["TC061-P0"]["global_probe_outcome"] == "REFUTED_BY_CERTIFIED_WITNESS"
+    assert len(agg_c1["global_probe_outcomes"]["TC061-P0"]["decisive_fail_witnesses"]) == 1
+    assert agg_c1["global_probe_outcomes"]["TC061-P0"]["decisive_fail_witnesses"][0]["witness_tier"] == 0
+    assert (
+        agg_c1["global_probe_outcomes"]["TC061-P_1_8"]["global_probe_outcome"]
+        == "UNRESOLVED/INCOMPLETE_COVERAGE"
+    )
+
+    # --- Case 2a: Main-probe FAIL at Tier 0 with KL1 R_mix UNRESOLVED companion (P0 later UNRESOLVED):
+    def _eval_case2a_main_fail_kl1_unres(
+        sp, *, escalation_tier=0, protocol_rules=None, allow_nonprotocol_override=False, selberg_table=None
+    ):
+        saved_p = flint_ctx.prec
+        try:
+            flint_ctx.prec = 256
+            j_b = (rhs_p0 + arb("0.04")) if escalation_tier == 0 else (rhs_p0 + arb(0, arb("0.20")))
+            rmix_b = (rhs_rmix + arb(0, arb("1e-5"))) if escalation_tier == 0 else (rhs_rmix - arb("0.1"))
+            return _make_tc061r2_stub_point_result(
+                rules, escalation_tier, J_ball=j_b, X_ball=arb(0), R_mix_ball=rmix_b
+            )
+        finally:
+            flint_ctx.prec = saved_p
+
+    out_c2a = execute_holdout_point_with_protocol_escalation(
+        spec_256, probes, rules, point_id="HO-BASE-256", evaluator_fn=_eval_case2a_main_fail_kl1_unres
+    )
+    assert out_c2a["escalation_tier_used"] == 1
+    assert out_c2a["escalation_stop_reason"] == "ALL_APPLICABLE_CANDIDATES_RESOLVED"
+    assert out_c2a["probe_evaluation"]["per_probe"]["TC061-P0"]["point_verdict"] == "FAIL"
+    assert out_c2a["probe_evaluation"]["per_probe"]["TC061-P0"]["witness_tier"] == 0
+    assert out_c2a["probe_evaluation"]["mechanism_kl1_sub_budgets"]["R_mix_verdict"] == "PASS"
+    assert out_c2a["probe_evaluation"]["mechanism_kl1_sub_budgets"]["R_mix_witness_tier"] == 1
+
+    # --- Case 2b: KL1 offdiag FAIL at Tier 0 with P0 UNRESOLVED companion (offdiag later UNRESOLVED):
+    def _eval_case2b_kl1_fail_main_unres(
+        sp, *, escalation_tier=0, protocol_rules=None, allow_nonprotocol_override=False, selberg_table=None
+    ):
+        saved_p = flint_ctx.prec
+        try:
+            flint_ctx.prec = 256
+            j_b = rhs_p0 + arb(0, arb("1e-4"))  # P0 stays UNRESOLVED across all tiers
+            x_b = (
+                (rhs_offdiag + arb("0.20")) / arb(4)
+                if escalation_tier == 0
+                else (rhs_offdiag + arb(0, arb("0.50"))) / arb(4)
+            )
+            return _make_tc061r2_stub_point_result(
+                rules, escalation_tier, J_ball=j_b, X_ball=x_b, R_mix_ball=arb(0)
+            )
+        finally:
+            flint_ctx.prec = saved_p
+
+    out_c2b = execute_holdout_point_with_protocol_escalation(
+        spec_256, probes, rules, point_id="HO-BASE-256", evaluator_fn=_eval_case2b_kl1_fail_main_unres
+    )
+    assert out_c2b["escalation_tier_used"] == 2
+    kl1_2b = out_c2b["probe_evaluation"]["mechanism_kl1_sub_budgets"]
+    assert kl1_2b["offdiag_verdict"] == "FAIL"
+    assert kl1_2b["offdiag_witness_tier"] == 0
+    assert kl1_2b["offdiag_differs_from_last_evaluated_tier"] is True
+    row_c2b = json.loads(
+        json.dumps(
+            strip_enclosure_arb_for_json(
+                build_holdout_point_artifact_row(entry_256, out_c2b, compute_divisor_partition=False)
+            )
+        )
+    )
+    agg_c2b = aggregate_holdout_rows_and_outcomes([row_c2b], probes, registered_count=1)
+    assert (
+        agg_c2b["mechanism_kl1_holdout_summary"]["offdiag_sub_budget_outcome"]
+        == "REFUTED_BY_CERTIFIED_WITNESS"
+    )
+    assert (
+        agg_c2b["global_probe_outcomes"]["TC061-P0"]["global_probe_outcome"]
+        == "UNRESOLVED/INCOMPLETE_COVERAGE"
+    )
+
+    # --- Case 3: Previous PASS at Tier 0 followed by UNRESOLVED at Tier 1 retains Tier 0 PASS certificate
+    # and stops immediately at Tier 1 once the remaining unresolved candidate resolves!
+    def _eval_case3_pass_then_unres(
+        sp, *, escalation_tier=0, protocol_rules=None, allow_nonprotocol_override=False, selberg_table=None
+    ):
+        saved_p = flint_ctx.prec
+        try:
+            flint_ctx.prec = 256
+            if escalation_tier == 0:
+                # All main probes PASS (J = 0), but KL1 R_mix straddles rhs_rmix (UNRESOLVED):
+                return _make_tc061r2_stub_point_result(
+                    rules,
+                    escalation_tier,
+                    J_ball=arb(0),
+                    X_ball=arb(0),
+                    R_mix_ball=rhs_rmix + arb(0, arb("1e-4")),
+                )
+            # At Tier 1: R_mix resolves to PASS (0), while J_ball straddles rhs_p0 (P0 UNRESOLVED):
+            return _make_tc061r2_stub_point_result(
+                rules,
+                escalation_tier,
+                J_ball=rhs_p0 + arb(0, arb("0.05")),
+                X_ball=arb(0),
+                R_mix_ball=arb(0),
+            )
+        finally:
+            flint_ctx.prec = saved_p
+
+    out_c3 = execute_holdout_point_with_protocol_escalation(
+        spec_256, probes, rules, point_id="HO-BASE-256", evaluator_fn=_eval_case3_pass_then_unres
+    )
+    assert out_c3["escalation_tier_used"] == 1  # Stops at Tier 1 without running Tier 2!
+    assert len(out_c3["escalation_history"]) == 2
+    assert out_c3["escalation_stop_reason"] == "ALL_APPLICABLE_CANDIDATES_RESOLVED"
+    p0_c3 = out_c3["probe_evaluation"]["per_probe"]["TC061-P0"]
+    assert p0_c3["point_verdict"] == "PASS"
+    assert p0_c3["witness_tier"] == 0
+    assert p0_c3["differs_from_last_evaluated_tier"] is True
+    hi_m3 = _sci_or_latex_num_to_fraction(p0_c3["margin_M_Y"]["upper_dec"])
+    assert hi_m3 <= Fraction(0, 1)
+
+    # --- Case 4: All candidates UNRESOLVED through final Tier 2 remain UNRESOLVED:
+    def _eval_case4_all_unres(
+        sp, *, escalation_tier=0, protocol_rules=None, allow_nonprotocol_override=False, selberg_table=None
+    ):
+        saved_p = flint_ctx.prec
+        try:
+            flint_ctx.prec = 256
+            return _make_tc061r2_stub_point_result(
+                rules,
+                escalation_tier,
+                J_ball=rhs_p0 + arb("0.25") + arb(0, arb("1.0")),
+                X_ball=(rhs_offdiag + arb(0, arb("0.5"))) / arb(4),
+                R_mix_ball=rhs_rmix + arb(0, arb("0.5")),
+            )
+        finally:
+            flint_ctx.prec = saved_p
+
+    out_c4 = execute_holdout_point_with_protocol_escalation(
+        spec_256, probes, rules, point_id="HO-BASE-256", evaluator_fn=_eval_case4_all_unres
+    )
+    assert out_c4["escalation_tier_used"] == 2
+    assert out_c4["escalation_stop_reason"] == "ESCALATION_LADDER_EXHAUSTED_WITH_UNRESOLVED_CANDIDATES"
+    for pid, pd4 in out_c4["probe_evaluation"]["per_probe"].items():
+        assert pd4["point_verdict"] == "UNRESOLVED", f"{pid} must remain UNRESOLVED"
+        assert pd4["selected_witness"] is None
+    assert out_c4["probe_evaluation"]["mechanism_kl1_sub_budgets"]["offdiag_verdict"] == "UNRESOLVED"
+    assert out_c4["probe_evaluation"]["mechanism_kl1_sub_budgets"]["R_mix_verdict"] == "UNRESOLVED"
+
+    # --- Case 10: All applicable candidates decisive at Tier 0 (even when out-of-domain P0 & KL1
+    # have zero-straddling margins at Y = 32 < 64) -> zero unnecessary escalation!
+    spec_32 = ExactScaleSpec("32", "exact_rational", Fraction(32, 1))
+    saved_p32 = flint_ctx.prec
+    try:
+        flint_ctx.prec = 256
+        lg_32 = arb(32).log()
+    finally:
+        flint_ctx.prec = saved_p32
+
+    def _eval_case10_y32_out_of_domain_straddle(
+        sp, *, escalation_tier=0, protocol_rules=None, allow_nonprotocol_override=False, selberg_table=None
+    ):
+        saved_p = flint_ctx.prec
+        try:
+            flint_ctx.prec = 256
+            # J straddles log(32) -> P0 would be UNRESOLVED if in-domain, while P_1_2, P_1_4, P_1_8
+            # have strictly larger RHS and are certified PASS!
+            return _make_tc061r2_stub_point_result(
+                rules,
+                escalation_tier,
+                Y_int=32,
+                T_Y=77,
+                D0_raw=3,
+                ceil_tau_Y=202,
+                J_ball=lg_32 + arb(0, arb("1e-3")),
+                X_ball=(arb(3) / arb(16)) * lg_32 + arb(0, arb("1e-3")),
+                R_mix_ball=(arb(1) / arb(4)) * lg_32 + arb(0, arb("1e-3")),
+            )
+        finally:
+            flint_ctx.prec = saved_p
+
+    out_c10 = execute_holdout_point_with_protocol_escalation(
+        spec_32,
+        probes,
+        rules,
+        point_id="CAL-32",
+        evaluator_fn=_eval_case10_y32_out_of_domain_straddle,
+        in_declared_domain_fn=lambda pr: 32 >= int(pr["domain_threshold_Y0"]),
+        kl1_in_declared_domain=False,
+    )
+    assert out_c10["escalation_tier_used"] == 0
+    assert len(out_c10["escalation_history"]) == 1
+    assert out_c10["escalation_stop_reason"] == "ALL_APPLICABLE_CANDIDATES_DECISIVE_AT_TIER_0"
+    ev_c10 = out_c10["accumulated_candidate_evidence"]
+    assert "TC061-P0" in ev_c10["out_of_domain_candidates"]
+    assert "TC061-KL1:offdiag" in ev_c10["out_of_domain_candidates"]
+    assert "TC061-KL1:R_mix" in ev_c10["out_of_domain_candidates"]
+    assert out_c10["probe_evaluation"]["per_probe"]["TC061-P0"]["point_verdict"] == "NOT_EVALUATED"
+    assert (
+        out_c10["probe_evaluation"]["per_probe"]["TC061-P0"]["out_of_domain_diagnostic_verdict"]
+        == "UNRESOLVED"
+    )
+    for sec_pid in ("TC061-P_1_2", "TC061-P_1_4", "TC061-P_1_8"):
+        assert out_c10["probe_evaluation"]["per_probe"][sec_pid]["point_verdict"] == "PASS"
+
+
+def test_tc061r2_contradictory_certified_verdicts_trigger_integrity_conflict_retaining_both_witnesses() -> None:
+    """Verify `TASK-TC-061R2` §4 Case 5: contradictory certified PASS and FAIL verdicts across
+    escalation tiers for the same candidate, point, and parameters trigger an explicit certification
+    inconsistency, retain both certified enclosures, and block clean Section 3 certification.
+    """
+    proto = json.loads(MIXED_ARITHMETIC_COVARIANCE_PROTOCOL_PATH.read_text(encoding="utf-8"))
+    probes = proto["frozen_candidate_probes"]
+    rules = proto["numerical_settings_and_escalation_rules"]
+    entry_256 = next(
+        e for e in proto["preregistered_holdout_grid"] if e["point_id"] == "HO-BASE-256"
+    )
+    spec_256 = ExactScaleSpec.from_protocol_entry(entry_256)
+
+    saved = flint_ctx.prec
+    try:
+        flint_ctx.prec = 256
+        lg_256 = arb(256).log()
+        rhs_rmix = (arb(1) / arb(4)) * lg_256
+    finally:
+        flint_ctx.prec = saved
+
+    # Tier 0: P0..P_1_8 certified PASS (J = -1.0), KL1 R_mix UNRESOLVED (triggers Tier 1).
+    # Tier 1: P0..P_1_8 return certified FAIL (J = +100.0) -> contradictory PASS vs FAIL!
+    def _eval_conflict_pass_then_fail(
+        sp, *, escalation_tier=0, protocol_rules=None, allow_nonprotocol_override=False, selberg_table=None
+    ):
+        saved_p = flint_ctx.prec
+        try:
+            flint_ctx.prec = 256
+            if escalation_tier == 0:
+                return _make_tc061r2_stub_point_result(
+                    rules,
+                    0,
+                    J_ball=arb(-1),
+                    X_ball=arb(0),
+                    R_mix_ball=rhs_rmix + arb(0, arb("1e-3")),
+                )
+            return _make_tc061r2_stub_point_result(
+                rules, 1, J_ball=arb(100), X_ball=arb(0), R_mix_ball=arb(0)
+            )
+        finally:
+            flint_ctx.prec = saved_p
+
+    # 1. Structured report mode preserves BOTH enclosures and blocks clean certification:
+    out_conf = execute_holdout_point_with_protocol_escalation(
+        spec_256,
+        probes,
+        rules,
+        point_id="HO-BASE-256",
+        evaluator_fn=_eval_conflict_pass_then_fail,
+        raise_on_integrity_conflict=False,
+    )
+    assert out_conf["certification_integrity_ok"] is False
+    assert out_conf["certification_integrity_status"] == CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
+    assert out_conf["escalation_stop_reason"] == "STOPPED_ON_CERTIFICATION_INTEGRITY_CONFLICT"
+    assert len(out_conf["integrity_conflicts"]) == 4  # All 4 main probes flipped PASS -> FAIL
+
+    p0_conf = out_conf["probe_evaluation"]["per_probe"]["TC061-P0"]
+    assert p0_conf["point_verdict"] == CERTIFICATION_INTEGRITY_CONFLICT_VERDICT
+    assert p0_conf["selected_witness"] is None
+    assert p0_conf["margin_M_Y"] is None
+    cw = p0_conf["conflicting_certified_witnesses"]
+    assert len(cw) == 2
+    assert cw[0]["tier"] == 0 and cw[0]["tier_verdict"] == "PASS"
+    assert cw[1]["tier"] == 1 and cw[1]["tier_verdict"] == "FAIL"
+    assert cw[0]["parameter_identity"] == cw[1]["parameter_identity"]
+    assert _sci_or_latex_num_to_fraction(cw[0]["margin_enclosure"]["upper_dec"]) <= Fraction(0, 1)
+    assert _sci_or_latex_num_to_fraction(cw[1]["margin_enclosure"]["lower_dec"]) > Fraction(0, 1)
+
+    row_conf = json.loads(
+        json.dumps(
+            strip_enclosure_arb_for_json(
+                build_holdout_point_artifact_row(entry_256, out_conf, compute_divisor_partition=False)
+            )
+        )
+    )
+    agg_conf = aggregate_holdout_rows_and_outcomes([row_conf], probes, registered_count=1)
+    assert agg_conf["certification_integrity_summary"]["certification_integrity_ok"] is False
+    assert agg_conf["certification_integrity_summary"]["certification_report_blocked"] is True
+    assert agg_conf["holdout_coverage_summary"]["certification_report_blocked"] is True
+    assert (
+        agg_conf["global_probe_outcomes"]["TC061-P0"]["global_probe_outcome"]
+        == CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
+    )
+    assert (
+        agg_conf["global_probe_outcomes"]["TC061-P0"]["global_probe_outcome"]
+        != "REFUTED_BY_CERTIFIED_WITNESS"
+    )
+
+    with pytest.raises(CertificationIntegrityError) as exc_agg:
+        aggregate_holdout_rows_and_outcomes(
+            [row_conf], probes, registered_count=1, fail_on_integrity_conflict=True
+        )
+    assert len(exc_agg.value.conflicts) == 4
+
+    # 2. Fail-closed runner mode (`raise_on_integrity_conflict=True`) raises CertificationIntegrityError
+    # carrying both witnesses:
+    with pytest.raises(CertificationIntegrityError) as exc_run:
+        execute_holdout_point_with_protocol_escalation(
+            spec_256,
+            probes,
+            rules,
+            point_id="HO-BASE-256",
+            evaluator_fn=_eval_conflict_pass_then_fail,
+            raise_on_integrity_conflict=True,
+        )
+    c0 = exc_run.value.conflicts[0]
+    assert c0["earlier_certified_witness"]["tier_verdict"] == "PASS"
+    assert c0["later_conflicting_witness"]["tier_verdict"] == "FAIL"
+
+
+def test_tc061r2_explicit_resource_statuses_unknown_rss_mixed_coverage_and_math_separation(
+    tc061_artifact: Dict[str, Any],
+) -> None:
+    """Verify `TASK-TC-061R2` §4 Cases 6, 7, and 8 across `evaluate_point_resource_compliance`,
+    `execute_holdout_point_with_protocol_escalation`, `aggregate_section_resource_compliance`,
+    and `aggregate_holdout_rows_and_outcomes`, plus historical `WITHIN` preservation on the 14
+    evaluated Liouville holdout rows.
+    """
+    proto = json.loads(MIXED_ARITHMETIC_COVARIANCE_PROTOCOL_PATH.read_text(encoding="utf-8"))
+    probes = proto["frozen_candidate_probes"]
+    rules = proto["numerical_settings_and_escalation_rules"]
+    entry_256 = next(
+        e for e in proto["preregistered_holdout_grid"] if e["point_id"] == "HO-BASE-256"
+    )
+    spec_256 = ExactScaleSpec.from_protocol_entry(entry_256)
+
+    # --- Case 6: Wall time within budget, no RSS measurement (peak_rss_mb=None) ->
+    # memory=UNKNOWN, overall=UNKNOWN, within_resource_budget=None, while preserving mathematical PASS/FAIL!
+    def _eval_no_rss_pass(
+        sp, *, escalation_tier=0, protocol_rules=None, allow_nonprotocol_override=False, selberg_table=None
+    ):
+        return _make_tc061r2_stub_point_result(
+            rules,
+            escalation_tier,
+            J_ball=arb(-1),
+            X_ball=arb(0),
+            R_mix_ball=arb(0),
+            elapsed_sec=0.12,
+            current_rss_mb=None,
+            peak_rss_mb=None,
+            peak_rss_semantics=None,
+        )
+
+    out_no_rss = execute_holdout_point_with_protocol_escalation(
+        spec_256, probes, rules, point_id="HO-BASE-256", evaluator_fn=_eval_no_rss_pass
+    )
+    rb_no_rss = out_no_rss["resource_budget_check"]
+    assert set(RESOURCE_COMPLIANCE_STATUSES) == {"WITHIN", "EXCEEDED", "UNKNOWN"}
+    assert rb_no_rss["wall_budget_status"] == "WITHIN"
+    assert rb_no_rss["memory_budget_status"] == "UNKNOWN"
+    assert rb_no_rss["overall_resource_status"] == "UNKNOWN"
+    assert rb_no_rss["peak_rss_mb"] is None
+    assert rb_no_rss["rss_budget_exceeded"] is None
+    assert rb_no_rss["within_resource_budget"] is None
+    assert rb_no_rss["resource_compliance_verified"] is False
+    for pd in out_no_rss["probe_evaluation"]["per_probe"].values():
+        assert pd["point_verdict"] == "PASS"
+
+    row_no_rss = json.loads(
+        json.dumps(
+            strip_enclosure_arb_for_json(
+                build_holdout_point_artifact_row(entry_256, out_no_rss, compute_divisor_partition=False)
+            )
+        )
+    )
+    agg_no_rss = aggregate_holdout_rows_and_outcomes([row_no_rss], probes, registered_count=1)
+    assert agg_no_rss["resource_compliance_summary"]["wall_budget_status"] == "WITHIN"
+    assert agg_no_rss["resource_compliance_summary"]["memory_budget_status"] == "UNKNOWN"
+    assert agg_no_rss["resource_compliance_summary"]["overall_resource_budget_status"] == "UNKNOWN"
+    assert agg_no_rss["holdout_coverage_summary"]["all_points_within_resource_budgets"] is None
+    assert agg_no_rss["holdout_coverage_summary"]["all_resource_budgets_verified_within"] is False
+    # Mathematical certification remains separate and valid:
+    assert agg_no_rss["holdout_coverage_summary"]["mathematical_coverage_complete"] is True
+    assert (
+        agg_no_rss["global_probe_outcomes"]["TC061-P0"]["global_probe_outcome"]
+        == "SURVIVED_TESTED_POINTS"
+    )
+
+    # --- Case 7: Mixed available/missing telemetry across tiers and across points:
+    # 7a: Missing Tier-0 RSS + valid final-tier OS PROCESS_LIFETIME_HIGH_WATER_MARK -> WITHIN:
+    chk_7a = evaluate_point_resource_compliance(
+        [
+            {"elapsed_sec": 1.0, "current_rss_mb": None, "peak_rss_mb": None, "peak_rss_measurement_semantics": None},
+            {
+                "elapsed_sec": 2.0,
+                "current_rss_mb": 200.0,
+                "peak_rss_mb": 250.0,
+                "peak_rss_measurement_semantics": "PROCESS_LIFETIME_HIGH_WATER_MARK",
+            },
+        ],
+        max_wall_sec=300.0,
+        max_rss_mb=4096.0,
+    )
+    assert chk_7a["memory_budget_status"] == "WITHIN"
+    assert chk_7a["overall_resource_status"] == "WITHIN"
+    assert chk_7a["peak_rss_coverage_reason"] == "FINAL_TIER_PROCESS_LIFETIME_HIGH_WATER_MARK_COVERS_PRIOR_TIERS"
+
+    # 7b: Measured Tier-0 RSS + missing final-tier RSS -> UNKNOWN (Tier 0 cannot cover Tier 1):
+    chk_7b = evaluate_point_resource_compliance(
+        [
+            {
+                "elapsed_sec": 1.0,
+                "current_rss_mb": 200.0,
+                "peak_rss_mb": 250.0,
+                "peak_rss_measurement_semantics": "PROCESS_LIFETIME_HIGH_WATER_MARK",
+            },
+            {"elapsed_sec": 2.0, "current_rss_mb": None, "peak_rss_mb": None, "peak_rss_measurement_semantics": None},
+        ],
+        max_wall_sec=300.0,
+        max_rss_mb=4096.0,
+    )
+    assert chk_7b["memory_budget_status"] == "UNKNOWN"
+    assert chk_7b["overall_resource_status"] == "UNKNOWN"
+    assert chk_7b["peak_rss_mb"] is None
+    assert chk_7b["partial_uncovered_max_rss_mb"] == 250.0
+
+    # 7c: Missing Tier-0 RSS + final-tier RSS WITHOUT process high-water semantics -> UNKNOWN:
+    chk_7c = evaluate_point_resource_compliance(
+        [
+            {"elapsed_sec": 1.0, "current_rss_mb": None, "peak_rss_mb": None, "peak_rss_measurement_semantics": None},
+            {
+                "elapsed_sec": 2.0,
+                "current_rss_mb": 200.0,
+                "peak_rss_mb": 250.0,
+                "peak_rss_measurement_semantics": "TIER_LOCAL_SNAPSHOT",
+            },
+        ],
+        max_wall_sec=300.0,
+        max_rss_mb=4096.0,
+    )
+    assert chk_7c["memory_budget_status"] == "UNKNOWN"
+    assert chk_7c["overall_resource_status"] == "UNKNOWN"
+
+    # 7d: Non-monotonic final PROCESS_LIFETIME_HIGH_WATER_MARK (< earlier tier) -> conservative UNKNOWN:
+    chk_7d = evaluate_point_resource_compliance(
+        [
+            {
+                "elapsed_sec": 1.0,
+                "current_rss_mb": 300.0,
+                "peak_rss_mb": 350.0,
+                "peak_rss_measurement_semantics": "PROCESS_LIFETIME_HIGH_WATER_MARK",
+            },
+            {
+                "elapsed_sec": 2.0,
+                "current_rss_mb": 200.0,
+                "peak_rss_mb": 250.0,
+                "peak_rss_measurement_semantics": "PROCESS_LIFETIME_HIGH_WATER_MARK",
+            },
+        ],
+        max_wall_sec=300.0,
+        max_rss_mb=4096.0,
+    )
+    assert chk_7d["memory_budget_status"] == "UNKNOWN"
+    assert chk_7d["peak_rss_coverage_reason"] == "INVALID_OR_NON_MONOTONIC_RSS_TELEMETRY"
+
+    # 7e: Multi-point aggregation mixing WITHIN and UNKNOWN -> UNKNOWN overall:
+    sec_mix = aggregate_section_resource_compliance([chk_7a, chk_7b], registered_count=2)
+    assert sec_mix["wall_budget_status"] == "WITHIN"
+    assert sec_mix["memory_budget_status"] == "UNKNOWN"
+    assert sec_mix["overall_resource_budget_status"] == "UNKNOWN"
+    assert sec_mix["overall_status_counts"] == {"WITHIN": 1, "EXCEEDED": 0, "UNKNOWN": 1}
+    assert sec_mix["all_points_within_resource_budgets"] is None
+    assert sec_mix["all_resource_budgets_verified_within"] is False
+
+    # --- Case 8: Under-limit, RSS excess, wall excess, and wall excess + missing RSS:
+    chk_8_ok = evaluate_point_resource_compliance(
+        [{"elapsed_sec": 10.0, "current_rss_mb": 150.0, "peak_rss_mb": 200.0}],
+        max_wall_sec=300.0,
+        max_rss_mb=4096.0,
+    )
+    assert (
+        chk_8_ok["wall_budget_status"],
+        chk_8_ok["memory_budget_status"],
+        chk_8_ok["overall_resource_status"],
+        chk_8_ok["within_resource_budget"],
+    ) == ("WITHIN", "WITHIN", "WITHIN", True)
+
+    chk_8_wall_ex_no_rss = evaluate_point_resource_compliance(
+        [{"elapsed_sec": 305.0, "current_rss_mb": None, "peak_rss_mb": None}],
+        max_wall_sec=300.0,
+        max_rss_mb=4096.0,
+    )
+    assert chk_8_wall_ex_no_rss["wall_budget_status"] == "EXCEEDED"
+    assert chk_8_wall_ex_no_rss["memory_budget_status"] == "UNKNOWN"
+    assert chk_8_wall_ex_no_rss["overall_resource_status"] == "EXCEEDED"
+    assert chk_8_wall_ex_no_rss["wall_budget_exceeded"] is True
+    assert chk_8_wall_ex_no_rss["rss_budget_exceeded"] is None
+    assert chk_8_wall_ex_no_rss["within_resource_budget"] is False
+
+    chk_8_no_wall_rss_ex = evaluate_point_resource_compliance(
+        [{"elapsed_sec": None, "current_rss_mb": None, "peak_rss_mb": 5000.0}],
+        max_wall_sec=300.0,
+        max_rss_mb=4096.0,
+    )
+    assert chk_8_no_wall_rss_ex["wall_budget_status"] == "UNKNOWN"
+    assert chk_8_no_wall_rss_ex["memory_budget_status"] == "EXCEEDED"
+    assert chk_8_no_wall_rss_ex["overall_resource_status"] == "EXCEEDED"
+    assert chk_8_no_wall_rss_ex["within_resource_budget"] is False
+
+    sec_ex = aggregate_section_resource_compliance(
+        [chk_8_ok, chk_8_wall_ex_no_rss], registered_count=2
+    )
+    assert sec_ex["overall_resource_budget_status"] == "EXCEEDED"
+    assert sec_ex["all_points_within_resource_budgets"] is False
+    assert sec_ex["any_resource_budget_exceeded"] is True
+
+    # Also verify escalation stops immediately when Tier 0 already exceeds wall budget:
+    saved_p = flint_ctx.prec
+    try:
+        flint_ctx.prec = 256
+        lg_256 = arb(256).log()
+    finally:
+        flint_ctx.prec = saved_p
+
+    def _eval_unres_wall_exceeded(
+        sp, *, escalation_tier=0, protocol_rules=None, allow_nonprotocol_override=False, selberg_table=None
+    ):
+        return _make_tc061r2_stub_point_result(
+            rules,
+            escalation_tier,
+            J_ball=lg_256 + arb(0, arb("1e-3")),
+            X_ball=arb(0),
+            R_mix_ball=arb(0),
+            elapsed_sec=305.0,
+            current_rss_mb=None,
+            peak_rss_mb=None,
+            peak_rss_semantics=None,
+        )
+
+    out_stop_bgt = execute_holdout_point_with_protocol_escalation(
+        spec_256, probes, rules, point_id="HO-BASE-256", evaluator_fn=_eval_unres_wall_exceeded
+    )
+    assert out_stop_bgt["escalation_tier_used"] == 0
+    assert out_stop_bgt["escalation_stop_reason"] == "STOPPED_ON_RESOURCE_BUDGET_EXCEEDED"
+    assert out_stop_bgt["resource_budget_check"]["overall_resource_status"] == "EXCEEDED"
+
+    # Verify the 14 stored production holdout rows preserve measured WITHIN RSS & wall compliance:
+    sec3 = tc061_artifact["section_3_preregistered_holdout_experiment"]
+    res_sum = sec3["resource_compliance_summary"]
+    assert res_sum["wall_budget_status"] == "WITHIN"
+    assert res_sum["memory_budget_status"] == "WITHIN"
+    assert res_sum["overall_resource_budget_status"] == "WITHIN"
+    assert res_sum["overall_status_counts"] == {"WITHIN": 14, "EXCEEDED": 0, "UNKNOWN": 0}
+    assert res_sum["all_points_within_resource_budgets"] is True
+    assert res_sum["all_resource_budgets_verified_within"] is True
+    for r in sec3["holdout_point_evaluations"]:
+        rb = r["resource_budget_check"]
+        assert rb["wall_budget_status"] == "WITHIN"
+        assert rb["memory_budget_status"] == "WITHIN"
+        assert rb["overall_resource_status"] == "WITHIN"
+        assert rb["peak_rss_mb"] is not None and 0.0 < float(rb["peak_rss_mb"]) <= 4096.0
+
+
+def test_tc061r2_wording_repairs_and_inherited_formal_build_preservation(
+    tc061_artifact: Dict[str, Any],
+) -> None:
+    """Verify `TASK-TC-061R2` §§5–6 wording repairs (`unbounded along powers of a prime outside S`,
+    explicit `every eta > 0` RH quantifier, accumulated-evidence escalation policy, unsplit panel
+    subdivision docstring) and preservation of inherited formal build `b65dba14...`.
+    """
+    rev_txt = TC_061_REVIEW_DOC_PATH.read_text(encoding="utf-8")
+    # Exclude §9 historical quotation when checking active prose:
+    active_rev_txt = rev_txt.split("## 9. `TASK-TC-061R2`")[0]
+    assert "unbounded along powers of a prime" in active_rev_txt
+    assert "unbounded on primes outside" not in active_rev_txt
+    assert "for **every** $\\eta > 0$" in active_rev_txt
+    assert "stopping immediately on certified `FAIL`" not in active_rev_txt
+
+    doc_settings = resolve_protocol_quadrature_settings.__doc__ or ""
+    assert "32" in doc_settings and "64" in doc_settings
+    assert "panel-splitting parameters inactive" not in doc_settings
+
+    br = json.loads((REPO_ROOT / "formal" / "build_report.json").read_text(encoding="utf-8"))
+    assert br["producing_git_commit"] == ACCEPTED_TC061R_IMPLEMENTATION_AND_FORMAL_COMMIT
+    assert br["total_theorems"] == 822
+    sec7 = tc061_artifact["section_7_lean_formalization_audit"]
+    assert (
+        sec7["formal_build_report_provenance"]["producing_git_commit"]
+        == ACCEPTED_TC061R_IMPLEMENTATION_AND_FORMAL_COMMIT
+    )
+    assert sec7["formal_build_report_provenance"]["inherited_formal_producing_commit_preserved"] is True
+    assert sec7["formal_build_report_provenance"]["live_module_sha256_matches_build_report"] is True
+
+
+def test_tc061r2_cutoff_mutation_out_of_domain_aggregation_and_rss_violation_edge_cases() -> None:
+    """Verify adversarial edge cases identified during independent review:
+    - Canonical cutoff mutation across tiers raises `CertificationIntegrityError` (never `KeyError`)
+      when `raise_on_integrity_conflict=True` and marks all applicable candidates conflicted ->
+      `CERTIFICATION_INTEGRITY_CONFLICT` when `raise_on_integrity_conflict=False`;
+    - Out-of-domain rows passed to `aggregate_holdout_rows_and_outcomes` adjust
+      `in_domain_registered_count` (`out_of_domain_excluded_count`) so valid in-domain rows retain
+      `SURVIVED_TESTED_POINTS`;
+    - Earlier-tier `current_rss_mb` exceeding limit is reflected in `peak_rss_mb` even when a later
+      tier reports a smaller `peak_rss_mb`.
+    """
+    proto = json.loads(MIXED_ARITHMETIC_COVARIANCE_PROTOCOL_PATH.read_text(encoding="utf-8"))
+    probes = proto["frozen_candidate_probes"]
+    rules = proto["numerical_settings_and_escalation_rules"]
+    entry_256 = next(
+        e for e in proto["preregistered_holdout_grid"] if e["point_id"] == "HO-BASE-256"
+    )
+    spec_256 = ExactScaleSpec.from_protocol_entry(entry_256)
+    entry_32 = dict(
+        entry_256,
+        point_id="CAL-32",
+        family="calibration",
+        label="32",
+        rational_factor="32/1",
+        exposure_status="CALIBRATION",
+        prior_exposure_note="synthetic out-of-domain row for aggregator test",
+    )
+    spec_32 = ExactScaleSpec.from_protocol_entry(entry_32)
+
+    saved_p = flint_ctx.prec
+    try:
+        flint_ctx.prec = 256
+        lg_256 = arb(256).log()
+        j_unres = lg_256 + arb(0, arb("1e-3"))
+        j_fail = lg_256 + arb("1.0")
+        j_pass_32 = arb("-0.01")
+        j_pass_256 = arb("1.0")
+    finally:
+        flint_ctx.prec = saved_p
+
+    # 1) Canonical cutoff mutation across tiers:
+    def _eval_cutoff_mutated(
+        sp, *, escalation_tier=0, protocol_rules=None, allow_nonprotocol_override=False, selberg_table=None
+    ):
+        r = _make_tc061r2_stub_point_result(
+            rules,
+            escalation_tier,
+            J_ball=j_unres if escalation_tier == 0 else j_fail,
+            X_ball=arb(0),
+            R_mix_ball=arb(0),
+        )
+        if escalation_tier >= 1:
+            r["cutoffs"] = {"T_Y": 1025, "D0_raw": 5, "D0_eff": 5}
+        return r
+
+    with pytest.raises(CertificationIntegrityError) as exc_cut:
+        execute_holdout_point_with_protocol_escalation(
+            spec_256,
+            probes,
+            rules,
+            point_id="HO-BASE-256",
+            evaluator_fn=_eval_cutoff_mutated,
+            raise_on_integrity_conflict=True,
+        )
+    assert "CANONICAL_CUTOFFS" in str(exc_cut.value)
+
+    out_cut = execute_holdout_point_with_protocol_escalation(
+        spec_256,
+        probes,
+        rules,
+        point_id="HO-BASE-256",
+        evaluator_fn=_eval_cutoff_mutated,
+        raise_on_integrity_conflict=False,
+    )
+    row_cut = json.loads(
+        json.dumps(
+            strip_enclosure_arb_for_json(
+                build_holdout_point_artifact_row(
+                    entry_256,
+                    out_cut,
+                    compute_divisor_partition=False,
+                )
+            )
+        )
+    )
+    agg_cut = aggregate_holdout_rows_and_outcomes(
+        [row_cut], probes, registered_count=1, fail_on_integrity_conflict=False
+    )
+    assert agg_cut["certification_integrity_summary"]["certification_report_blocked"] is True
+    assert (
+        agg_cut["global_probe_outcomes"]["TC061-P0"]["global_probe_outcome"]
+        == "CERTIFICATION_INTEGRITY_CONFLICT"
+    )
+    assert (
+        agg_cut["mechanism_kl1_holdout_summary"]["offdiag_sub_budget_outcome"]
+        == "CERTIFICATION_INTEGRITY_CONFLICT"
+    )
+
+    # 2) Mixed out-of-domain + in-domain rows in aggregate_holdout_rows_and_outcomes:
+    out_32 = execute_holdout_point_with_protocol_escalation(
+        spec_32,
+        probes,
+        rules,
+        point_id="CAL-32",
+        in_declared_domain_fn=lambda pr: pr["probe_id"] != "TC061-P0",
+        kl1_in_declared_domain=False,
+        evaluator_fn=lambda sp, **kw: _make_tc061r2_stub_point_result(
+            rules,
+            kw.get("escalation_tier", 0),
+            Y_int=32,
+            T_Y=77,
+            D0_raw=3,
+            ceil_tau_Y=202,
+            J_ball=j_pass_32,
+            X_ball=arb(0),
+            R_mix_ball=arb(0),
+        ),
+    )
+    out_256_ok = execute_holdout_point_with_protocol_escalation(
+        spec_256,
+        probes,
+        rules,
+        point_id="HO-BASE-256",
+        evaluator_fn=lambda sp, **kw: _make_tc061r2_stub_point_result(
+            rules, kw.get("escalation_tier", 0), J_ball=j_pass_256, X_ball=arb(0), R_mix_ball=arb(0)
+        ),
+    )
+    row_32 = json.loads(
+        json.dumps(
+            strip_enclosure_arb_for_json(
+                build_holdout_point_artifact_row(
+                    entry_32, out_32, compute_divisor_partition=False
+                )
+            )
+        )
+    )
+    row_256_ok = json.loads(
+        json.dumps(
+            strip_enclosure_arb_for_json(
+                build_holdout_point_artifact_row(
+                    entry_256,
+                    out_256_ok,
+                    compute_divisor_partition=False,
+                )
+            )
+        )
+    )
+    agg_mix_dom = aggregate_holdout_rows_and_outcomes([row_32, row_256_ok], probes, registered_count=2)
+    assert agg_mix_dom["global_probe_outcomes"]["TC061-P0"]["holdout_points_registered"] == 1
+    assert agg_mix_dom["global_probe_outcomes"]["TC061-P0"]["out_of_domain_excluded_count"] == 1
+    assert (
+        agg_mix_dom["global_probe_outcomes"]["TC061-P0"]["global_probe_outcome"]
+        == "SURVIVED_TESTED_POINTS"
+    )
+    assert agg_mix_dom["global_probe_outcomes"]["TC061-P_1_2"]["holdout_points_registered"] == 2
+    assert (
+        agg_mix_dom["global_probe_outcomes"]["TC061-P_1_2"]["global_probe_outcome"]
+        == "SURVIVED_TESTED_POINTS"
+    )
+    assert agg_mix_dom["mechanism_kl1_holdout_summary"]["in_domain_registered_count"] == 1
+    assert agg_mix_dom["mechanism_kl1_holdout_summary"]["out_of_domain_excluded_count"] == 1
+    assert (
+        agg_mix_dom["mechanism_kl1_holdout_summary"]["offdiag_sub_budget_outcome"]
+        == "SURVIVED_TESTED_POINTS"
+    )
+
+    # 3) Earlier-tier current_rss_mb violation reflected in peak_rss_mb:
+    chk_curr_ex = evaluate_point_resource_compliance(
+        [
+            {"elapsed_sec": 1.0, "current_rss_mb": 5000.0, "peak_rss_mb": None},
+            {
+                "elapsed_sec": 2.0,
+                "current_rss_mb": 200.0,
+                "peak_rss_mb": 250.0,
+                "peak_rss_semantics": "TIER_LOCAL_SNAPSHOT",
+            },
+        ],
+        max_wall_sec=300.0,
+        max_rss_mb=4096.0,
+    )
+    assert chk_curr_ex["memory_budget_status"] == "EXCEEDED"
+    assert chk_curr_ex["peak_rss_mb"] == 5000.0
+
+
 

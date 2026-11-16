@@ -1,7 +1,7 @@
 r"""
-TASK-TC-061 / TASK-TC-061R: Preregistered Mixed Arithmetic Covariance Test, Signed-Kernel Proof
-Attempt, Complete-Core Formula, Frozen-Protocol Execution, and Proof-Scope Repair toward
-SUBGATE-TC-043A (EPIC-TC-042).
+TASK-TC-061 / TASK-TC-061R / TASK-TC-061R2: Preregistered Mixed Arithmetic Covariance Test, Signed-
+Kernel Proof Attempt, Complete-Core Formula, Frozen-Protocol Execution, Escalation Witness
+Preservation, Explicit Resource Status, and Report Closeout toward SUBGATE-TC-043A (EPIC-TC-042).
 
 Implements, verifies, and certifies in 256-bit FLINT/Arb outward-rounded ball arithmetic (using
 `tau` strictly via `_tau_arb()` as the sole circle constant, reserving `K` exclusively for real-
@@ -35,13 +35,18 @@ core vector, and `a_eta, b_eta` for scalar constants):
      genuine input intervals spanning `T` or `D_0` jumps (`[256 - 2^{-12}, 256 + 2^{-12}]`,
      `[742/5, 2969/20]`, `[148, 149]`, and `[64, 65]` spanning `T: 182 -> 185`).
 
-3. Section 3 — Faithful Frozen-Protocol 14-Point Execution, KL1 Escalation, & Deviation Record:
+3. Section 3 — Faithful Frozen-Protocol 14-Point Execution, Decisive-Witness Accumulator, & Resource Status:
    - Resolves quadrature mode and tolerances strictly from `data/tc_mixed_arithmetic_covariance_protocol.json`
-     and certified `T(Y)` (`T < 512`: unsplit quadrature with `quad_tol_bits = 240`; `T >= 512`:
-     three-zone quadrature with `quad_tol_bits = 160`, `16` panels, ratio `12`, Taylor degree `56`),
-     records requested vs actually used settings and inactive parameters per mode, prevents silent
-     overrides, includes both `TC061-KL1` sub-budgets in the escalation trigger, records post-run
-     wall-time and RSS budget checks without claiming OS-level preemptive kills, and documents the
+     and certified `T(Y)` (`T < 512`: unsplit quadrature with `quad_tol_bits = 240` at Tier 0 and
+     registered `32`/`64` panel subdivisions on escalation; `T >= 512`: three-zone quadrature with
+     `quad_tol_bits = 160`, `16` panels, ratio `12`, Taylor degree `56`), records requested vs
+     actually used settings and genuinely inactive parameters per mode, prevents silent overrides,
+     accumulates decisive `PASS`/`FAIL` witness provenance across all four main probes and both
+     `TC061-KL1` sub-budgets (preserving certified counterexamples and certificates when later tiers
+     are `UNRESOLVED` while flagging contradictory certified `PASS`/`FAIL` verdicts as an explicit
+     `CERTIFICATION_INTEGRITY_CONFLICT` retaining both witnesses), tracks separate 3-valued
+     (`WITHIN`, `EXCEEDED`, `UNKNOWN`) wall-time and memory compliance statuses without claiming
+     OS-level preemptive kills or coercing missing RSS into verified compliance, and documents the
      corrected `HO-BASE-128` (`T = 431`, `quad_tol_bits = 240`) rerun vs the original `TC-061`
      (`quad_tol_bits = 160`) deviation as a corrected repeat of the registered experiment.
 
@@ -172,10 +177,14 @@ from tc.simultaneous_compatibility_combined_energy import (
 
 TASK_TC_061_ID = "TASK-TC-061"
 TASK_TC_061R_ID = "TASK-TC-061R"
+TASK_TC_061R2_ID = "TASK-TC-061R2"
 PROPOSED_TC061_BRANCH = "task/tc-061-mixed-arithmetic-covariance-hypothesis-test"
 PROPOSED_TC061R_BRANCH = "task/tc-061r-core-formula-protocol-and-proof-scope-repair"
+PROPOSED_TC061R2_BRANCH = "task/tc-061r2-witness-preservation-resource-status-and-closeout"
 REVIEWED_TC061_TIP = "e7ced078f32a376d582a6aaf098ad0b3036da51f"
 REVIEWED_TC061_IMPLEMENTATION = "74e9df24d165619b0857cd37a895d599a93ba08e"
+REVIEWED_TC061R_TIP = "93dd56a5554b698dab642611605e29c80e756462"
+ACCEPTED_TC061R_IMPLEMENTATION_AND_FORMAL_COMMIT = "b65dba142658a8e4fd80c339d7029aa14e114c5a"
 ACCEPTED_TC060R2_IMPLEMENTATION = "2812faad941301bde8b6dc09ac5d8c23957204ff"
 ACCEPTED_TC060R2_TIP = "4bfb36ed7a62f207a6479dd932a997563a407ff8"
 MERGED_MAIN_BASELINE_TC061 = "71a101005f1ee073e981187bb7d07d90daef9c65"
@@ -237,6 +246,42 @@ PROBE_GLOBAL_OUTCOMES: Tuple[str, ...] = (
     "PROVED_UNIFORMLY",
 )
 POINT_MARGIN_VERDICTS: Tuple[str, ...] = ("PASS", "FAIL", "UNRESOLVED", "NOT_EVALUATED")
+CERTIFICATION_INTEGRITY_CONFLICT_VERDICT = "INTEGRITY_CONFLICT"
+CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME = "CERTIFICATION_INTEGRITY_CONFLICT"
+RESOURCE_COMPLIANCE_STATUSES: Tuple[str, ...] = ("WITHIN", "EXCEEDED", "UNKNOWN")
+
+
+class CertificationIntegrityError(RuntimeError):
+    """Raised when contradictory certified PASS and FAIL enclosures occur for the same candidate,
+    point, and parameter identity across escalation tiers, blocking certification while retaining
+    both conflicting witnesses.
+    """
+
+    def __init__(self, message: str, conflicts: Sequence[Dict[str, Any]]) -> None:
+        super().__init__(message)
+        self.conflicts: List[Dict[str, Any]] = list(conflicts)
+
+
+def _clone_preserving_arb(obj: Any) -> Any:
+    """Recursively clone dicts/lists/tuples while keeping immutable `flint.arb`/`acb` instances."""
+    if isinstance(obj, dict):
+        return {k: _clone_preserving_arb(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_clone_preserving_arb(v) for v in obj]
+    if isinstance(obj, tuple):
+        return tuple(_clone_preserving_arb(v) for v in obj)
+    return obj
+
+
+def strip_enclosure_arb_for_json(obj: Any) -> Any:
+    """Strip in-memory `enclosure_arb` keys so structures round-trip cleanly through `json.dumps`."""
+    if isinstance(obj, (arb, acb)):
+        return str(obj)
+    if isinstance(obj, dict):
+        return {k: strip_enclosure_arb_for_json(v) for k, v in obj.items() if k != "enclosure_arb"}
+    if isinstance(obj, (list, tuple)):
+        return [strip_enclosure_arb_for_json(v) for v in obj]
+    return obj
 
 # Populated dynamically or matched against the exact theorem declarations in MixedArithmeticCovariance.lean
 EXPECTED_TC061_THEOREMS: List[str] = [
@@ -361,11 +406,23 @@ def classify_global_probe_outcome(
     *,
     coverage_complete: bool,
     uniform_proof_established: bool = False,
+    fail_on_integrity_conflict: bool = False,
 ) -> str:
-    """Classify global probe outcome into one of the four mandatory `PROBE_GLOBAL_OUTCOMES`."""
+    """Classify global probe outcome into one of `PROBE_GLOBAL_OUTCOMES` (or
+    `CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME` / `CertificationIntegrityError` if an integrity
+    conflict occurred, keeping certification conflicts strictly distinct from valid counterexamples).
+    """
+    allowed = set(POINT_MARGIN_VERDICTS) | {CERTIFICATION_INTEGRITY_CONFLICT_VERDICT}
     for v in point_verdicts:
-        if v not in POINT_MARGIN_VERDICTS:
-            raise ValueError(f"Invalid point verdict {v!r}; expected one of {POINT_MARGIN_VERDICTS}")
+        if v not in allowed:
+            raise ValueError(f"Invalid point verdict {v!r}; expected one of {sorted(allowed)}")
+    if any(v == CERTIFICATION_INTEGRITY_CONFLICT_VERDICT for v in point_verdicts):
+        if fail_on_integrity_conflict:
+            raise CertificationIntegrityError(
+                "Contradictory certified PASS and FAIL verdicts encountered in global aggregation",
+                [],
+            )
+        return CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
     if any(v == "FAIL" for v in point_verdicts):
         return "REFUTED_BY_CERTIFIED_WITNESS"
     if (not coverage_complete) or len(point_verdicts) == 0 or any(v != "PASS" for v in point_verdicts):
@@ -573,9 +630,9 @@ def certify_exact_scale_cutoffs(
         flint_ctx.prec = saved
 
 
-def _measure_process_rss_megabytes() -> Dict[str, Optional[float]]:
-    """Measure current and peak process RSS (working set) in MiB via OS kernel APIs without
-    claiming preemptive OS timeout/memory termination.
+def _measure_process_rss_megabytes() -> Dict[str, Any]:
+    """Measure current and OS process-lifetime high-water peak RSS (working set) in MiB via OS
+    kernel APIs without claiming preemptive OS timeout/memory termination.
     """
     if os.name == "nt":
         try:
@@ -609,6 +666,7 @@ def _measure_process_rss_megabytes() -> Dict[str, Optional[float]]:
                 return {
                     "current_rss_mb": round(pmc.WorkingSetSize / (1024.0 * 1024.0), 3),
                     "peak_rss_mb": round(pmc.PeakWorkingSetSize / (1024.0 * 1024.0), 3),
+                    "peak_rss_measurement_semantics": "PROCESS_LIFETIME_HIGH_WATER_MARK",
                 }
         except Exception:  # noqa: BLE001
             pass
@@ -622,10 +680,15 @@ def _measure_process_rss_megabytes() -> Dict[str, Optional[float]]:
             return {
                 "current_rss_mb": None,
                 "peak_rss_mb": round(float(ru.ru_maxrss) / divisor, 3),
+                "peak_rss_measurement_semantics": "PROCESS_LIFETIME_HIGH_WATER_MARK",
             }
         except Exception:  # noqa: BLE001
             pass
-    return {"current_rss_mb": None, "peak_rss_mb": None}
+    return {
+        "current_rss_mb": None,
+        "peak_rss_mb": None,
+        "peak_rss_measurement_semantics": None,
+    }
 
 
 def load_frozen_protocol_rules(
@@ -652,8 +715,11 @@ def resolve_protocol_quadrature_settings(
       `quad_tol_bits = 160`, `n_panels = 16`, `zone1_ratio_threshold_x_over_n = 12`,
       `zone3_cutoff_N1 = max(T_Y + 1, ceil_tau_Y)`, `zone3_taylor_degree_M = 56`).
     - `escalation_tier >= 1`: requests the exact registered tier entry from
-      `escalation_ladder_on_zero_straddling_margin`, applying all 5 settings in `three_zone` mode
-      and marking the three-zone/panel-splitting parameters inactive in `unsplit` mode.
+      `escalation_ladder_on_zero_straddling_margin`, applying all 5 settings in `three_zone` mode,
+      and in `unsplit` mode applying the registered `prec_bits`, `quad_tol_bits`, and `n_panels`
+      (`32` / `64` panel subdivisions) while marking only the genuinely inactive zone-specific
+      parameters (`zone1_ratio_threshold_x_over_n`, `zone3_cutoff_N1`, `zone3_taylor_degree_M`)
+      as inactive.
     """
     if T_Y < 1:
         raise ValueError(f"T_Y must be >= 1, got {T_Y}")
@@ -932,48 +998,72 @@ def evaluate_mixed_covariance_point_arb(
         three_zone = bool(resolved["three_zone"]) if use_three_zone is None else bool(use_three_zone)
         quadrature_mode = "three_zone" if three_zone else "unsplit"
         if not three_zone:
-            if n_panels is not None and int(n_panels) != 1:
+            if escalation_tier == 0 and n_panels is not None and int(n_panels) != 1:
                 raise ValueError(
-                    f"Inactive n_panels={n_panels} != 1 cannot be passed when quadrature_mode='unsplit'"
+                    f"Inactive Tier-0 n_panels={n_panels} != 1 cannot be passed when quadrature_mode='unsplit'"
                 )
             if zone1_ratio_threshold is not None or M_taylor is not None:
                 raise ValueError(
                     "Inactive three-zone parameters (zone1_ratio_threshold, M_taylor) cannot be passed "
                     "when quadrature_mode='unsplit'"
                 )
-        eff_prec = int(prec_bits) if prec_bits is not None else int(rules["base_prec_bits"])
+        eff_prec = int(prec_bits) if prec_bits is not None else int(resolved["used_settings"]["prec_bits"])
+        req_s = resolved["requested_settings"]
         if three_zone:
             z3 = rules["three_zone_parameters"]
-            eff_quad_tol = (
-                int(quad_tol_bits)
-                if quad_tol_bits is not None
-                else int(rules["quad_tol_bits_three_zone_large_T"])
+            default_qt = (
+                int(rules["quad_tol_bits_three_zone_large_T"])
+                if escalation_tier == 0
+                else int(req_s["quad_tol_bits"])
             )
-            eff_panels = int(n_panels) if n_panels is not None else int(z3["n_panels"])
+            default_np = int(z3["n_panels"]) if escalation_tier == 0 else int(req_s["n_panels"])
+            default_z1 = (
+                int(z3["zone1_ratio_threshold_x_over_n"])
+                if escalation_tier == 0
+                else int(req_s["zone1_ratio_threshold_x_over_n"])
+            )
+            default_m = (
+                int(z3["zone3_taylor_degree_M"])
+                if escalation_tier == 0
+                else int(req_s["zone3_taylor_degree_M"])
+            )
+            eff_quad_tol = int(quad_tol_bits) if quad_tol_bits is not None else default_qt
+            eff_panels = int(n_panels) if n_panels is not None else default_np
             eff_z1_ratio = (
-                int(zone1_ratio_threshold)
-                if zone1_ratio_threshold is not None
-                else int(z3["zone1_ratio_threshold_x_over_n"])
+                int(zone1_ratio_threshold) if zone1_ratio_threshold is not None else default_z1
             )
-            eff_M_taylor = int(M_taylor) if M_taylor is not None else int(z3["zone3_taylor_degree_M"])
+            eff_M_taylor = int(M_taylor) if M_taylor is not None else default_m
             n1_cut_ov: Optional[int] = max(T_y + 1, ceil_tau_y)
             inactive_parameters = []
         else:
-            eff_quad_tol = (
-                int(quad_tol_bits)
-                if quad_tol_bits is not None
-                else int(rules["quad_tol_bits_unsplit_small_T"])
+            default_qt_u = (
+                int(rules["quad_tol_bits_unsplit_small_T"])
+                if escalation_tier == 0
+                else int(req_s["quad_tol_bits"])
             )
-            eff_panels = 1
+            eff_quad_tol = int(quad_tol_bits) if quad_tol_bits is not None else default_qt_u
+            eff_panels = (
+                1
+                if escalation_tier == 0
+                else (int(n_panels) if n_panels is not None else int(req_s["n_panels"]))
+            )
             eff_z1_ratio = None
             eff_M_taylor = None
             n1_cut_ov = None
-            inactive_parameters = [
-                "n_panels",
-                "zone1_ratio_threshold_x_over_n",
-                "zone3_cutoff_N1",
-                "zone3_taylor_degree_M",
-            ]
+            inactive_parameters = (
+                [
+                    "n_panels",
+                    "zone1_ratio_threshold_x_over_n",
+                    "zone3_cutoff_N1",
+                    "zone3_taylor_degree_M",
+                ]
+                if escalation_tier == 0
+                else [
+                    "zone1_ratio_threshold_x_over_n",
+                    "zone3_cutoff_N1",
+                    "zone3_taylor_degree_M",
+                ]
+            )
         requested_settings = {
             "escalation_tier": escalation_tier,
             "quadrature_mode": quadrature_mode,
@@ -1518,6 +1608,7 @@ def evaluate_mixed_covariance_point_arb(
             "elapsed_sec": elapsed,
             "current_rss_mb": rss_info["current_rss_mb"],
             "peak_rss_mb": rss_info["peak_rss_mb"],
+            "peak_rss_measurement_semantics": rss_info.get("peak_rss_measurement_semantics"),
         }
     finally:
         flint_ctx.prec = saved
@@ -2473,24 +2564,343 @@ def verify_section_2_cutoff_and_interval_certification(
 # ---------------------------------------------------------------------------
 
 
+def _is_valid_nonneg_real(val: Any) -> bool:
+    """Return True iff `val` is a finite non-negative real (`int`/`float`, excluding `bool`/`None`)."""
+    return (
+        isinstance(val, (int, float))
+        and not isinstance(val, bool)
+        and math.isfinite(float(val))
+        and float(val) >= 0.0
+    )
+
+
+def evaluate_point_resource_compliance(
+    history: Sequence[Dict[str, Any]],
+    *,
+    max_wall_sec: float,
+    max_rss_mb: float,
+) -> Dict[str, Any]:
+    """Evaluate per-point wall-time and memory compliance with explicit 3-valued statuses
+    (`WITHIN`, `EXCEEDED`, `UNKNOWN`) (`TASK-TC-061R2` §3):
+    - Raw missing values (`None`) remain `None` and are never coerced to `0` or `WITHIN`;
+    - Wall-time and memory statuses are tracked separately and aggregated via:
+      any `EXCEEDED` -> `EXCEEDED`; all `WITHIN` -> `WITHIN`; otherwise `UNKNOWN`;
+    - Across multiple tiers, a final-tier OS `PROCESS_LIFETIME_HIGH_WATER_MARK` reading covers
+      earlier tiers in the same process only when it is valid and monotonically consistent with
+      all prior observed RSS readings; otherwise missing tier RSS is treated conservatively as `UNKNOWN`.
+    """
+    any_wall_invalid = any(
+        h.get("elapsed_sec") is not None and not _is_valid_nonneg_real(h.get("elapsed_sec"))
+        for h in history
+    )
+    valid_walls = [
+        float(h["elapsed_sec"])
+        for h in history
+        if _is_valid_nonneg_real(h.get("elapsed_sec"))
+    ]
+    all_tiers_have_valid_wall = bool(
+        len(history) > 0 and (not any_wall_invalid) and len(valid_walls) == len(history)
+    )
+    partial_wall_sum: Optional[float] = round(sum(valid_walls), 6) if valid_walls else None
+    any_wall_exceeded = bool(
+        any(w > max_wall_sec for w in valid_walls)
+        or (partial_wall_sum is not None and partial_wall_sum > max_wall_sec)
+    )
+    if any_wall_exceeded:
+        wall_status = "EXCEEDED"
+        wall_exceeded_opt: Optional[bool] = True
+    elif all_tiers_have_valid_wall and partial_wall_sum is not None and partial_wall_sum <= max_wall_sec:
+        wall_status = "WITHIN"
+        wall_exceeded_opt = False
+    else:
+        wall_status = "UNKNOWN"
+        wall_exceeded_opt = None
+
+    final_tier_elapsed: Optional[float] = (
+        round(float(history[-1]["elapsed_sec"]), 6)
+        if (len(history) > 0 and _is_valid_nonneg_real(history[-1].get("elapsed_sec")))
+        else None
+    )
+    cumulative_elapsed: Optional[float] = (
+        partial_wall_sum if (all_tiers_have_valid_wall or any_wall_exceeded) else None
+    )
+
+    any_rss_invalid = any(
+        (h.get("peak_rss_mb") is not None and not _is_valid_nonneg_real(h.get("peak_rss_mb")))
+        or (h.get("current_rss_mb") is not None and not _is_valid_nonneg_real(h.get("current_rss_mb")))
+        for h in history
+    )
+    valid_peak_vals = [
+        float(h["peak_rss_mb"])
+        for h in history
+        if _is_valid_nonneg_real(h.get("peak_rss_mb"))
+    ]
+    valid_curr_vals = [
+        float(h["current_rss_mb"])
+        for h in history
+        if _is_valid_nonneg_real(h.get("current_rss_mb"))
+    ]
+    all_observed_rss = valid_peak_vals + valid_curr_vals
+    any_rss_exceeded = bool(any(v > max_rss_mb for v in all_observed_rss))
+
+    hwm_monotonicity_ok = True
+    max_prior_rss = -1.0
+    for h in history:
+        p_v = float(h["peak_rss_mb"]) if _is_valid_nonneg_real(h.get("peak_rss_mb")) else None
+        c_v = float(h["current_rss_mb"]) if _is_valid_nonneg_real(h.get("current_rss_mb")) else None
+        if p_v is not None and c_v is not None and p_v + 1e-6 < c_v:
+            hwm_monotonicity_ok = False
+        if (
+            p_v is not None
+            and h.get("peak_rss_measurement_semantics") == "PROCESS_LIFETIME_HIGH_WATER_MARK"
+            and max_prior_rss >= 0.0
+            and p_v + 1e-6 < max_prior_rss
+        ):
+            hwm_monotonicity_ok = False
+        if p_v is not None:
+            max_prior_rss = max(max_prior_rss, p_v)
+        if c_v is not None:
+            max_prior_rss = max(max_prior_rss, c_v)
+
+    all_tiers_have_valid_peak_rss = bool(
+        len(history) > 0
+        and (not any_rss_invalid)
+        and len(valid_peak_vals) == len(history)
+    )
+    final_has_valid_hwm = bool(
+        len(history) > 0
+        and (not any_rss_invalid)
+        and hwm_monotonicity_ok
+        and _is_valid_nonneg_real(history[-1].get("peak_rss_mb"))
+        and history[-1].get("peak_rss_measurement_semantics") == "PROCESS_LIFETIME_HIGH_WATER_MARK"
+        and (
+            not all_observed_rss
+            or float(history[-1]["peak_rss_mb"]) + 1e-6 >= max(all_observed_rss)
+        )
+    )
+
+    if len(history) == 0 or any_rss_invalid or not hwm_monotonicity_ok:
+        rss_coverage_complete = False
+        rss_coverage_reason = "INVALID_OR_NON_MONOTONIC_RSS_TELEMETRY"
+    elif all_tiers_have_valid_peak_rss:
+        rss_coverage_complete = True
+        rss_coverage_reason = "ALL_EXECUTED_TIERS_DIRECTLY_MEASURED"
+    elif final_has_valid_hwm:
+        rss_coverage_complete = True
+        rss_coverage_reason = "FINAL_TIER_PROCESS_LIFETIME_HIGH_WATER_MARK_COVERS_PRIOR_TIERS"
+    else:
+        rss_coverage_complete = False
+        rss_coverage_reason = "MISSING_OR_UNCOVERED_TIER_PEAK_RSS_TELEMETRY"
+
+    if any_rss_exceeded:
+        mem_status = "EXCEEDED"
+        rss_exceeded_opt: Optional[bool] = True
+    elif rss_coverage_complete:
+        mem_status = "WITHIN"
+        rss_exceeded_opt = False
+    else:
+        mem_status = "UNKNOWN"
+        rss_exceeded_opt = None
+
+    observed_max_rss: Optional[float] = (
+        round(max(all_observed_rss), 3) if all_observed_rss else None
+    )
+    covered_or_violating_peak_rss: Optional[float] = (
+        round(
+            max(all_observed_rss)
+            if any_rss_exceeded
+            else max(valid_peak_vals if valid_peak_vals else all_observed_rss),
+            3,
+        )
+        if (rss_coverage_complete or any_rss_exceeded) and all_observed_rss
+        else None
+    )
+
+    if "EXCEEDED" in (wall_status, mem_status):
+        overall_status = "EXCEEDED"
+        within_budget_opt: Optional[bool] = False
+        compliance_verified = False
+    elif wall_status == "WITHIN" and mem_status == "WITHIN":
+        overall_status = "WITHIN"
+        within_budget_opt = True
+        compliance_verified = True
+    else:
+        overall_status = "UNKNOWN"
+        within_budget_opt = None
+        compliance_verified = False
+
+    last_curr_rss = (
+        round(float(history[-1]["current_rss_mb"]), 3)
+        if (len(history) > 0 and _is_valid_nonneg_real(history[-1].get("current_rss_mb")))
+        else None
+    )
+
+    return {
+        "max_wall_seconds_per_point_limit": max_wall_sec,
+        "max_rss_megabytes_limit": max_rss_mb,
+        "final_tier_elapsed_sec": final_tier_elapsed,
+        "cumulative_point_elapsed_sec": cumulative_elapsed,
+        "partial_observed_elapsed_sec": partial_wall_sum,
+        "current_rss_mb": last_curr_rss,
+        "peak_rss_mb": covered_or_violating_peak_rss,
+        "partial_uncovered_max_rss_mb": (
+            observed_max_rss if covered_or_violating_peak_rss is None else None
+        ),
+        "peak_rss_coverage_complete": rss_coverage_complete,
+        "peak_rss_coverage_reason": rss_coverage_reason,
+        "wall_budget_status": wall_status,
+        "memory_budget_status": mem_status,
+        "overall_resource_status": overall_status,
+        "wall_budget_exceeded": wall_exceeded_opt,
+        "rss_budget_exceeded": rss_exceeded_opt,
+        "within_resource_budget": within_budget_opt,
+        "resource_compliance_verified": compliance_verified,
+        "enforcement_mode": "POST_EVALUATION_BUDGET_AUDIT_NO_OS_PREEMPTIVE_KILL",
+    }
+
+
+def aggregate_section_resource_compliance(
+    point_checks: Sequence[Dict[str, Any]],
+    *,
+    registered_count: int,
+) -> Dict[str, Any]:
+    """Aggregate per-point 3-valued resource compliance statuses (`WITHIN`, `EXCEEDED`, `UNKNOWN`)
+    across a section without coercing `UNKNOWN` into verified compliance (`TASK-TC-061R2` §3).
+    """
+    complete_set = bool(registered_count > 0 and len(point_checks) == registered_count)
+
+    def _count(statuses: Sequence[str]) -> Dict[str, int]:
+        return {
+            s_k: sum(1 for s in statuses if s == s_k)
+            for s_k in RESOURCE_COMPLIANCE_STATUSES
+        }
+
+    def _combine(statuses: Sequence[str]) -> str:
+        for s in statuses:
+            if s not in RESOURCE_COMPLIANCE_STATUSES:
+                raise ValueError(f"Invalid resource status {s!r}")
+        if any(s == "EXCEEDED" for s in statuses):
+            return "EXCEEDED"
+        if complete_set and all(s == "WITHIN" for s in statuses):
+            return "WITHIN"
+        return "UNKNOWN"
+
+    wall_list = [str(c["wall_budget_status"]) for c in point_checks]
+    mem_list = [str(c["memory_budget_status"]) for c in point_checks]
+    ov_list = [str(c["overall_resource_status"]) for c in point_checks]
+
+    wall_agg = _combine(wall_list)
+    mem_agg = _combine(mem_list)
+    ov_agg = _combine(ov_list)
+
+    within_opt: Optional[bool]
+    if ov_agg == "WITHIN":
+        within_opt = True
+    elif ov_agg == "EXCEEDED":
+        within_opt = False
+    else:
+        within_opt = None
+
+    return {
+        "registered_point_count": registered_count,
+        "evaluated_point_count": len(point_checks),
+        "wall_budget_status": wall_agg,
+        "memory_budget_status": mem_agg,
+        "overall_resource_budget_status": ov_agg,
+        "wall_status_counts": _count(wall_list),
+        "memory_status_counts": _count(mem_list),
+        "overall_status_counts": _count(ov_list),
+        "all_points_within_resource_budgets": within_opt,
+        "all_resource_budgets_verified_within": bool(ov_agg == "WITHIN"),
+        "any_resource_budget_exceeded": bool(ov_agg == "EXCEEDED"),
+        "any_resource_budget_unknown": bool(
+            (not complete_set) or any(s == "UNKNOWN" for s in ov_list)
+        ),
+        "enforcement_mode": "POST_EVALUATION_BUDGET_AUDIT_NO_OS_PREEMPTIVE_KILL",
+    }
+
+
+def _build_point_parameter_identities(
+    spec: ExactScaleSpec,
+    probes: Sequence[Dict[str, Any]],
+) -> Tuple[Dict[str, Dict[str, Any]], Dict[str, Dict[str, Any]]]:
+    """Construct immutable parameter identities for all main probes and both `KL1` sub-budgets."""
+    pt_ident = {
+        "label": spec.label,
+        "kind": spec.kind,
+        "rational_factor": f"{spec.rational_factor.numerator}/{spec.rational_factor.denominator}",
+        "exp_power": f"{spec.exp_power.numerator}/{spec.exp_power.denominator}",
+    }
+    main_ids: Dict[str, Dict[str, Any]] = {}
+    for pr in probes:
+        pid = str(pr["probe_id"])
+        main_ids[pid] = {
+            "candidate_kind": "MAIN_PROBE",
+            "probe_id": pid,
+            "tier": str(pr["tier"]),
+            "domain_threshold_Y0": str(pr["domain_threshold_Y0"]),
+            "a_numerator": int(pr["a_numerator"]),
+            "a_denominator": int(pr["a_denominator"]),
+            "eta_fraction": pr["eta_fraction"],
+            "b_fraction": str(pr.get("b_fraction", "1/1")),
+            "kappa_fraction": str(pr.get("kappa_fraction", "1/1")),
+            "point_identity": dict(pt_ident),
+        }
+    kl1_ids: Dict[str, Dict[str, Any]] = {
+        "TC061-KL1:offdiag": {
+            "candidate_kind": "KL1_SUB_BUDGET",
+            "lemma_candidate_id": "TC061-KL1-OFFDIAG-AND-MIXED-SPLIT",
+            "sub_budget_id": "offdiag",
+            "lhs_formula": "4 * X_tilde(Y)",
+            "rhs_logY_Dtilde_share_fraction": "3/4",
+            "domain_threshold_Y0": "64",
+            "point_identity": dict(pt_ident),
+        },
+        "TC061-KL1:R_mix": {
+            "candidate_kind": "KL1_SUB_BUDGET",
+            "lemma_candidate_id": "TC061-KL1-OFFDIAG-AND-MIXED-SPLIT",
+            "sub_budget_id": "R_mix",
+            "lhs_formula": "||B_Y||_Y^2 - 4 * <P_Y, B_Y>_Y",
+            "rhs_logY_Dtilde_share_fraction": "1/4",
+            "domain_threshold_Y0": "64",
+            "point_identity": dict(pt_ident),
+        },
+    }
+    return main_ids, kl1_ids
+
+
 def execute_holdout_point_with_protocol_escalation(
     spec: ExactScaleSpec,
     probes: Sequence[Dict[str, Any]],
     protocol_rules: Dict[str, Any],
     *,
+    point_id: Optional[str] = None,
     selberg_table: Optional[Dict[str, Any]] = None,
     evaluator_fn: Optional[Callable[..., Dict[str, Any]]] = None,
     in_declared_domain_fn: Optional[Callable[[Dict[str, Any]], bool]] = None,
     kl1_in_declared_domain: bool = True,
+    raise_on_integrity_conflict: bool = False,
 ) -> Dict[str, Any]:
-    """Execute one preregistered held-out point strictly under `protocol_rules` (`TASK-TC-061R` §6):
-    - Resolves Tier 0 settings exclusively from `protocol_rules` and certified `T(Y)` (`allow_nonprotocol_override=False`);
-    - Escalates through `escalation_ladder_on_zero_straddling_margin` whenever ANY in-domain main probe
-      OR ANY in-domain `TC061-KL1-OFFDIAG-AND-MIXED-SPLIT` sub-budget is `UNRESOLVED`;
-    - Preserves certified `FAIL` (`REFUTED_BY_CERTIFIED_WITNESS`) without altering frozen probe constants;
-    - Preserves `UNRESOLVED` after the final escalation tier (`UNRESOLVED/INCOMPLETE_COVERAGE`);
-    - Audits per-point wall-clock and process RSS budgets (`POST_EVALUATION_BUDGET_AUDIT_NO_OS_PREEMPTIVE_KILL`).
+    """Execute one preregistered held-out point strictly under `protocol_rules` with a per-candidate
+    decisive-evidence accumulator across all four main probes and both `TC061-KL1` sub-budgets
+    (`TASK-TC-061R` §6 / `TASK-TC-061R2` §§2–3):
+    - Resolves Tier 0 and escalation settings exclusively from `protocol_rules` and certified `T(Y)`;
+    - Retains any certified `FAIL` or `PASS` witness (with exact point/probe ID, parameter identity,
+      certified margin enclosure, tier, precision, and execution settings) even when a subsequent
+      escalation tier triggered by another candidate returns `UNRESOLVED` for the already-decided
+      candidate, never attaching an earlier tier's verdict to a later tier's unrelated margin;
+    - Keeps out-of-domain candidates separate (`OUT_OF_DECLARED_DOMAIN`) so they cannot trigger
+      escalation or pollute in-domain verdicts;
+    - Flags contradictory certified `PASS` and `FAIL` verdicts across tiers for the same candidate,
+      point, and parameter identity as `CERTIFICATION_INTEGRITY_CONFLICT`, preserving both certified
+      enclosures and raising `CertificationIntegrityError` when `raise_on_integrity_conflict=True`;
+    - Continues registered escalation only while at least one applicable in-domain candidate lacks
+      decisive evidence, no integrity conflict has occurred, and no resource limit is `EXCEEDED`;
+    - Tracks separate 3-valued (`WITHIN`, `EXCEEDED`, `UNKNOWN`) wall-clock and memory compliance
+      statuses (`POST_EVALUATION_BUDGET_AUDIT_NO_OS_PREEMPTIVE_KILL`) without coercing missing RSS
+      telemetry (`None`) into verified compliance or turning missing RSS into mathematical failure.
     """
+    eff_point_id = str(point_id) if point_id is not None else str(spec.label)
     eval_callable = evaluator_fn if evaluator_fn is not None else evaluate_mixed_covariance_point_arb
     dom_fn = in_declared_domain_fn if in_declared_domain_fn is not None else (lambda _pr: True)
     escalation_ladder = protocol_rules["escalation_ladder_on_zero_straddling_margin"]
@@ -2498,7 +2908,161 @@ def execute_holdout_point_with_protocol_escalation(
     max_wall_sec = float(res_limits["max_wall_seconds_per_point"])
     max_rss_mb = float(res_limits["max_rss_megabytes"])
 
-    def _run_tier(tier_idx: int, tbl_use: Optional[Dict[str, Any]]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+    main_param_ids, kl1_param_ids = _build_point_parameter_identities(spec, probes)
+    probe_by_id: Dict[str, Dict[str, Any]] = {str(pr["probe_id"]): pr for pr in probes}
+
+    candidate_acc: Dict[str, Dict[str, Any]] = {}
+    for pr in probes:
+        pid = str(pr["probe_id"])
+        in_dom = bool(dom_fn(pr))
+        candidate_acc[pid] = {
+            "point_id": eff_point_id,
+            "candidate_id": pid,
+            "candidate_kind": "MAIN_PROBE",
+            "in_declared_domain": in_dom,
+            "domain_status": "IN_DECLARED_DOMAIN" if in_dom else "OUT_OF_DECLARED_DOMAIN",
+            "applicable_for_escalation": in_dom,
+            "parameter_identity": main_param_ids[pid],
+            "effective_verdict": "UNRESOLVED" if in_dom else "NOT_EVALUATED",
+            "selected_witness": None,
+            "decisive_witnesses": [],
+            "integrity_conflict_detected": False,
+            "conflicting_certified_witnesses": [],
+            "tier_observations": [],
+        }
+    for kl1_cid, kl1_pid in kl1_param_ids.items():
+        in_dom_kl1 = bool(kl1_in_declared_domain)
+        candidate_acc[kl1_cid] = {
+            "point_id": eff_point_id,
+            "candidate_id": kl1_cid,
+            "candidate_kind": "KL1_SUB_BUDGET",
+            "in_declared_domain": in_dom_kl1,
+            "domain_status": "IN_DECLARED_DOMAIN" if in_dom_kl1 else "OUT_OF_DECLARED_DOMAIN",
+            "applicable_for_escalation": in_dom_kl1,
+            "parameter_identity": kl1_pid,
+            "effective_verdict": "UNRESOLVED" if in_dom_kl1 else "NOT_EVALUATED",
+            "selected_witness": None,
+            "decisive_witnesses": [],
+            "integrity_conflict_detected": False,
+            "conflicting_certified_witnesses": [],
+            "tier_observations": [],
+        }
+
+    integrity_conflicts: List[Dict[str, Any]] = []
+    history: List[Dict[str, Any]] = []
+    baseline_cutoffs: Optional[Dict[str, Any]] = None
+
+    def _record_candidate_observation(
+        cid: str,
+        *,
+        tier_idx: int,
+        r_pt: Dict[str, Any],
+        in_dom_obs: bool,
+        param_id_obs: Dict[str, Any],
+        verdict_t: str,
+        reason_t: str,
+        margin_enclosure: Dict[str, Any],
+        supporting_terms: Dict[str, Any],
+    ) -> None:
+        acc = candidate_acc[cid]
+        obs_rec: Dict[str, Any] = {
+            "point_id": eff_point_id,
+            "point_label": spec.label,
+            "candidate_id": cid,
+            "candidate_kind": acc["candidate_kind"],
+            "in_declared_domain": bool(in_dom_obs),
+            "parameter_identity": _clone_preserving_arb(param_id_obs),
+            "tier": int(tier_idx),
+            "prec_bits": int(r_pt["prec_bits"]),
+            "quad_tol_bits": int(r_pt["quad_tol_bits"]),
+            "quadrature_mode": str(r_pt["quadrature_mode"]),
+            "panels_used": int(r_pt["panels_used"]),
+            "requested_settings": _clone_preserving_arb(r_pt["requested_settings"]),
+            "used_settings": _clone_preserving_arb(r_pt["used_settings"]),
+            "inactive_parameters": list(r_pt["inactive_parameters"]),
+            "tier_verdict": str(verdict_t),
+            "verdict_reason": str(reason_t),
+            "certified_definite": bool(verdict_t in ("PASS", "FAIL")),
+            "margin_enclosure": _clone_preserving_arb(margin_enclosure),
+            "supporting_terms": _clone_preserving_arb(supporting_terms),
+        }
+        if param_id_obs != acc["parameter_identity"] or bool(in_dom_obs) != acc["in_declared_domain"]:
+            prior_w = acc["selected_witness"]
+            acc["integrity_conflict_detected"] = True
+            acc["effective_verdict"] = CERTIFICATION_INTEGRITY_CONFLICT_VERDICT
+            conflict_param = {
+                "conflict_type": "CANDIDATE_PARAMETER_OR_DOMAIN_IDENTITY_MUTATION",
+                "point_id": eff_point_id,
+                "candidate_id": cid,
+                "candidate_kind": acc["candidate_kind"],
+                "expected_parameter_identity": acc["parameter_identity"],
+                "observed_parameter_identity": param_id_obs,
+                "expected_in_declared_domain": acc["in_declared_domain"],
+                "observed_in_declared_domain": bool(in_dom_obs),
+                "earlier_certified_witness": prior_w,
+                "later_conflicting_witness": obs_rec,
+            }
+            if prior_w is not None and prior_w not in acc["conflicting_certified_witnesses"]:
+                acc["conflicting_certified_witnesses"].append(prior_w)
+            acc["conflicting_certified_witnesses"].append(obs_rec)
+            acc["selected_witness"] = None
+            integrity_conflicts.append(conflict_param)
+            acc["tier_observations"].append(obs_rec)
+            return
+
+        acc["tier_observations"].append(obs_rec)
+        if cutoff_mutated_in_current_tier and acc["in_declared_domain"]:
+            prior_w = acc["selected_witness"]
+            acc["integrity_conflict_detected"] = True
+            acc["effective_verdict"] = CERTIFICATION_INTEGRITY_CONFLICT_VERDICT
+            if prior_w is not None and prior_w not in acc["conflicting_certified_witnesses"]:
+                acc["conflicting_certified_witnesses"].append(prior_w)
+            acc["conflicting_certified_witnesses"].append(obs_rec)
+            acc["selected_witness"] = None
+            return
+
+        if not acc["in_declared_domain"]:
+            return
+
+        if verdict_t in ("PASS", "FAIL"):
+            acc["decisive_witnesses"].append(obs_rec)
+            if acc["integrity_conflict_detected"]:
+                if any(
+                    w["tier_verdict"] != verdict_t for w in acc["conflicting_certified_witnesses"]
+                ):
+                    acc["conflicting_certified_witnesses"].append(obs_rec)
+            elif acc["selected_witness"] is None:
+                acc["selected_witness"] = obs_rec
+                acc["effective_verdict"] = verdict_t
+            elif acc["selected_witness"]["tier_verdict"] != verdict_t:
+                prior_w = acc["selected_witness"]
+                acc["integrity_conflict_detected"] = True
+                acc["effective_verdict"] = CERTIFICATION_INTEGRITY_CONFLICT_VERDICT
+                acc["conflicting_certified_witnesses"] = [prior_w, obs_rec]
+                acc["selected_witness"] = None
+                integrity_conflicts.append(
+                    {
+                        "conflict_type": "CONTRADICTORY_CERTIFIED_VERDICTS_ACROSS_TIERS",
+                        "point_id": eff_point_id,
+                        "candidate_id": cid,
+                        "candidate_kind": acc["candidate_kind"],
+                        "parameter_identity": _clone_preserving_arb(acc["parameter_identity"]),
+                        "earlier_certified_witness": prior_w,
+                        "later_conflicting_witness": obs_rec,
+                    }
+                )
+        else:
+            if (not acc["integrity_conflict_detected"]) and acc["selected_witness"] is None:
+                acc["effective_verdict"] = "UNRESOLVED"
+
+    cutoff_mutated_in_current_tier = False
+
+    def _run_and_accumulate_tier(
+        tier_idx: int,
+        tbl_use: Optional[Dict[str, Any]],
+    ) -> Tuple[Dict[str, Any], Dict[str, Any], List[str], Dict[str, Any]]:
+        nonlocal baseline_cutoffs, cutoff_mutated_in_current_tier
+        cutoff_mutated_in_current_tier = False
         r_pt = eval_callable(
             spec,
             escalation_tier=tier_idx,
@@ -2506,6 +3070,25 @@ def execute_holdout_point_with_protocol_escalation(
             allow_nonprotocol_override=False,
             selberg_table=tbl_use,
         )
+        cur_cut = {
+            "T_Y": int(r_pt["cutoffs"]["T_Y"]),
+            "D0_raw": int(r_pt["cutoffs"]["D0_raw"]),
+            "D0_eff": int(r_pt["cutoffs"]["D0_eff"]),
+        }
+        if baseline_cutoffs is None:
+            baseline_cutoffs = cur_cut
+        elif cur_cut != baseline_cutoffs:
+            cutoff_mutated_in_current_tier = True
+            integrity_conflicts.append(
+                {
+                    "conflict_type": "CANONICAL_CUTOFF_MUTATION_ACROSS_TIERS",
+                    "point_id": eff_point_id,
+                    "candidate_id": "CANONICAL_CUTOFFS",
+                    "tier": tier_idx,
+                    "baseline_cutoffs": baseline_cutoffs,
+                    "observed_cutoffs": cur_cut,
+                }
+            )
         p_ev = _evaluate_probes_for_point_result(
             r_pt,
             probes,
@@ -2513,33 +3096,146 @@ def execute_holdout_point_with_protocol_escalation(
             kl1_in_declared_domain=kl1_in_declared_domain,
             prec_bits=int(r_pt["prec_bits"]),
         )
-        return r_pt, p_ev
+        for pr in probes:
+            pid = str(pr["probe_id"])
+            pd = p_ev["per_probe"][pid]
+            _record_candidate_observation(
+                pid,
+                tier_idx=tier_idx,
+                r_pt=r_pt,
+                in_dom_obs=bool(pd["in_declared_domain"]),
+                param_id_obs=main_param_ids[pid],
+                verdict_t=str(pd["point_verdict"]),
+                reason_t=str(pd["verdict_reason"]),
+                margin_enclosure=pd["margin_M_Y"],
+                supporting_terms={
+                    "a_Y_eta_rhs_term": pd["a_Y_eta_rhs_term"],
+                    "log_Y_D_tilde_rhs_term": pd["log_Y_D_tilde_rhs_term"],
+                    "total_rhs": pd["total_rhs"],
+                    "forcing_dominance_status": pd["forcing_dominance_status"],
+                    "a_Y_eta_dominates_rhs": pd["a_Y_eta_dominates_rhs"],
+                    "a_Y_eta_share_of_total_rhs": pd["a_Y_eta_share_of_total_rhs"],
+                    "J_over_log_Y_D_tilde": p_ev["J_over_log_Y_D_tilde"],
+                },
+            )
+        kl1_ev = p_ev["mechanism_kl1_sub_budgets"]
+        _record_candidate_observation(
+            "TC061-KL1:offdiag",
+            tier_idx=tier_idx,
+            r_pt=r_pt,
+            in_dom_obs=bool(kl1_ev["in_declared_domain"]),
+            param_id_obs=kl1_param_ids["TC061-KL1:offdiag"],
+            verdict_t=str(kl1_ev["offdiag_verdict"]),
+            reason_t=(
+                "CERTIFIED_UPPER_MARGIN_LE_ZERO"
+                if kl1_ev["offdiag_verdict"] == "PASS"
+                else (
+                    "CERTIFIED_LOWER_MARGIN_GT_ZERO_WITNESS"
+                    if kl1_ev["offdiag_verdict"] == "FAIL"
+                    else "ZERO_STRADDLING_MARGIN_ENCLOSURE"
+                )
+            ),
+            margin_enclosure=kl1_ev["offdiag_margin"],
+            supporting_terms={
+                "offdiag_4X_tilde": kl1_ev["offdiag_4X_tilde"],
+                "offdiag_rhs_3_4_logY_D_tilde": kl1_ev["offdiag_rhs_3_4_logY_D_tilde"],
+            },
+        )
+        _record_candidate_observation(
+            "TC061-KL1:R_mix",
+            tier_idx=tier_idx,
+            r_pt=r_pt,
+            in_dom_obs=bool(kl1_ev["in_declared_domain"]),
+            param_id_obs=kl1_param_ids["TC061-KL1:R_mix"],
+            verdict_t=str(kl1_ev["R_mix_verdict"]),
+            reason_t=(
+                "CERTIFIED_UPPER_MARGIN_LE_ZERO"
+                if kl1_ev["R_mix_verdict"] == "PASS"
+                else (
+                    "CERTIFIED_LOWER_MARGIN_GT_ZERO_WITNESS"
+                    if kl1_ev["R_mix_verdict"] == "FAIL"
+                    else "ZERO_STRADDLING_MARGIN_ENCLOSURE"
+                )
+            ),
+            margin_enclosure=kl1_ev["R_mix_margin"],
+            supporting_terms={
+                "R_mix": kl1_ev["R_mix"],
+                "R_mix_rhs_1_4_logY_D_tilde": kl1_ev["R_mix_rhs_1_4_logY_D_tilde"],
+            },
+        )
 
-    res, probe_eval = _run_tier(0, selberg_table)
+        unresolved_app = [
+            cid
+            for cid, acc in candidate_acc.items()
+            if acc["in_declared_domain"] and acc["effective_verdict"] == "UNRESOLVED"
+        ]
+        acc_main_unres = any(
+            candidate_acc[str(pr["probe_id"])]["in_declared_domain"]
+            and candidate_acc[str(pr["probe_id"])]["effective_verdict"] == "UNRESOLVED"
+            for pr in probes
+        )
+        acc_kl1_unres = any(
+            candidate_acc[kcid]["in_declared_domain"]
+            and candidate_acc[kcid]["effective_verdict"] == "UNRESOLVED"
+            for kcid in ("TC061-KL1:offdiag", "TC061-KL1:R_mix")
+        )
+        raw_elapsed = r_pt.get("elapsed_sec")
+        hist_elapsed = (
+            round(float(raw_elapsed), 6) if _is_valid_nonneg_real(raw_elapsed) else raw_elapsed
+        )
+        history.append(
+            {
+                "escalation_tier": tier_idx,
+                "quadrature_mode": r_pt["quadrature_mode"],
+                "requested_settings": _clone_preserving_arb(r_pt["requested_settings"]),
+                "used_settings": _clone_preserving_arb(r_pt["used_settings"]),
+                "inactive_parameters": list(r_pt["inactive_parameters"]),
+                "elapsed_sec": hist_elapsed,
+                "current_rss_mb": r_pt.get("current_rss_mb"),
+                "peak_rss_mb": r_pt.get("peak_rss_mb"),
+                "peak_rss_measurement_semantics": r_pt.get("peak_rss_measurement_semantics"),
+                "tier_raw_any_main_probe_in_domain_unresolved": p_ev[
+                    "any_main_probe_in_domain_unresolved"
+                ],
+                "tier_raw_any_kl1_in_domain_unresolved": p_ev["any_kl1_in_domain_unresolved"],
+                "any_main_probe_in_domain_unresolved": acc_main_unres,
+                "any_kl1_in_domain_unresolved": acc_kl1_unres,
+                "unresolved_applicable_candidates_after_tier": list(unresolved_app),
+                "main_probe_verdicts": {
+                    pid: pd["point_verdict"] for pid, pd in p_ev["per_probe"].items()
+                },
+                "accumulated_main_probe_verdicts": {
+                    str(pr["probe_id"]): candidate_acc[str(pr["probe_id"])]["effective_verdict"]
+                    for pr in probes
+                },
+                "kl1_verdicts": {
+                    "offdiag_verdict": kl1_ev["offdiag_verdict"],
+                    "R_mix_verdict": kl1_ev["R_mix_verdict"],
+                },
+                "accumulated_kl1_verdicts": {
+                    "offdiag_verdict": candidate_acc["TC061-KL1:offdiag"]["effective_verdict"],
+                    "R_mix_verdict": candidate_acc["TC061-KL1:R_mix"]["effective_verdict"],
+                },
+            }
+        )
+        cur_res_chk = evaluate_point_resource_compliance(
+            history, max_wall_sec=max_wall_sec, max_rss_mb=max_rss_mb
+        )
+        return r_pt, p_ev, unresolved_app, cur_res_chk
+
+    res, last_raw_probe_eval, unresolved_ids, resource_budget_check = _run_and_accumulate_tier(
+        0, selberg_table
+    )
     escalation_tier_used = 0
-    history: List[Dict[str, Any]] = [
-        {
-            "escalation_tier": 0,
-            "quadrature_mode": res["quadrature_mode"],
-            "requested_settings": res["requested_settings"],
-            "used_settings": res["used_settings"],
-            "inactive_parameters": res["inactive_parameters"],
-            "elapsed_sec": round(float(res["elapsed_sec"]), 6),
-            "current_rss_mb": res.get("current_rss_mb"),
-            "peak_rss_mb": res.get("peak_rss_mb"),
-            "any_main_probe_in_domain_unresolved": probe_eval["any_main_probe_in_domain_unresolved"],
-            "any_kl1_in_domain_unresolved": probe_eval["any_kl1_in_domain_unresolved"],
-            "main_probe_verdicts": {
-                pid: pd["point_verdict"] for pid, pd in probe_eval["per_probe"].items()
-            },
-            "kl1_verdicts": {
-                "offdiag_verdict": probe_eval["mechanism_kl1_sub_budgets"]["offdiag_verdict"],
-                "R_mix_verdict": probe_eval["mechanism_kl1_sub_budgets"]["R_mix_verdict"],
-            },
-        }
-    ]
 
-    if probe_eval["any_in_domain_unresolved"]:
+    if len(integrity_conflicts) > 0:
+        stop_reason = "STOPPED_ON_CERTIFICATION_INTEGRITY_CONFLICT"
+    elif len(unresolved_ids) == 0:
+        stop_reason = "ALL_APPLICABLE_CANDIDATES_DECISIVE_AT_TIER_0"
+    elif resource_budget_check["overall_resource_status"] == "EXCEEDED":
+        stop_reason = "STOPPED_ON_RESOURCE_BUDGET_EXCEEDED"
+    else:
+        stop_reason = "ESCALATION_LADDER_EXHAUSTED_WITH_UNRESOLVED_CANDIDATES"
         for esc in escalation_ladder:
             tier_num = int(esc["tier"])
             esc_prec = int(esc["prec_bits"])
@@ -2548,60 +3244,779 @@ def execute_holdout_point_with_protocol_escalation(
                 esc_tbl = compute_selberg_centered_remainder_table_fast_arb(
                     int(res["cutoffs"]["T_Y"]), prec_bits=esc_prec + 32
                 )
-            res, probe_eval = _run_tier(tier_num, esc_tbl)
-            escalation_tier_used = tier_num
-            history.append(
-                {
-                    "escalation_tier": tier_num,
-                    "quadrature_mode": res["quadrature_mode"],
-                    "requested_settings": res["requested_settings"],
-                    "used_settings": res["used_settings"],
-                    "inactive_parameters": res["inactive_parameters"],
-                    "elapsed_sec": round(float(res["elapsed_sec"]), 6),
-                    "current_rss_mb": res.get("current_rss_mb"),
-                    "peak_rss_mb": res.get("peak_rss_mb"),
-                    "any_main_probe_in_domain_unresolved": probe_eval[
-                        "any_main_probe_in_domain_unresolved"
-                    ],
-                    "any_kl1_in_domain_unresolved": probe_eval["any_kl1_in_domain_unresolved"],
-                    "main_probe_verdicts": {
-                        pid: pd["point_verdict"] for pid, pd in probe_eval["per_probe"].items()
-                    },
-                    "kl1_verdicts": {
-                        "offdiag_verdict": probe_eval["mechanism_kl1_sub_budgets"]["offdiag_verdict"],
-                        "R_mix_verdict": probe_eval["mechanism_kl1_sub_budgets"]["R_mix_verdict"],
-                    },
-                }
+            res, last_raw_probe_eval, unresolved_ids, resource_budget_check = (
+                _run_and_accumulate_tier(tier_num, esc_tbl)
             )
-            if not probe_eval["any_in_domain_unresolved"]:
+            escalation_tier_used = tier_num
+            if len(integrity_conflicts) > 0:
+                stop_reason = "STOPPED_ON_CERTIFICATION_INTEGRITY_CONFLICT"
+                break
+            if len(unresolved_ids) == 0:
+                stop_reason = "ALL_APPLICABLE_CANDIDATES_RESOLVED"
+                break
+            if resource_budget_check["overall_resource_status"] == "EXCEEDED":
+                stop_reason = "STOPPED_ON_RESOURCE_BUDGET_EXCEEDED"
                 break
 
-    total_point_wall_sec = sum(float(h["elapsed_sec"]) for h in history)
-    peak_rss_candidates = [float(h["peak_rss_mb"]) for h in history if h.get("peak_rss_mb") is not None]
-    peak_rss_observed = max(peak_rss_candidates) if peak_rss_candidates else res.get("peak_rss_mb")
-    wall_exceeded = bool(float(res["elapsed_sec"]) > max_wall_sec or total_point_wall_sec > max_wall_sec)
-    rss_exceeded = bool(peak_rss_observed is not None and float(peak_rss_observed) > max_rss_mb)
-    budget_ok = bool(not wall_exceeded and not rss_exceeded)
+    # Assemble accumulated per_probe and mechanism_kl1_sub_budgets strictly from selected witnesses
+    # so an earlier tier's decisive verdict is NEVER paired with a later tier's unrelated margin:
+    acc_per_probe: Dict[str, Any] = {}
+    any_witness_differs_from_last = False
+    for pr in probes:
+        pid = str(pr["probe_id"])
+        acc = candidate_acc[pid]
+        last_obs = acc["tier_observations"][-1]
+        if acc["integrity_conflict_detected"]:
+            any_witness_differs_from_last = True
+            acc_per_probe[pid] = {
+                "probe_id": pid,
+                "tier": pr["tier"],
+                "in_declared_domain": True,
+                "applicable_for_escalation": True,
+                "integrity_conflict_detected": True,
+                "effective_verdict": CERTIFICATION_INTEGRITY_CONFLICT_VERDICT,
+                "point_verdict": CERTIFICATION_INTEGRITY_CONFLICT_VERDICT,
+                "verdict_reason": "CERTIFICATION_INTEGRITY_CONFLICT_ACROSS_TIERS",
+                "conflicting_certified_witnesses": acc["conflicting_certified_witnesses"],
+                "a_Y_eta_rhs_term": None,
+                "log_Y_D_tilde_rhs_term": None,
+                "total_rhs": None,
+                "margin_M_Y": None,
+                "forcing_dominance_status": None,
+                "a_Y_eta_dominates_rhs": None,
+                "a_Y_eta_share_of_total_rhs": None,
+                "parameter_identity": acc["parameter_identity"],
+                "witness_tier": None,
+                "witness_prec_bits": None,
+                "witness_quad_tol_bits": None,
+                "witness_quadrature_mode": None,
+                "witness_used_settings": None,
+                "selected_witness": None,
+                "differs_from_last_evaluated_tier": True,
+                "last_evaluated_tier_observation": last_obs,
+                "tier_observations": acc["tier_observations"],
+            }
+        elif not acc["in_declared_domain"]:
+            st_last = last_obs["supporting_terms"]
+            acc_per_probe[pid] = {
+                "probe_id": pid,
+                "tier": pr["tier"],
+                "in_declared_domain": False,
+                "applicable_for_escalation": False,
+                "integrity_conflict_detected": False,
+                "effective_verdict": "NOT_EVALUATED",
+                "point_verdict": "NOT_EVALUATED",
+                "out_of_domain_diagnostic_verdict": last_obs["tier_verdict"],
+                "verdict_reason": "OUT_OF_DECLARED_DOMAIN_EXCLUDED_FROM_HOLDOUT_VERDICT",
+                "a_Y_eta_rhs_term": st_last["a_Y_eta_rhs_term"],
+                "log_Y_D_tilde_rhs_term": st_last["log_Y_D_tilde_rhs_term"],
+                "total_rhs": st_last["total_rhs"],
+                "margin_M_Y": last_obs["margin_enclosure"],
+                "forcing_dominance_status": st_last["forcing_dominance_status"],
+                "a_Y_eta_dominates_rhs": st_last["a_Y_eta_dominates_rhs"],
+                "a_Y_eta_share_of_total_rhs": st_last["a_Y_eta_share_of_total_rhs"],
+                "parameter_identity": acc["parameter_identity"],
+                "witness_tier": None,
+                "witness_prec_bits": None,
+                "witness_quad_tol_bits": None,
+                "witness_quadrature_mode": None,
+                "witness_used_settings": None,
+                "selected_witness": None,
+                "differs_from_last_evaluated_tier": False,
+                "last_evaluated_tier_observation": last_obs,
+                "tier_observations": acc["tier_observations"],
+            }
+        elif acc["selected_witness"] is not None:
+            w = acc["selected_witness"]
+            st_w = w["supporting_terms"]
+            diff_last = bool(w["tier"] != escalation_tier_used)
+            any_witness_differs_from_last = any_witness_differs_from_last or diff_last
+            acc_per_probe[pid] = {
+                "probe_id": pid,
+                "tier": pr["tier"],
+                "in_declared_domain": True,
+                "applicable_for_escalation": True,
+                "integrity_conflict_detected": False,
+                "effective_verdict": w["tier_verdict"],
+                "point_verdict": w["tier_verdict"],
+                "verdict_reason": w["verdict_reason"],
+                "a_Y_eta_rhs_term": st_w["a_Y_eta_rhs_term"],
+                "log_Y_D_tilde_rhs_term": st_w["log_Y_D_tilde_rhs_term"],
+                "total_rhs": st_w["total_rhs"],
+                "margin_M_Y": w["margin_enclosure"],
+                "forcing_dominance_status": st_w["forcing_dominance_status"],
+                "a_Y_eta_dominates_rhs": st_w["a_Y_eta_dominates_rhs"],
+                "a_Y_eta_share_of_total_rhs": st_w["a_Y_eta_share_of_total_rhs"],
+                "parameter_identity": w["parameter_identity"],
+                "witness_tier": w["tier"],
+                "witness_prec_bits": w["prec_bits"],
+                "witness_quad_tol_bits": w["quad_tol_bits"],
+                "witness_quadrature_mode": w["quadrature_mode"],
+                "witness_used_settings": w["used_settings"],
+                "selected_witness": w,
+                "differs_from_last_evaluated_tier": diff_last,
+                "last_evaluated_tier_observation": last_obs,
+                "tier_observations": acc["tier_observations"],
+            }
+        else:
+            st_last = last_obs["supporting_terms"]
+            acc_per_probe[pid] = {
+                "probe_id": pid,
+                "tier": pr["tier"],
+                "in_declared_domain": True,
+                "applicable_for_escalation": True,
+                "integrity_conflict_detected": False,
+                "effective_verdict": "UNRESOLVED",
+                "point_verdict": "UNRESOLVED",
+                "verdict_reason": last_obs["verdict_reason"],
+                "a_Y_eta_rhs_term": st_last["a_Y_eta_rhs_term"],
+                "log_Y_D_tilde_rhs_term": st_last["log_Y_D_tilde_rhs_term"],
+                "total_rhs": st_last["total_rhs"],
+                "margin_M_Y": last_obs["margin_enclosure"],
+                "forcing_dominance_status": st_last["forcing_dominance_status"],
+                "a_Y_eta_dominates_rhs": st_last["a_Y_eta_dominates_rhs"],
+                "a_Y_eta_share_of_total_rhs": st_last["a_Y_eta_share_of_total_rhs"],
+                "parameter_identity": acc["parameter_identity"],
+                "witness_tier": None,
+                "witness_prec_bits": None,
+                "witness_quad_tol_bits": None,
+                "witness_quadrature_mode": None,
+                "witness_used_settings": None,
+                "selected_witness": None,
+                "differs_from_last_evaluated_tier": False,
+                "last_evaluated_tier_observation": last_obs,
+                "tier_observations": acc["tier_observations"],
+            }
 
-    resource_budget_check = {
-        "max_wall_seconds_per_point_limit": max_wall_sec,
-        "max_rss_megabytes_limit": max_rss_mb,
-        "final_tier_elapsed_sec": round(float(res["elapsed_sec"]), 6),
-        "cumulative_point_elapsed_sec": round(total_point_wall_sec, 6),
+    def _select_kl1_fields(cid: str, lhs_key: str, rhs_key: str) -> Dict[str, Any]:
+        nonlocal any_witness_differs_from_last
+        acc = candidate_acc[cid]
+        last_obs = acc["tier_observations"][-1]
+        if acc["integrity_conflict_detected"]:
+            any_witness_differs_from_last = True
+            return {
+                "verdict": CERTIFICATION_INTEGRITY_CONFLICT_VERDICT,
+                "lhs": None,
+                "rhs": None,
+                "margin": None,
+                "integrity_conflict_detected": True,
+                "conflicting_certified_witnesses": acc["conflicting_certified_witnesses"],
+                "selected_witness": None,
+                "witness_tier": None,
+                "differs_from_last_evaluated_tier": True,
+                "last_evaluated_tier_observation": last_obs,
+                "tier_observations": acc["tier_observations"],
+            }
+        if not acc["in_declared_domain"]:
+            st_l = last_obs["supporting_terms"]
+            return {
+                "verdict": "NOT_EVALUATED",
+                "out_of_domain_diagnostic_verdict": last_obs["tier_verdict"],
+                "lhs": st_l[lhs_key],
+                "rhs": st_l[rhs_key],
+                "margin": last_obs["margin_enclosure"],
+                "integrity_conflict_detected": False,
+                "conflicting_certified_witnesses": [],
+                "selected_witness": None,
+                "witness_tier": None,
+                "differs_from_last_evaluated_tier": False,
+                "last_evaluated_tier_observation": last_obs,
+                "tier_observations": acc["tier_observations"],
+            }
+        if acc["selected_witness"] is not None:
+            w = acc["selected_witness"]
+            st_w = w["supporting_terms"]
+            diff_l = bool(w["tier"] != escalation_tier_used)
+            any_witness_differs_from_last = any_witness_differs_from_last or diff_l
+            return {
+                "verdict": w["tier_verdict"],
+                "lhs": st_w[lhs_key],
+                "rhs": st_w[rhs_key],
+                "margin": w["margin_enclosure"],
+                "integrity_conflict_detected": False,
+                "conflicting_certified_witnesses": [],
+                "selected_witness": w,
+                "witness_tier": w["tier"],
+                "differs_from_last_evaluated_tier": diff_l,
+                "last_evaluated_tier_observation": last_obs,
+                "tier_observations": acc["tier_observations"],
+            }
+        st_l = last_obs["supporting_terms"]
+        return {
+            "verdict": "UNRESOLVED",
+            "lhs": st_l[lhs_key],
+            "rhs": st_l[rhs_key],
+            "margin": last_obs["margin_enclosure"],
+            "integrity_conflict_detected": False,
+            "conflicting_certified_witnesses": [],
+            "selected_witness": None,
+            "witness_tier": None,
+            "differs_from_last_evaluated_tier": False,
+            "last_evaluated_tier_observation": last_obs,
+            "tier_observations": acc["tier_observations"],
+        }
+
+    off_sel = _select_kl1_fields(
+        "TC061-KL1:offdiag", "offdiag_4X_tilde", "offdiag_rhs_3_4_logY_D_tilde"
+    )
+    mix_sel = _select_kl1_fields("TC061-KL1:R_mix", "R_mix", "R_mix_rhs_1_4_logY_D_tilde")
+
+    acc_main_unres_final = any(
+        acc["in_declared_domain"] and acc["effective_verdict"] == "UNRESOLVED"
+        for cid, acc in candidate_acc.items()
+        if acc["candidate_kind"] == "MAIN_PROBE"
+    )
+    acc_kl1_unres_final = any(
+        acc["in_declared_domain"] and acc["effective_verdict"] == "UNRESOLVED"
+        for cid, acc in candidate_acc.items()
+        if acc["candidate_kind"] == "KL1_SUB_BUDGET"
+    )
+    acc_main_fail_final = any(
+        acc["in_declared_domain"] and acc["effective_verdict"] == "FAIL"
+        for cid, acc in candidate_acc.items()
+        if acc["candidate_kind"] == "MAIN_PROBE"
+    )
+    acc_kl1_fail_final = any(
+        acc["in_declared_domain"] and acc["effective_verdict"] == "FAIL"
+        for cid, acc in candidate_acc.items()
+        if acc["candidate_kind"] == "KL1_SUB_BUDGET"
+    )
+
+    accumulated_probe_eval: Dict[str, Any] = {
+        "per_probe": acc_per_probe,
+        "any_main_probe_in_domain_unresolved": acc_main_unres_final,
+        "any_kl1_in_domain_unresolved": acc_kl1_unres_final,
+        "any_in_domain_unresolved": bool(acc_main_unres_final or acc_kl1_unres_final),
+        "any_main_probe_in_domain_fail": acc_main_fail_final,
+        "any_kl1_in_domain_fail": acc_kl1_fail_final,
+        "certification_integrity_ok": len(integrity_conflicts) == 0,
+        "integrity_conflicts": integrity_conflicts,
+        "mechanism_kl1_sub_budgets": {
+            "in_declared_domain": bool(kl1_in_declared_domain),
+            "offdiag_4X_tilde": off_sel["lhs"],
+            "offdiag_rhs_3_4_logY_D_tilde": off_sel["rhs"],
+            "offdiag_margin": off_sel["margin"],
+            "offdiag_verdict": off_sel["verdict"],
+            "offdiag_witness_tier": off_sel["witness_tier"],
+            "offdiag_selected_witness": off_sel["selected_witness"],
+            "offdiag_integrity_conflict_detected": off_sel["integrity_conflict_detected"],
+            "offdiag_conflicting_certified_witnesses": off_sel[
+                "conflicting_certified_witnesses"
+            ],
+            "offdiag_differs_from_last_evaluated_tier": off_sel[
+                "differs_from_last_evaluated_tier"
+            ],
+            "offdiag_last_evaluated_tier_observation": off_sel[
+                "last_evaluated_tier_observation"
+            ],
+            "offdiag_tier_observations": off_sel["tier_observations"],
+            "R_mix": mix_sel["lhs"],
+            "R_mix_rhs_1_4_logY_D_tilde": mix_sel["rhs"],
+            "R_mix_margin": mix_sel["margin"],
+            "R_mix_verdict": mix_sel["verdict"],
+            "R_mix_witness_tier": mix_sel["witness_tier"],
+            "R_mix_selected_witness": mix_sel["selected_witness"],
+            "R_mix_integrity_conflict_detected": mix_sel["integrity_conflict_detected"],
+            "R_mix_conflicting_certified_witnesses": mix_sel[
+                "conflicting_certified_witnesses"
+            ],
+            "R_mix_differs_from_last_evaluated_tier": mix_sel[
+                "differs_from_last_evaluated_tier"
+            ],
+            "R_mix_last_evaluated_tier_observation": mix_sel[
+                "last_evaluated_tier_observation"
+            ],
+            "R_mix_tier_observations": mix_sel["tier_observations"],
+        },
+        "J_over_log_Y_D_tilde": last_raw_probe_eval["J_over_log_Y_D_tilde"],
+    }
+
+    in_domain_summary = {
+        cid: {
+            "candidate_id": cid,
+            "candidate_kind": acc["candidate_kind"],
+            "effective_verdict": acc["effective_verdict"],
+            "witness_tier": (
+                acc["selected_witness"]["tier"] if acc["selected_witness"] is not None else None
+            ),
+            "selected_witness": acc["selected_witness"],
+            "integrity_conflict_detected": acc["integrity_conflict_detected"],
+            "conflicting_certified_witnesses": acc["conflicting_certified_witnesses"],
+            "differs_from_last_evaluated_tier": bool(
+                acc["integrity_conflict_detected"]
+                or (
+                    acc["selected_witness"] is not None
+                    and acc["selected_witness"]["tier"] != escalation_tier_used
+                )
+            ),
+        }
+        for cid, acc in candidate_acc.items()
+        if acc["in_declared_domain"] or acc["integrity_conflict_detected"]
+    }
+    out_of_domain_summary = {
+        cid: {
+            "candidate_id": cid,
+            "candidate_kind": acc["candidate_kind"],
+            "domain_status": "OUT_OF_DECLARED_DOMAIN",
+            "excluded_from_escalation": True,
+            "effective_verdict": "NOT_EVALUATED",
+            "diagnostic_tier_observations": acc["tier_observations"],
+        }
+        for cid, acc in candidate_acc.items()
+        if (not acc["in_declared_domain"]) and (not acc["integrity_conflict_detected"])
+    }
+
+    accumulated_candidate_evidence = {
+        "point_id": eff_point_id,
+        "last_evaluated_observable_tier": escalation_tier_used,
+        "any_candidate_witness_differs_from_last_tier": any_witness_differs_from_last,
+        "escalation_stop_reason": stop_reason,
+        "certification_integrity_ok": len(integrity_conflicts) == 0,
+        "certification_integrity_status": (
+            "CERTIFIED_CONSISTENT"
+            if len(integrity_conflicts) == 0
+            else CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
+        ),
+        "integrity_conflicts": integrity_conflicts,
+        "in_domain_candidates": in_domain_summary,
+        "out_of_domain_candidates": out_of_domain_summary,
+    }
+
+    if raise_on_integrity_conflict and len(integrity_conflicts) > 0:
+        raise CertificationIntegrityError(
+            f"Certification integrity conflict at {eff_point_id}: "
+            f"{[c.get('candidate_id', c.get('conflict_type', 'UNKNOWN_CONFLICT')) for c in integrity_conflicts]}",
+            integrity_conflicts,
+        )
+
+    return {
+        "point_id": eff_point_id,
+        "point_result": res,
+        "last_evaluated_observable_tier": escalation_tier_used,
+        "any_candidate_witness_differs_from_last_tier": any_witness_differs_from_last,
+        "probe_evaluation": accumulated_probe_eval,
+        "last_tier_raw_probe_evaluation": last_raw_probe_eval,
+        "accumulated_candidate_evidence": accumulated_candidate_evidence,
+        "certification_integrity_ok": len(integrity_conflicts) == 0,
+        "certification_integrity_status": (
+            "CERTIFIED_CONSISTENT"
+            if len(integrity_conflicts) == 0
+            else CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
+        ),
+        "integrity_conflicts": integrity_conflicts,
+        "escalation_tier_used": escalation_tier_used,
+        "escalation_stop_reason": stop_reason,
+        "escalation_history": history,
+        "resource_budget_check": resource_budget_check,
+    }
+
+
+def build_holdout_point_artifact_row(
+    entry: Dict[str, Any],
+    exec_out: Dict[str, Any],
+    *,
+    compute_divisor_partition: bool = True,
+) -> Dict[str, Any]:
+    """Build a JSON-ready `holdout_point_evaluations` row from `execute_holdout_point_with_protocol_escalation`,
+    keeping last-tier observable enclosures distinct from accumulated per-candidate witness evidence
+    (`TASK-TC-061R2` §2).
+    """
+    res = exec_out["point_result"]
+    probe_eval = exec_out["probe_evaluation"]
+    escalation_tier_used = int(exec_out["escalation_tier_used"])
+    res_budget = exec_out["resource_budget_check"]
+    spec = ExactScaleSpec.from_protocol_entry(entry)
+
+    has_full_cons = (
+        "J_consistency_residual_QA" in res and "J_consistency_residual_2PB" in res
+    )
+    if has_full_cons:
+        res_qa = res["J_consistency_residual_QA"]
+        res_2pb = res["J_consistency_residual_2PB"]
+        cons_ok: Optional[bool] = bool(
+            arb(0) in res_qa
+            and abs(res_qa) < arb("1e-44")
+            and arb(0) in res_2pb
+            and abs(res_2pb) < arb("1e-44")
+        )
+    else:
+        res_qa = None
+        res_2pb = None
+        cons_ok = True
+
+    pb_b = res.get("pair_P_B")
+    if isinstance(pb_b, arb):
+        pb_sign: Optional[str] = (
+            "STRICTLY_POSITIVE"
+            if bool(pb_b > arb(0))
+            else ("STRICTLY_NEGATIVE" if bool(pb_b < arb(0)) else "STRADDLING_ZERO")
+        )
+    else:
+        pb_sign = None
+
+    j_b = res["J_direct"]
+    j_sign = (
+        "STRICTLY_POSITIVE"
+        if bool(j_b > arb(0))
+        else ("STRICTLY_NEGATIVE" if bool(j_b < arb(0)) else "STRADDLING_ZERO")
+    )
+
+    div_part = (
+        certify_open_core_divisor_partition(
+            spec.evaluate_arb(prec_bits=int(res["cutoffs"]["cutoff_prec_bits_used"])),
+            kappa=1,
+            prec_bits=int(res["cutoffs"]["cutoff_prec_bits_used"]),
+        )
+        if compute_divisor_partition
+        else None
+    )
+
+    has_tail = bool(res.get("has_subunit_tail_ge_ceil_tau_Y", False))
+    raw_el = res.get("elapsed_sec")
+    el_out = round(float(raw_el), 4) if _is_valid_nonneg_real(raw_el) else None
+
+    return {
+        "point_id": entry["point_id"],
+        "label": entry["label"],
+        "grid_tier": entry["grid_tier"],
+        "prior_exposure_status": entry["prior_exposure_status"],
+        "prior_exposure_detail": entry["prior_exposure_detail"],
+        "cutoffs": res["cutoffs"],
+        "open_core_divisor_partition": div_part,
+        "quadrature_mode": res["quadrature_mode"],
+        "escalation_tier_used": escalation_tier_used,
+        "escalation_stop_reason": exec_out["escalation_stop_reason"],
+        "last_evaluated_observable_tier": escalation_tier_used,
+        "any_candidate_witness_differs_from_last_tier": exec_out[
+            "any_candidate_witness_differs_from_last_tier"
+        ],
+        "certification_integrity_ok": exec_out["certification_integrity_ok"],
+        "certification_integrity_status": exec_out["certification_integrity_status"],
+        "integrity_conflicts": exec_out["integrity_conflicts"],
+        "requested_settings": res["requested_settings"],
+        "used_settings": res["used_settings"],
+        "inactive_parameters": res["inactive_parameters"],
+        "escalation_history": exec_out["escalation_history"],
+        "prec_bits_used": res["prec_bits"],
+        "quad_tol_bits_used": res["quad_tol_bits"],
+        "panels_used": res["panels_used"],
+        "unique_quadrature_nodes": res.get("unique_quadrature_nodes"),
+        "elapsed_sec": el_out,
         "current_rss_mb": res.get("current_rss_mb"),
-        "peak_rss_mb": peak_rss_observed,
-        "wall_budget_exceeded": wall_exceeded,
-        "rss_budget_exceeded": rss_exceeded,
-        "within_resource_budget": budget_ok,
-        "enforcement_mode": "POST_EVALUATION_BUDGET_AUDIT_NO_OS_PREEMPTIVE_KILL",
+        "peak_rss_mb": res_budget["peak_rss_mb"],
+        "resource_budget_check": res_budget,
+        "Y_enclosure": serialize_arb_certified(res["Y_arb"]),
+        "E_Y": serialize_arb_certified(res["E_Y"]) if "E_Y" in res else None,
+        "D_tilde_Y": serialize_arb_certified(res["D_tilde_Y"]),
+        "X_tilde_Y": serialize_arb_certified(res["X_tilde_Y"]),
+        "P_norm_sq": serialize_arb_certified(res["P_norm_sq"]) if "P_norm_sq" in res else None,
+        "A_norm_sq": serialize_arb_certified(res["A_norm_sq"]) if "A_norm_sq" in res else None,
+        "B_norm_sq": serialize_arb_certified(res["B_norm_sq"]) if "B_norm_sq" in res else None,
+        "pair_P_B": serialize_arb_certified(pb_b) if isinstance(pb_b, arb) else None,
+        "pair_P_B_sign": pb_sign,
+        "J_direct": serialize_arb_certified(j_b),
+        "J_sign": j_sign,
+        "J_algebraic_consistency_QA": (
+            serialize_arb_certified(res["J_algebraic_consistency_QA"])
+            if "J_algebraic_consistency_QA" in res
+            else None
+        ),
+        "J_algebraic_consistency_2PB": (
+            serialize_arb_certified(res["J_algebraic_consistency_2PB"])
+            if "J_algebraic_consistency_2PB" in res
+            else None
+        ),
+        "J_consistency_check_role": "ALGEBRAIC_CONSISTENCY_CHECK_SAME_INPUTS",
+        "J_consistency_residual_QA": (
+            serialize_arb_certified(res_qa) if isinstance(res_qa, arb) else None
+        ),
+        "J_consistency_residual_2PB": (
+            serialize_arb_certified(res_2pb) if isinstance(res_2pb, arb) else None
+        ),
+        "algebraic_consistency_verified": cons_ok,
+        "log_Y_times_D_tilde": serialize_arb_certified(res["log_Y_times_D_tilde"]),
+        "J_over_log_Y_D_tilde": probe_eval["J_over_log_Y_D_tilde"],
+        "has_subunit_tail_ge_ceil_tau_Y": has_tail,
+        "subunit_tail_breakdown": (
+            {
+                "subunit_tail_d_range_inclusive": res["subunit_tail_d_range_inclusive"],
+                "B_tail_norm_sq": serialize_arb_certified(res["B_tail_norm_sq"]),
+                "B_inter_norm_sq": serialize_arb_certified(res["B_inter_norm_sq"]),
+                "pair_P_B_tail": serialize_arb_certified(res["pair_P_B_tail"]),
+                "pair_B_inter_B_tail": serialize_arb_certified(res["pair_B_inter_B_tail"]),
+                "J_subunit_tail_contribution": serialize_arb_certified(
+                    res["J_subunit_tail_contribution"]
+                ),
+                "J_without_subunit_tail": serialize_arb_certified(res["J_without_subunit_tail"]),
+            }
+            if has_tail
+            else None
+        ),
+        "probe_evaluations": probe_eval["per_probe"],
+        "mechanism_kl1_sub_budgets": probe_eval["mechanism_kl1_sub_budgets"],
+        "accumulated_candidate_evidence": exec_out["accumulated_candidate_evidence"],
+    }
+
+
+def aggregate_holdout_rows_and_outcomes(
+    holdout_rows: Sequence[Dict[str, Any]],
+    probes: Sequence[Dict[str, Any]],
+    *,
+    registered_count: int,
+    fail_on_integrity_conflict: bool = False,
+) -> Dict[str, Any]:
+    """Aggregate holdout coverage, 3-valued resource compliance, certification integrity, and
+    global main-probe / `KL1` outcomes directly from serialized or in-memory `holdout_rows`
+    (`TASK-TC-061R2` §§2–4):
+    - Uses each row's accumulated candidate verdict and `selected_witness` provenance;
+    - Keeps mathematical point coverage (`coverage_complete`) separate from `resource_compliance_summary`
+      so `UNKNOWN` RSS telemetry prevents claiming verified resource compliance without turning
+      rigorous inequality certificates into mathematical failures;
+    - Preserves `REFUTED_BY_CERTIFIED_WITNESS` whenever a valid counterexample exists even if other
+      candidates or points remain `UNRESOLVED`;
+    - Blocks a clean certification report (`certification_report_blocked = True`) if any candidate
+      encountered `CERTIFICATION_INTEGRITY_CONFLICT`.
+    """
+    all_conflicts: List[Dict[str, Any]] = []
+    for r in holdout_rows:
+        row_conflicts = list(r.get("integrity_conflicts") or [])
+        for c in row_conflicts:
+            all_conflicts.append(c)
+        row_has_conflict_verdict = any(
+            str(pd.get("point_verdict")) == CERTIFICATION_INTEGRITY_CONFLICT_VERDICT
+            or bool(pd.get("integrity_conflict_detected", False))
+            for pd in (r.get("probe_evaluations") or {}).values()
+        ) or (
+            str((r.get("mechanism_kl1_sub_budgets") or {}).get("offdiag_verdict"))
+            == CERTIFICATION_INTEGRITY_CONFLICT_VERDICT
+            or str((r.get("mechanism_kl1_sub_budgets") or {}).get("R_mix_verdict"))
+            == CERTIFICATION_INTEGRITY_CONFLICT_VERDICT
+        )
+        if (not r.get("certification_integrity_ok", True) or row_has_conflict_verdict) and len(
+            row_conflicts
+        ) == 0:
+            all_conflicts.append(
+                {
+                    "conflict_type": "ROW_INTEGRITY_FLAG_OR_VERDICT_WITHOUT_CONFLICT_RECORD",
+                    "point_id": r.get("point_id"),
+                    "candidate_id": "ROW_LEVEL_INTEGRITY",
+                }
+            )
+    cert_integrity_ok = len(all_conflicts) == 0
+    if fail_on_integrity_conflict and not cert_integrity_ok:
+        raise CertificationIntegrityError(
+            f"Section 3 aggregation blocked by {len(all_conflicts)} certification integrity conflict(s)",
+            all_conflicts,
+        )
+
+    mathematical_coverage_complete = bool(
+        registered_count > 0
+        and len(holdout_rows) == registered_count
+        and cert_integrity_ok
+    )
+    res_summary = aggregate_section_resource_compliance(
+        [r["resource_budget_check"] for r in holdout_rows],
+        registered_count=registered_count,
+    )
+
+    probe_summaries: Dict[str, Any] = {}
+    any_probe_or_kl1_fail = False
+    for pr in probes:
+        pid = str(pr["probe_id"])
+        verdicts: List[str] = []
+        fail_witnesses: List[Dict[str, Any]] = []
+        conflict_records: List[Dict[str, Any]] = []
+        out_of_domain_count = 0
+        for r in holdout_rows:
+            pdata = r["probe_evaluations"][pid]
+            if not pdata.get("in_declared_domain", True) and not pdata.get(
+                "integrity_conflict_detected", False
+            ):
+                out_of_domain_count += 1
+                continue
+            v = str(pdata["point_verdict"])
+            verdicts.append(v)
+            if v == "FAIL":
+                any_probe_or_kl1_fail = True
+                w_sel = pdata.get("selected_witness")
+                fail_witnesses.append(
+                    {
+                        "point_id": r["point_id"],
+                        "probe_id": pid,
+                        "witness_tier": pdata.get("witness_tier"),
+                        "witness_prec_bits": pdata.get("witness_prec_bits"),
+                        "witness_quad_tol_bits": pdata.get("witness_quad_tol_bits"),
+                        "witness_quadrature_mode": pdata.get("witness_quadrature_mode"),
+                        "witness_used_settings": pdata.get("witness_used_settings"),
+                        "parameter_identity": pdata.get("parameter_identity"),
+                        "margin_M_Y": pdata["margin_M_Y"],
+                        "selected_witness": w_sel,
+                    }
+                )
+            elif v == CERTIFICATION_INTEGRITY_CONFLICT_VERDICT:
+                conflict_records.append(
+                    {
+                        "point_id": r["point_id"],
+                        "probe_id": pid,
+                        "conflicting_certified_witnesses": pdata.get(
+                            "conflicting_certified_witnesses", []
+                        ),
+                    }
+                )
+        in_dom_registered = max(0, registered_count - out_of_domain_count)
+        in_dom_complete = bool(
+            mathematical_coverage_complete
+            and in_dom_registered > 0
+            and len(verdicts) == in_dom_registered
+        )
+        outcome = classify_global_probe_outcome(
+            verdicts,
+            coverage_complete=in_dom_complete,
+            uniform_proof_established=False,
+            fail_on_integrity_conflict=fail_on_integrity_conflict,
+        )
+        probe_summaries[pid] = {
+            "probe_id": pid,
+            "tier": pr["tier"],
+            "formula": pr["formula"],
+            "holdout_points_registered": in_dom_registered,
+            "out_of_domain_excluded_count": out_of_domain_count,
+            "holdout_points_evaluated": len(verdicts),
+            "pass_count": sum(1 for v in verdicts if v == "PASS"),
+            "fail_count": sum(1 for v in verdicts if v == "FAIL"),
+            "unresolved_count": sum(1 for v in verdicts if v == "UNRESOLVED"),
+            "not_evaluated_count": sum(1 for v in verdicts if v == "NOT_EVALUATED"),
+            "integrity_conflict_count": sum(
+                1 for v in verdicts if v == CERTIFICATION_INTEGRITY_CONFLICT_VERDICT
+            ),
+            "decisive_fail_witnesses": fail_witnesses,
+            "integrity_conflicts": conflict_records,
+            "coverage_complete": in_dom_complete,
+            "uniform_proof_established": False,
+            "global_probe_outcome": outcome,
+        }
+
+    kl1_off_verdicts: List[str] = []
+    kl1_mix_verdicts: List[str] = []
+    kl1_off_fail_witnesses: List[Dict[str, Any]] = []
+    kl1_mix_fail_witnesses: List[Dict[str, Any]] = []
+    kl1_out_of_domain_count = 0
+    for r in holdout_rows:
+        kl1_d = r["mechanism_kl1_sub_budgets"]
+        kl1_has_conflict = bool(
+            kl1_d.get("offdiag_integrity_conflict_detected", False)
+            or kl1_d.get("R_mix_integrity_conflict_detected", False)
+            or str(kl1_d.get("offdiag_verdict")) == CERTIFICATION_INTEGRITY_CONFLICT_VERDICT
+            or str(kl1_d.get("R_mix_verdict")) == CERTIFICATION_INTEGRITY_CONFLICT_VERDICT
+        )
+        if not kl1_d.get("in_declared_domain", True) and not kl1_has_conflict:
+            kl1_out_of_domain_count += 1
+            continue
+        vo = str(kl1_d["offdiag_verdict"])
+        vm = str(kl1_d["R_mix_verdict"])
+        kl1_off_verdicts.append(vo)
+        kl1_mix_verdicts.append(vm)
+        if vo == "FAIL":
+            any_probe_or_kl1_fail = True
+            kl1_off_fail_witnesses.append(
+                {
+                    "point_id": r["point_id"],
+                    "candidate_id": "TC061-KL1:offdiag",
+                    "witness_tier": kl1_d.get("offdiag_witness_tier"),
+                    "margin": kl1_d["offdiag_margin"],
+                    "selected_witness": kl1_d.get("offdiag_selected_witness"),
+                }
+            )
+        if vm == "FAIL":
+            any_probe_or_kl1_fail = True
+            kl1_mix_fail_witnesses.append(
+                {
+                    "point_id": r["point_id"],
+                    "candidate_id": "TC061-KL1:R_mix",
+                    "witness_tier": kl1_d.get("R_mix_witness_tier"),
+                    "margin": kl1_d["R_mix_margin"],
+                    "selected_witness": kl1_d.get("R_mix_selected_witness"),
+                }
+            )
+
+    kl1_in_dom_registered = max(0, registered_count - kl1_out_of_domain_count)
+    kl1_off_complete = bool(
+        mathematical_coverage_complete
+        and kl1_in_dom_registered > 0
+        and len(kl1_off_verdicts) == kl1_in_dom_registered
+    )
+    kl1_mix_complete = bool(
+        mathematical_coverage_complete
+        and kl1_in_dom_registered > 0
+        and len(kl1_mix_verdicts) == kl1_in_dom_registered
+    )
+    kl1_summary = {
+        "in_domain_registered_count": kl1_in_dom_registered,
+        "out_of_domain_excluded_count": kl1_out_of_domain_count,
+        "offdiag_sub_budget_outcome": classify_global_probe_outcome(
+            kl1_off_verdicts,
+            coverage_complete=kl1_off_complete,
+            uniform_proof_established=False,
+            fail_on_integrity_conflict=fail_on_integrity_conflict,
+        ),
+        "offdiag_decisive_fail_witnesses": kl1_off_fail_witnesses,
+        "mixed_core_sub_budget_outcome": classify_global_probe_outcome(
+            kl1_mix_verdicts,
+            coverage_complete=kl1_mix_complete,
+            uniform_proof_established=False,
+            fail_on_integrity_conflict=fail_on_integrity_conflict,
+        ),
+        "mixed_core_decisive_fail_witnesses": kl1_mix_fail_witnesses,
+    }
+
+    row_4096 = next((r for r in holdout_rows if r["point_id"] == "HO-EXT-4096"), None)
+    tail_4096_evaluated = bool(
+        row_4096 is not None
+        and row_4096["cutoffs"]["T_Y"] == 32768
+        and row_4096["has_subunit_tail_ge_ceil_tau_Y"] is True
+        and row_4096["subunit_tail_breakdown"] is not None
+        and row_4096["subunit_tail_breakdown"]["subunit_tail_d_range_inclusive"] == [25736, 32767]
+    )
+
+    holdout_coverage_summary = {
+        "registered_count": registered_count,
+        "evaluated_count": len(holdout_rows),
+        "coverage_complete": mathematical_coverage_complete,
+        "mathematical_coverage_complete": mathematical_coverage_complete,
+        "Y_4096_nonempty_subunit_tail_evaluated": tail_4096_evaluated,
+        "overall_resource_budget_status": res_summary["overall_resource_budget_status"],
+        "wall_budget_status": res_summary["wall_budget_status"],
+        "memory_budget_status": res_summary["memory_budget_status"],
+        "all_points_within_resource_budgets": res_summary["all_points_within_resource_budgets"],
+        "all_resource_budgets_verified_within": res_summary["all_resource_budgets_verified_within"],
+        "certification_integrity_ok": cert_integrity_ok,
+        "certification_report_blocked": not cert_integrity_ok,
+        "mechanism_revision_triggered": False,
+        "mechanism_revision_note": (
+            "All 4 frozen probes and both TC061-KL1 sub-budgets passed on all evaluated held-out "
+            "points; zero failures occurred, so no TC061-REV1-* post-diagnosis mechanism revision "
+            "was triggered."
+            if (not any_probe_or_kl1_fail and cert_integrity_ok)
+            else (
+                "Certification report blocked by contradictory certified verdicts across tiers."
+                if not cert_integrity_ok
+                else "Certified counterexample witness(es) recorded; frozen probe parameters remain immutable."
+            )
+        ),
     }
 
     return {
-        "point_result": res,
-        "probe_evaluation": probe_eval,
-        "escalation_tier_used": escalation_tier_used,
-        "escalation_history": history,
-        "resource_budget_check": resource_budget_check,
+        "holdout_coverage_summary": holdout_coverage_summary,
+        "resource_compliance_summary": res_summary,
+        "certification_integrity_summary": {
+            "certification_integrity_ok": cert_integrity_ok,
+            "certification_report_blocked": not cert_integrity_ok,
+            "integrity_conflict_count": len(all_conflicts),
+            "integrity_conflicts": all_conflicts,
+        },
+        "global_probe_outcomes": probe_summaries,
+        "mechanism_kl1_holdout_summary": kl1_summary,
+        "Y_4096_nonempty_subunit_tail_evaluated": tail_4096_evaluated,
     }
 
 
@@ -2612,8 +4027,9 @@ def verify_section_3_preregistered_holdout_experiment(
     """Execute the complete 14-point preregistered held-out experiment (`128` through `4096`,
     including nonempty `d >= ceil(tau*Y)` full-tail evaluations at `Y = 2048` and `Y = 4096`,
     protocol-faithful `quad_tol_bits = 240` unsplit quadrature on `T < 512` (`Y = 128`),
-    and automatic escalation on any zero-straddling main probe OR `KL1` sub-budget margin)
-    against the immutable protocol (`TASK-TC-061R` §6).
+    per-candidate decisive-witness accumulation across main probes and `KL1` sub-budgets, and
+    separate 3-valued `WITHIN`/`EXCEEDED`/`UNKNOWN` resource compliance auditing) against the
+    immutable protocol (`TASK-TC-061R` §6 / `TASK-TC-061R2` §§2–3).
     """
     t_sec3_start = time.perf_counter()
     proto = json.loads(MIXED_ARITHMETIC_COVARIANCE_PROTOCOL_PATH.read_text(encoding="utf-8"))
@@ -2633,11 +4049,7 @@ def verify_section_3_preregistered_holdout_experiment(
     )
 
     holdout_rows: List[Dict[str, Any]] = []
-    per_probe_verdicts: Dict[str, List[str]] = {pr["probe_id"]: [] for pr in probes}
-    kl1_offdiag_verdicts: List[str] = []
-    kl1_mix_verdicts: List[str] = []
     consistency_all_ok = True
-    all_resource_budgets_ok = True
     raw_results_by_id: Dict[str, Dict[str, Any]] = {}
 
     for entry in holdout_entries:
@@ -2646,135 +4058,28 @@ def verify_section_3_preregistered_holdout_experiment(
             spec,
             probes,
             protocol_rules,
+            point_id=str(entry["point_id"]),
             selberg_table=tbl,
             in_declared_domain_fn=lambda _pr: True,
             kl1_in_declared_domain=True,
+            raise_on_integrity_conflict=False,
         )
-        res = exec_out["point_result"]
-        probe_eval = exec_out["probe_evaluation"]
-        escalation_tier_used = exec_out["escalation_tier_used"]
-        res_budget = exec_out["resource_budget_check"]
-        all_resource_budgets_ok = all_resource_budgets_ok and bool(res_budget["within_resource_budget"])
-        raw_results_by_id[entry["point_id"]] = res
-
-        res_qa = res["J_consistency_residual_QA"]
-        res_2pb = res["J_consistency_residual_2PB"]
-        cons_ok = bool(
-            arb(0) in res_qa
-            and abs(res_qa) < arb("1e-44")
-            and arb(0) in res_2pb
-            and abs(res_2pb) < arb("1e-44")
+        raw_results_by_id[str(entry["point_id"])] = exec_out["point_result"]
+        row_dict = build_holdout_point_artifact_row(
+            entry, exec_out, compute_divisor_partition=True
         )
-        consistency_all_ok = consistency_all_ok and cons_ok
-
-        for pid, pdata in probe_eval["per_probe"].items():
-            per_probe_verdicts[pid].append(pdata["point_verdict"])
-        kl1_offdiag_verdicts.append(probe_eval["mechanism_kl1_sub_budgets"]["offdiag_verdict"])
-        kl1_mix_verdicts.append(probe_eval["mechanism_kl1_sub_budgets"]["R_mix_verdict"])
-
-        pb_b = res["pair_P_B"]
-        pb_sign = (
-            "STRICTLY_POSITIVE"
-            if bool(pb_b > arb(0))
-            else ("STRICTLY_NEGATIVE" if bool(pb_b < arb(0)) else "STRADDLING_ZERO")
-        )
-        j_b = res["J_direct"]
-        j_sign = (
-            "STRICTLY_POSITIVE"
-            if bool(j_b > arb(0))
-            else ("STRICTLY_NEGATIVE" if bool(j_b < arb(0)) else "STRADDLING_ZERO")
-        )
-
-        div_part = certify_open_core_divisor_partition(
-            spec.evaluate_arb(prec_bits=res["cutoffs"]["cutoff_prec_bits_used"]),
-            kappa=1,
-            prec_bits=res["cutoffs"]["cutoff_prec_bits_used"],
-        )
-
-        row_dict: Dict[str, Any] = {
-            "point_id": entry["point_id"],
-            "label": entry["label"],
-            "grid_tier": entry["grid_tier"],
-            "prior_exposure_status": entry["prior_exposure_status"],
-            "prior_exposure_detail": entry["prior_exposure_detail"],
-            "cutoffs": res["cutoffs"],
-            "open_core_divisor_partition": div_part,
-            "quadrature_mode": res["quadrature_mode"],
-            "escalation_tier_used": escalation_tier_used,
-            "requested_settings": res["requested_settings"],
-            "used_settings": res["used_settings"],
-            "inactive_parameters": res["inactive_parameters"],
-            "escalation_history": exec_out["escalation_history"],
-            "prec_bits_used": res["prec_bits"],
-            "quad_tol_bits_used": res["quad_tol_bits"],
-            "panels_used": res["panels_used"],
-            "unique_quadrature_nodes": res["unique_quadrature_nodes"],
-            "elapsed_sec": round(res["elapsed_sec"], 4),
-            "current_rss_mb": res.get("current_rss_mb"),
-            "peak_rss_mb": res.get("peak_rss_mb"),
-            "resource_budget_check": res_budget,
-            "Y_enclosure": serialize_arb_certified(res["Y_arb"]),
-            "E_Y": serialize_arb_certified(res["E_Y"]),
-            "D_tilde_Y": serialize_arb_certified(res["D_tilde_Y"]),
-            "X_tilde_Y": serialize_arb_certified(res["X_tilde_Y"]),
-            "P_norm_sq": serialize_arb_certified(res["P_norm_sq"]),
-            "A_norm_sq": serialize_arb_certified(res["A_norm_sq"]),
-            "B_norm_sq": serialize_arb_certified(res["B_norm_sq"]),
-            "pair_P_B": serialize_arb_certified(pb_b),
-            "pair_P_B_sign": pb_sign,
-            "J_direct": serialize_arb_certified(j_b),
-            "J_sign": j_sign,
-            "J_algebraic_consistency_QA": serialize_arb_certified(res["J_algebraic_consistency_QA"]),
-            "J_algebraic_consistency_2PB": serialize_arb_certified(res["J_algebraic_consistency_2PB"]),
-            "J_consistency_check_role": "ALGEBRAIC_CONSISTENCY_CHECK_SAME_INPUTS",
-            "J_consistency_residual_QA": serialize_arb_certified(res_qa),
-            "J_consistency_residual_2PB": serialize_arb_certified(res_2pb),
-            "algebraic_consistency_verified": cons_ok,
-            "log_Y_times_D_tilde": serialize_arb_certified(res["log_Y_times_D_tilde"]),
-            "J_over_log_Y_D_tilde": probe_eval["J_over_log_Y_D_tilde"],
-            "has_subunit_tail_ge_ceil_tau_Y": res["has_subunit_tail_ge_ceil_tau_Y"],
-            "subunit_tail_breakdown": (
-                {
-                    "subunit_tail_d_range_inclusive": res["subunit_tail_d_range_inclusive"],
-                    "B_tail_norm_sq": serialize_arb_certified(res["B_tail_norm_sq"]),
-                    "B_inter_norm_sq": serialize_arb_certified(res["B_inter_norm_sq"]),
-                    "pair_P_B_tail": serialize_arb_certified(res["pair_P_B_tail"]),
-                    "pair_B_inter_B_tail": serialize_arb_certified(res["pair_B_inter_B_tail"]),
-                    "J_subunit_tail_contribution": serialize_arb_certified(
-                        res["J_subunit_tail_contribution"]
-                    ),
-                    "J_without_subunit_tail": serialize_arb_certified(res["J_without_subunit_tail"]),
-                }
-                if res["has_subunit_tail_ge_ceil_tau_Y"]
-                else None
-            ),
-            "probe_evaluations": probe_eval["per_probe"],
-            "mechanism_kl1_sub_budgets": probe_eval["mechanism_kl1_sub_budgets"],
-        }
+        consistency_all_ok = consistency_all_ok and bool(row_dict["algebraic_consistency_verified"])
         holdout_rows.append(row_dict)
 
-    coverage_complete = bool(len(holdout_rows) == len(holdout_entries) and all_resource_budgets_ok)
-    probe_summaries: Dict[str, Any] = {}
-    for pr in probes:
-        pid = pr["probe_id"]
-        verdicts = per_probe_verdicts[pid]
-        outcome = classify_global_probe_outcome(
-            verdicts, coverage_complete=coverage_complete, uniform_proof_established=False
-        )
-        probe_summaries[pid] = {
-            "probe_id": pid,
-            "tier": pr["tier"],
-            "formula": pr["formula"],
-            "holdout_points_registered": len(holdout_entries),
-            "holdout_points_evaluated": len(verdicts),
-            "pass_count": sum(1 for v in verdicts if v == "PASS"),
-            "fail_count": sum(1 for v in verdicts if v == "FAIL"),
-            "unresolved_count": sum(1 for v in verdicts if v == "UNRESOLVED"),
-            "not_evaluated_count": sum(1 for v in verdicts if v == "NOT_EVALUATED"),
-            "coverage_complete": coverage_complete,
-            "uniform_proof_established": False,
-            "global_probe_outcome": outcome,
-        }
+    agg = aggregate_holdout_rows_and_outcomes(
+        holdout_rows,
+        probes,
+        registered_count=len(holdout_entries),
+        fail_on_integrity_conflict=False,
+    )
+    res_summary = agg["resource_compliance_summary"]
+    cert_summary = agg["certification_integrity_summary"]
+    tail_4096_evaluated = agg["Y_4096_nonempty_subunit_tail_evaluated"]
 
     # Exact exposure-category breakdown derived verbatim from the frozen protocol:
     exposure_counts: Dict[str, int] = {}
@@ -2873,25 +4178,37 @@ def verify_section_3_preregistered_holdout_experiment(
         "verified": bool(ho_128_protocol_ok and ho_128_overlap_ok),
     }
 
-    # Verify Y = 4096 full-tail row was evaluated with nonempty sub-unit tail:
-    row_4096 = next((r for r in holdout_rows if r["point_id"] == "HO-EXT-4096"), None)
-    tail_4096_evaluated = bool(
-        row_4096 is not None
-        and row_4096["cutoffs"]["T_Y"] == 32768
-        and row_4096["has_subunit_tail_ge_ceil_tau_Y"] is True
-        and row_4096["subunit_tail_breakdown"] is not None
-        and row_4096["subunit_tail_breakdown"]["subunit_tail_d_range_inclusive"] == [25736, 32767]
-    )
-
     sec3_wall_sec = time.perf_counter() - t_sec3_start
-    max_point_wall_sec = max((float(r["elapsed_sec"]) for r in holdout_rows), default=0.0)
-    rss_vals = [float(r["peak_rss_mb"]) for r in holdout_rows if r.get("peak_rss_mb") is not None]
+    valid_row_walls: List[float] = []
+    for r in holdout_rows:
+        rb_chk = r.get("resource_budget_check") or {}
+        if rb_chk.get("wall_budget_status") == "UNKNOWN":
+            continue
+        cum_w = rb_chk.get("cumulative_point_elapsed_sec", r.get("elapsed_sec"))
+        if _is_valid_nonneg_real(cum_w):
+            valid_row_walls.append(float(cum_w))
+    max_point_wall_sec: Optional[float] = (
+        round(max(valid_row_walls), 4)
+        if (valid_row_walls and res_summary["wall_budget_status"] != "UNKNOWN")
+        else None
+    )
+    rss_vals = [
+        float(r["peak_rss_mb"]) for r in holdout_rows if _is_valid_nonneg_real(r.get("peak_rss_mb"))
+    ]
     execution_telemetry_summary = {
         "telemetry_scope": "THIS_ARTIFACT_GENERATION_RUN_ONLY",
         "section_3_total_wall_sec": round(sec3_wall_sec, 4),
-        "max_single_point_wall_sec": round(max_point_wall_sec, 4),
-        "max_observed_peak_rss_mb": round(max(rss_vals), 3) if rss_vals else None,
-        "all_points_within_300s_and_4096mb_budget": all_resource_budgets_ok,
+        "max_single_point_wall_sec": max_point_wall_sec,
+        "max_observed_peak_rss_mb": (
+            round(max(rss_vals), 3)
+            if (rss_vals and res_summary["memory_budget_status"] != "UNKNOWN")
+            else None
+        ),
+        "wall_budget_status": res_summary["wall_budget_status"],
+        "memory_budget_status": res_summary["memory_budget_status"],
+        "overall_resource_budget_status": res_summary["overall_resource_budget_status"],
+        "all_points_within_300s_and_4096mb_budget": res_summary["all_points_within_resource_budgets"],
+        "all_resource_budgets_verified_within": res_summary["all_resource_budgets_verified_within"],
         "budget_enforcement_mode": "POST_EVALUATION_BUDGET_AUDIT_NO_OS_PREEMPTIVE_KILL",
     }
 
@@ -2913,33 +4230,19 @@ def verify_section_3_preregistered_holdout_experiment(
             "fourteen_point_holdout_arb_enclosures_and_full_tail_4096": "CERTIFIED_FINITE_OBSERVATION",
             "uniform_probe_and_closure_hypothesis_H_validity": "OPEN_CONJECTURE_OR_FAILED_CANDIDATE",
         },
-        "holdout_coverage_summary": {
-            "registered_count": len(holdout_entries),
-            "evaluated_count": len(holdout_rows),
-            "coverage_complete": coverage_complete,
-            "Y_4096_nonempty_subunit_tail_evaluated": tail_4096_evaluated,
-            "all_points_within_resource_budgets": all_resource_budgets_ok,
-            "mechanism_revision_triggered": False,
-            "mechanism_revision_note": (
-                "All 4 frozen probes and both TC061-KL1 sub-budgets passed on 14/14 held-out points; "
-                "zero failures occurred, so no TC061-REV1-* post-diagnosis mechanism revision was triggered."
-            ),
-        },
+        "holdout_coverage_summary": agg["holdout_coverage_summary"],
+        "resource_compliance_summary": res_summary,
+        "certification_integrity_summary": cert_summary,
         "exposure_category_breakdown": exposure_category_breakdown,
         "execution_telemetry_summary": execution_telemetry_summary,
         "tc061r_protocol_deviation_and_rerun_comparison": tc061r_protocol_deviation_and_rerun_comparison,
-        "global_probe_outcomes": probe_summaries,
-        "mechanism_kl1_holdout_summary": {
-            "offdiag_sub_budget_outcome": classify_global_probe_outcome(
-                kl1_offdiag_verdicts, coverage_complete=coverage_complete, uniform_proof_established=False
-            ),
-            "mixed_core_sub_budget_outcome": classify_global_probe_outcome(
-                kl1_mix_verdicts, coverage_complete=coverage_complete, uniform_proof_established=False
-            ),
-        },
+        "global_probe_outcomes": agg["global_probe_outcomes"],
+        "mechanism_kl1_holdout_summary": agg["mechanism_kl1_holdout_summary"],
         "holdout_point_evaluations": holdout_rows,
         "all_section_3_checks_pass": bool(
-            coverage_complete
+            agg["holdout_coverage_summary"]["mathematical_coverage_complete"]
+            and cert_summary["certification_integrity_ok"]
+            and not res_summary["any_resource_budget_exceeded"]
             and consistency_all_ok
             and tail_4096_evaluated
             and ho_128_protocol_ok
@@ -3422,8 +4725,9 @@ def compute_finite_prime_control_invariants(
     """Compute and strictly separate the three arithmetic invariants of a finite-prime parity control
     `a_S(n) = (-1)^{sum_{p in S} v_p(n)}` (`TASK-TC-061R` §3):
     1. Exact divisor convolution `(1 * a_S)(n)` (`= prod_{p in S} 1_{2 | v_p(n)} * prod_{p notin S} (v_p(n)+1)`),
-       which grows unboundedly on prime factors outside `S` (`d(n_{notin S})`), unlike all-prime
-       `(1 * lambda)(n) = 1_{sq}(n) in {0, 1}`;
+       which is unbounded along powers of a prime `p` outside `S` (`(1 * a_S)(p) = 2` whereas
+       `(1 * a_S)(p^k) = k + 1`, and `(1 * a_S)(n) = d(n_{notin S})` when `2 | v_q(n)` for all
+       `q in S`), unlike all-prime `(1 * lambda)(n) = 1_{sq}(n) in {0, 1}`;
     2. Natural density of `{n >= 1 : (1 * a_S)(n) != 0}` (`= {n >= 1 : 2 | v_p(n) forall p in S}`),
        namely `prod_{p in S} (p / (p + 1))`;
     3. Simple-pole residue at `z = 1` of `D_{a_S}(z) = sum_{n >= 1} a_S(n) n^{-z} = zeta(z) * prod_{p in S} ((1 - p^{-z})/(1 + p^{-z}))`
@@ -4896,20 +6200,31 @@ def verify_tc061_lean_theorems_live(
         }
 
     formal_provenance: Dict[str, Any] = {}
+    build_hash_matches = False
+    inherited_commit_matches = False
     if FORMAL_BUILD_REPORT_PATH.exists():
         try:
             br = json.loads(FORMAL_BUILD_REPORT_PATH.read_text(encoding="utf-8"))
             src_hashes = br.get("formal_source_hashes") or br.get("source_hashes") or {}
+            mod_hash_br = src_hashes.get("formal/RiemannScope/MixedArithmeticCovariance.lean")
+            prod_commit_br = br.get("producing_git_commit")
+            build_hash_matches = bool(mod_hash_br == module_sha256)
+            inherited_commit_matches = bool(
+                prod_commit_br == ACCEPTED_TC061R_IMPLEMENTATION_AND_FORMAL_COMMIT
+            )
             formal_provenance = {
                 "status": br.get("status"),
-                "producing_git_commit": br.get("producing_git_commit"),
+                "producing_git_commit": prod_commit_br,
+                "expected_inherited_formal_producing_commit": (
+                    ACCEPTED_TC061R_IMPLEMENTATION_AND_FORMAL_COMMIT
+                ),
+                "inherited_formal_producing_commit_preserved": inherited_commit_matches,
                 "project_theorem_declarations_compiled": br.get(
                     "project_theorem_declarations_compiled"
                 ),
                 "total_theorems": br.get("total_theorems"),
-                "module_sha256_in_build_report": src_hashes.get(
-                    "formal/RiemannScope/MixedArithmeticCovariance.lean"
-                ),
+                "module_sha256_in_build_report": mod_hash_br,
+                "live_module_sha256_matches_build_report": build_hash_matches,
                 "report_hash": br.get("report_hash"),
             }
         except Exception:  # noqa: BLE001
@@ -4940,6 +6255,7 @@ def verify_tc061_lean_theorems_live(
             and custom_axiom_count == 0
             and pi_macro_count == 0
             and axioms_ok
+            and build_hash_matches
         ),
     }
 
@@ -5321,6 +6637,7 @@ def execute_task_tc061_mixed_covariance_audit(
     report: Dict[str, Any] = {
         "task_id": TASK_TC_061_ID,
         "repair_task_id": TASK_TC_061R_ID,
+        "closeout_task_id": TASK_TC_061R2_ID,
         "parent_epic": EPIC_TC_042_ID,
         "parent_subgate": PARENT_SUBGATE_ID,
         "prior_tasks": [
@@ -5344,6 +6661,8 @@ def execute_task_tc061_mixed_covariance_audit(
             TASK_TC_060_ID,
             TASK_TC_060R_ID,
             TASK_TC_060R2_ID,
+            TASK_TC_061_ID,
+            TASK_TC_061R_ID,
         ],
         "merged_main_baseline": MERGED_MAIN_BASELINE_TC061,
         "accepted_tc060r2_tip": ACCEPTED_TC060R2_TIP,
@@ -5351,11 +6670,58 @@ def execute_task_tc061_mixed_covariance_audit(
         "inherited_tc060r_formal_commit": REVIEWED_TC060R_IMPLEMENTATION,
         "reviewed_tc061_tip": REVIEWED_TC061_TIP,
         "reviewed_tc061_implementation": REVIEWED_TC061_IMPLEMENTATION,
+        "reviewed_tc061r_tip": REVIEWED_TC061R_TIP,
+        "accepted_tc061r_implementation_and_formal_commit": (
+            ACCEPTED_TC061R_IMPLEMENTATION_AND_FORMAL_COMMIT
+        ),
         "frozen_protocol_id": FROZEN_PROTOCOL_ID,
         "frozen_protocol_sha256": FROZEN_PROTOCOL_SHA256,
         "frozen_protocol_registration_commit": FROZEN_PROTOCOL_REGISTRATION_COMMIT,
-        "branch": PROPOSED_TC061R_BRANCH,
+        "branch": PROPOSED_TC061R2_BRANCH,
+        "previous_tc061r_branch": PROPOSED_TC061R_BRANCH,
         "original_tc061_branch": PROPOSED_TC061_BRANCH,
+        "provenance_separation": {
+            "implementation_provenance": {
+                "closeout_task_id": TASK_TC_061R2_ID,
+                "branch": PROPOSED_TC061R2_BRANCH,
+                "reviewed_tc061r_tip_baseline": REVIEWED_TC061R_TIP,
+                "accepted_tc061r_implementation_commit": (
+                    ACCEPTED_TC061R_IMPLEMENTATION_AND_FORMAL_COMMIT
+                ),
+                "scope": (
+                    "Runner per-candidate decisive-witness accumulator, explicit 3-valued "
+                    "(WITHIN/EXCEEDED/UNKNOWN) resource compliance tracking, regression suite, "
+                    "and documentation closeout."
+                ),
+            },
+            "mathematical_certificate_execution_provenance": {
+                "execution_mode": "LIVE_SOURCE_EXECUTION_THROUGH_REPAIRED_RUNNER",
+                "epistemic_experiment_role": (
+                    "REPEAT_OF_REGISTERED_EXPERIMENT_NOT_NEW_UNSEEN_EVIDENCE"
+                ),
+                "quadrature_recomputed_live_from_source": True,
+                "hand_edited_enclosures": False,
+                "restamped_prior_execution": False,
+                "generated_at_utc": datetime.now(timezone.utc).isoformat(),
+            },
+            "synthetic_regression_evidence_provenance": {
+                "test_suite_path": "tests/test_tc_mixed_arithmetic_covariance.py",
+                "included_in_production_artifact_verdicts": False,
+                "scope": (
+                    "Injected FAIL->UNRESOLVED, PASS->UNRESOLVED, KL1 cross-escalation, "
+                    "contradictory PASS/FAIL integrity-conflict, and missing/mixed/exceeded "
+                    "telemetry tests run strictly in pytest against the production runner and "
+                    "Section 3 aggregator."
+                ),
+            },
+            "formal_build_provenance": {
+                "inherited_formal_producing_commit": (
+                    ACCEPTED_TC061R_IMPLEMENTATION_AND_FORMAL_COMMIT
+                ),
+                "formal_inputs_changed_in_tc061r2": False,
+                "formal_build_report_path": "formal/build_report.json",
+            },
+        },
         "epistemic_categories_enforced": list(EPISTEMIC_CATEGORIES),
         "global_consequence_classes_enforced": list(GLOBAL_CONSEQUENCE_CLASSES),
         "probe_global_outcomes_enforced": list(PROBE_GLOBAL_OUTCOMES),
