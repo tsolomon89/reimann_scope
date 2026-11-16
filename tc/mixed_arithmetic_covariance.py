@@ -1,7 +1,8 @@
 r"""
-TASK-TC-061 / TASK-TC-061R / TASK-TC-061R2: Preregistered Mixed Arithmetic Covariance Test, Signed-
-Kernel Proof Attempt, Complete-Core Formula, Frozen-Protocol Execution, Escalation Witness
-Preservation, Explicit Resource Status, and Report Closeout toward SUBGATE-TC-043A (EPIC-TC-042).
+TASK-TC-061 / TASK-TC-061R / TASK-TC-061R2 / TASK-TC-061R3: Preregistered Mixed Arithmetic
+Covariance Test, Signed-Kernel Proof Attempt, Complete-Core Formula, Frozen-Protocol Execution,
+Escalation Witness Preservation, Explicit Resource Status, Honest Outcome Summaries, and Peak-Memory
+Coverage Closeout toward SUBGATE-TC-043A (EPIC-TC-042).
 
 Implements, verifies, and certifies in 256-bit FLINT/Arb outward-rounded ball arithmetic (using
 `tau` strictly via `_tau_arb()` as the sole circle constant, reserving `K` exclusively for real-
@@ -178,13 +179,17 @@ from tc.simultaneous_compatibility_combined_energy import (
 TASK_TC_061_ID = "TASK-TC-061"
 TASK_TC_061R_ID = "TASK-TC-061R"
 TASK_TC_061R2_ID = "TASK-TC-061R2"
+TASK_TC_061R3_ID = "TASK-TC-061R3"
 PROPOSED_TC061_BRANCH = "task/tc-061-mixed-arithmetic-covariance-hypothesis-test"
 PROPOSED_TC061R_BRANCH = "task/tc-061r-core-formula-protocol-and-proof-scope-repair"
 PROPOSED_TC061R2_BRANCH = "task/tc-061r2-witness-preservation-resource-status-and-closeout"
+PROPOSED_TC061R3_BRANCH = "task/tc-061r3-outcome-summary-and-peak-coverage-closeout"
 REVIEWED_TC061_TIP = "e7ced078f32a376d582a6aaf098ad0b3036da51f"
 REVIEWED_TC061_IMPLEMENTATION = "74e9df24d165619b0857cd37a895d599a93ba08e"
 REVIEWED_TC061R_TIP = "93dd56a5554b698dab642611605e29c80e756462"
 ACCEPTED_TC061R_IMPLEMENTATION_AND_FORMAL_COMMIT = "b65dba142658a8e4fd80c339d7029aa14e114c5a"
+ACCEPTED_TC061R2_IMPLEMENTATION = "3dbf2e0c999ec6b030b769b0bb3e55ff2783b50b"
+REVIEWED_TC061R2_TIP = "418531a02e3ea9c267d72201e439c2f09248ee03"
 ACCEPTED_TC060R2_IMPLEMENTATION = "2812faad941301bde8b6dc09ac5d8c23957204ff"
 ACCEPTED_TC060R2_TIP = "4bfb36ed7a62f207a6479dd932a997563a407ff8"
 MERGED_MAIN_BASELINE_TC061 = "71a101005f1ee073e981187bb7d07d90daef9c65"
@@ -249,6 +254,9 @@ POINT_MARGIN_VERDICTS: Tuple[str, ...] = ("PASS", "FAIL", "UNRESOLVED", "NOT_EVA
 CERTIFICATION_INTEGRITY_CONFLICT_VERDICT = "INTEGRITY_CONFLICT"
 CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME = "CERTIFICATION_INTEGRITY_CONFLICT"
 RESOURCE_COMPLIANCE_STATUSES: Tuple[str, ...] = ("WITHIN", "EXCEEDED", "UNKNOWN")
+RECOGNIZED_PEAK_RSS_COVERING_SEMANTICS: Tuple[str, ...] = (
+    "PROCESS_LIFETIME_HIGH_WATER_MARK",
+)
 
 
 class CertificationIntegrityError(RuntimeError):
@@ -2581,13 +2589,17 @@ def evaluate_point_resource_compliance(
     max_rss_mb: float,
 ) -> Dict[str, Any]:
     """Evaluate per-point wall-time and memory compliance with explicit 3-valued statuses
-    (`WITHIN`, `EXCEEDED`, `UNKNOWN`) (`TASK-TC-061R2` §3):
+    (`WITHIN`, `EXCEEDED`, `UNKNOWN`) (`TASK-TC-061R2` §3 / `TASK-TC-061R3` §3):
     - Raw missing values (`None`) remain `None` and are never coerced to `0` or `WITHIN`;
     - Wall-time and memory statuses are tracked separately and aggregated via:
       any `EXCEEDED` -> `EXCEEDED`; all `WITHIN` -> `WITHIN`; otherwise `UNKNOWN`;
-    - Across multiple tiers, a final-tier OS `PROCESS_LIFETIME_HIGH_WATER_MARK` reading covers
-      earlier tiers in the same process only when it is valid and monotonically consistent with
-      all prior observed RSS readings; otherwise missing tier RSS is treated conservatively as `UNKNOWN`.
+    - Any valid observed RSS value above `max_rss_mb` (including a point-in-time snapshot or
+      `current_rss_mb`) establishes `EXCEEDED` even when other coverage is missing;
+    - Under-limit `WITHIN` memory compliance requires genuine peak-covering measurement semantics
+      (`RECOGNIZED_PEAK_RSS_COVERING_SEMANTICS = ("PROCESS_LIFETIME_HIGH_WATER_MARK",)`);
+      under-limit `TIER_LOCAL_SNAPSHOT` readings, missing semantics, or unrecognized semantics do
+      NOT establish peak coverage and leave memory compliance `UNKNOWN` unless covered by a valid,
+      monotonically consistent final-tier `PROCESS_LIFETIME_HIGH_WATER_MARK` reading in the same process.
     """
     any_wall_invalid = any(
         h.get("elapsed_sec") is not None and not _is_valid_nonneg_real(h.get("elapsed_sec"))
@@ -2628,6 +2640,10 @@ def evaluate_point_resource_compliance(
     any_rss_invalid = any(
         (h.get("peak_rss_mb") is not None and not _is_valid_nonneg_real(h.get("peak_rss_mb")))
         or (h.get("current_rss_mb") is not None and not _is_valid_nonneg_real(h.get("current_rss_mb")))
+        or (
+            h.get("peak_rss_measurement_semantics") is not None
+            and not isinstance(h.get("peak_rss_measurement_semantics"), str)
+        )
         for h in history
     )
     valid_peak_vals = [
@@ -2652,7 +2668,7 @@ def evaluate_point_resource_compliance(
             hwm_monotonicity_ok = False
         if (
             p_v is not None
-            and h.get("peak_rss_measurement_semantics") == "PROCESS_LIFETIME_HIGH_WATER_MARK"
+            and h.get("peak_rss_measurement_semantics") in RECOGNIZED_PEAK_RSS_COVERING_SEMANTICS
             and max_prior_rss >= 0.0
             and p_v + 1e-6 < max_prior_rss
         ):
@@ -2662,10 +2678,19 @@ def evaluate_point_resource_compliance(
         if c_v is not None:
             max_prior_rss = max(max_prior_rss, c_v)
 
-    all_tiers_have_valid_peak_rss = bool(
+    all_tiers_have_valid_covering_peak_rss = bool(
         len(history) > 0
         and (not any_rss_invalid)
-        and len(valid_peak_vals) == len(history)
+        and hwm_monotonicity_ok
+        and all(
+            _is_valid_nonneg_real(h.get("peak_rss_mb"))
+            and h.get("peak_rss_measurement_semantics") in RECOGNIZED_PEAK_RSS_COVERING_SEMANTICS
+            for h in history
+        )
+        and (
+            not all_observed_rss
+            or float(history[-1]["peak_rss_mb"]) + 1e-6 >= max(all_observed_rss)
+        )
     )
     final_has_valid_hwm = bool(
         len(history) > 0
@@ -2678,16 +2703,24 @@ def evaluate_point_resource_compliance(
             or float(history[-1]["peak_rss_mb"]) + 1e-6 >= max(all_observed_rss)
         )
     )
+    any_noncovering_peak_semantics = any(
+        _is_valid_nonneg_real(h.get("peak_rss_mb"))
+        and h.get("peak_rss_measurement_semantics") not in RECOGNIZED_PEAK_RSS_COVERING_SEMANTICS
+        for h in history
+    )
 
     if len(history) == 0 or any_rss_invalid or not hwm_monotonicity_ok:
         rss_coverage_complete = False
         rss_coverage_reason = "INVALID_OR_NON_MONOTONIC_RSS_TELEMETRY"
-    elif all_tiers_have_valid_peak_rss:
+    elif all_tiers_have_valid_covering_peak_rss:
         rss_coverage_complete = True
         rss_coverage_reason = "ALL_EXECUTED_TIERS_DIRECTLY_MEASURED"
     elif final_has_valid_hwm:
         rss_coverage_complete = True
         rss_coverage_reason = "FINAL_TIER_PROCESS_LIFETIME_HIGH_WATER_MARK_COVERS_PRIOR_TIERS"
+    elif len(valid_peak_vals) == len(history) and any_noncovering_peak_semantics:
+        rss_coverage_complete = False
+        rss_coverage_reason = "NON_COVERING_SNAPSHOT_OR_UNVERIFIED_PEAK_RSS_SEMANTICS"
     else:
         rss_coverage_complete = False
         rss_coverage_reason = "MISSING_OR_UNCOVERED_TIER_PEAK_RSS_TELEMETRY"
@@ -2763,11 +2796,16 @@ def aggregate_section_resource_compliance(
     point_checks: Sequence[Dict[str, Any]],
     *,
     registered_count: int,
+    distinct_evaluated_count: Optional[int] = None,
 ) -> Dict[str, Any]:
     """Aggregate per-point 3-valued resource compliance statuses (`WITHIN`, `EXCEEDED`, `UNKNOWN`)
     across a section without coercing `UNKNOWN` into verified compliance (`TASK-TC-061R2` §3).
     """
-    complete_set = bool(registered_count > 0 and len(point_checks) == registered_count)
+    complete_set = bool(
+        registered_count > 0
+        and len(point_checks) == registered_count
+        and (distinct_evaluated_count is None or distinct_evaluated_count == registered_count)
+    )
 
     def _count(statuses: Sequence[str]) -> Dict[str, int]:
         return {
@@ -2814,7 +2852,10 @@ def aggregate_section_resource_compliance(
         "all_resource_budgets_verified_within": bool(ov_agg == "WITHIN"),
         "any_resource_budget_exceeded": bool(ov_agg == "EXCEEDED"),
         "any_resource_budget_unknown": bool(
-            (not complete_set) or any(s == "UNKNOWN" for s in ov_list)
+            (not complete_set)
+            or any(s == "UNKNOWN" for s in ov_list)
+            or wall_agg == "UNKNOWN"
+            or mem_agg == "UNKNOWN"
         ),
         "enforcement_mode": "POST_EVALUATION_BUDGET_AUDIT_NO_OS_PREEMPTIVE_KILL",
     }
@@ -3758,11 +3799,218 @@ def build_holdout_point_artifact_row(
     }
 
 
+def derive_holdout_mechanism_revision_note(
+    *,
+    registered_count: int,
+    evaluated_count: int,
+    mathematical_coverage_complete: bool,
+    cert_integrity_ok: bool,
+    probes: Sequence[Dict[str, Any]],
+    probe_summaries: Dict[str, Any],
+    kl1_summary: Dict[str, Any],
+    unregistered_point_ids: Sequence[str] = (),
+) -> str:
+    """Derive honest human-readable holdout outcome and mechanism-revision prose directly from
+    structured accumulated outcomes and coverage data (`TASK-TC-061R3` §2):
+    - Selects the complete all-pass statement ONLY when `cert_integrity_ok` is `True`, registered
+      point coverage is complete (`evaluated_count == registered_count > 0`), and every configured
+      main probe and both `TC061-KL1` sub-budgets have `in_domain_registered > 0` and achieved
+      `SURVIVED_TESTED_POINTS` (or `PROVED_UNIFORMLY`);
+    - Explicitly distinguishes certification integrity conflicts, valid counterexamples
+      (`REFUTED_BY_CERTIFIED_WITNESS`), missing/incomplete registered point coverage, unresolved
+      calculations, mixed `PASS`/`UNRESOLVED` outcomes, and candidates with zero applicable
+      in-domain observations;
+    - Never fabricates a completed `TC061-REV1-*` mechanism revision from a failure or unresolved
+      outcome, and keeps mathematical verdicts independent of resource-compliance status.
+    """
+    candidate_entries: List[Tuple[str, str, int, int]] = [
+        *(
+            (
+                str(pr["probe_id"]),
+                str(probe_summaries[str(pr["probe_id"])]["global_probe_outcome"]),
+                int(probe_summaries[str(pr["probe_id"])]["holdout_points_registered"]),
+                int(probe_summaries[str(pr["probe_id"])]["out_of_domain_excluded_count"]),
+            )
+            for pr in probes
+        ),
+        (
+            "TC061-KL1:offdiag",
+            str(kl1_summary["offdiag_sub_budget_outcome"]),
+            int(kl1_summary["in_domain_registered_count"]),
+            int(kl1_summary["out_of_domain_excluded_count"]),
+        ),
+        (
+            "TC061-KL1:R_mix",
+            str(kl1_summary["mixed_core_sub_budget_outcome"]),
+            int(kl1_summary["in_domain_registered_count"]),
+            int(kl1_summary["out_of_domain_excluded_count"]),
+        ),
+    ]
+
+    if (not cert_integrity_ok) or any(
+        outc == CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME for _, outc, _, _ in candidate_entries
+    ):
+        return (
+            "Certification report blocked by certification integrity conflict(s) across escalation "
+            "tiers; neither all-pass survival nor an unqualified counterexample refutation is "
+            "claimed from conflicting evidence, and no TC061-REV1-* mechanism revision was triggered."
+        )
+
+    refuted_ids = [
+        cid for cid, outc, _, _ in candidate_entries if outc == "REFUTED_BY_CERTIFIED_WITNESS"
+    ]
+    if len(refuted_ids) > 0:
+        unres_comp_ids = [
+            cid
+            for cid, outc, _, _ in candidate_entries
+            if outc == "UNRESOLVED/INCOMPLETE_COVERAGE"
+        ]
+        if len(unres_comp_ids) > 0 or evaluated_count != registered_count:
+            comp_detail = (
+                f"companion unresolved/incomplete candidates: {', '.join(unres_comp_ids)}"
+                if len(unres_comp_ids) > 0
+                else "partial registered point coverage"
+            )
+            return (
+                f"Certified counterexample witness(es) recorded (REFUTED_BY_CERTIFIED_WITNESS on "
+                f"{', '.join(refuted_ids)}; {comp_detail} across "
+                f"{evaluated_count}/{registered_count} registered points); frozen probe parameters "
+                f"remain immutable and no TC061-REV1-* mechanism revision was triggered."
+            )
+        return (
+            f"Certified counterexample witness(es) recorded (REFUTED_BY_CERTIFIED_WITNESS on "
+            f"{', '.join(refuted_ids)}); frozen probe parameters remain immutable and no "
+            f"TC061-REV1-* mechanism revision was triggered."
+        )
+
+    if registered_count <= 0 or evaluated_count != registered_count or not mathematical_coverage_complete:
+        if len(unregistered_point_ids) > 0:
+            return (
+                f"Incomplete holdout coverage: {evaluated_count} of {registered_count} registered "
+                f"held-out points were evaluated (unregistered point_id(s) "
+                f"{', '.join(unregistered_point_ids)} do not match the frozen protocol grid; "
+                f"UNRESOLVED/INCOMPLETE_COVERAGE); complete all-pass survival is not established, "
+                f"and no TC061-REV1-* mechanism revision was triggered."
+            )
+        if evaluated_count == 0:
+            return (
+                f"Incomplete holdout coverage: 0 of {registered_count} registered held-out points "
+                f"were evaluated (UNRESOLVED/INCOMPLETE_COVERAGE across all configured probes and "
+                f"TC061-KL1 sub-budgets); all-pass survival is not established, and no "
+                f"TC061-REV1-* mechanism revision was triggered."
+            )
+        if registered_count <= 0 or evaluated_count > registered_count:
+            return (
+                f"Mismatched holdout coverage: {evaluated_count} evaluated rows vs {registered_count} "
+                f"registered held-out points (UNRESOLVED/INCOMPLETE_COVERAGE due to row-count "
+                f"mismatch against the frozen protocol); complete all-pass survival is not "
+                f"established, and no TC061-REV1-* mechanism revision was triggered."
+            )
+        return (
+            f"Incomplete holdout coverage: {evaluated_count} of {registered_count} registered "
+            f"held-out points were evaluated (UNRESOLVED/INCOMPLETE_COVERAGE due to missing "
+            f"registered point evaluations); complete all-pass survival is not established, and no "
+            f"TC061-REV1-* mechanism revision was triggered."
+        )
+
+    survived_ids = [
+        cid
+        for cid, outc, in_dom_reg, _ in candidate_entries
+        if in_dom_reg > 0 and outc in ("SURVIVED_TESTED_POINTS", "PROVED_UNIFORMLY")
+    ]
+    no_obs_ids = [cid for cid, _, in_dom_reg, _ in candidate_entries if in_dom_reg == 0]
+    unresolved_ids = [
+        cid
+        for cid, outc, in_dom_reg, _ in candidate_entries
+        if in_dom_reg > 0 and outc not in ("SURVIVED_TESTED_POINTS", "PROVED_UNIFORMLY")
+    ]
+
+    if (
+        len(probes) > 0
+        and len(survived_ids) == len(candidate_entries)
+        and len(unresolved_ids) == 0
+        and len(no_obs_ids) == 0
+    ):
+        any_ood = any(ood > 0 for _, _, _, ood in candidate_entries)
+        if len(probes) == 4 and not any_ood:
+            return (
+                "All 4 frozen probes and both TC061-KL1 sub-budgets passed on all evaluated held-out "
+                "points; zero failures occurred, so no TC061-REV1-* post-diagnosis mechanism revision "
+                "was triggered."
+            )
+        if len(probes) == 4 and any_ood:
+            return (
+                "All 4 frozen probes and both TC061-KL1 sub-budgets passed on all applicable "
+                "in-domain held-out points (with out-of-domain exclusions preserved); zero failures "
+                "occurred, so no TC061-REV1-* post-diagnosis mechanism revision was triggered."
+            )
+        return (
+            f"All {len(probes)} configured probe(s) and both TC061-KL1 sub-budgets passed on all "
+            f"applicable in-domain held-out points; zero failures occurred, so no TC061-REV1-* "
+            f"post-diagnosis mechanism revision was triggered."
+        )
+
+    total_cands = len(candidate_entries)
+    if len(survived_ids) == 0:
+        if len(unresolved_ids) == 0 and len(no_obs_ids) > 0:
+            return (
+                f"Zero applicable in-domain observations across {evaluated_count}/{registered_count} "
+                f"evaluated points: all {len(no_obs_ids)}/{total_cands} candidates "
+                f"({', '.join(no_obs_ids)}) were out-of-domain (UNRESOLVED/INCOMPLETE_COVERAGE) "
+                f"with 0 candidates achieving SURVIVED_TESTED_POINTS; all-pass survival is not "
+                f"established, and no TC061-REV1-* mechanism revision was triggered."
+            )
+        no_obs_clause = (
+            f" and {len(no_obs_ids)} ({', '.join(no_obs_ids)}) had zero applicable in-domain observations"
+            if len(no_obs_ids) > 0
+            else ""
+        )
+        return (
+            f"Unresolved holdout calculations across {evaluated_count}/{registered_count} evaluated "
+            f"points: {len(unresolved_ids)}/{total_cands} candidates ({', '.join(unresolved_ids)}) "
+            f"remain UNRESOLVED/INCOMPLETE_COVERAGE{no_obs_clause} with 0 candidates achieving "
+            f"SURVIVED_TESTED_POINTS; all-pass survival is not established, and no TC061-REV1-* "
+            f"mechanism revision was triggered."
+        )
+
+    if len(unresolved_ids) > 0:
+        no_obs_clause = (
+            f" and {', '.join(no_obs_ids)} had zero applicable in-domain observations"
+            if len(no_obs_ids) > 0
+            else ""
+        )
+        return (
+            f"Mixed holdout outcomes across {evaluated_count}/{registered_count} evaluated points: "
+            f"{len(survived_ids)}/{total_cands} candidates ({', '.join(survived_ids)}) achieved "
+            f"SURVIVED_TESTED_POINTS while {len(unresolved_ids)}/{total_cands} "
+            f"({', '.join(unresolved_ids)}) remain UNRESOLVED/INCOMPLETE_COVERAGE{no_obs_clause}; "
+            f"complete all-pass survival is not established, and no TC061-REV1-* mechanism revision "
+            f"was triggered."
+        )
+
+    if len(probes) == 0 and len(no_obs_ids) == 0:
+        return (
+            "Incomplete candidate configuration: 0 main probes were configured alongside "
+            "TC061-KL1 sub-budgets; complete 4-probe all-pass survival is not established, and no "
+            "TC061-REV1-* mechanism revision was triggered."
+        )
+
+    return (
+        f"Partial domain applicability across {evaluated_count}/{registered_count} evaluated points: "
+        f"{len(survived_ids)}/{total_cands} candidates ({', '.join(survived_ids)}) achieved "
+        f"SURVIVED_TESTED_POINTS on their in-domain points, while {', '.join(no_obs_ids)} had zero "
+        f"applicable in-domain observations (UNRESOLVED/INCOMPLETE_COVERAGE); complete all-pass "
+        f"survival across all configured candidates is not established, and no TC061-REV1-* "
+        f"mechanism revision was triggered."
+    )
+
+
 def aggregate_holdout_rows_and_outcomes(
     holdout_rows: Sequence[Dict[str, Any]],
     probes: Sequence[Dict[str, Any]],
     *,
     registered_count: int,
+    registered_point_ids: Optional[Sequence[str]] = None,
     fail_on_integrity_conflict: bool = False,
 ) -> Dict[str, Any]:
     """Aggregate holdout coverage, 3-valued resource compliance, certification integrity, and
@@ -3782,15 +4030,32 @@ def aggregate_holdout_rows_and_outcomes(
         row_conflicts = list(r.get("integrity_conflicts") or [])
         for c in row_conflicts:
             all_conflicts.append(c)
-        row_has_conflict_verdict = any(
-            str(pd.get("point_verdict")) == CERTIFICATION_INTEGRITY_CONFLICT_VERDICT
-            or bool(pd.get("integrity_conflict_detected", False))
-            for pd in (r.get("probe_evaluations") or {}).values()
-        ) or (
-            str((r.get("mechanism_kl1_sub_budgets") or {}).get("offdiag_verdict"))
-            == CERTIFICATION_INTEGRITY_CONFLICT_VERDICT
-            or str((r.get("mechanism_kl1_sub_budgets") or {}).get("R_mix_verdict"))
-            == CERTIFICATION_INTEGRITY_CONFLICT_VERDICT
+        kl1_sub = r.get("mechanism_kl1_sub_budgets") or {}
+        acc_ev = r.get("accumulated_candidate_evidence") or {}
+        acc_cands = [
+            *list((acc_ev.get("in_domain_candidates") or {}).values()),
+            *list((acc_ev.get("out_of_domain_candidates") or {}).values()),
+        ]
+        row_has_conflict_verdict = (
+            any(
+                str(pd.get("point_verdict")) == CERTIFICATION_INTEGRITY_CONFLICT_VERDICT
+                or str(pd.get("effective_verdict")) == CERTIFICATION_INTEGRITY_CONFLICT_VERDICT
+                or bool(pd.get("integrity_conflict_detected", False))
+                or len(pd.get("conflicting_certified_witnesses") or []) > 0
+                for pd in (r.get("probe_evaluations") or {}).values()
+            )
+            or (
+                str(kl1_sub.get("offdiag_verdict")) == CERTIFICATION_INTEGRITY_CONFLICT_VERDICT
+                or str(kl1_sub.get("R_mix_verdict")) == CERTIFICATION_INTEGRITY_CONFLICT_VERDICT
+                or bool(kl1_sub.get("offdiag_integrity_conflict_detected", False))
+                or bool(kl1_sub.get("R_mix_integrity_conflict_detected", False))
+            )
+            or any(
+                str(cd.get("effective_verdict")) == CERTIFICATION_INTEGRITY_CONFLICT_VERDICT
+                or bool(cd.get("integrity_conflict_detected", False))
+                or len(cd.get("conflicting_certified_witnesses") or []) > 0
+                for cd in acc_cands
+            )
         )
         if (not r.get("certification_integrity_ok", True) or row_has_conflict_verdict) and len(
             row_conflicts
@@ -3809,14 +4074,49 @@ def aggregate_holdout_rows_and_outcomes(
             all_conflicts,
         )
 
+    distinct_point_ids = {
+        str(r.get("point_id")).strip()
+        for r in holdout_rows
+        if isinstance(r.get("point_id"), str) and str(r.get("point_id")).strip() != ""
+    }
+    unregistered_ids: List[str] = []
+    if registered_point_ids is not None:
+        expected_ids = {
+            str(pid).strip()
+            for pid in registered_point_ids
+            if isinstance(pid, str) and str(pid).strip() != ""
+        }
+        matched_ids = distinct_point_ids & expected_ids
+        unregistered_ids = sorted(distinct_point_ids - expected_ids)
+        ids_match_protocol = bool(
+            len(expected_ids) == registered_count
+            and distinct_point_ids == expected_ids
+            and len(unregistered_ids) == 0
+        )
+        effective_evaluated_count = (
+            len(matched_ids)
+            if (len(matched_ids) < len(holdout_rows) or len(unregistered_ids) > 0)
+            else len(holdout_rows)
+        )
+        distinct_for_resource = len(matched_ids) if not ids_match_protocol else len(distinct_point_ids)
+    else:
+        ids_match_protocol = True
+        effective_evaluated_count = (
+            len(distinct_point_ids) if len(distinct_point_ids) < len(holdout_rows) else len(holdout_rows)
+        )
+        distinct_for_resource = len(distinct_point_ids)
+
     mathematical_coverage_complete = bool(
         registered_count > 0
         and len(holdout_rows) == registered_count
+        and len(distinct_point_ids) == registered_count
+        and ids_match_protocol
         and cert_integrity_ok
     )
     res_summary = aggregate_section_resource_compliance(
         [r["resource_budget_check"] for r in holdout_rows],
         registered_count=registered_count,
+        distinct_evaluated_count=distinct_for_resource,
     )
 
     probe_summaries: Dict[str, Any] = {}
@@ -3834,7 +4134,14 @@ def aggregate_holdout_rows_and_outcomes(
             ):
                 out_of_domain_count += 1
                 continue
-            v = str(pdata["point_verdict"])
+            v = (
+                CERTIFICATION_INTEGRITY_CONFLICT_VERDICT
+                if (
+                    bool(pdata.get("integrity_conflict_detected", False))
+                    or len(pdata.get("conflicting_certified_witnesses") or []) > 0
+                )
+                else str(pdata["point_verdict"])
+            )
             verdicts.append(v)
             if v == "FAIL":
                 any_probe_or_kl1_fail = True
@@ -3912,8 +4219,16 @@ def aggregate_holdout_rows_and_outcomes(
         if not kl1_d.get("in_declared_domain", True) and not kl1_has_conflict:
             kl1_out_of_domain_count += 1
             continue
-        vo = str(kl1_d["offdiag_verdict"])
-        vm = str(kl1_d["R_mix_verdict"])
+        vo = (
+            CERTIFICATION_INTEGRITY_CONFLICT_VERDICT
+            if bool(kl1_d.get("offdiag_integrity_conflict_detected", False))
+            else str(kl1_d["offdiag_verdict"])
+        )
+        vm = (
+            CERTIFICATION_INTEGRITY_CONFLICT_VERDICT
+            if bool(kl1_d.get("R_mix_integrity_conflict_detected", False))
+            else str(kl1_d["R_mix_verdict"])
+        )
         kl1_off_verdicts.append(vo)
         kl1_mix_verdicts.append(vm)
         if vo == "FAIL":
@@ -3980,7 +4295,7 @@ def aggregate_holdout_rows_and_outcomes(
 
     holdout_coverage_summary = {
         "registered_count": registered_count,
-        "evaluated_count": len(holdout_rows),
+        "evaluated_count": effective_evaluated_count,
         "coverage_complete": mathematical_coverage_complete,
         "mathematical_coverage_complete": mathematical_coverage_complete,
         "Y_4096_nonempty_subunit_tail_evaluated": tail_4096_evaluated,
@@ -3992,16 +4307,15 @@ def aggregate_holdout_rows_and_outcomes(
         "certification_integrity_ok": cert_integrity_ok,
         "certification_report_blocked": not cert_integrity_ok,
         "mechanism_revision_triggered": False,
-        "mechanism_revision_note": (
-            "All 4 frozen probes and both TC061-KL1 sub-budgets passed on all evaluated held-out "
-            "points; zero failures occurred, so no TC061-REV1-* post-diagnosis mechanism revision "
-            "was triggered."
-            if (not any_probe_or_kl1_fail and cert_integrity_ok)
-            else (
-                "Certification report blocked by contradictory certified verdicts across tiers."
-                if not cert_integrity_ok
-                else "Certified counterexample witness(es) recorded; frozen probe parameters remain immutable."
-            )
+        "mechanism_revision_note": derive_holdout_mechanism_revision_note(
+            registered_count=registered_count,
+            evaluated_count=effective_evaluated_count,
+            mathematical_coverage_complete=mathematical_coverage_complete,
+            cert_integrity_ok=cert_integrity_ok,
+            probes=probes,
+            probe_summaries=probe_summaries,
+            kl1_summary=kl1_summary,
+            unregistered_point_ids=unregistered_ids,
         ),
     }
 
@@ -4018,6 +4332,26 @@ def aggregate_holdout_rows_and_outcomes(
         "mechanism_kl1_holdout_summary": kl1_summary,
         "Y_4096_nonempty_subunit_tail_evaluated": tail_4096_evaluated,
     }
+
+
+def _build_section_3_epistemic_scope_note(evaluated_count: int, registered_count: int) -> str:
+    """Build Section 3's epistemic scope note without assuming complete 14-point evaluation when
+    coverage is partial or empty (`TASK-TC-061R3` §2).
+    """
+    cnt_phrase = (
+        f"all {registered_count} preregistered held-out"
+        if (registered_count > 0 and evaluated_count == registered_count)
+        else f"{evaluated_count} of {registered_count} preregistered held-out"
+    )
+    return (
+        f"Mixed empirical-certificate / open-hypothesis section: {cnt_phrase} "
+        "256-bit Arb enclosures (including protocol-faithful quad_tol_bits = 240 unsplit "
+        "evaluation at Y = 128, nonempty d >= ceil(tau*Y) full-tail evaluations at Y = 2048 "
+        "and Y = 4096, and sided discontinuity points) are CERTIFIED_FINITE_OBSERVATION; "
+        "uniform validity of TC061-P0, TC061-P_{1/2}, TC061-P_{1/4}, TC061-P_{1/8}, and full "
+        "closure hypothesis H over all real Y >= Y_0 remains OPEN_CONJECTURE_OR_FAILED_CANDIDATE "
+        "(finite grid survival is SURVIVED_TESTED_POINTS, never PROVED_UNIFORMLY)."
+    )
 
 
 def verify_section_3_preregistered_holdout_experiment(
@@ -4075,6 +4409,7 @@ def verify_section_3_preregistered_holdout_experiment(
         holdout_rows,
         probes,
         registered_count=len(holdout_entries),
+        registered_point_ids=[str(e["point_id"]) for e in holdout_entries],
         fail_on_integrity_conflict=False,
     )
     res_summary = agg["resource_compliance_summary"]
@@ -4217,14 +4552,8 @@ def verify_section_3_preregistered_holdout_experiment(
             "CERTIFIED_FINITE_OBSERVATION",
             "OPEN_CONJECTURE_OR_FAILED_CANDIDATE",
         ],
-        "section_epistemic_scope_note": (
-            "Mixed empirical-certificate / open-hypothesis section: all 14 preregistered held-out "
-            "256-bit Arb enclosures (including protocol-faithful quad_tol_bits = 240 unsplit "
-            "evaluation at Y = 128, nonempty d >= ceil(tau*Y) full-tail evaluations at Y = 2048 "
-            "and Y = 4096, and sided discontinuity points) are CERTIFIED_FINITE_OBSERVATION; "
-            "uniform validity of TC061-P0, TC061-P_{1/2}, TC061-P_{1/4}, TC061-P_{1/8}, and full "
-            "closure hypothesis H over all real Y >= Y_0 remains OPEN_CONJECTURE_OR_FAILED_CANDIDATE "
-            "(finite grid survival is SURVIVED_TESTED_POINTS, never PROVED_UNIFORMLY)."
+        "section_epistemic_scope_note": _build_section_3_epistemic_scope_note(
+            len(holdout_rows), len(holdout_entries)
         ),
         "component_epistemic_map": {
             "fourteen_point_holdout_arb_enclosures_and_full_tail_4096": "CERTIFIED_FINITE_OBSERVATION",
@@ -6554,6 +6883,91 @@ def build_headline_and_exposure_reconciliation_summary(
     }
 
 
+def derive_report_top_level_outcome_fields(sec3: Dict[str, Any]) -> Tuple[str, str]:
+    """Derive top-level `completion_outcome_code` and `research_outcome_class` from Section 3's
+    structured outcomes (`TASK-TC-061R3` §2), selecting complete all-pass survival prose ONLY when
+    registered coverage is complete, integrity is valid, and all 4 frozen probes and both `TC061-KL1`
+    sub-budgets achieved `SURVIVED_TESTED_POINTS`.
+    """
+    cov = sec3["holdout_coverage_summary"]
+    cert = sec3["certification_integrity_summary"]
+    gpo = sec3["global_probe_outcomes"]
+    kl1 = sec3["mechanism_kl1_holdout_summary"]
+
+    common_proof_tail = (
+        "whereas unsigned 1 and fixed finite-prime parity controls a_2, a_{3,5,7} are certified "
+        "FAIL on every frozen probe across the evaluated grid Y in {64, 128, 256, 512} under exact "
+        "matched z = 1 Laurent compensation (scoped strictly to the evaluated finite grid without "
+        "unproved asymptotic growth laws or unique-tau-mechanism claims). Proves in Lean 4 (7 "
+        "public theorems, 0 sorry, 0 custom axioms) and analytically the concrete mixed identity "
+        "4*D_tilde(Y) + J(Y) = ||2*P_Y - B_Y||_Y^2 = ||Q_Y + A_Y||_Y^2, the complete-core adjusted "
+        "beta_Y bridge and compact (0, 2, 4) Gram representation, the finite-prime parity "
+        "convolution formula (1 * a_S)(n), prime-power sign agreement in P_Y, unconditional "
+        "uniform composite self-collision bounds 0 <= X_self(Y) <= 186*(tau - 1) < 1302 in Lean 4 "
+        "and 0 <= X_self(Y) <= (289/60)*log(tau) < (1377/160)*log(tau) < 16 analytically outside "
+        "Lean, the unconditional coarse half-line complement bound "
+        "E_{comp,diag}(Y, T) <= D_inf(T) <= 2*c_G*T*zeta''(2), conditional Route D transfer from H "
+        "with R-independent threshold Y_*, and exact equivalence H(J, D_tilde) <-> H(F, D_tilde) "
+        "for the signed remainder F(Y) = 4*X_off(Y) + ||B_Y||_Y^2 - 4*<P_Y, B_Y>_Y "
+        "(TC061R-OBL-SIGNED-REMAINDER-F, with S(Y) = 5*X_off(Y) + 5*||B_Y||_Y^2 as a one-way "
+        "sufficient relaxation TC061-LEM-OFFDIAG-AND-CORE); SUBGATE-TC-043A remains OPEN and "
+        "rh_proved remains False."
+    )
+
+    all_main_survived = (
+        len(gpo) == 4
+        and all(
+            int(v["holdout_points_registered"]) > 0
+            and str(v["global_probe_outcome"]) in ("SURVIVED_TESTED_POINTS", "PROVED_UNIFORMLY")
+            for v in gpo.values()
+        )
+    )
+    all_kl1_survived = (
+        int(kl1.get("in_domain_registered_count", 0)) > 0
+        and str(kl1["offdiag_sub_budget_outcome"]) in ("SURVIVED_TESTED_POINTS", "PROVED_UNIFORMLY")
+        and str(kl1["mixed_core_sub_budget_outcome"]) in ("SURVIVED_TESTED_POINTS", "PROVED_UNIFORMLY")
+    )
+    any_refuted = any(
+        str(v["global_probe_outcome"]) == "REFUTED_BY_CERTIFIED_WITNESS" for v in gpo.values()
+    ) or (
+        str(kl1["offdiag_sub_budget_outcome"]) == "REFUTED_BY_CERTIFIED_WITNESS"
+        or str(kl1["mixed_core_sub_budget_outcome"]) == "REFUTED_BY_CERTIFIED_WITNESS"
+    )
+
+    if not bool(cert["certification_integrity_ok"]):
+        code = "CERTIFICATION_INTEGRITY_CONFLICT_BLOCKED"
+        sec3_clause = str(cov["mechanism_revision_note"])
+    elif any_refuted:
+        code = "REFUTED_ON_TESTED_HOLDOUT_WITH_PROVED_SELF_COLLISION_BOUND_AND_CONDITIONAL_TRANSFER"
+        sec3_clause = str(cov["mechanism_revision_note"])
+    elif bool(cov["mathematical_coverage_complete"]) and all_main_survived and all_kl1_survived:
+        code = "SURVIVED_TESTED_POINTS_WITH_PROVED_SELF_COLLISION_BOUND_AND_CONDITIONAL_TRANSFER"
+        reg_n = int(cov["registered_count"])
+        eval_n = int(cov["evaluated_count"])
+        sec3_clause = (
+            f"all four frozen probes (PRIMARY TC061-P0 and SECONDARY TC061-P_{{1/2}}, "
+            f"TC061-P_{{1/4}}, TC061-P_{{1/8}}) and both TC061-KL1 sub-budgets achieve "
+            f"SURVIVED_TESTED_POINTS (0 FAIL, 0 UNRESOLVED, {eval_n}/{reg_n} complete holdout "
+            f"coverage; finite evidence, NOT a uniform proof)"
+        )
+    else:
+        code = "UNRESOLVED_OR_INCOMPLETE_HOLDOUT_WITH_PROVED_SELF_COLLISION_BOUND_AND_CONDITIONAL_TRANSFER"
+        sec3_clause = str(cov["mechanism_revision_note"])
+
+    outcome_class = (
+        "Preregistered Mixed Arithmetic Covariance Experiment & Signed-Kernel Proof Attempt "
+        "(TASK-TC-061 / repaired in TASK-TC-061R..TC-061R3) — Frozen protocol "
+        "TC061-MIXED-ARITHMETIC-COVARIANCE-PROTOCOL-V1 (SHA-256 "
+        "c892c4c5a1ff2a60a11fa499b2d2bc017e01f0426e4aa8feef5880aaff8a70eb, registered at "
+        "bc2f9f709f868ef02981600873dfa0c05da0ba0c before any Y > 64 evaluation) evaluated across "
+        f"{cov['evaluated_count']}/{cov['registered_count']} held-out points up to Y = 4096 "
+        "(including unsplit quad_tol_bits = 240 at Y = 128, T = 431 < 512, and nonempty "
+        "d >= ceil(tau*Y) sub-unit tail d in [25736, 32767] at Y = 4096, T = 32768) and continuous "
+        f"straddling intervals across T and D_0 jumps: {sec3_clause}, {common_proof_tail}"
+    )
+    return code, outcome_class
+
+
 def execute_task_tc061_mixed_covariance_audit(
     prec_bits: int = 256,
     verify_lean_live: bool = True,
@@ -6633,11 +7047,12 @@ def execute_task_tc061_mixed_covariance_audit(
         assert ep_ok is True, f"{sec_name} epistemic scope metadata check failed: {ep_msg}"
 
     reconciliation = build_headline_and_exposure_reconciliation_summary(sec1, sec2, sec3, sec4, sec5)
+    comp_code, res_outcome_class = derive_report_top_level_outcome_fields(sec3)
 
     report: Dict[str, Any] = {
         "task_id": TASK_TC_061_ID,
         "repair_task_id": TASK_TC_061R_ID,
-        "closeout_task_id": TASK_TC_061R2_ID,
+        "closeout_task_id": TASK_TC_061R3_ID,
         "parent_epic": EPIC_TC_042_ID,
         "parent_subgate": PARENT_SUBGATE_ID,
         "prior_tasks": [
@@ -6663,6 +7078,7 @@ def execute_task_tc061_mixed_covariance_audit(
             TASK_TC_060R2_ID,
             TASK_TC_061_ID,
             TASK_TC_061R_ID,
+            TASK_TC_061R2_ID,
         ],
         "merged_main_baseline": MERGED_MAIN_BASELINE_TC061,
         "accepted_tc060r2_tip": ACCEPTED_TC060R2_TIP,
@@ -6674,24 +7090,30 @@ def execute_task_tc061_mixed_covariance_audit(
         "accepted_tc061r_implementation_and_formal_commit": (
             ACCEPTED_TC061R_IMPLEMENTATION_AND_FORMAL_COMMIT
         ),
+        "reviewed_tc061r2_tip": REVIEWED_TC061R2_TIP,
+        "accepted_tc061r2_implementation": ACCEPTED_TC061R2_IMPLEMENTATION,
         "frozen_protocol_id": FROZEN_PROTOCOL_ID,
         "frozen_protocol_sha256": FROZEN_PROTOCOL_SHA256,
         "frozen_protocol_registration_commit": FROZEN_PROTOCOL_REGISTRATION_COMMIT,
-        "branch": PROPOSED_TC061R2_BRANCH,
+        "branch": PROPOSED_TC061R3_BRANCH,
+        "previous_tc061r2_branch": PROPOSED_TC061R2_BRANCH,
         "previous_tc061r_branch": PROPOSED_TC061R_BRANCH,
         "original_tc061_branch": PROPOSED_TC061_BRANCH,
         "provenance_separation": {
             "implementation_provenance": {
-                "closeout_task_id": TASK_TC_061R2_ID,
-                "branch": PROPOSED_TC061R2_BRANCH,
+                "closeout_task_id": TASK_TC_061R3_ID,
+                "branch": PROPOSED_TC061R3_BRANCH,
+                "reviewed_tc061r2_tip_baseline": REVIEWED_TC061R2_TIP,
+                "accepted_tc061r2_implementation_commit": ACCEPTED_TC061R2_IMPLEMENTATION,
                 "reviewed_tc061r_tip_baseline": REVIEWED_TC061R_TIP,
                 "accepted_tc061r_implementation_commit": (
                     ACCEPTED_TC061R_IMPLEMENTATION_AND_FORMAL_COMMIT
                 ),
                 "scope": (
-                    "Runner per-candidate decisive-witness accumulator, explicit 3-valued "
-                    "(WITHIN/EXCEEDED/UNKNOWN) resource compliance tracking, regression suite, "
-                    "and documentation closeout."
+                    "Outcome-summary prose derivation (no false all-pass claim on unresolved or "
+                    "incomplete coverage), peak-memory measurement-semantics validation "
+                    "(snapshot-only readings reported as UNKNOWN unless covered by process "
+                    "high-water mark), focused regression contract, and summary reprocessing."
                 ),
             },
             "mathematical_certificate_execution_provenance": {
@@ -6708,10 +7130,9 @@ def execute_task_tc061_mixed_covariance_audit(
                 "test_suite_path": "tests/test_tc_mixed_arithmetic_covariance.py",
                 "included_in_production_artifact_verdicts": False,
                 "scope": (
-                    "Injected FAIL->UNRESOLVED, PASS->UNRESOLVED, KL1 cross-escalation, "
-                    "contradictory PASS/FAIL integrity-conflict, and missing/mixed/exceeded "
-                    "telemetry tests run strictly in pytest against the production runner and "
-                    "Section 3 aggregator."
+                    "Injected unresolved/incomplete/mixed/refuted/conflict outcome-prose cases, "
+                    "snapshot-vs-high-water memory semantics cases, and witness-preservation tests "
+                    "run strictly in pytest against the production helpers and Section 3 aggregator."
                 ),
             },
             "formal_build_provenance": {
@@ -6719,44 +7140,15 @@ def execute_task_tc061_mixed_covariance_audit(
                     ACCEPTED_TC061R_IMPLEMENTATION_AND_FORMAL_COMMIT
                 ),
                 "formal_inputs_changed_in_tc061r2": False,
+                "formal_inputs_changed_in_tc061r3": False,
                 "formal_build_report_path": "formal/build_report.json",
             },
         },
         "epistemic_categories_enforced": list(EPISTEMIC_CATEGORIES),
         "global_consequence_classes_enforced": list(GLOBAL_CONSEQUENCE_CLASSES),
         "probe_global_outcomes_enforced": list(PROBE_GLOBAL_OUTCOMES),
-        "completion_outcome_code": "SURVIVED_TESTED_POINTS_WITH_PROVED_SELF_COLLISION_BOUND_AND_CONDITIONAL_TRANSFER",
-        "research_outcome_class": (
-            "Preregistered Mixed Arithmetic Covariance Experiment & Signed-Kernel Proof Attempt "
-            "(TASK-TC-061 / repaired in TASK-TC-061R) — Frozen protocol "
-            "TC061-MIXED-ARITHMETIC-COVARIANCE-PROTOCOL-V1 (SHA-256 "
-            "c892c4c5a1ff2a60a11fa499b2d2bc017e01f0426e4aa8feef5880aaff8a70eb, registered at "
-            "bc2f9f709f868ef02981600873dfa0c05da0ba0c before any Y > 64 evaluation) executed "
-            "faithfully across 14/14 held-out points up to Y = 4096 (including unsplit "
-            "quad_tol_bits = 240 at Y = 128, T = 431 < 512, and nonempty d >= ceil(tau*Y) "
-            "sub-unit tail d in [25736, 32767] at Y = 4096, T = 32768) and continuous straddling "
-            "intervals across T and D_0 jumps: all four frozen probes (PRIMARY TC061-P0 and "
-            "SECONDARY TC061-P_{1/2}, TC061-P_{1/4}, TC061-P_{1/8}) and both TC061-KL1 sub-budgets "
-            "achieve SURVIVED_TESTED_POINTS (0 FAIL, 0 UNRESOLVED, 14/14 complete holdout coverage; "
-            "finite evidence, NOT a uniform proof), whereas unsigned 1 and fixed finite-prime "
-            "parity controls a_2, a_{3,5,7} are certified FAIL on every frozen probe across the "
-            "evaluated grid Y in {64, 128, 256, 512} under exact matched z = 1 Laurent compensation "
-            "(scoped strictly to the evaluated finite grid without unproved asymptotic growth laws "
-            "or unique-tau-mechanism claims). Proves in Lean 4 (7 public theorems, 0 sorry, 0 "
-            "custom axioms) and analytically the concrete mixed identity "
-            "4*D_tilde(Y) + J(Y) = ||2*P_Y - B_Y||_Y^2 = ||Q_Y + A_Y||_Y^2, the complete-core "
-            "adjusted beta_Y bridge and compact (0, 2, 4) Gram representation, the finite-prime "
-            "parity convolution formula (1 * a_S)(n), prime-power sign agreement in P_Y, "
-            "unconditional uniform composite self-collision bounds 0 <= X_self(Y) <= 186*(tau - 1) "
-            "< 1302 in Lean 4 and 0 <= X_self(Y) <= (289/60)*log(tau) < (1377/160)*log(tau) < 16 "
-            "analytically outside Lean, the unconditional coarse half-line complement bound "
-            "E_{comp,diag}(Y, T) <= D_inf(T) <= 2*c_G*T*zeta''(2), conditional Route D transfer "
-            "from H with R-independent threshold Y_*, and exact equivalence H(J, D_tilde) <-> "
-            "H(F, D_tilde) for the signed remainder F(Y) = 4*X_off(Y) + ||B_Y||_Y^2 - 4*<P_Y, B_Y>_Y "
-            "(TC061R-OBL-SIGNED-REMAINDER-F, with S(Y) = 5*X_off(Y) + 5*||B_Y||_Y^2 as a one-way "
-            "sufficient relaxation TC061-LEM-OFFDIAG-AND-CORE); SUBGATE-TC-043A remains OPEN and "
-            "rh_proved remains False."
-        ),
+        "completion_outcome_code": comp_code,
+        "research_outcome_class": res_outcome_class,
         "hypothesis_H_status": "OPEN_CONJECTURE_OR_FAILED_CANDIDATE",
         "subgate_tc043a_status": "OPEN",
         "rh_proved": False,
@@ -6834,6 +7226,312 @@ def write_task_tc061_mixed_covariance_artifact(
     return cleaned
 
 
+def _collect_serialized_arb_dicts(
+    node: Any, prefix: str = ""
+) -> Dict[str, Dict[str, Any]]:
+    """Collect `{json_path: serialized_arb_dict}` across a deserialized JSON artifact tree."""
+    out: Dict[str, Dict[str, Any]] = {}
+    if isinstance(node, dict):
+        if "arb_ball_str" in node and "lower_dec" in node and "upper_dec" in node:
+            out[prefix] = dict(node)
+            return out
+        for k, v in node.items():
+            if k in ("serialized_arb_self_check", "section_8_tc061_review_displayed_enclosures_audit"):
+                continue
+            sub_p = f"{prefix}.{k}" if prefix else str(k)
+            out.update(_collect_serialized_arb_dicts(v, sub_p))
+    elif isinstance(node, list):
+        for idx, item in enumerate(node):
+            out.update(_collect_serialized_arb_dicts(item, f"{prefix}[{idx}]"))
+    return out
+
+
+def reprocess_task_tc061_derived_summaries(
+    path: Path = MIXED_ARITHMETIC_COVARIANCE_ARTIFACT_PATH,
+    *,
+    verify_lean_live: bool = True,
+    verify_review_doc: bool = True,
+    require_all_section_3_checks_pass: bool = True,
+) -> Dict[str, Any]:
+    """Recompute derived Section 3 resource-compliance checks, Section 3 aggregated outcomes and
+    `mechanism_revision_note`, top-level `completion_outcome_code` / `research_outcome_class`,
+    `headline_and_exposure_reconciliation`, and live Lean/review audits through the repaired
+    source-controlled functions while reusing all unchanged 256-bit Arb enclosures and original
+    execution telemetry/timestamps (`TASK-TC-061R3` §5).
+    """
+    assert path.exists(), f"Missing {path}; cannot reprocess summaries without source artifact."
+    proto_chk = verify_frozen_protocol_immutability()
+    assert proto_chk["verified"] is True, f"Frozen protocol check failed: {proto_chk}"
+
+    proto = json.loads(MIXED_ARITHMETIC_COVARIANCE_PROTOCOL_PATH.read_text(encoding="utf-8"))
+    probes = proto["frozen_candidate_probes"]
+    holdout_entries = proto["preregistered_holdout_grid"]
+    rules = proto["numerical_settings_and_escalation_rules"]
+    res_limits = rules["resource_limits"]
+    max_wall_sec = float(res_limits["max_wall_seconds_per_point"])
+    max_rss_mb = float(res_limits["max_rss_megabytes"])
+
+    existing = json.loads(path.read_text(encoding="utf-8"))
+    orig_exec_prov = dict(
+        existing.get("provenance_separation", {}).get(
+            "mathematical_certificate_execution_provenance", {}
+        )
+    )
+    orig_quad_ts = orig_exec_prov.get("original_quadrature_generated_at_utc") or orig_exec_prov.get(
+        "generated_at_utc"
+    )
+    if not orig_quad_ts:
+        raise ValueError("Missing original quadrature execution timestamp in stored artifact")
+    orig_arb_map = _collect_serialized_arb_dicts(existing)
+    orig_total_balls = int(existing["serialized_arb_self_check"]["total_certified_arb_balls_checked"])
+
+    sec1 = existing["section_1_protocol_and_exact_mixed_identity"]
+    sec2 = existing["section_2_cutoff_and_interval_certification"]
+    sec3 = existing["section_3_preregistered_holdout_experiment"]
+    sec4 = existing["section_4_controls_and_tc_arithmetic_attribution"]
+    sec5 = existing["section_5_arithmetic_proof_attempt_and_kernel_reduction"]
+
+    holdout_rows = sec3["holdout_point_evaluations"]
+    consistency_all_ok = True
+    for r in holdout_rows:
+        rb = evaluate_point_resource_compliance(
+            r["escalation_history"],
+            max_wall_sec=max_wall_sec,
+            max_rss_mb=max_rss_mb,
+        )
+        r["resource_budget_check"] = rb
+        if "within_resource_budget" in r:
+            r["within_resource_budget"] = rb["within_resource_budget"]
+        r["peak_rss_mb"] = rb["peak_rss_mb"]
+        consistency_all_ok = consistency_all_ok and bool(r["algebraic_consistency_verified"])
+
+    agg = aggregate_holdout_rows_and_outcomes(
+        holdout_rows,
+        probes,
+        registered_count=len(holdout_entries),
+        registered_point_ids=[str(e["point_id"]) for e in holdout_entries],
+        fail_on_integrity_conflict=False,
+    )
+    res_summary = agg["resource_compliance_summary"]
+    cert_summary = agg["certification_integrity_summary"]
+    tail_4096_evaluated = agg["Y_4096_nonempty_subunit_tail_evaluated"]
+
+    sec3["section_epistemic_scope_note"] = _build_section_3_epistemic_scope_note(
+        agg["holdout_coverage_summary"]["evaluated_count"], len(holdout_entries)
+    )
+    sec3["holdout_coverage_summary"] = agg["holdout_coverage_summary"]
+    sec3["resource_compliance_summary"] = res_summary
+    sec3["certification_integrity_summary"] = cert_summary
+    sec3["global_probe_outcomes"] = agg["global_probe_outcomes"]
+    sec3["mechanism_kl1_holdout_summary"] = agg["mechanism_kl1_holdout_summary"]
+
+    valid_row_walls: List[float] = []
+    for r in holdout_rows:
+        rb_chk = r.get("resource_budget_check") or {}
+        if rb_chk.get("wall_budget_status") == "UNKNOWN":
+            continue
+        cum_w = rb_chk.get("cumulative_point_elapsed_sec", r.get("elapsed_sec"))
+        if _is_valid_nonneg_real(cum_w):
+            valid_row_walls.append(float(cum_w))
+    max_point_wall_sec: Optional[float] = (
+        round(max(valid_row_walls), 4)
+        if (valid_row_walls and res_summary["wall_budget_status"] != "UNKNOWN")
+        else None
+    )
+    rss_vals = [
+        float(r["peak_rss_mb"]) for r in holdout_rows if _is_valid_nonneg_real(r.get("peak_rss_mb"))
+    ]
+    orig_tel = dict(sec3["execution_telemetry_summary"])
+    sec3["execution_telemetry_summary"] = {
+        "telemetry_scope": orig_tel.get("telemetry_scope", "REUSED_TC061R2_EXECUTION_TELEMETRY"),
+        "section_3_total_wall_sec": orig_tel["section_3_total_wall_sec"],
+        "max_single_point_wall_sec": max_point_wall_sec,
+        "max_observed_peak_rss_mb": (
+            round(max(rss_vals), 3)
+            if (rss_vals and res_summary["memory_budget_status"] != "UNKNOWN")
+            else None
+        ),
+        "wall_budget_status": res_summary["wall_budget_status"],
+        "memory_budget_status": res_summary["memory_budget_status"],
+        "overall_resource_budget_status": res_summary["overall_resource_budget_status"],
+        "all_points_within_300s_and_4096mb_budget": res_summary["all_points_within_resource_budgets"],
+        "all_resource_budgets_verified_within": res_summary["all_resource_budgets_verified_within"],
+        "budget_enforcement_mode": "POST_EVALUATION_BUDGET_AUDIT_NO_OS_PREEMPTIVE_KILL",
+    }
+
+    row_128 = next((r for r in holdout_rows if r["point_id"] == "HO-BASE-128"), None)
+    ho_128_protocol_ok = bool(
+        row_128 is not None
+        and row_128["cutoffs"]["T_Y"] == 431
+        and row_128["quadrature_mode"] == "unsplit"
+        and row_128["quad_tol_bits_used"] == 240
+        and row_128["panels_used"] == 1
+    )
+    ho_128_overlap_ok = bool(sec3["tc061r_protocol_deviation_and_rerun_comparison"]["verified"])
+    sec3["all_section_3_checks_pass"] = bool(
+        agg["holdout_coverage_summary"]["mathematical_coverage_complete"]
+        and cert_summary["certification_integrity_ok"]
+        and not res_summary["any_resource_budget_exceeded"]
+        and consistency_all_ok
+        and tail_4096_evaluated
+        and ho_128_protocol_ok
+        and ho_128_overlap_ok
+    )
+    if require_all_section_3_checks_pass:
+        assert sec3["all_section_3_checks_pass"] is True, (
+            f"Reprocessed Section 3 checks failed: {sec3['holdout_coverage_summary']}"
+        )
+
+    reconciliation = build_headline_and_exposure_reconciliation_summary(sec1, sec2, sec3, sec4, sec5)
+    comp_code, res_outcome_class = derive_report_top_level_outcome_fields(sec3)
+
+    prior_tasks = list(existing.get("prior_tasks", []))
+    if TASK_TC_061R2_ID not in prior_tasks:
+        prior_tasks.append(TASK_TC_061R2_ID)
+
+    # Rebuild top-level dict preserving crisp key order while keeping all numerical sections intact:
+    updated: Dict[str, Any] = {
+        "task_id": TASK_TC_061_ID,
+        "repair_task_id": TASK_TC_061R_ID,
+        "closeout_task_id": TASK_TC_061R3_ID,
+        "parent_epic": EPIC_TC_042_ID,
+        "parent_subgate": PARENT_SUBGATE_ID,
+        "prior_tasks": prior_tasks,
+        "merged_main_baseline": MERGED_MAIN_BASELINE_TC061,
+        "accepted_tc060r2_tip": ACCEPTED_TC060R2_TIP,
+        "accepted_tc060r2_implementation": ACCEPTED_TC060R2_IMPLEMENTATION,
+        "inherited_tc060r_formal_commit": REVIEWED_TC060R_IMPLEMENTATION,
+        "reviewed_tc061_tip": REVIEWED_TC061_TIP,
+        "reviewed_tc061_implementation": REVIEWED_TC061_IMPLEMENTATION,
+        "reviewed_tc061r_tip": REVIEWED_TC061R_TIP,
+        "accepted_tc061r_implementation_and_formal_commit": (
+            ACCEPTED_TC061R_IMPLEMENTATION_AND_FORMAL_COMMIT
+        ),
+        "reviewed_tc061r2_tip": REVIEWED_TC061R2_TIP,
+        "accepted_tc061r2_implementation": ACCEPTED_TC061R2_IMPLEMENTATION,
+        "frozen_protocol_id": FROZEN_PROTOCOL_ID,
+        "frozen_protocol_sha256": FROZEN_PROTOCOL_SHA256,
+        "frozen_protocol_registration_commit": FROZEN_PROTOCOL_REGISTRATION_COMMIT,
+        "branch": PROPOSED_TC061R3_BRANCH,
+        "previous_tc061r2_branch": PROPOSED_TC061R2_BRANCH,
+        "previous_tc061r_branch": PROPOSED_TC061R_BRANCH,
+        "original_tc061_branch": PROPOSED_TC061_BRANCH,
+        "provenance_separation": {
+            "implementation_provenance": {
+                "closeout_task_id": TASK_TC_061R3_ID,
+                "branch": PROPOSED_TC061R3_BRANCH,
+                "reviewed_tc061r2_tip_baseline": REVIEWED_TC061R2_TIP,
+                "accepted_tc061r2_implementation_commit": ACCEPTED_TC061R2_IMPLEMENTATION,
+                "reviewed_tc061r_tip_baseline": REVIEWED_TC061R_TIP,
+                "accepted_tc061r_implementation_commit": (
+                    ACCEPTED_TC061R_IMPLEMENTATION_AND_FORMAL_COMMIT
+                ),
+                "scope": (
+                    "Outcome-summary prose derivation (no false all-pass claim on unresolved or "
+                    "incomplete coverage), peak-memory measurement-semantics validation "
+                    "(snapshot-only readings reported as UNKNOWN unless covered by process "
+                    "high-water mark), focused regression contract, and summary reprocessing."
+                ),
+            },
+            "mathematical_certificate_execution_provenance": {
+                "execution_mode": "SUMMARY_REPROCESSING_REUSING_TC061R2_SOURCE_ENCLOSURES_AND_TELEMETRY",
+                "epistemic_experiment_role": (
+                    "SUMMARY_REPROCESSING_OF_EXISTING_REGISTERED_EXPERIMENT_NOT_FRESH_QUADRATURE_OR_NEW_UNSEEN_EVIDENCE"
+                ),
+                "quadrature_recomputed_live_from_source": False,
+                "quadrature_recomputed_in_tc061r3": False,
+                "reused_quadrature_producing_commit": ACCEPTED_TC061R2_IMPLEMENTATION,
+                "original_quadrature_generated_at_utc": orig_quad_ts,
+                "generated_at_utc": orig_quad_ts,
+                "summary_reprocessed_from_source_logic": True,
+                "hand_edited_enclosures": False,
+                "restamped_prior_execution": False,
+                "execution_timestamps_reset": False,
+            },
+            "synthetic_regression_evidence_provenance": {
+                "test_suite_path": "tests/test_tc_mixed_arithmetic_covariance.py",
+                "included_in_production_artifact_verdicts": False,
+                "scope": (
+                    "Injected unresolved/incomplete/mixed/refuted/conflict outcome-prose cases, "
+                    "snapshot-vs-high-water memory semantics cases, and witness-preservation tests "
+                    "run strictly in pytest against the production helpers and Section 3 aggregator."
+                ),
+            },
+            "formal_build_provenance": {
+                "inherited_formal_producing_commit": (
+                    ACCEPTED_TC061R_IMPLEMENTATION_AND_FORMAL_COMMIT
+                ),
+                "formal_inputs_changed_in_tc061r2": False,
+                "formal_inputs_changed_in_tc061r3": False,
+                "formal_build_report_path": "formal/build_report.json",
+            },
+        },
+        "epistemic_categories_enforced": existing["epistemic_categories_enforced"],
+        "global_consequence_classes_enforced": existing["global_consequence_classes_enforced"],
+        "probe_global_outcomes_enforced": existing["probe_global_outcomes_enforced"],
+        "completion_outcome_code": comp_code,
+        "research_outcome_class": res_outcome_class,
+        "hypothesis_H_status": existing["hypothesis_H_status"],
+        "subgate_tc043a_status": existing["subgate_tc043a_status"],
+        "rh_proved": existing["rh_proved"],
+        "precision_bits": existing["precision_bits"],
+        "circle_constant_convention": existing["circle_constant_convention"],
+        "grade_variable_convention": existing["grade_variable_convention"],
+        "headline_and_exposure_reconciliation": reconciliation,
+        "section_1_protocol_and_exact_mixed_identity": sec1,
+        "section_2_cutoff_and_interval_certification": sec2,
+        "section_3_preregistered_holdout_experiment": sec3,
+        "section_4_controls_and_tc_arithmetic_attribution": sec4,
+        "section_5_arithmetic_proof_attempt_and_kernel_reduction": sec5,
+        "section_6_route_d_conditional_transfer_and_scope": existing[
+            "section_6_route_d_conditional_transfer_and_scope"
+        ],
+    }
+
+    if verify_lean_live:
+        lean_audit = verify_tc061_lean_theorems_live(EXPECTED_TC061_THEOREMS)
+        assert lean_audit["all_tc061_lean_checks_pass"] is True, (
+            f"TC-061 Lean theorem audit failed: {lean_audit}"
+        )
+        updated["section_7_lean_formalization_audit"] = lean_audit
+    else:
+        updated["section_7_lean_formalization_audit"] = existing["section_7_lean_formalization_audit"]
+
+    new_arb_map = _collect_serialized_arb_dicts(updated)
+    for b_path, b_dict in new_arb_map.items():
+        lo_dec = _sci_or_latex_num_to_fraction(str(b_dict["lower_dec"]))
+        hi_dec = _sci_or_latex_num_to_fraction(str(b_dict["upper_dec"]))
+        b_lo, b_hi, _ = _parse_arb_ball_str_to_fractions(str(b_dict["arb_ball_str"]))
+        assert lo_dec <= hi_dec and max(lo_dec, b_lo) <= min(hi_dec, b_hi), (
+            f"Serialized Arb enclosure invariant failed at {b_path}: {b_dict}"
+        )
+        if b_path in orig_arb_map:
+            assert b_dict == orig_arb_map[b_path], (
+                f"Summary reprocessing mutated serialized Arb enclosure at {b_path}"
+            )
+    if require_all_section_3_checks_pass:
+        assert new_arb_map == orig_arb_map and len(new_arb_map) == orig_total_balls, (
+            f"Summary reprocessing altered serialized Arb map count ({len(new_arb_map)} vs {orig_total_balls})"
+        )
+    updated["serialized_arb_self_check"] = existing["serialized_arb_self_check"]
+
+    if verify_review_doc and TC_061_REVIEW_DOC_PATH.exists():
+        rev_audit = verify_tc061_review_displayed_enclosures(updated, TC_061_REVIEW_DOC_PATH)
+        assert rev_audit["all_displayed_intervals_contain_generated_enclosures"] is True, (
+            "Displayed intervals in TC_061_MIXED_ARITHMETIC_COVARIANCE.md failed check: "
+            f"pi_macros={rev_audit['pi_macro_count']}, pi_glyphs={rev_audit['pi_glyph_count']}, "
+            f"untagged={rev_audit['untagged_intervals']}, failed={rev_audit['failed_intervals']}"
+        )
+        updated["section_8_tc061_review_displayed_enclosures_audit"] = rev_audit
+
+    path.write_text(
+        json.dumps(updated, indent=2, sort_keys=False, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+    return updated
+
+
 def refresh_task_tc061_provenance_and_review_audit(
     path: Path = MIXED_ARITHMETIC_COVARIANCE_ARTIFACT_PATH,
 ) -> Dict[str, Any]:
@@ -6871,7 +7569,18 @@ def refresh_task_tc061_provenance_and_review_audit(
 if __name__ == "__main__":
     import sys
 
-    if "--refresh-provenance" in sys.argv[1:]:
+    if "--reprocess-summaries" in sys.argv[1:]:
+        verify_rev = "--no-verify-review" not in sys.argv[1:]
+        verify_ln = "--no-verify-lean" not in sys.argv[1:]
+        rep = reprocess_task_tc061_derived_summaries(
+            verify_lean_live=verify_ln,
+            verify_review_doc=verify_rev,
+        )
+        print(
+            f"Reprocessed derived summaries in {MIXED_ARITHMETIC_COVARIANCE_ARTIFACT_PATH} "
+            f"(subgate={rep['subgate_tc043a_status']}, rh_proved={rep['rh_proved']})"
+        )
+    elif "--refresh-provenance" in sys.argv[1:]:
         rep = refresh_task_tc061_provenance_and_review_audit()
         print(
             f"Refreshed provenance & review audit in {MIXED_ARITHMETIC_COVARIANCE_ARTIFACT_PATH} "

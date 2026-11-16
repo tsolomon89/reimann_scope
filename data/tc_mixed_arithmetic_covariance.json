@@ -1,7 +1,7 @@
 {
   "task_id": "TASK-TC-061",
   "repair_task_id": "TASK-TC-061R",
-  "closeout_task_id": "TASK-TC-061R2",
+  "closeout_task_id": "TASK-TC-061R3",
   "parent_epic": "EPIC-TC-042",
   "parent_subgate": "SUBGATE-TC-043A",
   "prior_tasks": [
@@ -26,7 +26,8 @@
     "TASK-TC-060R",
     "TASK-TC-060R2",
     "TASK-TC-061",
-    "TASK-TC-061R"
+    "TASK-TC-061R",
+    "TASK-TC-061R2"
   ],
   "merged_main_baseline": "71a101005f1ee073e981187bb7d07d90daef9c65",
   "accepted_tc060r2_tip": "4bfb36ed7a62f207a6479dd932a997563a407ff8",
@@ -36,36 +37,47 @@
   "reviewed_tc061_implementation": "74e9df24d165619b0857cd37a895d599a93ba08e",
   "reviewed_tc061r_tip": "93dd56a5554b698dab642611605e29c80e756462",
   "accepted_tc061r_implementation_and_formal_commit": "b65dba142658a8e4fd80c339d7029aa14e114c5a",
+  "reviewed_tc061r2_tip": "418531a02e3ea9c267d72201e439c2f09248ee03",
+  "accepted_tc061r2_implementation": "3dbf2e0c999ec6b030b769b0bb3e55ff2783b50b",
   "frozen_protocol_id": "TC061-MIXED-ARITHMETIC-COVARIANCE-PROTOCOL-V1",
   "frozen_protocol_sha256": "c892c4c5a1ff2a60a11fa499b2d2bc017e01f0426e4aa8feef5880aaff8a70eb",
   "frozen_protocol_registration_commit": "bc2f9f709f868ef02981600873dfa0c05da0ba0c",
-  "branch": "task/tc-061r2-witness-preservation-resource-status-and-closeout",
+  "branch": "task/tc-061r3-outcome-summary-and-peak-coverage-closeout",
+  "previous_tc061r2_branch": "task/tc-061r2-witness-preservation-resource-status-and-closeout",
   "previous_tc061r_branch": "task/tc-061r-core-formula-protocol-and-proof-scope-repair",
   "original_tc061_branch": "task/tc-061-mixed-arithmetic-covariance-hypothesis-test",
   "provenance_separation": {
     "implementation_provenance": {
-      "closeout_task_id": "TASK-TC-061R2",
-      "branch": "task/tc-061r2-witness-preservation-resource-status-and-closeout",
+      "closeout_task_id": "TASK-TC-061R3",
+      "branch": "task/tc-061r3-outcome-summary-and-peak-coverage-closeout",
+      "reviewed_tc061r2_tip_baseline": "418531a02e3ea9c267d72201e439c2f09248ee03",
+      "accepted_tc061r2_implementation_commit": "3dbf2e0c999ec6b030b769b0bb3e55ff2783b50b",
       "reviewed_tc061r_tip_baseline": "93dd56a5554b698dab642611605e29c80e756462",
       "accepted_tc061r_implementation_commit": "b65dba142658a8e4fd80c339d7029aa14e114c5a",
-      "scope": "Runner per-candidate decisive-witness accumulator, explicit 3-valued (WITHIN/EXCEEDED/UNKNOWN) resource compliance tracking, regression suite, and documentation closeout."
+      "scope": "Outcome-summary prose derivation (no false all-pass claim on unresolved or incomplete coverage), peak-memory measurement-semantics validation (snapshot-only readings reported as UNKNOWN unless covered by process high-water mark), focused regression contract, and summary reprocessing."
     },
     "mathematical_certificate_execution_provenance": {
-      "execution_mode": "LIVE_SOURCE_EXECUTION_THROUGH_REPAIRED_RUNNER",
-      "epistemic_experiment_role": "REPEAT_OF_REGISTERED_EXPERIMENT_NOT_NEW_UNSEEN_EVIDENCE",
-      "quadrature_recomputed_live_from_source": true,
+      "execution_mode": "SUMMARY_REPROCESSING_REUSING_TC061R2_SOURCE_ENCLOSURES_AND_TELEMETRY",
+      "epistemic_experiment_role": "SUMMARY_REPROCESSING_OF_EXISTING_REGISTERED_EXPERIMENT_NOT_FRESH_QUADRATURE_OR_NEW_UNSEEN_EVIDENCE",
+      "quadrature_recomputed_live_from_source": false,
+      "quadrature_recomputed_in_tc061r3": false,
+      "reused_quadrature_producing_commit": "3dbf2e0c999ec6b030b769b0bb3e55ff2783b50b",
+      "original_quadrature_generated_at_utc": "2026-11-16T14:17:18.838355+00:00",
+      "generated_at_utc": "2026-11-16T14:17:18.838355+00:00",
+      "summary_reprocessed_from_source_logic": true,
       "hand_edited_enclosures": false,
       "restamped_prior_execution": false,
-      "generated_at_utc": "2026-11-16T14:17:18.838355+00:00"
+      "execution_timestamps_reset": false
     },
     "synthetic_regression_evidence_provenance": {
       "test_suite_path": "tests/test_tc_mixed_arithmetic_covariance.py",
       "included_in_production_artifact_verdicts": false,
-      "scope": "Injected FAIL->UNRESOLVED, PASS->UNRESOLVED, KL1 cross-escalation, contradictory PASS/FAIL integrity-conflict, and missing/mixed/exceeded telemetry tests run strictly in pytest against the production runner and Section 3 aggregator."
+      "scope": "Injected unresolved/incomplete/mixed/refuted/conflict outcome-prose cases, snapshot-vs-high-water memory semantics cases, and witness-preservation tests run strictly in pytest against the production helpers and Section 3 aggregator."
     },
     "formal_build_provenance": {
       "inherited_formal_producing_commit": "b65dba142658a8e4fd80c339d7029aa14e114c5a",
       "formal_inputs_changed_in_tc061r2": false,
+      "formal_inputs_changed_in_tc061r3": false,
       "formal_build_report_path": "formal/build_report.json"
     }
   },
@@ -90,7 +102,7 @@
     "PROVED_UNIFORMLY"
   ],
   "completion_outcome_code": "SURVIVED_TESTED_POINTS_WITH_PROVED_SELF_COLLISION_BOUND_AND_CONDITIONAL_TRANSFER",
-  "research_outcome_class": "Preregistered Mixed Arithmetic Covariance Experiment & Signed-Kernel Proof Attempt (TASK-TC-061 / repaired in TASK-TC-061R) — Frozen protocol TC061-MIXED-ARITHMETIC-COVARIANCE-PROTOCOL-V1 (SHA-256 c892c4c5a1ff2a60a11fa499b2d2bc017e01f0426e4aa8feef5880aaff8a70eb, registered at bc2f9f709f868ef02981600873dfa0c05da0ba0c before any Y > 64 evaluation) executed faithfully across 14/14 held-out points up to Y = 4096 (including unsplit quad_tol_bits = 240 at Y = 128, T = 431 < 512, and nonempty d >= ceil(tau*Y) sub-unit tail d in [25736, 32767] at Y = 4096, T = 32768) and continuous straddling intervals across T and D_0 jumps: all four frozen probes (PRIMARY TC061-P0 and SECONDARY TC061-P_{1/2}, TC061-P_{1/4}, TC061-P_{1/8}) and both TC061-KL1 sub-budgets achieve SURVIVED_TESTED_POINTS (0 FAIL, 0 UNRESOLVED, 14/14 complete holdout coverage; finite evidence, NOT a uniform proof), whereas unsigned 1 and fixed finite-prime parity controls a_2, a_{3,5,7} are certified FAIL on every frozen probe across the evaluated grid Y in {64, 128, 256, 512} under exact matched z = 1 Laurent compensation (scoped strictly to the evaluated finite grid without unproved asymptotic growth laws or unique-tau-mechanism claims). Proves in Lean 4 (7 public theorems, 0 sorry, 0 custom axioms) and analytically the concrete mixed identity 4*D_tilde(Y) + J(Y) = ||2*P_Y - B_Y||_Y^2 = ||Q_Y + A_Y||_Y^2, the complete-core adjusted beta_Y bridge and compact (0, 2, 4) Gram representation, the finite-prime parity convolution formula (1 * a_S)(n), prime-power sign agreement in P_Y, unconditional uniform composite self-collision bounds 0 <= X_self(Y) <= 186*(tau - 1) < 1302 in Lean 4 and 0 <= X_self(Y) <= (289/60)*log(tau) < (1377/160)*log(tau) < 16 analytically outside Lean, the unconditional coarse half-line complement bound E_{comp,diag}(Y, T) <= D_inf(T) <= 2*c_G*T*zeta''(2), conditional Route D transfer from H with R-independent threshold Y_*, and exact equivalence H(J, D_tilde) <-> H(F, D_tilde) for the signed remainder F(Y) = 4*X_off(Y) + ||B_Y||_Y^2 - 4*<P_Y, B_Y>_Y (TC061R-OBL-SIGNED-REMAINDER-F, with S(Y) = 5*X_off(Y) + 5*||B_Y||_Y^2 as a one-way sufficient relaxation TC061-LEM-OFFDIAG-AND-CORE); SUBGATE-TC-043A remains OPEN and rh_proved remains False.",
+  "research_outcome_class": "Preregistered Mixed Arithmetic Covariance Experiment & Signed-Kernel Proof Attempt (TASK-TC-061 / repaired in TASK-TC-061R..TC-061R3) — Frozen protocol TC061-MIXED-ARITHMETIC-COVARIANCE-PROTOCOL-V1 (SHA-256 c892c4c5a1ff2a60a11fa499b2d2bc017e01f0426e4aa8feef5880aaff8a70eb, registered at bc2f9f709f868ef02981600873dfa0c05da0ba0c before any Y > 64 evaluation) evaluated across 14/14 held-out points up to Y = 4096 (including unsplit quad_tol_bits = 240 at Y = 128, T = 431 < 512, and nonempty d >= ceil(tau*Y) sub-unit tail d in [25736, 32767] at Y = 4096, T = 32768) and continuous straddling intervals across T and D_0 jumps: all four frozen probes (PRIMARY TC061-P0 and SECONDARY TC061-P_{1/2}, TC061-P_{1/4}, TC061-P_{1/8}) and both TC061-KL1 sub-budgets achieve SURVIVED_TESTED_POINTS (0 FAIL, 0 UNRESOLVED, 14/14 complete holdout coverage; finite evidence, NOT a uniform proof), whereas unsigned 1 and fixed finite-prime parity controls a_2, a_{3,5,7} are certified FAIL on every frozen probe across the evaluated grid Y in {64, 128, 256, 512} under exact matched z = 1 Laurent compensation (scoped strictly to the evaluated finite grid without unproved asymptotic growth laws or unique-tau-mechanism claims). Proves in Lean 4 (7 public theorems, 0 sorry, 0 custom axioms) and analytically the concrete mixed identity 4*D_tilde(Y) + J(Y) = ||2*P_Y - B_Y||_Y^2 = ||Q_Y + A_Y||_Y^2, the complete-core adjusted beta_Y bridge and compact (0, 2, 4) Gram representation, the finite-prime parity convolution formula (1 * a_S)(n), prime-power sign agreement in P_Y, unconditional uniform composite self-collision bounds 0 <= X_self(Y) <= 186*(tau - 1) < 1302 in Lean 4 and 0 <= X_self(Y) <= (289/60)*log(tau) < (1377/160)*log(tau) < 16 analytically outside Lean, the unconditional coarse half-line complement bound E_{comp,diag}(Y, T) <= D_inf(T) <= 2*c_G*T*zeta''(2), conditional Route D transfer from H with R-independent threshold Y_*, and exact equivalence H(J, D_tilde) <-> H(F, D_tilde) for the signed remainder F(Y) = 4*X_off(Y) + ||B_Y||_Y^2 - 4*<P_Y, B_Y>_Y (TC061R-OBL-SIGNED-REMAINDER-F, with S(Y) = 5*X_off(Y) + 5*||B_Y||_Y^2 as a one-way sufficient relaxation TC061-LEM-OFFDIAG-AND-CORE); SUBGATE-TC-043A remains OPEN and rh_proved remains False.",
   "hypothesis_H_status": "OPEN_CONJECTURE_OR_FAILED_CANDIDATE",
   "subgate_tc043a_status": "OPEN",
   "rh_proved": false,

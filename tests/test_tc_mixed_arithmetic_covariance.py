@@ -38,6 +38,7 @@ from tc.mixed_arithmetic_covariance import (
     ACCEPTED_TC060R2_IMPLEMENTATION,
     ACCEPTED_TC060R2_TIP,
     ACCEPTED_TC061R_IMPLEMENTATION_AND_FORMAL_COMMIT,
+    ACCEPTED_TC061R2_IMPLEMENTATION,
     CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME,
     CERTIFICATION_INTEGRITY_CONFLICT_VERDICT,
     EXPECTED_TC061_THEOREMS,
@@ -52,17 +53,22 @@ from tc.mixed_arithmetic_covariance import (
     PROPOSED_TC061_BRANCH,
     PROPOSED_TC061R_BRANCH,
     PROPOSED_TC061R2_BRANCH,
+    PROPOSED_TC061R3_BRANCH,
+    RECOGNIZED_PEAK_RSS_COVERING_SEMANTICS,
     RESOURCE_COMPLIANCE_STATUSES,
     REVIEWED_TC061_IMPLEMENTATION,
     REVIEWED_TC061_TIP,
     REVIEWED_TC061R_TIP,
+    REVIEWED_TC061R2_TIP,
     TASK_TC_061_ID,
     TASK_TC_061R_ID,
     TASK_TC_061R2_ID,
+    TASK_TC_061R3_ID,
     TC_061_LEAN_MODULE_PATH,
     TC_061_REVIEW_DOC_PATH,
     CertificationIntegrityError,
     ExactScaleSpec,
+    _collect_serialized_arb_dicts,
     aggregate_holdout_rows_and_outcomes,
     aggregate_section_resource_compliance,
     build_holdout_point_artifact_row,
@@ -74,6 +80,8 @@ from tc.mixed_arithmetic_covariance import (
     compute_complete_core_s_Y_and_beta_Y_arb,
     compute_finite_prime_control_invariants,
     compute_selberg_centered_remainder_table_fast_arb,
+    derive_holdout_mechanism_revision_note,
+    derive_report_top_level_outcome_fields,
     evaluate_divisor_sum_aS_direct,
     evaluate_finite_prime_parity_convolution_formula,
     evaluate_interval_via_cutoff_case_split_arb,
@@ -82,6 +90,7 @@ from tc.mixed_arithmetic_covariance import (
     evaluate_window_gram_G_Y_r_arb,
     execute_holdout_point_with_protocol_escalation,
     load_frozen_protocol_rules,
+    reprocess_task_tc061_derived_summaries,
     resolve_protocol_quadrature_settings,
     strip_enclosure_arb_for_json,
     verify_coarse_halfline_complement_bound_arb,
@@ -116,7 +125,8 @@ def test_tc061_artifact_provenance_epistemic_scope_and_preserved_tc060r2(
     """
     assert tc061_artifact["task_id"] == TASK_TC_061_ID
     assert tc061_artifact["repair_task_id"] == TASK_TC_061R_ID
-    assert tc061_artifact["closeout_task_id"] == TASK_TC_061R2_ID
+    assert tc061_artifact["closeout_task_id"] == TASK_TC_061R3_ID
+    assert TASK_TC_061R2_ID in tc061_artifact["prior_tasks"]
     assert tc061_artifact["parent_subgate"] == PARENT_SUBGATE_ID
     assert tc061_artifact["subgate_tc043a_status"] == "OPEN"
     assert tc061_artifact["rh_proved"] is False
@@ -132,22 +142,37 @@ def test_tc061_artifact_provenance_epistemic_scope_and_preserved_tc060r2(
         tc061_artifact["accepted_tc061r_implementation_and_formal_commit"]
         == ACCEPTED_TC061R_IMPLEMENTATION_AND_FORMAL_COMMIT
     )
-    assert tc061_artifact["branch"] == PROPOSED_TC061R2_BRANCH
+    assert tc061_artifact["reviewed_tc061r2_tip"] == REVIEWED_TC061R2_TIP
+    assert tc061_artifact["accepted_tc061r2_implementation"] == ACCEPTED_TC061R2_IMPLEMENTATION
+    assert tc061_artifact["branch"] == PROPOSED_TC061R3_BRANCH
+    assert tc061_artifact["previous_tc061r2_branch"] == PROPOSED_TC061R2_BRANCH
     assert tc061_artifact["previous_tc061r_branch"] == PROPOSED_TC061R_BRANCH
     assert tc061_artifact["original_tc061_branch"] == PROPOSED_TC061_BRANCH
     prov_sep = tc061_artifact["provenance_separation"]
+    exec_prov = prov_sep["mathematical_certificate_execution_provenance"]
     assert (
-        prov_sep["mathematical_certificate_execution_provenance"]["epistemic_experiment_role"]
-        == "REPEAT_OF_REGISTERED_EXPERIMENT_NOT_NEW_UNSEEN_EVIDENCE"
+        exec_prov["execution_mode"]
+        == "SUMMARY_REPROCESSING_REUSING_TC061R2_SOURCE_ENCLOSURES_AND_TELEMETRY"
     )
-    assert prov_sep["mathematical_certificate_execution_provenance"]["hand_edited_enclosures"] is False
-    assert prov_sep["mathematical_certificate_execution_provenance"]["restamped_prior_execution"] is False
+    assert (
+        exec_prov["epistemic_experiment_role"]
+        == "SUMMARY_REPROCESSING_OF_EXISTING_REGISTERED_EXPERIMENT_NOT_FRESH_QUADRATURE_OR_NEW_UNSEEN_EVIDENCE"
+    )
+    assert exec_prov["quadrature_recomputed_in_tc061r3"] is False
+    assert exec_prov["reused_quadrature_producing_commit"] == ACCEPTED_TC061R2_IMPLEMENTATION
+    assert exec_prov["original_quadrature_generated_at_utc"] == "2026-11-16T14:17:18.838355+00:00"
+    assert exec_prov["generated_at_utc"] == "2026-11-16T14:17:18.838355+00:00"
+    assert exec_prov["summary_reprocessed_from_source_logic"] is True
+    assert exec_prov["hand_edited_enclosures"] is False
+    assert exec_prov["restamped_prior_execution"] is False
+    assert exec_prov["execution_timestamps_reset"] is False
     assert prov_sep["synthetic_regression_evidence_provenance"]["included_in_production_artifact_verdicts"] is False
     assert (
         prov_sep["formal_build_provenance"]["inherited_formal_producing_commit"]
         == ACCEPTED_TC061R_IMPLEMENTATION_AND_FORMAL_COMMIT
     )
     assert prov_sep["formal_build_provenance"]["formal_inputs_changed_in_tc061r2"] is False
+    assert prov_sep["formal_build_provenance"]["formal_inputs_changed_in_tc061r3"] is False
     assert tc061_artifact["epistemic_categories_enforced"] == list(EPISTEMIC_CATEGORIES)
     assert tc061_artifact["probe_global_outcomes_enforced"] == list(PROBE_GLOBAL_OUTCOMES)
 
@@ -953,6 +978,7 @@ def test_tc061r_escalation_state_machine_kl1_unresolved_final_unresolved_and_cer
             "elapsed_sec": elapsed_sec,
             "current_rss_mb": peak_rss_mb,
             "peak_rss_mb": peak_rss_mb,
+            "peak_rss_measurement_semantics": "PROCESS_LIFETIME_HIGH_WATER_MARK",
         }
 
     lg_256 = arb(256).log()
@@ -1817,7 +1843,14 @@ def test_tc061r2_explicit_resource_statuses_unknown_rss_mixed_coverage_and_math_
 
     # --- Case 8: Under-limit, RSS excess, wall excess, and wall excess + missing RSS:
     chk_8_ok = evaluate_point_resource_compliance(
-        [{"elapsed_sec": 10.0, "current_rss_mb": 150.0, "peak_rss_mb": 200.0}],
+        [
+            {
+                "elapsed_sec": 10.0,
+                "current_rss_mb": 150.0,
+                "peak_rss_mb": 200.0,
+                "peak_rss_measurement_semantics": "PROCESS_LIFETIME_HIGH_WATER_MARK",
+            }
+        ],
         max_wall_sec=300.0,
         max_rss_mb=4096.0,
     )
@@ -2109,7 +2142,7 @@ def test_tc061r2_cutoff_mutation_out_of_domain_aggregation_and_rss_violation_edg
                 "elapsed_sec": 2.0,
                 "current_rss_mb": 200.0,
                 "peak_rss_mb": 250.0,
-                "peak_rss_semantics": "TIER_LOCAL_SNAPSHOT",
+                "peak_rss_measurement_semantics": "TIER_LOCAL_SNAPSHOT",
             },
         ],
         max_wall_sec=300.0,
@@ -2117,6 +2150,719 @@ def test_tc061r2_cutoff_mutation_out_of_domain_aggregation_and_rss_violation_edg
     )
     assert chk_curr_ex["memory_budget_status"] == "EXCEEDED"
     assert chk_curr_ex["peak_rss_mb"] == 5000.0
+
+
+def test_tc061r3_honest_outcome_summaries_across_unresolved_incomplete_mixed_fail_and_conflict(
+    tmp_path: Path,
+    tc061_artifact: Dict[str, Any],
+) -> None:
+    """Verify `TASK-TC-061R3` §§2 & 4 across all 7 required Outcome cases on the production helpers,
+    JSON serialization round-trip, `derive_report_top_level_outcome_fields`, and
+    `reprocess_task_tc061_derived_summaries` (on isolated synthetic temp copies).
+    """
+    from typing import Optional as _Optional
+
+    proto = json.loads(MIXED_ARITHMETIC_COVARIANCE_PROTOCOL_PATH.read_text(encoding="utf-8"))
+    probes = proto["frozen_candidate_probes"]
+    rules = proto["numerical_settings_and_escalation_rules"]
+    entry_256 = next(
+        e for e in proto["preregistered_holdout_grid"] if e["point_id"] == "HO-BASE-256"
+    )
+    entry_512 = next(
+        e for e in proto["preregistered_holdout_grid"] if e["point_id"] == "HO-BASE-512"
+    )
+    spec_256 = ExactScaleSpec.from_protocol_entry(entry_256)
+    spec_512 = ExactScaleSpec.from_protocol_entry(entry_512)
+    entry_32 = dict(
+        entry_256,
+        point_id="CAL-32",
+        family="calibration",
+        label="32",
+        rational_factor="32/1",
+        exposure_status="CALIBRATION",
+        prior_exposure_note="synthetic out-of-domain row for aggregator test",
+    )
+    spec_32 = ExactScaleSpec.from_protocol_entry(entry_32)
+
+    saved_p = flint_ctx.prec
+    try:
+        flint_ctx.prec = 256
+        lg_256 = arb(256).log()
+        # Wide ball straddling every main probe RHS and both KL1 RHS bounds:
+        j_all_unres = arb("3.0", "5.0")
+        x_all_unres = arb("1.0", "2.0")
+        rmix_all_unres = arb("1.0", "2.0")
+        # Mixed: P0 straddles lg_256, while secondary probes (RHS >= (5/64)*256^(1/8) + lg_256) and KL1 PASS:
+        j_p0_only_unres = lg_256 + arb(0, arb("1e-3"))
+        # Fail P0 (J = lg_256 + 0.10 > lg_256), while P_{1/8} straddles (RHS = (5/64)*2 + lg_256 = lg_256 + 0.15625):
+        j_p0_fail_p18_unres = lg_256 + arb("0.15625", "1e-3")
+        j_pass = arb("0.0")
+    finally:
+        flint_ctx.prec = saved_p
+
+    def _mk_row(
+        entry: Dict[str, Any],
+        spec: ExactScaleSpec,
+        *,
+        j_b: arb,
+        x_b: arb = arb(0),
+        rmix_b: arb = arb(0),
+        y_int: int = 256,
+        t_y: int = 1024,
+        d0_raw: int = 5,
+        ceil_tau_y: int = 1609,
+        in_dom_fn=None,
+        kl1_in_dom: bool = True,
+        peak_sem: _Optional[str] = "PROCESS_LIFETIME_HIGH_WATER_MARK",
+    ) -> Dict[str, Any]:
+        out = execute_holdout_point_with_protocol_escalation(
+            spec,
+            probes,
+            rules,
+            point_id=str(entry["point_id"]),
+            in_declared_domain_fn=in_dom_fn,
+            kl1_in_declared_domain=kl1_in_dom,
+            evaluator_fn=lambda sp, **kw: _make_tc061r2_stub_point_result(
+                rules,
+                kw.get("escalation_tier", 0),
+                Y_int=y_int,
+                T_Y=t_y,
+                D0_raw=d0_raw,
+                ceil_tau_Y=ceil_tau_y,
+                J_ball=j_b,
+                X_ball=x_b,
+                R_mix_ball=rmix_b,
+                peak_rss_semantics=peak_sem,
+            ),
+            raise_on_integrity_conflict=False,
+        )
+        return json.loads(
+            json.dumps(
+                strip_enclosure_arb_for_json(
+                    build_holdout_point_artifact_row(entry, out, compute_divisor_partition=False)
+                )
+            )
+        )
+
+    def _wrap_sec3(agg_d: Dict[str, Any]) -> Dict[str, Any]:
+        return {
+            "holdout_coverage_summary": agg_d["holdout_coverage_summary"],
+            "certification_integrity_summary": agg_d["certification_integrity_summary"],
+            "global_probe_outcomes": agg_d["global_probe_outcomes"],
+            "mechanism_kl1_holdout_summary": agg_d["mechanism_kl1_holdout_summary"],
+        }
+
+    # --- Outcome Case 1: All six candidates UNRESOLVED (1 row, registered_count=1):
+    row_all_unres = _mk_row(
+        entry_256, spec_256, j_b=j_all_unres, x_b=x_all_unres, rmix_b=rmix_all_unres
+    )
+    agg_1 = aggregate_holdout_rows_and_outcomes([row_all_unres], probes, registered_count=1)
+    for pid in ("TC061-P0", "TC061-P_1_2", "TC061-P_1_4", "TC061-P_1_8"):
+        assert agg_1["global_probe_outcomes"][pid]["global_probe_outcome"] == "UNRESOLVED/INCOMPLETE_COVERAGE"
+    assert agg_1["mechanism_kl1_holdout_summary"]["offdiag_sub_budget_outcome"] == "UNRESOLVED/INCOMPLETE_COVERAGE"
+    assert agg_1["mechanism_kl1_holdout_summary"]["mixed_core_sub_budget_outcome"] == "UNRESOLVED/INCOMPLETE_COVERAGE"
+    note_1 = agg_1["holdout_coverage_summary"]["mechanism_revision_note"]
+    assert "All 4 frozen probes" not in note_1
+    assert "passed" not in note_1.lower()
+    assert "Unresolved holdout calculations" in note_1
+    assert "6/6 candidates" in note_1
+    assert "0 candidates achieving SURVIVED_TESTED_POINTS" in note_1
+    assert agg_1["holdout_coverage_summary"]["mechanism_revision_triggered"] is False
+    code_1, cls_1 = derive_report_top_level_outcome_fields(_wrap_sec3(agg_1))
+    assert code_1 == "UNRESOLVED_OR_INCOMPLETE_HOLDOUT_WITH_PROVED_SELF_COLLISION_BOUND_AND_CONDITIONAL_TRANSFER"
+    assert "all four frozen probes" not in cls_1.lower()
+    assert "Unresolved holdout calculations" in cls_1
+
+    # --- Outcome Case 2: Empty (0/14) and partially missing (1/2 and duplicate-id 2/2) coverage:
+    agg_empty = aggregate_holdout_rows_and_outcomes([], probes, registered_count=14)
+    note_empty = agg_empty["holdout_coverage_summary"]["mechanism_revision_note"]
+    assert agg_empty["holdout_coverage_summary"]["mathematical_coverage_complete"] is False
+    assert "All 4 frozen probes" not in note_empty
+    assert "passed" not in note_empty.lower()
+    assert "Incomplete holdout coverage: 0 of 14" in note_empty
+    assert agg_empty["holdout_coverage_summary"]["mechanism_revision_triggered"] is False
+    code_emp, cls_emp = derive_report_top_level_outcome_fields(_wrap_sec3(agg_empty))
+    assert code_emp == "UNRESOLVED_OR_INCOMPLETE_HOLDOUT_WITH_PROVED_SELF_COLLISION_BOUND_AND_CONDITIONAL_TRANSFER"
+    assert "all four frozen probes" not in cls_emp.lower()
+
+    row_pass_256 = _mk_row(entry_256, spec_256, j_b=j_pass)
+    agg_partial = aggregate_holdout_rows_and_outcomes([row_pass_256], probes, registered_count=2)
+    note_partial = agg_partial["holdout_coverage_summary"]["mechanism_revision_note"]
+    assert agg_partial["holdout_coverage_summary"]["mathematical_coverage_complete"] is False
+    assert agg_partial["global_probe_outcomes"]["TC061-P0"]["global_probe_outcome"] == "UNRESOLVED/INCOMPLETE_COVERAGE"
+    assert "All 4 frozen probes" not in note_partial
+    assert "passed" not in note_partial.lower()
+    assert "Incomplete holdout coverage: 1 of 2" in note_partial
+
+    # Duplicate point_id must also fail complete mathematical AND resource coverage:
+    agg_dup = aggregate_holdout_rows_and_outcomes(
+        [row_pass_256, row_pass_256], probes, registered_count=2
+    )
+    assert agg_dup["holdout_coverage_summary"]["mathematical_coverage_complete"] is False
+    assert agg_dup["holdout_coverage_summary"]["evaluated_count"] == 1
+    assert agg_dup["resource_compliance_summary"]["overall_resource_budget_status"] == "UNKNOWN"
+    assert agg_dup["resource_compliance_summary"]["all_resource_budgets_verified_within"] is False
+    assert "Incomplete holdout coverage: 1 of 2" in agg_dup["holdout_coverage_summary"]["mechanism_revision_note"]
+
+    # Excess rows beyond registered_count must also fail complete coverage honestly:
+    row_extra_512 = _mk_row(
+        entry_512,
+        spec_512,
+        j_b=j_pass,
+        y_int=512,
+        t_y=2436,
+        d0_raw=6,
+        ceil_tau_y=3217,
+    )
+    agg_excess = aggregate_holdout_rows_and_outcomes(
+        [row_pass_256, row_extra_512], probes, registered_count=1
+    )
+    assert agg_excess["holdout_coverage_summary"]["mathematical_coverage_complete"] is False
+    assert (
+        "Mismatched holdout coverage: 2 evaluated rows vs 1 registered held-out points"
+        in agg_excess["holdout_coverage_summary"]["mechanism_revision_note"]
+    )
+
+    # Also test end-to-end summary reprocessing on a synthetic truncated 1-of-14 temp JSON copy:
+    trunc_json = tmp_path / "synthetic_partial_1_of_14.json"
+    synth_art = json.loads(json.dumps(tc061_artifact))
+    synth_art["section_3_preregistered_holdout_experiment"]["holdout_point_evaluations"] = [
+        synth_art["section_3_preregistered_holdout_experiment"]["holdout_point_evaluations"][0]
+    ]
+    trunc_json.write_text(json.dumps(synth_art, indent=2) + "\n", encoding="utf-8")
+    reproc_partial = reprocess_task_tc061_derived_summaries(
+        trunc_json,
+        verify_lean_live=False,
+        verify_review_doc=False,
+        require_all_section_3_checks_pass=False,
+    )
+    assert (
+        reproc_partial["completion_outcome_code"]
+        == "UNRESOLVED_OR_INCOMPLETE_HOLDOUT_WITH_PROVED_SELF_COLLISION_BOUND_AND_CONDITIONAL_TRANSFER"
+    )
+    assert (
+        "Incomplete holdout coverage: 1 of 14"
+        in reproc_partial["section_3_preregistered_holdout_experiment"]["holdout_coverage_summary"][
+            "mechanism_revision_note"
+        ]
+    )
+    assert (
+        "1 of 14 preregistered held-out"
+        in reproc_partial["section_3_preregistered_holdout_experiment"]["section_epistemic_scope_note"]
+    )
+
+    # --- Outcome Case 3: Mixed PASS / UNRESOLVED:
+    row_mixed = _mk_row(entry_256, spec_256, j_b=j_p0_only_unres)
+    agg_mixed = aggregate_holdout_rows_and_outcomes([row_mixed], probes, registered_count=1)
+    assert agg_mixed["global_probe_outcomes"]["TC061-P0"]["global_probe_outcome"] == "UNRESOLVED/INCOMPLETE_COVERAGE"
+    assert agg_mixed["global_probe_outcomes"]["TC061-P_1_2"]["global_probe_outcome"] == "SURVIVED_TESTED_POINTS"
+    assert agg_mixed["mechanism_kl1_holdout_summary"]["offdiag_sub_budget_outcome"] == "SURVIVED_TESTED_POINTS"
+    note_mixed = agg_mixed["holdout_coverage_summary"]["mechanism_revision_note"]
+    assert "All 4 frozen probes" not in note_mixed
+    assert "Mixed holdout outcomes across 1/1 evaluated points: 5/6 candidates" in note_mixed
+    assert "1/6 (TC061-P0) remain UNRESOLVED/INCOMPLETE_COVERAGE" in note_mixed
+    assert agg_mixed["holdout_coverage_summary"]["mechanism_revision_triggered"] is False
+
+    # --- Outcome Case 4: Valid FAIL counterexample with unresolved companions:
+    row_fail_unres = _mk_row(entry_256, spec_256, j_b=j_p0_fail_p18_unres)
+    agg_fail = aggregate_holdout_rows_and_outcomes([row_fail_unres], probes, registered_count=1)
+    assert agg_fail["global_probe_outcomes"]["TC061-P0"]["global_probe_outcome"] == "REFUTED_BY_CERTIFIED_WITNESS"
+    assert len(agg_fail["global_probe_outcomes"]["TC061-P0"]["decisive_fail_witnesses"]) == 1
+    assert agg_fail["global_probe_outcomes"]["TC061-P_1_8"]["global_probe_outcome"] == "UNRESOLVED/INCOMPLETE_COVERAGE"
+    note_fail = agg_fail["holdout_coverage_summary"]["mechanism_revision_note"]
+    assert "Certified counterexample witness(es) recorded (REFUTED_BY_CERTIFIED_WITNESS on TC061-P0" in note_fail
+    assert "companion unresolved/incomplete candidates: TC061-P_1_8" in note_fail
+    assert "All 4 frozen probes" not in note_fail
+    assert agg_fail["holdout_coverage_summary"]["mechanism_revision_triggered"] is False
+    code_fail, cls_fail = derive_report_top_level_outcome_fields(_wrap_sec3(agg_fail))
+    assert code_fail == "REFUTED_ON_TESTED_HOLDOUT_WITH_PROVED_SELF_COLLISION_BOUND_AND_CONDITIONAL_TRANSFER"
+    assert "REFUTED_BY_CERTIFIED_WITNESS on TC061-P0" in cls_fail
+
+    # --- Outcome Case 5: Certification integrity conflict blocks report (no all-pass or unqualified counterexample):
+    def _eval_conflict(sp, *, escalation_tier=0, **kw):
+        saved_c = flint_ctx.prec
+        try:
+            flint_ctx.prec = 256
+            # Tier 0: P0 PASS (lg_256 - 0.1), R_mix UNRESOLVED so Tier 1 runs; Tier 1: P0 FAIL (lg_256 + 0.5)!
+            lg_y = arb(256).log()
+            j_v = (lg_y - arb("0.1")) if escalation_tier == 0 else (lg_y + arb("0.5"))
+            rm_v = (
+                ((arb(1) / arb(4)) * lg_y + arb(0, arb("1e-3")))
+                if escalation_tier == 0
+                else arb(0)
+            )
+            return _make_tc061r2_stub_point_result(
+                rules, escalation_tier, J_ball=j_v, X_ball=arb(0), R_mix_ball=rm_v
+            )
+        finally:
+            flint_ctx.prec = saved_c
+
+    out_conf = execute_holdout_point_with_protocol_escalation(
+        spec_256,
+        probes,
+        rules,
+        point_id="HO-BASE-256",
+        evaluator_fn=_eval_conflict,
+        raise_on_integrity_conflict=False,
+    )
+    row_conf = json.loads(
+        json.dumps(
+            strip_enclosure_arb_for_json(
+                build_holdout_point_artifact_row(entry_256, out_conf, compute_divisor_partition=False)
+            )
+        )
+    )
+    agg_conf = aggregate_holdout_rows_and_outcomes(
+        [row_conf], probes, registered_count=1, fail_on_integrity_conflict=False
+    )
+    assert agg_conf["certification_integrity_summary"]["certification_report_blocked"] is True
+    note_conf = agg_conf["holdout_coverage_summary"]["mechanism_revision_note"]
+    assert "Certification report blocked by certification integrity conflict(s)" in note_conf
+    assert "neither all-pass survival nor an unqualified counterexample refutation is claimed" in note_conf
+    assert agg_conf["holdout_coverage_summary"]["mechanism_revision_triggered"] is False
+    code_conf, cls_conf = derive_report_top_level_outcome_fields(_wrap_sec3(agg_conf))
+    assert code_conf == "CERTIFICATION_INTEGRITY_CONFLICT_BLOCKED"
+    assert "neither all-pass survival nor an unqualified counterexample refutation" in cls_conf
+
+    # Also verify tampered nested KL1 conflict flag (with verdict left as PASS and empty integrity_conflicts)
+    # still blocks certification and forces CERTIFICATION_INTEGRITY_CONFLICT:
+    row_tampered_kl1 = json.loads(json.dumps(row_pass_256))
+    row_tampered_kl1["mechanism_kl1_sub_budgets"]["offdiag_integrity_conflict_detected"] = True
+    agg_tampered_kl1 = aggregate_holdout_rows_and_outcomes(
+        [row_tampered_kl1], probes, registered_count=1, fail_on_integrity_conflict=False
+    )
+    assert agg_tampered_kl1["certification_integrity_summary"]["certification_report_blocked"] is True
+    assert (
+        agg_tampered_kl1["mechanism_kl1_holdout_summary"]["offdiag_sub_budget_outcome"]
+        == "CERTIFICATION_INTEGRITY_CONFLICT"
+    )
+    assert (
+        "Certification report blocked by certification integrity conflict(s)"
+        in agg_tampered_kl1["holdout_coverage_summary"]["mechanism_revision_note"]
+    )
+
+    # --- Outcome Case 6: Complete genuine PASS coverage & independence from resource UNKNOWN status:
+    row_pass_512_snap = _mk_row(
+        entry_512,
+        spec_512,
+        j_b=j_pass,
+        y_int=512,
+        t_y=2436,
+        d0_raw=6,
+        ceil_tau_y=3217,
+        peak_sem="TIER_LOCAL_SNAPSHOT",
+    )
+    agg_ok = aggregate_holdout_rows_and_outcomes(
+        [row_pass_256, row_pass_512_snap], probes, registered_count=2
+    )
+    assert agg_ok["resource_compliance_summary"]["memory_budget_status"] == "UNKNOWN"
+    assert agg_ok["holdout_coverage_summary"]["mathematical_coverage_complete"] is True
+    assert (
+        agg_ok["holdout_coverage_summary"]["mechanism_revision_note"]
+        == "All 4 frozen probes and both TC061-KL1 sub-budgets passed on all evaluated held-out "
+        "points; zero failures occurred, so no TC061-REV1-* post-diagnosis mechanism revision "
+        "was triggered."
+    )
+    code_ok, _ = derive_report_top_level_outcome_fields(_wrap_sec3(agg_ok))
+    assert code_ok == "SURVIVED_TESTED_POINTS_WITH_PROVED_SELF_COLLISION_BOUND_AND_CONDITIONAL_TRANSFER"
+
+    # --- Outcome Case 7: Out-of-domain handling (mixed applicable vs zero-applicable-observation candidate):
+    row_32_ood = _mk_row(
+        entry_32,
+        spec_32,
+        j_b=arb("-0.01"),
+        y_int=32,
+        t_y=77,
+        d0_raw=3,
+        ceil_tau_y=202,
+        in_dom_fn=lambda pr: pr["probe_id"] != "TC061-P0",
+        kl1_in_dom=False,
+    )
+    # 7a: CAL-32 + HO-BASE-256 -> every candidate has >= 1 in-domain PASS observation:
+    agg_ood_both = aggregate_holdout_rows_and_outcomes([row_32_ood, row_pass_256], probes, registered_count=2)
+    assert (
+        "passed on all applicable in-domain held-out points (with out-of-domain exclusions preserved)"
+        in agg_ood_both["holdout_coverage_summary"]["mechanism_revision_note"]
+    )
+    # 7b: CAL-32 alone -> P0 and KL1 have 0 in-domain observations and MUST NOT be counted as passed:
+    agg_ood_only = aggregate_holdout_rows_and_outcomes([row_32_ood], probes, registered_count=1)
+    assert agg_ood_only["global_probe_outcomes"]["TC061-P0"]["global_probe_outcome"] == "UNRESOLVED/INCOMPLETE_COVERAGE"
+    assert agg_ood_only["mechanism_kl1_holdout_summary"]["offdiag_sub_budget_outcome"] == "UNRESOLVED/INCOMPLETE_COVERAGE"
+    note_ood_only = agg_ood_only["holdout_coverage_summary"]["mechanism_revision_note"]
+    assert "All 4 frozen probes" not in note_ood_only
+    assert "zero applicable in-domain observations" in note_ood_only
+    code_ood_only, _ = derive_report_top_level_outcome_fields(_wrap_sec3(agg_ood_only))
+    assert code_ood_only == "UNRESOLVED_OR_INCOMPLETE_HOLDOUT_WITH_PROVED_SELF_COLLISION_BOUND_AND_CONDITIONAL_TRANSFER"
+
+    # 7c: All 6 candidates out-of-domain (e.g. diagnostic Y = 8 < 16) and empty probes=[]:
+    entry_8 = dict(
+        entry_256,
+        point_id="DIAG-8",
+        family="diagnostic",
+        label="8",
+        rational_factor="8/1",
+        exposure_status="DIAGNOSTIC",
+        prior_exposure_note="synthetic all-out-of-domain row",
+    )
+    spec_8 = ExactScaleSpec.from_protocol_entry(entry_8)
+    row_8_all_ood = _mk_row(
+        entry_8,
+        spec_8,
+        j_b=arb("-0.08"),
+        y_int=8,
+        t_y=14,
+        d0_raw=2,
+        ceil_tau_y=51,
+        in_dom_fn=lambda _pr: False,
+        kl1_in_dom=False,
+    )
+    agg_all_ood = aggregate_holdout_rows_and_outcomes([row_8_all_ood], probes, registered_count=1)
+    note_all_ood = agg_all_ood["holdout_coverage_summary"]["mechanism_revision_note"]
+    assert "Zero applicable in-domain observations" in note_all_ood
+    assert "all 6/6 candidates" in note_all_ood
+    assert "()" not in note_all_ood
+    assert "passed" not in note_all_ood.lower()
+
+    agg_no_main_probes = aggregate_holdout_rows_and_outcomes([row_pass_256], [], registered_count=1)
+    note_no_main = agg_no_main_probes["holdout_coverage_summary"]["mechanism_revision_note"]
+    assert "Incomplete candidate configuration: 0 main probes" in note_no_main
+    assert "  " not in note_no_main
+    assert "passed" not in note_no_main.lower()
+
+    # 7d: Unregistered point_id substitution (14 rows, 14 distinct IDs, one registered ID replaced
+    # by "HO-UNREGISTERED-999") MUST reject complete coverage and resource WITHIN certification:
+    unreg_json = tmp_path / "synthetic_unregistered_point_id.json"
+    synth_unreg = json.loads(json.dumps(tc061_artifact))
+    for r_u in synth_unreg["section_3_preregistered_holdout_experiment"]["holdout_point_evaluations"]:
+        if r_u["point_id"] == "HO-UNSEEN-1536":
+            r_u["point_id"] = "HO-UNREGISTERED-999"
+    unreg_json.write_text(json.dumps(synth_unreg, indent=2) + "\n", encoding="utf-8")
+    reproc_unreg = reprocess_task_tc061_derived_summaries(
+        unreg_json,
+        verify_lean_live=False,
+        verify_review_doc=False,
+        require_all_section_3_checks_pass=False,
+    )
+    sec3_unreg = reproc_unreg["section_3_preregistered_holdout_experiment"]
+    assert sec3_unreg["holdout_coverage_summary"]["mathematical_coverage_complete"] is False
+    assert sec3_unreg["holdout_coverage_summary"]["evaluated_count"] == 13
+    assert sec3_unreg["resource_compliance_summary"]["overall_resource_budget_status"] == "UNKNOWN"
+    assert sec3_unreg["all_section_3_checks_pass"] is False
+    assert (
+        reproc_unreg["completion_outcome_code"]
+        == "UNRESOLVED_OR_INCOMPLETE_HOLDOUT_WITH_PROVED_SELF_COLLISION_BOUND_AND_CONDITIONAL_TRANSFER"
+    )
+    assert (
+        "Incomplete holdout coverage: 13 of 14 registered held-out points were evaluated "
+        "(unregistered point_id(s) HO-UNREGISTERED-999"
+        in sec3_unreg["holdout_coverage_summary"]["mechanism_revision_note"]
+    )
+
+
+def test_tc061r3_snapshot_vs_peak_memory_coverage_semantics_and_artifact_preservation(
+    tmp_path: Path,
+    tc061_artifact: Dict[str, Any],
+) -> None:
+    """Verify `TASK-TC-061R3` §§3, 4, & 5 across all 8 required Resource cases, JSON round-trip and
+    summary-reprocessing propagation, and preservation of the 14 recorded all-pass holdouts, 6
+    candidate outcomes, 0 conflicts, genuine `PROCESS_LIFETIME_HIGH_WATER_MARK` telemetry, and
+    3,208 unchanged 256-bit Arb enclosures.
+    """
+    assert RECOGNIZED_PEAK_RSS_COVERING_SEMANTICS == ("PROCESS_LIFETIME_HIGH_WATER_MARK",)
+
+    # --- Resource Case 1: Under-limit TIER_LOCAL_SNAPSHOT (single tier and repeated at every tier) -> UNKNOWN:
+    chk_snap_1 = evaluate_point_resource_compliance(
+        [
+            {
+                "elapsed_sec": 1.0,
+                "peak_rss_mb": 250.0,
+                "peak_rss_measurement_semantics": "TIER_LOCAL_SNAPSHOT",
+            }
+        ],
+        max_wall_sec=300.0,
+        max_rss_mb=4096.0,
+    )
+    assert chk_snap_1["wall_budget_status"] == "WITHIN"
+    assert chk_snap_1["memory_budget_status"] == "UNKNOWN"
+    assert chk_snap_1["overall_resource_status"] == "UNKNOWN"
+    assert chk_snap_1["within_resource_budget"] is None
+    assert chk_snap_1["resource_compliance_verified"] is False
+    assert chk_snap_1["peak_rss_coverage_complete"] is False
+    assert (
+        chk_snap_1["peak_rss_coverage_reason"]
+        == "NON_COVERING_SNAPSHOT_OR_UNVERIFIED_PEAK_RSS_SEMANTICS"
+    )
+    assert chk_snap_1["peak_rss_mb"] is None
+    assert chk_snap_1["partial_uncovered_max_rss_mb"] == 250.0
+    assert chk_snap_1["enforcement_mode"] == "POST_EVALUATION_BUDGET_AUDIT_NO_OS_PREEMPTIVE_KILL"
+
+    chk_snap_all_tiers = evaluate_point_resource_compliance(
+        [
+            {
+                "elapsed_sec": 1.0,
+                "peak_rss_mb": 250.0,
+                "peak_rss_measurement_semantics": "TIER_LOCAL_SNAPSHOT",
+            },
+            {
+                "elapsed_sec": 2.0,
+                "peak_rss_mb": 260.0,
+                "peak_rss_measurement_semantics": "TIER_LOCAL_SNAPSHOT",
+            },
+            {
+                "elapsed_sec": 3.0,
+                "peak_rss_mb": 270.0,
+                "peak_rss_measurement_semantics": "TIER_LOCAL_SNAPSHOT",
+            },
+        ],
+        max_wall_sec=300.0,
+        max_rss_mb=4096.0,
+    )
+    assert chk_snap_all_tiers["memory_budget_status"] == "UNKNOWN"
+    assert chk_snap_all_tiers["overall_resource_status"] == "UNKNOWN"
+    assert (
+        chk_snap_all_tiers["peak_rss_coverage_reason"]
+        == "NON_COVERING_SNAPSHOT_OR_UNVERIFIED_PEAK_RSS_SEMANTICS"
+    )
+
+    # --- Resource Case 2: Numeric peak values with missing, unrecognized, or invalid semantics -> UNKNOWN:
+    for bad_sem in (None, "", "UNRECOGNIZED_SAMPLER", 123, ["PROCESS_LIFETIME_HIGH_WATER_MARK"]):
+        hist_bad = [{"elapsed_sec": 1.0, "peak_rss_mb": 250.0}]
+        if bad_sem is not None:
+            hist_bad[0]["peak_rss_measurement_semantics"] = bad_sem
+        chk_bad = evaluate_point_resource_compliance(hist_bad, max_wall_sec=300.0, max_rss_mb=4096.0)
+        assert chk_bad["memory_budget_status"] == "UNKNOWN"
+        assert chk_bad["overall_resource_status"] == "UNKNOWN"
+        assert chk_bad["within_resource_budget"] is None
+
+    # Invalid non-string semantics in Tier 0 remains conservative UNKNOWN even if Tier 1 has HWM:
+    chk_invalid_sem = evaluate_point_resource_compliance(
+        [
+            {"elapsed_sec": 1.0, "peak_rss_mb": 250.0, "peak_rss_measurement_semantics": 999},
+            {
+                "elapsed_sec": 2.0,
+                "peak_rss_mb": 300.0,
+                "peak_rss_measurement_semantics": "PROCESS_LIFETIME_HIGH_WATER_MARK",
+            },
+        ],
+        max_wall_sec=300.0,
+        max_rss_mb=4096.0,
+    )
+    assert chk_invalid_sem["memory_budget_status"] == "UNKNOWN"
+    assert chk_invalid_sem["peak_rss_coverage_reason"] == "INVALID_OR_NON_MONOTONIC_RSS_TELEMETRY"
+
+    # --- Resource Case 3: Under-limit snapshots / missing semantics followed by valid covering HWM -> WITHIN:
+    chk_snap_then_hwm = evaluate_point_resource_compliance(
+        [
+            {
+                "elapsed_sec": 1.0,
+                "current_rss_mb": 210.0,
+                "peak_rss_mb": 250.0,
+                "peak_rss_measurement_semantics": "TIER_LOCAL_SNAPSHOT",
+            },
+            {
+                "elapsed_sec": 1.5,
+                "current_rss_mb": 260.0,
+                "peak_rss_mb": 265.0,
+            },
+            {
+                "elapsed_sec": 2.5,
+                "current_rss_mb": 290.0,
+                "peak_rss_mb": 320.0,
+                "peak_rss_measurement_semantics": "PROCESS_LIFETIME_HIGH_WATER_MARK",
+            },
+        ],
+        max_wall_sec=300.0,
+        max_rss_mb=4096.0,
+    )
+    assert chk_snap_then_hwm["wall_budget_status"] == "WITHIN"
+    assert chk_snap_then_hwm["memory_budget_status"] == "WITHIN"
+    assert chk_snap_then_hwm["overall_resource_status"] == "WITHIN"
+    assert chk_snap_then_hwm["within_resource_budget"] is True
+    assert (
+        chk_snap_then_hwm["peak_rss_coverage_reason"]
+        == "FINAL_TIER_PROCESS_LIFETIME_HIGH_WATER_MARK_COVERS_PRIOR_TIERS"
+    )
+    assert chk_snap_then_hwm["peak_rss_mb"] == 320.0
+
+    # --- Resource Case 4: Earlier genuine HWM followed by uncovered snapshot OR missing final reading -> UNKNOWN:
+    chk_hwm_then_snap = evaluate_point_resource_compliance(
+        [
+            {
+                "elapsed_sec": 1.0,
+                "peak_rss_mb": 280.0,
+                "peak_rss_measurement_semantics": "PROCESS_LIFETIME_HIGH_WATER_MARK",
+            },
+            {
+                "elapsed_sec": 2.0,
+                "peak_rss_mb": 295.0,
+                "peak_rss_measurement_semantics": "TIER_LOCAL_SNAPSHOT",
+            },
+        ],
+        max_wall_sec=300.0,
+        max_rss_mb=4096.0,
+    )
+    assert chk_hwm_then_snap["memory_budget_status"] == "UNKNOWN"
+    assert chk_hwm_then_snap["overall_resource_status"] == "UNKNOWN"
+    assert chk_hwm_then_snap["within_resource_budget"] is None
+
+    chk_hwm_then_none = evaluate_point_resource_compliance(
+        [
+            {
+                "elapsed_sec": 1.0,
+                "peak_rss_mb": 280.0,
+                "peak_rss_measurement_semantics": "PROCESS_LIFETIME_HIGH_WATER_MARK",
+            },
+            {
+                "elapsed_sec": 2.0,
+                "peak_rss_mb": None,
+                "peak_rss_measurement_semantics": None,
+            },
+        ],
+        max_wall_sec=300.0,
+        max_rss_mb=4096.0,
+    )
+    assert chk_hwm_then_none["memory_budget_status"] == "UNKNOWN"
+    assert chk_hwm_then_none["overall_resource_status"] == "UNKNOWN"
+
+    # --- Resource Case 5: Snapshot above limit, including with missing readings elsewhere -> EXCEEDED:
+    chk_snap_exceeded = evaluate_point_resource_compliance(
+        [
+            {
+                "elapsed_sec": 1.0,
+                "peak_rss_mb": 4500.0,
+                "peak_rss_measurement_semantics": "TIER_LOCAL_SNAPSHOT",
+            },
+            {
+                "elapsed_sec": None,
+                "peak_rss_mb": None,
+                "peak_rss_measurement_semantics": None,
+            },
+        ],
+        max_wall_sec=300.0,
+        max_rss_mb=4096.0,
+    )
+    assert chk_snap_exceeded["wall_budget_status"] == "UNKNOWN"
+    assert chk_snap_exceeded["memory_budget_status"] == "EXCEEDED"
+    assert chk_snap_exceeded["overall_resource_status"] == "EXCEEDED"
+    assert chk_snap_exceeded["rss_budget_exceeded"] is True
+    assert chk_snap_exceeded["within_resource_budget"] is False
+    assert chk_snap_exceeded["peak_rss_mb"] == 4500.0
+
+    # --- Resource Case 6: Existing valid peak coverage -> WITHIN:
+    chk_valid_hwm = evaluate_point_resource_compliance(
+        [
+            {
+                "elapsed_sec": 2.0,
+                "current_rss_mb": 180.0,
+                "peak_rss_mb": 240.0,
+                "peak_rss_measurement_semantics": "PROCESS_LIFETIME_HIGH_WATER_MARK",
+            }
+        ],
+        max_wall_sec=300.0,
+        max_rss_mb=4096.0,
+    )
+    assert chk_valid_hwm["memory_budget_status"] == "WITHIN"
+    assert chk_valid_hwm["overall_resource_status"] == "WITHIN"
+    assert chk_valid_hwm["peak_rss_coverage_reason"] == "ALL_EXECUTED_TIERS_DIRECTLY_MEASURED"
+
+    # --- Resource Case 7: Known wall-time excess with UNKNOWN snapshot memory -> overall EXCEEDED:
+    chk_wall_ex_snap_mem = evaluate_point_resource_compliance(
+        [
+            {
+                "elapsed_sec": 310.0,
+                "peak_rss_mb": 250.0,
+                "peak_rss_measurement_semantics": "TIER_LOCAL_SNAPSHOT",
+            }
+        ],
+        max_wall_sec=300.0,
+        max_rss_mb=4096.0,
+    )
+    assert chk_wall_ex_snap_mem["wall_budget_status"] == "EXCEEDED"
+    assert chk_wall_ex_snap_mem["memory_budget_status"] == "UNKNOWN"
+    assert chk_wall_ex_snap_mem["overall_resource_status"] == "EXCEEDED"
+    assert chk_wall_ex_snap_mem["within_resource_budget"] is False
+    sec_wall_ex = aggregate_section_resource_compliance([chk_wall_ex_snap_mem], registered_count=1)
+    assert sec_wall_ex["wall_budget_status"] == "EXCEEDED"
+    assert sec_wall_ex["memory_budget_status"] == "UNKNOWN"
+    assert sec_wall_ex["overall_resource_budget_status"] == "EXCEEDED"
+    assert sec_wall_ex["any_resource_budget_exceeded"] is True
+    assert sec_wall_ex["any_resource_budget_unknown"] is True
+    assert sec_wall_ex["all_resource_budgets_verified_within"] is False
+
+    # --- Resource Case 8: UNKNOWN and EXCEEDED survive JSON serialization, section aggregation,
+    # and summary reprocessing without becoming verified compliance:
+    roundtrip_checks = json.loads(json.dumps([chk_snap_1, chk_valid_hwm]))
+    sec_rt_unknown = aggregate_section_resource_compliance(roundtrip_checks, registered_count=2)
+    assert sec_rt_unknown["memory_budget_status"] == "UNKNOWN"
+    assert sec_rt_unknown["overall_resource_budget_status"] == "UNKNOWN"
+    assert sec_rt_unknown["all_points_within_resource_budgets"] is None
+    assert sec_rt_unknown["all_resource_budgets_verified_within"] is False
+
+    roundtrip_ex = json.loads(json.dumps([chk_snap_1, chk_snap_exceeded]))
+    sec_rt_ex = aggregate_section_resource_compliance(roundtrip_ex, registered_count=2)
+    assert sec_rt_ex["memory_budget_status"] == "EXCEEDED"
+    assert sec_rt_ex["overall_resource_budget_status"] == "EXCEEDED"
+    assert sec_rt_ex["all_points_within_resource_budgets"] is False
+    assert sec_rt_ex["all_resource_budgets_verified_within"] is False
+
+    synth_snap_path = tmp_path / "synthetic_snapshot_rss.json"
+    synth_snap_art = json.loads(json.dumps(tc061_artifact))
+    synth_snap_art["section_3_preregistered_holdout_experiment"]["holdout_point_evaluations"][0][
+        "escalation_history"
+    ][0]["peak_rss_measurement_semantics"] = "TIER_LOCAL_SNAPSHOT"
+    synth_snap_path.write_text(json.dumps(synth_snap_art, indent=2) + "\n", encoding="utf-8")
+    reproc_snap = reprocess_task_tc061_derived_summaries(
+        synth_snap_path,
+        verify_lean_live=False,
+        verify_review_doc=False,
+        require_all_section_3_checks_pass=True,
+    )
+    sec3_snap = reproc_snap["section_3_preregistered_holdout_experiment"]
+    assert sec3_snap["resource_compliance_summary"]["memory_budget_status"] == "UNKNOWN"
+    assert sec3_snap["resource_compliance_summary"]["overall_resource_budget_status"] == "UNKNOWN"
+    assert sec3_snap["resource_compliance_summary"]["all_resource_budgets_verified_within"] is False
+    assert sec3_snap["execution_telemetry_summary"]["max_observed_peak_rss_mb"] is None
+    # Mathematical verdicts remain independent of UNKNOWN resource compliance:
+    assert (
+        sec3_snap["global_probe_outcomes"]["TC061-P0"]["global_probe_outcome"]
+        == "SURVIVED_TESTED_POINTS"
+    )
+
+    # --- Preservation check on the recorded real TC-061 artifact (14 holdouts, 6 candidates,
+    # 0 conflicts, genuine PROCESS_LIFETIME_HIGH_WATER_MARK coverage, and 3,208 unchanged Arb balls):
+    sec3_real = tc061_artifact["section_3_preregistered_holdout_experiment"]
+    assert sec3_real["holdout_coverage_summary"]["registered_count"] == 14
+    assert sec3_real["holdout_coverage_summary"]["evaluated_count"] == 14
+    assert sec3_real["holdout_coverage_summary"]["mathematical_coverage_complete"] is True
+    assert sec3_real["certification_integrity_summary"]["integrity_conflict_count"] == 0
+    assert sec3_real["certification_integrity_summary"]["certification_report_blocked"] is False
+    for pid in ("TC061-P0", "TC061-P_1_2", "TC061-P_1_4", "TC061-P_1_8"):
+        assert (
+            sec3_real["global_probe_outcomes"][pid]["global_probe_outcome"]
+            == "SURVIVED_TESTED_POINTS"
+        )
+        assert sec3_real["global_probe_outcomes"][pid]["pass_count"] == 14
+    assert (
+        sec3_real["mechanism_kl1_holdout_summary"]["offdiag_sub_budget_outcome"]
+        == "SURVIVED_TESTED_POINTS"
+    )
+    assert (
+        sec3_real["mechanism_kl1_holdout_summary"]["mixed_core_sub_budget_outcome"]
+        == "SURVIVED_TESTED_POINTS"
+    )
+    assert sec3_real["resource_compliance_summary"]["memory_budget_status"] == "WITHIN"
+    assert sec3_real["resource_compliance_summary"]["overall_resource_budget_status"] == "WITHIN"
+    for r_real in sec3_real["holdout_point_evaluations"]:
+        assert len(r_real["escalation_history"]) == 1
+        assert (
+            r_real["escalation_history"][0]["peak_rss_measurement_semantics"]
+            == "PROCESS_LIFETIME_HIGH_WATER_MARK"
+        )
+        assert (
+            r_real["resource_budget_check"]["peak_rss_coverage_reason"]
+            == "ALL_EXECUTED_TIERS_DIRECTLY_MEASURED"
+        )
+    assert len(_collect_serialized_arb_dicts(tc061_artifact)) == 3208
 
 
 
