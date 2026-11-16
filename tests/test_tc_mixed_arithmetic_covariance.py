@@ -21,10 +21,14 @@ from pathlib import Path
 import re
 from typing import Any, Dict, List
 
-from flint import arb
+from flint import arb, ctx as flint_ctx
 import pytest
 
-from tc.canonical_theta_correlation_bound import REPO_ROOT, verify_all_serialized_arb_in_tree
+from tc.canonical_theta_correlation_bound import (
+    REPO_ROOT,
+    serialize_arb_certified,
+    verify_all_serialized_arb_in_tree,
+)
 from tc.dyadic_power_lift_primitive_correlation import EPISTEMIC_CATEGORIES, PARENT_SUBGATE_ID
 from tc.liouville_square_dilation import (
     _parse_arb_ball_str_to_fractions,
@@ -43,7 +47,11 @@ from tc.mixed_arithmetic_covariance import (
     POINT_MARGIN_VERDICTS,
     PROBE_GLOBAL_OUTCOMES,
     PROPOSED_TC061_BRANCH,
+    PROPOSED_TC061R_BRANCH,
+    REVIEWED_TC061_IMPLEMENTATION,
+    REVIEWED_TC061_TIP,
     TASK_TC_061_ID,
+    TASK_TC_061R_ID,
     TC_061_LEAN_MODULE_PATH,
     TC_061_REVIEW_DOC_PATH,
     ExactScaleSpec,
@@ -52,9 +60,18 @@ from tc.mixed_arithmetic_covariance import (
     certify_exact_scale_cutoffs,
     classify_global_probe_outcome,
     classify_probe_margin_arb,
+    compute_complete_core_s_Y_and_beta_Y_arb,
+    compute_finite_prime_control_invariants,
     compute_selberg_centered_remainder_table_fast_arb,
+    evaluate_divisor_sum_aS_direct,
+    evaluate_finite_prime_parity_convolution_formula,
     evaluate_interval_via_cutoff_case_split_arb,
     evaluate_mixed_covariance_point_arb,
+    evaluate_window_gram_G_Y_r_arb,
+    execute_holdout_point_with_protocol_escalation,
+    load_frozen_protocol_rules,
+    resolve_protocol_quadrature_settings,
+    verify_coarse_halfline_complement_bound_arb,
     verify_frozen_protocol_immutability,
     verify_self_collision_elementary_majorant_proof_arb,
     verify_tc061_lean_theorems_live,
@@ -85,6 +102,7 @@ def test_tc061_artifact_provenance_epistemic_scope_and_preserved_tc060r2(
     tau-only / K-grade notation hygiene, serialized Arb self-check, and TC-060R2 preservation.
     """
     assert tc061_artifact["task_id"] == TASK_TC_061_ID
+    assert tc061_artifact["repair_task_id"] == TASK_TC_061R_ID
     assert tc061_artifact["parent_subgate"] == PARENT_SUBGATE_ID
     assert tc061_artifact["subgate_tc043a_status"] == "OPEN"
     assert tc061_artifact["rh_proved"] is False
@@ -93,7 +111,10 @@ def test_tc061_artifact_provenance_epistemic_scope_and_preserved_tc060r2(
     assert tc061_artifact["accepted_tc060r2_tip"] == ACCEPTED_TC060R2_TIP
     assert tc061_artifact["accepted_tc060r2_implementation"] == ACCEPTED_TC060R2_IMPLEMENTATION
     assert tc061_artifact["inherited_tc060r_formal_commit"] == REVIEWED_TC060R_IMPLEMENTATION
-    assert tc061_artifact["branch"] == PROPOSED_TC061_BRANCH
+    assert tc061_artifact["reviewed_tc061_tip"] == REVIEWED_TC061_TIP
+    assert tc061_artifact["reviewed_tc061_implementation"] == REVIEWED_TC061_IMPLEMENTATION
+    assert tc061_artifact["branch"] == PROPOSED_TC061R_BRANCH
+    assert tc061_artifact["original_tc061_branch"] == PROPOSED_TC061_BRANCH
     assert tc061_artifact["epistemic_categories_enforced"] == list(EPISTEMIC_CATEGORIES)
     assert tc061_artifact["probe_global_outcomes_enforced"] == list(PROBE_GLOBAL_OUTCOMES)
 
@@ -536,7 +557,15 @@ def test_tc061_signed_kernel_w2_self_collision_bound_and_coprime_bridge(
         assert brow["aggregate_log_removal_certified"] is True
         assert brow["complement_window_identity_verified"] is True
 
-    assert sec5["remaining_quantitative_lemma"]["lemma_id"] == "TC061-LEM-OFFDIAG-AND-CORE"
+    assert sec5["remaining_quantitative_lemma"]["lemma_id"] == "TC061R-OBL-SIGNED-REMAINDER-F"
+    assert (
+        sec5["remaining_quantitative_lemma"]["exact_equivalent_obligation_id"]
+        == "TC061R-OBL-SIGNED-REMAINDER-F"
+    )
+    assert (
+        sec5["remaining_quantitative_lemma"]["sufficient_unsigned_core_relaxation_id"]
+        == "TC061-LEM-OFFDIAG-AND-CORE"
+    )
 
     sec6 = tc061_artifact["section_6_route_d_conditional_transfer_and_scope"]
     assert sec6["all_section_6_checks_pass"] is True
@@ -658,3 +687,465 @@ def test_tc061_review_displayed_enclosures_and_adversarial_tamper_rejection(
     res_shift = verify_tc061_review_displayed_enclosures(tc061_artifact, bad_shift)
     assert res_shift["failed_count"] == 1
     assert res_shift["all_displayed_intervals_contain_generated_enclosures"] is False
+
+    # Adversarial check 4: mismatched Lean declaration line anchor must fail closed (even with valid interval):
+    bad_anchor = tmp_path / "bad_anchor.md"
+    bad_anchor.write_text(
+        '`[0.1171271185860626646392829570809787502938 +/- 5.0e-40]` '
+        '<!-- tc-enclosure: observable="J_direct" params="Y=64" '
+        'json_path="section_1_protocol_and_exact_mixed_identity.diagnostic_and_calibration_evaluations[Y=64].J_direct" -->\n'
+        "Bad anchor [`MixedCovarianceClosureHypothesis`](file:///c:/Development/Projects/reimann_scope/formal/RiemannScope/MixedArithmeticCovariance.lean#L1-L2).\n",
+        encoding="utf-8",
+    )
+    res_anc = verify_tc061_review_displayed_enclosures(tc061_artifact, bad_anchor)
+    assert res_anc["failed_count"] == 0
+    assert len(res_anc["failed_lean_line_anchors"]) == 1
+    assert res_anc["all_displayed_intervals_contain_generated_enclosures"] is False
+
+
+def test_tc061r_protocol_quadrature_boundary_selection_and_silent_override_rejection() -> None:
+    """Verify frozen-protocol quadrature selection at `T = 431` (`Y = 128`), `T = 511`, and
+    `T = 512`, escalation tiers 1 and 2, and fail-closed rejection of silent caller overrides
+    and inactive three-zone parameters in `unsplit` mode (`TASK-TC-061R` §6).
+    """
+    rules = load_frozen_protocol_rules()
+
+    # 1. Boundary T = 431 (< 512) and T = 511 (< 512) -> unsplit, quad_tol_bits = 240, n_panels = 1:
+    r_431 = resolve_protocol_quadrature_settings(rules, 431, 805, escalation_tier=0)
+    assert r_431["quadrature_mode"] == "unsplit"
+    assert r_431["three_zone"] is False
+    assert r_431["used_settings"] == {
+        "quadrature_mode": "unsplit",
+        "prec_bits": 256,
+        "quad_tol_bits": 240,
+        "n_panels": 1,
+        "zone1_ratio_threshold_x_over_n": None,
+        "zone3_cutoff_N1": None,
+        "zone3_taylor_degree_M": None,
+    }
+    assert r_431["inactive_parameters"] == [
+        "quad_tol_bits_three_zone_large_T",
+        "n_panels",
+        "zone1_ratio_threshold_x_over_n",
+        "zone3_cutoff_N1",
+        "zone3_taylor_degree_M",
+    ]
+
+    r_511 = resolve_protocol_quadrature_settings(rules, 511, 900, escalation_tier=0)
+    assert r_511["quadrature_mode"] == "unsplit"
+    assert r_511["used_settings"]["quad_tol_bits"] == 240
+    assert r_511["used_settings"]["n_panels"] == 1
+
+    # 2. Boundary T = 512 (>= 512) -> three_zone, quad_tol_bits = 160, 16 panels, ratio 12, M = 56:
+    r_512 = resolve_protocol_quadrature_settings(rules, 512, 900, escalation_tier=0)
+    assert r_512["quadrature_mode"] == "three_zone"
+    assert r_512["three_zone"] is True
+    assert r_512["used_settings"] == {
+        "quadrature_mode": "three_zone",
+        "prec_bits": 256,
+        "quad_tol_bits": 160,
+        "n_panels": 16,
+        "zone1_ratio_threshold_x_over_n": 12,
+        "zone3_cutoff_N1": 900,
+        "zone3_taylor_degree_M": 56,
+    }
+    assert r_512["inactive_parameters"] == ["quad_tol_bits_unsplit_small_T"]
+
+    # 3. Registered escalation tiers 1 and 2:
+    r_512_t1 = resolve_protocol_quadrature_settings(rules, 512, 900, escalation_tier=1)
+    assert r_512_t1["used_settings"]["prec_bits"] == 512
+    assert r_512_t1["used_settings"]["quad_tol_bits"] == 240
+    assert r_512_t1["used_settings"]["n_panels"] == 32
+    assert r_512_t1["used_settings"]["zone1_ratio_threshold_x_over_n"] == 16
+    assert r_512_t1["used_settings"]["zone3_taylor_degree_M"] == 80
+
+    r_512_t2 = resolve_protocol_quadrature_settings(rules, 512, 900, escalation_tier=2)
+    assert r_512_t2["used_settings"]["prec_bits"] == 1024
+    assert r_512_t2["used_settings"]["quad_tol_bits"] == 440
+    assert r_512_t2["used_settings"]["n_panels"] == 64
+    assert r_512_t2["used_settings"]["zone1_ratio_threshold_x_over_n"] == 22
+    assert r_512_t2["used_settings"]["zone3_taylor_degree_M"] == 112
+
+    # 4. Silent caller overrides at Y = 128 (T = 431) and Y = 256 (T = 1024) must raise ValueError:
+    sp128 = ExactScaleSpec("128", "exact_rational", Fraction(128, 1))
+    with pytest.raises(ValueError, match="Silent quad_tol_bits override"):
+        evaluate_mixed_covariance_point_arb(sp128, quad_tol_bits=160)
+    with pytest.raises(ValueError, match="Silent n_panels override"):
+        evaluate_mixed_covariance_point_arb(sp128, n_panels=16)
+    with pytest.raises(ValueError, match="Silent M_taylor override"):
+        evaluate_mixed_covariance_point_arb(sp128, M_taylor=56)
+    with pytest.raises(ValueError, match="Inactive three-zone parameters"):
+        evaluate_mixed_covariance_point_arb(
+            sp128,
+            quad_tol_bits=180,
+            M_taylor=56,
+            use_three_zone=False,
+            allow_nonprotocol_override=True,
+        )
+
+    sp256 = ExactScaleSpec("256", "exact_rational", Fraction(256, 1))
+    with pytest.raises(ValueError, match="Silent quad_tol_bits override"):
+        evaluate_mixed_covariance_point_arb(sp256, quad_tol_bits=240)
+
+
+def test_tc061r_holdout_y128_240bit_rerun_and_stored_settings_consistency(
+    tc061_artifact: Dict[str, Any],
+) -> None:
+    """Verify live `Y = 128` (`T = 431 < 512`) evaluation runs at `quadrature_mode='unsplit'`,
+    `quad_tol_bits = 240`, `n_panels = 1`, matches stored `HO-BASE-128`, and check that all 14
+    stored holdout rows obey the frozen `T < 512` vs `T >= 512` quadrature rule (`TASK-TC-061R` §6).
+    """
+    tbl = compute_selberg_centered_remainder_table_fast_arb(500, prec_bits=288)
+    sp128 = ExactScaleSpec("128", "exact_rational", Fraction(128, 1))
+    live_128 = evaluate_mixed_covariance_point_arb(sp128, selberg_table=tbl)
+    assert live_128["cutoffs"]["T_Y"] == 431
+    assert live_128["quadrature_mode"] == "unsplit"
+    assert live_128["three_zone_used"] is False
+    assert live_128["quad_tol_bits"] == 240
+    assert live_128["panels_used"] == 1
+    assert live_128["zone1_ratio_threshold_used"] is None
+    assert live_128["M_taylor_used"] is None
+
+    sec3 = tc061_artifact["section_3_preregistered_holdout_experiment"]
+    rows = sec3["holdout_point_evaluations"]
+    assert len(rows) == 14
+    for r in rows:
+        t_y = int(r["cutoffs"]["T_Y"])
+        if t_y < 512:
+            assert r["point_id"] == "HO-BASE-128"
+            assert r["quadrature_mode"] == "unsplit"
+            assert r["quad_tol_bits_used"] == 240
+            assert r["panels_used"] == 1
+            assert r["used_settings"]["zone1_ratio_threshold_x_over_n"] is None
+            assert r["used_settings"]["zone3_taylor_degree_M"] is None
+        else:
+            assert r["quadrature_mode"] == "three_zone"
+            assert r["quad_tol_bits_used"] == 160
+            assert r["panels_used"] == 16
+            assert r["used_settings"]["zone1_ratio_threshold_x_over_n"] == 12
+            assert r["used_settings"]["zone3_taylor_degree_M"] == 56
+        assert r["resource_budget_check"]["within_resource_budget"] is True
+        assert (
+            r["resource_budget_check"]["enforcement_mode"]
+            == "POST_EVALUATION_BUDGET_AUDIT_NO_OS_PREEMPTIVE_KILL"
+        )
+
+    by_id = {r["point_id"]: r for r in rows}
+    stored_j128_lo, stored_j128_hi, _ = _parse_arb_ball_str_to_fractions(
+        by_id["HO-BASE-128"]["J_direct"]["arb_ball_str"]
+    )
+    live_j128_lo, live_j128_hi, _ = _parse_arb_ball_str_to_fractions(
+        serialize_arb_certified(live_128["J_direct"])["arb_ball_str"]
+    )
+    assert max(stored_j128_lo, live_j128_lo) <= min(stored_j128_hi, live_j128_hi)
+
+    comp = sec3["tc061r_protocol_deviation_and_rerun_comparison"]
+    assert comp["verified"] is True
+    assert comp["all_verdicts_identical_pass"] is True
+    assert (
+        comp["epistemic_role"]
+        == "CORRECTED_PROTOCOL_REPEAT_ON_SAME_REGISTERED_POINT_NOT_NEW_UNSEEN_POINT"
+    )
+    for obs_cmp in comp["observable_enclosure_comparisons"].values():
+        assert obs_cmp["enclosures_overlap"] is True
+        assert obs_cmp["corrected_240bit_enclosed_within_original_160bit"] is True
+
+
+def test_tc061r_escalation_state_machine_kl1_unresolved_final_unresolved_and_certified_fail() -> None:
+    """Exercise `execute_holdout_point_with_protocol_escalation` across:
+    1. Main probes all `PASS` + one `KL1` sub-budget `UNRESOLVED` at Tier 0 -> triggers Tier 1;
+    2. Final-tier `UNRESOLVED` -> stops after Tier 2 and yields `UNRESOLVED/INCOMPLETE_COVERAGE`;
+    3. Certified `FAIL` -> stops at Tier 0 without changing constants (`REFUTED_BY_CERTIFIED_WITNESS`);
+    4. Post-evaluation wall-clock / RSS budget audit failure (`within_resource_budget == False`).
+    """
+    proto = json.loads(MIXED_ARITHMETIC_COVARIANCE_PROTOCOL_PATH.read_text(encoding="utf-8"))
+    probes = proto["frozen_candidate_probes"]
+    rules = proto["numerical_settings_and_escalation_rules"]
+    spec = ExactScaleSpec("256", "exact_rational", Fraction(256, 1))
+
+    def _make_stub_result(
+        tier: int,
+        *,
+        J_ball: arb,
+        X_ball: arb,
+        R_mix_ball: arb,
+        elapsed_sec: float = 0.05,
+        peak_rss_mb: float = 128.0,
+    ) -> Dict[str, Any]:
+        resolved = resolve_protocol_quadrature_settings(rules, 1024, 1609, escalation_tier=tier)
+        used = resolved["used_settings"]
+        d_b = arb(1)
+        lg_y = arb(256).log()
+        return {
+            "cutoffs": {
+                "label": "256",
+                "kind": "exact_rational",
+                "T_Y": 1024,
+                "D0_raw": 5,
+                "D0_eff": 5,
+                "ceil_tau_Y": 1609,
+                "cutoff_prec_bits_used": int(used["prec_bits"]),
+            },
+            "Y_arb": arb(256),
+            "log_Y_arb": lg_y,
+            "D_tilde_Y": d_b,
+            "log_Y_times_D_tilde": lg_y * d_b,
+            "X_tilde_Y": X_ball,
+            "R_mix_Y": R_mix_ball,
+            "J_direct": J_ball,
+            "quadrature_mode": resolved["quadrature_mode"],
+            "escalation_tier": tier,
+            "requested_settings": resolved["requested_settings"],
+            "used_settings": used,
+            "inactive_parameters": resolved["inactive_parameters"],
+            "prec_bits": int(used["prec_bits"]),
+            "quad_tol_bits": int(used["quad_tol_bits"]),
+            "panels_used": int(used["n_panels"]),
+            "elapsed_sec": elapsed_sec,
+            "current_rss_mb": peak_rss_mb,
+            "peak_rss_mb": peak_rss_mb,
+        }
+
+    lg_256 = arb(256).log()
+    rhs_1_4 = (arb(1) / arb(4)) * lg_256
+
+    # Case 1: Main probes PASS (J = -1.0 << log(256)), offdiag PASS (4*X = -1.0),
+    # but R_mix straddles (1/4)*log(256) at Tier 0 and resolves strictly below at Tier 1!
+    def _eval_kl1_only(sp, *, escalation_tier=0, protocol_rules=None, allow_nonprotocol_override=False, selberg_table=None):
+        assert allow_nonprotocol_override is False
+        rmix = (rhs_1_4 + arb(0, arb("1e-20"))) if escalation_tier == 0 else (rhs_1_4 - arb("0.1"))
+        return _make_stub_result(escalation_tier, J_ball=arb(-1), X_ball=arb("-0.25"), R_mix_ball=rmix)
+
+    out_kl1 = execute_holdout_point_with_protocol_escalation(
+        spec, probes, rules, evaluator_fn=_eval_kl1_only
+    )
+    assert out_kl1["escalation_tier_used"] == 1
+    assert len(out_kl1["escalation_history"]) == 2
+    assert out_kl1["escalation_history"][0]["any_main_probe_in_domain_unresolved"] is False
+    assert out_kl1["escalation_history"][0]["any_kl1_in_domain_unresolved"] is True
+    assert out_kl1["escalation_history"][1]["used_settings"]["prec_bits"] == 512
+    assert out_kl1["escalation_history"][1]["used_settings"]["quad_tol_bits"] == 240
+    assert out_kl1["escalation_history"][1]["used_settings"]["n_panels"] == 32
+    assert out_kl1["probe_evaluation"]["mechanism_kl1_sub_budgets"]["R_mix_verdict"] == "PASS"
+
+    # Case 2: Margin remains UNRESOLVED through final escalation Tier 2 -> preserved UNRESOLVED:
+    def _eval_always_unresolved(sp, *, escalation_tier=0, protocol_rules=None, allow_nonprotocol_override=False, selberg_table=None):
+        return _make_stub_result(
+            escalation_tier,
+            J_ball=lg_256 + arb(0, arb("1e-15")),
+            X_ball=arb(0),
+            R_mix_ball=arb(0),
+        )
+
+    out_unres = execute_holdout_point_with_protocol_escalation(
+        spec, probes, rules, evaluator_fn=_eval_always_unresolved
+    )
+    assert out_unres["escalation_tier_used"] == 2
+    assert len(out_unres["escalation_history"]) == 3
+    assert out_unres["escalation_history"][2]["used_settings"]["prec_bits"] == 1024
+    assert out_unres["escalation_history"][2]["used_settings"]["quad_tol_bits"] == 440
+    assert out_unres["escalation_history"][2]["used_settings"]["n_panels"] == 64
+    p0_v = out_unres["probe_evaluation"]["per_probe"]["TC061-P0"]["point_verdict"]
+    assert p0_v == "UNRESOLVED"
+    assert classify_global_probe_outcome([p0_v], coverage_complete=True) == "UNRESOLVED/INCOMPLETE_COVERAGE"
+
+    # Case 3: Certified FAIL at Tier 0 (J = 100 >> RHS) -> no escalation, probe constants untouched:
+    probes_snapshot = json.dumps(probes, sort_keys=True)
+
+    def _eval_cert_fail(sp, *, escalation_tier=0, protocol_rules=None, allow_nonprotocol_override=False, selberg_table=None):
+        return _make_stub_result(escalation_tier, J_ball=arb(100), X_ball=arb(20), R_mix_ball=arb(20))
+
+    out_fail = execute_holdout_point_with_protocol_escalation(
+        spec, probes, rules, evaluator_fn=_eval_cert_fail
+    )
+    assert out_fail["escalation_tier_used"] == 0
+    assert len(out_fail["escalation_history"]) == 1
+    assert json.dumps(probes, sort_keys=True) == probes_snapshot
+    for pid, pd in out_fail["probe_evaluation"]["per_probe"].items():
+        assert pd["point_verdict"] == "FAIL", f"{pid} must be FAIL"
+    assert (
+        classify_global_probe_outcome(["FAIL", "PASS"], coverage_complete=True)
+        == "REFUTED_BY_CERTIFIED_WITNESS"
+    )
+
+    # Case 4: Budget audit catches wall-clock > 300s or peak_rss > 4096 MB:
+    def _eval_over_budget(sp, *, escalation_tier=0, protocol_rules=None, allow_nonprotocol_override=False, selberg_table=None):
+        return _make_stub_result(
+            escalation_tier,
+            J_ball=arb(0),
+            X_ball=arb(0),
+            R_mix_ball=arb(0),
+            elapsed_sec=305.0,
+            peak_rss_mb=5000.0,
+        )
+
+    out_bgt = execute_holdout_point_with_protocol_escalation(
+        spec, probes, rules, evaluator_fn=_eval_over_budget
+    )
+    assert out_bgt["resource_budget_check"]["wall_budget_exceeded"] is True
+    assert out_bgt["resource_budget_check"]["rss_budget_exceeded"] is True
+    assert out_bgt["resource_budget_check"]["within_resource_budget"] is False
+
+
+def test_tc061r_finite_prime_control_convolution_densities_residues_and_scoped_prose(
+    tc061_artifact: Dict[str, Any],
+) -> None:
+    """Verify exact `(1 * a_S)(n)` convolution formula against direct divisor sums across `1..300`,
+    required spot checks `(∅, 12) -> 6` and `({2}, 3, 6, 12) -> (2, 0, 2)`, distinct support
+    densities vs `z = 1` residues, and absence of unproved asymptotic claims (`TASK-TC-061R` §3).
+    """
+    assert evaluate_finite_prime_parity_convolution_formula(12, ()) == 6
+    assert evaluate_divisor_sum_aS_direct(12, ()) == 6
+    assert evaluate_finite_prime_parity_convolution_formula(3, (2,)) == 2
+    assert evaluate_finite_prime_parity_convolution_formula(6, (2,)) == 0
+    assert evaluate_finite_prime_parity_convolution_formula(12, (2,)) == 2
+    assert [evaluate_divisor_sum_aS_direct(n, (2,)) for n in (3, 6, 12)] == [2, 0, 2]
+
+    for s_primes in ((), (2,), (3, 5, 7)):
+        inv = compute_finite_prime_control_invariants(s_primes, verify_up_to=300)
+        assert inv["convolution_formula_verified"] is True
+
+    sec4 = tc061_artifact["section_4_controls_and_tc_arithmetic_attribution"]
+    assert sec4["control_arithmetic_invariants_verified"] is True
+    invs = sec4["control_arithmetic_invariants"]
+    assert invs["unsigned_1"]["nonzero_support_natural_density_fraction"] == "1/1"
+    assert invs["unsigned_1"]["dirichlet_series_D_aS_residue_at_z1_fraction"] == "1/1"
+    assert invs["a2"]["nonzero_support_natural_density_fraction"] == "2/3"
+    assert invs["a2"]["dirichlet_series_D_aS_residue_at_z1_fraction"] == "1/3"
+    assert invs["a_3_5_7"]["nonzero_support_natural_density_fraction"] == "35/64"
+    assert invs["a_3_5_7"]["dirichlet_series_D_aS_residue_at_z1_fraction"] == "1/4"
+
+    # Ensure unproved O(Y) / asymp growth claims are absent from Section 4 metadata and top-level summary:
+    for prose_txt in (
+        sec4["section_epistemic_scope_note"],
+        sec4["tc_arithmetic_attribution_statement"],
+        tc061_artifact["research_outcome_class"],
+    ):
+        assert "O(Y) growth" not in prose_txt
+        assert "O(Y) known-component growth" not in prose_txt
+        assert r"\asymp" not in prose_txt
+
+
+def test_tc061r_complete_core_sY_vs_betaY_compact_gram_and_spillover_above_T(
+    tc061_artifact: Dict[str, Any],
+) -> None:
+    """Verify distinct `s_Y` vs `beta_Y` vectors, nonzero spillover on `T < n <= 2*T`, pointwise
+    complete-core bridge, and compact `(0, 2, 4)` Gram identity against 1D window evaluation
+    (`TASK-TC-061R` §2).
+    """
+    tbl = compute_selberg_centered_remainder_table_fast_arb(30, prec_bits=288)
+    saved_prec = flint_ctx.prec
+    try:
+        flint_ctx.prec = 256
+        for y_k in (2, 4, 8):
+            sp = ExactScaleSpec(str(y_k), "exact_rational", Fraction(y_k, 1))
+            res_1d = evaluate_mixed_covariance_point_arb(sp, selberg_table=tbl)
+            T_k = res_1d["cutoffs"]["T_Y"]
+            D0_eff = res_1d["cutoffs"]["D0_eff"]
+            vecs = compute_complete_core_s_Y_and_beta_Y_arb(T_k, D0_eff, tbl["R_osc"], prec_bits=256)
+            a_n = vecs["a_n"]
+            s_Y = vecs["s_Y"]
+            beta_Y = vecs["beta_Y"]
+
+            # Distinct on 2 <= n <= T (since a_n != 0 and (log n)^2 > 0), equal on T < n <= 2*T:
+            assert bool(abs(s_Y[2] - beta_Y[2]) > arb("0.4"))
+            assert len(vecs["spillover_above_T_indices"]) > 0
+            assert bool(vecs["max_spillover_above_T_abs"] > arb(0))
+            for n_sp in vecs["spillover_above_T_indices"]:
+                assert T_k < n_sp <= 2 * T_k
+                assert bool(arb(0) in (s_Y[n_sp] - beta_Y[n_sp]))
+
+            # Direct compact (0, 2, 4) Gram sum vs 1D J_direct:
+            Y_b = arb(y_k)
+            N2 = 2 * T_k
+            g_sum = arb(0)
+            for m_i in range(1, N2 + 1):
+                for n_i in range(1, N2 + 1):
+                    if a_n[m_i] != arb(0) and a_n[n_i] != arb(0):
+                        g_sum += (
+                            a_n[m_i]
+                            * a_n[n_i]
+                            * evaluate_window_gram_G_Y_r_arb(Y_b, m_i, n_i, 0, prec_bits=256)
+                        )
+                    cross = a_n[m_i] * beta_Y[n_i] + beta_Y[m_i] * a_n[n_i]
+                    if cross != arb(0):
+                        g_sum -= cross * evaluate_window_gram_G_Y_r_arb(Y_b, m_i, n_i, 2, prec_bits=256)
+                    if beta_Y[m_i] != arb(0) and beta_Y[n_i] != arb(0):
+                        g_sum += (
+                            beta_Y[m_i]
+                            * beta_Y[n_i]
+                            * evaluate_window_gram_G_Y_r_arb(Y_b, m_i, n_i, 4, prec_bits=256)
+                        )
+            j_compact = g_sum - arb(4) * res_1d["D_tilde_Y"]
+            diff_j = j_compact - res_1d["J_direct"]
+            assert bool(arb(0) in diff_j and abs(diff_j) < arb("1e-55"))
+    finally:
+        flint_ctx.prec = saved_prec
+
+    sec1 = tc061_artifact["section_1_protocol_and_exact_mixed_identity"]
+    for r1 in sec1["diagnostic_and_calibration_evaluations"]:
+        assert r1["spillover_above_T_count"] > 0
+        lo_br, hi_br, _ = _parse_arb_ball_str_to_fractions(
+            r1["max_pointwise_adjusted_beta_Y_bridge_residual"]["arb_ball_str"]
+        )
+        assert max(abs(lo_br), abs(hi_br)) < Fraction(1, 10**65)
+
+
+def test_tc061r_coarse_halfline_complement_bound_signed_F_S_and_headline_reconciliation(
+    tc061_artifact: Dict[str, Any],
+) -> None:
+    """Verify unconditional coarse half-line complement bound `D_inf(T) <= 2*c_G*T*zeta''(2)`,
+    signed `Y = 32` log-removal sandwich, same-integer mixed `(P_Y, B_Y)` cancellation witness,
+    `F(Y)` / `S(Y)` certificates across `16..4096`, and programmatic headline/exposure reconciliation
+    (`TASK-TC-061R` §§4, 5, 7).
+    """
+    coarse = verify_coarse_halfline_complement_bound_arb()
+    assert coarse["verified"] is True
+    assert coarse["c_G_matches_half_gamma_5_2"] is True
+    assert coarse["kernel_majorant_1_to_40_verified"] is True
+    assert coarse["Q_lambda_halfline_norm_le_2_cG_L_verified"] is True
+
+    sec5 = tc061_artifact["section_5_arithmetic_proof_attempt_and_kernel_reduction"]
+    assert sec5["w2_and_sign_agreement_1_to_500"]["same_integer_mixed_PB_cancellation_witness_verified"] is True
+    br = sec5["aggregate_log_removal_and_global_coprime_bridge"]
+    assert br["signed_y32_sandwich_verified"] is True
+    assert br["coarse_halfline_complement_bound"]["verified"] is True
+    for brow in br["bridge_rows"]:
+        assert brow["coarse_complement_diag_bound_certified"] is True
+
+    for sr in sec5["composite_self_collision_theorem"]["evaluated_scales_16_to_4096"]:
+        assert sr["J_le_5Xself_plus_Dtilde_plus_S_certified"] is True
+        lo_res, hi_res, _ = _parse_arb_ball_str_to_fractions(
+            sr["J_minus_4Xself_plus_F_residual"]["arb_ball_str"]
+        )
+        assert lo_res <= Fraction(0, 1) <= hi_res
+        assert max(abs(lo_res), abs(hi_res)) < Fraction(1, 10**40)
+
+    rec = tc061_artifact["headline_and_exposure_reconciliation"]
+    exp_r = rec["holdout_exposure_reconciliation"]
+    assert exp_r["total_holdout_points"] == 14
+    assert exp_r["unseen_for_all_observables_count"] == 8
+    assert exp_r["unseen_for_all_tc054_to_tc060_window_observables_count"] == 1
+    assert exp_r["combined_zero_prior_window_observable_count"] == 9
+    assert exp_r["counts_by_status"] == {
+        "PRIOR_PARTIAL_COMPONENT_EXPOSURE": 2,
+        "UNSEEN_FOR_ALL_OBSERVABLES": 8,
+        "PRIOR_ANCILLARY_EXPOSURE": 2,
+        "UNSEEN_FOR_ALL_TC054_TO_TC060_WINDOW_OBSERVABLES": 1,
+        "PRIOR_INDEX_PARTITION_EXPOSURE_ONLY": 1,
+    }
+
+    cut_r = rec["cutoff_transitions_reconciliation"]
+    assert cut_r["e5_sided_pair"] == {
+        "e5_minus_D0_raw": 4,
+        "e5_plus_D0_raw": 5,
+        "e5_minus_T_Y": 518,
+        "e5_plus_T_Y": 519,
+    }
+    assert cut_r["unit_interval_64_to_65"]["T_range"] == [182, 185]
+    assert cut_r["unit_interval_64_to_65"]["active_branch_count"] == 4
+
+    r4096_ratio = rec["headline_holdout_values"]["HO_EXT_4096"]["J_over_log_Y_D_tilde"]["ratio"]
+    lo_r, hi_r, _ = _parse_arb_ball_str_to_fractions(r4096_ratio["arb_ball_str"])
+    assert Fraction(-1356, 10000) < lo_r <= hi_r < Fraction(-1355, 10000)
+

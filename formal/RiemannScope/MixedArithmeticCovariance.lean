@@ -1,10 +1,12 @@
 /-
 RiemannScope.MixedArithmeticCovariance
-TASK-TC-061 (EPIC-TC-042 / SUBGATE-TC-043A):
+TASK-TC-061 / TASK-TC-061R (EPIC-TC-042 / SUBGATE-TC-043A):
 Mixed Arithmetic Covariance J_T(Y), Exact Prime-Power Factorization Sign Agreement,
 Selberg w_{2,lambda} Prime-Power and Biprime Formulas, Finite-Window Off-Diagonal Kernel
-Expansion with Unconditional Composite Self-Collision Bound, and Sharp Route D Closure
-Transfer under MixedCovarianceClosureHypothesis.
+Expansion with Unconditional Composite Self-Collision Bound, Sharp Route D Closure
+Transfer under MixedCovarianceClosureHypothesis, Complete-Core Adjusted Basis Expansion
+with Compact (0, 2, 4) Gram Identity, Finite-Prime Parity Divisor Convolution Formula,
+and Signed-Remainder Equivalence with Sufficient Unsigned-Core Relaxation.
 
 Formalizes in Lean 4 (complete machine-checked proofs with canonical circle constant
 RiemannScope.tau throughout):
@@ -34,6 +36,25 @@ RiemannScope.tau throughout):
    and simultaneous `(1/4 + 1/4 + 1/4 = 3/4)` feedback contractions, all-`ε` transfer under
    `MixedCovarianceClosureHypothesis`, and companion `2 * A_sq ≤ 4 * A_sq` bridge to
    `complete_reconstruction_drift_contraction_transfer_tc060` at `η' = (η + ε) / 2`.
+5. `complete_core_adjusted_expansion_and_compact_gram_tc061r`:
+   Support vanishing outside `1 .. 2 * T` for distinct smooth-core coefficients
+   `openCoreSmoothCoeffS` and shift-adjusted coefficients `openCoreAdjustedCoeffBeta`, exact
+   smooth-core `gaussianTermPhi` basis expansion, direct pointwise complete-core bridge from
+   `openCoreOscShiftD2Part` without invoking `TC-060`, exact compact `(0, 2, 4)` Gram
+   identity for `signedMixedCovarianceJ` on `1 ≤ m, n ≤ 2 * T`, and explicit separation
+   `s(2) ≠ β(2)` (`2 ≤ T`), coincidence `β(n) = s(n)` on `T < n`, and nonzero spillover
+   witness on `T < n ≤ 2 * T` at `(T, D0, n) = (3, 0, 6)`.
+6. `finite_prime_parity_divisor_convolution_formula_tc061r`:
+   Complete multiplicativity on positive integers of `finitePrimeSetParity S n`, exact factored
+   divisor-convolution identity `(1 * a_S)(n) = ∏_{p ∈ S} ((1 + (-1)^{v_p(n)}) / 2) * ∏_{p ∣ n, p ∉ S} (v_p(n) + 1)`
+   showing failure to isolate square divisors whenever primes outside `S` divide `n` to odd
+   multiplicity, empty-set divisor-count specialization, and concrete evaluations on `3, 6, 12`.
+7. `signed_remainder_equivalence_and_sufficient_core_relaxation_tc061r`:
+   Nonnegativity of `inheritedPrimePowerDiagDtilde` and `canonicalPrimePowerDiagDtilde`, exact
+   distinct-integer `m ≠ n` sum for `inheritedPrimePowerDistinctOffDiagXoff`, lossless split
+   `J = 4 * X_self + F`, two-way equivalence `MixedCovarianceClosureHypothesis J D ↔ MixedCovarianceClosureHypothesis F D`
+   under bounded nonnegative `X_self`, and quadratic upper bound `J ≤ 5 * X_self + D_tilde + S`
+   giving one-way sufficient relaxation `MixedCovarianceClosureHypothesis S D → MixedCovarianceClosureHypothesis J D`.
 -/
 
 import RiemannScope.SignedDilationArithmeticEnergy
@@ -2527,6 +2548,1234 @@ theorem mixed_covariance_hypothesis_route_d_closure_transfer_tc061 :
       linarith
     have h_closed := h_tc060.2.2 hR_open_bd
     exact ⟨_, h_closed.2.1, h_closed.2.2.2⟩
+
+/-! ### Section 7: Complete-Core Adjusted Basis Expansion and Compact `(0, 2, 4)` Gram Identity (`TASK-TC-061R` §2) -/
+
+/-- Truncated Liouville coefficient `λ(n) * 1_{1 ≤ n ≤ T}` extended by `0` outside `1 .. T`. -/
+def truncatedLiouvilleCoeff (T n : ℕ) : ℝ :=
+  if 1 ≤ n ∧ n ≤ T then (liouvilleLambda n : ℝ) else 0
+
+/-- Smooth-core basis coefficient `s_{T, D0}(n)` of the large-divisor smooth remainder
+    `∑_{min(D0, T - 1) < d ≤ T - 1} (R_2^{int}(d; c_lam) - M_2(d; c_half)) Δ_d^{sm}(X; T)`,
+    kept strictly distinct from the shift-adjusted coefficient `openCoreAdjustedCoeffBeta`. -/
+noncomputable def openCoreSmoothCoeffS (c_lam c_half : ℝ) (T D0 n : ℕ) : ℝ :=
+  (∑ d ∈ (Finset.Icc (min D0 (T - 1) + 1) (T - 1)).filter (fun d => d ∣ n ∧ n / d ≤ T / d),
+      (selbergCenteredRemainderInt c_lam d - squarePoleDriftM c_half d) *
+        (liouvilleLambda (n / d) : ℝ)) -
+    (∑ d ∈ (Finset.Icc (min D0 (T - 1) + 1) (T - 1)).filter
+        (fun d => (d + 1) ∣ n ∧ n / (d + 1) ≤ T / d),
+      (selbergCenteredRemainderInt c_lam d - squarePoleDriftM c_half d) *
+        (liouvilleLambda (n / (d + 1)) : ℝ))
+
+/-- Complete-core shift-adjusted basis coefficient
+    `β_{T, D0}(n) := s_{T, D0}(n) - 1_{1 ≤ n ≤ T} λ(n) (log n)^2`. -/
+noncomputable def openCoreAdjustedCoeffBeta (c_lam c_half : ℝ) (T D0 n : ℕ) : ℝ :=
+  openCoreSmoothCoeffS c_lam c_half T D0 n - truncatedLiouvilleCoeff T n * (Real.log (n : ℝ)) ^ 2
+
+private theorem continuousOn_logWeightedKernel_integrand_tc061r_aux {Y : ℝ} (hY2 : 2 ≤ Y)
+    (ν m n : ℕ) :
+    ContinuousOn
+      (fun X => (gaussianTermPhi m X * gaussianTermPhi n X / (Real.log X) ^ ν) / X)
+      (Set.uIcc Y (RiemannScope.tau * Y)) := by
+  obtain ⟨_, hprops⟩ := uIcc_tau_props_tc061_aux hY2
+  have hlog_cont : ContinuousOn Real.log (Set.uIcc Y (RiemannScope.tau * Y)) :=
+    ContinuousOn.log continuousOn_id (fun X hX => ne_of_gt (hprops X hX).2.1)
+  exact (((continuousOn_gaussianTermPhi_uIcc_tc061_aux hY2 m).mul
+    (continuousOn_gaussianTermPhi_uIcc_tc061_aux hY2 n)).div
+    (hlog_cont.pow ν) (fun X hX => pow_ne_zero ν (hprops X hX).2.2.2.1)).div
+    continuousOn_id (fun X hX => ne_of_gt (hprops X hX).2.1)
+
+/-- **Theorem 5 (`TASK-TC-061R` §2, Complete-Core Smooth vs Adjusted Basis Expansion, Direct Pointwise Bridge, and Compact `(0, 2, 4)` Gram Identity)**:
+    1. *Support within `1 .. 2 * T`*:
+       For `T ≥ 1` and `n = 0 ∨ 2 * T < n`, both `openCoreSmoothCoeffS c_lam c_half T D0 n = 0`
+       and `openCoreAdjustedCoeffBeta c_lam c_half T D0 n = 0`;
+    2. *Exact smooth-core `gaussianTermPhi` basis identity*:
+       For `T ≥ 1` and `X ≥ 0`,
+       `∑ d ∈ Finset.Icc (min D0 (T - 1) + 1) (T - 1), (selbergCenteredRemainderInt c_lam d - squarePoleDriftM c_half d) * scaledFiberSmoothStep T d X = ∑ n ∈ Finset.Icc 1 (2 * T), openCoreSmoothCoeffS c_lam c_half T D0 n * gaussianTermPhi n X`;
+    3. *Direct pointwise complete-core bridge from `openCoreOscShiftD2Part` (`T ≥ 1`, `X > 0`, `log X ≠ 0`)*:
+       `openCoreOscShiftD2Part c_lam c_half T D0 X = (∑ n ∈ Finset.Icc 1 (2 * T), openCoreAdjustedCoeffBeta c_lam c_half T D0 n * gaussianTermPhi n X) / (Real.log X) ^ 2 + 2 * normalizedPrimePowerTermP T X - finiteQLambda T X`,
+       hence `2 * P_T(X) - O_{T, D0}(X) = Q_T(X) - (∑_{1 ≤ n ≤ 2T} β_n φ_n(X)) / (log X)^2 = ∑_{1 ≤ n ≤ 2T} (truncatedLiouvilleCoeff T n - β_n / (log X)^2) φ_n(X)`;
+    4. *Exact compact `(0, 2, 4)` Gram identity (`Y ≥ 2`, `T ≥ 1`)*:
+       Expresses `signedMixedCovarianceJ c_lam c_half T D0 Y` as the finite `1 ≤ m, n ≤ 2 * T`
+       bilinear form against `logWeightedWindowKernel ν Y m n` (`ν ∈ {0, 2, 4}`) minus
+       `4 * inheritedPrimePowerDiagDtilde T Y`;
+    5. *Explicit `s ≠ β` separation at `n = 2`, coincidence `β = s` above `T`, and nonzero spillover witness on `T < n ≤ 2 * T`*:
+       For `T ≥ 2`, `openCoreAdjustedCoeffBeta c_lam c_half T D0 2 - openCoreSmoothCoeffS c_lam c_half T D0 2 = (Real.log 2) ^ 2`
+       and `openCoreSmoothCoeffS c_lam c_half T D0 2 ≠ openCoreAdjustedCoeffBeta c_lam c_half T D0 2`;
+       for `T < n`, `openCoreAdjustedCoeffBeta c_lam c_half T D0 n = openCoreSmoothCoeffS c_lam c_half T D0 n`;
+       and at the canonical `Y = 2` schedule `(T, D0, n) = (3, 0, 6)` (`3 < 6 ≤ 2 * 3`),
+       `openCoreAdjustedCoeffBeta c_lam c_half 3 0 6 = openCoreSmoothCoeffS c_lam c_half 3 0 6 = -(c_lam + c_half)`
+       (`≠ 0` whenever `c_lam + c_half ≠ 0`, and equal to `1 ≠ 0` at `(c_lam, c_half) = (-1, 0)`). -/
+theorem complete_core_adjusted_expansion_and_compact_gram_tc061r :
+    (∀ {T : ℕ}, 1 ≤ T → ∀ (D0 n : ℕ) (c_lam c_half : ℝ),
+      (n = 0 ∨ 2 * T < n) →
+        openCoreSmoothCoeffS c_lam c_half T D0 n = 0 ∧
+          openCoreAdjustedCoeffBeta c_lam c_half T D0 n = 0) ∧
+    (∀ {T : ℕ}, 1 ≤ T → ∀ (D0 : ℕ) (c_lam c_half : ℝ) {X : ℝ}, 0 ≤ X →
+      (∑ d ∈ Finset.Icc (min D0 (T - 1) + 1) (T - 1),
+          (selbergCenteredRemainderInt c_lam d - squarePoleDriftM c_half d) *
+            scaledFiberSmoothStep T d X) =
+        ∑ n ∈ Finset.Icc 1 (2 * T),
+          openCoreSmoothCoeffS c_lam c_half T D0 n * gaussianTermPhi n X) ∧
+    (∀ {T : ℕ}, 1 ≤ T → ∀ (D0 : ℕ) (c_lam c_half : ℝ) {X : ℝ}, 0 < X → Real.log X ≠ 0 →
+      openCoreOscShiftD2Part c_lam c_half T D0 X =
+          (∑ n ∈ Finset.Icc 1 (2 * T),
+              openCoreAdjustedCoeffBeta c_lam c_half T D0 n * gaussianTermPhi n X) /
+            (Real.log X) ^ 2 +
+            2 * normalizedPrimePowerTermP T X -
+            finiteQLambda T X ∧
+        2 * normalizedPrimePowerTermP T X - openCoreOscShiftD2Part c_lam c_half T D0 X =
+          finiteQLambda T X -
+            (∑ n ∈ Finset.Icc 1 (2 * T),
+                openCoreAdjustedCoeffBeta c_lam c_half T D0 n * gaussianTermPhi n X) /
+              (Real.log X) ^ 2 ∧
+        2 * normalizedPrimePowerTermP T X - openCoreOscShiftD2Part c_lam c_half T D0 X =
+          ∑ n ∈ Finset.Icc 1 (2 * T),
+            (truncatedLiouvilleCoeff T n -
+                openCoreAdjustedCoeffBeta c_lam c_half T D0 n / (Real.log X) ^ 2) *
+              gaussianTermPhi n X) ∧
+    (∀ {Y : ℝ}, 2 ≤ Y → ∀ {T : ℕ}, 1 ≤ T → ∀ (D0 : ℕ) (c_lam c_half : ℝ),
+      signedMixedCovarianceJ c_lam c_half T D0 Y =
+        (∑ m ∈ Finset.Icc 1 (2 * T), ∑ n ∈ Finset.Icc 1 (2 * T),
+          (truncatedLiouvilleCoeff T m * truncatedLiouvilleCoeff T n *
+              logWeightedWindowKernel 0 Y m n -
+            (truncatedLiouvilleCoeff T m * openCoreAdjustedCoeffBeta c_lam c_half T D0 n +
+                openCoreAdjustedCoeffBeta c_lam c_half T D0 m * truncatedLiouvilleCoeff T n) *
+              logWeightedWindowKernel 2 Y m n +
+            openCoreAdjustedCoeffBeta c_lam c_half T D0 m *
+              openCoreAdjustedCoeffBeta c_lam c_half T D0 n *
+              logWeightedWindowKernel 4 Y m n)) -
+          4 * inheritedPrimePowerDiagDtilde T Y) ∧
+    ((∀ {T : ℕ}, 2 ≤ T → ∀ (D0 : ℕ) (c_lam c_half : ℝ),
+        openCoreAdjustedCoeffBeta c_lam c_half T D0 2 -
+            openCoreSmoothCoeffS c_lam c_half T D0 2 =
+          (Real.log 2) ^ 2 ∧
+          openCoreSmoothCoeffS c_lam c_half T D0 2 ≠
+            openCoreAdjustedCoeffBeta c_lam c_half T D0 2) ∧
+      (∀ {T D0 n : ℕ}, T < n → ∀ (c_lam c_half : ℝ),
+        openCoreAdjustedCoeffBeta c_lam c_half T D0 n =
+          openCoreSmoothCoeffS c_lam c_half T D0 n) ∧
+      (∀ (c_lam c_half : ℝ),
+        openCoreAdjustedCoeffBeta c_lam c_half 3 0 6 =
+            openCoreSmoothCoeffS c_lam c_half 3 0 6 ∧
+          openCoreSmoothCoeffS c_lam c_half 3 0 6 = -(c_lam + c_half) ∧
+          (c_lam + c_half ≠ 0 → openCoreAdjustedCoeffBeta c_lam c_half 3 0 6 ≠ 0)) ∧
+      openCoreAdjustedCoeffBeta (-1) 0 3 0 6 = 1 ∧
+      openCoreAdjustedCoeffBeta (-1) 0 3 0 6 ≠ 0) := by
+  have h_part1 :
+      ∀ {T : ℕ}, 1 ≤ T → ∀ (D0 n : ℕ) (c_lam c_half : ℝ),
+        (n = 0 ∨ 2 * T < n) →
+          openCoreSmoothCoeffS c_lam c_half T D0 n = 0 ∧
+            openCoreAdjustedCoeffBeta c_lam c_half T D0 n = 0 := by
+    intro T _hT D0 n c_lam c_half hn
+    have h_trunc_zero : truncatedLiouvilleCoeff T n = 0 := by
+      unfold truncatedLiouvilleCoeff
+      rw [if_neg]
+      rcases hn with rfl | hgt <;> omega
+    have h_smooth_zero : openCoreSmoothCoeffS c_lam c_half T D0 n = 0 := by
+      unfold openCoreSmoothCoeffS
+      rcases hn with rfl | hgt
+      · simp [liouvilleLambda]
+      · have h_f1 :
+            (Finset.Icc (min D0 (T - 1) + 1) (T - 1)).filter
+                (fun d => d ∣ n ∧ n / d ≤ T / d) = ∅ := by
+          ext d
+          simp only [Finset.mem_filter, Finset.mem_Icc, Finset.not_mem_empty, iff_false]
+          rintro ⟨⟨hd_lo, _⟩, hd_dvd, h_div⟩
+          have hd_pos : 0 < d := by omega
+          have h_le_T : d * (n / d) ≤ T := by
+            rw [mul_comm]
+            exact (Nat.le_div_iff_mul_le hd_pos).mp h_div
+          rw [Nat.mul_div_cancel' hd_dvd] at h_le_T
+          omega
+        have h_f2 :
+            (Finset.Icc (min D0 (T - 1) + 1) (T - 1)).filter
+                (fun d => (d + 1) ∣ n ∧ n / (d + 1) ≤ T / d) = ∅ := by
+          ext d
+          simp only [Finset.mem_filter, Finset.mem_Icc, Finset.not_mem_empty, iff_false]
+          rintro ⟨⟨hd_lo, _⟩, hd1_dvd, h_div⟩
+          have hd_pos : 0 < d := by omega
+          let q := n / (d + 1)
+          have hdq_le_T : d * q ≤ T := by
+            rw [mul_comm]
+            exact (Nat.le_div_iff_mul_le hd_pos).mp h_div
+          have hq_le_dq : q ≤ d * q := Nat.le_mul_of_pos_left q hd_pos
+          have hn_eq : (d + 1) * q = n := Nat.mul_div_cancel' hd1_dvd
+          have h_exp : (d + 1) * q = d * q + q := Nat.succ_mul d q
+          omega
+        rw [h_f1, h_f2, Finset.sum_empty, Finset.sum_empty, sub_self]
+    refine ⟨h_smooth_zero, ?_⟩
+    unfold openCoreAdjustedCoeffBeta
+    rw [h_smooth_zero, h_trunc_zero, zero_mul, sub_zero]
+  have h_part2 :
+      ∀ {T : ℕ}, 1 ≤ T → ∀ (D0 : ℕ) (c_lam c_half : ℝ) {X : ℝ}, 0 ≤ X →
+        (∑ d ∈ Finset.Icc (min D0 (T - 1) + 1) (T - 1),
+            (selbergCenteredRemainderInt c_lam d - squarePoleDriftM c_half d) *
+              scaledFiberSmoothStep T d X) =
+          ∑ n ∈ Finset.Icc 1 (2 * T),
+            openCoreSmoothCoeffS c_lam c_half T D0 n * gaussianTermPhi n X := by
+    intro T _hT D0 c_lam c_half X hX
+    obtain ⟨_, _, h_dil, _, _⟩ := window_integrability_and_kernel_scaling_tc059 zero_lt_one
+    let I := Finset.Icc (min D0 (T - 1) + 1) (T - 1)
+    let w : ℕ → ℝ := fun d => selbergCenteredRemainderInt c_lam d - squarePoleDriftM c_half d
+    change (∑ d ∈ I, w d * scaledFiberSmoothStep T d X) =
+      ∑ n ∈ Finset.Icc 1 (2 * T),
+        ((∑ d ∈ I.filter (fun d => d ∣ n ∧ n / d ≤ T / d),
+            w d * (liouvilleLambda (n / d) : ℝ)) -
+          (∑ d ∈ I.filter (fun d => (d + 1) ∣ n ∧ n / (d + 1) ≤ T / d),
+            w d * (liouvilleLambda (n / (d + 1)) : ℝ))) *
+          gaussianTermPhi n X
+    have h_lhs_sub :
+        (∑ d ∈ I, w d * scaledFiberSmoothStep T d X) =
+          (∑ d ∈ I, w d * ((1 / Real.sqrt (d : ℝ)) * finiteQLambda (T / d) (X / (d : ℝ)))) -
+            (∑ d ∈ I,
+              w d *
+                ((1 / Real.sqrt ((d + 1 : ℕ) : ℝ)) *
+                  finiteQLambda (T / d) (X / ((d + 1 : ℕ) : ℝ)))) := by
+      unfold scaledFiberSmoothStep
+      rw [← Finset.sum_sub_distrib]
+      apply Finset.sum_congr rfl
+      intro d _; ring
+    have h_rhs_sub :
+        (∑ n ∈ Finset.Icc 1 (2 * T),
+            ((∑ d ∈ I.filter (fun d => d ∣ n ∧ n / d ≤ T / d),
+                w d * (liouvilleLambda (n / d) : ℝ)) -
+              (∑ d ∈ I.filter (fun d => (d + 1) ∣ n ∧ n / (d + 1) ≤ T / d),
+                w d * (liouvilleLambda (n / (d + 1)) : ℝ))) *
+              gaussianTermPhi n X) =
+          (∑ n ∈ Finset.Icc 1 (2 * T),
+              (∑ d ∈ I.filter (fun d => d ∣ n ∧ n / d ≤ T / d),
+                w d * (liouvilleLambda (n / d) : ℝ)) *
+                gaussianTermPhi n X) -
+            (∑ n ∈ Finset.Icc 1 (2 * T),
+              (∑ d ∈ I.filter (fun d => (d + 1) ∣ n ∧ n / (d + 1) ≤ T / d),
+                w d * (liouvilleLambda (n / (d + 1)) : ℝ)) *
+                gaussianTermPhi n X) := by
+      rw [← Finset.sum_sub_distrib]
+      apply Finset.sum_congr rfl
+      intro n _; ring
+    rw [h_lhs_sub, h_rhs_sub]
+    congr 1
+    · have h1 :
+          (∑ d ∈ I, w d * ((1 / Real.sqrt (d : ℝ)) * finiteQLambda (T / d) (X / (d : ℝ)))) =
+            ∑ dq ∈ I.sigma (fun d => Finset.Icc 1 (T / d)),
+              w dq.1 * (liouvilleLambda dq.2 : ℝ) * gaussianTermPhi (dq.1 * dq.2) X := by
+        rw [Finset.sum_sigma]
+        apply Finset.sum_congr rfl
+        intro d hd
+        simp only [I, Finset.mem_Icc] at hd
+        have hd_pos : 0 < d := by omega
+        have hQ_eq :
+            finiteQLambda (T / d) (X / (d : ℝ)) =
+              ∑ q ∈ Finset.Icc 1 (T / d),
+                (liouvilleLambda q : ℝ) * gaussianTermPhi q (X / (d : ℝ)) := by
+          dsimp [finiteQLambda, gaussianTermPhi]
+          rw [Finset.mul_sum]; apply Finset.sum_congr rfl; intro q _; ring
+        rw [hQ_eq, Finset.mul_sum, Finset.mul_sum]
+        apply Finset.sum_congr rfl
+        intro q _
+        rw [h_dil hd_pos q hX]
+        ring
+      have h2 :
+          (∑ n ∈ Finset.Icc 1 (2 * T),
+              (∑ d ∈ I.filter (fun d => d ∣ n ∧ n / d ≤ T / d),
+                w d * (liouvilleLambda (n / d) : ℝ)) *
+                gaussianTermPhi n X) =
+            ∑ nd ∈ (Finset.Icc 1 (2 * T)).sigma
+                (fun n => I.filter (fun d => d ∣ n ∧ n / d ≤ T / d)),
+              w nd.2 * (liouvilleLambda (nd.1 / nd.2) : ℝ) * gaussianTermPhi nd.1 X := by
+        rw [Finset.sum_sigma]
+        apply Finset.sum_congr rfl
+        intro n _; rw [Finset.sum_mul]
+      rw [h1, h2]
+      apply Finset.sum_bij (fun dq _ => ⟨dq.1 * dq.2, dq.1⟩)
+      · rintro ⟨d, q⟩ hdq
+        simp only [I, Finset.mem_sigma, Finset.mem_Icc, Finset.mem_filter] at hdq ⊢
+        rcases hdq with ⟨⟨hd_lo, hd_hi⟩, ⟨hq1, hq_div⟩⟩
+        have hd_pos : 0 < d := by omega
+        have hdq_le : d * q ≤ T := by
+          rw [mul_comm]
+          exact (Nat.le_div_iff_mul_le hd_pos).mp hq_div
+        exact ⟨⟨Nat.mul_pos hd_pos (by omega), by omega⟩,
+          ⟨⟨hd_lo, hd_hi⟩, ⟨⟨q, rfl⟩, by rwa [Nat.mul_div_right q hd_pos]⟩⟩⟩
+      · rintro ⟨d1, q1⟩ h1 ⟨d2, q2⟩ _ h_eq
+        simp only [Sigma.mk.inj_iff] at h_eq
+        rcases h_eq with ⟨h_mul, hd_eq⟩
+        have hd_eq' : d1 = d2 := eq_of_heq hd_eq
+        subst hd_eq'
+        simp only [I, Finset.mem_sigma, Finset.mem_Icc] at h1
+        have hq_eq : q1 = q2 := Nat.eq_of_mul_eq_mul_left (by omega) h_mul
+        subst hq_eq; rfl
+      · rintro ⟨n, d⟩ hnd
+        simp only [I, Finset.mem_sigma, Finset.mem_Icc, Finset.mem_filter] at hnd
+        rcases hnd with ⟨⟨hn1, _⟩, ⟨⟨hd_lo, hd_hi⟩, ⟨hd_dvd, hnd_le⟩⟩⟩
+        have hd_pos : 0 < d := by omega
+        let q := n / d
+        have hdq : d * q = n := Nat.mul_div_cancel' hd_dvd
+        have hq_pos : 0 < q := Nat.div_pos (Nat.le_of_dvd (by omega) hd_dvd) hd_pos
+        refine ⟨⟨d, q⟩, Finset.mem_sigma.mpr ⟨Finset.mem_Icc.mpr ⟨hd_lo, hd_hi⟩,
+          Finset.mem_Icc.mpr ⟨hq_pos, hnd_le⟩⟩, ?_⟩
+        exact Sigma.ext hdq (heq_of_eq rfl)
+      · rintro ⟨d, q⟩ hdq
+        dsimp only at hdq ⊢
+        simp only [I, Finset.mem_sigma, Finset.mem_Icc] at hdq
+        rw [Nat.mul_div_right q (by omega)]
+    · have h1 :
+          (∑ d ∈ I,
+              w d *
+                ((1 / Real.sqrt ((d + 1 : ℕ) : ℝ)) *
+                  finiteQLambda (T / d) (X / ((d + 1 : ℕ) : ℝ)))) =
+            ∑ dq ∈ I.sigma (fun d => Finset.Icc 1 (T / d)),
+              w dq.1 * (liouvilleLambda dq.2 : ℝ) * gaussianTermPhi ((dq.1 + 1) * dq.2) X := by
+        rw [Finset.sum_sigma]
+        apply Finset.sum_congr rfl
+        intro d _
+        have hd1_pos : 0 < d + 1 := by omega
+        have hQ_eq :
+            finiteQLambda (T / d) (X / ((d + 1 : ℕ) : ℝ)) =
+              ∑ q ∈ Finset.Icc 1 (T / d),
+                (liouvilleLambda q : ℝ) * gaussianTermPhi q (X / ((d + 1 : ℕ) : ℝ)) := by
+          dsimp [finiteQLambda, gaussianTermPhi]
+          rw [Finset.mul_sum]; apply Finset.sum_congr rfl; intro q _; ring
+        rw [hQ_eq, Finset.mul_sum, Finset.mul_sum]
+        apply Finset.sum_congr rfl
+        intro q _
+        rw [h_dil hd1_pos q hX]
+        ring
+      have h2 :
+          (∑ n ∈ Finset.Icc 1 (2 * T),
+              (∑ d ∈ I.filter (fun d => (d + 1) ∣ n ∧ n / (d + 1) ≤ T / d),
+                w d * (liouvilleLambda (n / (d + 1)) : ℝ)) *
+                gaussianTermPhi n X) =
+            ∑ nd ∈ (Finset.Icc 1 (2 * T)).sigma
+                (fun n => I.filter (fun d => (d + 1) ∣ n ∧ n / (d + 1) ≤ T / d)),
+              w nd.2 * (liouvilleLambda (nd.1 / (nd.2 + 1)) : ℝ) * gaussianTermPhi nd.1 X := by
+        rw [Finset.sum_sigma]
+        apply Finset.sum_congr rfl
+        intro n _; rw [Finset.sum_mul]
+      rw [h1, h2]
+      apply Finset.sum_bij (fun dq _ => ⟨(dq.1 + 1) * dq.2, dq.1⟩)
+      · rintro ⟨d, q⟩ hdq
+        simp only [I, Finset.mem_sigma, Finset.mem_Icc, Finset.mem_filter] at hdq ⊢
+        rcases hdq with ⟨⟨hd_lo, hd_hi⟩, ⟨hq1, hq_div⟩⟩
+        have hd_pos : 0 < d := by omega
+        have hd1_pos : 0 < d + 1 := by omega
+        have hdq_le : d * q ≤ T := by
+          rw [mul_comm]
+          exact (Nat.le_div_iff_mul_le hd_pos).mp hq_div
+        have hq_le_dq : q ≤ d * q := Nat.le_mul_of_pos_left q hd_pos
+        have h_d1q_le : (d + 1) * q ≤ 2 * T := by
+          have h_exp : (d + 1) * q = d * q + q := Nat.succ_mul d q
+          omega
+        exact ⟨⟨Nat.mul_pos hd1_pos (by omega), h_d1q_le⟩,
+          ⟨⟨hd_lo, hd_hi⟩, ⟨⟨q, rfl⟩, by rwa [Nat.mul_div_right q hd1_pos]⟩⟩⟩
+      · rintro ⟨d1, q1⟩ _ ⟨d2, q2⟩ _ h_eq
+        simp only [Sigma.mk.inj_iff] at h_eq
+        rcases h_eq with ⟨h_mul, hd_eq⟩
+        have hd_eq' : d1 = d2 := eq_of_heq hd_eq
+        subst hd_eq'
+        have hq_eq : q1 = q2 := Nat.eq_of_mul_eq_mul_left (by omega) h_mul
+        subst hq_eq; rfl
+      · rintro ⟨n, d⟩ hnd
+        simp only [I, Finset.mem_sigma, Finset.mem_Icc, Finset.mem_filter] at hnd
+        rcases hnd with ⟨⟨hn1, _⟩, ⟨⟨hd_lo, hd_hi⟩, ⟨hd_dvd, hnd_le⟩⟩⟩
+        have hd1_pos : 0 < d + 1 := by omega
+        let q := n / (d + 1)
+        have hdq : (d + 1) * q = n := Nat.mul_div_cancel' hd_dvd
+        have hq_pos : 0 < q := Nat.div_pos (Nat.le_of_dvd (by omega) hd_dvd) hd1_pos
+        refine ⟨⟨d, q⟩, Finset.mem_sigma.mpr ⟨Finset.mem_Icc.mpr ⟨hd_lo, hd_hi⟩,
+          Finset.mem_Icc.mpr ⟨hq_pos, hnd_le⟩⟩, ?_⟩
+        exact Sigma.ext hdq (heq_of_eq rfl)
+      · rintro ⟨d, q⟩ _
+        rw [Nat.mul_div_right q (by omega)]
+  have h_part3 :
+      ∀ {T : ℕ}, 1 ≤ T → ∀ (D0 : ℕ) (c_lam c_half : ℝ) {X : ℝ}, 0 < X → Real.log X ≠ 0 →
+        openCoreOscShiftD2Part c_lam c_half T D0 X =
+            (∑ n ∈ Finset.Icc 1 (2 * T),
+                openCoreAdjustedCoeffBeta c_lam c_half T D0 n * gaussianTermPhi n X) /
+              (Real.log X) ^ 2 +
+              2 * normalizedPrimePowerTermP T X -
+              finiteQLambda T X ∧
+          2 * normalizedPrimePowerTermP T X - openCoreOscShiftD2Part c_lam c_half T D0 X =
+            finiteQLambda T X -
+              (∑ n ∈ Finset.Icc 1 (2 * T),
+                  openCoreAdjustedCoeffBeta c_lam c_half T D0 n * gaussianTermPhi n X) /
+                (Real.log X) ^ 2 ∧
+          2 * normalizedPrimePowerTermP T X - openCoreOscShiftD2Part c_lam c_half T D0 X =
+            ∑ n ∈ Finset.Icc 1 (2 * T),
+              (truncatedLiouvilleCoeff T n -
+                  openCoreAdjustedCoeffBeta c_lam c_half T D0 n / (Real.log X) ^ 2) *
+                gaussianTermPhi n X := by
+    intro T hT D0 c_lam c_half X hX_pos hlog_ne
+    have hlog_sq_ne : (Real.log X) ^ 2 ≠ 0 := pow_ne_zero 2 hlog_ne
+    have hlam1 : (liouvilleLambda 1 : ℝ) = 1 := by
+      simp [liouvilleLambda, natOmega, liouvilleSignFromOmega]
+    have hlam_mult :
+        ∀ d q : ℕ, 0 < d → 0 < q →
+          (liouvilleLambda (d * q) : ℝ) = (liouvilleLambda d : ℝ) * (liouvilleLambda q : ℝ) :=
+      fun _ _ hd hq => liouvilleLambda_mul_pos_tc061_aux hd hq
+    have h_desc :=
+      (logarithmic_prime_power_descent_and_kernel_shift_tc057
+        (a := fun n => (liouvilleLambda n : ℝ)) hlam1 hlam_mult 0 0 T hX_pos).2.1.1
+    have hP_eq :
+        normalizedPrimePowerTermP T X =
+          (∑ n ∈ Finset.Icc 1 T,
+              (liouvilleLambda n : ℝ) * Real.log (n : ℝ) * gaussianTermPhi n X) /
+            Real.log X := by
+      unfold normalizedPrimePowerTermP
+      rw [← h_desc]
+    have hQ_eq :
+        finiteQLambda T X =
+          ∑ n ∈ Finset.Icc 1 T, (liouvilleLambda n : ℝ) * gaussianTermPhi n X := by
+      dsimp [finiteQLambda, gaussianTermPhi]
+      rw [Finset.mul_sum]; apply Finset.sum_congr rfl; intro n _; ring
+    have h_trunc_sum :
+        ∀ g : ℕ → ℝ,
+          (∑ n ∈ Finset.Icc 1 (2 * T), truncatedLiouvilleCoeff T n * g n) =
+            ∑ n ∈ Finset.Icc 1 T, (liouvilleLambda n : ℝ) * g n := by
+      intro g
+      have h_sub : Finset.Icc 1 T ⊆ Finset.Icc 1 (2 * T) := by
+        intro n hn; rw [Finset.mem_Icc] at hn ⊢; omega
+      rw [← Finset.sum_subset h_sub]
+      · apply Finset.sum_congr rfl
+        intro n hn
+        rw [Finset.mem_Icc] at hn
+        unfold truncatedLiouvilleCoeff
+        rw [if_pos hn]
+      · intro n _ hn1
+        rw [Finset.mem_Icc] at hn1
+        unfold truncatedLiouvilleCoeff
+        rw [if_neg hn1, zero_mul]
+    have hQ_2T :
+        finiteQLambda T X =
+          ∑ n ∈ Finset.Icc 1 (2 * T), truncatedLiouvilleCoeff T n * gaussianTermPhi n X := by
+      rw [hQ_eq, h_trunc_sum]
+    have h_logsq_2T :
+        (∑ n ∈ Finset.Icc 1 T,
+            (liouvilleLambda n : ℝ) * (Real.log (n : ℝ)) ^ 2 * gaussianTermPhi n X) =
+          ∑ n ∈ Finset.Icc 1 (2 * T),
+            truncatedLiouvilleCoeff T n * (Real.log (n : ℝ)) ^ 2 * gaussianTermPhi n X := by
+      calc
+        (∑ n ∈ Finset.Icc 1 T,
+            (liouvilleLambda n : ℝ) * (Real.log (n : ℝ)) ^ 2 * gaussianTermPhi n X)
+          = ∑ n ∈ Finset.Icc 1 T,
+              (liouvilleLambda n : ℝ) * ((Real.log (n : ℝ)) ^ 2 * gaussianTermPhi n X) :=
+            Finset.sum_congr rfl (fun _ _ => by ring)
+        _ = ∑ n ∈ Finset.Icc 1 (2 * T),
+              truncatedLiouvilleCoeff T n * ((Real.log (n : ℝ)) ^ 2 * gaussianTermPhi n X) :=
+            (h_trunc_sum (fun n => (Real.log (n : ℝ)) ^ 2 * gaussianTermPhi n X)).symm
+        _ = ∑ n ∈ Finset.Icc 1 (2 * T),
+              truncatedLiouvilleCoeff T n * (Real.log (n : ℝ)) ^ 2 * gaussianTermPhi n X :=
+            Finset.sum_congr rfl (fun _ _ => by ring)
+    have hQsh_exp :
+        finiteQShifted (fun n => (liouvilleLambda n : ℝ)) 2 T X =
+          (Real.log X) ^ 2 * finiteQLambda T X -
+            2 * Real.log X *
+              (∑ n ∈ Finset.Icc 1 T,
+                (liouvilleLambda n : ℝ) * Real.log (n : ℝ) * gaussianTermPhi n X) +
+            (∑ n ∈ Finset.Icc 1 (2 * T),
+              truncatedLiouvilleCoeff T n * (Real.log (n : ℝ)) ^ 2 * gaussianTermPhi n X) := by
+      unfold finiteQShifted
+      have h_each :
+          ∀ n ∈ Finset.Icc 1 T,
+            (liouvilleLambda n : ℝ) * (Real.log (X / (n : ℝ))) ^ 2 * gaussianTermPhi n X =
+              (Real.log X) ^ 2 * ((liouvilleLambda n : ℝ) * gaussianTermPhi n X) -
+                2 * Real.log X *
+                  ((liouvilleLambda n : ℝ) * Real.log (n : ℝ) * gaussianTermPhi n X) +
+                (liouvilleLambda n : ℝ) * (Real.log (n : ℝ)) ^ 2 * gaussianTermPhi n X := by
+        intro n hn
+        rw [Finset.mem_Icc] at hn
+        have hn_pos : (0 : ℝ) < (n : ℝ) := Nat.cast_pos.mpr hn.1
+        rw [Real.log_div (ne_of_gt hX_pos) (ne_of_gt hn_pos)]
+        ring
+      rw [Finset.sum_congr rfl h_each, Finset.sum_add_distrib, Finset.sum_sub_distrib,
+        ← Finset.mul_sum, ← Finset.mul_sum, ← hQ_eq, h_logsq_2T]
+    have h_beta_sum :
+        (∑ n ∈ Finset.Icc 1 (2 * T),
+            openCoreSmoothCoeffS c_lam c_half T D0 n * gaussianTermPhi n X) -
+          (∑ n ∈ Finset.Icc 1 (2 * T),
+            truncatedLiouvilleCoeff T n * (Real.log (n : ℝ)) ^ 2 * gaussianTermPhi n X) =
+          ∑ n ∈ Finset.Icc 1 (2 * T),
+            openCoreAdjustedCoeffBeta c_lam c_half T D0 n * gaussianTermPhi n X := by
+      rw [← Finset.sum_sub_distrib]
+      apply Finset.sum_congr rfl
+      intro n _
+      unfold openCoreAdjustedCoeffBeta
+      ring
+    have h_id1 :
+        openCoreOscShiftD2Part c_lam c_half T D0 X =
+          (∑ n ∈ Finset.Icc 1 (2 * T),
+              openCoreAdjustedCoeffBeta c_lam c_half T D0 n * gaussianTermPhi n X) /
+            (Real.log X) ^ 2 +
+            2 * normalizedPrimePowerTermP T X -
+            finiteQLambda T X := by
+      unfold openCoreOscShiftD2Part
+      rw [h_part2 hT D0 c_lam c_half (le_of_lt hX_pos), hQsh_exp, hP_eq]
+      let S_sm := ∑ n ∈ Finset.Icc 1 (2 * T),
+        openCoreSmoothCoeffS c_lam c_half T D0 n * gaussianTermPhi n X
+      let S_lg := ∑ n ∈ Finset.Icc 1 (2 * T),
+        truncatedLiouvilleCoeff T n * (Real.log (n : ℝ)) ^ 2 * gaussianTermPhi n X
+      let S_p := ∑ n ∈ Finset.Icc 1 T,
+        (liouvilleLambda n : ℝ) * Real.log (n : ℝ) * gaussianTermPhi n X
+      have h_alg :
+          (S_sm - ((Real.log X) ^ 2 * finiteQLambda T X - 2 * Real.log X * S_p + S_lg)) /
+              (Real.log X) ^ 2 =
+            (S_sm - S_lg) / (Real.log X) ^ 2 + 2 * (S_p / Real.log X) - finiteQLambda T X := by
+        field_simp [hlog_ne, hlog_sq_ne]
+        ring
+      change (S_sm - ((Real.log X) ^ 2 * finiteQLambda T X - 2 * Real.log X * S_p + S_lg)) /
+          (Real.log X) ^ 2 = _
+      rw [h_alg]
+      dsimp [S_sm, S_lg]
+      rw [h_beta_sum]
+    have h_id2 :
+        2 * normalizedPrimePowerTermP T X - openCoreOscShiftD2Part c_lam c_half T D0 X =
+          finiteQLambda T X -
+            (∑ n ∈ Finset.Icc 1 (2 * T),
+                openCoreAdjustedCoeffBeta c_lam c_half T D0 n * gaussianTermPhi n X) /
+              (Real.log X) ^ 2 := by
+      linarith [h_id1]
+    refine ⟨h_id1, h_id2, ?_⟩
+    rw [h_id2, hQ_2T, Finset.sum_div, ← Finset.sum_sub_distrib]
+    apply Finset.sum_congr rfl
+    intro n _
+    ring
+  have h_part5 :
+      (∀ {T : ℕ}, 2 ≤ T → ∀ (D0 : ℕ) (c_lam c_half : ℝ),
+        openCoreAdjustedCoeffBeta c_lam c_half T D0 2 -
+            openCoreSmoothCoeffS c_lam c_half T D0 2 =
+          (Real.log 2) ^ 2 ∧
+          openCoreSmoothCoeffS c_lam c_half T D0 2 ≠
+            openCoreAdjustedCoeffBeta c_lam c_half T D0 2) ∧
+        (∀ {T D0 n : ℕ}, T < n → ∀ (c_lam c_half : ℝ),
+          openCoreAdjustedCoeffBeta c_lam c_half T D0 n =
+            openCoreSmoothCoeffS c_lam c_half T D0 n) ∧
+        (∀ (c_lam c_half : ℝ),
+          openCoreAdjustedCoeffBeta c_lam c_half 3 0 6 =
+              openCoreSmoothCoeffS c_lam c_half 3 0 6 ∧
+            openCoreSmoothCoeffS c_lam c_half 3 0 6 = -(c_lam + c_half) ∧
+            (c_lam + c_half ≠ 0 → openCoreAdjustedCoeffBeta c_lam c_half 3 0 6 ≠ 0)) ∧
+        openCoreAdjustedCoeffBeta (-1) 0 3 0 6 = 1 ∧
+        openCoreAdjustedCoeffBeta (-1) 0 3 0 6 ≠ 0 := by
+    have h_coincide :
+        ∀ {T D0 n : ℕ}, T < n → ∀ (c_lam c_half : ℝ),
+          openCoreAdjustedCoeffBeta c_lam c_half T D0 n =
+            openCoreSmoothCoeffS c_lam c_half T D0 n := by
+      intro T D0 n hgt c_lam c_half
+      unfold openCoreAdjustedCoeffBeta truncatedLiouvilleCoeff
+      rw [if_neg (by omega)]
+      ring
+    have h_sep2 :
+        ∀ {T : ℕ}, 2 ≤ T → ∀ (D0 : ℕ) (c_lam c_half : ℝ),
+          openCoreAdjustedCoeffBeta c_lam c_half T D0 2 -
+              openCoreSmoothCoeffS c_lam c_half T D0 2 =
+            (Real.log 2) ^ 2 ∧
+            openCoreSmoothCoeffS c_lam c_half T D0 2 ≠
+              openCoreAdjustedCoeffBeta c_lam c_half T D0 2 := by
+      intro T hT2 D0 c_lam c_half
+      have hl2 : liouvilleLambda 2 = -1 := by
+        have ho2 : natOmega 2 = 1 :=
+          ArithmeticFunction.cardFactors_eq_one_iff_prime.mpr Nat.prime_two
+        simp [liouvilleLambda, ho2, liouvilleSignFromOmega]
+      have h_diff :
+          openCoreAdjustedCoeffBeta c_lam c_half T D0 2 -
+              openCoreSmoothCoeffS c_lam c_half T D0 2 =
+            (Real.log 2) ^ 2 := by
+        unfold openCoreAdjustedCoeffBeta truncatedLiouvilleCoeff
+        rw [if_pos ⟨by omega, hT2⟩, hl2]
+        norm_num
+      have hlog2_pos : (0 : ℝ) < (Real.log 2) ^ 2 :=
+        sq_pos_of_pos (Real.log_pos (by norm_num : (1 : ℝ) < 2))
+      exact ⟨h_diff, fun h_eq => by linarith⟩
+    have h_spill :
+        ∀ (c_lam c_half : ℝ),
+          openCoreAdjustedCoeffBeta c_lam c_half 3 0 6 =
+              openCoreSmoothCoeffS c_lam c_half 3 0 6 ∧
+            openCoreSmoothCoeffS c_lam c_half 3 0 6 = -(c_lam + c_half) ∧
+            (c_lam + c_half ≠ 0 → openCoreAdjustedCoeffBeta c_lam c_half 3 0 6 ≠ 0) := by
+      intro c_lam c_half
+      have h_eq6 :
+          openCoreAdjustedCoeffBeta c_lam c_half 3 0 6 =
+            openCoreSmoothCoeffS c_lam c_half 3 0 6 :=
+        h_coincide (by decide : 3 < 6) c_lam c_half
+      have hf1 :
+          (Finset.Icc (min 0 (3 - 1) + 1) (3 - 1)).filter
+              (fun d => d ∣ 6 ∧ 6 / d ≤ 3 / d) = ∅ := by
+        decide
+      have hf2 :
+          (Finset.Icc (min 0 (3 - 1) + 1) (3 - 1)).filter
+              (fun d => (d + 1) ∣ 6 ∧ 6 / (d + 1) ≤ 3 / d) = {1} := by
+        decide
+      have hl3 : liouvilleLambda 3 = -1 := by
+        have ho3 : natOmega 3 = 1 :=
+          ArithmeticFunction.cardFactors_eq_one_iff_prime.mpr Nat.prime_three
+        simp [liouvilleLambda, ho3, liouvilleSignFromOmega]
+      have hw2_1 : selbergCumulativeW2 1 = 0 := by
+        unfold selbergCumulativeW2
+        have hempty : Finset.Icc 2 1 = ∅ := by decide
+        rw [hempty, Finset.sum_empty]
+      have hR1 : selbergCenteredRemainderInt c_lam 1 = -c_lam := by
+        unfold selbergCenteredRemainderInt
+        rw [hw2_1]
+        ring
+      have hM1 : squarePoleDriftM c_half 1 = c_half := by
+        unfold squarePoleDriftM
+        simp
+      have hs6 : openCoreSmoothCoeffS c_lam c_half 3 0 6 = -(c_lam + c_half) := by
+        unfold openCoreSmoothCoeffS
+        rw [hf1, hf2, Finset.sum_empty, Finset.sum_singleton]
+        norm_num [hl3, hR1, hM1]
+        ring
+      refine ⟨h_eq6, hs6, fun hsum_ne hzero => hsum_ne ?_⟩
+      linarith [h_eq6, hs6, hzero]
+    have h_ex : openCoreAdjustedCoeffBeta (-1) 0 3 0 6 = 1 := by
+      have h0 := h_spill (-1) 0
+      linarith [h0.1, h0.2.1]
+    exact ⟨h_sep2, h_coincide, h_spill, h_ex, by linarith [h_ex]⟩
+  refine ⟨h_part1, h_part2, h_part3, ?_, h_part5⟩
+  intro Y hY2 T hT D0 c_lam c_half
+  obtain ⟨_, hprops⟩ := uIcc_tau_props_tc061_aux hY2
+  have h_norm_id :=
+    (mixed_covariance_identity_and_theta_energy_bound_tc061).2.2.1 hY2 hT D0 c_lam c_half
+  have h_J_eq :
+      signedMixedCovarianceJ c_lam c_half T D0 Y =
+        windowEnergyNormSq Y
+            (fun X =>
+              2 * normalizedPrimePowerTermP T X -
+                openCoreOscShiftD2Part c_lam c_half T D0 X) -
+          4 * inheritedPrimePowerDiagDtilde T Y := by
+    linarith [h_norm_id.1]
+  rw [h_J_eq]
+  congr 1
+  unfold windowEnergyNormSq windowPairing
+  let lam := truncatedLiouvilleCoeff T
+  let beta := openCoreAdjustedCoeffBeta c_lam c_half T D0
+  have h_congr :
+      (∫ X in Y..(RiemannScope.tau * Y),
+          (2 * normalizedPrimePowerTermP T X - openCoreOscShiftD2Part c_lam c_half T D0 X) *
+            (2 * normalizedPrimePowerTermP T X - openCoreOscShiftD2Part c_lam c_half T D0 X) /
+            X) =
+        ∫ X in Y..(RiemannScope.tau * Y),
+          ∑ m ∈ Finset.Icc 1 (2 * T), ∑ n ∈ Finset.Icc 1 (2 * T),
+            (lam m * lam n *
+                ((gaussianTermPhi m X * gaussianTermPhi n X / (Real.log X) ^ 0) / X) -
+              (lam m * beta n + beta m * lam n) *
+                ((gaussianTermPhi m X * gaussianTermPhi n X / (Real.log X) ^ 2) / X) +
+              beta m * beta n *
+                ((gaussianTermPhi m X * gaussianTermPhi n X / (Real.log X) ^ 4) / X)) := by
+    apply intervalIntegral.integral_congr
+    intro X hX
+    dsimp only
+    obtain ⟨_, hX_pos, _, hlog_ne, _⟩ := hprops X hX
+    have h_pt := (h_part3 hT D0 c_lam c_half hX_pos hlog_ne).2.2
+    rw [h_pt, Finset.sum_mul_sum, Finset.sum_div]
+    apply Finset.sum_congr rfl
+    intro m _
+    rw [Finset.sum_div]
+    apply Finset.sum_congr rfl
+    intro n _
+    dsimp [lam, beta]
+    rw [pow_zero]
+    field_simp [hlog_ne, ne_of_gt hX_pos]
+    ring
+  have h_term_cont :
+      ∀ m n : ℕ,
+        ContinuousOn
+          (fun X =>
+            lam m * lam n *
+                ((gaussianTermPhi m X * gaussianTermPhi n X / (Real.log X) ^ 0) / X) -
+              (lam m * beta n + beta m * lam n) *
+                ((gaussianTermPhi m X * gaussianTermPhi n X / (Real.log X) ^ 2) / X) +
+              beta m * beta n *
+                ((gaussianTermPhi m X * gaussianTermPhi n X / (Real.log X) ^ 4) / X))
+          (Set.uIcc Y (RiemannScope.tau * Y)) := by
+    intro m n
+    exact ((continuousOn_const.mul (continuousOn_logWeightedKernel_integrand_tc061r_aux hY2 0 m n)).sub
+      (continuousOn_const.mul (continuousOn_logWeightedKernel_integrand_tc061r_aux hY2 2 m n))).add
+      (continuousOn_const.mul (continuousOn_logWeightedKernel_integrand_tc061r_aux hY2 4 m n))
+  rw [h_congr, intervalIntegral.integral_finset_sum]
+  · apply Finset.sum_congr rfl
+    intro m _
+    rw [intervalIntegral.integral_finset_sum]
+    · apply Finset.sum_congr rfl
+      intro n _
+      have hi0 : IntervalIntegrable _ volume Y (RiemannScope.tau * Y) :=
+        (continuousOn_logWeightedKernel_integrand_tc061r_aux hY2 0 m n).intervalIntegrable
+      have hi2 : IntervalIntegrable _ volume Y (RiemannScope.tau * Y) :=
+        (continuousOn_logWeightedKernel_integrand_tc061r_aux hY2 2 m n).intervalIntegrable
+      have hi4 : IntervalIntegrable _ volume Y (RiemannScope.tau * Y) :=
+        (continuousOn_logWeightedKernel_integrand_tc061r_aux hY2 4 m n).intervalIntegrable
+      rw [intervalIntegral.integral_add
+          ((hi0.const_mul _).sub (hi2.const_mul _)) (hi4.const_mul _),
+        intervalIntegral.integral_sub (hi0.const_mul _) (hi2.const_mul _),
+        intervalIntegral.integral_const_mul,
+        intervalIntegral.integral_const_mul,
+        intervalIntegral.integral_const_mul]
+      rfl
+    · intro n _
+      exact (h_term_cont m n).intervalIntegrable
+  · intro m _
+    exact (continuousOn_finset_sum _ (fun n _ => h_term_cont m n)).intervalIntegrable
+
+/-! ### Section 8: Finite-Prime Parity Control and Factored Divisor-Convolution Obstruction (`TASK-TC-061R` §3) -/
+
+/-- Finite-prime-set parity control `a_S(n) := (-1)^{∑_{p ∈ S} v_p(n)}` for `n ≥ 1` (`a_S(0) := 0`). -/
+def finitePrimeSetParity (S : Finset ℕ) (n : ℕ) : ℤ :=
+  if n = 0 then 0 else (-1 : ℤ) ^ (∑ p ∈ S, n.factorization p)
+
+/-- **Theorem 6 (`TASK-TC-061R` §3, Multiplicative Finite-Prime Parity Control and Exact Factored Divisor Convolution)**:
+    1. *Multiplicativity on positive integers*:
+       `finitePrimeSetParity S 1 = 1` and `finitePrimeSetParity S (a * b) = finitePrimeSetParity S a * finitePrimeSetParity S b`
+       for all `a ≠ 0`, `b ≠ 0`;
+    2. *Exact factored divisor-convolution formula on `ℝ` (`∀ p ∈ S, p.Prime`, `1 ≤ n`)*:
+       `∑ d ∈ n.divisors, (finitePrimeSetParity S d : ℝ) = (∏ p ∈ S, (1 + (-1 : ℝ) ^ (n.factorization p)) / 2) * (∏ p ∈ n.primeFactors \ S, ((n.factorization p : ℝ) + 1))`;
+    3. *Empty-set divisor-count specialization (`(1 * a_∅)(n) = d(n)`) and concrete witnesses*:
+        Evaluates `(1 * a_∅)(12) = 6`, `(1 * a_{2})(3) = 2`, `(1 * a_{2})(6) = 0`, and `(1 * a_{2})(12) = 2`. -/
+theorem finite_prime_parity_divisor_convolution_formula_tc061r :
+    (∀ (S : Finset ℕ),
+      finitePrimeSetParity S 1 = 1 ∧
+        ∀ {a b : ℕ}, a ≠ 0 → b ≠ 0 →
+          finitePrimeSetParity S (a * b) = finitePrimeSetParity S a * finitePrimeSetParity S b) ∧
+    (∀ (S : Finset ℕ), (∀ p ∈ S, p.Prime) → ∀ {n : ℕ}, 1 ≤ n →
+      (∑ d ∈ n.divisors, (finitePrimeSetParity S d : ℝ)) =
+        (∏ p ∈ S, (1 + (-1 : ℝ) ^ (n.factorization p)) / 2) *
+          (∏ p ∈ n.primeFactors \ S, ((n.factorization p : ℝ) + 1))) ∧
+    ((∀ {n : ℕ}, 1 ≤ n → (∑ d ∈ n.divisors, finitePrimeSetParity ∅ d) = (n.divisors.card : ℤ)) ∧
+      (∑ d ∈ (12 : ℕ).divisors, finitePrimeSetParity ∅ d) = 6 ∧
+      (∑ d ∈ (3 : ℕ).divisors, finitePrimeSetParity {2} d) = 2 ∧
+      (∑ d ∈ (6 : ℕ).divisors, finitePrimeSetParity {2} d) = 0 ∧
+      (∑ d ∈ (12 : ℕ).divisors, finitePrimeSetParity {2} d) = 2) := by
+  have h_mult :
+      ∀ (S : Finset ℕ),
+        finitePrimeSetParity S 1 = 1 ∧
+          ∀ {a b : ℕ}, a ≠ 0 → b ≠ 0 →
+            finitePrimeSetParity S (a * b) =
+              finitePrimeSetParity S a * finitePrimeSetParity S b := by
+    intro S
+    refine ⟨by simp [finitePrimeSetParity], ?_⟩
+    intro a b ha hb
+    have hab : a * b ≠ 0 := mul_ne_zero ha hb
+    have h_sum :
+        (∑ p ∈ S, (a * b).factorization p) =
+          (∑ p ∈ S, a.factorization p) + (∑ p ∈ S, b.factorization p) := by
+      rw [← Finset.sum_add_distrib]
+      apply Finset.sum_congr rfl
+      intro p _
+      rw [Nat.factorization_mul ha hb, Finsupp.add_apply]
+    unfold finitePrimeSetParity
+    rw [if_neg ha, if_neg hb, if_neg hab, h_sum, pow_add]
+  have h_conv :
+      ∀ (S : Finset ℕ), (∀ p ∈ S, p.Prime) → ∀ {n : ℕ}, 1 ≤ n →
+        (∑ d ∈ n.divisors, (finitePrimeSetParity S d : ℝ)) =
+          (∏ p ∈ S, (1 + (-1 : ℝ) ^ (n.factorization p)) / 2) *
+            (∏ p ∈ n.primeFactors \ S, ((n.factorization p : ℝ) + 1)) := by
+    intro S _hS n hn
+    have hn_ne : n ≠ 0 := by omega
+    let f_S : ArithmeticFunction ℝ :=
+      ⟨fun d => (finitePrimeSetParity S d : ℝ), by simp [finitePrimeSetParity]⟩
+    have hf_mult : f_S.IsMultiplicative := by
+      refine ⟨by change (finitePrimeSetParity S 1 : ℝ) = 1; rw [(h_mult S).1]; norm_num, ?_⟩
+      intro a b _
+      by_cases ha : a = 0
+      · subst ha; simp [f_S, finitePrimeSetParity]
+      · by_cases hb : b = 0
+        · subst hb; simp [f_S, finitePrimeSetParity]
+        · change (finitePrimeSetParity S (a * b) : ℝ) =
+            (finitePrimeSetParity S a : ℝ) * (finitePrimeSetParity S b : ℝ)
+          rw [(h_mult S).2 ha hb]
+          push_cast; rfl
+    let g_S : ArithmeticFunction ℝ := f_S * (ArithmeticFunction.zeta : ArithmeticFunction ℝ)
+    have hg_mult : g_S.IsMultiplicative :=
+      hf_mult.mul ArithmeticFunction.isMultiplicative_zeta.natCast
+    have hg_apply : ∀ m : ℕ, g_S m = ∑ d ∈ m.divisors, (finitePrimeSetParity S d : ℝ) := by
+      intro m
+      change (f_S * (ArithmeticFunction.zeta : ArithmeticFunction ℝ)) m = _
+      rw [ArithmeticFunction.coe_mul_zeta_apply]
+      rfl
+    have hg_pp :
+        ∀ {q : ℕ}, q.Prime → ∀ (k : ℕ),
+          g_S (q ^ k) =
+            if q ∈ S then (1 + (-1 : ℝ) ^ k) / 2 else (k : ℝ) + 1 := by
+      intro q hq k
+      rw [hg_apply, Nat.sum_divisors_prime_pow hq]
+      by_cases hqS : q ∈ S
+      · rw [if_pos hqS]
+        have h_term :
+            ∀ j ∈ Finset.range (k + 1),
+              (finitePrimeSetParity S (q ^ j) : ℝ) = (-1 : ℝ) ^ j := by
+          intro j _
+          have hqj_ne : q ^ j ≠ 0 := pow_ne_zero j hq.ne_zero
+          have h_sum_q : (∑ p ∈ S, (q ^ j).factorization p) = j := by
+            rw [hq.factorization_pow]
+            have h_sing :
+                (∑ p ∈ S, (Finsupp.single q j) p) = ∑ _p ∈ ({q} : Finset ℕ), j := by
+              rw [← Finset.sum_subset (Finset.singleton_subset_iff.mpr hqS)]
+              · simp
+              · intro p _ hp_ne
+                rw [Finset.mem_singleton] at hp_ne
+                simp [Finsupp.single_apply, Ne.symm hp_ne]
+            simpa using h_sing
+          unfold finitePrimeSetParity
+          rw [if_neg hqj_ne, h_sum_q]
+          push_cast; rfl
+        rw [Finset.sum_congr rfl h_term, geom_sum_eq (by norm_num : (-1 : ℝ) ≠ 1) (k + 1),
+          pow_succ]
+        ring
+      · rw [if_neg hqS]
+        have h_term :
+            ∀ j ∈ Finset.range (k + 1),
+              (finitePrimeSetParity S (q ^ j) : ℝ) = 1 := by
+          intro j _
+          have hqj_ne : q ^ j ≠ 0 := pow_ne_zero j hq.ne_zero
+          have h_sum_z : (∑ p ∈ S, (q ^ j).factorization p) = 0 := by
+            apply Finset.sum_eq_zero
+            intro p hpS
+            have hp_ne : q ≠ p := fun heq => hqS (heq ▸ hpS)
+            rw [hq.factorization_pow, Finsupp.single_apply, if_neg hp_ne]
+          unfold finitePrimeSetParity
+          rw [if_neg hqj_ne, h_sum_z]
+          norm_num
+        rw [Finset.sum_congr rfl h_term, Finset.sum_const, Finset.card_range, nsmul_eq_mul]
+        push_cast; ring
+    have h_fact :=
+      ArithmeticFunction.IsMultiplicative.multiplicative_factorization g_S hg_mult hn_ne
+    rw [← hg_apply n, h_fact]
+    unfold Finsupp.prod
+    rw [Nat.support_factorization n]
+    have h_val_pf :
+        ∀ p ∈ n.primeFactors,
+          g_S (p ^ n.factorization p) =
+            if p ∈ S then (1 + (-1 : ℝ) ^ (n.factorization p)) / 2
+            else (n.factorization p : ℝ) + 1 := by
+      intro p hp
+      exact hg_pp (Nat.prime_of_mem_primeFactors hp) (n.factorization p)
+    rw [Finset.prod_congr rfl h_val_pf]
+    have h_union : n.primeFactors = (n.primeFactors ∩ S) ∪ (n.primeFactors \ S) := by
+      ext p
+      simp only [Finset.mem_union, Finset.mem_inter, Finset.mem_sdiff]
+      tauto
+    have h_disj : Disjoint (n.primeFactors ∩ S) (n.primeFactors \ S) := by
+      rw [Finset.disjoint_left]
+      intro p h1 h2
+      exact (Finset.mem_sdiff.mp h2).2 (Finset.mem_inter.mp h1).2
+    conv_lhs => rw [h_union]
+    rw [Finset.prod_union h_disj]
+    congr 1
+    · have h_in :
+          (∏ p ∈ n.primeFactors ∩ S,
+              (if p ∈ S then (1 + (-1 : ℝ) ^ (n.factorization p)) / 2
+               else (n.factorization p : ℝ) + 1)) =
+            ∏ p ∈ n.primeFactors ∩ S, (1 + (-1 : ℝ) ^ (n.factorization p)) / 2 := by
+        apply Finset.prod_congr rfl
+        intro p hp
+        rw [if_pos (Finset.mem_inter.mp hp).2]
+      rw [h_in]
+      have h_sub_S : n.primeFactors ∩ S ⊆ S :=
+        fun _ hp => (Finset.mem_inter.mp hp).2
+      apply Finset.prod_subset h_sub_S
+      intro p hpS hp_not
+      have hp_not_pf : p ∉ n.primeFactors := fun hpf => hp_not (Finset.mem_inter.mpr ⟨hpf, hpS⟩)
+      rw [← Nat.support_factorization n, Finsupp.not_mem_support_iff] at hp_not_pf
+      rw [hp_not_pf]
+      norm_num
+    · apply Finset.prod_congr rfl
+      intro p hp
+      rw [if_neg (Finset.mem_sdiff.mp hp).2]
+  have h_empty :
+      ∀ {n : ℕ}, 1 ≤ n →
+        (∑ d ∈ n.divisors, finitePrimeSetParity ∅ d) = (n.divisors.card : ℤ) := by
+    intro n hn
+    have h_one : ∀ d ∈ n.divisors, finitePrimeSetParity ∅ d = 1 := by
+      intro d hd
+      rw [Nat.mem_divisors] at hd
+      have hd_ne : d ≠ 0 := ne_of_gt (Nat.pos_of_dvd_of_pos hd.1 hn)
+      simp [finitePrimeSetParity, hd_ne]
+    rw [Finset.sum_congr rfl h_one, Finset.sum_const, nsmul_one]
+  refine ⟨h_mult, h_conv, h_empty, ?_, ?_, ?_, ?_⟩
+  · rw [h_empty (by decide : 1 ≤ 12)]
+    decide
+  · have hp1 : finitePrimeSetParity {2} 1 = 1 := (h_mult {2}).1
+    have hp3 : finitePrimeSetParity {2} 3 = 1 := by
+      have hz : (3 : ℕ).factorization 2 = 0 := by
+        rw [Nat.prime_three.factorization, Finsupp.single_apply]
+        decide
+      simp [finitePrimeSetParity, hz]
+    have hdiv3 : (3 : ℕ).divisors = {1, 3} := by decide
+    rw [hdiv3, Finset.sum_pair (by decide), hp1, hp3]
+    norm_num
+  · have hp1 : finitePrimeSetParity {2} 1 = 1 := (h_mult {2}).1
+    have hp2 : finitePrimeSetParity {2} 2 = -1 := by
+      simp [finitePrimeSetParity, Nat.prime_two.factorization_self]
+    have hp3 : finitePrimeSetParity {2} 3 = 1 := by
+      have hz : (3 : ℕ).factorization 2 = 0 := by
+        rw [Nat.prime_three.factorization, Finsupp.single_apply]
+        decide
+      simp [finitePrimeSetParity, hz]
+    have hp6 : finitePrimeSetParity {2} 6 = -1 := by
+      have h6 : (6 : ℕ) = 2 * 3 := rfl
+      rw [h6, (h_mult {2}).2 (by decide) (by decide), hp2, hp3]
+      norm_num
+    have hdiv6 : (6 : ℕ).divisors = {1, 2, 3, 6} := by decide
+    rw [hdiv6]
+    simp [hp1, hp2, hp3, hp6]
+  · have hp1 : finitePrimeSetParity {2} 1 = 1 := (h_mult {2}).1
+    have hp2 : finitePrimeSetParity {2} 2 = -1 := by
+      simp [finitePrimeSetParity, Nat.prime_two.factorization_self]
+    have hp3 : finitePrimeSetParity {2} 3 = 1 := by
+      have hz : (3 : ℕ).factorization 2 = 0 := by
+        rw [Nat.prime_three.factorization, Finsupp.single_apply]
+        decide
+      simp [finitePrimeSetParity, hz]
+    have hp4 : finitePrimeSetParity {2} 4 = 1 := by
+      have h4 : (4 : ℕ) = 2 * 2 := rfl
+      rw [h4, (h_mult {2}).2 (by decide) (by decide), hp2]
+      norm_num
+    have hp6 : finitePrimeSetParity {2} 6 = -1 := by
+      have h6 : (6 : ℕ) = 2 * 3 := rfl
+      rw [h6, (h_mult {2}).2 (by decide) (by decide), hp2, hp3]
+      norm_num
+    have hp12 : finitePrimeSetParity {2} 12 = 1 := by
+      have h12 : (12 : ℕ) = 4 * 3 := rfl
+      rw [h12, (h_mult {2}).2 (by decide) (by decide), hp4, hp3]
+      norm_num
+    have hdiv12 : (12 : ℕ).divisors = {1, 2, 3, 4, 6, 12} := by decide
+    rw [hdiv12]
+    simp [hp1, hp2, hp3, hp4, hp6, hp12]
+
+/-! ### Section 9: Self-Collision Split, Complete Signed Remainder `F`, and Sufficient Relaxation `S` (`TASK-TC-061R` §5) -/
+
+/-- Inherited-cutoff `m = n` composite self-collision window sum
+    `X_{self, T}(Y) := ∑_{1 ≤ n ≤ T} offDiagPrimePowerWeight n n * logWeightedWindowKernel 2 Y n n`. -/
+noncomputable def inheritedPrimePowerSelfCollisionXself (T : ℕ) (Y : ℝ) : ℝ :=
+  ∑ n ∈ Finset.Icc 1 T, offDiagPrimePowerWeight n n * logWeightedWindowKernel 2 Y n n
+
+/-- Canonical-schedule (`T = canonicalCutoffT Y`) composite self-collision sum `X_{self}(Y)`. -/
+noncomputable def canonicalPrimePowerSelfCollisionXself (Y : ℝ) : ℝ :=
+  inheritedPrimePowerSelfCollisionXself (canonicalCutoffT Y) Y
+
+/-- Distinct-integer (`m ≠ n`) off-diagonal prime-power window sum
+    `X_{off, T}(Y) := X̃_T(Y) - X_{self, T}(Y)`. -/
+noncomputable def inheritedPrimePowerDistinctOffDiagXoff (T : ℕ) (Y : ℝ) : ℝ :=
+  inheritedPrimePowerOffDiagXtilde T Y - inheritedPrimePowerSelfCollisionXself T Y
+
+/-- Complete signed remainder functional after removing `4 * X_{self, T}(Y)`:
+    `F_{T, D0}(Y) := 4 * X_{off, T}(Y) + ‖O_{T, D0}‖_Y^2 - 4 * ⟨P_T, O_{T, D0}⟩_Y`. -/
+noncomputable def completeSignedRemainderF (c_lam c_half : ℝ) (T D0 : ℕ) (Y : ℝ) : ℝ :=
+  4 * inheritedPrimePowerDistinctOffDiagXoff T Y +
+    windowEnergyNormSq Y (openCoreOscShiftD2Part c_lam c_half T D0) -
+    4 * windowPairing Y (normalizedPrimePowerTermP T) (openCoreOscShiftD2Part c_lam c_half T D0)
+
+/-- Canonical-schedule (`T = canonicalCutoffT Y`, `D0 = ⌊log Y⌋`) complete signed remainder `F(Y)`. -/
+noncomputable def canonicalSignedRemainderF (c_lam c_half : ℝ) (Y : ℝ) : ℝ :=
+  completeSignedRemainderF c_lam c_half (canonicalCutoffT Y) (Nat.floor (Real.log Y)) Y
+
+/-- Sufficient unsigned-core relaxation functional eliminating the mixed pairing via `‖P + 2 O‖_Y^2 ≥ 0`:
+    `S_{T, D0}(Y) := 5 * X_{off, T}(Y) + 5 * ‖O_{T, D0}‖_Y^2`. -/
+noncomputable def unsignedCoreRelaxationS (c_lam c_half : ℝ) (T D0 : ℕ) (Y : ℝ) : ℝ :=
+  5 * inheritedPrimePowerDistinctOffDiagXoff T Y +
+    5 * windowEnergyNormSq Y (openCoreOscShiftD2Part c_lam c_half T D0)
+
+/-- Canonical-schedule (`T = canonicalCutoffT Y`, `D0 = ⌊log Y⌋`) sufficient relaxation `S(Y)`. -/
+noncomputable def canonicalUnsignedCoreRelaxationS (c_lam c_half : ℝ) (Y : ℝ) : ℝ :=
+  unsignedCoreRelaxationS c_lam c_half (canonicalCutoffT Y) (Nat.floor (Real.log Y)) Y
+
+/-- **Theorem 7 (`TASK-TC-061R` §5, Self-Collision Split, Complete Signed-Remainder Equivalence `H(J, D) ↔ H(F, D)`, and One-Way Sufficient Relaxation `H(S, D) → H(J, D)`)**:
+    1. *Nonnegativity of `D̃`, distinct-integer (`m ≠ n`) off-diagonal sum, and exact split `J = 4 * X_self + F`*;
+    2. *Explicit bounded-perturbation equivalence `MixedCovarianceClosureHypothesis J D ↔ MixedCovarianceClosureHypothesis F D`*
+       with explicit constant tracking (`a_eta` forward, `a_eta + 4 * C` reverse) and canonical instantiation;
+    3. *Quadratic upper bound `J ≤ 5 * X_self + D̃ + S` from `0 ≤ ‖P_T + 2 O_{T, D0}‖_Y^2` and one-way sufficient relaxation*
+       `MixedCovarianceClosureHypothesis S D → MixedCovarianceClosureHypothesis J D` with
+       `a_eta ↦ a_eta + 5 * C`, `b_eta ↦ b_eta + 1`, `Y_eta ↦ max Y_eta (Real.exp 1)`, and canonical instantiation. -/
+theorem signed_remainder_equivalence_and_sufficient_core_relaxation_tc061r :
+    ((∀ {Y : ℝ}, 2 ≤ Y → ∀ (T : ℕ),
+        0 ≤ inheritedPrimePowerDiagDtilde T Y ∧
+          inheritedPrimePowerDistinctOffDiagXoff T Y =
+            (∑ m ∈ Finset.Icc 1 T, ∑ n ∈ (Finset.Icc 1 T).erase m,
+              (liouvilleLambda m : ℝ) * (liouvilleLambda n : ℝ) *
+                offDiagPrimePowerWeight m n * logWeightedWindowKernel 2 Y m n)) ∧
+      (∀ {Y : ℝ}, 2 ≤ Y → 0 ≤ canonicalPrimePowerDiagDtilde Y) ∧
+      (∀ (c_lam c_half : ℝ) (T D0 : ℕ) (Y : ℝ),
+        signedMixedCovarianceJ c_lam c_half T D0 Y =
+          4 * inheritedPrimePowerSelfCollisionXself T Y +
+            completeSignedRemainderF c_lam c_half T D0 Y) ∧
+      (∀ (c_lam c_half : ℝ) (Y : ℝ),
+        canonicalSignedMixedCovarianceJ c_lam c_half Y =
+          4 * canonicalPrimePowerSelfCollisionXself Y +
+            canonicalSignedRemainderF c_lam c_half Y)) ∧
+    ((∀ {J F X_self D : ℝ → ℝ} {C : ℝ},
+        0 ≤ C →
+        (∀ Y : ℝ, 2 ≤ Y → J Y = 4 * X_self Y + F Y ∧ 0 ≤ X_self Y ∧ X_self Y ≤ C) →
+        ((∀ {η a_eta b_eta κ_eta Y_eta : ℝ},
+            2 ≤ Y_eta →
+            (∀ Y : ℝ, Y_eta ≤ Y →
+              J Y ≤ a_eta * Y ^ η + b_eta * (Real.log Y) ^ (2 - κ_eta) * D Y) →
+            (∀ Y : ℝ, Y_eta ≤ Y →
+              F Y ≤ a_eta * Y ^ η + b_eta * (Real.log Y) ^ (2 - κ_eta) * D Y)) ∧
+          (∀ {η a_eta b_eta κ_eta Y_eta : ℝ},
+            0 < η → 2 ≤ Y_eta →
+            (∀ Y : ℝ, Y_eta ≤ Y →
+              F Y ≤ a_eta * Y ^ η + b_eta * (Real.log Y) ^ (2 - κ_eta) * D Y) →
+            (∀ Y : ℝ, Y_eta ≤ Y →
+              J Y ≤ (a_eta + 4 * C) * Y ^ η + b_eta * (Real.log Y) ^ (2 - κ_eta) * D Y)) ∧
+          (MixedCovarianceClosureHypothesis J D ↔ MixedCovarianceClosureHypothesis F D))) ∧
+      (∀ (c_lam c_half : ℝ),
+        MixedCovarianceClosureHypothesis
+          (canonicalSignedMixedCovarianceJ c_lam c_half) canonicalPrimePowerDiagDtilde ↔
+        MixedCovarianceClosureHypothesis
+          (canonicalSignedRemainderF c_lam c_half) canonicalPrimePowerDiagDtilde)) ∧
+    ((∀ {Y : ℝ}, 2 ≤ Y → ∀ {T : ℕ}, 1 ≤ T → ∀ (D0 : ℕ) (c_lam c_half : ℝ),
+        0 ≤ windowEnergyNormSq Y
+            (fun X =>
+              normalizedPrimePowerTermP T X +
+                2 * openCoreOscShiftD2Part c_lam c_half T D0 X) ∧
+          signedMixedCovarianceJ c_lam c_half T D0 Y ≤
+            5 * inheritedPrimePowerSelfCollisionXself T Y +
+              inheritedPrimePowerDiagDtilde T Y +
+              unsignedCoreRelaxationS c_lam c_half T D0 Y) ∧
+      (∀ {J S D : ℝ → ℝ} {C : ℝ},
+        0 ≤ C →
+        (∀ Y : ℝ, 2 ≤ Y → 0 ≤ D Y ∧ J Y ≤ 5 * C + D Y + S Y) →
+        ((∀ {η a_eta b_eta κ_eta Y_eta : ℝ},
+            0 < η → 0 < κ_eta → κ_eta ≤ 2 → 2 ≤ Y_eta →
+            (∀ Y : ℝ, Y_eta ≤ Y →
+              S Y ≤ a_eta * Y ^ η + b_eta * (Real.log Y) ^ (2 - κ_eta) * D Y) →
+            (∀ Y : ℝ, max Y_eta (Real.exp 1) ≤ Y →
+              J Y ≤ (a_eta + 5 * C) * Y ^ η +
+                (b_eta + 1) * (Real.log Y) ^ (2 - κ_eta) * D Y)) ∧
+          (MixedCovarianceClosureHypothesis S D → MixedCovarianceClosureHypothesis J D))) ∧
+      (∀ (c_lam c_half : ℝ),
+        MixedCovarianceClosureHypothesis
+          (canonicalUnsignedCoreRelaxationS c_lam c_half) canonicalPrimePowerDiagDtilde →
+        MixedCovarianceClosureHypothesis
+          (canonicalSignedMixedCovarianceJ c_lam c_half) canonicalPrimePowerDiagDtilde)) := by
+  have h_D_nn : ∀ {Y : ℝ}, 2 ≤ Y → ∀ (T : ℕ), 0 ≤ inheritedPrimePowerDiagDtilde T Y := by
+    intro Y hY2 T
+    obtain ⟨hle, hprops⟩ := uIcc_tau_props_tc061_aux hY2
+    unfold inheritedPrimePowerDiagDtilde
+    apply intervalIntegral.integral_nonneg hle
+    intro X hX
+    have hX_uIcc : X ∈ Set.uIcc Y (RiemannScope.tau * Y) := by rwa [Set.uIcc_of_le hle]
+    have hX_pos : 0 < X := (hprops X hX_uIcc).2.1
+    unfold pointwisePrimePowerDiagNorm
+    apply div_nonneg
+    · apply div_nonneg
+      · apply Finset.sum_nonneg
+        intro pk _
+        exact mul_nonneg (div_nonneg (sq_nonneg _) (Nat.cast_nonneg _)) (sq_nonneg _)
+      · exact sq_nonneg _
+    · exact le_of_lt hX_pos
+  have h_Xoff_eq :
+      ∀ {Y : ℝ}, 2 ≤ Y → ∀ (T : ℕ),
+        inheritedPrimePowerDistinctOffDiagXoff T Y =
+          ∑ m ∈ Finset.Icc 1 T, ∑ n ∈ (Finset.Icc 1 T).erase m,
+            (liouvilleLambda m : ℝ) * (liouvilleLambda n : ℝ) *
+              offDiagPrimePowerWeight m n * logWeightedWindowKernel 2 Y m n := by
+    intro Y hY2 T
+    have h_Xtilde :=
+      ((finite_window_offdiag_kernel_and_composite_self_collision_bound_tc061).1 hY2 T).2
+    unfold inheritedPrimePowerDistinctOffDiagXoff inheritedPrimePowerSelfCollisionXself
+    rw [h_Xtilde, ← Finset.sum_sub_distrib]
+    apply Finset.sum_congr rfl
+    intro m hm
+    rw [← Finset.add_sum_erase _ _ hm]
+    have hm_ne : m ≠ 0 := by rw [Finset.mem_Icc] at hm; omega
+    have h_lam_sq : (liouvilleLambda m : ℝ) * (liouvilleLambda m : ℝ) = 1 := by
+      have h_int : liouvilleLambda m * liouvilleLambda m = 1 := by
+        simp only [liouvilleLambda, hm_ne, ↓reduceIte, liouvilleSignFromOmega]
+        rw [← pow_add, show natOmega m + natOmega m = 2 * natOmega m by omega, pow_mul]
+        norm_num
+      exact_mod_cast h_int
+    rw [h_lam_sq, one_mul]
+    ring
+  have h_J_split :
+      ∀ (c_lam c_half : ℝ) (T D0 : ℕ) (Y : ℝ),
+        signedMixedCovarianceJ c_lam c_half T D0 Y =
+          4 * inheritedPrimePowerSelfCollisionXself T Y +
+            completeSignedRemainderF c_lam c_half T D0 Y := by
+    intro c_lam c_half T D0 Y
+    unfold signedMixedCovarianceJ completeSignedRemainderF inheritedPrimePowerDistinctOffDiagXoff
+    ring
+  have h_J_can_split :
+      ∀ (c_lam c_half : ℝ) (Y : ℝ),
+        canonicalSignedMixedCovarianceJ c_lam c_half Y =
+          4 * canonicalPrimePowerSelfCollisionXself Y +
+            canonicalSignedRemainderF c_lam c_half Y := by
+    intro c_lam c_half Y
+    unfold canonicalSignedMixedCovarianceJ canonicalPrimePowerSelfCollisionXself
+      canonicalSignedRemainderF
+    exact h_J_split c_lam c_half _ _ Y
+  have h_equiv_gen :
+      ∀ {J F X_self D : ℝ → ℝ} {C : ℝ},
+        0 ≤ C →
+        (∀ Y : ℝ, 2 ≤ Y → J Y = 4 * X_self Y + F Y ∧ 0 ≤ X_self Y ∧ X_self Y ≤ C) →
+        ((∀ {η a_eta b_eta κ_eta Y_eta : ℝ},
+            2 ≤ Y_eta →
+            (∀ Y : ℝ, Y_eta ≤ Y →
+              J Y ≤ a_eta * Y ^ η + b_eta * (Real.log Y) ^ (2 - κ_eta) * D Y) →
+            (∀ Y : ℝ, Y_eta ≤ Y →
+              F Y ≤ a_eta * Y ^ η + b_eta * (Real.log Y) ^ (2 - κ_eta) * D Y)) ∧
+          (∀ {η a_eta b_eta κ_eta Y_eta : ℝ},
+            0 < η → 2 ≤ Y_eta →
+            (∀ Y : ℝ, Y_eta ≤ Y →
+              F Y ≤ a_eta * Y ^ η + b_eta * (Real.log Y) ^ (2 - κ_eta) * D Y) →
+            (∀ Y : ℝ, Y_eta ≤ Y →
+              J Y ≤ (a_eta + 4 * C) * Y ^ η + b_eta * (Real.log Y) ^ (2 - κ_eta) * D Y)) ∧
+          (MixedCovarianceClosureHypothesis J D ↔ MixedCovarianceClosureHypothesis F D)) := by
+    intro J F X_self D C hC_nn h_split
+    have h_fwd :
+        ∀ {η a_eta b_eta κ_eta Y_eta : ℝ},
+          2 ≤ Y_eta →
+          (∀ Y : ℝ, Y_eta ≤ Y →
+            J Y ≤ a_eta * Y ^ η + b_eta * (Real.log Y) ^ (2 - κ_eta) * D Y) →
+          (∀ Y : ℝ, Y_eta ≤ Y →
+            F Y ≤ a_eta * Y ^ η + b_eta * (Real.log Y) ^ (2 - κ_eta) * D Y) := by
+      intro η a_eta b_eta κ_eta Y_eta hY_eta hJ Y hYY
+      obtain ⟨h_eq, hX_nn, _⟩ := h_split Y (le_trans hY_eta hYY)
+      linarith [hJ Y hYY]
+    have h_rev :
+        ∀ {η a_eta b_eta κ_eta Y_eta : ℝ},
+          0 < η → 2 ≤ Y_eta →
+          (∀ Y : ℝ, Y_eta ≤ Y →
+            F Y ≤ a_eta * Y ^ η + b_eta * (Real.log Y) ^ (2 - κ_eta) * D Y) →
+          (∀ Y : ℝ, Y_eta ≤ Y →
+            J Y ≤ (a_eta + 4 * C) * Y ^ η + b_eta * (Real.log Y) ^ (2 - κ_eta) * D Y) := by
+      intro η a_eta b_eta κ_eta Y_eta hη hY_eta hF Y hYY
+      have hY2 : 2 ≤ Y := le_trans hY_eta hYY
+      obtain ⟨h_eq, _, hX_le⟩ := h_split Y hY2
+      have h_pow_ge1 : 1 ≤ Y ^ η := Real.one_le_rpow (by linarith) (le_of_lt hη)
+      have hC_pow : 4 * C ≤ 4 * C * Y ^ η := by nlinarith
+      linarith [hF Y hYY]
+    refine ⟨h_fwd, h_rev, ?_⟩
+    constructor
+    · intro hJ_hyp η hη
+      obtain ⟨a_eta, b_eta, κ_eta, Y_eta, ha, hb, hκ_pos, hκ_le2, hYe, hJ⟩ := hJ_hyp η hη
+      exact ⟨a_eta, b_eta, κ_eta, Y_eta, ha, hb, hκ_pos, hκ_le2, hYe, h_fwd hYe hJ⟩
+    · intro hF_hyp η hη
+      obtain ⟨a_eta, b_eta, κ_eta, Y_eta, ha, hb, hκ_pos, hκ_le2, hYe, hF⟩ := hF_hyp η hη
+      exact ⟨a_eta + 4 * C, b_eta, κ_eta, Y_eta, by positivity, hb, hκ_pos, hκ_le2, hYe,
+        h_rev hη hYe hF⟩
+  have h_self_bds :=
+    (finite_window_offdiag_kernel_and_composite_self_collision_bound_tc061).2.2
+  have h_equiv_can :
+      ∀ (c_lam c_half : ℝ),
+        MixedCovarianceClosureHypothesis
+          (canonicalSignedMixedCovarianceJ c_lam c_half) canonicalPrimePowerDiagDtilde ↔
+        MixedCovarianceClosureHypothesis
+          (canonicalSignedRemainderF c_lam c_half) canonicalPrimePowerDiagDtilde := by
+    intro c_lam c_half
+    refine (h_equiv_gen (X_self := canonicalPrimePowerSelfCollisionXself)
+      (C := 186 * (RiemannScope.tau - 1)) (le_of_lt h_self_bds.1) ?_).2.2
+    intro Y hY2
+    have hb := h_self_bds.2.2 hY2 (canonicalCutoffT Y)
+    exact ⟨h_J_can_split c_lam c_half Y, hb.1, le_trans hb.2.1 hb.2.2⟩
+  have h_quad_relax :
+      ∀ {Y : ℝ}, 2 ≤ Y → ∀ {T : ℕ}, 1 ≤ T → ∀ (D0 : ℕ) (c_lam c_half : ℝ),
+        0 ≤ windowEnergyNormSq Y
+            (fun X =>
+              normalizedPrimePowerTermP T X +
+                2 * openCoreOscShiftD2Part c_lam c_half T D0 X) ∧
+          signedMixedCovarianceJ c_lam c_half T D0 Y ≤
+            5 * inheritedPrimePowerSelfCollisionXself T Y +
+              inheritedPrimePowerDiagDtilde T Y +
+              unsignedCoreRelaxationS c_lam c_half T D0 Y := by
+    intro Y hY2 T hT D0 c_lam c_half
+    obtain ⟨hle, hprops⟩ := uIcc_tau_props_tc061_aux hY2
+    obtain ⟨_, _, hP_cont, _, hO_cont⟩ :=
+      continuousOn_core_components_tc061_aux hY2 T D0 c_lam c_half
+    have h_int_PP := intervalIntegrable_window_pair_tc061_aux hY2 hP_cont hP_cont
+    have h_int_OO := intervalIntegrable_window_pair_tc061_aux hY2 hO_cont hO_cont
+    have h_int_PO := intervalIntegrable_window_pair_tc061_aux hY2 hP_cont hO_cont
+    have h_nn :
+        0 ≤ windowEnergyNormSq Y
+            (fun X =>
+              normalizedPrimePowerTermP T X +
+                2 * openCoreOscShiftD2Part c_lam c_half T D0 X) := by
+      unfold windowEnergyNormSq windowPairing
+      apply intervalIntegral.integral_nonneg hle
+      intro X hX
+      have hX_uIcc : X ∈ Set.uIcc Y (RiemannScope.tau * Y) := by rwa [Set.uIcc_of_le hle]
+      have hX_pos : 0 < X := (hprops X hX_uIcc).2.1
+      exact div_nonneg (mul_self_nonneg _) (le_of_lt hX_pos)
+    have h_expand_sq :
+        windowEnergyNormSq Y
+          (fun X =>
+            normalizedPrimePowerTermP T X +
+              2 * openCoreOscShiftD2Part c_lam c_half T D0 X) =
+          windowEnergyNormSq Y (normalizedPrimePowerTermP T) +
+            4 * windowEnergyNormSq Y (openCoreOscShiftD2Part c_lam c_half T D0) +
+            4 * windowPairing Y (normalizedPrimePowerTermP T)
+              (openCoreOscShiftD2Part c_lam c_half T D0) := by
+      unfold windowEnergyNormSq windowPairing
+      rw [← intervalIntegral.integral_const_mul, ← intervalIntegral.integral_const_mul,
+        ← intervalIntegral.integral_add h_int_PP (h_int_OO.const_mul 4),
+        ← intervalIntegral.integral_add (h_int_PP.add (h_int_OO.const_mul 4))
+          (h_int_PO.const_mul 4)]
+      apply intervalIntegral.integral_congr
+      intro X _; ring
+    have hP_split := (mixed_covariance_identity_and_theta_energy_bound_tc061).1 hY2 hT
+    refine ⟨h_nn, ?_⟩
+    unfold signedMixedCovarianceJ unsignedCoreRelaxationS inheritedPrimePowerDistinctOffDiagXoff
+    linarith [h_nn, h_expand_sq, hP_split]
+  have h_relax_gen :
+      ∀ {J S D : ℝ → ℝ} {C : ℝ},
+        0 ≤ C →
+        (∀ Y : ℝ, 2 ≤ Y → 0 ≤ D Y ∧ J Y ≤ 5 * C + D Y + S Y) →
+        ((∀ {η a_eta b_eta κ_eta Y_eta : ℝ},
+            0 < η → 0 < κ_eta → κ_eta ≤ 2 → 2 ≤ Y_eta →
+            (∀ Y : ℝ, Y_eta ≤ Y →
+              S Y ≤ a_eta * Y ^ η + b_eta * (Real.log Y) ^ (2 - κ_eta) * D Y) →
+            (∀ Y : ℝ, max Y_eta (Real.exp 1) ≤ Y →
+              J Y ≤ (a_eta + 5 * C) * Y ^ η +
+                (b_eta + 1) * (Real.log Y) ^ (2 - κ_eta) * D Y)) ∧
+          (MixedCovarianceClosureHypothesis S D → MixedCovarianceClosureHypothesis J D)) := by
+    intro J S D C hC_nn h_ub
+    have h_step :
+        ∀ {η a_eta b_eta κ_eta Y_eta : ℝ},
+          0 < η → 0 < κ_eta → κ_eta ≤ 2 → 2 ≤ Y_eta →
+          (∀ Y : ℝ, Y_eta ≤ Y →
+            S Y ≤ a_eta * Y ^ η + b_eta * (Real.log Y) ^ (2 - κ_eta) * D Y) →
+          (∀ Y : ℝ, max Y_eta (Real.exp 1) ≤ Y →
+            J Y ≤ (a_eta + 5 * C) * Y ^ η +
+              (b_eta + 1) * (Real.log Y) ^ (2 - κ_eta) * D Y) := by
+      intro η a_eta b_eta κ_eta Y_eta hη _hκ_pos hκ_le2 hY_eta hS Y hYm
+      have hYYe : Y_eta ≤ Y := le_trans (le_max_left _ _) hYm
+      have hY_ge_e : Real.exp 1 ≤ Y := le_trans (le_max_right _ _) hYm
+      have hY2 : 2 ≤ Y := le_trans hY_eta hYYe
+      obtain ⟨hD_nn, hJ_ub⟩ := h_ub Y hY2
+      have h_pow_ge1 : 1 ≤ Y ^ η := Real.one_le_rpow (by linarith) (le_of_lt hη)
+      have hC_pow : 5 * C ≤ 5 * C * Y ^ η := by nlinarith
+      have hlogY_ge1 : 1 ≤ Real.log Y := by
+        have h := Real.log_le_log (Real.exp_pos 1) hY_ge_e
+        rwa [Real.log_exp] at h
+      have h_logpow_ge1 : 1 ≤ (Real.log Y) ^ (2 - κ_eta) :=
+        Real.one_le_rpow hlogY_ge1 (by linarith)
+      have hD_abs : D Y ≤ (Real.log Y) ^ (2 - κ_eta) * D Y := by nlinarith
+      linarith [hS Y hYYe]
+    refine ⟨h_step, ?_⟩
+    intro hS_hyp η hη
+    obtain ⟨a_eta, b_eta, κ_eta, Y_eta, ha, hb, hκ_pos, hκ_le2, hYe, hS⟩ := hS_hyp η hη
+    refine ⟨a_eta + 5 * C, b_eta + 1, κ_eta, max Y_eta (Real.exp 1),
+      by positivity, by positivity, hκ_pos, hκ_le2, le_trans hYe (le_max_left _ _),
+      h_step hη hκ_pos hκ_le2 hYe hS⟩
+  refine ⟨⟨fun hY2 T => ⟨h_D_nn hY2 T, h_Xoff_eq hY2 T⟩,
+      fun hY2 => h_D_nn hY2 (canonicalCutoffT _),
+      h_J_split, h_J_can_split⟩,
+    ⟨h_equiv_gen, h_equiv_can⟩,
+    ⟨h_quad_relax, h_relax_gen, ?_⟩⟩
+  intro c_lam c_half
+  refine (h_relax_gen (C := 186 * (RiemannScope.tau - 1))
+    (le_of_lt h_self_bds.1) ?_).2
+  intro Y hY2
+  have hT_can : 1 ≤ canonicalCutoffT Y := canonicalCutoffT_ge_one_tc061_aux hY2
+  have h_D_can : 0 ≤ canonicalPrimePowerDiagDtilde Y := h_D_nn hY2 (canonicalCutoffT Y)
+  have h_J_can :=
+    (h_quad_relax hY2 hT_can (Nat.floor (Real.log Y)) c_lam c_half).2
+  have hb := h_self_bds.2.2 hY2 (canonicalCutoffT Y)
+  have h_self_le : canonicalPrimePowerSelfCollisionXself Y ≤ 186 * (RiemannScope.tau - 1) :=
+    le_trans hb.2.1 hb.2.2
+  unfold canonicalSignedMixedCovarianceJ canonicalPrimePowerDiagDtilde
+    canonicalUnsignedCoreRelaxationS canonicalPrimePowerSelfCollisionXself at *
+  exact ⟨h_D_can, by linarith⟩
 
 end MixedArithmeticCovariance
 end RiemannScope
