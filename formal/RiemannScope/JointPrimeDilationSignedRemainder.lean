@@ -1,11 +1,12 @@
 /-
 RiemannScope.JointPrimeDilationSignedRemainder
-TASK-TC-062 (EPIC-TC-042 / SUBGATE-TC-043A):
+TASK-TC-062 / TASK-TC-062R (EPIC-TC-042 / SUBGATE-TC-043A):
 Joint Prime-Dilation Signed-Remainder Kernel, Exact One-Prime and Disjoint Two-Prime
 Anchor Reindexings, Certified Whole-Line Contraction Ratios and Submultiplicativity
 Refutation, Spillover Fringe Reindexing and Truncated Mixed-Covariance Equivalence,
 Stage A Interior Hilbert Split with Candidate A1 Refutation and Replacement Bound A1',
-and Interior Prime-Pair Closure Equivalence with Conditional Route D Transfer.
+Interior Prime-Pair Closure Equivalence with Conditional Route D Transfer, and
+Two-Sided Interior Anchor-Diagonal Bound with Off-Diagonal Closure Equivalence.
 
 Formalizes in Lean 4 (complete machine-checked proofs with canonical circle constant
 RiemannScope.tau throughout; complex coordinates written z = x + i y with x, y real
@@ -17,6 +18,7 @@ and critical line x = 1/2):
 5. `spillover_fringe_reindexing_and_mixed_covariance_reduction_tc062`
 6. `stage_a_interior_hilbert_split_and_candidate_a1_refutation_tc062`
 7. `interior_prime_pair_closure_equivalence_and_route_d_transfer_tc062`
+8. `two_sided_interior_diag_bound_and_offdiag_equivalence_tc062r`
 -/
 
 import Mathlib.NumberTheory.Harmonic.EulerMascheroni
@@ -1704,7 +1706,14 @@ private theorem wholeLineGaussianGram_eval_tc062_aux {d1 d2 g r1 r2 : ℕ} {c k 
     wholeLineGaussianGram d1 d2 = wholeLineConstantCG * (c * (1 / Real.sqrt k)) := by
   rw [wholeLineGaussianGram_eq_unit_tc062_aux hg h1 h2, hk, hc]
 
-/-- **Theorem 4 (`TASK-TC-062` §5, Certified `10^(-12)` Enclosures of Whole-Line Contraction Ratios `R({2}), R({3}), R({2, 3}), R({2, 3, 5})`, Product `R({2}) * R({3})`, and Strict Submultiplicativity & Monotonicity Refutation)**:
+/-- **Theorem 4 (`TASK-TC-062` §5 / `TASK-TC-062R` §7C, Certified `10^(-12)` Enclosures of Whole-Line Contraction Ratios `R({2}), R({3}), R({2, 3}), R({2, 3, 5})`, Product `R({2}) * R({3})`, and Strict Submultiplicativity & Monotonicity Refutation)**:
+    *Scope note (`TASK-TC-062R` §7C)*: `wholeLineGaussianGram`, `wholeLineSignedProfileNormSq`,
+    `wholeLineDiagSumNormSq`, and `wholeLineContractionRatioR` are algebraic closed-form
+    definitions in Lean (`CONCRETE_ANALYTIC_IN_LEAN`), while the improper half-line
+    Gaussian/Gamma integral identification
+    `integral_{0..infty} phi_m(X) phi_n(X) dX/X = wholeLineGaussianGram m n` via
+    `(d/dX)(-((2*a*X^3 + 3*X)/(4*a^2)) * exp(-a*X^2)) = (X^4 - 3/(4*a^2)) * exp(-a*X^2)`
+    at `a = m^(-2) + n^(-2)` is proved analytically outside Lean (`ANALYTIC_PROVED_OUTSIDE_LEAN`).
     1. Exact algebraic `5/2`-power square-times-square-root identity (`(m^2 + n^2)^(5/2) = (m^2 + n^2)^2 * sqrt(m^2 + n^2)`) and positivity `0 < wholeLineConstantCG`;
     2. Certified `10^(-12)` rational interval enclosures for `R({2})`, `R({3})`, `R({2, 3})`, `R({2, 3, 5})`, and `R({2}) * R({3})`;
     3. Strict ordering `R({2}) * R({3}) < R({2}) < R({2, 3}) < R({2, 3, 5})`, refuting both submultiplicativity `R(S ∪ T) ≤ R(S) R(T)` and prime-set monotonicity `R(S ∪ {q}) ≤ R(S)`. -/
@@ -6180,6 +6189,2793 @@ theorem interior_prime_pair_closure_equivalence_and_route_d_transfer_tc062
   unfold canonicalLiouvilleEnergyE
   exact ((mixed_covariance_identity_and_theta_energy_bound_tc061).2.2.2.2.2 hY2
     actualSelbergConstantCLam actualSquarePoleConstantCHalf).2
+
+/-! ### Section 7: Two-Sided Interior Anchor-Diagonal Bound & Off-Diagonal Equivalence (`TASK-TC-062R` §3, §7A, §7D) -/
+
+/-- Aggregate interior `p`-adic anchor diagonal sum `Σ_{p, diag}^{int}(Y)` over
+    `m ∈ primeInteriorTruncatedAnchors p T` (`TASK-TC-062R` §3 & §7A). -/
+noncomputable def interiorAnchorDiagSigma (c_lam c_half : ℝ) (p T D0 : ℕ) (Y : ℝ) : ℝ :=
+  ∑ m ∈ primeInteriorTruncatedAnchors p T,
+    (completeSignedKernelHcal c_lam c_half T D0 Y m m -
+      completeSignedKernelHcal c_lam c_half T D0 Y (p * m) m -
+      completeSignedKernelHcal c_lam c_half T D0 Y m (p * m) +
+      completeSignedKernelHcal c_lam c_half T D0 Y (p * m) (p * m))
+
+/-- Distinct-anchor (`m ≠ n`) interior `p`-adic off-diagonal sum `Σ_{p, off}^{int}(Y)` over
+    `primeInteriorTruncatedAnchors p T` (`TASK-TC-062R` §3 & §7D). -/
+noncomputable def interiorAnchorOffDiagSigma (c_lam c_half : ℝ) (p T D0 : ℕ) (Y : ℝ) : ℝ :=
+  ∑ m ∈ primeInteriorTruncatedAnchors p T,
+    ∑ n ∈ (primeInteriorTruncatedAnchors p T).erase m,
+      (liouvilleLambda m : ℝ) * (liouvilleLambda n : ℝ) *
+        (completeSignedKernelHcal c_lam c_half T D0 Y m n -
+          completeSignedKernelHcal c_lam c_half T D0 Y (p * m) n -
+          completeSignedKernelHcal c_lam c_half T D0 Y m (p * n) +
+          completeSignedKernelHcal c_lam c_half T D0 Y (p * m) (p * n))
+
+/-- Canonical-schedule (`T = canonicalCutoffT Y`, `D0 = ⌊log Y⌋`) interior anchor diagonal sum. -/
+noncomputable def canonicalInteriorDiagSigma (c_lam c_half : ℝ) (p : ℕ) (Y : ℝ) : ℝ :=
+  interiorAnchorDiagSigma c_lam c_half p (canonicalCutoffT Y) (Nat.floor (Real.log Y)) Y
+
+/-- Canonical-schedule (`T = canonicalCutoffT Y`, `D0 = ⌊log Y⌋`) distinct-anchor interior
+    off-diagonal sum (`TC062-OBL-INTERIOR-PRIME-PAIR-OFFDIAG` observable). -/
+noncomputable def canonicalInteriorOffDiagSigma (c_lam c_half : ℝ) (p : ℕ) (Y : ℝ) : ℝ :=
+  interiorAnchorOffDiagSigma c_lam c_half p (canonicalCutoffT Y) (Nat.floor (Real.log Y)) Y
+
+private theorem interiorPairedRemainderF_diag_offdiag_split_tc062r_aux
+    (c_lam c_half : ℝ) (p T D0 : ℕ) (Y : ℝ) :
+    interiorPairedRemainderF c_lam c_half p T D0 Y =
+        interiorAnchorDiagSigma c_lam c_half p T D0 Y +
+          interiorAnchorOffDiagSigma c_lam c_half p T D0 Y ∧
+      interiorAnchorOffDiagSigma c_lam c_half p T D0 Y =
+        ∑ mn ∈ (primeInteriorTruncatedAnchors p T ×ˢ primeInteriorTruncatedAnchors p T).filter
+            (fun mn => mn.1 ≠ mn.2),
+          (liouvilleLambda mn.1 : ℝ) * (liouvilleLambda mn.2 : ℝ) *
+            (completeSignedKernelHcal c_lam c_half T D0 Y mn.1 mn.2 -
+              completeSignedKernelHcal c_lam c_half T D0 Y (p * mn.1) mn.2 -
+              completeSignedKernelHcal c_lam c_half T D0 Y mn.1 (p * mn.2) +
+              completeSignedKernelHcal c_lam c_half T D0 Y (p * mn.1) (p * mn.2)) := by
+  let S := primeInteriorTruncatedAnchors p T
+  let term : ℕ → ℕ → ℝ := fun m n =>
+    (liouvilleLambda m : ℝ) * (liouvilleLambda n : ℝ) *
+      (completeSignedKernelHcal c_lam c_half T D0 Y m n -
+        completeSignedKernelHcal c_lam c_half T D0 Y (p * m) n -
+        completeSignedKernelHcal c_lam c_half T D0 Y m (p * n) +
+        completeSignedKernelHcal c_lam c_half T D0 Y (p * m) (p * n))
+  constructor
+  · unfold interiorPairedRemainderF interiorAnchorDiagSigma interiorAnchorOffDiagSigma
+    rw [← Finset.sum_add_distrib]
+    apply Finset.sum_congr rfl
+    intro m hm
+    have hm1 : 1 ≤ m :=
+      (Finset.mem_Icc.mp (Finset.mem_filter.mp (Finset.mem_filter.mp hm).1).1).1
+    rw [← Finset.add_sum_erase _ _ hm, liouvilleLambda_sq_eq_one_tc062_aux hm1, one_mul]
+  · unfold interiorAnchorOffDiagSigma
+    change (∑ m ∈ S, ∑ n ∈ S.erase m, term m n) =
+      ∑ mn ∈ (S ×ˢ S).filter (fun mn => mn.1 ≠ mn.2), term mn.1 mn.2
+    rw [Finset.sum_filter, Finset.sum_product]
+    apply Finset.sum_congr rfl
+    intro m hm
+    symm
+    rw [← Finset.add_sum_erase _ _ hm, if_neg (not_not.mpr rfl), zero_add]
+    apply Finset.sum_congr rfl
+    intro n hn
+    exact if_pos (Finset.mem_erase.mp hn).1.symm
+
+private theorem commonPrimePowerLogSq_prime_mul_identities_tc062r_aux
+    {p m : ℕ} (hp : p.Prime) (hm1 : 1 ≤ m) :
+    commonPrimePowerLogSq m (p * m) = commonPrimePowerLogSq m m ∧
+      commonPrimePowerLogSq (p * m) (p * m) =
+        commonPrimePowerLogSq m m + (Real.log (p : ℝ)) ^ 2 := by
+  have h_mp : commonPrimePowerLogSq m (p * m) = commonPrimePowerLogSq m m := by
+    unfold commonPrimePowerLogSq
+    have h_min : min m (p * m) = min m m := by
+      rw [min_self, min_eq_left (Nat.le_mul_of_pos_left m hp.pos)]
+    have h_gcd : Nat.gcd m (p * m) = Nat.gcd m m := by
+      rw [Nat.gcd_self, Nat.gcd_eq_left (dvd_mul_left m p)]
+    rw [h_min, h_gcd]
+  refine ⟨h_mp, ?_⟩
+  let U := insert p (insert p (m.primeFactors ∪ m.primeFactors))
+  have hU_prime : ∀ r ∈ U, r.Prime := by
+    intro r hr
+    simp only [U, Finset.mem_insert, Finset.mem_union] at hr
+    rcases hr with rfl | rfl | hrm | hrm
+    · exact hp
+    · exact hp
+    · exact Nat.prime_of_mem_primeFactors hrm
+    · exact Nat.prime_of_mem_primeFactors hrm
+  have hpm1 : 1 ≤ p * m := Nat.mul_pos hp.pos hm1
+  have h_mm :
+      commonPrimePowerLogSq m m =
+        ∑ r ∈ U, ((min (m.factorization r) (m.factorization r) : ℕ) : ℝ) *
+          (Real.log (r : ℝ)) ^ 2 := by
+    apply commonPrimePowerLogSq_eq_sum_min_factorization_tc062_aux hm1 hm1 U hU_prime
+    simpa only [pow_zero, one_mul] using
+      primeFactors_gcd_subset_insert_two_tc062_aux hp hp hm1 hm1 0 0 0 0
+  have h_pmpm :
+      commonPrimePowerLogSq (p * m) (p * m) =
+        ∑ r ∈ U, ((min ((p * m).factorization r) ((p * m).factorization r) : ℕ) : ℝ) *
+          (Real.log (r : ℝ)) ^ 2 := by
+    apply commonPrimePowerLogSq_eq_sum_min_factorization_tc062_aux hpm1 hpm1 U hU_prime
+    simpa only [pow_one, pow_zero, mul_one] using
+      primeFactors_gcd_subset_insert_two_tc062_aux hp hp hm1 hm1 1 0 1 0
+  have hpU : p ∈ U := Finset.mem_insert_self p _
+  rw [h_pmpm, h_mm, ← Finset.add_sum_erase _ _ hpU,
+    ← Finset.add_sum_erase U
+      (fun r => ((min (m.factorization r) (m.factorization r) : ℕ) : ℝ) * (Real.log (r : ℝ)) ^ 2)
+      hpU]
+  have h_er_eq :
+      (∑ r ∈ U.erase p,
+          ((min ((p * m).factorization r) ((p * m).factorization r) : ℕ) : ℝ) *
+            (Real.log (r : ℝ)) ^ 2) =
+        ∑ r ∈ U.erase p,
+          ((min (m.factorization r) (m.factorization r) : ℕ) : ℝ) *
+            (Real.log (r : ℝ)) ^ 2 := by
+    apply Finset.sum_congr rfl
+    intro r hr
+    have hrp : p ≠ r := (Finset.mem_erase.mp hr).1.symm
+    rw [factorization_prime_mul_of_ne_tc062_aux hp hrp hm1]
+  rw [h_er_eq, min_self, min_self, factorization_prime_mul_self_tc062_aux hp hm1]
+  push_cast
+  ring
+
+private theorem anchor_diagonal_hcal_identities_tc062r_aux
+    {p : ℕ} (hp : p.Prime) {Y : ℝ} (hY2 : 2 ≤ Y) {T m : ℕ}
+    (hm1 : 1 ≤ m) (hpmT : p * m ≤ T) (D0 : ℕ) (c_lam c_half : ℝ) :
+    (completeSignedKernelHcal c_lam c_half T D0 Y m m -
+        completeSignedKernelHcal c_lam c_half T D0 Y (p * m) m -
+        completeSignedKernelHcal c_lam c_half T D0 Y m (p * m) +
+        completeSignedKernelHcal c_lam c_half T D0 Y (p * m) (p * m) =
+      windowEnergyNormSq Y
+          (fun X =>
+            adjustedStationProfilePsi c_lam c_half T D0 m X -
+              adjustedStationProfilePsi c_lam c_half T D0 (p * m) X) -
+        4 * (Real.log (m : ℝ)) ^ 2 * logWeightedWindowKernel 2 Y m m -
+        4 * (Real.log ((p * m : ℕ) : ℝ)) ^ 2 * logWeightedWindowKernel 2 Y (p * m) (p * m) +
+        8 * commonPrimePowerLogSq m m * logWeightedWindowKernel 2 Y m (p * m)) ∧
+      (completeSignedKernelHcal c_lam c_half T D0 Y m m -
+          completeSignedKernelHcal c_lam c_half T D0 Y (p * m) m -
+          completeSignedKernelHcal c_lam c_half T D0 Y m (p * m) +
+          completeSignedKernelHcal c_lam c_half T D0 Y (p * m) (p * m) =
+        windowEnergyNormSq Y
+            (fun X =>
+              adjustedStationProfilePsi c_lam c_half T D0 m X -
+                adjustedStationProfilePsi c_lam c_half T D0 (p * m) X) -
+          4 * (Real.log (p : ℝ)) ^ 2 * logWeightedWindowKernel 2 Y (p * m) (p * m) -
+          4 * offDiagPrimePowerWeight m m * logWeightedWindowKernel 2 Y m m -
+          4 * offDiagPrimePowerWeight (p * m) (p * m) *
+            logWeightedWindowKernel 2 Y (p * m) (p * m) -
+          4 * commonPrimePowerLogSq m m *
+            (logWeightedWindowKernel 2 Y m m -
+              2 * logWeightedWindowKernel 2 Y m (p * m) +
+              logWeightedWindowKernel 2 Y (p * m) (p * m))) := by
+  have hp2 : 2 ≤ p := hp.two_le
+  have hpm1 : 1 ≤ p * m := Nat.mul_pos hp.pos hm1
+  have hT1 : 1 ≤ T := le_trans hpm1 hpmT
+  have h2m_le : 2 * m ≤ p * m := Nat.mul_le_mul_right m hp2
+  have hpm_ne : m ≠ p * m := by omega
+  have h_not_mem : m ∉ ({p * m} : Finset ℕ) := Finset.not_mem_singleton.mpr hpm_ne
+  have h_pair_sub : ({m, p * m} : Finset ℕ) ⊆ Finset.Icc 1 T := by
+    intro x hx
+    simp only [Finset.mem_insert, Finset.mem_singleton] at hx
+    rw [Finset.mem_Icc]
+    rcases hx with hx_eq | hx_eq
+    · rw [hx_eq]; exact ⟨hm1, le_trans (Nat.le_mul_of_pos_left m hp.pos) hpmT⟩
+    · rw [hx_eq]; exact ⟨hpm1, hpmT⟩
+  have h_pair_id :=
+    subset_hcal_bilinear_eq_windowNorm_sub_tc062_aux hY2 hT1 D0 c_lam c_half {m, p * m} h_pair_sub
+  have h_lam_sq := liouvilleLambda_sq_eq_one_tc062_aux hm1
+  have h_lam_pm := liouvilleLambda_prime_mul_real_tc062_aux hp hm1
+  have h_lhs :
+      (∑ u ∈ ({m, p * m} : Finset ℕ), ∑ v ∈ ({m, p * m} : Finset ℕ),
+          (liouvilleLambda u : ℝ) * (liouvilleLambda v : ℝ) *
+            completeSignedKernelHcal c_lam c_half T D0 Y u v) =
+        completeSignedKernelHcal c_lam c_half T D0 Y m m -
+          completeSignedKernelHcal c_lam c_half T D0 Y (p * m) m -
+          completeSignedKernelHcal c_lam c_half T D0 Y m (p * m) +
+          completeSignedKernelHcal c_lam c_half T D0 Y (p * m) (p * m) := by
+    simp only [Finset.sum_insert h_not_mem, Finset.sum_singleton]
+    rw [h_lam_pm]
+    calc
+      (liouvilleLambda m : ℝ) * (liouvilleLambda m : ℝ) *
+            completeSignedKernelHcal c_lam c_half T D0 Y m m +
+          (liouvilleLambda m : ℝ) * -(liouvilleLambda m : ℝ) *
+            completeSignedKernelHcal c_lam c_half T D0 Y m (p * m) +
+          (-(liouvilleLambda m : ℝ) * (liouvilleLambda m : ℝ) *
+              completeSignedKernelHcal c_lam c_half T D0 Y (p * m) m +
+            -(liouvilleLambda m : ℝ) * -(liouvilleLambda m : ℝ) *
+              completeSignedKernelHcal c_lam c_half T D0 Y (p * m) (p * m))
+        = ((liouvilleLambda m : ℝ) * (liouvilleLambda m : ℝ)) *
+            (completeSignedKernelHcal c_lam c_half T D0 Y m m -
+              completeSignedKernelHcal c_lam c_half T D0 Y (p * m) m -
+              completeSignedKernelHcal c_lam c_half T D0 Y m (p * m) +
+              completeSignedKernelHcal c_lam c_half T D0 Y (p * m) (p * m)) := by ring
+      _ = completeSignedKernelHcal c_lam c_half T D0 Y m m -
+            completeSignedKernelHcal c_lam c_half T D0 Y (p * m) m -
+            completeSignedKernelHcal c_lam c_half T D0 Y m (p * m) +
+            completeSignedKernelHcal c_lam c_half T D0 Y (p * m) (p * m) := by
+          rw [h_lam_sq, one_mul]
+  have h_norm_eq :
+      windowEnergyNormSq Y
+          (fun X =>
+            ∑ n ∈ ({m, p * m} : Finset ℕ),
+              (liouvilleLambda n : ℝ) * adjustedStationProfilePsi c_lam c_half T D0 n X) =
+        windowEnergyNormSq Y
+          (fun X =>
+            adjustedStationProfilePsi c_lam c_half T D0 m X -
+              adjustedStationProfilePsi c_lam c_half T D0 (p * m) X) := by
+    unfold windowEnergyNormSq windowPairing
+    apply intervalIntegral.integral_congr
+    intro X _
+    simp only [Finset.sum_insert h_not_mem, Finset.sum_singleton]
+    rw [h_lam_pm]
+    have h_sq_pt :
+        ((liouvilleLambda m : ℝ) * adjustedStationProfilePsi c_lam c_half T D0 m X +
+            -(liouvilleLambda m : ℝ) * adjustedStationProfilePsi c_lam c_half T D0 (p * m) X) *
+          ((liouvilleLambda m : ℝ) * adjustedStationProfilePsi c_lam c_half T D0 m X +
+            -(liouvilleLambda m : ℝ) * adjustedStationProfilePsi c_lam c_half T D0 (p * m) X) =
+        (adjustedStationProfilePsi c_lam c_half T D0 m X -
+            adjustedStationProfilePsi c_lam c_half T D0 (p * m) X) *
+          (adjustedStationProfilePsi c_lam c_half T D0 m X -
+            adjustedStationProfilePsi c_lam c_half T D0 (p * m) X) := by
+      calc
+        ((liouvilleLambda m : ℝ) * adjustedStationProfilePsi c_lam c_half T D0 m X +
+              -(liouvilleLambda m : ℝ) * adjustedStationProfilePsi c_lam c_half T D0 (p * m) X) *
+            ((liouvilleLambda m : ℝ) * adjustedStationProfilePsi c_lam c_half T D0 m X +
+              -(liouvilleLambda m : ℝ) * adjustedStationProfilePsi c_lam c_half T D0 (p * m) X)
+          = ((liouvilleLambda m : ℝ) * (liouvilleLambda m : ℝ)) *
+              ((adjustedStationProfilePsi c_lam c_half T D0 m X -
+                  adjustedStationProfilePsi c_lam c_half T D0 (p * m) X) *
+                (adjustedStationProfilePsi c_lam c_half T D0 m X -
+                  adjustedStationProfilePsi c_lam c_half T D0 (p * m) X)) := by ring
+        _ = (adjustedStationProfilePsi c_lam c_half T D0 m X -
+                adjustedStationProfilePsi c_lam c_half T D0 (p * m) X) *
+              (adjustedStationProfilePsi c_lam c_half T D0 m X -
+                adjustedStationProfilePsi c_lam c_half T D0 (p * m) X) := by
+            rw [h_lam_sq, one_mul]
+    rw [h_sq_pt]
+  obtain ⟨hc_mp, hc_pmpm⟩ := commonPrimePowerLogSq_prime_mul_identities_tc062r_aux hp hm1
+  have hc_pm : commonPrimePowerLogSq (p * m) m = commonPrimePowerLogSq m m := by
+    rw [commonPrimePowerLogSq_symm_tc062_aux, hc_mp]
+  have hG_symm : logWeightedWindowKernel 2 Y (p * m) m = logWeightedWindowKernel 2 Y m (p * m) :=
+    logWeightedWindowKernel_symm_tc062_aux 2 Y (p * m) m
+  have h_dtilde :
+      subsetPrimePowerDiagDtilde {m, p * m} Y =
+        commonPrimePowerLogSq m m * logWeightedWindowKernel 2 Y m m -
+          2 * commonPrimePowerLogSq m m * logWeightedWindowKernel 2 Y m (p * m) +
+          (commonPrimePowerLogSq m m + (Real.log (p : ℝ)) ^ 2) *
+            logWeightedWindowKernel 2 Y (p * m) (p * m) := by
+    unfold subsetPrimePowerDiagDtilde
+    simp only [Finset.sum_insert h_not_mem, Finset.sum_singleton]
+    rw [h_lam_pm, hc_mp, hc_pm, hc_pmpm, hG_symm]
+    calc
+      (liouvilleLambda m : ℝ) * (liouvilleLambda m : ℝ) * commonPrimePowerLogSq m m *
+            logWeightedWindowKernel 2 Y m m +
+          (liouvilleLambda m : ℝ) * -(liouvilleLambda m : ℝ) * commonPrimePowerLogSq m m *
+            logWeightedWindowKernel 2 Y m (p * m) +
+          (-(liouvilleLambda m : ℝ) * (liouvilleLambda m : ℝ) * commonPrimePowerLogSq m m *
+              logWeightedWindowKernel 2 Y m (p * m) +
+            -(liouvilleLambda m : ℝ) * -(liouvilleLambda m : ℝ) *
+              (commonPrimePowerLogSq m m + (Real.log (p : ℝ)) ^ 2) *
+              logWeightedWindowKernel 2 Y (p * m) (p * m))
+        = ((liouvilleLambda m : ℝ) * (liouvilleLambda m : ℝ)) *
+            (commonPrimePowerLogSq m m * logWeightedWindowKernel 2 Y m m -
+              2 * commonPrimePowerLogSq m m * logWeightedWindowKernel 2 Y m (p * m) +
+              (commonPrimePowerLogSq m m + (Real.log (p : ℝ)) ^ 2) *
+                logWeightedWindowKernel 2 Y (p * m) (p * m)) := by ring
+      _ = commonPrimePowerLogSq m m * logWeightedWindowKernel 2 Y m m -
+            2 * commonPrimePowerLogSq m m * logWeightedWindowKernel 2 Y m (p * m) +
+            (commonPrimePowerLogSq m m + (Real.log (p : ℝ)) ^ 2) *
+              logWeightedWindowKernel 2 Y (p * m) (p * m) := by rw [h_lam_sq, one_mul]
+  have h_xself :
+      subsetPrimePowerSelfCollisionXself {m, p * m} Y =
+        offDiagPrimePowerWeight m m * logWeightedWindowKernel 2 Y m m +
+          offDiagPrimePowerWeight (p * m) (p * m) * logWeightedWindowKernel 2 Y (p * m) (p * m) := by
+    unfold subsetPrimePowerSelfCollisionXself
+    simp only [Finset.sum_insert h_not_mem, Finset.sum_singleton]
+  rw [h_lhs, h_norm_eq, h_dtilde, h_xself] at h_pair_id
+  refine ⟨?_, ?_⟩
+  · rw [h_pair_id]
+    unfold offDiagPrimePowerWeight
+    rw [hc_pmpm]
+    ring
+  · rw [h_pair_id]
+    ring
+
+private theorem interiorAnchorDiagSigma_lower_bound_tc062r_aux
+    {p : ℕ} (hp : p.Prime) {Y : ℝ} (hY2 : 2 ≤ Y) {T : ℕ} (_hT : 1 ≤ T)
+    (D0 : ℕ) (c_lam c_half : ℝ) :
+    -744 * (RiemannScope.tau - 1) ≤
+        -4 * (∑ n ∈ Finset.Icc 1 T,
+          (Real.log (n : ℝ)) ^ 2 * logWeightedWindowKernel 2 Y n n) ∧
+      -4 * (∑ n ∈ Finset.Icc 1 T,
+          (Real.log (n : ℝ)) ^ 2 * logWeightedWindowKernel 2 Y n n) ≤
+        interiorAnchorDiagSigma c_lam c_half p T D0 Y := by
+  obtain ⟨hle, _⟩ := uIcc_tau_props_tc062_aux hY2
+  have h_tc061 :=
+    ((finite_window_offdiag_kernel_and_composite_self_collision_bound_tc061).2.2.2.2 hY2 T).2.2
+  have h_744 :
+      -744 * (RiemannScope.tau - 1) ≤
+        -4 * (∑ n ∈ Finset.Icc 1 T,
+          (Real.log (n : ℝ)) ^ 2 * logWeightedWindowKernel 2 Y n n) := by
+    linarith only [h_tc061]
+  refine ⟨h_744, ?_⟩
+  obtain ⟨h_cov_sub, _, _, h_cov_sum⟩ := coveredInteriorStations_props_tc062_aux hp T
+  have h_ker_nn : ∀ a b : ℕ, 0 ≤ logWeightedWindowKernel 2 Y a b := by
+    intro a b
+    unfold logWeightedWindowKernel
+    apply intervalIntegral.integral_nonneg hle
+    intro X hX
+    have hX_pos : 0 < X := by rw [Set.mem_Icc] at hX; linarith only [hY2, hX.1]
+    have ha_nn : 0 ≤ gaussianTermPhi a X := by unfold gaussianTermPhi; positivity
+    have hb_nn : 0 ≤ gaussianTermPhi b X := by unfold gaussianTermPhi; positivity
+    exact div_nonneg (div_nonneg (mul_nonneg ha_nn hb_nn) (sq_nonneg _)) (le_of_lt hX_pos)
+  have h_each_ge :
+      ∀ m ∈ primeInteriorTruncatedAnchors p T,
+        -4 * ((Real.log (m : ℝ)) ^ 2 * logWeightedWindowKernel 2 Y m m +
+            (Real.log ((p * m : ℕ) : ℝ)) ^ 2 * logWeightedWindowKernel 2 Y (p * m) (p * m)) ≤
+          completeSignedKernelHcal c_lam c_half T D0 Y m m -
+            completeSignedKernelHcal c_lam c_half T D0 Y (p * m) m -
+            completeSignedKernelHcal c_lam c_half T D0 Y m (p * m) +
+            completeSignedKernelHcal c_lam c_half T D0 Y (p * m) (p * m) := by
+    intro m hm
+    have hm_f := Finset.mem_filter.mp hm
+    have hm1 : 1 ≤ m := (Finset.mem_Icc.mp (Finset.mem_filter.mp hm_f.1).1).1
+    have hpmT : p * m ≤ T := hm_f.2
+    have h_id := (anchor_diagonal_hcal_identities_tc062r_aux hp hY2 hm1 hpmT D0 c_lam c_half).1
+    rw [h_id]
+    have h_wn_nn :
+        0 ≤ windowEnergyNormSq Y
+          (fun X =>
+            adjustedStationProfilePsi c_lam c_half T D0 m X -
+              adjustedStationProfilePsi c_lam c_half T D0 (p * m) X) := by
+      unfold windowEnergyNormSq windowPairing
+      apply intervalIntegral.integral_nonneg hle
+      intro X hX
+      exact div_nonneg (mul_self_nonneg _) (by rw [Set.mem_Icc] at hX; linarith only [hY2, hX.1])
+    have hc_nn : 0 ≤ commonPrimePowerLogSq m m := by
+      unfold commonPrimePowerLogSq
+      exact Finset.sum_nonneg (fun _ _ => sq_nonneg _)
+    have h8_nn : 0 ≤ 8 * commonPrimePowerLogSq m m * logWeightedWindowKernel 2 Y m (p * m) :=
+      mul_nonneg (mul_nonneg (by norm_num) hc_nn) (h_ker_nn m (p * m))
+    linarith only [h_wn_nn, h8_nn]
+  have h_sum_ge :
+      (∑ m ∈ primeInteriorTruncatedAnchors p T,
+          (-4 * ((Real.log (m : ℝ)) ^ 2 * logWeightedWindowKernel 2 Y m m +
+            (Real.log ((p * m : ℕ) : ℝ)) ^ 2 * logWeightedWindowKernel 2 Y (p * m) (p * m)))) ≤
+        interiorAnchorDiagSigma c_lam c_half p T D0 Y := by
+    unfold interiorAnchorDiagSigma
+    exact Finset.sum_le_sum h_each_ge
+  rw [← Finset.mul_sum] at h_sum_ge
+  have h_cov_eq :=
+    h_cov_sum (fun n => (Real.log (n : ℝ)) ^ 2 * logWeightedWindowKernel 2 Y n n)
+  rw [← h_cov_eq] at h_sum_ge
+  have h_cov_le :
+      (∑ n ∈ coveredInteriorStations p T,
+          (Real.log (n : ℝ)) ^ 2 * logWeightedWindowKernel 2 Y n n) ≤
+        ∑ n ∈ Finset.Icc 1 T,
+          (Real.log (n : ℝ)) ^ 2 * logWeightedWindowKernel 2 Y n n :=
+    Finset.sum_le_sum_of_subset_of_nonneg h_cov_sub
+      (fun n _ _ => mul_nonneg (sq_nonneg _) (h_ker_nn n n))
+  linarith only [h_sum_ge, h_cov_le]
+
+private theorem squarePoleDriftM_sharp_step_abs_le_tc062r_aux
+    (c_half : ℝ) {d : ℕ} (hd1 : 1 ≤ d) :
+    |squarePoleDriftM c_half d - squarePoleDriftM c_half (d - 1)| ≤
+      (8 + |c_half|) * (1 + Real.log (d : ℝ)) / Real.sqrt (d : ℝ) := by
+  by_cases hd_eq1 : d = 1
+  · subst hd_eq1
+    unfold squarePoleDriftM
+    simp [Real.log_one]
+  · have hd2 : 2 ≤ d := by omega
+    have hd_ne : d ≠ 0 := by omega
+    have hdm1_ne : d - 1 ≠ 0 := by omega
+    have hd_pos : (0 : ℝ) < (d : ℝ) := by positivity
+    have hsqrt_pos : 0 < Real.sqrt (d : ℝ) := Real.sqrt_pos.mpr hd_pos
+    have hdm1_eq : ((d - 1 : ℕ) : ℝ) = (d : ℝ) - 1 := by
+      rw [Nat.cast_sub hd1, Nat.cast_one]
+    have h2_le_d : (2 : ℝ) ≤ (d : ℝ) := by exact_mod_cast hd2
+    have hdm1_pos : (0 : ℝ) < (d : ℝ) - 1 := by linarith
+    have hsqrt_m1_pos : 0 < Real.sqrt ((d : ℝ) - 1) := Real.sqrt_pos.mpr hdm1_pos
+    have h_sqrt_diff_nn : 0 ≤ Real.sqrt (d : ℝ) - Real.sqrt ((d : ℝ) - 1) :=
+      sub_nonneg.mpr (Real.sqrt_le_sqrt (by linarith))
+    have h_sqrt_diff_le :
+        Real.sqrt (d : ℝ) - Real.sqrt ((d : ℝ) - 1) ≤ 1 / Real.sqrt (d : ℝ) := by
+      have h_prod :
+          (Real.sqrt (d : ℝ) - Real.sqrt ((d : ℝ) - 1)) *
+            (Real.sqrt (d : ℝ) + Real.sqrt ((d : ℝ) - 1)) = 1 := by
+        calc
+          (Real.sqrt (d : ℝ) - Real.sqrt ((d : ℝ) - 1)) *
+              (Real.sqrt (d : ℝ) + Real.sqrt ((d : ℝ) - 1))
+            = (Real.sqrt (d : ℝ)) ^ 2 - (Real.sqrt ((d : ℝ) - 1)) ^ 2 := by ring
+          _ = (d : ℝ) - ((d : ℝ) - 1) := by
+              rw [Real.sq_sqrt (le_of_lt hd_pos), Real.sq_sqrt (le_of_lt hdm1_pos)]
+          _ = 1 := by ring
+      have h_sum_ge : Real.sqrt (d : ℝ) ≤ Real.sqrt (d : ℝ) + Real.sqrt ((d : ℝ) - 1) := by
+        linarith [Real.sqrt_nonneg ((d : ℝ) - 1)]
+      rw [le_div_iff hsqrt_pos]
+      have hm := mul_le_mul_of_nonneg_left h_sum_ge h_sqrt_diff_nn
+      linarith [h_prod]
+    have h_log_diff_nn : 0 ≤ Real.log (d : ℝ) - Real.log ((d : ℝ) - 1) :=
+      sub_nonneg.mpr (Real.log_le_log hdm1_pos (by linarith))
+    have h_log_diff_le : Real.log (d : ℝ) - Real.log ((d : ℝ) - 1) ≤ 1 / ((d : ℝ) - 1) := by
+      have h_exp := Real.add_one_le_exp (1 / ((d : ℝ) - 1))
+      have h_lhs : 1 / ((d : ℝ) - 1) + 1 = (d : ℝ) / ((d : ℝ) - 1) := by
+        field_simp [ne_of_gt hdm1_pos]
+      rw [h_lhs] at h_exp
+      have hl := Real.log_le_log (div_pos hd_pos hdm1_pos) h_exp
+      rw [Real.log_exp, Real.log_div (ne_of_gt hd_pos) (ne_of_gt hdm1_pos)] at hl
+      linarith
+    have h_sqrt_d_le : Real.sqrt (d : ℝ) ≤ 2 * Real.sqrt ((d : ℝ) - 1) := by
+      have h_sq_le : (Real.sqrt (d : ℝ)) ^ 2 ≤ (2 * Real.sqrt ((d : ℝ) - 1)) ^ 2 := by
+        rw [Real.sq_sqrt (le_of_lt hd_pos), mul_pow, Real.sq_sqrt (le_of_lt hdm1_pos)]
+        linarith
+      have h_diff_sq :
+          (2 * Real.sqrt ((d : ℝ) - 1)) ^ 2 - (Real.sqrt (d : ℝ)) ^ 2 =
+            (2 * Real.sqrt ((d : ℝ) - 1) - Real.sqrt (d : ℝ)) *
+              (2 * Real.sqrt ((d : ℝ) - 1) + Real.sqrt (d : ℝ)) := by ring
+      have h_sum_pos : 0 < 2 * Real.sqrt ((d : ℝ) - 1) + Real.sqrt (d : ℝ) := by positivity
+      by_contra h_gt
+      push_neg at h_gt
+      have h_neg : (2 * Real.sqrt ((d : ℝ) - 1)) ^ 2 - (Real.sqrt (d : ℝ)) ^ 2 < 0 := by
+        rw [h_diff_sq]
+        exact mul_neg_of_neg_of_pos (by linarith) h_sum_pos
+      linarith
+    have h_mid :
+        4 * Real.sqrt ((d : ℝ) - 1) * (Real.log (d : ℝ) - Real.log ((d : ℝ) - 1)) ≤
+          8 / Real.sqrt (d : ℝ) := by
+      have h1 :
+          4 * Real.sqrt ((d : ℝ) - 1) * (Real.log (d : ℝ) - Real.log ((d : ℝ) - 1)) ≤
+            4 / Real.sqrt ((d : ℝ) - 1) := by
+        have hsq : Real.sqrt ((d : ℝ) - 1) * Real.sqrt ((d : ℝ) - 1) = (d : ℝ) - 1 :=
+          Real.mul_self_sqrt (le_of_lt hdm1_pos)
+        have h_inv_s : Real.sqrt ((d : ℝ) - 1) * (Real.sqrt ((d : ℝ) - 1))⁻¹ = 1 :=
+          mul_inv_cancel (ne_of_gt hsqrt_m1_pos)
+        calc
+          4 * Real.sqrt ((d : ℝ) - 1) * (Real.log (d : ℝ) - Real.log ((d : ℝ) - 1))
+            ≤ 4 * Real.sqrt ((d : ℝ) - 1) * (1 / ((d : ℝ) - 1)) :=
+              mul_le_mul_of_nonneg_left h_log_diff_le (by positivity)
+          _ = 4 * Real.sqrt ((d : ℝ) - 1) *
+                (1 / (Real.sqrt ((d : ℝ) - 1) * Real.sqrt ((d : ℝ) - 1))) := by rw [hsq]
+          _ = (4 / Real.sqrt ((d : ℝ) - 1)) *
+                (Real.sqrt ((d : ℝ) - 1) * (Real.sqrt ((d : ℝ) - 1))⁻¹) := by
+              simp only [div_eq_mul_inv, mul_inv_rev, one_mul]
+              ring
+          _ = 4 / Real.sqrt ((d : ℝ) - 1) := by rw [h_inv_s, mul_one]
+      have h2 : 4 / Real.sqrt ((d : ℝ) - 1) ≤ 8 / Real.sqrt (d : ℝ) := by
+        rw [div_le_div_iff hsqrt_m1_pos hsqrt_pos]
+        linarith
+      exact le_trans h1 h2
+    unfold squarePoleDriftM
+    rw [if_neg hd_ne, if_neg hdm1_ne, hdm1_eq]
+    have h_decomp :
+        4 * Real.sqrt (d : ℝ) * Real.log (d : ℝ) + c_half * Real.sqrt (d : ℝ) -
+            (4 * Real.sqrt ((d : ℝ) - 1) * Real.log ((d : ℝ) - 1) +
+              c_half * Real.sqrt ((d : ℝ) - 1)) =
+          4 * (Real.sqrt (d : ℝ) - Real.sqrt ((d : ℝ) - 1)) * Real.log (d : ℝ) +
+            4 * Real.sqrt ((d : ℝ) - 1) * (Real.log (d : ℝ) - Real.log ((d : ℝ) - 1)) +
+            c_half * (Real.sqrt (d : ℝ) - Real.sqrt ((d : ℝ) - 1)) := by ring
+    rw [h_decomp]
+    have hlogd_nn : 0 ≤ Real.log (d : ℝ) := Real.log_nonneg (by linarith)
+    have ht1 :
+        |4 * (Real.sqrt (d : ℝ) - Real.sqrt ((d : ℝ) - 1)) * Real.log (d : ℝ)| ≤
+          4 * Real.log (d : ℝ) / Real.sqrt (d : ℝ) := by
+      rw [abs_of_nonneg (by positivity)]
+      calc
+        4 * (Real.sqrt (d : ℝ) - Real.sqrt ((d : ℝ) - 1)) * Real.log (d : ℝ)
+          ≤ 4 * (1 / Real.sqrt (d : ℝ)) * Real.log (d : ℝ) :=
+            mul_le_mul_of_nonneg_right
+              (mul_le_mul_of_nonneg_left h_sqrt_diff_le (by norm_num)) hlogd_nn
+        _ = 4 * Real.log (d : ℝ) / Real.sqrt (d : ℝ) := by ring
+    have ht2 :
+        |4 * Real.sqrt ((d : ℝ) - 1) * (Real.log (d : ℝ) - Real.log ((d : ℝ) - 1))| ≤
+          8 / Real.sqrt (d : ℝ) := by
+      rw [abs_of_nonneg (by positivity)]
+      exact h_mid
+    have ht3 :
+        |c_half * (Real.sqrt (d : ℝ) - Real.sqrt ((d : ℝ) - 1))| ≤
+          |c_half| / Real.sqrt (d : ℝ) := by
+      rw [abs_mul, abs_of_nonneg h_sqrt_diff_nn]
+      calc
+        |c_half| * (Real.sqrt (d : ℝ) - Real.sqrt ((d : ℝ) - 1))
+          ≤ |c_half| * (1 / Real.sqrt (d : ℝ)) :=
+            mul_le_mul_of_nonneg_left h_sqrt_diff_le (abs_nonneg c_half)
+        _ = |c_half| / Real.sqrt (d : ℝ) := by ring
+    have h_tri1 := abs_add
+      (4 * (Real.sqrt (d : ℝ) - Real.sqrt ((d : ℝ) - 1)) * Real.log (d : ℝ) +
+        4 * Real.sqrt ((d : ℝ) - 1) * (Real.log (d : ℝ) - Real.log ((d : ℝ) - 1)))
+      (c_half * (Real.sqrt (d : ℝ) - Real.sqrt ((d : ℝ) - 1)))
+    have h_tri2 := abs_add
+      (4 * (Real.sqrt (d : ℝ) - Real.sqrt ((d : ℝ) - 1)) * Real.log (d : ℝ))
+      (4 * Real.sqrt ((d : ℝ) - 1) * (Real.log (d : ℝ) - Real.log ((d : ℝ) - 1)))
+    have h_sum_num :
+        (4 * Real.log (d : ℝ) + 8 + |c_half|) / Real.sqrt (d : ℝ) ≤
+          (8 + |c_half|) * (1 + Real.log (d : ℝ)) / Real.sqrt (d : ℝ) := by
+      apply div_le_div_of_nonneg_right _ (le_of_lt hsqrt_pos)
+      have h_extra_nn : 0 ≤ (4 + |c_half|) * Real.log (d : ℝ) :=
+        mul_nonneg (by positivity) hlogd_nn
+      linarith [h_extra_nn, show (8 + |c_half|) * (1 + Real.log (d : ℝ)) -
+        (4 * Real.log (d : ℝ) + 8 + |c_half|) = (4 + |c_half|) * Real.log (d : ℝ) by ring]
+    have h_comb :
+        4 * Real.log (d : ℝ) / Real.sqrt (d : ℝ) +
+            8 / Real.sqrt (d : ℝ) + |c_half| / Real.sqrt (d : ℝ) =
+          (4 * Real.log (d : ℝ) + 8 + |c_half|) / Real.sqrt (d : ℝ) := by ring
+    linarith
+
+private theorem sum_inv_sq_Icc_succ_le_inv_tc062r_aux {a : ℕ} (ha : 1 ≤ a) (M : ℕ) :
+    (∑ r ∈ Finset.Icc (a + 1) M, (1 / (r : ℝ) ^ 2)) ≤ 1 / (a : ℝ) := by
+  by_cases h_lt : M < a
+  · have h_emp : Finset.Icc (a + 1) M = ∅ := by
+      ext r; simp only [Finset.mem_Icc, Finset.not_mem_empty, iff_false]; omega
+    rw [h_emp, Finset.sum_empty]
+    positivity
+  · have ha_le : a ≤ M := by omega
+    obtain ⟨k, rfl⟩ : ∃ k : ℕ, M = a + k := ⟨M - a, by omega⟩
+    have h_tel :
+        ∀ m : ℕ,
+          (∑ r ∈ Finset.Icc (a + 1) (a + m), (1 / (r : ℝ) ^ 2)) ≤
+            1 / (a : ℝ) - 1 / ((a + m : ℕ) : ℝ) := by
+      intro m
+      induction' m with m ih
+      · simp
+      · have h_ins :
+            Finset.Icc (a + 1) (a + (m + 1)) =
+              insert (a + m + 1) (Finset.Icc (a + 1) (a + m)) := by
+          ext r; simp only [Finset.mem_Icc, Finset.mem_insert]; omega
+        have h_not : a + m + 1 ∉ Finset.Icc (a + 1) (a + m) := by simp
+        rw [h_ins, Finset.sum_insert h_not]
+        let x : ℝ := ((a + m : ℕ) : ℝ)
+        have hx_pos : 0 < x := by dsimp [x]; exact_mod_cast (by omega : 0 < a + m)
+        have hx1_pos : 0 < x + 1 := by linarith
+        have h_cast : ((a + m + 1 : ℕ) : ℝ) = x + 1 := by dsimp [x]; push_cast; ring
+        have h_cast2 : ((a + (m + 1) : ℕ) : ℝ) = x + 1 := by dsimp [x]; push_cast; ring
+        rw [h_cast, h_cast2]
+        have h_step : 1 / (x + 1) ^ 2 ≤ 1 / x - 1 / (x + 1) := by
+          have h_diff : 1 / x - 1 / (x + 1) = 1 / (x * (x + 1)) := by
+            field_simp [ne_of_gt hx_pos, ne_of_gt hx1_pos]
+          rw [h_diff]
+          exact one_div_le_one_div_of_le (mul_pos hx_pos hx1_pos) (by nlinarith)
+        linarith
+    have h_res := h_tel k
+    have h_inv_nn : 0 ≤ 1 / ((a + k : ℕ) : ℝ) := by positivity
+    linarith
+
+private theorem gaussianTermPhi_windowEnergy_bounds_tc062r_aux
+    {Y : ℝ} (hY2 : 2 ≤ Y) {k : ℕ} (hk1 : 1 ≤ k) :
+    0 ≤ windowEnergyNormSq Y (gaussianTermPhi k) ∧
+      windowEnergyNormSq Y (gaussianTermPhi k) ≤
+        (27 / 8 : ℝ) * (RiemannScope.tau - 1) / Y ∧
+      windowEnergyNormSq Y (gaussianTermPhi k) ≤
+        (RiemannScope.tau - 1) * RiemannScope.tau ^ 4 * Y ^ 5 / (k : ℝ) ^ 6 := by
+  obtain ⟨hle, hprops⟩ := uIcc_tau_props_tc062_aux hY2
+  have hY_pos : 0 < Y := by linarith only [hY2]
+  have hk_pos : (0 : ℝ) < (k : ℝ) := Nat.cast_pos.mpr (by omega)
+  have hk_ne : (k : ℝ) ≠ 0 := ne_of_gt hk_pos
+  have h_cont := continuousOn_gaussianTermPhi_uIcc_tc062_aux Y k
+  have h_int :
+      IntervalIntegrable
+        (fun X => gaussianTermPhi k X * gaussianTermPhi k X / X)
+        volume Y (RiemannScope.tau * Y) :=
+    ((h_cont.mul h_cont).div continuousOn_id
+      (fun X hX => ne_of_gt (hprops X hX).2.1)).intervalIntegrable
+  have h_pt_eq :
+      ∀ X : ℝ, 0 < X →
+        gaussianTermPhi k X * gaussianTermPhi k X / X =
+          X ^ 4 / (k : ℝ) ^ 6 * Real.exp (-(2 * X ^ 2 / (k : ℝ) ^ 2)) := by
+    intro X hX_pos
+    have hX_ne : X ≠ 0 := ne_of_gt hX_pos
+    have hX5 : X ^ (5 / 2 : ℝ) * X ^ (5 / 2 : ℝ) = X ^ 5 := by
+      rw [← sq, ← Real.rpow_natCast _ 2, ← Real.rpow_mul (le_of_lt hX_pos)]
+      have he : (5 / 2 : ℝ) * ((2 : ℕ) : ℝ) = ((5 : ℕ) : ℝ) := by norm_num
+      rw [he, Real.rpow_natCast]
+    have hexp2 :
+        Real.exp (-(X ^ 2) / (k : ℝ) ^ 2) * Real.exp (-(X ^ 2) / (k : ℝ) ^ 2) =
+          Real.exp (-(2 * X ^ 2 / (k : ℝ) ^ 2)) := by
+      rw [← Real.exp_add]
+      congr 1
+      ring
+    unfold gaussianTermPhi
+    calc
+      (X ^ (5 / 2 : ℝ) * (((k : ℝ) ^ 3)⁻¹ * Real.exp (-(X ^ 2) / (k : ℝ) ^ 2))) *
+          (X ^ (5 / 2 : ℝ) * (((k : ℝ) ^ 3)⁻¹ * Real.exp (-(X ^ 2) / (k : ℝ) ^ 2))) / X
+        = (X ^ (5 / 2 : ℝ) * X ^ (5 / 2 : ℝ)) *
+            ((((k : ℝ) ^ 3)⁻¹ * ((k : ℝ) ^ 3)⁻¹) *
+              (Real.exp (-(X ^ 2) / (k : ℝ) ^ 2) * Real.exp (-(X ^ 2) / (k : ℝ) ^ 2))) / X := by
+            ring
+      _ = X ^ 5 * ((((k : ℝ) ^ 3)⁻¹ * ((k : ℝ) ^ 3)⁻¹) *
+            Real.exp (-(2 * X ^ 2 / (k : ℝ) ^ 2))) / X := by rw [hX5, hexp2]
+      _ = X ^ 4 / (k : ℝ) ^ 6 * Real.exp (-(2 * X ^ 2 / (k : ℝ) ^ 2)) := by
+          field_simp [hX_ne, hk_ne]; ring
+  unfold windowEnergyNormSq windowPairing
+  have h_nn :
+      0 ≤ ∫ X in Y..(RiemannScope.tau * Y),
+        gaussianTermPhi k X * gaussianTermPhi k X / X := by
+    apply intervalIntegral.integral_nonneg hle
+    intro X hX
+    exact div_nonneg (mul_self_nonneg _) (by rw [Set.mem_Icc] at hX; linarith only [hY2, hX.1])
+  have h_bd1 :
+      (∫ X in Y..(RiemannScope.tau * Y),
+          gaussianTermPhi k X * gaussianTermPhi k X / X) ≤
+        (27 / 8 : ℝ) * (RiemannScope.tau - 1) / Y := by
+    have hc1 : IntervalIntegrable (fun _ : ℝ => (27 / 8 : ℝ) / Y ^ 2)
+        volume Y (RiemannScope.tau * Y) := intervalIntegrable_const
+    have hm1 :=
+      intervalIntegral.integral_mono_on hle h_int hc1 (by
+        intro X hX
+        have hX_pos : 0 < X := by linarith only [hY_pos, hX.1]
+        have hX_ne : X ≠ 0 := ne_of_gt hX_pos
+        rw [h_pt_eq X hX_pos]
+        let z : ℝ := 2 * X ^ 2 / (k : ℝ) ^ 2
+        have hz_pos : 0 < z := by dsimp [z]; positivity
+        have hz3 : z / 3 ≤ Real.exp (z / 3) := by linarith [Real.add_one_le_exp (z / 3)]
+        have hz_cube : (z / 3) ^ 3 ≤ (Real.exp (z / 3)) ^ 3 :=
+          pow_le_pow_left (by positivity) hz3 3
+        have hexp_cube : (Real.exp (z / 3)) ^ 3 = Real.exp z := by
+          rw [← Real.exp_nat_mul]; congr 1; ring
+        rw [hexp_cube] at hz_cube
+        have hexp_prod : Real.exp z * Real.exp (-z) = 1 := by
+          rw [← Real.exp_add, add_neg_self, Real.exp_zero]
+        have hm_exp := mul_le_mul_of_nonneg_right hz_cube (le_of_lt (Real.exp_pos (-z)))
+        rw [hexp_prod] at hm_exp
+        have hexp_neg_le : Real.exp (-z) ≤ 27 / z ^ 3 := by
+          rw [le_div_iff (pow_pos hz_pos 3)]
+          linarith [show (z / 3) ^ 3 * Real.exp (-z) = Real.exp (-z) * z ^ 3 / 27 by ring]
+        calc
+          X ^ 4 / (k : ℝ) ^ 6 * Real.exp (-z)
+            ≤ X ^ 4 / (k : ℝ) ^ 6 * (27 / z ^ 3) :=
+              mul_le_mul_of_nonneg_left hexp_neg_le (by positivity)
+          _ = (27 / 8 : ℝ) / X ^ 2 := by
+              dsimp [z]
+              field_simp [hX_ne, hk_ne]
+              ring
+          _ ≤ (27 / 8 : ℝ) / Y ^ 2 :=
+              div_le_div_of_nonneg_left (by norm_num) (sq_pos_of_pos hY_pos)
+                (pow_le_pow_left (le_of_lt hY_pos) hX.1 2))
+    rw [intervalIntegral.integral_const, smul_eq_mul] at hm1
+    have h_eq1 :
+        (RiemannScope.tau * Y - Y) * ((27 / 8 : ℝ) / Y ^ 2) =
+          (27 / 8 : ℝ) * (RiemannScope.tau - 1) / Y := by
+      field_simp [ne_of_gt hY_pos]; ring
+    linarith only [hm1, h_eq1]
+  have h_bd2 :
+      (∫ X in Y..(RiemannScope.tau * Y),
+          gaussianTermPhi k X * gaussianTermPhi k X / X) ≤
+        (RiemannScope.tau - 1) * RiemannScope.tau ^ 4 * Y ^ 5 / (k : ℝ) ^ 6 := by
+    have hc2 :
+        IntervalIntegrable (fun _ : ℝ => (RiemannScope.tau * Y) ^ 4 / (k : ℝ) ^ 6)
+          volume Y (RiemannScope.tau * Y) := intervalIntegrable_const
+    have hm2 :=
+      intervalIntegral.integral_mono_on hle h_int hc2 (by
+        intro X hX
+        have hX_pos : 0 < X := by linarith only [hY_pos, hX.1]
+        rw [h_pt_eq X hX_pos]
+        have hexp_le1 : Real.exp (-(2 * X ^ 2 / (k : ℝ) ^ 2)) ≤ 1 := by
+          rw [Real.exp_le_one_iff]
+          exact neg_nonpos.mpr (by positivity)
+        have hX4_le : X ^ 4 ≤ (RiemannScope.tau * Y) ^ 4 :=
+          pow_le_pow_left (le_of_lt hX_pos) hX.2 4
+        calc
+          X ^ 4 / (k : ℝ) ^ 6 * Real.exp (-(2 * X ^ 2 / (k : ℝ) ^ 2))
+            ≤ X ^ 4 / (k : ℝ) ^ 6 * 1 :=
+              mul_le_mul_of_nonneg_left hexp_le1 (by positivity)
+          _ = X ^ 4 / (k : ℝ) ^ 6 := mul_one _
+          _ ≤ (RiemannScope.tau * Y) ^ 4 / (k : ℝ) ^ 6 :=
+              div_le_div_of_nonneg_right hX4_le (by positivity))
+    rw [intervalIntegral.integral_const, smul_eq_mul] at hm2
+    have h_eq2 :
+        (RiemannScope.tau * Y - Y) * ((RiemannScope.tau * Y) ^ 4 / (k : ℝ) ^ 6) =
+          (RiemannScope.tau - 1) * RiemannScope.tau ^ 4 * Y ^ 5 / (k : ℝ) ^ 6 := by
+      field_simp [hk_ne]; ring
+    linarith only [hm2, h_eq2]
+  exact ⟨h_nn, h_bd1, h_bd2⟩
+
+private theorem sum_multiples_gaussianTermPhi_windowEnergy_le_tc062r_aux :
+    let C_phi : ℝ := (RiemannScope.tau - 1) * (27 / 8 + 2 * RiemannScope.tau ^ 4)
+    0 < C_phi ∧
+      ∀ {Y : ℝ}, 2 ≤ Y → ∀ (T : ℕ) {L : ℕ}, 1 ≤ L →
+        (∑ k ∈ (Finset.Icc 1 T).filter (fun k => L ∣ k),
+          windowEnergyNormSq Y (gaussianTermPhi k)) ≤ C_phi / (L : ℝ) := by
+  dsimp only
+  have htau_bds := tau_gt_one_and_lt_eight_tc062_aux
+  have htau_pos : 0 < RiemannScope.tau := by linarith only [htau_bds.1]
+  have htau_m1_pos : 0 < RiemannScope.tau - 1 := by linarith only [htau_bds.1]
+  let C_phi : ℝ := (RiemannScope.tau - 1) * (27 / 8 + 2 * RiemannScope.tau ^ 4)
+  have hCphi_pos : 0 < C_phi := by dsimp [C_phi]; positivity
+  refine ⟨hCphi_pos, ?_⟩
+  intro Y hY2 T L hL1
+  have hY_pos : 0 < Y := by linarith only [hY2]
+  have hY_ne : Y ≠ 0 := ne_of_gt hY_pos
+  have hL_pos_nat : 0 < L := by omega
+  have hL_pos : (0 : ℝ) < (L : ℝ) := Nat.cast_pos.mpr hL_pos_nat
+  have hL_ne : (L : ℝ) ≠ 0 := ne_of_gt hL_pos
+  let M := T / L
+  have h_reidx :
+      (Finset.Icc 1 T).filter (fun k => L ∣ k) =
+        (Finset.Icc 1 M).image (fun r => L * r) := by
+    ext k
+    simp only [M, Finset.mem_filter, Finset.mem_Icc, Finset.mem_image]
+    constructor
+    · rintro ⟨⟨hk1, hkT⟩, h_dvd⟩
+      refine ⟨k / L, ⟨Nat.div_pos (Nat.le_of_dvd hk1 h_dvd) hL_pos_nat,
+        Nat.div_le_div_right hkT⟩, Nat.mul_div_cancel' h_dvd⟩
+    · rintro ⟨r, ⟨hr1, hrM⟩, rfl⟩
+      have h_le : L * r ≤ T := by
+        rw [mul_comm]
+        exact le_trans (Nat.mul_le_mul_right L hrM) (Nat.div_mul_le_self T L)
+      exact ⟨⟨Nat.mul_pos hL_pos_nat hr1, h_le⟩, dvd_mul_right L r⟩
+  have h_inj : Set.InjOn (fun r => L * r) ↑(Finset.Icc 1 M) :=
+    fun _ _ _ _ h_eq => Nat.eq_of_mul_eq_mul_left hL_pos_nat h_eq
+  rw [h_reidx, Finset.sum_image h_inj]
+  let m0 := Nat.floor (Y / (L : ℝ))
+  have h_sub_u : Finset.Icc 1 M ⊆ Finset.Icc 1 m0 ∪ Finset.Icc (m0 + 1) M := by
+    intro r hr
+    rw [Finset.mem_Icc] at hr
+    simp only [Finset.mem_union, Finset.mem_Icc]
+    omega
+  have h_disj : Disjoint (Finset.Icc 1 m0) (Finset.Icc (m0 + 1) M) := by
+    rw [Finset.disjoint_left]; intro r h1 h2; simp only [Finset.mem_Icc] at h1 h2; omega
+  have h_term_nn : ∀ r : ℕ, 0 ≤ windowEnergyNormSq Y (gaussianTermPhi (L * r)) := by
+    intro r
+    obtain ⟨hle, _⟩ := uIcc_tau_props_tc062_aux hY2
+    unfold windowEnergyNormSq windowPairing
+    apply intervalIntegral.integral_nonneg hle
+    intro X hX
+    exact div_nonneg (mul_self_nonneg _) (by rw [Set.mem_Icc] at hX; linarith only [hY2, hX.1])
+  have h_split :
+      (∑ r ∈ Finset.Icc 1 M, windowEnergyNormSq Y (gaussianTermPhi (L * r))) ≤
+        (∑ r ∈ Finset.Icc 1 m0, windowEnergyNormSq Y (gaussianTermPhi (L * r))) +
+          (∑ r ∈ Finset.Icc (m0 + 1) M, windowEnergyNormSq Y (gaussianTermPhi (L * r))) := by
+    rw [← Finset.sum_union h_disj]
+    exact Finset.sum_le_sum_of_subset_of_nonneg h_sub_u (fun r _ _ => h_term_nn r)
+  have h_head :
+      (∑ r ∈ Finset.Icc 1 m0, windowEnergyNormSq Y (gaussianTermPhi (L * r))) ≤
+        (RiemannScope.tau - 1) * (27 / 8 : ℝ) / (L : ℝ) := by
+    have h_each :
+        ∀ r ∈ Finset.Icc 1 m0,
+          windowEnergyNormSq Y (gaussianTermPhi (L * r)) ≤
+            (27 / 8 : ℝ) * (RiemannScope.tau - 1) / Y := by
+      intro r hr
+      have hr1 : 1 ≤ r := (Finset.mem_Icc.mp hr).1
+      exact (gaussianTermPhi_windowEnergy_bounds_tc062r_aux hY2 (Nat.mul_pos hL_pos_nat hr1)).2.1
+    have h_m0_le : (m0 : ℝ) ≤ Y / (L : ℝ) := Nat.floor_le (by positivity)
+    calc
+      (∑ r ∈ Finset.Icc 1 m0, windowEnergyNormSq Y (gaussianTermPhi (L * r)))
+        ≤ ∑ _r ∈ Finset.Icc 1 m0, ((27 / 8 : ℝ) * (RiemannScope.tau - 1) / Y) :=
+          Finset.sum_le_sum h_each
+      _ = ((Finset.Icc 1 m0).card : ℝ) * ((27 / 8 : ℝ) * (RiemannScope.tau - 1) / Y) := by simp
+      _ ≤ (Y / (L : ℝ)) * ((27 / 8 : ℝ) * (RiemannScope.tau - 1) / Y) := by
+          have hc : (Finset.Icc 1 m0).card ≤ m0 := by simp [Nat.card_Icc]
+          exact mul_le_mul_of_nonneg_right
+            (le_trans (by exact_mod_cast hc) h_m0_le) (by positivity)
+      _ = (RiemannScope.tau - 1) * (27 / 8 : ℝ) / (L : ℝ) := by
+          field_simp [hY_ne, hL_ne]; ring
+  have h_tail :
+      (∑ r ∈ Finset.Icc (m0 + 1) M, windowEnergyNormSq Y (gaussianTermPhi (L * r))) ≤
+        (RiemannScope.tau - 1) * (2 * RiemannScope.tau ^ 4) / (L : ℝ) := by
+    have h_each_tail :
+        ∀ r ∈ Finset.Icc (m0 + 1) M,
+          windowEnergyNormSq Y (gaussianTermPhi (L * r)) ≤
+            ((RiemannScope.tau - 1) * RiemannScope.tau ^ 4 * Y ^ 5 / (L : ℝ) ^ 6) *
+              (1 / (r : ℝ) ^ 6) := by
+      intro r hr
+      have hr1 : 1 ≤ r := by rw [Finset.mem_Icc] at hr; omega
+      have hb :=
+        (gaussianTermPhi_windowEnergy_bounds_tc062r_aux hY2 (Nat.mul_pos hL_pos_nat hr1)).2.2
+      have h_pow6 : ((L * r : ℕ) : ℝ) ^ 6 = (L : ℝ) ^ 6 * (r : ℝ) ^ 6 := by push_cast; ring
+      rw [h_pow6] at hb
+      calc
+        windowEnergyNormSq Y (gaussianTermPhi (L * r))
+          ≤ (RiemannScope.tau - 1) * RiemannScope.tau ^ 4 * Y ^ 5 / ((L : ℝ) ^ 6 * (r : ℝ) ^ 6) := hb
+        _ = ((RiemannScope.tau - 1) * RiemannScope.tau ^ 4 * Y ^ 5 / (L : ℝ) ^ 6) *
+              (1 / (r : ℝ) ^ 6) := by ring
+    have h_sum_r6 :
+        (∑ r ∈ Finset.Icc (m0 + 1) M, windowEnergyNormSq Y (gaussianTermPhi (L * r))) ≤
+          ((RiemannScope.tau - 1) * RiemannScope.tau ^ 4 * Y ^ 5 / (L : ℝ) ^ 6) *
+            (∑ r ∈ Finset.Icc (m0 + 1) M, (1 / (r : ℝ) ^ 6)) := by
+      rw [Finset.mul_sum]
+      exact Finset.sum_le_sum h_each_tail
+    by_cases hm0_zero : m0 = 0
+    · have hYL_lt1 : Y / (L : ℝ) < 1 := by
+        have hlt := Nat.lt_floor_add_one (Y / (L : ℝ))
+        change Y / (L : ℝ) < (m0 : ℝ) + 1 at hlt
+        rw [hm0_zero] at hlt
+        simpa using hlt
+      have hY_le_L : Y ≤ (L : ℝ) := by
+        rw [div_lt_one hL_pos] at hYL_lt1
+        exact le_of_lt hYL_lt1
+      have hY5_L6 : Y ^ 5 / (L : ℝ) ^ 6 ≤ 1 / (L : ℝ) := by
+        have hY5 : Y ^ 5 ≤ (L : ℝ) ^ 5 := pow_le_pow_left (le_of_lt hY_pos) hY_le_L 5
+        calc
+          Y ^ 5 / (L : ℝ) ^ 6 ≤ (L : ℝ) ^ 5 / (L : ℝ) ^ 6 :=
+            div_le_div_of_nonneg_right hY5 (by positivity)
+          _ = 1 / (L : ℝ) := by field_simp [hL_ne]; ring
+      have h_r6_le2 : (∑ r ∈ Finset.Icc 1 M, (1 / (r : ℝ) ^ 6)) ≤ 2 := by
+        have h_sub12 : Finset.Icc 1 M ⊆ ({1} : Finset ℕ) ∪ Finset.Icc 2 M := by
+          intro r hr
+          rw [Finset.mem_Icc] at hr
+          simp only [Finset.mem_union, Finset.mem_singleton, Finset.mem_Icc]
+          omega
+        have h_d12 : Disjoint ({1} : Finset ℕ) (Finset.Icc 2 M) := by
+          rw [Finset.disjoint_left]; intro r h1 h2; simp at h1 h2; omega
+        have h1 :
+            (∑ r ∈ Finset.Icc 1 M, (1 / (r : ℝ) ^ 6)) ≤
+              1 + ∑ r ∈ Finset.Icc 2 M, (1 / (r : ℝ) ^ 6) := by
+          calc
+            (∑ r ∈ Finset.Icc 1 M, (1 / (r : ℝ) ^ 6))
+              ≤ ∑ r ∈ ({1} : Finset ℕ) ∪ Finset.Icc 2 M, (1 / (r : ℝ) ^ 6) :=
+                Finset.sum_le_sum_of_subset_of_nonneg h_sub12 (fun _ _ _ => by positivity)
+            _ = 1 + ∑ r ∈ Finset.Icc 2 M, (1 / (r : ℝ) ^ 6) := by
+                rw [Finset.sum_union h_d12, Finset.sum_singleton]; norm_num
+        have h2 :
+            (∑ r ∈ Finset.Icc 2 M, (1 / (r : ℝ) ^ 6)) ≤
+              ∑ r ∈ Finset.Icc 2 M, (1 / (r : ℝ) ^ 2) := by
+          apply Finset.sum_le_sum
+          intro r hr
+          have hr1 : (1 : ℝ) ≤ (r : ℝ) := by
+            have hr_ge2 := (Finset.mem_Icc.mp hr).1
+            exact_mod_cast (by omega : 1 ≤ r)
+          have hp : (r : ℝ) ^ 2 ≤ (r : ℝ) ^ 6 := by
+            have h4 : (1 : ℝ) ≤ (r : ℝ) ^ 4 := one_le_pow_of_one_le hr1 4
+            calc
+              (r : ℝ) ^ 2 = (r : ℝ) ^ 2 * 1 := (mul_one _).symm
+              _ ≤ (r : ℝ) ^ 2 * (r : ℝ) ^ 4 := mul_le_mul_of_nonneg_left h4 (sq_nonneg _)
+              _ = (r : ℝ) ^ 6 := by ring
+          exact one_div_le_one_div_of_le (pow_pos (by linarith) 2) hp
+        have h3 := sum_inv_sq_Icc_succ_le_inv_tc062r_aux (le_refl 1) M
+        push_cast at h3
+        linarith
+      rw [hm0_zero, zero_add] at h_sum_r6 ⊢
+      calc
+        (∑ r ∈ Finset.Icc 1 M, windowEnergyNormSq Y (gaussianTermPhi (L * r)))
+          ≤ ((RiemannScope.tau - 1) * RiemannScope.tau ^ 4 * (Y ^ 5 / (L : ℝ) ^ 6)) * 2 := by
+            have hm := mul_le_mul_of_nonneg_left h_r6_le2
+              (show 0 ≤ (RiemannScope.tau - 1) * RiemannScope.tau ^ 4 * Y ^ 5 / (L : ℝ) ^ 6 by positivity)
+            linarith [h_sum_r6, hm,
+              show ((RiemannScope.tau - 1) * RiemannScope.tau ^ 4 * Y ^ 5 / (L : ℝ) ^ 6) * 2 =
+                ((RiemannScope.tau - 1) * RiemannScope.tau ^ 4 * (Y ^ 5 / (L : ℝ) ^ 6)) * 2 by ring]
+        _ ≤ ((RiemannScope.tau - 1) * RiemannScope.tau ^ 4 * (1 / (L : ℝ))) * 2 :=
+            mul_le_mul_of_nonneg_right
+              (mul_le_mul_of_nonneg_left hY5_L6 (by positivity)) (by norm_num)
+        _ = (RiemannScope.tau - 1) * (2 * RiemannScope.tau ^ 4) / (L : ℝ) := by ring
+    · have hm0_ge1 : 1 ≤ m0 := by omega
+      have hYL_lt : Y / (L : ℝ) < (m0 : ℝ) + 1 := Nat.lt_floor_add_one (Y / (L : ℝ))
+      have hm0_ge_half : Y / (2 * (L : ℝ)) ≤ (m0 : ℝ) := by
+        have h1_le_m0 : (1 : ℝ) ≤ (m0 : ℝ) := by exact_mod_cast hm0_ge1
+        have h2m0 : Y / (L : ℝ) ≤ 2 * (m0 : ℝ) := by linarith
+        have hm := div_le_div_of_nonneg_right h2m0 (by norm_num : (0 : ℝ) ≤ 2)
+        calc
+          Y / (2 * (L : ℝ)) = (Y / (L : ℝ)) / 2 := by ring
+          _ ≤ (2 * (m0 : ℝ)) / 2 := hm
+          _ = (m0 : ℝ) := by ring
+      have h_inv_m0 : 1 / (m0 : ℝ) ≤ 2 * (L : ℝ) / Y := by
+        have h_pos_div : 0 < Y / (2 * (L : ℝ)) := by positivity
+        have h1 := one_div_le_one_div_of_le h_pos_div hm0_ge_half
+        have h_simp : 1 / (Y / (2 * (L : ℝ))) = 2 * (L : ℝ) / Y := by
+          field_simp [hY_ne, hL_ne]
+        rwa [h_simp] at h1
+      have h_r6_tail :
+          (∑ r ∈ Finset.Icc (m0 + 1) M, (1 / (r : ℝ) ^ 6)) ≤
+            2 * (L : ℝ) ^ 5 / Y ^ 5 := by
+        have h_each_r :
+            ∀ r ∈ Finset.Icc (m0 + 1) M,
+              1 / (r : ℝ) ^ 6 ≤ ((L : ℝ) ^ 4 / Y ^ 4) * (1 / (r : ℝ) ^ 2) := by
+          intro r hr
+          have hr_ge : m0 + 1 ≤ r := (Finset.mem_Icc.mp hr).1
+          have hr_r : (m0 : ℝ) + 1 ≤ (r : ℝ) := by exact_mod_cast hr_ge
+          have hYL_le_r : Y / (L : ℝ) ≤ (r : ℝ) := le_of_lt (lt_of_lt_of_le hYL_lt hr_r)
+          have h4 : (Y / (L : ℝ)) ^ 4 ≤ (r : ℝ) ^ 4 :=
+            pow_le_pow_left (by positivity) hYL_le_r 4
+          have h_inv4 : 1 / (r : ℝ) ^ 4 ≤ (L : ℝ) ^ 4 / Y ^ 4 := by
+            have h1 := one_div_le_one_div_of_le (pow_pos (div_pos hY_pos hL_pos) 4) h4
+            have h_eq : 1 / (Y / (L : ℝ)) ^ 4 = (L : ℝ) ^ 4 / Y ^ 4 := by
+              field_simp [hY_ne, hL_ne]
+            rwa [h_eq] at h1
+          calc
+            1 / (r : ℝ) ^ 6 = (1 / (r : ℝ) ^ 4) * (1 / (r : ℝ) ^ 2) := by ring
+            _ ≤ ((L : ℝ) ^ 4 / Y ^ 4) * (1 / (r : ℝ) ^ 2) :=
+                mul_le_mul_of_nonneg_right h_inv4 (by positivity)
+        calc
+          (∑ r ∈ Finset.Icc (m0 + 1) M, (1 / (r : ℝ) ^ 6))
+            ≤ ∑ r ∈ Finset.Icc (m0 + 1) M, ((L : ℝ) ^ 4 / Y ^ 4) * (1 / (r : ℝ) ^ 2) :=
+              Finset.sum_le_sum h_each_r
+          _ = ((L : ℝ) ^ 4 / Y ^ 4) * ∑ r ∈ Finset.Icc (m0 + 1) M, (1 / (r : ℝ) ^ 2) :=
+              (Finset.mul_sum _ _ _).symm
+          _ ≤ ((L : ℝ) ^ 4 / Y ^ 4) * (1 / (m0 : ℝ)) :=
+              mul_le_mul_of_nonneg_left (sum_inv_sq_Icc_succ_le_inv_tc062r_aux hm0_ge1 M)
+                (by positivity)
+          _ ≤ ((L : ℝ) ^ 4 / Y ^ 4) * (2 * (L : ℝ) / Y) :=
+              mul_le_mul_of_nonneg_left h_inv_m0 (by positivity)
+          _ = 2 * (L : ℝ) ^ 5 / Y ^ 5 := by ring
+      calc
+        (∑ r ∈ Finset.Icc (m0 + 1) M, windowEnergyNormSq Y (gaussianTermPhi (L * r)))
+          ≤ ((RiemannScope.tau - 1) * RiemannScope.tau ^ 4 * Y ^ 5 / (L : ℝ) ^ 6) *
+              (2 * (L : ℝ) ^ 5 / Y ^ 5) :=
+            le_trans h_sum_r6
+              (mul_le_mul_of_nonneg_left h_r6_tail (by positivity))
+        _ = (RiemannScope.tau - 1) * (2 * RiemannScope.tau ^ 4) / (L : ℝ) := by
+            field_simp [hY_ne, hL_ne]; ring
+  have h_comb :
+      (RiemannScope.tau - 1) * (27 / 8 : ℝ) / (L : ℝ) +
+          (RiemannScope.tau - 1) * (2 * RiemannScope.tau ^ 4) / (L : ℝ) =
+        ((RiemannScope.tau - 1) * (27 / 8 + 2 * RiemannScope.tau ^ 4)) / (L : ℝ) := by ring
+  linarith only [h_split, h_head, h_tail, h_comb]
+
+private theorem one_add_log_le_four_fourth_root_tc062r_aux {x : ℝ} (hx1 : 1 ≤ x) :
+    1 + Real.log x ≤ 4 * Real.sqrt (Real.sqrt x) ∧
+      (1 + Real.log x) ^ 4 ≤ 256 * x := by
+  let u := Real.sqrt (Real.sqrt x)
+  have hx_nn : 0 ≤ x := by linarith
+  have hu2 : u ^ 2 = Real.sqrt x := by
+    dsimp [u]
+    exact Real.sq_sqrt (Real.sqrt_nonneg x)
+  have hu4 : u ^ 4 = x := by
+    calc
+      u ^ 4 = (u ^ 2) ^ 2 := by ring
+      _ = (Real.sqrt x) ^ 2 := by rw [hu2]
+      _ = x := Real.sq_sqrt hx_nn
+  have hu_ge1 : 1 ≤ u := by
+    dsimp [u]
+    calc
+      (1 : ℝ) = Real.sqrt (Real.sqrt 1) := by norm_num
+      _ ≤ Real.sqrt (Real.sqrt x) := Real.sqrt_le_sqrt (Real.sqrt_le_sqrt hx1)
+  have hu_pos : 0 < u := lt_of_lt_of_le zero_lt_one hu_ge1
+  have hlog_u : Real.log u ≤ u - 1 := by
+    have he := Real.add_one_le_exp (Real.log u)
+    rw [Real.exp_log hu_pos] at he
+    linarith
+  have hlog_x : Real.log x = 4 * Real.log u := by
+    rw [← hu4, Real.log_pow]
+    push_cast
+    ring
+  have h1 : 1 + Real.log x ≤ 4 * u := by linarith
+  have h_nn : 0 ≤ 1 + Real.log x := by linarith [Real.log_nonneg hx1]
+  have h4 := pow_le_pow_left h_nn h1 4
+  have hrhs : (4 * u) ^ 4 = 256 * x := by
+    calc
+      (4 * u) ^ 4 = 256 * u ^ 4 := by ring
+      _ = 256 * x := by rw [hu4]
+  exact ⟨h1, by rwa [hrhs] at h4⟩
+
+private theorem lcm_weighted_series_bound_tc062r_aux (T : ℕ) :
+    (∑ d ∈ Finset.Icc 1 T, ∑ e ∈ Finset.Icc 1 T,
+      ((1 + Real.log (d : ℝ)) / Real.sqrt (d : ℝ)) *
+        ((1 + Real.log (e : ℝ)) / Real.sqrt (e : ℝ)) /
+        (Nat.lcm d e : ℝ)) ≤ 18785 := by
+  let q : ℕ → ℝ := fun n => Real.sqrt (Real.sqrt (n : ℝ))
+  have hq_props :
+      ∀ n : ℕ, 1 ≤ n →
+        1 ≤ q n ∧ (q n) ^ 2 = Real.sqrt (n : ℝ) ∧ (q n) ^ 4 = (n : ℝ) ∧
+          (q n) ^ 6 = (n : ℝ) * Real.sqrt (n : ℝ) := by
+    intro n hn1
+    have h1 : 1 ≤ q n := by
+      dsimp [q]
+      calc
+        (1 : ℝ) = Real.sqrt (Real.sqrt 1) := by norm_num
+        _ ≤ Real.sqrt (Real.sqrt (n : ℝ)) :=
+          Real.sqrt_le_sqrt (Real.sqrt_le_sqrt (by exact_mod_cast hn1))
+    have h2 : (q n) ^ 2 = Real.sqrt (n : ℝ) := Real.sq_sqrt (Real.sqrt_nonneg _)
+    have h4 : (q n) ^ 4 = (n : ℝ) := by
+      calc
+        (q n) ^ 4 = ((q n) ^ 2) ^ 2 := by ring
+        _ = (Real.sqrt (n : ℝ)) ^ 2 := by rw [h2]
+        _ = (n : ℝ) := Real.sq_sqrt (Nat.cast_nonneg n)
+    have h6 : (q n) ^ 6 = (n : ℝ) * Real.sqrt (n : ℝ) := by
+      calc
+        (q n) ^ 6 = (q n) ^ 4 * (q n) ^ 2 := by ring
+        _ = (n : ℝ) * Real.sqrt (n : ℝ) := by rw [h4, h2]
+    exact ⟨h1, h2, h4, h6⟩
+  have h_q5_step :
+      ∀ n : ℕ, 2 ≤ n →
+        1 / (q n) ^ 5 ≤ 4 * (1 / q (n - 1) - 1 / q n) := by
+    intro n hn2
+    let m := n - 1
+    have hm1 : 1 ≤ m := by omega
+    have hn_eq : n = m + 1 := by omega
+    rw [hn_eq, show m + 1 - 1 = m by omega]
+    obtain ⟨hv1, _, hv4, _⟩ := hq_props m hm1
+    obtain ⟨hu1, _, hu4, _⟩ := hq_props (m + 1) (by omega)
+    let u := q (m + 1)
+    let v := q m
+    have hv_pos : 0 < v := lt_of_lt_of_le zero_lt_one hv1
+    have hu_pos : 0 < u := lt_of_lt_of_le zero_lt_one hu1
+    have hv_le_u : v ≤ u :=
+      Real.sqrt_le_sqrt (Real.sqrt_le_sqrt (by exact_mod_cast Nat.le_succ m))
+    have h_diff4 : (u - v) * (u + v) * (u ^ 2 + v ^ 2) = 1 := by
+      calc
+        (u - v) * (u + v) * (u ^ 2 + v ^ 2) = u ^ 4 - v ^ 4 := by ring
+        _ = ((m + 1 : ℕ) : ℝ) - (m : ℝ) := by rw [hu4, hv4]
+        _ = 1 := by push_cast; ring
+    have h_sum1 : u + v ≤ 2 * u := by linarith
+    have h_sum2 : u ^ 2 + v ^ 2 ≤ 2 * u ^ 2 := by
+      have hsq := pow_le_pow_left (le_of_lt hv_pos) hv_le_u 2
+      linarith
+    have h_prod_le : (u + v) * (u ^ 2 + v ^ 2) ≤ 4 * u ^ 3 := by
+      calc
+        (u + v) * (u ^ 2 + v ^ 2) ≤ (2 * u) * (2 * u ^ 2) :=
+          mul_le_mul h_sum1 h_sum2 (by positivity) (by positivity)
+        _ = 4 * u ^ 3 := by ring
+    have h_uv_diff : 1 ≤ 4 * u ^ 3 * (u - v) := by
+      have hm := mul_le_mul_of_nonneg_left h_prod_le (sub_nonneg.mpr hv_le_u)
+      linarith [h_diff4, show (u - v) * (4 * u ^ 3) = 4 * u ^ 3 * (u - v) by ring]
+    have h_uv_prod : v * u ≤ u ^ 2 := by
+      calc
+        v * u ≤ u * u := mul_le_mul_of_nonneg_right hv_le_u (le_of_lt hu_pos)
+        _ = u ^ 2 := (sq u).symm
+    have h_inv_diff : 1 / v - 1 / u = (u - v) / (v * u) := by
+      field_simp [ne_of_gt hv_pos, ne_of_gt hu_pos]
+    change 1 / u ^ 5 ≤ 4 * (1 / v - 1 / u)
+    rw [h_inv_diff]
+    have h_step1 : (u - v) / u ^ 2 ≤ (u - v) / (v * u) :=
+      div_le_div_of_nonneg_left (sub_nonneg.mpr hv_le_u) (mul_pos hv_pos hu_pos) h_uv_prod
+    have h_step2 : 1 / u ^ 5 ≤ 4 * ((u - v) / u ^ 2) := by
+      rw [show 4 * ((u - v) / u ^ 2) = (4 * u ^ 3 * (u - v)) / u ^ 5 by
+        field_simp [ne_of_gt hu_pos]; ring]
+      exact div_le_div_of_nonneg_right h_uv_diff (by positivity)
+    linarith
+  have h_tel_q : ∀ M : ℕ, (∑ n ∈ Finset.Icc 2 M, (1 / q (n - 1) - 1 / q n)) ≤ 1 := by
+    intro M
+    by_cases hM0 : M = 0
+    · subst hM0; simp
+    · obtain ⟨k, rfl⟩ : ∃ k : ℕ, M = k + 1 := ⟨M - 1, by omega⟩
+      have h_eq :
+          ∀ m : ℕ,
+            (∑ n ∈ Finset.Icc 2 (m + 1), (1 / q (n - 1) - 1 / q n)) =
+              1 - 1 / q (m + 1) := by
+        intro m
+        induction' m with m ih
+        · simp [q]
+        · have h_ins :
+              Finset.Icc 2 (m + 1 + 1) = insert (m + 2) (Finset.Icc 2 (m + 1)) := by
+            ext r; simp only [Finset.mem_Icc, Finset.mem_insert]; omega
+          have h_not : m + 2 ∉ Finset.Icc 2 (m + 1) := by simp
+          rw [h_ins, Finset.sum_insert h_not, ih]
+          have h_sub : m + 2 - 1 = m + 1 := by omega
+          have h_add : m + 1 + 1 = m + 2 := by omega
+          rw [h_sub, h_add]
+          ring
+      rw [h_eq k]
+      have h_inv_nn : 0 ≤ 1 / q (k + 1) := by dsimp [q]; positivity
+      linarith
+  have h_sum_a :
+      (∑ a ∈ Finset.Icc 1 T, (1 + Real.log (a : ℝ)) / ((a : ℝ) * Real.sqrt (a : ℝ))) ≤ 17 := by
+    have h_sub12 : Finset.Icc 1 T ⊆ ({1} : Finset ℕ) ∪ Finset.Icc 2 T := by
+      intro a ha
+      rw [Finset.mem_Icc] at ha
+      simp only [Finset.mem_union, Finset.mem_singleton, Finset.mem_Icc]
+      omega
+    have h_d12 : Disjoint ({1} : Finset ℕ) (Finset.Icc 2 T) := by
+      rw [Finset.disjoint_left]; intro a h1 h2; simp at h1 h2; omega
+    have h_nn :
+        ∀ a : ℕ, 0 ≤ (1 + Real.log (a : ℝ)) / ((a : ℝ) * Real.sqrt (a : ℝ)) := by
+      intro a
+      by_cases ha0 : a = 0
+      · simp [ha0]
+      · have ha1 : (1 : ℝ) ≤ (a : ℝ) := by exact_mod_cast Nat.pos_of_ne_zero ha0
+        exact div_nonneg (by linarith [Real.log_nonneg ha1]) (by positivity)
+    have h_u_le :
+        (∑ a ∈ Finset.Icc 1 T, (1 + Real.log (a : ℝ)) / ((a : ℝ) * Real.sqrt (a : ℝ))) ≤
+          1 + ∑ a ∈ Finset.Icc 2 T, (1 + Real.log (a : ℝ)) / ((a : ℝ) * Real.sqrt (a : ℝ)) := by
+      calc
+        _ ≤ ∑ a ∈ ({1} : Finset ℕ) ∪ Finset.Icc 2 T,
+              (1 + Real.log (a : ℝ)) / ((a : ℝ) * Real.sqrt (a : ℝ)) :=
+            Finset.sum_le_sum_of_subset_of_nonneg h_sub12 (fun a _ _ => h_nn a)
+        _ = 1 + ∑ a ∈ Finset.Icc 2 T,
+              (1 + Real.log (a : ℝ)) / ((a : ℝ) * Real.sqrt (a : ℝ)) := by
+            rw [Finset.sum_union h_d12, Finset.sum_singleton]
+            simp [Real.log_one]
+    have h_each2 :
+        ∀ a ∈ Finset.Icc 2 T,
+          (1 + Real.log (a : ℝ)) / ((a : ℝ) * Real.sqrt (a : ℝ)) ≤
+            16 * (1 / q (a - 1) - 1 / q a) := by
+      intro a ha
+      have ha2 : 2 ≤ a := (Finset.mem_Icc.mp ha).1
+      have ha1 : 1 ≤ a := by omega
+      obtain ⟨hq1, _, _, hq6⟩ := hq_props a ha1
+      have hq_pos : 0 < q a := lt_of_lt_of_le zero_lt_one hq1
+      have hlog_le := (one_add_log_le_four_fourth_root_tc062r_aux (x := (a : ℝ)) (by exact_mod_cast ha1)).1
+      have h1 :
+          (1 + Real.log (a : ℝ)) / ((a : ℝ) * Real.sqrt (a : ℝ)) ≤ 4 / (q a) ^ 5 := by
+        rw [← hq6]
+        calc
+          (1 + Real.log (a : ℝ)) / (q a) ^ 6 ≤ (4 * q a) / (q a) ^ 6 :=
+            div_le_div_of_nonneg_right hlog_le (by positivity)
+          _ = 4 / (q a) ^ 5 := by field_simp [ne_of_gt hq_pos]; ring
+      have h2 := h_q5_step a ha2
+      linarith [h1, h2, show 4 / (q a) ^ 5 = 4 * (1 / (q a) ^ 5) by ring]
+    have h_s2 :
+        (∑ a ∈ Finset.Icc 2 T, (1 + Real.log (a : ℝ)) / ((a : ℝ) * Real.sqrt (a : ℝ))) ≤ 16 := by
+      calc
+        _ ≤ ∑ a ∈ Finset.Icc 2 T, 16 * (1 / q (a - 1) - 1 / q a) := Finset.sum_le_sum h_each2
+        _ = 16 * ∑ a ∈ Finset.Icc 2 T, (1 / q (a - 1) - 1 / q a) := (Finset.mul_sum _ _ _).symm
+        _ ≤ 16 * 1 := mul_le_mul_of_nonneg_left (h_tel_q T) (by norm_num)
+        _ = 16 := mul_one _
+    linarith
+  have h_sum_g :
+      (∑ g ∈ Finset.Icc 1 T, (1 + Real.log (g : ℝ)) ^ 2 / (g : ℝ) ^ 2) ≤ 65 := by
+    have h_sub12 : Finset.Icc 1 T ⊆ ({1} : Finset ℕ) ∪ Finset.Icc 2 T := by
+      intro g hg
+      rw [Finset.mem_Icc] at hg
+      simp only [Finset.mem_union, Finset.mem_singleton, Finset.mem_Icc]
+      omega
+    have h_d12 : Disjoint ({1} : Finset ℕ) (Finset.Icc 2 T) := by
+      rw [Finset.disjoint_left]; intro g h1 h2; simp at h1 h2; omega
+    have h_u_le :
+        (∑ g ∈ Finset.Icc 1 T, (1 + Real.log (g : ℝ)) ^ 2 / (g : ℝ) ^ 2) ≤
+          1 + ∑ g ∈ Finset.Icc 2 T, (1 + Real.log (g : ℝ)) ^ 2 / (g : ℝ) ^ 2 := by
+      calc
+        _ ≤ ∑ g ∈ ({1} : Finset ℕ) ∪ Finset.Icc 2 T, (1 + Real.log (g : ℝ)) ^ 2 / (g : ℝ) ^ 2 :=
+            Finset.sum_le_sum_of_subset_of_nonneg h_sub12 (fun _ _ _ => by positivity)
+        _ = 1 + ∑ g ∈ Finset.Icc 2 T, (1 + Real.log (g : ℝ)) ^ 2 / (g : ℝ) ^ 2 := by
+            rw [Finset.sum_union h_d12, Finset.sum_singleton]
+            simp [Real.log_one]
+    have h_each2 :
+        ∀ g ∈ Finset.Icc 2 T,
+          (1 + Real.log (g : ℝ)) ^ 2 / (g : ℝ) ^ 2 ≤ 64 * (1 / q (g - 1) - 1 / q g) := by
+      intro g hg
+      have hg2 : 2 ≤ g := (Finset.mem_Icc.mp hg).1
+      have hg1 : 1 ≤ g := by omega
+      obtain ⟨hq1, _, hq4, _⟩ := hq_props g hg1
+      have hq_pos : 0 < q g := lt_of_lt_of_le zero_lt_one hq1
+      have hlog_le := (one_add_log_le_four_fourth_root_tc062r_aux (x := (g : ℝ)) (by exact_mod_cast hg1)).1
+      have hlog_nn : 0 ≤ 1 + Real.log (g : ℝ) := by
+        linarith [Real.log_nonneg (show (1 : ℝ) ≤ (g : ℝ) by exact_mod_cast hg1)]
+      have hsq : (1 + Real.log (g : ℝ)) ^ 2 ≤ (4 * q g) ^ 2 := pow_le_pow_left hlog_nn hlog_le 2
+      have hq5_le6 : (q g) ^ 5 ≤ (q g) ^ 6 := by
+        have h5 : 0 ≤ (q g) ^ 5 := by positivity
+        have heq : (q g) ^ 6 = (q g) ^ 5 * q g := by ring
+        rw [heq]
+        exact le_mul_of_one_le_right h5 hq1
+      have h1 : (1 + Real.log (g : ℝ)) ^ 2 / (g : ℝ) ^ 2 ≤ 16 / (q g) ^ 5 := by
+        calc
+          (1 + Real.log (g : ℝ)) ^ 2 / (g : ℝ) ^ 2
+            = (1 + Real.log (g : ℝ)) ^ 2 / ((q g) ^ 4) ^ 2 := by rw [hq4]
+          _ ≤ (4 * q g) ^ 2 / ((q g) ^ 4) ^ 2 :=
+              div_le_div_of_nonneg_right hsq (by positivity)
+          _ = 16 / (q g) ^ 6 := by field_simp [ne_of_gt hq_pos]; ring
+          _ ≤ 16 / (q g) ^ 5 :=
+              div_le_div_of_nonneg_left (by norm_num) (pow_pos hq_pos 5) hq5_le6
+      have h2 := h_q5_step g hg2
+      linarith [h1, h2, show 16 / (q g) ^ 5 = 16 * (1 / (q g) ^ 5) by ring]
+    have h_s2 : (∑ g ∈ Finset.Icc 2 T, (1 + Real.log (g : ℝ)) ^ 2 / (g : ℝ) ^ 2) ≤ 64 := by
+      calc
+        _ ≤ ∑ g ∈ Finset.Icc 2 T, 64 * (1 / q (g - 1) - 1 / q g) := Finset.sum_le_sum h_each2
+        _ = 64 * ∑ g ∈ Finset.Icc 2 T, (1 / q (g - 1) - 1 / q g) := (Finset.mul_sum _ _ _).symm
+        _ ≤ 64 * 1 := mul_le_mul_of_nonneg_left (h_tel_q T) (by norm_num)
+        _ = 64 := mul_one _
+    linarith
+  let P2 := Finset.Icc 1 T ×ˢ Finset.Icc 1 T
+  let P3 := (Finset.Icc 1 T ×ˢ Finset.Icc 1 T) ×ˢ Finset.Icc 1 T
+  let phi : ℕ × ℕ → (ℕ × ℕ) × ℕ :=
+    fun de => ((Nat.gcd de.1 de.2, de.1 / Nat.gcd de.1 de.2), de.2 / Nat.gcd de.1 de.2)
+  let F3 : (ℕ × ℕ) × ℕ → ℝ := fun gab =>
+    ((1 + Real.log (gab.1.1 : ℝ)) ^ 2 / (gab.1.1 : ℝ) ^ 2) *
+      ((1 + Real.log (gab.1.2 : ℝ)) / ((gab.1.2 : ℝ) * Real.sqrt (gab.1.2 : ℝ))) *
+      ((1 + Real.log (gab.2 : ℝ)) / ((gab.2 : ℝ) * Real.sqrt (gab.2 : ℝ)))
+  have hF3_nn : ∀ gab ∈ P3, 0 ≤ F3 gab := by
+    intro gab hgab
+    simp only [P3, Finset.mem_product, Finset.mem_Icc] at hgab
+    rcases hgab with ⟨⟨⟨_, _⟩, ⟨ha1, _⟩⟩, ⟨hb1, _⟩⟩
+    have hla : 0 ≤ 1 + Real.log (gab.1.2 : ℝ) := by
+      linarith [Real.log_nonneg (show (1 : ℝ) ≤ (gab.1.2 : ℝ) by exact_mod_cast ha1)]
+    have hlb : 0 ≤ 1 + Real.log (gab.2 : ℝ) := by
+      linarith [Real.log_nonneg (show (1 : ℝ) ≤ (gab.2 : ℝ) by exact_mod_cast hb1)]
+    dsimp [F3]
+    exact mul_nonneg
+      (mul_nonneg (div_nonneg (sq_nonneg _) (sq_nonneg _)) (div_nonneg hla (by positivity)))
+      (div_nonneg hlb (by positivity))
+  have h_phi_sub : P2.image phi ⊆ P3 := by
+    intro gab hgab
+    rcases Finset.mem_image.mp hgab with ⟨⟨d, e⟩, hde, rfl⟩
+    simp only [P2, P3, phi, Finset.mem_product, Finset.mem_Icc] at hde ⊢
+    rcases hde with ⟨⟨hd1, hdT⟩, ⟨he1, heT⟩⟩
+    have hg_pos : 0 < Nat.gcd d e := Nat.gcd_pos_of_pos_left e hd1
+    have hg_dvd_d : Nat.gcd d e ∣ d := Nat.gcd_dvd_left d e
+    have hg_dvd_e : Nat.gcd d e ∣ e := Nat.gcd_dvd_right d e
+    have hg_le_d : Nat.gcd d e ≤ d := Nat.le_of_dvd hd1 hg_dvd_d
+    have hg_le_e : Nat.gcd d e ≤ e := Nat.le_of_dvd he1 hg_dvd_e
+    exact ⟨⟨⟨hg_pos, le_trans hg_le_d hdT⟩,
+      ⟨Nat.div_pos hg_le_d hg_pos, le_trans (Nat.div_le_self d _) hdT⟩⟩,
+      ⟨Nat.div_pos hg_le_e hg_pos, le_trans (Nat.div_le_self e _) heT⟩⟩
+  have h_phi_inj : Set.InjOn phi ↑P2 := by
+    rintro ⟨d1, e1⟩ h1 ⟨d2, e2⟩ h2 h_eq
+    simp only [Finset.mem_coe, P2, Finset.mem_product, Finset.mem_Icc] at h1 h2
+    simp only [phi, Prod.mk.injEq] at h_eq
+    rcases h_eq with ⟨⟨hg_eq, ha_eq⟩, hb_eq⟩
+    have hd1_eq : d1 = Nat.gcd d1 e1 * (d1 / Nat.gcd d1 e1) :=
+      (Nat.mul_div_cancel' (Nat.gcd_dvd_left d1 e1)).symm
+    have hd2_eq : d2 = Nat.gcd d2 e2 * (d2 / Nat.gcd d2 e2) :=
+      (Nat.mul_div_cancel' (Nat.gcd_dvd_left d2 e2)).symm
+    have he1_eq : e1 = Nat.gcd d1 e1 * (e1 / Nat.gcd d1 e1) :=
+      (Nat.mul_div_cancel' (Nat.gcd_dvd_right d1 e1)).symm
+    have he2_eq : e2 = Nat.gcd d2 e2 * (e2 / Nat.gcd d2 e2) :=
+      (Nat.mul_div_cancel' (Nat.gcd_dvd_right d2 e2)).symm
+    rw [ha_eq, hg_eq] at hd1_eq
+    rw [hb_eq, hg_eq] at he1_eq
+    exact Prod.ext (hd1_eq.trans hd2_eq.symm) (he1_eq.trans he2_eq.symm)
+  have h_term_le :
+      ∀ de ∈ P2,
+        ((1 + Real.log (de.1 : ℝ)) / Real.sqrt (de.1 : ℝ)) *
+          ((1 + Real.log (de.2 : ℝ)) / Real.sqrt (de.2 : ℝ)) /
+          (Nat.lcm de.1 de.2 : ℝ) ≤ F3 (phi de) := by
+    rintro ⟨d, e⟩ hde
+    simp only [P2, Finset.mem_product, Finset.mem_Icc] at hde
+    rcases hde with ⟨⟨hd1, _⟩, ⟨he1, _⟩⟩
+    let g := Nat.gcd d e
+    let a := d / g
+    let b := e / g
+    have hg_pos : 0 < g := Nat.gcd_pos_of_pos_left e hd1
+    have hd_eq : g * a = d := Nat.mul_div_cancel' (Nat.gcd_dvd_left d e)
+    have he_eq : g * b = e := Nat.mul_div_cancel' (Nat.gcd_dvd_right d e)
+    have ha1 : 1 ≤ a := Nat.div_pos (Nat.le_of_dvd hd1 (Nat.gcd_dvd_left d e)) hg_pos
+    have hb1 : 1 ≤ b := Nat.div_pos (Nat.le_of_dvd he1 (Nat.gcd_dvd_right d e)) hg_pos
+    have hlcm_eq : Nat.lcm d e = g * a * b := by
+      have hm : g * Nat.lcm d e = g * (g * a * b) := by
+        calc
+          g * Nat.lcm d e = d * e := Nat.gcd_mul_lcm d e
+          _ = (g * a) * (g * b) := by rw [← hd_eq, ← he_eq]
+          _ = g * (g * a * b) := by ring
+      exact Nat.eq_of_mul_eq_mul_left hg_pos hm
+    have hg_r : (1 : ℝ) ≤ (g : ℝ) := by exact_mod_cast hg_pos
+    have ha_r : (1 : ℝ) ≤ (a : ℝ) := by exact_mod_cast ha1
+    have hb_r : (1 : ℝ) ≤ (b : ℝ) := by exact_mod_cast hb1
+    have hlg_nn : 0 ≤ Real.log (g : ℝ) := Real.log_nonneg hg_r
+    have hla_nn : 0 ≤ Real.log (a : ℝ) := Real.log_nonneg ha_r
+    have hlb_nn : 0 ≤ Real.log (b : ℝ) := Real.log_nonneg hb_r
+    have h1_d : 1 + Real.log (d : ℝ) ≤ (1 + Real.log (g : ℝ)) * (1 + Real.log (a : ℝ)) := by
+      rw [← hd_eq, Nat.cast_mul, Real.log_mul (by positivity) (by positivity)]
+      linarith only [mul_nonneg hlg_nn hla_nn,
+        show (1 + Real.log (g : ℝ)) * (1 + Real.log (a : ℝ)) -
+            (1 + (Real.log (g : ℝ) + Real.log (a : ℝ))) =
+          Real.log (g : ℝ) * Real.log (a : ℝ) by ring]
+    have h1_e : 1 + Real.log (e : ℝ) ≤ (1 + Real.log (g : ℝ)) * (1 + Real.log (b : ℝ)) := by
+      rw [← he_eq, Nat.cast_mul, Real.log_mul (by positivity) (by positivity)]
+      linarith only [mul_nonneg hlg_nn hlb_nn,
+        show (1 + Real.log (g : ℝ)) * (1 + Real.log (b : ℝ)) -
+            (1 + (Real.log (g : ℝ) + Real.log (b : ℝ))) =
+          Real.log (g : ℝ) * Real.log (b : ℝ) by ring]
+    have hle_nn : 0 ≤ Real.log (e : ℝ) := Real.log_nonneg (by exact_mod_cast he1)
+    have h_num :
+        (1 + Real.log (d : ℝ)) * (1 + Real.log (e : ℝ)) ≤
+          (1 + Real.log (g : ℝ)) ^ 2 * (1 + Real.log (a : ℝ)) * (1 + Real.log (b : ℝ)) := by
+      have hm := mul_le_mul h1_d h1_e (by linarith [hle_nn]) (by positivity)
+      linarith [hm, show ((1 + Real.log (g : ℝ)) * (1 + Real.log (a : ℝ))) *
+          ((1 + Real.log (g : ℝ)) * (1 + Real.log (b : ℝ))) =
+        (1 + Real.log (g : ℝ)) ^ 2 * (1 + Real.log (a : ℝ)) * (1 + Real.log (b : ℝ)) by ring]
+    have h_den :
+        Real.sqrt (d : ℝ) * Real.sqrt (e : ℝ) * (Nat.lcm d e : ℝ) =
+          (g : ℝ) ^ 2 * ((a : ℝ) * Real.sqrt (a : ℝ)) * ((b : ℝ) * Real.sqrt (b : ℝ)) := by
+      rw [hlcm_eq, ← hd_eq, ← he_eq]
+      push_cast
+      rw [Real.sqrt_mul (by positivity) (a : ℝ), Real.sqrt_mul (by positivity) (b : ℝ)]
+      have hsg : Real.sqrt (g : ℝ) * Real.sqrt (g : ℝ) = (g : ℝ) :=
+        Real.mul_self_sqrt (by positivity)
+      calc
+        Real.sqrt (g : ℝ) * Real.sqrt (a : ℝ) * (Real.sqrt (g : ℝ) * Real.sqrt (b : ℝ)) *
+            ((g : ℝ) * (a : ℝ) * (b : ℝ))
+          = (Real.sqrt (g : ℝ) * Real.sqrt (g : ℝ)) * (g : ℝ) *
+              ((a : ℝ) * Real.sqrt (a : ℝ)) * ((b : ℝ) * Real.sqrt (b : ℝ)) := by ring
+        _ = (g : ℝ) ^ 2 * ((a : ℝ) * Real.sqrt (a : ℝ)) * ((b : ℝ) * Real.sqrt (b : ℝ)) := by
+            rw [hsg]; ring
+    change ((1 + Real.log (d : ℝ)) / Real.sqrt (d : ℝ)) *
+        ((1 + Real.log (e : ℝ)) / Real.sqrt (e : ℝ)) / (Nat.lcm d e : ℝ) ≤
+      ((1 + Real.log (g : ℝ)) ^ 2 / (g : ℝ) ^ 2) *
+        ((1 + Real.log (a : ℝ)) / ((a : ℝ) * Real.sqrt (a : ℝ))) *
+        ((1 + Real.log (b : ℝ)) / ((b : ℝ) * Real.sqrt (b : ℝ)))
+    have h_lhs_div :
+        ((1 + Real.log (d : ℝ)) / Real.sqrt (d : ℝ)) *
+            ((1 + Real.log (e : ℝ)) / Real.sqrt (e : ℝ)) / (Nat.lcm d e : ℝ) =
+          ((1 + Real.log (d : ℝ)) * (1 + Real.log (e : ℝ))) /
+            (Real.sqrt (d : ℝ) * Real.sqrt (e : ℝ) * (Nat.lcm d e : ℝ)) := by ring
+    have h_rhs_div :
+        ((1 + Real.log (g : ℝ)) ^ 2 / (g : ℝ) ^ 2) *
+            ((1 + Real.log (a : ℝ)) / ((a : ℝ) * Real.sqrt (a : ℝ))) *
+            ((1 + Real.log (b : ℝ)) / ((b : ℝ) * Real.sqrt (b : ℝ))) =
+          ((1 + Real.log (g : ℝ)) ^ 2 * (1 + Real.log (a : ℝ)) * (1 + Real.log (b : ℝ))) /
+            ((g : ℝ) ^ 2 * ((a : ℝ) * Real.sqrt (a : ℝ)) * ((b : ℝ) * Real.sqrt (b : ℝ))) := by
+      ring
+    rw [h_lhs_div, h_rhs_div, h_den]
+    exact div_le_div_of_nonneg_right h_num (by positivity)
+  have h_P3_fact :
+      (∑ gab ∈ P3, F3 gab) =
+        (∑ g ∈ Finset.Icc 1 T, (1 + Real.log (g : ℝ)) ^ 2 / (g : ℝ) ^ 2) *
+          (∑ a ∈ Finset.Icc 1 T, (1 + Real.log (a : ℝ)) / ((a : ℝ) * Real.sqrt (a : ℝ))) ^ 2 := by
+    dsimp [P3, F3]
+    rw [Finset.sum_product, Finset.sum_product]
+    dsimp only
+    simp_rw [mul_assoc, ← Finset.mul_sum, ← Finset.sum_mul]
+    ring
+  have h_a_nn :
+      0 ≤ ∑ a ∈ Finset.Icc 1 T, (1 + Real.log (a : ℝ)) / ((a : ℝ) * Real.sqrt (a : ℝ)) := by
+    apply Finset.sum_nonneg
+    intro a ha
+    have ha1 : (1 : ℝ) ≤ (a : ℝ) := by exact_mod_cast (Finset.mem_Icc.mp ha).1
+    exact div_nonneg (by linarith [Real.log_nonneg ha1]) (by positivity)
+  calc
+    (∑ d ∈ Finset.Icc 1 T, ∑ e ∈ Finset.Icc 1 T,
+        ((1 + Real.log (d : ℝ)) / Real.sqrt (d : ℝ)) *
+          ((1 + Real.log (e : ℝ)) / Real.sqrt (e : ℝ)) /
+          (Nat.lcm d e : ℝ))
+      = ∑ de ∈ P2,
+          ((1 + Real.log (de.1 : ℝ)) / Real.sqrt (de.1 : ℝ)) *
+            ((1 + Real.log (de.2 : ℝ)) / Real.sqrt (de.2 : ℝ)) /
+            (Nat.lcm de.1 de.2 : ℝ) := by
+          dsimp [P2]; rw [Finset.sum_product]
+    _ ≤ ∑ de ∈ P2, F3 (phi de) := Finset.sum_le_sum h_term_le
+    _ = ∑ gab ∈ P2.image phi, F3 gab := (Finset.sum_image h_phi_inj).symm
+    _ ≤ ∑ gab ∈ P3, F3 gab := Finset.sum_le_sum_of_subset_of_nonneg h_phi_sub (fun x hx _ => hF3_nn x hx)
+    _ = (∑ g ∈ Finset.Icc 1 T, (1 + Real.log (g : ℝ)) ^ 2 / (g : ℝ) ^ 2) *
+          (∑ a ∈ Finset.Icc 1 T, (1 + Real.log (a : ℝ)) / ((a : ℝ) * Real.sqrt (a : ℝ))) ^ 2 := h_P3_fact
+    _ ≤ 65 * 17 ^ 2 := mul_le_mul h_sum_g (pow_le_pow_left h_a_nn h_sum_a 2) (sq_nonneg _) (by norm_num)
+    _ = 18785 := by norm_num
+
+private theorem sq_sum_le_card_mul_sum_sq_tc062r_aux (S : Finset ℕ) (f : ℕ → ℝ) :
+    (∑ x ∈ S, f x) ^ 2 ≤ (S.card : ℝ) * ∑ x ∈ S, (f x) ^ 2 := by
+  have h_nn : 0 ≤ ∑ x ∈ S, ∑ y ∈ S, (f x - f y) ^ 2 :=
+    Finset.sum_nonneg (fun _ _ => Finset.sum_nonneg (fun _ _ => sq_nonneg _))
+  have h_exp :
+      (∑ x ∈ S, ∑ y ∈ S, (f x - f y) ^ 2) =
+        2 * ((S.card : ℝ) * ∑ x ∈ S, (f x) ^ 2 - (∑ x ∈ S, f x) ^ 2) := by
+    have h_inner :
+        ∀ x ∈ S,
+          (∑ y ∈ S, (f x - f y) ^ 2) =
+            (S.card : ℝ) * (f x) ^ 2 - 2 * f x * (∑ y ∈ S, f y) + ∑ y ∈ S, (f y) ^ 2 := by
+      intro x _
+      have h1 : ∀ y ∈ S, (f x - f y) ^ 2 = (f x) ^ 2 - 2 * f x * f y + (f y) ^ 2 :=
+        fun _ _ => by ring
+      rw [Finset.sum_congr rfl h1, Finset.sum_add_distrib, Finset.sum_sub_distrib,
+        Finset.sum_const, nsmul_eq_mul, ← Finset.mul_sum]
+    rw [Finset.sum_congr rfl h_inner, Finset.sum_add_distrib, Finset.sum_sub_distrib,
+      ← Finset.mul_sum, Finset.sum_const, nsmul_eq_mul]
+    have h_mid :
+        (∑ x ∈ S, 2 * f x * ∑ y ∈ S, f y) = 2 * (∑ x ∈ S, f x) ^ 2 := by
+      have h2 : ∀ x ∈ S, 2 * f x * (∑ y ∈ S, f y) = f x * (2 * ∑ y ∈ S, f y) :=
+        fun _ _ => by ring
+      rw [Finset.sum_congr rfl h2, ← Finset.sum_mul]
+      ring
+    rw [h_mid]
+    ring
+  linarith
+
+private theorem openCoreAdjustedCoeffBeta_four_piece_eq_tc062r_aux
+    {T : ℕ} (hT2 : 2 ≤ T) (D0 : ℕ) (c_lam c_half : ℝ) {k : ℕ} (hk : k ∈ Finset.Icc 1 T) :
+    openCoreAdjustedCoeffBeta c_lam c_half T D0 k =
+      -(c_lam * (if IsSquare k then 1 else 0)) -
+        (if k = T then selbergCenteredRemainderInt c_lam T - squarePoleDriftM c_half T else 0) -
+        (∑ e ∈ k.divisors,
+          (squarePoleDriftM c_half e - squarePoleDriftM c_half (e - 1)) *
+            (liouvilleLambda (k / e) : ℝ)) -
+        ((∑ d ∈ (Finset.Icc 1 (min D0 (T - 1))).filter (fun d => d ∣ k ∧ k / d ≤ T / d),
+            (selbergCenteredRemainderInt c_lam d - squarePoleDriftM c_half d) *
+              (liouvilleLambda (k / d) : ℝ)) -
+          (∑ d ∈ (Finset.Icc 1 (min D0 (T - 1))).filter
+              (fun d => (d + 1) ∣ k ∧ k / (d + 1) ≤ T / d),
+            (selbergCenteredRemainderInt c_lam d - squarePoleDriftM c_half d) *
+              (liouvilleLambda (k / (d + 1)) : ℝ))) := by
+  let D_min := min D0 (T - 1)
+  obtain ⟨_, h_alpha_lt, h_alpha_T, _⟩ :=
+    (noncircular_reassembly_and_basis_stratification_tc060 c_lam).2.2.2.2 T hT2
+  have hk_bds := Finset.mem_Icc.mp hk
+  have hk_ne : k ≠ 0 := by omega
+  have h_alpha_adj :
+      smoothBasisCoeffAlpha c_lam T k -
+          truncatedLiouvilleCoeff T k * (Real.log (k : ℝ)) ^ 2 =
+        -(c_lam * (if IsSquare k then 1 else 0)) -
+          (if k = T then selbergCenteredRemainderInt c_lam T else 0) := by
+    have h_tr : truncatedLiouvilleCoeff T k = (liouvilleLambda k : ℝ) := if_pos hk_bds
+    rw [h_tr]
+    by_cases hkT : k = T
+    · subst hkT; rw [h_alpha_T, if_pos rfl]; ring
+    · have hk_lt : k ∈ Finset.Icc 1 (T - 1) := Finset.mem_Icc.mpr ⟨hk_bds.1, by omega⟩
+      rw [h_alpha_lt k hk_lt, if_neg hkT]; ring
+  let driftOp : ℝ :=
+    (∑ d ∈ (Finset.Icc 1 (T - 1)).filter (fun d => d ∣ k ∧ k / d ≤ T / d),
+        squarePoleDriftM c_half d * (liouvilleLambda (k / d) : ℝ)) -
+      (∑ d ∈ (Finset.Icc 1 (T - 1)).filter (fun d => (d + 1) ∣ k ∧ k / (d + 1) ≤ T / d),
+        squarePoleDriftM c_half d * (liouvilleLambda (k / (d + 1)) : ℝ))
+  let smallOp : ℝ :=
+    (∑ d ∈ (Finset.Icc 1 D_min).filter (fun d => d ∣ k ∧ k / d ≤ T / d),
+        (selbergCenteredRemainderInt c_lam d - squarePoleDriftM c_half d) *
+          (liouvilleLambda (k / d) : ℝ)) -
+      (∑ d ∈ (Finset.Icc 1 D_min).filter (fun d => (d + 1) ∣ k ∧ k / (d + 1) ≤ T / d),
+        (selbergCenteredRemainderInt c_lam d - squarePoleDriftM c_half d) *
+          (liouvilleLambda (k / (d + 1)) : ℝ))
+  have h_beta_split :
+      openCoreAdjustedCoeffBeta c_lam c_half T D0 k =
+        (smoothBasisCoeffAlpha c_lam T k -
+            truncatedLiouvilleCoeff T k * (Real.log (k : ℝ)) ^ 2) -
+          driftOp - smallOp := by
+    have h_u : Finset.Icc 1 (T - 1) = Finset.Icc 1 D_min ∪ Finset.Icc (D_min + 1) (T - 1) := by
+      ext d; simp only [D_min, Finset.mem_Icc, Finset.mem_union]; omega
+    have h_d : Disjoint (Finset.Icc 1 D_min) (Finset.Icc (D_min + 1) (T - 1)) := by
+      rw [Finset.disjoint_left]; intro d h1 h2; simp only [Finset.mem_Icc] at h1 h2; omega
+    have h_lin :
+        ∀ (P : ℕ → Prop) [DecidablePred P] (f : ℕ → ℝ),
+          (∑ d ∈ (Finset.Icc 1 (T - 1)).filter P, f d) =
+            (∑ d ∈ (Finset.Icc 1 D_min).filter P, f d) +
+              (∑ d ∈ (Finset.Icc (D_min + 1) (T - 1)).filter P, f d) := by
+      intro P _ f
+      conv_lhs => rw [h_u, Finset.filter_union]
+      exact Finset.sum_union (Finset.disjoint_filter_filter h_d)
+    unfold openCoreAdjustedCoeffBeta openCoreSmoothCoeffS smoothBasisCoeffAlpha
+    dsimp [driftOp, smallOp, D_min]
+    have h1 := h_lin (fun d => d ∣ k ∧ k / d ≤ T / d)
+      (fun d => (selbergCenteredRemainderInt c_lam d - squarePoleDriftM c_half d) *
+        (liouvilleLambda (k / d) : ℝ))
+    have h2 := h_lin (fun d => (d + 1) ∣ k ∧ k / (d + 1) ≤ T / d)
+      (fun d => (selbergCenteredRemainderInt c_lam d - squarePoleDriftM c_half d) *
+        (liouvilleLambda (k / (d + 1)) : ℝ))
+    have h_sub1 :
+        (∑ d ∈ (Finset.Icc 1 (T - 1)).filter (fun d => d ∣ k ∧ k / d ≤ T / d),
+            (selbergCenteredRemainderInt c_lam d - squarePoleDriftM c_half d) *
+              (liouvilleLambda (k / d) : ℝ)) =
+          (∑ d ∈ (Finset.Icc 1 (T - 1)).filter (fun d => d ∣ k ∧ k / d ≤ T / d),
+              selbergCenteredRemainderInt c_lam d * (liouvilleLambda (k / d) : ℝ)) -
+            (∑ d ∈ (Finset.Icc 1 (T - 1)).filter (fun d => d ∣ k ∧ k / d ≤ T / d),
+              squarePoleDriftM c_half d * (liouvilleLambda (k / d) : ℝ)) := by
+      rw [← Finset.sum_sub_distrib]
+      apply Finset.sum_congr rfl; intro d _; ring
+    have h_sub2 :
+        (∑ d ∈ (Finset.Icc 1 (T - 1)).filter (fun d => (d + 1) ∣ k ∧ k / (d + 1) ≤ T / d),
+            (selbergCenteredRemainderInt c_lam d - squarePoleDriftM c_half d) *
+              (liouvilleLambda (k / (d + 1)) : ℝ)) =
+          (∑ d ∈ (Finset.Icc 1 (T - 1)).filter (fun d => (d + 1) ∣ k ∧ k / (d + 1) ≤ T / d),
+              selbergCenteredRemainderInt c_lam d * (liouvilleLambda (k / (d + 1)) : ℝ)) -
+            (∑ d ∈ (Finset.Icc 1 (T - 1)).filter (fun d => (d + 1) ∣ k ∧ k / (d + 1) ≤ T / d),
+              squarePoleDriftM c_half d * (liouvilleLambda (k / (d + 1)) : ℝ)) := by
+      rw [← Finset.sum_sub_distrib]
+      apply Finset.sum_congr rfl; intro d _; ring
+    linarith [h1, h2, h_sub1, h_sub2]
+  have h_drift_eq :
+      driftOp =
+        (∑ e ∈ k.divisors,
+            (squarePoleDriftM c_half e - squarePoleDriftM c_half (e - 1)) *
+              (liouvilleLambda (k / e) : ℝ)) -
+          (if k = T then squarePoleDriftM c_half T else 0) := by
+    have h_s1 :
+        (∑ d ∈ (Finset.Icc 1 (T - 1)).filter (fun d => d ∣ k ∧ k / d ≤ T / d),
+            squarePoleDriftM c_half d * (liouvilleLambda (k / d) : ℝ)) =
+          (∑ e ∈ k.divisors,
+              squarePoleDriftM c_half e * (liouvilleLambda (k / e) : ℝ)) -
+            (if k = T then squarePoleDriftM c_half T else 0) := by
+      have hf_eq :
+          (Finset.Icc 1 (T - 1)).filter (fun d => d ∣ k ∧ k / d ≤ T / d) =
+            k.divisors.erase T := by
+        ext d
+        simp only [Finset.mem_filter, Finset.mem_Icc, Finset.mem_erase, Nat.mem_divisors]
+        constructor
+        · rintro ⟨⟨_, hd_hi⟩, ⟨hd_dvd, _⟩⟩
+          exact ⟨by omega, ⟨hd_dvd, hk_ne⟩⟩
+        · rintro ⟨hd_ne_T, ⟨hd_dvd, _⟩⟩
+          have hd_pos : 0 < d := Nat.pos_of_dvd_of_pos hd_dvd hk_bds.1
+          have hd_le_k : d ≤ k := Nat.le_of_dvd hk_bds.1 hd_dvd
+          exact ⟨⟨hd_pos, by omega⟩, ⟨hd_dvd, Nat.div_le_div_right hk_bds.2⟩⟩
+      rw [hf_eq]
+      by_cases hkT : k = T
+      · rw [hkT]
+        have hT_div : T ∈ T.divisors := Nat.mem_divisors.mpr ⟨dvd_refl T, by omega⟩
+        have hl1 : (liouvilleLambda (T / T) : ℝ) = 1 := by
+          rw [Nat.div_self (by omega)]
+          simp [liouvilleLambda, natOmega, liouvilleSignFromOmega]
+        rw [if_pos rfl, ← Finset.add_sum_erase _ _ hT_div, hl1, mul_one]
+        ring
+      · have hT_not : T ∉ k.divisors := by
+          intro hmem
+          have hle := Nat.le_of_dvd hk_bds.1 (Nat.mem_divisors.mp hmem).1
+          omega
+        rw [if_neg hkT, Finset.erase_eq_of_not_mem hT_not, sub_zero]
+    have h_s2 :
+        (∑ d ∈ (Finset.Icc 1 (T - 1)).filter (fun d => (d + 1) ∣ k ∧ k / (d + 1) ≤ T / d),
+            squarePoleDriftM c_half d * (liouvilleLambda (k / (d + 1)) : ℝ)) =
+          ∑ e ∈ k.divisors,
+            squarePoleDriftM c_half (e - 1) * (liouvilleLambda (k / e) : ℝ) := by
+      have h1_div : 1 ∈ k.divisors := Nat.one_mem_divisors.mpr hk_ne
+      have hM0 : squarePoleDriftM c_half 0 = 0 := by simp [squarePoleDriftM]
+      rw [← Finset.add_sum_erase _ _ h1_div, Nat.sub_self, hM0, zero_mul, zero_add]
+      apply Finset.sum_bij (fun d _ => d + 1)
+      · intro d hd
+        simp only [Finset.mem_filter, Finset.mem_Icc, Finset.mem_erase, Nat.mem_divisors] at hd ⊢
+        exact ⟨by omega, ⟨hd.2.1, hk_ne⟩⟩
+      · intro d1 _ d2 _ h; omega
+      · intro e he
+        simp only [Finset.mem_erase, Nat.mem_divisors] at he
+        rcases he with ⟨he_ne1, ⟨he_dvd, _⟩⟩
+        have he_pos : 0 < e := Nat.pos_of_dvd_of_pos he_dvd hk_bds.1
+        have he_ge2 : 2 ≤ e := by omega
+        have he_le_T : e ≤ T := le_trans (Nat.le_of_dvd hk_bds.1 he_dvd) hk_bds.2
+        let d := e - 1
+        have hd1 : d + 1 = e := by omega
+        have h_div_le : k / e ≤ T / d :=
+          le_trans (Nat.div_le_div_right hk_bds.2)
+            (Nat.div_le_div_left (by omega : d ≤ e) (by omega : 0 < d))
+        refine ⟨d, ?_, hd1⟩
+        simp only [Finset.mem_filter, Finset.mem_Icc]
+        exact ⟨⟨by omega, by omega⟩, ⟨by rwa [hd1], by rwa [hd1]⟩⟩
+      · intro d _; simp
+    dsimp [driftOp]
+    rw [h_s1, h_s2, sub_right_comm, ← Finset.sum_sub_distrib]
+    congr 1
+    apply Finset.sum_congr rfl
+    intro e _
+    ring
+  rw [h_beta_split, h_alpha_adj, h_drift_eq]
+  dsimp [smallOp, D_min]
+  split_ifs <;> ring
+
+private theorem sq_mul_div_self_eq_tc062r_aux (a c : ℝ) (ha : a ≠ 0) :
+    a ^ 2 * (c / a) = c * a := by
+  field_simp [ha]
+  ring
+
+private theorem piece2_cancel_alg_tc062r_aux (L4 Tv B w Y5 : ℝ) (hT : Tv ≠ 0) (hL : L4 ≠ 0) :
+    (1 / L4) * ((Tv ^ 2 * B ^ 2 * L4) * (w * Y5 / Tv ^ 6)) =
+      (B ^ 2 * w) * (Y5 / Tv ^ 4) := by
+  field_simp [hT, hL]
+  ring
+
+private theorem inv_mul_256_cancel_alg_tc062r_aux (L4 c s : ℝ) (hL : L4 ≠ 0) :
+    (1 / L4) * (4 * c * s ^ 2 * (256 * L4)) = 1024 * c * s ^ 2 := by
+  field_simp [hL]
+  ring
+
+private theorem driftStepDivisor_weighted_windowEnergy_le_tc062r_aux
+    (c_half : ℝ) {C_phi Y : ℝ} (hCphi_pos : 0 < C_phi) (hY2 : 2 ≤ Y)
+    (h_inv_log4_le16 : 1 / (Real.log Y) ^ 4 ≤ 16)
+    (h_phi_mult :
+      ∀ {Y : ℝ}, 2 ≤ Y → ∀ (T : ℕ) {L : ℕ}, 1 ≤ L →
+        (∑ k ∈ (Finset.Icc 1 T).filter (fun k => L ∣ k),
+          windowEnergyNormSq Y (gaussianTermPhi k)) ≤ C_phi / (L : ℝ))
+    (T : ℕ) :
+    (1 / (Real.log Y) ^ 4) *
+        (∑ k ∈ Finset.Icc 1 T,
+          (-(∑ e ∈ k.divisors,
+              (squarePoleDriftM c_half e - squarePoleDriftM c_half (e - 1)) *
+                (liouvilleLambda (k / e) : ℝ))) ^ 2 *
+            windowEnergyNormSq Y (gaussianTermPhi k)) ≤
+      16 * (8 + |c_half|) ^ 2 * C_phi * 18785 := by
+  let p3 : ℕ → ℝ := fun k =>
+    -(∑ e ∈ k.divisors,
+        (squarePoleDriftM c_half e - squarePoleDriftM c_half (e - 1)) *
+          (liouvilleLambda (k / e) : ℝ))
+  have h_phi_nn : ∀ k ∈ Finset.Icc 1 T, 0 ≤ windowEnergyNormSq Y (gaussianTermPhi k) :=
+    fun k hk => (gaussianTermPhi_windowEnergy_bounds_tc062r_aux hY2 (Finset.mem_Icc.mp hk).1).1
+  let w : ℕ → ℝ := fun e => (1 + Real.log (e : ℝ)) / Real.sqrt (e : ℝ)
+  have hw_nn : ∀ e ∈ Finset.Icc 1 T, 0 ≤ w e := by
+    intro e he
+    have he1 : (1 : ℝ) ≤ (e : ℝ) := by exact_mod_cast (Finset.mem_Icc.mp he).1
+    dsimp [w]
+    exact div_nonneg (by linarith [Real.log_nonneg he1]) (by positivity)
+  have h_p3_sq :
+      ∀ k ∈ Finset.Icc 1 T,
+        (p3 k) ^ 2 ≤
+          (8 + |c_half|) ^ 2 *
+            ∑ d ∈ Finset.Icc 1 T, ∑ e ∈ Finset.Icc 1 T,
+              (if d ∣ k ∧ e ∣ k then w d * w e else 0) := by
+    intro k hk
+    have hk_bds := Finset.mem_Icc.mp hk
+    have h_div_eq : k.divisors = (Finset.Icc 1 T).filter (fun e => e ∣ k) := by
+      ext e
+      simp only [Nat.mem_divisors, Finset.mem_filter, Finset.mem_Icc]
+      constructor
+      · rintro ⟨hd, _⟩
+        exact ⟨⟨Nat.pos_of_dvd_of_pos hd hk_bds.1,
+          le_trans (Nat.le_of_dvd hk_bds.1 hd) hk_bds.2⟩, hd⟩
+      · rintro ⟨_, hd⟩
+        exact ⟨hd, by omega⟩
+    have habs : |p3 k| ≤ (8 + |c_half|) * ∑ e ∈ k.divisors, w e := by
+      dsimp [p3]
+      rw [abs_neg]
+      calc
+        |∑ e ∈ k.divisors,
+            (squarePoleDriftM c_half e - squarePoleDriftM c_half (e - 1)) *
+              (liouvilleLambda (k / e) : ℝ)|
+          ≤ ∑ e ∈ k.divisors,
+              |(squarePoleDriftM c_half e - squarePoleDriftM c_half (e - 1)) *
+                (liouvilleLambda (k / e) : ℝ)| := Finset.abs_sum_le_sum_abs _ _
+        _ ≤ ∑ e ∈ k.divisors, (8 + |c_half|) * w e := by
+            apply Finset.sum_le_sum
+            intro e he
+            have he_dvd := (Nat.mem_divisors.mp he).1
+            have he1 : 1 ≤ e := Nat.pos_of_dvd_of_pos he_dvd hk_bds.1
+            rw [abs_mul]
+            have hlam := abs_liouvilleLambda_le_one_tc062_aux (k / e)
+            have hst := squarePoleDriftM_sharp_step_abs_le_tc062r_aux c_half he1
+            calc
+              |squarePoleDriftM c_half e - squarePoleDriftM c_half (e - 1)| *
+                  |(liouvilleLambda (k / e) : ℝ)|
+                ≤ |squarePoleDriftM c_half e - squarePoleDriftM c_half (e - 1)| * 1 :=
+                  mul_le_mul_of_nonneg_left hlam (abs_nonneg _)
+              _ ≤ (8 + |c_half|) * (1 + Real.log (e : ℝ)) / Real.sqrt (e : ℝ) := by linarith
+              _ = (8 + |c_half|) * w e := by dsimp [w]; ring
+        _ = (8 + |c_half|) * ∑ e ∈ k.divisors, w e := (Finset.mul_sum _ _ _).symm
+    have hsq1 := pow_le_pow_left (abs_nonneg _) habs 2
+    rw [sq_abs, mul_pow, h_div_eq, sq (∑ e ∈ (Finset.Icc 1 T).filter (fun e => e ∣ k), w e),
+      Finset.sum_mul_sum] at hsq1
+    have h_ite_prod :
+        (∑ d ∈ (Finset.Icc 1 T).filter (fun d => d ∣ k),
+          ∑ e ∈ (Finset.Icc 1 T).filter (fun e => e ∣ k), w d * w e) =
+          ∑ d ∈ Finset.Icc 1 T, ∑ e ∈ Finset.Icc 1 T,
+            (if d ∣ k ∧ e ∣ k then w d * w e else 0) := by
+      rw [Finset.sum_filter]
+      apply Finset.sum_congr rfl
+      intro d _
+      rw [Finset.sum_filter]
+      by_cases hdk : d ∣ k <;> simp [hdk]
+    rwa [h_ite_prod] at hsq1
+  have h_exch :
+      (∑ k ∈ Finset.Icc 1 T,
+          (∑ d ∈ Finset.Icc 1 T, ∑ e ∈ Finset.Icc 1 T,
+            (if d ∣ k ∧ e ∣ k then w d * w e else 0)) *
+            windowEnergyNormSq Y (gaussianTermPhi k)) ≤
+        C_phi * 18785 := by
+    have h_rw :
+        (∑ k ∈ Finset.Icc 1 T,
+            (∑ d ∈ Finset.Icc 1 T, ∑ e ∈ Finset.Icc 1 T,
+              (if d ∣ k ∧ e ∣ k then w d * w e else 0)) *
+              windowEnergyNormSq Y (gaussianTermPhi k)) =
+          ∑ d ∈ Finset.Icc 1 T, ∑ e ∈ Finset.Icc 1 T,
+            w d * w e *
+              (∑ k ∈ (Finset.Icc 1 T).filter (fun k => Nat.lcm d e ∣ k),
+                windowEnergyNormSq Y (gaussianTermPhi k)) := by
+      simp_rw [Finset.sum_mul]
+      trans (∑ d ∈ Finset.Icc 1 T, ∑ k ∈ Finset.Icc 1 T, ∑ e ∈ Finset.Icc 1 T,
+        (if d ∣ k ∧ e ∣ k then w d * w e else 0) *
+          windowEnergyNormSq Y (gaussianTermPhi k))
+      · exact Finset.sum_comm
+      apply Finset.sum_congr rfl
+      intro d _
+      rw [Finset.sum_comm]
+      apply Finset.sum_congr rfl
+      intro e _
+      rw [Finset.mul_sum, Finset.sum_filter]
+      apply Finset.sum_congr rfl
+      intro k _
+      by_cases hde : d ∣ k ∧ e ∣ k
+      · have hlcm : Nat.lcm d e ∣ k := Nat.lcm_dvd_iff.mpr hde
+        rw [if_pos hde, if_pos hlcm, mul_assoc]
+      · have hlcm : ¬ Nat.lcm d e ∣ k := fun h => hde (Nat.lcm_dvd_iff.mp h)
+        rw [if_neg hde, if_neg hlcm, zero_mul]
+    rw [h_rw]
+    have h_de_le :
+        ∀ d ∈ Finset.Icc 1 T, ∀ e ∈ Finset.Icc 1 T,
+          w d * w e *
+              (∑ k ∈ (Finset.Icc 1 T).filter (fun k => Nat.lcm d e ∣ k),
+                windowEnergyNormSq Y (gaussianTermPhi k)) ≤
+            C_phi * (w d * w e / (Nat.lcm d e : ℝ)) := by
+      intro d hd e he
+      have hd1 : 0 < d := (Finset.mem_Icc.mp hd).1
+      have he1 : 0 < e := (Finset.mem_Icc.mp he).1
+      have hlcm1 : 1 ≤ Nat.lcm d e := Nat.lcm_pos hd1 he1
+      have hm := mul_le_mul_of_nonneg_left (h_phi_mult hY2 T hlcm1)
+        (mul_nonneg (hw_nn d hd) (hw_nn e he))
+      linarith [hm, show w d * w e * (C_phi / (Nat.lcm d e : ℝ)) =
+        C_phi * (w d * w e / (Nat.lcm d e : ℝ)) by ring]
+    calc
+      (∑ d ∈ Finset.Icc 1 T, ∑ e ∈ Finset.Icc 1 T,
+          w d * w e *
+            (∑ k ∈ (Finset.Icc 1 T).filter (fun k => Nat.lcm d e ∣ k),
+              windowEnergyNormSq Y (gaussianTermPhi k)))
+        ≤ ∑ d ∈ Finset.Icc 1 T, ∑ e ∈ Finset.Icc 1 T,
+            C_phi * (w d * w e / (Nat.lcm d e : ℝ)) :=
+          Finset.sum_le_sum (fun d hd => Finset.sum_le_sum (fun e he => h_de_le d hd e he))
+      _ = C_phi * ∑ d ∈ Finset.Icc 1 T, ∑ e ∈ Finset.Icc 1 T,
+            w d * w e / (Nat.lcm d e : ℝ) := by
+          simp_rw [← Finset.mul_sum]
+      _ ≤ C_phi * 18785 :=
+          mul_le_mul_of_nonneg_left (lcm_weighted_series_bound_tc062r_aux T)
+            (le_of_lt hCphi_pos)
+  have hs3 :
+      (∑ k ∈ Finset.Icc 1 T, (p3 k) ^ 2 * windowEnergyNormSq Y (gaussianTermPhi k)) ≤
+        (8 + |c_half|) ^ 2 * (C_phi * 18785) := by
+    calc
+      _ ≤ ∑ k ∈ Finset.Icc 1 T,
+            (8 + |c_half|) ^ 2 *
+              ((∑ d ∈ Finset.Icc 1 T, ∑ e ∈ Finset.Icc 1 T,
+                (if d ∣ k ∧ e ∣ k then w d * w e else 0)) *
+                windowEnergyNormSq Y (gaussianTermPhi k)) := by
+          apply Finset.sum_le_sum
+          intro k hk
+          have hm := mul_le_mul_of_nonneg_right (h_p3_sq k hk) (h_phi_nn k hk)
+          linarith [hm, show ((8 + |c_half|) ^ 2 *
+              ∑ d ∈ Finset.Icc 1 T, ∑ e ∈ Finset.Icc 1 T,
+                (if d ∣ k ∧ e ∣ k then w d * w e else 0)) *
+              windowEnergyNormSq Y (gaussianTermPhi k) =
+            (8 + |c_half|) ^ 2 *
+              ((∑ d ∈ Finset.Icc 1 T, ∑ e ∈ Finset.Icc 1 T,
+                (if d ∣ k ∧ e ∣ k then w d * w e else 0)) *
+                windowEnergyNormSq Y (gaussianTermPhi k)) by ring]
+      _ = (8 + |c_half|) ^ 2 *
+            ∑ k ∈ Finset.Icc 1 T,
+              (∑ d ∈ Finset.Icc 1 T, ∑ e ∈ Finset.Icc 1 T,
+                (if d ∣ k ∧ e ∣ k then w d * w e else 0)) *
+                windowEnergyNormSq Y (gaussianTermPhi k) := (Finset.mul_sum _ _ _).symm
+      _ ≤ (8 + |c_half|) ^ 2 * (C_phi * 18785) :=
+          mul_le_mul_of_nonneg_left h_exch (sq_nonneg _)
+  calc
+    (1 / (Real.log Y) ^ 4) *
+        (∑ k ∈ Finset.Icc 1 T, (p3 k) ^ 2 * windowEnergyNormSq Y (gaussianTermPhi k))
+      ≤ 16 * ((8 + |c_half|) ^ 2 * (C_phi * 18785)) :=
+        mul_le_mul h_inv_log4_le16 hs3
+          (Finset.sum_nonneg (fun k hk => mul_nonneg (sq_nonneg _) (h_phi_nn k hk)))
+          (by norm_num)
+    _ = 16 * (8 + |c_half|) ^ 2 * C_phi * 18785 := by ring
+
+private theorem smallOp_weighted_windowEnergy_le_tc062r_aux
+    (c_lam c_half : ℝ) {C_phi Y : ℝ} (hCphi_pos : 0 < C_phi) (hY2 : 2 ≤ Y)
+    (hlogY_pos : 0 < Real.log Y)
+    (h_phi_mult :
+      ∀ {Y : ℝ}, 2 ≤ Y → ∀ (T : ℕ) {L : ℕ}, 1 ≤ L →
+        (∑ k ∈ (Finset.Icc 1 T).filter (fun k => L ∣ k),
+          windowEnergyNormSq Y (gaussianTermPhi k)) ≤ C_phi / (L : ℝ))
+    (T D0 : ℕ) (hD0_le_logY : (D0 : ℝ) ≤ Real.log Y) :
+    (1 / (Real.log Y) ^ 4) *
+        (∑ k ∈ Finset.Icc 1 T,
+          (-((∑ d ∈ (Finset.Icc 1 (min D0 (T - 1))).filter (fun d => d ∣ k ∧ k / d ≤ T / d),
+                (selbergCenteredRemainderInt c_lam d - squarePoleDriftM c_half d) *
+                  (liouvilleLambda (k / d) : ℝ)) -
+              (∑ d ∈ (Finset.Icc 1 (min D0 (T - 1))).filter
+                  (fun d => (d + 1) ∣ k ∧ k / (d + 1) ≤ T / d),
+                (selbergCenteredRemainderInt c_lam d - squarePoleDriftM c_half d) *
+                  (liouvilleLambda (k / (d + 1)) : ℝ)))) ^ 2 *
+            windowEnergyNormSq Y (gaussianTermPhi k)) ≤
+      1024 * C_phi * (4 + |c_lam| + |c_half|) ^ 2 := by
+  let D_min := min D0 (T - 1)
+  let C_sm : ℝ := 4 + |c_lam| + |c_half|
+  let p4 : ℕ → ℝ := fun k =>
+    -((∑ d ∈ (Finset.Icc 1 D_min).filter (fun d => d ∣ k ∧ k / d ≤ T / d),
+          (selbergCenteredRemainderInt c_lam d - squarePoleDriftM c_half d) *
+            (liouvilleLambda (k / d) : ℝ)) -
+        (∑ d ∈ (Finset.Icc 1 D_min).filter (fun d => (d + 1) ∣ k ∧ k / (d + 1) ≤ T / d),
+          (selbergCenteredRemainderInt c_lam d - squarePoleDriftM c_half d) *
+            (liouvilleLambda (k / (d + 1)) : ℝ)))
+  have h_phi_nn : ∀ k ∈ Finset.Icc 1 T, 0 ≤ windowEnergyNormSq Y (gaussianTermPhi k) :=
+    fun k hk => (gaussianTermPhi_windowEnergy_bounds_tc062r_aux hY2 (Finset.mem_Icc.mp hk).1).1
+  by_cases hDm0 : D_min = 0
+  · have hp4_zero :
+        (∑ k ∈ Finset.Icc 1 T, (p4 k) ^ 2 * windowEnergyNormSq Y (gaussianTermPhi k)) = 0 := by
+      apply Finset.sum_eq_zero
+      intro k _
+      dsimp [p4]
+      rw [hDm0]
+      simp
+    change (1 / (Real.log Y) ^ 4) *
+        (∑ k ∈ Finset.Icc 1 T, (p4 k) ^ 2 * windowEnergyNormSq Y (gaussianTermPhi k)) ≤
+      1024 * C_phi * C_sm ^ 2
+    rw [hp4_zero, mul_zero]
+    dsimp [C_sm]
+    positivity
+  · have hDm1 : 1 ≤ D_min := by omega
+    have hDm_le_D0 : D_min ≤ D0 := min_le_left _ _
+    have hDm_le_logY : (D_min : ℝ) ≤ Real.log Y :=
+      le_trans (by exact_mod_cast hDm_le_D0) hD0_le_logY
+    have hlogY_ge1 : 1 ≤ Real.log Y :=
+      le_trans (show (1 : ℝ) ≤ (D_min : ℝ) by exact_mod_cast hDm1) hDm_le_logY
+    let L_sm : ℝ := C_sm * (1 + Real.log (D_min : ℝ)) ^ 2
+    have hLsm_nn : 0 ≤ L_sm := by dsimp [L_sm, C_sm]; positivity
+    have h_w_sm :
+        ∀ d ∈ Finset.Icc 1 D_min,
+          |selbergCenteredRemainderInt c_lam d - squarePoleDriftM c_half d| ≤
+            (d : ℝ) * L_sm := by
+      intro d hd
+      have hd_bds := Finset.mem_Icc.mp hd
+      have hw := centered_minus_drift_abs_le_tc062_aux c_lam c_half hd_bds.1 (le_refl d)
+      have hlog_d_nn : 0 ≤ Real.log (d : ℝ) := Real.log_nonneg (by exact_mod_cast hd_bds.1)
+      have hlog_d_le : Real.log (d : ℝ) ≤ Real.log (D_min : ℝ) :=
+        Real.log_le_log (Nat.cast_pos.mpr hd_bds.1) (by exact_mod_cast hd_bds.2)
+      have h_q :
+          (Real.log (d : ℝ)) ^ 2 + 4 * Real.log (d : ℝ) + |c_lam| + |c_half| ≤ L_sm := by
+        dsimp [L_sm, C_sm]
+        have hsq := pow_le_pow_left hlog_d_nn hlog_d_le 2
+        have hlog_dm_nn : 0 ≤ Real.log (D_min : ℝ) := le_trans hlog_d_nn hlog_d_le
+        have h2_nn : 0 ≤ 2 * Real.log (D_min : ℝ) + (Real.log (D_min : ℝ)) ^ 2 :=
+          add_nonneg (mul_nonneg (by norm_num) hlog_dm_nn) (sq_nonneg _)
+        have h_rem_nn :
+            0 ≤ 4 + 3 * (Real.log (D_min : ℝ)) ^ 2 + 4 * Real.log (D_min : ℝ) +
+              (|c_lam| + |c_half|) * (2 * Real.log (D_min : ℝ) + (Real.log (D_min : ℝ)) ^ 2) := by
+          linarith [sq_nonneg (Real.log (D_min : ℝ)), hlog_dm_nn,
+            mul_nonneg (add_nonneg (abs_nonneg c_lam) (abs_nonneg c_half)) h2_nn]
+        linarith only [hlog_d_le, hsq, h_rem_nn,
+          show (4 + |c_lam| + |c_half|) * (1 + Real.log (D_min : ℝ)) ^ 2 -
+              ((Real.log (D_min : ℝ)) ^ 2 + 4 * Real.log (D_min : ℝ) + |c_lam| + |c_half|) =
+            4 + 3 * (Real.log (D_min : ℝ)) ^ 2 + 4 * Real.log (D_min : ℝ) +
+              (|c_lam| + |c_half|) * (2 * Real.log (D_min : ℝ) + (Real.log (D_min : ℝ)) ^ 2) by
+            ring]
+      exact le_trans hw (mul_le_mul_of_nonneg_left h_q (Nat.cast_nonneg d))
+    have h_p4_sq :
+        ∀ k ∈ Finset.Icc 1 T,
+          (p4 k) ^ 2 ≤
+            2 * (D_min : ℝ) * L_sm ^ 2 *
+              ((∑ d ∈ Finset.Icc 1 D_min, if d ∣ k then (d : ℝ) ^ 2 else 0) +
+                (∑ d ∈ Finset.Icc 1 D_min, if (d + 1) ∣ k then (d : ℝ) ^ 2 else 0)) := by
+      intro k _
+      let s1 :=
+        ∑ d ∈ (Finset.Icc 1 D_min).filter (fun d => d ∣ k ∧ k / d ≤ T / d),
+          (selbergCenteredRemainderInt c_lam d - squarePoleDriftM c_half d) *
+            (liouvilleLambda (k / d) : ℝ)
+      let s2 :=
+        ∑ d ∈ (Finset.Icc 1 D_min).filter (fun d => (d + 1) ∣ k ∧ k / (d + 1) ≤ T / d),
+          (selbergCenteredRemainderInt c_lam d - squarePoleDriftM c_half d) *
+            (liouvilleLambda (k / (d + 1)) : ℝ)
+      have hs1_abs :
+          |s1| ≤ L_sm * ∑ d ∈ Finset.Icc 1 D_min, (if d ∣ k then (d : ℝ) else 0) := by
+        calc
+          |s1|
+            ≤ ∑ d ∈ (Finset.Icc 1 D_min).filter (fun d => d ∣ k ∧ k / d ≤ T / d),
+                |(selbergCenteredRemainderInt c_lam d - squarePoleDriftM c_half d) *
+                  (liouvilleLambda (k / d) : ℝ)| := Finset.abs_sum_le_sum_abs _ _
+          _ ≤ ∑ d ∈ (Finset.Icc 1 D_min).filter (fun d => d ∣ k ∧ k / d ≤ T / d),
+                (d : ℝ) * L_sm := by
+              apply Finset.sum_le_sum
+              intro d hd
+              have hd_in := (Finset.mem_filter.mp hd).1
+              rw [abs_mul]
+              exact le_trans
+                (mul_le_mul_of_nonneg_left (abs_liouvilleLambda_le_one_tc062_aux _) (abs_nonneg _))
+                (by linarith [h_w_sm d hd_in])
+          _ ≤ ∑ d ∈ (Finset.Icc 1 D_min).filter (fun d => d ∣ k), (d : ℝ) * L_sm := by
+              apply Finset.sum_le_sum_of_subset_of_nonneg
+              · intro d hd; simp only [Finset.mem_filter] at hd ⊢; exact ⟨hd.1, hd.2.1⟩
+              · intro d _ _; exact mul_nonneg (Nat.cast_nonneg d) hLsm_nn
+          _ = L_sm * ∑ d ∈ Finset.Icc 1 D_min, (if d ∣ k then (d : ℝ) else 0) := by
+              rw [Finset.sum_filter, Finset.mul_sum]
+              apply Finset.sum_congr rfl
+              intro d _; split_ifs <;> ring
+      have hs2_abs :
+          |s2| ≤ L_sm * ∑ d ∈ Finset.Icc 1 D_min, (if (d + 1) ∣ k then (d : ℝ) else 0) := by
+        calc
+          |s2|
+            ≤ ∑ d ∈ (Finset.Icc 1 D_min).filter (fun d => (d + 1) ∣ k ∧ k / (d + 1) ≤ T / d),
+                |(selbergCenteredRemainderInt c_lam d - squarePoleDriftM c_half d) *
+                  (liouvilleLambda (k / (d + 1)) : ℝ)| := Finset.abs_sum_le_sum_abs _ _
+          _ ≤ ∑ d ∈ (Finset.Icc 1 D_min).filter (fun d => (d + 1) ∣ k ∧ k / (d + 1) ≤ T / d),
+                (d : ℝ) * L_sm := by
+              apply Finset.sum_le_sum
+              intro d hd
+              have hd_in := (Finset.mem_filter.mp hd).1
+              rw [abs_mul]
+              exact le_trans
+                (mul_le_mul_of_nonneg_left (abs_liouvilleLambda_le_one_tc062_aux _) (abs_nonneg _))
+                (by linarith [h_w_sm d hd_in])
+          _ ≤ ∑ d ∈ (Finset.Icc 1 D_min).filter (fun d => (d + 1) ∣ k), (d : ℝ) * L_sm := by
+              apply Finset.sum_le_sum_of_subset_of_nonneg
+              · intro d hd; simp only [Finset.mem_filter] at hd ⊢; exact ⟨hd.1, hd.2.1⟩
+              · intro d _ _; exact mul_nonneg (Nat.cast_nonneg d) hLsm_nn
+          _ = L_sm * ∑ d ∈ Finset.Icc 1 D_min, (if (d + 1) ∣ k then (d : ℝ) else 0) := by
+              rw [Finset.sum_filter, Finset.mul_sum]
+              apply Finset.sum_congr rfl
+              intro d _; split_ifs <;> ring
+      have hc_card : ((Finset.Icc 1 D_min).card : ℝ) = (D_min : ℝ) := by
+        simp [Nat.card_Icc, show D_min + 1 - 1 = D_min by omega]
+      have hcs1 :=
+        sq_sum_le_card_mul_sum_sq_tc062r_aux (Finset.Icc 1 D_min)
+          (fun d => if d ∣ k then (d : ℝ) else 0)
+      have hcs2 :=
+        sq_sum_le_card_mul_sum_sq_tc062r_aux (Finset.Icc 1 D_min)
+          (fun d => if (d + 1) ∣ k then (d : ℝ) else 0)
+      rw [hc_card] at hcs1 hcs2
+      have h_ite_sq1 :
+          (∑ d ∈ Finset.Icc 1 D_min, (if d ∣ k then (d : ℝ) else 0) ^ 2) =
+            ∑ d ∈ Finset.Icc 1 D_min, (if d ∣ k then (d : ℝ) ^ 2 else 0) := by
+        apply Finset.sum_congr rfl; intro d _; split_ifs <;> simp
+      have h_ite_sq2 :
+          (∑ d ∈ Finset.Icc 1 D_min, (if (d + 1) ∣ k then (d : ℝ) else 0) ^ 2) =
+            ∑ d ∈ Finset.Icc 1 D_min, (if (d + 1) ∣ k then (d : ℝ) ^ 2 else 0) := by
+        apply Finset.sum_congr rfl; intro d _; split_ifs <;> simp
+      rw [h_ite_sq1] at hcs1
+      rw [h_ite_sq2] at hcs2
+      have hs1_sq :
+          s1 ^ 2 ≤
+            (D_min : ℝ) * L_sm ^ 2 *
+              ∑ d ∈ Finset.Icc 1 D_min, (if d ∣ k then (d : ℝ) ^ 2 else 0) := by
+        have h1 := pow_le_pow_left (abs_nonneg _) hs1_abs 2
+        rw [sq_abs, mul_pow] at h1
+        have h2 := mul_le_mul_of_nonneg_left hcs1 (sq_nonneg L_sm)
+        linarith [h1, h2, show L_sm ^ 2 * ((D_min : ℝ) *
+          ∑ d ∈ Finset.Icc 1 D_min, (if d ∣ k then (d : ℝ) ^ 2 else 0)) =
+          (D_min : ℝ) * L_sm ^ 2 *
+            ∑ d ∈ Finset.Icc 1 D_min, (if d ∣ k then (d : ℝ) ^ 2 else 0) by ring]
+      have hs2_sq :
+          s2 ^ 2 ≤
+            (D_min : ℝ) * L_sm ^ 2 *
+              ∑ d ∈ Finset.Icc 1 D_min, (if (d + 1) ∣ k then (d : ℝ) ^ 2 else 0) := by
+        have h1 := pow_le_pow_left (abs_nonneg _) hs2_abs 2
+        rw [sq_abs, mul_pow] at h1
+        have h2 := mul_le_mul_of_nonneg_left hcs2 (sq_nonneg L_sm)
+        linarith [h1, h2, show L_sm ^ 2 * ((D_min : ℝ) *
+          ∑ d ∈ Finset.Icc 1 D_min, (if (d + 1) ∣ k then (d : ℝ) ^ 2 else 0)) =
+          (D_min : ℝ) * L_sm ^ 2 *
+            ∑ d ∈ Finset.Icc 1 D_min, (if (d + 1) ∣ k then (d : ℝ) ^ 2 else 0) by ring]
+      have hp4_eq : (p4 k) ^ 2 = (s1 - s2) ^ 2 := by dsimp [p4, s1, s2]; ring
+      have h2_sub : (s1 - s2) ^ 2 ≤ 2 * s1 ^ 2 + 2 * s2 ^ 2 := by
+        linarith only [sq_nonneg (s1 + s2),
+          show 2 * s1 ^ 2 + 2 * s2 ^ 2 - (s1 - s2) ^ 2 = (s1 + s2) ^ 2 by ring]
+      rw [hp4_eq]
+      linarith
+    have h_sum_d1 :
+        (∑ k ∈ Finset.Icc 1 T,
+            (∑ d ∈ Finset.Icc 1 D_min, if d ∣ k then (d : ℝ) ^ 2 else 0) *
+              windowEnergyNormSq Y (gaussianTermPhi k)) ≤
+          C_phi * (D_min : ℝ) ^ 2 := by
+      simp_rw [Finset.sum_mul]
+      rw [Finset.sum_comm]
+      have h_each_d :
+          ∀ d ∈ Finset.Icc 1 D_min,
+            (∑ k ∈ Finset.Icc 1 T,
+                (if d ∣ k then (d : ℝ) ^ 2 else 0) *
+                  windowEnergyNormSq Y (gaussianTermPhi k)) ≤
+              C_phi * (D_min : ℝ) := by
+        intro d hd
+        have hd_bds := Finset.mem_Icc.mp hd
+        have hd_ne : (d : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr (by omega)
+        have h_f :
+            (∑ k ∈ Finset.Icc 1 T,
+                (if d ∣ k then (d : ℝ) ^ 2 else 0) *
+                  windowEnergyNormSq Y (gaussianTermPhi k)) =
+              (d : ℝ) ^ 2 *
+                ∑ k ∈ (Finset.Icc 1 T).filter (fun k => d ∣ k),
+                  windowEnergyNormSq Y (gaussianTermPhi k) := by
+          rw [Finset.mul_sum, Finset.sum_filter]
+          apply Finset.sum_congr rfl; intro k _; split_ifs <;> simp
+        rw [h_f]
+        calc
+          (d : ℝ) ^ 2 *
+              ∑ k ∈ (Finset.Icc 1 T).filter (fun k => d ∣ k),
+                windowEnergyNormSq Y (gaussianTermPhi k)
+            ≤ (d : ℝ) ^ 2 * (C_phi / (d : ℝ)) :=
+              mul_le_mul_of_nonneg_left (h_phi_mult hY2 T hd_bds.1) (sq_nonneg _)
+          _ = C_phi * (d : ℝ) := sq_mul_div_self_eq_tc062r_aux (d : ℝ) C_phi hd_ne
+          _ ≤ C_phi * (D_min : ℝ) :=
+              mul_le_mul_of_nonneg_left (by exact_mod_cast hd_bds.2) (le_of_lt hCphi_pos)
+      calc
+        _ ≤ ∑ _d ∈ Finset.Icc 1 D_min, C_phi * (D_min : ℝ) := Finset.sum_le_sum h_each_d
+        _ = C_phi * (D_min : ℝ) ^ 2 := by
+            simp [Nat.card_Icc, show D_min + 1 - 1 = D_min by omega]; ring
+    have h_sum_d2 :
+        (∑ k ∈ Finset.Icc 1 T,
+            (∑ d ∈ Finset.Icc 1 D_min, if (d + 1) ∣ k then (d : ℝ) ^ 2 else 0) *
+              windowEnergyNormSq Y (gaussianTermPhi k)) ≤
+          C_phi * (D_min : ℝ) ^ 2 := by
+      simp_rw [Finset.sum_mul]
+      rw [Finset.sum_comm]
+      have h_each_d :
+          ∀ d ∈ Finset.Icc 1 D_min,
+            (∑ k ∈ Finset.Icc 1 T,
+                (if (d + 1) ∣ k then (d : ℝ) ^ 2 else 0) *
+                  windowEnergyNormSq Y (gaussianTermPhi k)) ≤
+              C_phi * (D_min : ℝ) := by
+        intro d hd
+        have hd_bds := Finset.mem_Icc.mp hd
+        have hd_pos : (0 : ℝ) < (d : ℝ) := Nat.cast_pos.mpr hd_bds.1
+        have hd_ne : (d : ℝ) ≠ 0 := ne_of_gt hd_pos
+        have h_f :
+            (∑ k ∈ Finset.Icc 1 T,
+                (if (d + 1) ∣ k then (d : ℝ) ^ 2 else 0) *
+                  windowEnergyNormSq Y (gaussianTermPhi k)) =
+              (d : ℝ) ^ 2 *
+                ∑ k ∈ (Finset.Icc 1 T).filter (fun k => (d + 1) ∣ k),
+                  windowEnergyNormSq Y (gaussianTermPhi k) := by
+          rw [Finset.mul_sum, Finset.sum_filter]
+          apply Finset.sum_congr rfl; intro k _; split_ifs <;> simp
+        rw [h_f]
+        have h_d1_le : C_phi / ((d + 1 : ℕ) : ℝ) ≤ C_phi / (d : ℝ) :=
+          div_le_div_of_nonneg_left (le_of_lt hCphi_pos) hd_pos
+            (by exact_mod_cast Nat.le_succ d)
+        calc
+          (d : ℝ) ^ 2 *
+              ∑ k ∈ (Finset.Icc 1 T).filter (fun k => (d + 1) ∣ k),
+                windowEnergyNormSq Y (gaussianTermPhi k)
+            ≤ (d : ℝ) ^ 2 * (C_phi / (d : ℝ)) :=
+              mul_le_mul_of_nonneg_left
+                (le_trans (h_phi_mult hY2 T (by omega : 1 ≤ d + 1)) h_d1_le) (sq_nonneg _)
+          _ = C_phi * (d : ℝ) := sq_mul_div_self_eq_tc062r_aux (d : ℝ) C_phi hd_ne
+          _ ≤ C_phi * (D_min : ℝ) :=
+              mul_le_mul_of_nonneg_left (by exact_mod_cast hd_bds.2) (le_of_lt hCphi_pos)
+      calc
+        _ ≤ ∑ _d ∈ Finset.Icc 1 D_min, C_phi * (D_min : ℝ) := Finset.sum_le_sum h_each_d
+        _ = C_phi * (D_min : ℝ) ^ 2 := by
+            simp [Nat.card_Icc, show D_min + 1 - 1 = D_min by omega]; ring
+    have hs4 :
+        (∑ k ∈ Finset.Icc 1 T, (p4 k) ^ 2 * windowEnergyNormSq Y (gaussianTermPhi k)) ≤
+          4 * C_phi * C_sm ^ 2 * (D_min : ℝ) ^ 3 * (1 + Real.log (D_min : ℝ)) ^ 4 := by
+      have h_step :
+          (∑ k ∈ Finset.Icc 1 T, (p4 k) ^ 2 * windowEnergyNormSq Y (gaussianTermPhi k)) ≤
+            2 * (D_min : ℝ) * L_sm ^ 2 * (2 * C_phi * (D_min : ℝ) ^ 2) := by
+        calc
+          _ ≤ ∑ k ∈ Finset.Icc 1 T,
+                2 * (D_min : ℝ) * L_sm ^ 2 *
+                  (((∑ d ∈ Finset.Icc 1 D_min, if d ∣ k then (d : ℝ) ^ 2 else 0) *
+                      windowEnergyNormSq Y (gaussianTermPhi k)) +
+                    ((∑ d ∈ Finset.Icc 1 D_min, if (d + 1) ∣ k then (d : ℝ) ^ 2 else 0) *
+                      windowEnergyNormSq Y (gaussianTermPhi k))) := by
+              apply Finset.sum_le_sum
+              intro k hk
+              have hm := mul_le_mul_of_nonneg_right (h_p4_sq k hk) (h_phi_nn k hk)
+              linarith [hm, show (2 * (D_min : ℝ) * L_sm ^ 2 *
+                  ((∑ d ∈ Finset.Icc 1 D_min, if d ∣ k then (d : ℝ) ^ 2 else 0) +
+                    (∑ d ∈ Finset.Icc 1 D_min, if (d + 1) ∣ k then (d : ℝ) ^ 2 else 0))) *
+                  windowEnergyNormSq Y (gaussianTermPhi k) =
+                2 * (D_min : ℝ) * L_sm ^ 2 *
+                  (((∑ d ∈ Finset.Icc 1 D_min, if d ∣ k then (d : ℝ) ^ 2 else 0) *
+                      windowEnergyNormSq Y (gaussianTermPhi k)) +
+                    ((∑ d ∈ Finset.Icc 1 D_min, if (d + 1) ∣ k then (d : ℝ) ^ 2 else 0) *
+                      windowEnergyNormSq Y (gaussianTermPhi k))) by ring]
+          _ = 2 * (D_min : ℝ) * L_sm ^ 2 *
+                ((∑ k ∈ Finset.Icc 1 T,
+                    (∑ d ∈ Finset.Icc 1 D_min, if d ∣ k then (d : ℝ) ^ 2 else 0) *
+                      windowEnergyNormSq Y (gaussianTermPhi k)) +
+                  (∑ k ∈ Finset.Icc 1 T,
+                    (∑ d ∈ Finset.Icc 1 D_min, if (d + 1) ∣ k then (d : ℝ) ^ 2 else 0) *
+                      windowEnergyNormSq Y (gaussianTermPhi k))) := by
+              rw [← Finset.mul_sum, Finset.sum_add_distrib]
+          _ ≤ 2 * (D_min : ℝ) * L_sm ^ 2 * (2 * C_phi * (D_min : ℝ) ^ 2) :=
+              mul_le_mul_of_nonneg_left (by linarith [h_sum_d1, h_sum_d2]) (by positivity)
+      calc
+        _ ≤ 2 * (D_min : ℝ) * L_sm ^ 2 * (2 * C_phi * (D_min : ℝ) ^ 2) := h_step
+        _ = 4 * C_phi * C_sm ^ 2 * (D_min : ℝ) ^ 3 * (1 + Real.log (D_min : ℝ)) ^ 4 := by
+            dsimp [L_sm]; ring
+    have h_logDm_le : Real.log (D_min : ℝ) ≤ Real.log (Real.log Y) :=
+      Real.log_le_log (Nat.cast_pos.mpr hDm1) hDm_le_logY
+    have h_logDm_nn : 0 ≤ 1 + Real.log (D_min : ℝ) := by
+      linarith [Real.log_nonneg (show (1 : ℝ) ≤ (D_min : ℝ) by exact_mod_cast hDm1)]
+    have h_256 := (one_add_log_le_four_fourth_root_tc062r_aux hlogY_ge1).2
+    have h_pow4_log :
+        (1 + Real.log (D_min : ℝ)) ^ 4 ≤ 256 * Real.log Y :=
+      le_trans (pow_le_pow_left h_logDm_nn (by linarith) 4) h_256
+    have h_Dm3 : (D_min : ℝ) ^ 3 ≤ (Real.log Y) ^ 3 :=
+      pow_le_pow_left (Nat.cast_nonneg D_min) hDm_le_logY 3
+    have h_prod_log4 :
+        (D_min : ℝ) ^ 3 * (1 + Real.log (D_min : ℝ)) ^ 4 ≤ 256 * (Real.log Y) ^ 4 := by
+      calc
+        (D_min : ℝ) ^ 3 * (1 + Real.log (D_min : ℝ)) ^ 4
+          ≤ (Real.log Y) ^ 3 * (256 * Real.log Y) :=
+            mul_le_mul h_Dm3 h_pow4_log (by positivity) (by positivity)
+        _ = 256 * (Real.log Y) ^ 4 := by ring
+    change (1 / (Real.log Y) ^ 4) *
+        (∑ k ∈ Finset.Icc 1 T, (p4 k) ^ 2 * windowEnergyNormSq Y (gaussianTermPhi k)) ≤
+      1024 * C_phi * C_sm ^ 2
+    calc
+      (1 / (Real.log Y) ^ 4) *
+          (∑ k ∈ Finset.Icc 1 T, (p4 k) ^ 2 * windowEnergyNormSq Y (gaussianTermPhi k))
+        ≤ (1 / (Real.log Y) ^ 4) *
+            (4 * C_phi * C_sm ^ 2 * ((D_min : ℝ) ^ 3 * (1 + Real.log (D_min : ℝ)) ^ 4)) := by
+          have hm := mul_le_mul_of_nonneg_left hs4 (by positivity : 0 ≤ 1 / (Real.log Y) ^ 4)
+          linarith [hm, show 4 * C_phi * C_sm ^ 2 * (D_min : ℝ) ^ 3 *
+              (1 + Real.log (D_min : ℝ)) ^ 4 =
+            4 * C_phi * C_sm ^ 2 * ((D_min : ℝ) ^ 3 * (1 + Real.log (D_min : ℝ)) ^ 4) by ring]
+      _ ≤ (1 / (Real.log Y) ^ 4) * (4 * C_phi * C_sm ^ 2 * (256 * (Real.log Y) ^ 4)) :=
+          mul_le_mul_of_nonneg_left
+            (mul_le_mul_of_nonneg_left h_prod_log4 (by dsimp [C_sm]; positivity))
+            (by positivity)
+      _ = 1024 * C_phi * C_sm ^ 2 :=
+          inv_mul_256_cancel_alg_tc062r_aux ((Real.log Y) ^ 4) C_phi C_sm
+            (ne_of_gt (pow_pos hlogY_pos 4))
+
+private theorem canonical_psi_sum_and_diag_abs_bound_tc062r_aux (c_lam c_half : ℝ) :
+    ∃ C_psi C_diag : ℝ, 0 ≤ C_psi ∧ 0 ≤ C_diag ∧
+      (∀ {Y : ℝ}, 2 ≤ Y →
+        (∑ n ∈ Finset.Icc 1 (canonicalCutoffT Y),
+          windowEnergyNormSq Y
+            (adjustedStationProfilePsi c_lam c_half
+              (canonicalCutoffT Y) (Nat.floor (Real.log Y)) n)) ≤ C_psi) ∧
+      (∀ {p : ℕ}, p.Prime → ∀ {Y : ℝ}, 2 ≤ Y →
+        |canonicalInteriorDiagSigma c_lam c_half p Y| ≤ C_diag) := by
+  have htau_bds := tau_gt_one_and_lt_eight_tc062_aux
+  have htau_pos : 0 < RiemannScope.tau := by linarith only [htau_bds.1]
+  have htau_m1_nn : 0 ≤ RiemannScope.tau - 1 := by linarith only [htau_bds.1]
+  let C_phi : ℝ := (RiemannScope.tau - 1) * (27 / 8 + 2 * RiemannScope.tau ^ 4)
+  obtain ⟨hCphi_pos, h_phi_mult⟩ := sum_multiples_gaussianTermPhi_windowEnergy_le_tc062r_aux
+  let B0 : ℝ := (9 / 4 : ℝ) ^ 2 + 18 + 4 * (|c_lam| + |c_half|)
+  let C_sm : ℝ := 4 + |c_lam| + |c_half|
+  let C_beta : ℝ :=
+    16 * c_lam ^ 2 * C_phi +
+      B0 ^ 2 * (RiemannScope.tau - 1) * RiemannScope.tau ^ 4 +
+      16 * (8 + |c_half|) ^ 2 * C_phi * 18785 +
+      1024 * C_phi * C_sm ^ 2
+  let C_psi : ℝ := 2 * C_phi + 8 * C_beta
+  let C_diag : ℝ := max (2 * C_psi) (744 * (RiemannScope.tau - 1))
+  have hCpsi_nn : 0 ≤ C_psi := by dsimp [C_psi, C_beta, B0, C_sm]; positivity
+  have hCdiag_nn : 0 ≤ C_diag := le_trans (mul_nonneg (by norm_num) hCpsi_nn) (le_max_left _ _)
+  have h_psi_bd :
+      ∀ {Y : ℝ}, 2 ≤ Y →
+        (∑ n ∈ Finset.Icc 1 (canonicalCutoffT Y),
+          windowEnergyNormSq Y
+            (adjustedStationProfilePsi c_lam c_half
+              (canonicalCutoffT Y) (Nat.floor (Real.log Y)) n)) ≤ C_psi := by
+    intro Y hY2
+    obtain ⟨hle, hprops⟩ := uIcc_tau_props_tc062_aux hY2
+    obtain ⟨hT2, _, _, hlogT_le, _, hY5_le, hlogY_gt_half⟩ :=
+      canonicalCutoffT_bounds_tc062_aux hY2
+    let T := canonicalCutoffT Y
+    let D0 := Nat.floor (Real.log Y)
+    let D_min := min D0 (T - 1)
+    have hT1 : 1 ≤ T := by omega
+    have hT_pos_r : (0 : ℝ) < (T : ℝ) := by exact_mod_cast (by omega : 0 < T)
+    have hlogY_pos : 0 < Real.log Y := by linarith only [hlogY_gt_half]
+    have h1_le_2logY : 1 ≤ 2 * Real.log Y := by linarith only [hlogY_gt_half]
+    have h1_le_4logY_sq : 1 ≤ 4 * (Real.log Y) ^ 2 := by
+      have hsq := pow_le_pow_left (by norm_num) (le_of_lt hlogY_gt_half) 2
+      linarith only [hsq]
+    have h_inv_log4_le16 : 1 / (Real.log Y) ^ 4 ≤ 16 := by
+      have hp4 := pow_le_pow_left (by norm_num) (le_of_lt hlogY_gt_half) 4
+      rw [div_le_iff (pow_pos hlogY_pos 4)]
+      linarith only [hp4]
+    have h_phi_all :
+        (∑ k ∈ Finset.Icc 1 T, windowEnergyNormSq Y (gaussianTermPhi k)) ≤ C_phi := by
+      have hf1 : (Finset.Icc 1 T).filter (fun k => 1 ∣ k) = Finset.Icc 1 T := by
+        ext k; simp
+      have h1 := h_phi_mult hY2 T (le_refl 1)
+      rw [hf1, Nat.cast_one, div_one] at h1
+      exact h1
+    have h_each_psi :
+        ∀ k ∈ Finset.Icc 1 T,
+          windowEnergyNormSq Y (adjustedStationProfilePsi c_lam c_half T D0 k) ≤
+            2 * windowEnergyNormSq Y (gaussianTermPhi k) +
+              (2 / (Real.log Y) ^ 4) *
+                ((openCoreAdjustedCoeffBeta c_lam c_half T D0 k) ^ 2 *
+                  windowEnergyNormSq Y (gaussianTermPhi k)) := by
+      intro k hk
+      have hk1 : 1 ≤ k := (Finset.mem_Icc.mp hk).1
+      have hlam_sq := liouvilleLambda_sq_eq_one_tc062_aux hk1
+      have h_psi_c := continuousOn_adjustedStationProfilePsi_tc062_aux hY2 c_lam c_half T D0 k
+      have h_phi_c := continuousOn_gaussianTermPhi_uIcc_tc062_aux Y k
+      have hi_psi :
+          IntervalIntegrable
+            (fun X =>
+              adjustedStationProfilePsi c_lam c_half T D0 k X *
+                adjustedStationProfilePsi c_lam c_half T D0 k X / X)
+            volume Y (RiemannScope.tau * Y) :=
+        ((h_psi_c.mul h_psi_c).div continuousOn_id
+          (fun X hX => ne_of_gt (hprops X hX).2.1)).intervalIntegrable
+      have hi_phi :
+          IntervalIntegrable
+            (fun X => gaussianTermPhi k X * gaussianTermPhi k X / X)
+            volume Y (RiemannScope.tau * Y) :=
+        ((h_phi_c.mul h_phi_c).div continuousOn_id
+          (fun X hX => ne_of_gt (hprops X hX).2.1)).intervalIntegrable
+      let c_k := 2 + (2 / (Real.log Y) ^ 4) * (openCoreAdjustedCoeffBeta c_lam c_half T D0 k) ^ 2
+      have h_mono :=
+        intervalIntegral.integral_mono_on hle hi_psi (hi_phi.const_mul c_k) (by
+          intro X hX
+          have hX_pos : 0 < X := by linarith only [hY2, hX.1]
+          have hlogX_ge : Real.log Y ≤ Real.log X :=
+            Real.log_le_log (by linarith only [hY2]) hX.1
+          have hlogX4_ge : (Real.log Y) ^ 4 ≤ (Real.log X) ^ 4 :=
+            pow_le_pow_left (le_of_lt hlogY_pos) hlogX_ge 4
+          have hb_sq :
+              (signedAdjustedCoeffB c_lam c_half T D0 k) ^ 2 =
+                (openCoreAdjustedCoeffBeta c_lam c_half T D0 k) ^ 2 := by
+            unfold signedAdjustedCoeffB
+            calc
+              ((liouvilleLambda k : ℝ) * openCoreAdjustedCoeffBeta c_lam c_half T D0 k) ^ 2
+                = ((liouvilleLambda k : ℝ) * (liouvilleLambda k : ℝ)) *
+                    (openCoreAdjustedCoeffBeta c_lam c_half T D0 k) ^ 2 := by ring
+              _ = (openCoreAdjustedCoeffBeta c_lam c_half T D0 k) ^ 2 := by rw [hlam_sq, one_mul]
+          have h_quad :
+              (1 - signedAdjustedCoeffB c_lam c_half T D0 k / (Real.log X) ^ 2) ^ 2 ≤ c_k := by
+            let v := signedAdjustedCoeffB c_lam c_half T D0 k / (Real.log X) ^ 2
+            have h2v : (1 - v) ^ 2 ≤ 2 + 2 * v ^ 2 := by
+              linarith only [sq_nonneg (1 + v), show 2 + 2 * v ^ 2 - (1 - v) ^ 2 = (1 + v) ^ 2 by ring]
+            have hv2 :
+                v ^ 2 ≤ (openCoreAdjustedCoeffBeta c_lam c_half T D0 k) ^ 2 / (Real.log Y) ^ 4 := by
+              dsimp [v]
+              rw [div_pow, hb_sq, show ((Real.log X) ^ 2) ^ 2 = (Real.log X) ^ 4 by ring]
+              exact div_le_div_of_nonneg_left (sq_nonneg _) (pow_pos hlogY_pos 4) hlogX4_ge
+            change (1 - v) ^ 2 ≤
+              2 + (2 / (Real.log Y) ^ 4) * (openCoreAdjustedCoeffBeta c_lam c_half T D0 k) ^ 2
+            linarith only [h2v, hv2,
+              show (2 / (Real.log Y) ^ 4) * (openCoreAdjustedCoeffBeta c_lam c_half T D0 k) ^ 2 =
+                2 * ((openCoreAdjustedCoeffBeta c_lam c_half T D0 k) ^ 2 / (Real.log Y) ^ 4) by ring]
+          unfold adjustedStationProfilePsi
+          have h_alg :
+              ((1 - signedAdjustedCoeffB c_lam c_half T D0 k / (Real.log X) ^ 2) *
+                  gaussianTermPhi k X) *
+                ((1 - signedAdjustedCoeffB c_lam c_half T D0 k / (Real.log X) ^ 2) *
+                  gaussianTermPhi k X) / X =
+                (1 - signedAdjustedCoeffB c_lam c_half T D0 k / (Real.log X) ^ 2) ^ 2 *
+                  (gaussianTermPhi k X * gaussianTermPhi k X / X) := by ring
+          rw [h_alg]
+          exact mul_le_mul_of_nonneg_right h_quad
+            (div_nonneg (mul_self_nonneg _) (le_of_lt hX_pos)))
+      rw [intervalIntegral.integral_const_mul] at h_mono
+      unfold windowEnergyNormSq windowPairing
+      dsimp [c_k] at h_mono
+      linarith
+    -- Bound each of the 4 pieces of beta_k^2 * ||phi_k||_Y^2 / (log Y)^4
+    let p1 : ℕ → ℝ := fun k => -(c_lam * (if IsSquare k then 1 else 0))
+    let p2 : ℕ → ℝ := fun k =>
+      -(if k = T then selbergCenteredRemainderInt c_lam T - squarePoleDriftM c_half T else 0)
+    let p3 : ℕ → ℝ := fun k =>
+      -(∑ e ∈ k.divisors,
+          (squarePoleDriftM c_half e - squarePoleDriftM c_half (e - 1)) *
+            (liouvilleLambda (k / e) : ℝ))
+    let p4 : ℕ → ℝ := fun k =>
+      -((∑ d ∈ (Finset.Icc 1 D_min).filter (fun d => d ∣ k ∧ k / d ≤ T / d),
+            (selbergCenteredRemainderInt c_lam d - squarePoleDriftM c_half d) *
+              (liouvilleLambda (k / d) : ℝ)) -
+          (∑ d ∈ (Finset.Icc 1 D_min).filter (fun d => (d + 1) ∣ k ∧ k / (d + 1) ≤ T / d),
+            (selbergCenteredRemainderInt c_lam d - squarePoleDriftM c_half d) *
+              (liouvilleLambda (k / (d + 1)) : ℝ)))
+    have h_four_sq :
+        ∀ k ∈ Finset.Icc 1 T,
+          (openCoreAdjustedCoeffBeta c_lam c_half T D0 k) ^ 2 ≤
+            4 * ((p1 k) ^ 2 + (p2 k) ^ 2 + (p3 k) ^ 2 + (p4 k) ^ 2) := by
+      intro k hk
+      have heq := openCoreAdjustedCoeffBeta_four_piece_eq_tc062r_aux hT2 D0 c_lam c_half hk
+      have h_sum4 : openCoreAdjustedCoeffBeta c_lam c_half T D0 k = p1 k + p2 k + p3 k + p4 k := by
+        rw [heq]; dsimp [p1, p2, p3, p4, D_min]; ring
+      rw [h_sum4]
+      linarith [sq_nonneg (p1 k - p2 k), sq_nonneg (p1 k - p3 k), sq_nonneg (p1 k - p4 k),
+        sq_nonneg (p2 k - p3 k), sq_nonneg (p2 k - p4 k), sq_nonneg (p3 k - p4 k),
+        show 4 * ((p1 k) ^ 2 + (p2 k) ^ 2 + (p3 k) ^ 2 + (p4 k) ^ 2) -
+            (p1 k + p2 k + p3 k + p4 k) ^ 2 =
+          (p1 k - p2 k) ^ 2 + (p1 k - p3 k) ^ 2 + (p1 k - p4 k) ^ 2 +
+            (p2 k - p3 k) ^ 2 + (p2 k - p4 k) ^ 2 + (p3 k - p4 k) ^ 2 by ring]
+    have h_phi_nn : ∀ k ∈ Finset.Icc 1 T, 0 ≤ windowEnergyNormSq Y (gaussianTermPhi k) :=
+      fun k hk => (gaussianTermPhi_windowEnergy_bounds_tc062r_aux hY2 (Finset.mem_Icc.mp hk).1).1
+    -- Piece 1 bound
+    have h_bd_p1 :
+        (1 / (Real.log Y) ^ 4) *
+            (∑ k ∈ Finset.Icc 1 T, (p1 k) ^ 2 * windowEnergyNormSq Y (gaussianTermPhi k)) ≤
+          16 * c_lam ^ 2 * C_phi := by
+      have h_each1 :
+          ∀ k ∈ Finset.Icc 1 T,
+            (p1 k) ^ 2 * windowEnergyNormSq Y (gaussianTermPhi k) ≤
+              c_lam ^ 2 * windowEnergyNormSq Y (gaussianTermPhi k) := by
+        intro k hk
+        have hp1_le : (p1 k) ^ 2 ≤ c_lam ^ 2 := by
+          dsimp [p1]; split_ifs <;> simp [sq_nonneg]
+        exact mul_le_mul_of_nonneg_right hp1_le (h_phi_nn k hk)
+      have hs1 :
+          (∑ k ∈ Finset.Icc 1 T, (p1 k) ^ 2 * windowEnergyNormSq Y (gaussianTermPhi k)) ≤
+            c_lam ^ 2 * C_phi := by
+        calc
+          _ ≤ ∑ k ∈ Finset.Icc 1 T, c_lam ^ 2 * windowEnergyNormSq Y (gaussianTermPhi k) :=
+              Finset.sum_le_sum h_each1
+          _ = c_lam ^ 2 * ∑ k ∈ Finset.Icc 1 T, windowEnergyNormSq Y (gaussianTermPhi k) :=
+              (Finset.mul_sum _ _ _).symm
+          _ ≤ c_lam ^ 2 * C_phi := mul_le_mul_of_nonneg_left h_phi_all (sq_nonneg _)
+      calc
+        (1 / (Real.log Y) ^ 4) *
+            (∑ k ∈ Finset.Icc 1 T, (p1 k) ^ 2 * windowEnergyNormSq Y (gaussianTermPhi k))
+          ≤ 16 * (c_lam ^ 2 * C_phi) :=
+            mul_le_mul h_inv_log4_le16 hs1
+              (Finset.sum_nonneg (fun k hk => mul_nonneg (sq_nonneg _) (h_phi_nn k hk)))
+              (by norm_num)
+        _ = 16 * c_lam ^ 2 * C_phi := by ring
+    -- Piece 2 bound
+    have h_bd_p2 :
+        (1 / (Real.log Y) ^ 4) *
+            (∑ k ∈ Finset.Icc 1 T, (p2 k) ^ 2 * windowEnergyNormSq Y (gaussianTermPhi k)) ≤
+          B0 ^ 2 * (RiemannScope.tau - 1) * RiemannScope.tau ^ 4 := by
+      have hT_mem : T ∈ Finset.Icc 1 T := Finset.mem_Icc.mpr ⟨hT1, le_refl T⟩
+      have h_only_T :
+          (∑ k ∈ Finset.Icc 1 T, (p2 k) ^ 2 * windowEnergyNormSq Y (gaussianTermPhi k)) =
+            (selbergCenteredRemainderInt c_lam T - squarePoleDriftM c_half T) ^ 2 *
+              windowEnergyNormSq Y (gaussianTermPhi T) := by
+        rw [← Finset.add_sum_erase _ _ hT_mem]
+        have h_er :
+            (∑ k ∈ (Finset.Icc 1 T).erase T,
+              (p2 k) ^ 2 * windowEnergyNormSq Y (gaussianTermPhi k)) = 0 := by
+          apply Finset.sum_eq_zero
+          intro k hk
+          dsimp [p2]
+          rw [if_neg (Finset.mem_erase.mp hk).1]
+          ring
+        rw [h_er, add_zero]
+        dsimp [p2]
+        rw [if_pos rfl]
+        ring
+      rw [h_only_T]
+      have hw_T := centered_minus_drift_abs_le_tc062_aux c_lam c_half hT1 (le_refl T)
+      have hlT_nn : 0 ≤ Real.log (T : ℝ) := Real.log_nonneg (by exact_mod_cast hT1)
+      have hlT_sq : (Real.log (T : ℝ)) ^ 2 ≤ (9 / 4 : ℝ) ^ 2 * (Real.log Y) ^ 2 := by
+        have hp_sq := pow_le_pow_left hlT_nn hlogT_le 2
+        linarith only [hp_sq, show ((9 / 4 : ℝ) * Real.log Y) ^ 2 =
+          (9 / 4 : ℝ) ^ 2 * (Real.log Y) ^ 2 by ring]
+      have hlT_lin : 4 * Real.log (T : ℝ) ≤ 18 * (Real.log Y) ^ 2 := by
+        have h1 : 4 * Real.log (T : ℝ) ≤ 9 * Real.log Y := by linarith only [hlogT_le]
+        have h2 : 9 * Real.log Y ≤ 9 * (Real.log Y * (2 * Real.log Y)) :=
+          mul_le_mul_of_nonneg_left
+            (le_mul_of_one_le_right (le_of_lt hlogY_pos) h1_le_2logY) (by norm_num)
+        linarith only [h1, h2, show 9 * (Real.log Y * (2 * Real.log Y)) = 18 * (Real.log Y) ^ 2 by ring]
+      have h_c_abs : |c_lam| + |c_half| ≤ 4 * (|c_lam| + |c_half|) * (Real.log Y) ^ 2 := by
+        have h1 := mul_le_mul_of_nonneg_left h1_le_4logY_sq
+          (show 0 ≤ |c_lam| + |c_half| by positivity)
+        linarith only [h1, show (|c_lam| + |c_half|) * (4 * (Real.log Y) ^ 2) =
+          4 * (|c_lam| + |c_half|) * (Real.log Y) ^ 2 by ring]
+      have h_B0_le :
+          (Real.log (T : ℝ)) ^ 2 + 4 * Real.log (T : ℝ) + |c_lam| + |c_half| ≤
+            B0 * (Real.log Y) ^ 2 := by
+        dsimp [B0]
+        linarith only [hlT_sq, hlT_lin, h_c_abs]
+      have hw_T2 :
+          |selbergCenteredRemainderInt c_lam T - squarePoleDriftM c_half T| ≤
+            (T : ℝ) * B0 * (Real.log Y) ^ 2 := by
+        calc
+          _ ≤ (T : ℝ) * ((Real.log (T : ℝ)) ^ 2 + 4 * Real.log (T : ℝ) + |c_lam| + |c_half|) := hw_T
+          _ ≤ (T : ℝ) * (B0 * (Real.log Y) ^ 2) :=
+              mul_le_mul_of_nonneg_left h_B0_le (le_of_lt hT_pos_r)
+          _ = (T : ℝ) * B0 * (Real.log Y) ^ 2 := by ring
+      have hw_sq :
+          (selbergCenteredRemainderInt c_lam T - squarePoleDriftM c_half T) ^ 2 ≤
+            (T : ℝ) ^ 2 * B0 ^ 2 * (Real.log Y) ^ 4 := by
+        have h1 := pow_le_pow_left (abs_nonneg _) hw_T2 2
+        rw [sq_abs] at h1
+        linarith only [h1, show ((T : ℝ) * B0 * (Real.log Y) ^ 2) ^ 2 =
+          (T : ℝ) ^ 2 * B0 ^ 2 * (Real.log Y) ^ 4 by ring]
+      have hphi_T := (gaussianTermPhi_windowEnergy_bounds_tc062r_aux hY2 hT1).2.2
+      have hY5_T4 : Y ^ 5 / (T : ℝ) ^ 4 ≤ 1 := (div_le_one (pow_pos hT_pos_r 4)).mpr hY5_le
+      calc
+        (1 / (Real.log Y) ^ 4) *
+            ((selbergCenteredRemainderInt c_lam T - squarePoleDriftM c_half T) ^ 2 *
+              windowEnergyNormSq Y (gaussianTermPhi T))
+          ≤ (1 / (Real.log Y) ^ 4) *
+              (((T : ℝ) ^ 2 * B0 ^ 2 * (Real.log Y) ^ 4) *
+                ((RiemannScope.tau - 1) * RiemannScope.tau ^ 4 * Y ^ 5 / (T : ℝ) ^ 6)) :=
+            mul_le_mul_of_nonneg_left
+              (mul_le_mul hw_sq hphi_T (h_phi_nn T hT_mem) (by dsimp [B0]; positivity))
+              (by positivity)
+        _ = (B0 ^ 2 * (RiemannScope.tau - 1) * RiemannScope.tau ^ 4) * (Y ^ 5 / (T : ℝ) ^ 4) := by
+            rw [piece2_cancel_alg_tc062r_aux ((Real.log Y) ^ 4) (T : ℝ) B0
+              ((RiemannScope.tau - 1) * RiemannScope.tau ^ 4) (Y ^ 5)
+              (ne_of_gt hT_pos_r) (ne_of_gt (pow_pos hlogY_pos 4))]
+            ring
+        _ ≤ (B0 ^ 2 * (RiemannScope.tau - 1) * RiemannScope.tau ^ 4) * 1 :=
+            mul_le_mul_of_nonneg_left hY5_T4 (by dsimp [B0]; positivity)
+        _ = B0 ^ 2 * (RiemannScope.tau - 1) * RiemannScope.tau ^ 4 := mul_one _
+    -- Piece 3 bound
+    have h_bd_p3 :
+        (1 / (Real.log Y) ^ 4) *
+            (∑ k ∈ Finset.Icc 1 T, (p3 k) ^ 2 * windowEnergyNormSq Y (gaussianTermPhi k)) ≤
+          16 * (8 + |c_half|) ^ 2 * C_phi * 18785 :=
+      driftStepDivisor_weighted_windowEnergy_le_tc062r_aux c_half hCphi_pos hY2
+        h_inv_log4_le16 h_phi_mult T
+    -- Piece 4 bound
+    have hD0_le_logY : (D0 : ℝ) ≤ Real.log Y := Nat.floor_le (le_of_lt hlogY_pos)
+    have h_bd_p4 :
+        (1 / (Real.log Y) ^ 4) *
+            (∑ k ∈ Finset.Icc 1 T, (p4 k) ^ 2 * windowEnergyNormSq Y (gaussianTermPhi k)) ≤
+          1024 * C_phi * C_sm ^ 2 :=
+      smallOp_weighted_windowEnergy_le_tc062r_aux c_lam c_half hCphi_pos hY2
+        hlogY_pos h_phi_mult T D0 hD0_le_logY
+    -- Combine all 4 pieces into C_psi
+    have h_beta_tot :
+        (1 / (Real.log Y) ^ 4) *
+            (∑ k ∈ Finset.Icc 1 T,
+              (openCoreAdjustedCoeffBeta c_lam c_half T D0 k) ^ 2 *
+                windowEnergyNormSq Y (gaussianTermPhi k)) ≤
+          4 * C_beta := by
+      have h_sum_4 :
+          (∑ k ∈ Finset.Icc 1 T,
+              (openCoreAdjustedCoeffBeta c_lam c_half T D0 k) ^ 2 *
+                windowEnergyNormSq Y (gaussianTermPhi k)) ≤
+            4 * ((∑ k ∈ Finset.Icc 1 T, (p1 k) ^ 2 * windowEnergyNormSq Y (gaussianTermPhi k)) +
+              (∑ k ∈ Finset.Icc 1 T, (p2 k) ^ 2 * windowEnergyNormSq Y (gaussianTermPhi k)) +
+              (∑ k ∈ Finset.Icc 1 T, (p3 k) ^ 2 * windowEnergyNormSq Y (gaussianTermPhi k)) +
+              (∑ k ∈ Finset.Icc 1 T, (p4 k) ^ 2 * windowEnergyNormSq Y (gaussianTermPhi k))) := by
+        rw [← Finset.sum_add_distrib, ← Finset.sum_add_distrib, ← Finset.sum_add_distrib,
+          Finset.mul_sum]
+        apply Finset.sum_le_sum
+        intro k hk
+        have hm := mul_le_mul_of_nonneg_right (h_four_sq k hk) (h_phi_nn k hk)
+        linarith [hm, show 4 * ((p1 k) ^ 2 + (p2 k) ^ 2 + (p3 k) ^ 2 + (p4 k) ^ 2) *
+            windowEnergyNormSq Y (gaussianTermPhi k) =
+          4 * ((p1 k) ^ 2 * windowEnergyNormSq Y (gaussianTermPhi k) +
+            (p2 k) ^ 2 * windowEnergyNormSq Y (gaussianTermPhi k) +
+            (p3 k) ^ 2 * windowEnergyNormSq Y (gaussianTermPhi k) +
+            (p4 k) ^ 2 * windowEnergyNormSq Y (gaussianTermPhi k)) by ring]
+      have hm := mul_le_mul_of_nonneg_left h_sum_4 (by positivity : 0 ≤ 1 / (Real.log Y) ^ 4)
+      dsimp [C_beta]
+      linarith [hm, h_bd_p1, h_bd_p2, h_bd_p3, h_bd_p4]
+    have h_psi_sum := Finset.sum_le_sum h_each_psi
+    rw [Finset.sum_add_distrib, ← Finset.mul_sum, ← Finset.mul_sum] at h_psi_sum
+    have h_alg_2 :
+        (2 / (Real.log Y) ^ 4) *
+            (∑ i ∈ Finset.Icc 1 T,
+              (openCoreAdjustedCoeffBeta c_lam c_half T D0 i) ^ 2 *
+                windowEnergyNormSq Y (gaussianTermPhi i)) =
+          2 * ((1 / (Real.log Y) ^ 4) *
+            (∑ i ∈ Finset.Icc 1 T,
+              (openCoreAdjustedCoeffBeta c_lam c_half T D0 i) ^ 2 *
+                windowEnergyNormSq Y (gaussianTermPhi i))) := by ring
+    rw [h_alg_2] at h_psi_sum
+    calc
+      (∑ n ∈ Finset.Icc 1 (canonicalCutoffT Y),
+          windowEnergyNormSq Y
+            (adjustedStationProfilePsi c_lam c_half
+              (canonicalCutoffT Y) (Nat.floor (Real.log Y)) n))
+        ≤ 2 * (∑ i ∈ Finset.Icc 1 T, windowEnergyNormSq Y (gaussianTermPhi i)) +
+            2 * ((1 / (Real.log Y) ^ 4) *
+              (∑ i ∈ Finset.Icc 1 T,
+                (openCoreAdjustedCoeffBeta c_lam c_half T D0 i) ^ 2 *
+                  windowEnergyNormSq Y (gaussianTermPhi i))) := h_psi_sum
+      _ ≤ 2 * C_phi + 2 * (4 * C_beta) :=
+          add_le_add
+            (mul_le_mul_of_nonneg_left h_phi_all (by norm_num))
+            (mul_le_mul_of_nonneg_left h_beta_tot (by norm_num))
+      _ = C_psi := by dsimp [C_psi]; ring
+  refine ⟨C_psi, C_diag, hCpsi_nn, hCdiag_nn, h_psi_bd, ?_⟩
+  intro p hp Y hY2
+  have hT1 : 1 ≤ canonicalCutoffT Y := canonicalCutoffT_ge_one_tc062_aux (by linarith only [hY2])
+  have h_ub_sigma :
+      canonicalInteriorDiagSigma c_lam c_half p Y ≤ 2 * C_psi := by
+    have h_a1p :=
+      (stage_a_interior_hilbert_split_and_candidate_a1_refutation_tc062).2.2 hp hY2 hT1
+        (Nat.floor (Real.log Y)) c_lam c_half
+    have h_psi := h_psi_bd hY2
+    unfold canonicalInteriorDiagSigma interiorAnchorDiagSigma
+    exact le_trans h_a1p (mul_le_mul_of_nonneg_left h_psi (by norm_num))
+  have h_lb_sigma :
+      -744 * (RiemannScope.tau - 1) ≤ canonicalInteriorDiagSigma c_lam c_half p Y := by
+    obtain ⟨h1, h2⟩ :=
+      interiorAnchorDiagSigma_lower_bound_tc062r_aux hp hY2 hT1
+        (Nat.floor (Real.log Y)) c_lam c_half
+    unfold canonicalInteriorDiagSigma
+    exact le_trans h1 h2
+  apply abs_le.mpr
+  refine ⟨?_, le_trans h_ub_sigma (le_max_left _ _)⟩
+  have h_max_r : 744 * (RiemannScope.tau - 1) ≤ C_diag := le_max_right _ _
+  linarith only [h_lb_sigma, h_max_r]
+
+private theorem mixedCovarianceClosure_of_bounded_diff_tc062r_aux
+    {F1 F2 D : ℝ → ℝ} {C_bd : ℝ} (hC_nn : 0 ≤ C_bd)
+    (h_diff : ∀ {Y : ℝ}, 2 ≤ Y → F2 Y ≤ F1 Y + C_bd) :
+    MixedCovarianceClosureHypothesis F1 D → MixedCovarianceClosureHypothesis F2 D := by
+  intro hF1 η hη
+  obtain ⟨a_eta, b_eta, κ_eta, Y_eta, ha, hb, hκ_pos, hκ_le2, hYe, hF1_bd⟩ := hF1 η hη
+  refine ⟨a_eta + C_bd, b_eta, κ_eta, Y_eta,
+    add_nonneg ha hC_nn, hb, hκ_pos, hκ_le2, hYe, ?_⟩
+  intro Y hYYe
+  have hY2 : 2 ≤ Y := le_trans hYe hYYe
+  have h1_rpow : 1 ≤ Y ^ η := Real.one_le_rpow (by linarith only [hY2]) (le_of_lt hη)
+  have hC_rpow : C_bd ≤ C_bd * Y ^ η := by
+    calc
+      C_bd = C_bd * 1 := (mul_one _).symm
+      _ ≤ C_bd * Y ^ η := mul_le_mul_of_nonneg_left h1_rpow hC_nn
+  have h1 := h_diff hY2
+  have h2 := hF1_bd Y hYYe
+  linarith [show (a_eta + C_bd) * Y ^ η = a_eta * Y ^ η + C_bd * Y ^ η by ring]
+
+private theorem interior_iff_offdiag_closure_hypothesis_tc062r_aux
+    {p : ℕ} (hp : p.Prime) (c_lam c_half : ℝ) :
+    MixedCovarianceClosureHypothesis
+        (canonicalInteriorPairedRemainderF c_lam c_half p) canonicalPrimePowerDiagDtilde ↔
+      MixedCovarianceClosureHypothesis
+        (canonicalInteriorOffDiagSigma c_lam c_half p) canonicalPrimePowerDiagDtilde := by
+  obtain ⟨_, C_diag, _, hCdiag_nn, _, h_diag_abs⟩ :=
+    canonical_psi_sum_and_diag_abs_bound_tc062r_aux c_lam c_half
+  have h_split :
+      ∀ Y : ℝ,
+        canonicalInteriorPairedRemainderF c_lam c_half p Y =
+          canonicalInteriorDiagSigma c_lam c_half p Y +
+            canonicalInteriorOffDiagSigma c_lam c_half p Y :=
+    fun Y =>
+      (interiorPairedRemainderF_diag_offdiag_split_tc062r_aux c_lam c_half p
+        (canonicalCutoffT Y) (Nat.floor (Real.log Y)) Y).1
+  constructor
+  · apply mixedCovarianceClosure_of_bounded_diff_tc062r_aux hCdiag_nn
+    intro Y hY2
+    have habs := (abs_le.mp (h_diag_abs hp hY2)).1
+    linarith [h_split Y]
+  · apply mixedCovarianceClosure_of_bounded_diff_tc062r_aux hCdiag_nn
+    intro Y hY2
+    have habs := (abs_le.mp (h_diag_abs hp hY2)).2
+    linarith [h_split Y]
+
+/-- **Theorem 8 (`TASK-TC-062R` §3, §7A, §7D, Exact `Σ_diag + Σ_off` Interior Split, Repaired General-Anchor Diagonal Identities, Unconditional Two-Sided `O(1)` Bound on `canonicalInteriorDiagSigma`, Two-Way Closure Equivalence onto `canonicalInteriorOffDiagSigma`, and Conditional Route D Transfer)**:
+    1. *Exact `F_{int,T} = Σ_diag + Σ_off` decomposition & off-diagonal product-filter form*:
+       `interiorPairedRemainderF = interiorAnchorDiagSigma + interiorAnchorOffDiagSigma` for all
+       parameters, with `interiorAnchorOffDiagSigma` equal to the sum over distinct pairs `m ≠ n` in
+       `primeInteriorTruncatedAnchors p T ×ˢ primeInteriorTruncatedAnchors p T`;
+    2. *Exact `commonPrimePowerLogSq` shift laws (`c(m, p*m) = c(m, m)`, `c(p*m, p*m) = c(m, m) + (log p)^2`) and both exact anchor-diagonal identities (`hp : p.Prime`, `2 ≤ Y`, `1 ≤ m`, `p * m ≤ T`)*:
+       Both the combined `(log m)^2, (log(p*m))^2` identity and the repaired general-anchor `c_self`
+       identity retaining `-4 * commonPrimePowerLogSq m m * (G^[2](m, m) - 2 * G^[2](m, p*m) + G^[2](p*m, p*m))`;
+    3. *Uniform lower bound on `interiorAnchorDiagSigma` (`hp : p.Prime`, `2 ≤ Y`, `1 ≤ T`)*:
+       `-744 * (RiemannScope.tau - 1) ≤ -4 * ∑_{n=1}^T (log n)^2 G^[2](n, n) ≤ interiorAnchorDiagSigma`;
+    4. *Sharp `1/sqrt(d)` square-pole drift step bound, shifted `gaussianTermPhi` window-energy bound `≤ C_phi / L`, uniform `lcm` mean-square series bound `C_lcm`, and unconditional two-sided `O(1)` bound `|canonicalInteriorDiagSigma c_lam c_half p Y| ≤ C_diag`* (retaining all 4 components of `openCoreAdjustedCoeffBeta` on `1 ≤ k ≤ T` without any pointwise `(log n)^2` assumption);
+    5. *Full chain of unconditional two-way `MixedCovarianceClosureHypothesis` equivalences onto `canonicalInteriorOffDiagSigma` (`TC062-OBL-INTERIOR-PRIME-PAIR-OFFDIAG`) and conditional Route D transfer to `canonicalLiouvilleEnergyE Y ≤ C_tot * Y ^ ε`*. -/
+theorem two_sided_interior_diag_bound_and_offdiag_equivalence_tc062r :
+    ((∀ (c_lam c_half : ℝ) (p T D0 : ℕ) (Y : ℝ),
+        interiorPairedRemainderF c_lam c_half p T D0 Y =
+            interiorAnchorDiagSigma c_lam c_half p T D0 Y +
+              interiorAnchorOffDiagSigma c_lam c_half p T D0 Y ∧
+          interiorAnchorOffDiagSigma c_lam c_half p T D0 Y =
+            ∑ mn ∈ (primeInteriorTruncatedAnchors p T ×ˢ primeInteriorTruncatedAnchors p T).filter
+                (fun mn => mn.1 ≠ mn.2),
+              (liouvilleLambda mn.1 : ℝ) * (liouvilleLambda mn.2 : ℝ) *
+                (completeSignedKernelHcal c_lam c_half T D0 Y mn.1 mn.2 -
+                  completeSignedKernelHcal c_lam c_half T D0 Y (p * mn.1) mn.2 -
+                  completeSignedKernelHcal c_lam c_half T D0 Y mn.1 (p * mn.2) +
+                  completeSignedKernelHcal c_lam c_half T D0 Y (p * mn.1) (p * mn.2))) ∧
+      (∀ (c_lam c_half : ℝ) (p : ℕ) (Y : ℝ),
+        canonicalInteriorPairedRemainderF c_lam c_half p Y =
+          canonicalInteriorDiagSigma c_lam c_half p Y +
+            canonicalInteriorOffDiagSigma c_lam c_half p Y)) ∧
+    (∀ {p : ℕ}, p.Prime →
+      (∀ {m : ℕ}, 1 ≤ m →
+        commonPrimePowerLogSq m (p * m) = commonPrimePowerLogSq m m ∧
+          commonPrimePowerLogSq (p * m) (p * m) =
+            commonPrimePowerLogSq m m + (Real.log (p : ℝ)) ^ 2) ∧
+        (∀ {Y : ℝ}, 2 ≤ Y → ∀ {T m : ℕ}, 1 ≤ m → p * m ≤ T →
+          ∀ (D0 : ℕ) (c_lam c_half : ℝ),
+            (completeSignedKernelHcal c_lam c_half T D0 Y m m -
+                completeSignedKernelHcal c_lam c_half T D0 Y (p * m) m -
+                completeSignedKernelHcal c_lam c_half T D0 Y m (p * m) +
+                completeSignedKernelHcal c_lam c_half T D0 Y (p * m) (p * m) =
+              windowEnergyNormSq Y
+                  (fun X =>
+                    adjustedStationProfilePsi c_lam c_half T D0 m X -
+                      adjustedStationProfilePsi c_lam c_half T D0 (p * m) X) -
+                4 * (Real.log (m : ℝ)) ^ 2 * logWeightedWindowKernel 2 Y m m -
+                4 * (Real.log ((p * m : ℕ) : ℝ)) ^ 2 *
+                  logWeightedWindowKernel 2 Y (p * m) (p * m) +
+                8 * commonPrimePowerLogSq m m * logWeightedWindowKernel 2 Y m (p * m)) ∧
+              (completeSignedKernelHcal c_lam c_half T D0 Y m m -
+                  completeSignedKernelHcal c_lam c_half T D0 Y (p * m) m -
+                  completeSignedKernelHcal c_lam c_half T D0 Y m (p * m) +
+                  completeSignedKernelHcal c_lam c_half T D0 Y (p * m) (p * m) =
+                windowEnergyNormSq Y
+                    (fun X =>
+                      adjustedStationProfilePsi c_lam c_half T D0 m X -
+                        adjustedStationProfilePsi c_lam c_half T D0 (p * m) X) -
+                  4 * (Real.log (p : ℝ)) ^ 2 *
+                    logWeightedWindowKernel 2 Y (p * m) (p * m) -
+                  4 * offDiagPrimePowerWeight m m * logWeightedWindowKernel 2 Y m m -
+                  4 * offDiagPrimePowerWeight (p * m) (p * m) *
+                    logWeightedWindowKernel 2 Y (p * m) (p * m) -
+                  4 * commonPrimePowerLogSq m m *
+                    (logWeightedWindowKernel 2 Y m m -
+                      2 * logWeightedWindowKernel 2 Y m (p * m) +
+                      logWeightedWindowKernel 2 Y (p * m) (p * m))))) ∧
+    (∀ {p : ℕ}, p.Prime → ∀ {Y : ℝ}, 2 ≤ Y → ∀ {T : ℕ}, 1 ≤ T →
+      ∀ (D0 : ℕ) (c_lam c_half : ℝ),
+        -744 * (RiemannScope.tau - 1) ≤
+            -4 * (∑ n ∈ Finset.Icc 1 T,
+              (Real.log (n : ℝ)) ^ 2 * logWeightedWindowKernel 2 Y n n) ∧
+          -4 * (∑ n ∈ Finset.Icc 1 T,
+              (Real.log (n : ℝ)) ^ 2 * logWeightedWindowKernel 2 Y n n) ≤
+            interiorAnchorDiagSigma c_lam c_half p T D0 Y) ∧
+    ((∀ (c_half : ℝ) {d : ℕ}, 1 ≤ d →
+        |squarePoleDriftM c_half d - squarePoleDriftM c_half (d - 1)| ≤
+          (8 + |c_half|) * (1 + Real.log (d : ℝ)) / Real.sqrt (d : ℝ)) ∧
+      (∃ C_phi : ℝ, 0 < C_phi ∧
+        ∀ {Y : ℝ}, 2 ≤ Y → ∀ (T : ℕ) {L : ℕ}, 1 ≤ L →
+          (∑ k ∈ (Finset.Icc 1 T).filter (fun k => L ∣ k),
+            windowEnergyNormSq Y (gaussianTermPhi k)) ≤ C_phi / (L : ℝ)) ∧
+      (∃ C_lcm : ℝ, 0 ≤ C_lcm ∧
+        ∀ (T : ℕ),
+          (∑ d ∈ Finset.Icc 1 T, ∑ e ∈ Finset.Icc 1 T,
+            ((1 + Real.log (d : ℝ)) / Real.sqrt (d : ℝ)) *
+              ((1 + Real.log (e : ℝ)) / Real.sqrt (e : ℝ)) /
+              (Nat.lcm d e : ℝ)) ≤ C_lcm) ∧
+      (∀ (c_lam c_half : ℝ),
+        ∃ C_psi C_diag : ℝ, 0 ≤ C_psi ∧ 0 ≤ C_diag ∧
+          (∀ {Y : ℝ}, 2 ≤ Y →
+            (∑ n ∈ Finset.Icc 1 (canonicalCutoffT Y),
+              windowEnergyNormSq Y
+                (adjustedStationProfilePsi c_lam c_half
+                  (canonicalCutoffT Y) (Nat.floor (Real.log Y)) n)) ≤ C_psi) ∧
+          (∀ {p : ℕ}, p.Prime → ∀ {Y : ℝ}, 2 ≤ Y →
+            |canonicalInteriorDiagSigma c_lam c_half p Y| ≤ C_diag))) ∧
+    (∀ {p : ℕ}, p.Prime →
+      ((∀ (c_lam c_half : ℝ),
+          (MixedCovarianceClosureHypothesis
+              (canonicalInteriorPairedRemainderF c_lam c_half p)
+              canonicalPrimePowerDiagDtilde ↔
+            MixedCovarianceClosureHypothesis
+              (canonicalInteriorOffDiagSigma c_lam c_half p)
+              canonicalPrimePowerDiagDtilde) ∧
+          (MixedCovarianceClosureHypothesis
+              (canonicalTruncatedSignedRemainderF c_lam c_half)
+              canonicalPrimePowerDiagDtilde ↔
+            MixedCovarianceClosureHypothesis
+              (canonicalInteriorOffDiagSigma c_lam c_half p)
+              canonicalPrimePowerDiagDtilde) ∧
+          (MixedCovarianceClosureHypothesis
+              (canonicalSignedRemainderF c_lam c_half)
+              canonicalPrimePowerDiagDtilde ↔
+            MixedCovarianceClosureHypothesis
+              (canonicalInteriorOffDiagSigma c_lam c_half p)
+              canonicalPrimePowerDiagDtilde) ∧
+          (MixedCovarianceClosureHypothesis
+              (canonicalSignedMixedCovarianceJ c_lam c_half)
+              canonicalPrimePowerDiagDtilde ↔
+            MixedCovarianceClosureHypothesis
+              (canonicalInteriorOffDiagSigma c_lam c_half p)
+              canonicalPrimePowerDiagDtilde)) ∧
+        ((MixedCovarianceClosureHypothesis
+              (canonicalSignedMixedCovarianceJ
+                actualSelbergConstantCLam actualSquarePoleConstantCHalf)
+              canonicalPrimePowerDiagDtilde ↔
+            MixedCovarianceClosureHypothesis
+              (canonicalInteriorOffDiagSigma
+                actualSelbergConstantCLam actualSquarePoleConstantCHalf p)
+              canonicalPrimePowerDiagDtilde) ∧
+          (MixedCovarianceClosureHypothesis
+              (canonicalSignedRemainderF
+                actualSelbergConstantCLam actualSquarePoleConstantCHalf)
+              canonicalPrimePowerDiagDtilde ↔
+            MixedCovarianceClosureHypothesis
+              (canonicalInteriorOffDiagSigma
+                actualSelbergConstantCLam actualSquarePoleConstantCHalf p)
+              canonicalPrimePowerDiagDtilde) ∧
+          (MixedCovarianceClosureHypothesis
+              (canonicalInteriorPairedRemainderF
+                actualSelbergConstantCLam actualSquarePoleConstantCHalf p)
+              canonicalPrimePowerDiagDtilde ↔
+            MixedCovarianceClosureHypothesis
+              (canonicalInteriorOffDiagSigma
+                actualSelbergConstantCLam actualSquarePoleConstantCHalf p)
+              canonicalPrimePowerDiagDtilde))) ∧
+      (∀ {M_lin : ℝ},
+        0 ≤ M_lin →
+        (∀ Z : ℝ, 1 ≤ Z → canonicalLiouvilleEnergyE Z ≤ M_lin * Z) →
+        MixedCovarianceClosureHypothesis
+          (canonicalInteriorOffDiagSigma
+            actualSelbergConstantCLam actualSquarePoleConstantCHalf p)
+          canonicalPrimePowerDiagDtilde →
+        (∀ ε : ℝ, 0 < ε →
+          ∃ zeta2_eps C_cut Y_diag a_known B_drift κ_d : ℝ,
+            0 ≤ zeta2_eps ∧ 0 ≤ C_cut ∧ Real.exp 1 ≤ Y_diag ∧
+              0 ≤ a_known ∧ 0 ≤ B_drift ∧ 0 < κ_d ∧
+              (∀ Y : ℝ, 1 ≤ Y →
+                (∑ pk ∈ primePowerPairsUpTo (Nat.floor Y),
+                  (Real.log (pk.1 : ℝ)) ^ 2 / (primePowerScale pk) ^ (1 + ε)) ≤ zeta2_eps) ∧
+              (∀ Y : ℝ, Y_diag ≤ Y →
+                canonicalPrimePowerDiagDtilde Y ≤
+                  (2 / (Real.log Y) ^ 2) *
+                    (∑ pk ∈ primePowerPairsUpTo (Nat.floor Y),
+                      primePowerDiagWeight pk *
+                        monotoneScaleEnvelope canonicalLiouvilleEnergyE (Y / primePowerScale pk)) +
+                    C_cut) ∧
+              (∀ R Y : ℝ, Y_diag ≤ Y → Y ≤ R →
+                windowEnergyNormSq Y
+                    (knownCompensatedD2Part
+                      actualSelbergConstantCLam actualSquarePoleConstantCHalf
+                      (canonicalCutoffT Y) (Nat.floor (Real.log Y))) ≤
+                  a_known * Y ^ (ε / 4) +
+                    (B_drift / (Real.log Y) ^ κ_d) *
+                      normalizedScaleSupremum canonicalLiouvilleEnergyE ε R * Y ^ ε)) →
+        ∀ ε : ℝ, 0 < ε →
+          ∃ C_tot : ℝ, 0 ≤ C_tot ∧ ∀ Y : ℝ, 1 ≤ Y → canonicalLiouvilleEnergyE Y ≤ C_tot * Y ^ ε)) := by
+  have h_part1 :
+      (∀ (c_lam c_half : ℝ) (p T D0 : ℕ) (Y : ℝ),
+        interiorPairedRemainderF c_lam c_half p T D0 Y =
+            interiorAnchorDiagSigma c_lam c_half p T D0 Y +
+              interiorAnchorOffDiagSigma c_lam c_half p T D0 Y ∧
+          interiorAnchorOffDiagSigma c_lam c_half p T D0 Y =
+            ∑ mn ∈ (primeInteriorTruncatedAnchors p T ×ˢ primeInteriorTruncatedAnchors p T).filter
+                (fun mn => mn.1 ≠ mn.2),
+              (liouvilleLambda mn.1 : ℝ) * (liouvilleLambda mn.2 : ℝ) *
+                (completeSignedKernelHcal c_lam c_half T D0 Y mn.1 mn.2 -
+                  completeSignedKernelHcal c_lam c_half T D0 Y (p * mn.1) mn.2 -
+                  completeSignedKernelHcal c_lam c_half T D0 Y mn.1 (p * mn.2) +
+                  completeSignedKernelHcal c_lam c_half T D0 Y (p * mn.1) (p * mn.2))) ∧
+      (∀ (c_lam c_half : ℝ) (p : ℕ) (Y : ℝ),
+        canonicalInteriorPairedRemainderF c_lam c_half p Y =
+          canonicalInteriorDiagSigma c_lam c_half p Y +
+            canonicalInteriorOffDiagSigma c_lam c_half p Y) := by
+    refine ⟨interiorPairedRemainderF_diag_offdiag_split_tc062r_aux, ?_⟩
+    intro c_lam c_half p Y
+    exact (interiorPairedRemainderF_diag_offdiag_split_tc062r_aux c_lam c_half p
+      (canonicalCutoffT Y) (Nat.floor (Real.log Y)) Y).1
+  have h_part2 :
+      ∀ {p : ℕ}, p.Prime →
+        (∀ {m : ℕ}, 1 ≤ m →
+          commonPrimePowerLogSq m (p * m) = commonPrimePowerLogSq m m ∧
+            commonPrimePowerLogSq (p * m) (p * m) =
+              commonPrimePowerLogSq m m + (Real.log (p : ℝ)) ^ 2) ∧
+          (∀ {Y : ℝ}, 2 ≤ Y → ∀ {T m : ℕ}, 1 ≤ m → p * m ≤ T →
+            ∀ (D0 : ℕ) (c_lam c_half : ℝ),
+              (completeSignedKernelHcal c_lam c_half T D0 Y m m -
+                  completeSignedKernelHcal c_lam c_half T D0 Y (p * m) m -
+                  completeSignedKernelHcal c_lam c_half T D0 Y m (p * m) +
+                  completeSignedKernelHcal c_lam c_half T D0 Y (p * m) (p * m) =
+                windowEnergyNormSq Y
+                    (fun X =>
+                      adjustedStationProfilePsi c_lam c_half T D0 m X -
+                        adjustedStationProfilePsi c_lam c_half T D0 (p * m) X) -
+                  4 * (Real.log (m : ℝ)) ^ 2 * logWeightedWindowKernel 2 Y m m -
+                  4 * (Real.log ((p * m : ℕ) : ℝ)) ^ 2 *
+                    logWeightedWindowKernel 2 Y (p * m) (p * m) +
+                  8 * commonPrimePowerLogSq m m * logWeightedWindowKernel 2 Y m (p * m)) ∧
+                (completeSignedKernelHcal c_lam c_half T D0 Y m m -
+                    completeSignedKernelHcal c_lam c_half T D0 Y (p * m) m -
+                    completeSignedKernelHcal c_lam c_half T D0 Y m (p * m) +
+                    completeSignedKernelHcal c_lam c_half T D0 Y (p * m) (p * m) =
+                  windowEnergyNormSq Y
+                      (fun X =>
+                        adjustedStationProfilePsi c_lam c_half T D0 m X -
+                          adjustedStationProfilePsi c_lam c_half T D0 (p * m) X) -
+                    4 * (Real.log (p : ℝ)) ^ 2 *
+                      logWeightedWindowKernel 2 Y (p * m) (p * m) -
+                    4 * offDiagPrimePowerWeight m m * logWeightedWindowKernel 2 Y m m -
+                    4 * offDiagPrimePowerWeight (p * m) (p * m) *
+                      logWeightedWindowKernel 2 Y (p * m) (p * m) -
+                    4 * commonPrimePowerLogSq m m *
+                      (logWeightedWindowKernel 2 Y m m -
+                        2 * logWeightedWindowKernel 2 Y m (p * m) +
+                        logWeightedWindowKernel 2 Y (p * m) (p * m)))) := by
+    intro p hp
+    refine ⟨?_, ?_⟩
+    · intro m hm1
+      exact commonPrimePowerLogSq_prime_mul_identities_tc062r_aux hp hm1
+    · intro Y hY2 T m hm1 hpmT D0 c_lam c_half
+      exact anchor_diagonal_hcal_identities_tc062r_aux hp hY2 hm1 hpmT D0 c_lam c_half
+  have h_part3 :
+      ∀ {p : ℕ}, p.Prime → ∀ {Y : ℝ}, 2 ≤ Y → ∀ {T : ℕ}, 1 ≤ T →
+        ∀ (D0 : ℕ) (c_lam c_half : ℝ),
+          -744 * (RiemannScope.tau - 1) ≤
+              -4 * (∑ n ∈ Finset.Icc 1 T,
+                (Real.log (n : ℝ)) ^ 2 * logWeightedWindowKernel 2 Y n n) ∧
+            -4 * (∑ n ∈ Finset.Icc 1 T,
+                (Real.log (n : ℝ)) ^ 2 * logWeightedWindowKernel 2 Y n n) ≤
+              interiorAnchorDiagSigma c_lam c_half p T D0 Y := by
+    intro p hp Y hY2 T hT D0 c_lam c_half
+    exact interiorAnchorDiagSigma_lower_bound_tc062r_aux hp hY2 hT D0 c_lam c_half
+  have h_part4 :
+      (∀ (c_half : ℝ) {d : ℕ}, 1 ≤ d →
+        |squarePoleDriftM c_half d - squarePoleDriftM c_half (d - 1)| ≤
+          (8 + |c_half|) * (1 + Real.log (d : ℝ)) / Real.sqrt (d : ℝ)) ∧
+      (∃ C_phi : ℝ, 0 < C_phi ∧
+        ∀ {Y : ℝ}, 2 ≤ Y → ∀ (T : ℕ) {L : ℕ}, 1 ≤ L →
+          (∑ k ∈ (Finset.Icc 1 T).filter (fun k => L ∣ k),
+            windowEnergyNormSq Y (gaussianTermPhi k)) ≤ C_phi / (L : ℝ)) ∧
+      (∃ C_lcm : ℝ, 0 ≤ C_lcm ∧
+        ∀ (T : ℕ),
+          (∑ d ∈ Finset.Icc 1 T, ∑ e ∈ Finset.Icc 1 T,
+            ((1 + Real.log (d : ℝ)) / Real.sqrt (d : ℝ)) *
+              ((1 + Real.log (e : ℝ)) / Real.sqrt (e : ℝ)) /
+              (Nat.lcm d e : ℝ)) ≤ C_lcm) ∧
+      (∀ (c_lam c_half : ℝ),
+        ∃ C_psi C_diag : ℝ, 0 ≤ C_psi ∧ 0 ≤ C_diag ∧
+          (∀ {Y : ℝ}, 2 ≤ Y →
+            (∑ n ∈ Finset.Icc 1 (canonicalCutoffT Y),
+              windowEnergyNormSq Y
+                (adjustedStationProfilePsi c_lam c_half
+                  (canonicalCutoffT Y) (Nat.floor (Real.log Y)) n)) ≤ C_psi) ∧
+          (∀ {p : ℕ}, p.Prime → ∀ {Y : ℝ}, 2 ≤ Y →
+            |canonicalInteriorDiagSigma c_lam c_half p Y| ≤ C_diag)) := by
+    obtain ⟨hCphi_pos, h_phi_mult⟩ := sum_multiples_gaussianTermPhi_windowEnergy_le_tc062r_aux
+    exact ⟨squarePoleDriftM_sharp_step_abs_le_tc062r_aux,
+      ⟨_, hCphi_pos, h_phi_mult⟩,
+      ⟨18785, by norm_num, lcm_weighted_series_bound_tc062r_aux⟩,
+      canonical_psi_sum_and_diag_abs_bound_tc062r_aux⟩
+  refine ⟨h_part1, h_part2, h_part3, h_part4, ?_⟩
+  intro p hp
+  have h_tc062 := interior_prime_pair_closure_equivalence_and_route_d_transfer_tc062 hp
+  have h_eqv_all :
+      ∀ (c_lam c_half : ℝ),
+        (MixedCovarianceClosureHypothesis
+            (canonicalInteriorPairedRemainderF c_lam c_half p)
+            canonicalPrimePowerDiagDtilde ↔
+          MixedCovarianceClosureHypothesis
+            (canonicalInteriorOffDiagSigma c_lam c_half p)
+            canonicalPrimePowerDiagDtilde) ∧
+        (MixedCovarianceClosureHypothesis
+            (canonicalTruncatedSignedRemainderF c_lam c_half)
+            canonicalPrimePowerDiagDtilde ↔
+          MixedCovarianceClosureHypothesis
+            (canonicalInteriorOffDiagSigma c_lam c_half p)
+            canonicalPrimePowerDiagDtilde) ∧
+        (MixedCovarianceClosureHypothesis
+            (canonicalSignedRemainderF c_lam c_half)
+            canonicalPrimePowerDiagDtilde ↔
+          MixedCovarianceClosureHypothesis
+            (canonicalInteriorOffDiagSigma c_lam c_half p)
+            canonicalPrimePowerDiagDtilde) ∧
+        (MixedCovarianceClosureHypothesis
+            (canonicalSignedMixedCovarianceJ c_lam c_half)
+            canonicalPrimePowerDiagDtilde ↔
+          MixedCovarianceClosureHypothesis
+            (canonicalInteriorOffDiagSigma c_lam c_half p)
+            canonicalPrimePowerDiagDtilde) := by
+    intro c_lam c_half
+    have h_IO := interior_iff_offdiag_closure_hypothesis_tc062r_aux hp c_lam c_half
+    obtain ⟨h_JI, h_FI, h_TI⟩ := h_tc062.2.1.1 c_lam c_half
+    exact ⟨h_IO, h_TI.trans h_IO, h_FI.trans h_IO, h_JI.trans h_IO⟩
+  have h_act := h_eqv_all actualSelbergConstantCLam actualSquarePoleConstantCHalf
+  refine ⟨⟨h_eqv_all, ⟨h_act.2.2.2, h_act.2.2.1, h_act.1⟩⟩, ?_⟩
+  intro M_lin hM_nn hE_lin h_off_hyp h_route_d_inputs
+  exact h_tc062.2.2 hM_nn hE_lin (h_act.1.mpr h_off_hyp) h_route_d_inputs
 
 end JointPrimeDilationSignedRemainder
 end RiemannScope

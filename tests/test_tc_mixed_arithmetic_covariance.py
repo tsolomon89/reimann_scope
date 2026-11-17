@@ -80,11 +80,14 @@ from tc.mixed_arithmetic_covariance import (
     compute_complete_core_s_Y_and_beta_Y_arb,
     compute_finite_prime_control_invariants,
     compute_selberg_centered_remainder_table_fast_arb,
+    compute_zone1_prime_power_diag_perturbation_arb,
     derive_holdout_mechanism_revision_note,
     derive_report_top_level_outcome_fields,
+    evaluate_control_matched_point_arb,
     evaluate_divisor_sum_aS_direct,
     evaluate_finite_prime_parity_convolution_formula,
     evaluate_interval_via_cutoff_case_split_arb,
+    evaluate_matched_control_point_arb,
     evaluate_mixed_covariance_point_arb,
     evaluate_point_resource_compliance,
     evaluate_window_gram_G_Y_r_arb,
@@ -92,6 +95,7 @@ from tc.mixed_arithmetic_covariance import (
     load_frozen_protocol_rules,
     reprocess_task_tc061_derived_summaries,
     resolve_protocol_quadrature_settings,
+    revalidate_tc061_prime_power_majorant_impact_arb,
     strip_enclosure_arb_for_json,
     verify_coarse_halfline_complement_bound_arb,
     verify_frozen_protocol_immutability,
@@ -2871,6 +2875,505 @@ def test_tc061r3_snapshot_vs_peak_memory_coverage_semantics_and_artifact_preserv
             == "ALL_EXECUTED_TIERS_DIRECTLY_MEASURED"
         )
     assert len(_collect_serialized_arb_dicts(tc061_artifact)) == 3208
+
+
+# ---------------------------------------------------------------------------
+# TASK-TC-062R §2 & §9: Zone 1 Prime-Power Majorant Repair & Revalidation Tests
+# ---------------------------------------------------------------------------
+
+
+def _independent_trial_division_primes_up_to(limit: int) -> List[int]:
+    """Independent reference prime list via naive trial division (without calling `prime_power_pairs_up_to`)."""
+    out: List[int] = []
+    for cand in range(2, limit + 1):
+        d = 2
+        is_p = True
+        while d * d <= cand:
+            if cand % d == 0:
+                is_p = False
+                break
+            d += 1
+        if is_p:
+            out.append(cand)
+    return out
+
+
+def _independent_reference_zone1_prime_power_diag_perturbation_arb(
+    T_y: int,
+    n0_j: int,
+    phi_lo: List[arb],
+    sqrt_du: arb,
+    lg_lo: arb,
+    in_omega: List[bool] | None = None,
+) -> arb:
+    """Independently written complete reference sum over all primes `p` and exponents `k >= 1`
+    with `p^k <= n0_j` (`TASK-TC-062R` §2).
+    """
+    if n0_j <= 1:
+        return arb(0)
+    total_sq = arb(0)
+    for p in _independent_trial_division_primes_up_to(n0_j):
+        lg_p_sq = arb(p).log() ** 2
+        pk = p
+        while pk <= min(T_y, n0_j):
+            L_pk = T_y // pk
+            q0 = min(L_pk, n0_j // pk)
+            s_pk = arb(0)
+            for q in range(1, q0 + 1):
+                m_idx = pk * q
+                if in_omega is None or in_omega[m_idx]:
+                    s_pk += phi_lo[m_idx]
+            total_sq += lg_p_sq * (s_pk * s_pk)
+            pk *= p
+    return (sqrt_du / lg_lo) * total_sq.sqrt()
+
+
+def test_tc062r_zone1_prime_power_ordering_bug_reproduction_and_independent_reference() -> None:
+    """Reproduce the exact prime-grouped ordering defect at `Y = 224, T = 867, n0 = 18`
+    (`[2, 4, 8, 16]` vs omitted `[3, 9, 5, 7, 11, 13, 17]`), verify AST absence of early-exit
+    `break` over `pp_info` / `prime_power_pairs_up_to` in `tc/mixed_arithmetic_covariance.py`,
+    and verify `compute_zone1_prime_power_diag_perturbation_arb` against an independent complete
+    reference sum across `n0 in (0, 1, 2, 3, 4, 5, 7, 8, 9, 16, 17, 18, 25, 27, 32)`.
+    """
+    import ast
+    import itertools
+    from tc.coupled_scale_energy_bootstrap import _tau_arb, prime_power_pairs_up_to
+
+    # 1. Exact reproduction of prime-grouped ordering at Y = 224 (T = 867, n0 = 18):
+    T_224 = certify_T_canonical_cutoff(224, prec_bits=256)
+    assert T_224 == 867
+    pp_pairs_867 = prime_power_pairs_up_to(T_224)
+    pks_in_order = [p ** k for (p, k) in pp_pairs_867]
+    # First 9 elements are powers of 2 up to 512, followed by powers of 3:
+    assert pks_in_order[:12] == [2, 4, 8, 16, 32, 64, 128, 256, 512, 3, 9, 27]
+
+    n0_bug = 18
+    early_break_prefix = list(itertools.takewhile(lambda pk: pk <= n0_bug, pks_in_order))
+    complete_filtered_in_group_order = [pk for pk in pks_in_order if pk <= n0_bug]
+    omitted_by_early_break = [pk for pk in complete_filtered_in_group_order if pk not in early_break_prefix]
+    assert early_break_prefix == [2, 4, 8, 16]
+    assert omitted_by_early_break == [3, 9, 5, 7, 11, 13, 17]
+
+    # 2. AST audit of tc/mixed_arithmetic_covariance.py: zero `for ... in pp_info` / `prime_power_pairs_up_to`
+    # loops contain `break`, and both point evaluators call `compute_zone1_prime_power_diag_perturbation_arb`:
+    src_path = REPO_ROOT / "tc" / "mixed_arithmetic_covariance.py"
+    tree = ast.parse(src_path.read_text(encoding="utf-8"), filename=str(src_path))
+    helper_call_funcs: List[str] = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.FunctionDef):
+            for sub in ast.walk(node):
+                if (
+                    isinstance(sub, ast.Call)
+                    and isinstance(sub.func, ast.Name)
+                    and sub.func.id == "compute_zone1_prime_power_diag_perturbation_arb"
+                ):
+                    helper_call_funcs.append(node.name)
+                if isinstance(sub, ast.For):
+                    iter_src = ast.unparse(sub.iter)
+                    if "pp_info" in iter_src or "prime_power_pairs_up_to" in iter_src:
+                        has_direct_break = any(isinstance(st, ast.Break) for st in ast.walk(sub))
+                        assert not has_direct_break, (
+                            f"Forbidden early-exit break on {iter_src!r} in {node.name}"
+                        )
+    assert "evaluate_mixed_covariance_point_arb" in helper_call_funcs
+    assert "evaluate_control_matched_point_arb" in helper_call_funcs
+    assert evaluate_matched_control_point_arb is evaluate_control_matched_point_arb
+
+    # 3. Independent complete reference sum agreement across required n0 grid:
+    saved = flint_ctx.prec
+    try:
+        flint_ctx.prec = 288
+        tau = _tau_arb()
+        sqrt_du = (tau.log() / arb(16)).sqrt()
+        x_lo = arb(224) * arb(2)  # >= 12 * 32 = 384 so all n <= 32 lie well inside Zone 1
+        lg_lo = x_lo.log()
+        pp_info = [(p ** k, T_224 // (p ** k), arb(p).log() ** 2) for (p, k) in pp_pairs_867]
+        phi_lo_full = [arb(0)] + [
+            (x_lo ** (arb(5) / arb(2))) * (arb(n) ** (-3)) * (-(x_lo * x_lo) / arb(n * n)).exp()
+            for n in range(1, 33)
+        ]
+
+        for n0_test in (0, 1, 2, 3, 4, 5, 7, 8, 9, 16, 17, 18, 25, 27, 32):
+            phi_slice = phi_lo_full[: n0_test + 1]
+            got = compute_zone1_prime_power_diag_perturbation_arb(
+                pp_info, n0_test, phi_slice, sqrt_du, lg_lo
+            )
+            ref = _independent_reference_zone1_prime_power_diag_perturbation_arb(
+                T_224, n0_test, phi_slice, sqrt_du, lg_lo
+            )
+            if n0_test <= 1:
+                assert got == arb(0) and ref == arb(0)
+            else:
+                diff = got - ref
+                assert bool(arb(0) in diff), f"Mismatch at n0={n0_test}: got={got}, ref={ref}"
+                assert bool(abs(diff) < arb("1e-120")), f"Wide residual at n0={n0_test}: {diff}"
+    finally:
+        flint_ctx.prec = saved
+
+
+def test_tc062r_zone1_helper_boundaries_in_omega_mask_and_permutation_invariance() -> None:
+    """Verify negative/zero/unit cutoffs (`n0 <= 1`), strict prime-power boundary increments at
+    `n0 in (3, 4, 8, 9, 16, 25, 27)`, optional `in_omega` filtering, fail-closed input validation,
+    and exact bit-for-bit (`mid` and `rad`) invariance under reversed, sorted, and random
+    permutations of `pp_info`.
+    """
+    import random
+    from tc.coupled_scale_energy_bootstrap import _tau_arb, prime_power_pairs_up_to
+
+    saved = flint_ctx.prec
+    try:
+        flint_ctx.prec = 256
+        T_y = 200
+        pp_pairs = prime_power_pairs_up_to(T_y)
+        pp_info = [(p ** k, T_y // (p ** k), arb(p).log() ** 2) for (p, k) in pp_pairs]
+        sqrt_du = (_tau_arb().log() / arb(16)).sqrt()
+        lg_lo = arb(5)
+        phi_pos = [arb(0)] + [arb(1) / arb(n + 1) for n in range(1, 40)]
+
+        # 1. Empty / non-positive / unit n0:
+        for n0_empty in (-5, -1, 0, 1):
+            assert (
+                compute_zone1_prime_power_diag_perturbation_arb(
+                    pp_info, n0_empty, phi_pos, sqrt_du, lg_lo
+                )
+                == arb(0)
+            )
+        assert (
+            compute_zone1_prime_power_diag_perturbation_arb([], 18, phi_pos, sqrt_du, lg_lo)
+            == arb(0)
+        )
+
+        # 2. Exact prime-power boundary jumps must strictly increase perturbation when phi_lo > 0:
+        for n0_prev, n0_boundary in ((1, 2), (2, 3), (3, 4), (7, 8), (8, 9), (15, 16), (24, 25), (26, 27)):
+            v_prev = compute_zone1_prime_power_diag_perturbation_arb(
+                pp_info, n0_prev, phi_pos, sqrt_du, lg_lo
+            )
+            v_curr = compute_zone1_prime_power_diag_perturbation_arb(
+                pp_info, n0_boundary, phi_pos, sqrt_du, lg_lo
+            )
+            assert bool(v_curr > v_prev), f"Expected jump across prime power {n0_prev}->{n0_boundary}"
+
+        # 3. Optional in_omega mask filtering:
+        mask_none_true = [False] * len(phi_pos)
+        assert (
+            compute_zone1_prime_power_diag_perturbation_arb(
+                pp_info, 27, phi_pos, sqrt_du, lg_lo, in_omega=mask_none_true
+            )
+            == arb(0)
+        )
+        mask_all_true = [True] * len(phi_pos)
+        v_unmasked = compute_zone1_prime_power_diag_perturbation_arb(
+            pp_info, 27, phi_pos, sqrt_du, lg_lo, in_omega=None
+        )
+        v_all_true = compute_zone1_prime_power_diag_perturbation_arb(
+            pp_info, 27, phi_pos, sqrt_du, lg_lo, in_omega=mask_all_true
+        )
+        assert v_unmasked.mid() == v_all_true.mid() and v_unmasked.rad() == v_all_true.rad()
+
+        # Selective mask (e.g. odd composite or multiples of 3):
+        mask_sel = [False] + [(m % 2 == 1 and m >= 3) for m in range(1, len(phi_pos))]
+        v_masked = compute_zone1_prime_power_diag_perturbation_arb(
+            pp_info, 27, phi_pos, sqrt_du, lg_lo, in_omega=mask_sel
+        )
+        v_masked_ref = _independent_reference_zone1_prime_power_diag_perturbation_arb(
+            T_y, 27, phi_pos, sqrt_du, lg_lo, in_omega=mask_sel
+        )
+        assert bool(arb(0) in (v_masked - v_masked_ref))
+        assert bool(abs(v_masked - v_masked_ref) < arb("1e-74"))
+        assert bool(arb(0) < v_masked < v_unmasked)
+
+        # 4. Exact permutation invariance (mid and rad bit-for-bit identical):
+        rng = random.Random(2026062)
+        perms = [
+            list(reversed(pp_info)),
+            sorted(pp_info, key=lambda it: it[0]),
+            sorted(pp_info, key=lambda it: -it[0]),
+        ]
+        for _ in range(10):
+            shuffled = list(pp_info)
+            rng.shuffle(shuffled)
+            perms.append(shuffled)
+        for perm in perms:
+            vp_unm = compute_zone1_prime_power_diag_perturbation_arb(
+                perm, 27, phi_pos, sqrt_du, lg_lo
+            )
+            assert vp_unm.mid() == v_unmasked.mid() and vp_unm.rad() == v_unmasked.rad()
+            vp_msk = compute_zone1_prime_power_diag_perturbation_arb(
+                perm, 27, phi_pos, sqrt_du, lg_lo, in_omega=mask_sel
+            )
+            assert vp_msk.mid() == v_masked.mid() and vp_msk.rad() == v_masked.rad()
+
+        # 5. Fail-closed input validation:
+        with pytest.raises(ValueError, match="phi_lo length"):
+            compute_zone1_prime_power_diag_perturbation_arb(pp_info, 10, phi_pos[:10], sqrt_du, lg_lo)
+        with pytest.raises(ValueError, match="in_omega length"):
+            compute_zone1_prime_power_diag_perturbation_arb(
+                pp_info, 10, phi_pos, sqrt_du, lg_lo, in_omega=[True] * 10
+            )
+        with pytest.raises(ValueError, match="lg_lo"):
+            compute_zone1_prime_power_diag_perturbation_arb(pp_info, 10, phi_pos, sqrt_du, arb(0))
+        with pytest.raises(ValueError, match="sqrt_du"):
+            compute_zone1_prime_power_diag_perturbation_arb(pp_info, 10, phi_pos, arb(-1), lg_lo)
+        with pytest.raises(ValueError, match="pk must be >= 2"):
+            compute_zone1_prime_power_diag_perturbation_arb(
+                [(1, 10, arb(1))], 10, phi_pos, sqrt_du, lg_lo
+            )
+    finally:
+        flint_ctx.prec = saved
+
+
+def test_tc062r_zone1_certified_signed_vector_norm_enclosure_at_y224() -> None:
+    """Certify in 256-bit Arb arithmetic across all 16 protocol panels at `Y = 224` (`T = 867`)
+    that `compute_zone1_prime_power_diag_perturbation_arb` dominates the actual signed Zone 1
+    prime-power vector norm
+    `(int_{u_lo}^{u_hi} sum_{p^k <= n0_j} (log p)^2 (sum_{q: p^k q <= n0_j} lambda(p^k q) phi_{p^k q}(Y e^u))^2 / (log Y + u)^2 du)^{1/2}`,
+    and certify on narrow sub-panel `[0, 2^{-10}]` (`n0 = 18`) that the historical early-exit
+    `break` formula strictly under-approximates (`old_break < actual_norm <= repaired`).
+    """
+    import itertools
+    import math
+    from flint import acb
+    from tc.coupled_scale_energy_bootstrap import _tau_arb, prime_power_pairs_up_to
+    from tc.liouville_square_dilation import liouville_lambda_int
+    from tc.signed_dilation_arithmetic_energy import classify_arb_le_certificate
+
+    saved = flint_ctx.prec
+    try:
+        # Zone 1 norm^2 has magnitude ~ exp(-2 * 12^2) ~ 1e-130, so use 640-bit precision
+        # and abs_tol = 2^-520 (~2.9e-157) to certify strict positivity before taking .sqrt():
+        flint_ctx.prec = 640
+        Y_int = 224
+        T_y = certify_T_canonical_cutoff(Y_int, prec_bits=256)
+        assert T_y == 867
+        tau = _tau_arb()
+        log_tau = tau.log()
+        Y_arb = arb(Y_int)
+        Y_c = acb(Y_arb)
+        log_Y = Y_arb.log()
+        log_Y_c = acb(log_Y)
+        pp_pairs = prime_power_pairs_up_to(T_y)
+        pp_info = [(p ** k, T_y // (p ** k), arb(p).log() ** 2) for (p, k) in pp_pairs]
+
+        # Verify lambda(p^k * q) == (-1)^k * lambda(q) so squares are identical:
+        for p, k in pp_pairs:
+            pk = p ** k
+            if pk <= 100:
+                for q in range(1, min(T_y // pk, 100 // pk) + 1):
+                    assert liouville_lambda_int(pk * q) == ((-1) ** k) * liouville_lambda_int(q)
+
+        lam_c = [acb(0)] + [acb(liouville_lambda_int(m)) for m in range(1, 200)]
+        inv_n3_r = [arb(0)] + [arb(m) ** (-3) for m in range(1, 200)]
+        inv_n3_c = [acb(v) for v in inv_n3_r]
+        neg_inv_n2_c = [acb(0)] + [-(acb(m) ** (-2)) for m in range(1, 200)]
+        rel_tol = 2 ** (-100)
+        abs_tol = 2 ** (-520)
+
+        def _integrate_actual_signed_z1_norm(u_lo_b: arb, u_hi_b: arb, n0_val: int) -> arb:
+            active_fibers = [
+                (pk, min(L_pk, n0_val // pk), acb(lg2))
+                for (pk, L_pk, lg2) in pp_info
+                if pk <= n0_val
+            ]
+
+            def _cb(u: acb, _an: bool) -> acb:
+                lg = log_Y_c + u
+                if _an and not bool(lg.real > arb(1) / arb(2)):
+                    nb = arb("nan")
+                    return acb(nb, nb)
+                x = Y_c * u.exp()
+                x2 = x * x
+                x_52 = (Y_c ** (acb(5) / acb(2))) * (acb(arb(5) / arb(2)) * u).exp()
+                phi_m = [acb(0)] * (n0_val + 1)
+                for m in range(1, n0_val + 1):
+                    phi_m[m] = x_52 * inv_n3_c[m] * (x2 * neg_inv_n2_c[m]).exp()
+                acc_c = acb(0)
+                for pk, q0, lg2_c in active_fibers:
+                    s_c = acb(0)
+                    for q in range(1, q0 + 1):
+                        idx = pk * q
+                        s_c += lam_c[idx] * phi_m[idx]
+                    acc_c += lg2_c * (s_c * s_c)
+                return acc_c / (lg * lg)
+
+            integral_sq = acb.integral(
+                _cb, acb(u_lo_b), acb(u_hi_b), rel_tol=rel_tol, abs_tol=abs_tol
+            ).real
+            assert bool(integral_sq > arb(0)), f"Non-positive integral_sq={integral_sq} at n0={n0_val}"
+            return integral_sq.sqrt()
+
+        # 1. All 16 protocol panels at Y = 224:
+        panels = 16
+        seen_n0: List[int] = []
+        for j in range(panels):
+            u_lo = log_tau * arb(j) / arb(panels)
+            u_hi = log_tau * arb(j + 1) / arb(panels)
+            sqrt_du = (u_hi - u_lo).sqrt()
+            x_lo = Y_arb * u_lo.exp()
+            lg_lo = log_Y + u_lo
+            n0_j = min(T_y, max(0, int(math.floor(float(x_lo.lower()) / 12.0))))
+            while n0_j > 0 and not bool(x_lo >= arb(12 * n0_j)):
+                n0_j -= 1
+            seen_n0.append(n0_j)
+            x_lo_52 = x_lo ** (arb(5) / arb(2))
+            x_lo_2 = x_lo * x_lo
+            phi_lo = [arb(0)] + [
+                x_lo_52 * inv_n3_r[m] * (-x_lo_2 / arb(m * m)).exp() for m in range(1, n0_j + 1)
+            ]
+            delta_rep = compute_zone1_prime_power_diag_perturbation_arb(
+                pp_info, n0_j, phi_lo, sqrt_du, lg_lo
+            )
+            actual_norm = _integrate_actual_signed_z1_norm(u_lo, u_hi, n0_j)
+            _, ok_le = classify_arb_le_certificate(actual_norm, delta_rep)
+            assert ok_le is True, f"Panel {j} (n0={n0_j}) failed norm bound: {actual_norm} vs {delta_rep}"
+        assert seen_n0[0] == 18
+
+        # 2. Narrow sub-panel [0, 2^{-10}] at Y = 224 (n0 = 18): old break strictly FAILS while repaired PASSES!
+        u_lo_nar = arb(0)
+        u_hi_nar = arb(2) ** (-10)
+        sqrt_du_nar = u_hi_nar.sqrt()
+        phi_lo_18 = [arb(0)] + [
+            (Y_arb ** (arb(5) / arb(2))) * inv_n3_r[m] * (-(Y_arb * Y_arb) / arb(m * m)).exp()
+            for m in range(1, 19)
+        ]
+        old_sq = arb(0)
+        for pk, L_pk, lg2 in itertools.takewhile(lambda it: it[0] <= 18, pp_info):
+            q0 = min(L_pk, 18 // pk)
+            sp = sum((phi_lo_18[pk * q] for q in range(1, q0 + 1)), arb(0))
+            old_sq += lg2 * (sp * sp)
+        old_delta_nar = (sqrt_du_nar / log_Y) * old_sq.sqrt()
+        rep_delta_nar = compute_zone1_prime_power_diag_perturbation_arb(
+            pp_info, 18, phi_lo_18, sqrt_du_nar, log_Y
+        )
+        actual_nar = _integrate_actual_signed_z1_norm(u_lo_nar, u_hi_nar, 18)
+        assert bool(old_delta_nar < actual_nar), (
+            f"Expected historical break majorant to undershoot at narrow panel: {old_delta_nar} vs {actual_nar}"
+        )
+        _, ok_rep_nar = classify_arb_le_certificate(actual_nar, rep_delta_nar)
+        assert ok_rep_nar is True
+    finally:
+        flint_ctx.prec = saved
+
+
+def test_tc062r_repaired_three_zone_vs_unsplit_overlap_at_y224_and_y256() -> None:
+    """Certify overlap (`0 in (res_3z[k] - res_unsplit[k])` with tight radius `< 1e-44`) between
+    repaired 3-zone quadrature (`use_three_zone=True`) and independent full-sum/unsplit quadrature
+    (`use_three_zone=False`) at `Y = 224` (`T = 867`) and `Y = 256` (`T = 1024`), plus matched
+    control algebraic consistency at `Y = 256`.
+    """
+    tbl = compute_selberg_centered_remainder_table_fast_arb(1100, prec_bits=288)
+    obs_keys = (
+        "E_Y",
+        "D_tilde_Y",
+        "X_tilde_Y",
+        "P_norm_sq",
+        "A_norm_sq",
+        "B_norm_sq",
+        "pair_P_B",
+        "J_direct",
+        "log_Y_times_D_tilde",
+    )
+    for y_val, expected_T in ((224, 867), (256, 1024)):
+        sp = ExactScaleSpec(str(y_val), "exact_rational", Fraction(y_val, 1))
+        res_3z = evaluate_mixed_covariance_point_arb(
+            sp,
+            prec_bits=256,
+            quad_tol_bits=160,
+            n_panels=16,
+            use_three_zone=True,
+            allow_nonprotocol_override=True,
+            selberg_table=tbl,
+        )
+        res_unsplit = evaluate_mixed_covariance_point_arb(
+            sp,
+            prec_bits=256,
+            quad_tol_bits=200,
+            use_three_zone=False,
+            allow_nonprotocol_override=True,
+            selberg_table=tbl,
+        )
+        assert res_3z["cutoffs"]["T_Y"] == expected_T
+        assert res_3z["three_zone_used"] is True
+        assert res_unsplit["three_zone_used"] is False
+        for k in obs_keys:
+            diff = res_3z[k] - res_unsplit[k]
+            assert bool(arb(0) in diff), f"3-zone vs unsplit mismatch at Y={y_val}, {k}: {diff}"
+            assert bool(abs(diff) < arb("1e-44")), f"Loose difference radius at Y={y_val}, {k}: {diff}"
+
+    for mode in ("liouville", "unsigned_1", "a2", "a_3_5_7"):
+        r_ctrl = evaluate_control_matched_point_arb(256, mode, tbl, prec_bits=256)
+        assert r_ctrl["T_Y"] == 1024
+        assert bool(arb(0) in r_ctrl["J_consistency_residual"])
+        assert bool(abs(r_ctrl["J_consistency_residual"]) < arb("1e-44"))
+
+
+def test_tc062r_artifact_revalidation_provenance_and_endpoint_invariants(
+    tc061_artifact: Dict[str, Any],
+) -> None:
+    """Verify presence, schema, ball-count conservation (`3,208`), and outward-endpoint invariants
+    of `provenance_separation["tc062r_prime_power_majorant_revalidation"]` in
+    `data/tc_mixed_arithmetic_covariance.json`.
+    """
+    assert callable(revalidate_tc061_prime_power_majorant_impact_arb)
+    prov_sep = tc061_artifact["provenance_separation"]
+    assert "tc062r_prime_power_majorant_revalidation" in prov_sep
+    rev = prov_sep["tc062r_prime_power_majorant_revalidation"]
+
+    assert rev["revalidation_task_id"] == "TASK-TC-062R"
+    assert (
+        rev["branch"]
+        == "task/tc-062r-prime-power-certification-and-diagonal-equivalence-repair"
+    )
+    assert rev["prior_baseline_git_commit"] == "6a2f5f519b3f2f4642ea2ce00626832e556953be"
+    assert isinstance(rev["revalidating_git_commit"], str) and len(rev["revalidating_git_commit"]) == 40
+    assert isinstance(rev["revalidated_at_utc"], str) and "T" in rev["revalidated_at_utc"]
+    assert rev["producing_module"] == "tc/mixed_arithmetic_covariance.py"
+    assert rev["producing_function"] == "revalidate_tc061_prime_power_majorant_impact_arb"
+    assert rev["repaired_helper_function"] == "compute_zone1_prime_power_diag_perturbation_arb"
+    assert rev["total_artifact_arb_balls"] == 3208
+    assert rev["overall_artifact_status"] in ("REVALIDATED", "WIDENED")
+    assert rev["any_probe_or_kl1_or_control_verdict_changed"] is False
+    assert rev["any_review_displayed_enclosure_needed_widening"] is False
+
+    counts = rev["overall_ball_status_counts"]
+    assert set(counts.keys()) == {"unaffected", "revalidated", "widened", "superseded"}
+    assert counts["unaffected"] == 930
+    assert counts["superseded"] == 0
+    assert counts["revalidated"] + counts["widened"] == 2278
+    assert sum(counts.values()) == 3208
+    assert counts["widened"] == rev["widened_ball_count"] == len(rev["widened_balls"])
+
+    inv = rev["per_section_impact_inventory"]
+    expected_sections = {
+        "headline_and_exposure_reconciliation",
+        "section_1_protocol_and_exact_mixed_identity",
+        "section_2_cutoff_and_interval_certification",
+        "section_3_preregistered_holdout_experiment",
+        "section_4_controls_and_tc_arithmetic_attribution",
+        "section_5_arithmetic_proof_attempt_and_kernel_reduction",
+        "section_6_route_d_conditional_transfer_and_scope",
+    }
+    assert set(inv.keys()) == expected_sections
+    assert inv["section_1_protocol_and_exact_mixed_identity"]["section_status"] == "UNAFFECTED"
+    assert inv["section_6_route_d_conditional_transfer_and_scope"]["section_status"] == "UNAFFECTED"
+    assert sum(s["total_balls"] for s in inv.values()) == 3208
+
+    # Ensure metadata block did not introduce serialized-Arb-shaped dicts and widened balls match live tree:
+    live_balls = _collect_serialized_arb_dicts(tc061_artifact)
+    assert len(live_balls) == 3208
+    for w_rec in rev["widened_balls"]:
+        jp = w_rec["json_path"]
+        assert jp in live_balls
+        node = live_balls[jp]
+        assert node["arb_ball_str"] == w_rec["widened_ball_str"]
+        assert node["lower_dec"] == w_rec["widened_lo_dec"]
+        assert node["upper_dec"] == w_rec["widened_hi_dec"]
+        p_lo = _sci_or_latex_num_to_fraction(w_rec["prior_lo_dec"])
+        p_hi = _sci_or_latex_num_to_fraction(w_rec["prior_hi_dec"])
+        w_lo = _sci_or_latex_num_to_fraction(w_rec["widened_lo_dec"])
+        w_hi = _sci_or_latex_num_to_fraction(w_rec["widened_hi_dec"])
+        assert w_lo <= p_lo and w_hi >= p_hi
+        assert (w_lo < p_lo) or (w_hi > p_hi)
+
 
 
 

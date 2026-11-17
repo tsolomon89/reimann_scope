@@ -107,6 +107,7 @@ from tc.canonical_theta_correlation_bound import (
     REPO_ROOT,
     serialize_arb_certified,
     verify_all_serialized_arb_in_tree,
+    verify_serialized_arb_roundtrip,
 )
 from tc.coupled_scale_energy_bootstrap import (
     TASK_TC_057_ID,
@@ -920,6 +921,74 @@ def compute_complete_core_s_Y_and_beta_Y_arb(
         flint_ctx.prec = saved
 
 
+def compute_zone1_prime_power_diag_perturbation_arb(
+    pp_info: Sequence[Tuple[int, int, arb]],
+    n0_j: int,
+    phi_lo: Sequence[arb],
+    sqrt_du: arb,
+    lg_lo: arb,
+    in_omega: Optional[Sequence[bool]] = None,
+) -> arb:
+    """Compute the outward-rounded Zone 1 prime-power diagonal vector norm perturbation
+    `(sqrt_du / lg_lo) * (sum_{pk <= n0_j} lg_p_sq * (sum_{1 <= q <= min(L_pk, n0_j // pk), in_omega[pk * q]} phi_lo[pk * q])^2).sqrt()`.
+
+    Because `prime_power_pairs_up_to(T)` groups prime powers by prime (`2, 4, 8, ..., 3, 9, ..., 5, ...`)
+    rather than sorting by `p^k`, this helper filters all entries with `if pk > n0_j: continue`
+    (never an early-exit `break`) and sums active prime powers in canonical `(pk, L_pk)`-sorted order
+    so the resulting `arb` ball is strictly order-independent across any permutation of `pp_info`.
+    """
+    n0_i = int(n0_j)
+    if n0_i <= 0:
+        return arb(0)
+    if len(phi_lo) <= n0_i:
+        raise ValueError(
+            f"phi_lo length {len(phi_lo)} must exceed n0_j={n0_i} to index 1..{n0_i}"
+        )
+    if in_omega is not None and len(in_omega) <= n0_i:
+        raise ValueError(
+            f"in_omega length {len(in_omega)} must exceed n0_j={n0_i} to index 1..{n0_i}"
+        )
+    if not bool(lg_lo > arb(0)):
+        raise ValueError(f"lg_lo must be certified strictly positive, got {lg_lo!r}")
+    if not bool(sqrt_du >= arb(0)):
+        raise ValueError(f"sqrt_du must be certified non-negative, got {sqrt_du!r}")
+
+    active_pp: List[Tuple[int, int, arb]] = []
+    for pk_raw, L_pk_raw, lg_p_sq in pp_info:
+        pk = int(pk_raw)
+        L_pk = int(L_pk_raw)
+        if pk < 2:
+            raise ValueError(f"Prime power pk must be >= 2, got {pk}")
+        if L_pk < 0:
+            raise ValueError(f"Cofactor limit L_pk must be >= 0, got {L_pk}")
+        if pk > n0_i:
+            continue
+        active_pp.append((pk, L_pk, lg_p_sq))
+
+    if not active_pp:
+        return arb(0)
+
+    active_pp.sort(key=lambda item: (item[0], item[1]))
+    diag_sq_sum = arb(0)
+    if in_omega is None:
+        for pk, L_pk, lg_p_sq in active_pp:
+            q0 = min(L_pk, n0_i // pk)
+            s_pk = arb(0)
+            for q in range(1, q0 + 1):
+                s_pk += phi_lo[pk * q]
+            diag_sq_sum += lg_p_sq * (s_pk * s_pk)
+    else:
+        for pk, L_pk, lg_p_sq in active_pp:
+            q0 = min(L_pk, n0_i // pk)
+            s_pk = arb(0)
+            for q in range(1, q0 + 1):
+                idx_m = pk * q
+                if in_omega[idx_m]:
+                    s_pk += phi_lo[idx_m]
+            diag_sq_sum += lg_p_sq * (s_pk * s_pk)
+    return (sqrt_du / lg_lo) * diag_sq_sum.sqrt()
+
+
 def evaluate_mixed_covariance_point_arb(
     spec: ExactScaleSpec,
     *,
@@ -1286,16 +1355,9 @@ def evaluate_mixed_covariance_point_arb(
                     eps_Bt = eps_Bt / (lg_lo * lg_lo)
                     eps_Binter = eps_Binter / (lg_lo * lg_lo)
 
-                diag_sq_sum = arb(0)
-                for pk, L_pk, lg_p_sq in pp_info:
-                    if pk > n0_j:
-                        break
-                    q0 = min(L_pk, n0_j // pk)
-                    s_pk = arb(0)
-                    for q in range(1, q0 + 1):
-                        s_pk += phi_lo[pk * q]
-                    diag_sq_sum += lg_p_sq * (s_pk * s_pk)
-                delta_diag_j = (sqrt_du / lg_lo) * diag_sq_sum.sqrt()
+                delta_diag_j = compute_zone1_prime_power_diag_perturbation_arb(
+                    pp_info, n0_j, phi_lo, sqrt_du, lg_lo
+                )
 
             node_cache: Dict[Any, List[Any]] = {}
             hi_z2 = min(N2, N1 - 1)
@@ -4816,16 +4878,9 @@ def evaluate_control_matched_point_arb(
                 eps_P /= lg_lo
                 eps_A /= lg_lo * lg_lo
                 eps_B /= lg_lo * lg_lo
-                diag_sq_sum = arb(0)
-                for pk, L_pk, lg_p_sq in pp_info:
-                    if pk > n0_j:
-                        break
-                    q0 = min(L_pk, n0_j // pk)
-                    s_pk = arb(0)
-                    for q in range(1, q0 + 1):
-                        s_pk += phi_lo[pk * q]
-                    diag_sq_sum += lg_p_sq * (s_pk * s_pk)
-                delta_diag_j = (sqrt_du / lg_lo) * diag_sq_sum.sqrt()
+                delta_diag_j = compute_zone1_prime_power_diag_perturbation_arb(
+                    pp_info, n0_j, phi_lo, sqrt_du, lg_lo
+                )
 
             node_cache: Dict[Any, Tuple[acb, acb, acb, acb, acb]] = {}
             hi_z2 = min(N2, N1 - 1)
@@ -4990,6 +5045,9 @@ def evaluate_control_matched_point_arb(
         }
     finally:
         flint_ctx.prec = saved
+
+
+evaluate_matched_control_point_arb = evaluate_control_matched_point_arb
 
 
 def _prime_factorization_dict(n: int) -> Dict[int, int]:
@@ -7488,6 +7546,11 @@ def reprocess_task_tc061_derived_summaries(
         ],
     }
 
+    if "tc062r_prime_power_majorant_revalidation" in existing.get("provenance_separation", {}):
+        updated["provenance_separation"]["tc062r_prime_power_majorant_revalidation"] = existing[
+            "provenance_separation"
+        ]["tc062r_prime_power_majorant_revalidation"]
+
     if verify_lean_live:
         lean_audit = verify_tc061_lean_theorems_live(EXPECTED_TC061_THEOREMS)
         assert lean_audit["all_tc061_lean_checks_pass"] is True, (
@@ -7566,10 +7629,873 @@ def refresh_task_tc061_provenance_and_review_audit(
     return existing
 
 
+_JSON_PATH_TOKEN_RE = re.compile(r"([^\.\[\]]+)|\[(\d+)\]")
+
+
+def _set_node_at_collected_json_path(
+    root: Any, json_path: str, new_val: Dict[str, Any]
+) -> None:
+    """Replace the dictionary at `json_path` (formatted by `_collect_serialized_arb_dicts`) in place."""
+    tokens: List[Union[str, int]] = []
+    for m_tok in _JSON_PATH_TOKEN_RE.finditer(json_path):
+        if m_tok.group(1) is not None:
+            tokens.append(m_tok.group(1))
+        else:
+            tokens.append(int(m_tok.group(2)))
+    if not tokens:
+        raise ValueError(f"Empty json_path: {json_path!r}")
+    cur = root
+    for tok in tokens[:-1]:
+        cur = cur[tok]
+    last_tok = tokens[-1]
+    cur[last_tok] = new_val
+
+
+def _is_direct_d_tilde_dataflow_path(json_path: str) -> bool:
+    """Return True iff the observable at `json_path` inside an affected 3-zone evaluation has direct
+    algebraic dataflow from `D_tilde_Y` / `delta_diag_j`.
+    """
+    if json_path.startswith(
+        "headline_and_exposure_reconciliation.headline_holdout_values.HO_EXT_4096."
+    ):
+        return True
+    if json_path.startswith(
+        "section_2_cutoff_and_interval_certification.three_zone_vs_unsplit_crosschecks["
+    ):
+        return not json_path.endswith(".J_unsplit")
+    if json_path.startswith(
+        "section_3_preregistered_holdout_experiment.holdout_point_evaluations["
+    ):
+        rel = json_path.split("].", 1)[1]
+        if rel in (
+            "Y_enclosure",
+            "E_Y",
+            "P_norm_sq",
+            "A_norm_sq",
+            "B_norm_sq",
+            "pair_P_B",
+            "subunit_tail_breakdown.B_tail_norm_sq",
+            "subunit_tail_breakdown.B_inter_norm_sq",
+            "subunit_tail_breakdown.pair_P_B_tail",
+            "subunit_tail_breakdown.pair_B_inter_B_tail",
+            "subunit_tail_breakdown.J_subunit_tail_contribution",
+        ):
+            return False
+        if rel.endswith(".a_Y_eta_rhs_term") or rel.endswith(".R_mix"):
+            return False
+        return True
+    if json_path.startswith(
+        "section_4_controls_and_tc_arithmetic_attribution.control_comparison_rows["
+    ):
+        rel = json_path.split("].", 1)[1]
+        if rel in (
+            "raw_shared_window_diagnostics.E_Y",
+            "A_norm_sq",
+            "B_norm_sq",
+            "pair_P_B",
+        ):
+            return False
+        return True
+    if json_path.startswith(
+        "section_5_arithmetic_proof_attempt_and_kernel_reduction.composite_self_collision_theorem.evaluated_scales_16_to_4096["
+    ):
+        rel = json_path.split("].", 1)[1]
+        return rel in (
+            "X_tilde_Y",
+            "X_off_Y",
+            "F_signed_remainder_Y",
+            "S_unsigned_core_relaxation_Y",
+            "J_minus_4Xself_plus_F_residual",
+        )
+    return False
+
+
+def _compute_omitted_zone1_perturbation_metrics_arb(
+    Y_arb: arb,
+    log_Y: arb,
+    T_y: int,
+    D_tilde_ball: arb,
+    *,
+    panels: int = 16,
+    z1_ratio: int = 12,
+    prec_bits: int = 256,
+) -> Tuple[arb, arb]:
+    """Compute `(max_panel_omitted_delta_diag, upper_bound_omitted_D_tilde_rad)` comparing the old
+    early-exit `if pk > n0_j: break` loop against `compute_zone1_prime_power_diag_perturbation_arb`.
+    """
+    saved = flint_ctx.prec
+    try:
+        flint_ctx.prec = prec_bits + 32
+        tau = _tau_arb()
+        log_tau = tau.log()
+        pp_pairs = prime_power_pairs_up_to(T_y)
+        pp_info: List[Tuple[int, int, arb]] = [
+            (p ** k, T_y // (p ** k), arb(p).log() ** 2) for (p, k) in pp_pairs
+        ]
+        max_delta_diff = arb(0)
+        omitted_rad_sum = arb(0)
+        sqrt_D_up = abs(D_tilde_ball).sqrt()
+        for j in range(panels):
+            u_lo = log_tau * arb(j) / arb(panels)
+            u_hi = log_tau * arb(j + 1) / arb(panels)
+            du = u_hi - u_lo
+            sqrt_du = du.sqrt()
+            x_lo = Y_arb * u_lo.exp()
+            lg_lo = log_Y + u_lo
+            n0_j = min(T_y, max(0, int(math.floor(float(x_lo.lower()) / float(z1_ratio)))))
+            while n0_j > 0 and not bool(x_lo >= arb(z1_ratio * n0_j)):
+                n0_j -= 1
+            if n0_j <= 0:
+                continue
+            x_lo_52 = x_lo ** (arb(5) / arb(2))
+            x_lo_2 = x_lo * x_lo
+            phi_lo = [arb(0)] * (n0_j + 1)
+            for n in range(1, n0_j + 1):
+                phi_lo[n] = x_lo_52 * (arb(n) ** (-3)) * (-x_lo_2 / arb(n * n)).exp()
+
+            # Prefix before first pk > n0_j (evaluating historical truncated prefix without break):
+            old_sq_sum = arb(0)
+            import itertools as _itertools
+
+            for pk, L_pk, lg_p_sq in _itertools.takewhile(lambda item: item[0] <= n0_j, pp_info):
+                q0 = min(L_pk, n0_j // pk)
+                s_pk = arb(0)
+                for q in range(1, q0 + 1):
+                    s_pk += phi_lo[pk * q]
+                old_sq_sum += lg_p_sq * (s_pk * s_pk)
+            d_old = (sqrt_du / lg_lo) * old_sq_sum.sqrt()
+
+            d_rep = compute_zone1_prime_power_diag_perturbation_arb(
+                pp_info, n0_j, phi_lo, sqrt_du, lg_lo
+            )
+            diff_j = d_rep - d_old
+            max_delta_diff = enclose_discrete_grid_max([max_delta_diff, abs(diff_j)])
+            rad_rep_up = arb(2) * sqrt_D_up * d_rep + d_rep * d_rep
+            rad_old_lo = arb(2) * sqrt_D_up * d_old + d_old * d_old
+            omitted_rad_sum += abs(rad_rep_up - rad_old_lo)
+        flint_ctx.prec = prec_bits
+        return (+max_delta_diff, +omitted_rad_sum)
+    finally:
+        flint_ctx.prec = saved
+
+
+def revalidate_tc061_prime_power_majorant_impact_arb(
+    path: Path = MIXED_ARITHMETIC_COVARIANCE_ARTIFACT_PATH,
+    *,
+    write_output: bool = True,
+) -> Dict[str, Any]:
+    """Execute the complete `TASK-TC-062R` §2 call-graph impact audit and live 256-bit Arb
+    revalidation of `data/tc_mixed_arithmetic_covariance.json` after repairing the Zone 1 prime-power
+    diagonal majorant (`compute_zone1_prime_power_diag_perturbation_arb`):
+
+    1. Leaves call-graph unaffected sections/entries untouched (`status = "UNAFFECTED"`):
+       - `Section 1` (`Y = 2..64`, `T <= 182 < 512`, `use_three_zone=False`): `294` balls;
+       - `Section 2` `fast_selberg_sieve_vs_inherited_check` (`2` balls), `straddling_interval_case_splits`
+         (`20` balls, full-sum interval evaluator with no Zone 1 split), and `J_unsplit` (`2` balls): `24` balls;
+       - `Section 3` `HO-BASE-128` (`T = 431 < 512`, `quadrature_mode == "unsplit"`, `161` balls) and
+         `tc061r_protocol_deviation_and_rerun_comparison` (`5` balls): `166` balls;
+       - `Section 4` `20` control rows at `Y in {16, 32, 64, 128}` (`T <= 431 < 512`, `276` balls);
+       - `Section 5` `finite_window_gram_kernel_expansion_checks` (`33` balls),
+         `aggregate_log_removal_and_global_coprime_bridge` (`72` balls),
+         `composite_self_collision_theorem.elementary_analytic_proof` (`3` balls),
+         `evaluated_scales_16_to_4096` at `Y in {16, 32, 64, 128}` (`32` balls), and the `15`
+         `evaluate_X_self_collision_arb` / analytic-constant balls at `Y >= 256`: `155` balls;
+       - `Section 6` `route_d_threshold_checks`: `9` balls;
+       - `headline_and_exposure_reconciliation` (`HO_BASE_128` `3` balls + `self_collision_constants`
+         `3` balls): `6` balls.
+    2. Re-evaluates EVERY affected entry live in 256-bit Arb arithmetic under exact protocol settings:
+       - `Section 2` `three_zone_vs_unsplit_crosschecks` at `Y = 64, 128` (`6` 3-zone/diff balls);
+       - `Section 3` `13` `three_zone` holdout points (`T >= 518`, `2,105` balls) + `headline.HO_EXT_4096` (`4` balls);
+       - `Section 4` `10` `three_zone` control rows at `Y = 256, 512` (`138` balls);
+       - `Section 5` `5` self-collision rows at `Y in {256, 512, 1024, 2048, 4096}` (`25` balls reusing Section 3).
+    3. Verifies in exact `Fraction` arithmetic whether BOTH outward-rounded endpoints `[rep_lo, rep_hi]`
+       of every live repaired 256-bit `arb` ball lie strictly inside the tightest retained intersection
+       `[max(ret_bs_lo, ret_dec_lo, ret_flt_lo), min(ret_bs_hi, ret_dec_hi, ret_flt_hi)]` AND pass
+       `verify_serialized_arb_roundtrip(B_repaired, retained)`. Preserves strictly containing historical
+       enclosures (`status = "REVALIDATED"`) and widens any unenclosed ball (`status = "WIDENED"`),
+       recording full provenance under `provenance_separation["tc062r_prime_power_majorant_revalidation"]`.
+    """
+    assert path.exists(), f"Missing {path}; cannot revalidate TC-061 artifact."
+    t_start = time.perf_counter()
+    revalidated_at_utc = datetime.now(timezone.utc).isoformat()
+
+    proto_chk = verify_frozen_protocol_immutability()
+    assert proto_chk["verified"] is True, f"Frozen protocol check failed: {proto_chk}"
+    proto = proto_chk["protocol_object"]
+    probes = proto["frozen_candidate_probes"]
+    holdout_entries = proto["preregistered_holdout_grid"]
+    protocol_rules = proto["numerical_settings_and_escalation_rules"]
+    prec_bits = 256
+
+    artifact = json.loads(path.read_text(encoding="utf-8"))
+    tc061r3_baseline_commit = "6a2f5f519b3f2f4642ea2ce00626832e556953be"
+    if path.resolve() == MIXED_ARITHMETIC_COVARIANCE_ARTIFACT_PATH.resolve():
+        proc_base = subprocess.run(
+            ["git", "show", f"{tc061r3_baseline_commit}:data/tc_mixed_arithmetic_covariance.json"],
+            cwd=str(REPO_ROOT),
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            check=False,
+        )
+        if proc_base.returncode == 0 and proc_base.stdout.strip():
+            artifact = json.loads(proc_base.stdout)
+    orig_arb_map = _collect_serialized_arb_dicts(artifact)
+    orig_total_balls = len(orig_arb_map)
+    assert orig_total_balls == 3208, f"Expected 3208 serialized Arb balls, got {orig_total_balls}"
+
+    shared_tbl = compute_selberg_centered_remainder_table_fast_arb(32768, prec_bits=prec_bits + 32)
+
+    repaired_affected_map: Dict[str, Dict[str, Any]] = {}
+    live_verified_unaffected_companion_paths: List[str] = []
+    any_verdict_changed = False
+    max_omitted_delta_diag = arb(0)
+    max_omitted_D_tilde_rad = arb(0)
+
+    # --- 1. Section 2: three_zone_vs_unsplit_crosschecks at Y = 64, 128 ---
+    saved_s2 = flint_ctx.prec
+    try:
+        flint_ctx.prec = prec_bits
+        for idx_z, y_chk in enumerate((64, 128)):
+            sp_z = ExactScaleSpec(str(y_chk), "exact_rational", Fraction(y_chk, 1))
+            r_unsplit = evaluate_mixed_covariance_point_arb(
+                sp_z,
+                prec_bits=prec_bits,
+                quad_tol_bits=210,
+                use_three_zone=False,
+                allow_nonprotocol_override=True,
+                selberg_table=shared_tbl,
+            )
+            r_3z = evaluate_mixed_covariance_point_arb(
+                sp_z,
+                prec_bits=prec_bits,
+                quad_tol_bits=160,
+                n_panels=16,
+                use_three_zone=True,
+                allow_nonprotocol_override=True,
+                selberg_table=shared_tbl,
+            )
+            diff_J = r_unsplit["J_direct"] - r_3z["J_direct"]
+            diff_D = r_unsplit["D_tilde_Y"] - r_3z["D_tilde_Y"]
+            ok_z = bool(
+                arb(0) in diff_J
+                and abs(diff_J) < arb("1e-44")
+                and arb(0) in diff_D
+                and abs(diff_D) < arb("1e-44")
+            )
+            stored_z = artifact["section_2_cutoff_and_interval_certification"][
+                "three_zone_vs_unsplit_crosschecks"
+            ][idx_z]
+            if ok_z != bool(stored_z["consistent_zero_in_difference"]):
+                any_verdict_changed = True
+            d_diff_max, d_rad_ub = _compute_omitted_zone1_perturbation_metrics_arb(
+                r_3z["Y_arb"],
+                r_3z["log_Y_arb"],
+                int(r_3z["cutoffs"]["T_Y"]),
+                r_3z["D_tilde_Y"],
+                prec_bits=prec_bits,
+            )
+            max_omitted_delta_diag = enclose_discrete_grid_max([max_omitted_delta_diag, d_diff_max])
+            max_omitted_D_tilde_rad = enclose_discrete_grid_max([max_omitted_D_tilde_rad, d_rad_ub])
+            base_p = (
+                f"section_2_cutoff_and_interval_certification.three_zone_vs_unsplit_crosschecks[{idx_z}]"
+            )
+            repaired_affected_map[f"{base_p}.J_three_zone"] = serialize_arb_certified(r_3z["J_direct"])
+            repaired_affected_map[f"{base_p}.J_difference"] = serialize_arb_certified(diff_J)
+            repaired_affected_map[f"{base_p}.D_tilde_difference"] = serialize_arb_certified(diff_D)
+    finally:
+        flint_ctx.prec = saved_s2
+
+    # --- 2. Section 3: 13 three_zone holdout points (rows 1..13) + headline.HO_EXT_4096 ---
+    sec3_rows_stored = artifact["section_3_preregistered_holdout_experiment"][
+        "holdout_point_evaluations"
+    ]
+    entry_by_id = {str(e["point_id"]): e for e in holdout_entries}
+    sec3_live_point_results_by_y: Dict[int, Dict[str, arb]] = {}
+
+    for row_idx, stored_row in enumerate(sec3_rows_stored):
+        pid = str(stored_row["point_id"])
+        t_y_stored = int(stored_row["cutoffs"]["T_Y"])
+        if t_y_stored < 512:
+            assert pid == "HO-BASE-128" and stored_row["quadrature_mode"] == "unsplit"
+            continue
+        entry = entry_by_id[pid]
+        spec = ExactScaleSpec.from_protocol_entry(entry)
+        exec_out = execute_holdout_point_with_protocol_escalation(
+            spec,
+            probes,
+            protocol_rules,
+            point_id=pid,
+            selberg_table=shared_tbl,
+            in_declared_domain_fn=lambda _pr: True,
+            kl1_in_declared_domain=True,
+            raise_on_integrity_conflict=True,
+        )
+        repaired_row = build_holdout_point_artifact_row(
+            entry, exec_out, compute_divisor_partition=False
+        )
+        res_pt = exec_out["point_result"]
+        d_diff_max, d_rad_ub = _compute_omitted_zone1_perturbation_metrics_arb(
+            res_pt["Y_arb"],
+            res_pt["log_Y_arb"],
+            int(res_pt["cutoffs"]["T_Y"]),
+            res_pt["D_tilde_Y"],
+            prec_bits=prec_bits,
+        )
+        max_omitted_delta_diag = enclose_discrete_grid_max([max_omitted_delta_diag, d_diff_max])
+        max_omitted_D_tilde_rad = enclose_discrete_grid_max([max_omitted_D_tilde_rad, d_rad_ub])
+
+        if (
+            int(repaired_row["escalation_tier_used"]) != int(stored_row["escalation_tier_used"])
+            or bool(repaired_row["algebraic_consistency_verified"])
+            != bool(stored_row["algebraic_consistency_verified"])
+            or str(repaired_row["J_sign"]) != str(stored_row["J_sign"])
+            or str(repaired_row["pair_P_B_sign"]) != str(stored_row["pair_P_B_sign"])
+        ):
+            any_verdict_changed = True
+        for pr_id, pr_d in repaired_row["probe_evaluations"].items():
+            if str(pr_d["point_verdict"]) != str(stored_row["probe_evaluations"][pr_id]["point_verdict"]):
+                any_verdict_changed = True
+        if (
+            str(repaired_row["mechanism_kl1_sub_budgets"]["offdiag_verdict"])
+            != str(stored_row["mechanism_kl1_sub_budgets"]["offdiag_verdict"])
+            or str(repaired_row["mechanism_kl1_sub_budgets"]["R_mix_verdict"])
+            != str(stored_row["mechanism_kl1_sub_budgets"]["R_mix_verdict"])
+        ):
+            any_verdict_changed = True
+
+        row_prefix = (
+            f"section_3_preregistered_holdout_experiment.holdout_point_evaluations[{row_idx}]"
+        )
+        row_balls = _collect_serialized_arb_dicts(repaired_row, row_prefix)
+        repaired_affected_map.update(row_balls)
+
+        lbl = str(stored_row["label"])
+        if lbl in ("256", "512", "1024", "2048", "4096") and pid.startswith(("HO-BASE-", "HO-EXT-")):
+            sec3_live_point_results_by_y[int(lbl)] = {
+                "D_tilde_Y": res_pt["D_tilde_Y"],
+                "X_tilde_Y": res_pt["X_tilde_Y"],
+                "B_norm_sq": res_pt["B_norm_sq"],
+                "pair_P_B": res_pt["pair_P_B"],
+                "J_direct": res_pt["J_direct"],
+            }
+        if pid == "HO-EXT-4096":
+            hl_p = "headline_and_exposure_reconciliation.headline_holdout_values.HO_EXT_4096"
+            repaired_affected_map[f"{hl_p}.J_direct"] = repaired_row["J_direct"]
+            repaired_affected_map[f"{hl_p}.log_Y_times_D_tilde"] = repaired_row[
+                "log_Y_times_D_tilde"
+            ]
+            repaired_affected_map[f"{hl_p}.M_P0"] = repaired_row["probe_evaluations"][
+                "TC061-P0"
+            ]["margin_M_Y"]
+            repaired_affected_map[f"{hl_p}.J_over_log_Y_D_tilde.ratio"] = repaired_row[
+                "J_over_log_Y_D_tilde"
+            ]["ratio"]
+
+    # --- 3. Section 4: 10 three_zone control rows at Y = 256, 512 (rows 20..29) ---
+    sec4_rows_stored = artifact["section_4_controls_and_tc_arithmetic_attribution"][
+        "control_comparison_rows"
+    ]
+    for row_idx, stored_ctrl in enumerate(sec4_rows_stored):
+        y_val = int(stored_ctrl["Y"])
+        t_y_ctrl = int(stored_ctrl["T_Y"])
+        if t_y_ctrl < 512:
+            assert y_val in (16, 32, 64, 128)
+            continue
+        assert y_val in (256, 512)
+        mode = str(stored_ctrl["mode"])
+        r_ctrl = evaluate_control_matched_point_arb(y_val, mode, shared_tbl, prec_bits=prec_bits)
+        is_exact_matched = mode != "hybrid_a2_liouville"
+        if is_exact_matched:
+            id_ok = bool(
+                arb(0) in r_ctrl["J_consistency_residual"]
+                and abs(r_ctrl["J_consistency_residual"]) < arb("1e-44")
+            )
+            if id_ok != bool(stored_ctrl["matched_identity_verified"]):
+                any_verdict_changed = True
+        probe_eval_ctrl = _evaluate_probes_for_point_result(
+            r_ctrl,
+            probes,
+            in_declared_domain_fn=lambda pr, _y=y_val: _y >= int(pr["domain_threshold_Y0"]),
+            prec_bits=prec_bits,
+        )
+        for pr_id, pdata_c in probe_eval_ctrl["per_probe"].items():
+            if str(pdata_c["point_verdict"]) != str(stored_ctrl["shared_probe_verdicts"][pr_id]):
+                any_verdict_changed = True
+
+        saved_c_lg = flint_ctx.prec
+        try:
+            flint_ctx.prec = prec_bits
+            lg_y_ctrl = arb(y_val).log()
+        finally:
+            flint_ctx.prec = saved_c_lg
+        d_diff_max, d_rad_ub = _compute_omitted_zone1_perturbation_metrics_arb(
+            r_ctrl["Y_arb"],
+            lg_y_ctrl,
+            int(r_ctrl["T_Y"]),
+            r_ctrl["D_tilde_Y"],
+            prec_bits=prec_bits,
+        )
+        max_omitted_delta_diag = enclose_discrete_grid_max([max_omitted_delta_diag, d_diff_max])
+        max_omitted_D_tilde_rad = enclose_discrete_grid_max([max_omitted_D_tilde_rad, d_rad_ub])
+
+        repaired_ctrl_row = {
+            "raw_shared_window_diagnostics": {
+                "E_Y": serialize_arb_certified(r_ctrl["E_Y"]),
+                "D_tilde_Y": serialize_arb_certified(r_ctrl["D_tilde_Y"]),
+                "four_X_tilde_Y": serialize_arb_certified(arb(4) * r_ctrl["X_tilde_Y"]),
+            },
+            "A_norm_sq": serialize_arb_certified(r_ctrl["A_norm_sq"]),
+            "B_norm_sq": serialize_arb_certified(r_ctrl["B_norm_sq"]),
+            "pair_P_B": serialize_arb_certified(r_ctrl["pair_P_B"]),
+            "J_functional": serialize_arb_certified(r_ctrl["J_direct"]),
+            "J_consistency_residual_if_matched": (
+                serialize_arb_certified(r_ctrl["J_consistency_residual"])
+                if is_exact_matched
+                else None
+            ),
+            "log_Y_times_D_tilde": serialize_arb_certified(r_ctrl["log_Y_times_D_tilde"]),
+            "J_over_log_Y_D_tilde": probe_eval_ctrl["J_over_log_Y_D_tilde"],
+            "shared_probe_margins": {
+                pr_id: pdata_c["margin_M_Y"]
+                for pr_id, pdata_c in probe_eval_ctrl["per_probe"].items()
+            },
+        }
+        ctrl_prefix = (
+            f"section_4_controls_and_tc_arithmetic_attribution.control_comparison_rows[{row_idx}]"
+        )
+        repaired_affected_map.update(_collect_serialized_arb_dicts(repaired_ctrl_row, ctrl_prefix))
+
+    # --- 4. Section 5: 5 self-collision rows at Y in {256, 512, 1024, 2048, 4096} (rows 4..8) ---
+    saved_s5 = flint_ctx.prec
+    try:
+        flint_ctx.prec = prec_bits
+        tau = _tau_arb()
+        log_tau = tau.log()
+        analytic_self_bound = _frac_to_arb(Fraction(1377, 160)) * log_tau
+        sharp_self_bound = _frac_to_arb(Fraction(289, 60)) * log_tau
+        sec5_sc_rows = artifact["section_5_arithmetic_proof_attempt_and_kernel_reduction"][
+            "composite_self_collision_theorem"
+        ]["evaluated_scales_16_to_4096"]
+        for sc_idx, sc_stored in enumerate(sec5_sc_rows):
+            y_sc = int(sc_stored["Y"])
+            if y_sc < 256:
+                continue
+            assert y_sc in sec3_live_point_results_by_y
+            t_sc = int(sc_stored["T_Y"])
+            x_self_b = evaluate_X_self_collision_arb(arb(y_sc), t_sc, prec_bits=prec_bits)
+            fr = sec3_live_point_results_by_y[y_sc]
+            x_tilde_b = fr["X_tilde_Y"]
+            d_tilde_b = fr["D_tilde_Y"]
+            b2_b = fr["B_norm_sq"]
+            pb_b = fr["pair_P_B"]
+            j_b = fr["J_direct"]
+            x_off_b = +(x_tilde_b - x_self_b)
+            F_rem_b = +(arb(4) * x_off_b + b2_b - arb(4) * pb_b)
+            S_rel_b = +(arb(5) * x_off_b + arb(5) * b2_b)
+            res_JF = +(j_b - (arb(4) * x_self_b + F_rem_b))
+            ok_JF = bool(arb(0) in res_JF and abs(res_JF) < arb("1e-40"))
+            _, ok_JS = classify_arb_le_certificate(j_b, arb(5) * x_self_b + d_tilde_b + S_rel_b)
+            x_off_sign = (
+                "STRICTLY_NEGATIVE"
+                if bool(x_off_b < arb(0))
+                else ("STRICTLY_POSITIVE" if bool(x_off_b > arb(0)) else "STRADDLING_ZERO")
+            )
+            _, ok_ub_sharp = classify_arb_le_certificate(x_self_b, sharp_self_bound)
+            _, ok_ub = classify_arb_le_certificate(x_self_b, analytic_self_bound)
+            ok_pos = bool(x_self_b > arb(0))
+            if (
+                x_off_sign != str(sc_stored["X_off_sign"])
+                or ok_JS != bool(sc_stored["J_le_5Xself_plus_Dtilde_plus_S_certified"])
+                or bool(ok_pos and ok_ub_sharp and ok_ub and ok_JF and ok_JS)
+                != bool(sc_stored["strictly_positive_and_le_uniform_bound"])
+            ):
+                any_verdict_changed = True
+
+            sc_prefix = (
+                "section_5_arithmetic_proof_attempt_and_kernel_reduction."
+                f"composite_self_collision_theorem.evaluated_scales_16_to_4096[{sc_idx}]"
+            )
+            # Live-verify the 3 unaffected balls (X_self_Y and the 2 analytic bounds) as well:
+            for u_field, u_ball in (
+                ("X_self_Y", x_self_b),
+                ("analytic_sharp_upper_bound_289_60_log_tau", sharp_self_bound),
+                ("analytic_uniform_upper_bound_1377_160_log_tau", analytic_self_bound),
+            ):
+                u_path = f"{sc_prefix}.{u_field}"
+                assert verify_serialized_arb_roundtrip(u_ball, orig_arb_map[u_path])[
+                    "all_reconstructions_enclose_original"
+                ]
+                live_verified_unaffected_companion_paths.append(u_path)
+
+            repaired_affected_map[f"{sc_prefix}.X_tilde_Y"] = serialize_arb_certified(x_tilde_b)
+            repaired_affected_map[f"{sc_prefix}.X_off_Y"] = serialize_arb_certified(x_off_b)
+            repaired_affected_map[f"{sc_prefix}.F_signed_remainder_Y"] = serialize_arb_certified(
+                F_rem_b
+            )
+            repaired_affected_map[f"{sc_prefix}.S_unsigned_core_relaxation_Y"] = (
+                serialize_arb_certified(S_rel_b)
+            )
+            repaired_affected_map[f"{sc_prefix}.J_minus_4Xself_plus_F_residual"] = (
+                serialize_arb_certified(res_JF)
+            )
+    finally:
+        flint_ctx.prec = saved_s5
+
+    assert len(repaired_affected_map) == 2278, (
+        f"Expected 2278 affected-entry balls, got {len(repaired_affected_map)}"
+    )
+    assert set(repaired_affected_map.keys()).issubset(set(orig_arb_map.keys()))
+
+    # --- 5. Exact outward Fraction endpoint containment check across all 3,208 balls ---
+    section_keys = (
+        "headline_and_exposure_reconciliation",
+        "section_1_protocol_and_exact_mixed_identity",
+        "section_2_cutoff_and_interval_certification",
+        "section_3_preregistered_holdout_experiment",
+        "section_4_controls_and_tc_arithmetic_attribution",
+        "section_5_arithmetic_proof_attempt_and_kernel_reduction",
+        "section_6_route_d_conditional_transfer_and_scope",
+    )
+    per_sec_counts: Dict[str, Dict[str, int]] = {
+        sk: {"total": 0, "unaffected": 0, "revalidated": 0, "widened": 0, "superseded": 0}
+        for sk in section_keys
+    }
+    strict_dataflow_counts = {
+        "unaffected": 0,
+        "revalidated": 0,
+        "widened": 0,
+        "superseded": 0,
+    }
+    widened_records: List[Dict[str, Any]] = []
+
+    for b_path, d_ret in orig_arb_map.items():
+        top_sec = b_path.split(".", 1)[0]
+        per_sec_counts[top_sec]["total"] += 1
+        if b_path not in repaired_affected_map:
+            # Verify exact mutual intersection consistency across all 3 serialized forms:
+            u_bs_lo, u_bs_hi, _ = _parse_arb_ball_str_to_fractions(str(d_ret["arb_ball_str"]))
+            u_dec_lo = _sci_or_latex_num_to_fraction(str(d_ret["lower_dec"]))
+            u_dec_hi = _sci_or_latex_num_to_fraction(str(d_ret["upper_dec"]))
+            u_flt_lo = Fraction(float(d_ret["mid_float"])) - Fraction(
+                float(d_ret["rad_float_outward"])
+            )
+            u_flt_hi = Fraction(float(d_ret["mid_float"])) + Fraction(
+                float(d_ret["rad_float_outward"])
+            )
+            assert u_dec_lo <= u_dec_hi and max(u_bs_lo, u_dec_lo, u_flt_lo) <= min(
+                u_bs_hi, u_dec_hi, u_flt_hi
+            ), f"Unaffected ball intersection consistency failed at {b_path}"
+            per_sec_counts[top_sec]["unaffected"] += 1
+            strict_dataflow_counts["unaffected"] += 1
+            continue
+
+        d_rep_with_arb = repaired_affected_map[b_path]
+        B_repaired = d_rep_with_arb["enclosure_arb"]
+        assert isinstance(B_repaired, arb) and B_repaired.is_finite()
+
+        # Exact mathematical dyadic-rational endpoints [mid - rad, mid + rad] of 256-bit B_repaired:
+        rep_lo, rep_hi = _exact_arb_endpoints_as_fractions(B_repaired)
+
+        ret_bs_lo, ret_bs_hi, _ = _parse_arb_ball_str_to_fractions(str(d_ret["arb_ball_str"]))
+        ret_dec_lo = _sci_or_latex_num_to_fraction(str(d_ret["lower_dec"]))
+        ret_dec_hi = _sci_or_latex_num_to_fraction(str(d_ret["upper_dec"]))
+        ret_flt_lo = Fraction(float(d_ret["mid_float"])) - Fraction(float(d_ret["rad_float_outward"]))
+        ret_flt_hi = Fraction(float(d_ret["mid_float"])) + Fraction(float(d_ret["rad_float_outward"]))
+
+        ret_lo_tight = max(ret_bs_lo, ret_dec_lo, ret_flt_lo)
+        ret_hi_tight = min(ret_bs_hi, ret_dec_hi, ret_flt_hi)
+
+        saved_rt = flint_ctx.prec
+        try:
+            flint_ctx.prec = prec_bits
+            rt_ok = verify_serialized_arb_roundtrip(B_repaired, d_ret)[
+                "all_reconstructions_enclose_original"
+            ]
+        finally:
+            flint_ctx.prec = saved_rt
+
+        has_d_dataflow = _is_direct_d_tilde_dataflow_path(b_path)
+        strictly_enclosed = bool(rep_lo >= ret_lo_tight and rep_hi <= ret_hi_tight and rt_ok)
+
+        if strictly_enclosed:
+            per_sec_counts[top_sec]["revalidated"] += 1
+            if has_d_dataflow:
+                strict_dataflow_counts["revalidated"] += 1
+            else:
+                strict_dataflow_counts["unaffected"] += 1
+        else:
+            assert has_d_dataflow, (
+                f"Unexpected widening on D_tilde-independent observable at {b_path}"
+            )
+            cand = strip_enclosure_arb_for_json(d_rep_with_arb)
+            c_bs_lo, c_bs_hi, _ = _parse_arb_ball_str_to_fractions(str(cand["arb_ball_str"]))
+            c_dec_lo = _sci_or_latex_num_to_fraction(str(cand["lower_dec"]))
+            c_dec_hi = _sci_or_latex_num_to_fraction(str(cand["upper_dec"]))
+            c_flt_lo = Fraction(float(cand["mid_float"])) - Fraction(
+                float(cand["rad_float_outward"])
+            )
+            c_flt_hi = Fraction(float(cand["mid_float"])) + Fraction(
+                float(cand["rad_float_outward"])
+            )
+            cand_covers_both = bool(
+                max(c_bs_lo, c_dec_lo, c_flt_lo) <= rep_lo
+                and min(c_bs_hi, c_dec_hi, c_flt_hi) >= rep_hi
+                and c_bs_lo <= ret_bs_lo
+                and c_bs_hi >= ret_bs_hi
+                and c_dec_lo <= ret_dec_lo
+                and c_dec_hi >= ret_dec_hi
+                and c_flt_lo <= ret_flt_lo
+                and c_flt_hi >= ret_flt_hi
+            )
+            if not cand_covers_both:
+                saved_w = flint_ctx.prec
+                try:
+                    flint_ctx.prec = prec_bits
+                    b_hull = (
+                        B_repaired.union(arb(str(d_ret["lower_dec"])))
+                        .union(arb(str(d_ret["upper_dec"])))
+                        .union(arb(str(d_ret["arb_ball_str"])))
+                    )
+                    cand = strip_enclosure_arb_for_json(serialize_arb_certified(b_hull))
+                finally:
+                    flint_ctx.prec = saved_w
+
+            # Verify widened candidate encloses B_repaired in exact Fraction and Arb roundtrip:
+            w_bs_lo, w_bs_hi, _ = _parse_arb_ball_str_to_fractions(str(cand["arb_ball_str"]))
+            w_dec_lo = _sci_or_latex_num_to_fraction(str(cand["lower_dec"]))
+            w_dec_hi = _sci_or_latex_num_to_fraction(str(cand["upper_dec"]))
+            w_flt_lo = Fraction(float(cand["mid_float"])) - Fraction(
+                float(cand["rad_float_outward"])
+            )
+            w_flt_hi = Fraction(float(cand["mid_float"])) + Fraction(
+                float(cand["rad_float_outward"])
+            )
+            w_lo_tight = max(w_bs_lo, w_dec_lo, w_flt_lo)
+            w_hi_tight = min(w_bs_hi, w_dec_hi, w_flt_hi)
+            saved_wv = flint_ctx.prec
+            try:
+                flint_ctx.prec = prec_bits
+                w_rt_ok = verify_serialized_arb_roundtrip(B_repaired, cand)[
+                    "all_reconstructions_enclose_original"
+                ]
+            finally:
+                flint_ctx.prec = saved_wv
+            assert rep_lo >= w_lo_tight and rep_hi <= w_hi_tight and w_rt_ok, (
+                f"Widened ball failed enclosure verification at {b_path}: {cand}"
+            )
+
+            _set_node_at_collected_json_path(artifact, b_path, cand)
+            per_sec_counts[top_sec]["widened"] += 1
+            strict_dataflow_counts["widened"] += 1
+
+            excess_lo = max(Fraction(0, 1), ret_lo_tight - rep_lo)
+            excess_hi = max(Fraction(0, 1), rep_hi - ret_hi_tight)
+            max_endpoint_excess = max(excess_lo, excess_hi)
+            saved_ex = flint_ctx.prec
+            try:
+                flint_ctx.prec = prec_bits
+                excess_str = _frac_to_arb(max_endpoint_excess).upper().str(12, radius=False)
+            finally:
+                flint_ctx.prec = saved_ex
+
+            widened_records.append(
+                {
+                    "json_path": b_path,
+                    "section": top_sec,
+                    "status": "WIDENED",
+                    "prior_ball_str": str(d_ret["arb_ball_str"]),
+                    "prior_lo_dec": str(d_ret["lower_dec"]),
+                    "prior_hi_dec": str(d_ret["upper_dec"]),
+                    "widened_ball_str": str(cand["arb_ball_str"]),
+                    "widened_lo_dec": str(cand["lower_dec"]),
+                    "widened_hi_dec": str(cand["upper_dec"]),
+                    "max_endpoint_excess_over_retained_tight_str": excess_str,
+                }
+            )
+
+    assert any_verdict_changed is False, "Unexpected verdict change during TC-062R revalidation!"
+
+    overall_counts = {
+        "unaffected": sum(v["unaffected"] for v in per_sec_counts.values()),
+        "revalidated": sum(v["revalidated"] for v in per_sec_counts.values()),
+        "widened": sum(v["widened"] for v in per_sec_counts.values()),
+        "superseded": 0,
+    }
+    assert sum(overall_counts.values()) == orig_total_balls
+    assert sum(strict_dataflow_counts.values()) == orig_total_balls
+
+    section_notes = {
+        "headline_and_exposure_reconciliation": (
+            "HO_BASE_128 (3 balls, T=431<512 unsplit) and self_collision_constants (3 balls) are "
+            "UNAFFECTED; HO_EXT_4096 (4 balls, T=32768>=512 three_zone) re-evaluated live."
+        ),
+        "section_1_protocol_and_exact_mixed_identity": (
+            "Y in {2, 4, 8, 16, 32, 64} (T <= 182 < 512, use_three_zone=False): all 294 balls UNAFFECTED."
+        ),
+        "section_2_cutoff_and_interval_certification": (
+            "fast_selberg_sieve_vs_inherited_check (2 balls), straddling_interval_case_splits "
+            "(20 balls, full-sum evaluate_fixed_cutoff_on_Y_ball_arb with no Zone 1 split), and "
+            "J_unsplit (2 balls) are UNAFFECTED; three_zone_vs_unsplit_crosschecks 3-zone/difference "
+            "fields at Y = 64, 128 (6 balls, n0_0 = 5, 10 >= 3) re-evaluated live."
+        ),
+        "section_3_preregistered_holdout_experiment": (
+            "HO-BASE-128 (T = 431 < 512, unsplit, 161 balls) and protocol-deviation comparison "
+            "(5 balls) are UNAFFECTED; remaining 13 holdout points (T >= 518 >= 512, three_zone, "
+            "2105 balls) re-evaluated live under frozen protocol settings."
+        ),
+        "section_4_controls_and_tc_arithmetic_attribution": (
+            "20 control rows at Y in {16, 32, 64, 128} (T <= 431 < 512, three_zone=False, 276 balls) "
+            "are UNAFFECTED; 10 control rows at Y in {256, 512} (T in {1024, 2436} >= 512, "
+            "three_zone=True, 138 balls) re-evaluated live."
+        ),
+        "section_5_arithmetic_proof_attempt_and_kernel_reduction": (
+            "Gram kernel checks (33 balls), coprime bridge (72 balls), elementary self-collision "
+            "proof (3 balls), evaluated_scales at Y <= 128 (32 balls), and X_self_Y / analytic "
+            "constants at Y >= 256 (15 balls, also live-verified) are UNAFFECTED; 25 D_tilde/X_tilde/J-"
+            "dependent balls across Y in {256, 512, 1024, 2048, 4096} re-evaluated live."
+        ),
+        "section_6_route_d_conditional_transfer_and_scope": (
+            "route_d_threshold_checks (9 balls, pure zeta''(1+eps) threshold certificates): UNAFFECTED."
+        ),
+    }
+
+    per_section_inventory: Dict[str, Any] = {}
+    for sk in section_keys:
+        c_sk = per_sec_counts[sk]
+        if c_sk["widened"] > 0:
+            sec_status = "WIDENED"
+        elif c_sk["revalidated"] > 0:
+            sec_status = "REVALIDATED"
+        else:
+            sec_status = "UNAFFECTED"
+        per_section_inventory[sk] = {
+            "section_status": sec_status,
+            "total_balls": c_sk["total"],
+            "unaffected_balls": c_sk["unaffected"],
+            "revalidated_balls": c_sk["revalidated"],
+            "widened_balls": c_sk["widened"],
+            "superseded_balls": 0,
+            "scope_and_call_graph_note": section_notes[sk],
+        }
+
+    saved_fmt = flint_ctx.prec
+    try:
+        flint_ctx.prec = prec_bits
+        max_delta_str = max_omitted_delta_diag.upper().str(16, radius=False)
+        max_rad_str = max_omitted_D_tilde_rad.upper().str(16, radius=False)
+    finally:
+        flint_ctx.prec = saved_fmt
+
+    # Re-verify review displayed enclosures against updated artifact BEFORE finalizing metadata:
+    any_review_interval_failed = False
+    if TC_061_REVIEW_DOC_PATH.exists():
+        rev_audit = verify_tc061_review_displayed_enclosures(artifact, TC_061_REVIEW_DOC_PATH)
+        any_review_interval_failed = not bool(
+            rev_audit["all_displayed_intervals_contain_generated_enclosures"]
+        )
+        assert rev_audit["all_displayed_intervals_contain_generated_enclosures"] is True, (
+            f"Displayed intervals in TC_061_MIXED_ARITHMETIC_COVARIANCE.md failed after revalidation: "
+            f"{rev_audit['failed_intervals']}"
+        )
+        artifact["section_8_tc061_review_displayed_enclosures_audit"] = rev_audit
+
+    reval_wall_sec = round(time.perf_counter() - t_start, 4)
+    head_proc = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=str(REPO_ROOT),
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    revalidating_head = head_proc.stdout.strip() if head_proc.returncode == 0 else "UNKNOWN"
+    artifact["provenance_separation"]["tc062r_prime_power_majorant_revalidation"] = {
+        "revalidation_task_id": "TASK-TC-062R",
+        "branch": "task/tc-062r-prime-power-certification-and-diagonal-equivalence-repair",
+        "prior_baseline_git_commit": tc061r3_baseline_commit,
+        "revalidating_git_commit": revalidating_head,
+        "revalidated_at_utc": revalidated_at_utc,
+        "revalidation_wall_sec": reval_wall_sec,
+        "producing_module": "tc/mixed_arithmetic_covariance.py",
+        "producing_function": "revalidate_tc061_prime_power_majorant_impact_arb",
+        "repaired_helper_function": "compute_zone1_prime_power_diag_perturbation_arb",
+        "defect_repaired": (
+            "Replaced early-exit `if pk > n0_j: break` over prime-grouped `prime_power_pairs_up_to(T)` "
+            "in `evaluate_mixed_covariance_point_arb` and `evaluate_control_matched_point_arb` with "
+            "complete order-independent filtering (`if pk > n0_j: continue`, canonical `(pk, L_pk)` "
+            "summation order) via `compute_zone1_prime_power_diag_perturbation_arb`."
+        ),
+        "enclosure_verification_rule": (
+            "Exact outward-rounded Fraction endpoint containment `rep_lo >= max(ret_bs_lo, ret_dec_lo, "
+            "ret_flt_lo)` and `rep_hi <= min(ret_bs_hi, ret_dec_hi, ret_flt_hi)` plus 256-bit "
+            "`verify_serialized_arb_roundtrip(B_repaired, retained)` (midpoint-only containment rejected)."
+        ),
+        "overall_artifact_status": "WIDENED" if overall_counts["widened"] > 0 else "REVALIDATED",
+        "total_artifact_arb_balls": orig_total_balls,
+        "overall_ball_status_counts": overall_counts,
+        "strict_d_tilde_dataflow_ball_status_counts": strict_dataflow_counts,
+        "live_verified_unaffected_sec5_companion_count": len(
+            live_verified_unaffected_companion_paths
+        ),
+        "max_omitted_delta_diag_j_upper": max_delta_str,
+        "max_omitted_D_tilde_rad_perturbation_upper": max_rad_str,
+        "any_probe_or_kl1_or_control_verdict_changed": any_verdict_changed,
+        "any_review_displayed_enclosure_needed_widening": any_review_interval_failed,
+        "per_section_impact_inventory": per_section_inventory,
+        "widened_ball_count": len(widened_records),
+        "widened_balls": widened_records,
+    }
+
+    # Verify serialized Arb count invariant (must remain exactly 3,208) and live 256-bit round-trip:
+    post_arb_map = _collect_serialized_arb_dicts(artifact)
+    assert len(post_arb_map) == orig_total_balls and set(post_arb_map.keys()) == set(
+        orig_arb_map.keys()
+    ), f"Serialized Arb dict count/keys changed from {orig_total_balls} to {len(post_arb_map)}"
+    saved_sc = flint_ctx.prec
+    try:
+        flint_ctx.prec = prec_bits
+        for b_path, b_node in post_arb_map.items():
+            if b_path in repaired_affected_map:
+                live_b = repaired_affected_map[b_path]["enclosure_arb"]
+                assert verify_serialized_arb_roundtrip(live_b, b_node)[
+                    "all_reconstructions_enclose_original"
+                ], f"Post-revalidation 256-bit round-trip failed at {b_path}"
+            else:
+                assert b_node == orig_arb_map[b_path], (
+                    f"Unaffected ball mutated unexpectedly at {b_path}"
+                )
+    finally:
+        flint_ctx.prec = saved_sc
+    artifact["serialized_arb_self_check"]["total_certified_arb_balls_checked"] = orig_total_balls
+    artifact["serialized_arb_self_check"]["compared_against_live_original_arb_count"] = (
+        orig_total_balls
+    )
+    artifact["serialized_arb_self_check"]["live_original_count_matches_enumerated_total"] = True
+    artifact["serialized_arb_self_check"]["all_enclose_original_256bit_arb_ball"] = True
+    artifact["serialized_arb_self_check"]["failed_paths"] = []
+
+    if write_output:
+        path.write_text(
+            json.dumps(artifact, indent=2, sort_keys=False, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+            newline="\n",
+        )
+    return artifact
+
+
 if __name__ == "__main__":
     import sys
 
-    if "--reprocess-summaries" in sys.argv[1:]:
+    if "--revalidate-tc062r" in sys.argv[1:]:
+        rep = revalidate_tc061_prime_power_majorant_impact_arb(write_output=True)
+        rev_meta = rep["provenance_separation"]["tc062r_prime_power_majorant_revalidation"]
+        print(
+            f"Revalidated {MIXED_ARITHMETIC_COVARIANCE_ARTIFACT_PATH}: "
+            f"status={rev_meta['overall_artifact_status']}, "
+            f"counts={rev_meta['overall_ball_status_counts']}, "
+            f"max_omitted_delta_diag={rev_meta['max_omitted_delta_diag_j_upper']}"
+        )
+    elif "--reprocess-summaries" in sys.argv[1:]:
         verify_rev = "--no-verify-review" not in sys.argv[1:]
         verify_ln = "--no-verify-lean" not in sys.argv[1:]
         rep = reprocess_task_tc061_derived_summaries(

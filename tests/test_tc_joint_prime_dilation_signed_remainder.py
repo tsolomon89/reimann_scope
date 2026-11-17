@@ -34,7 +34,7 @@ from __future__ import annotations
 from fractions import Fraction
 import json
 import re
-from typing import Any, Dict
+from typing import Any, Dict, Tuple
 
 from flint import arb, ctx as flint_ctx
 import pytest
@@ -52,20 +52,33 @@ from tc.joint_prime_dilation_signed_remainder import (
     GLOBAL_CONSEQUENCE_CLASSES,
     JOINT_PRIME_DILATION_ARTIFACT_PATH,
     JOINT_PRIME_DILATION_PROTOCOL_PATH,
+    REVIEWED_TC062_IMPLEMENTATION,
+    REVIEWED_TC062_PRODUCING_COMMIT,
+    REVIEWED_TC062_TIP,
     TASK_TC_062_ID,
+    TASK_TC_062R_ID,
     TC_062_LEAN_MODULE_PATH,
     TC_062_REVIEW_DOC_PATH,
+    aggregate_tc062_section5_and_derive_outcomes,
     build_complete_signed_kernel_evaluator_small_T,
+    compute_zone1_prime_power_diag_perturbation_tc062_arb,
+    derive_tc062_outcome_summaries,
     evaluate_interior_paired_matrix_free_arb,
     evaluate_whole_line_contraction_ratio_closed_arb,
     execute_tc062_holdout_point_with_escalation,
     extract_lean_declaration_spans_tc062,
+    generate_task_tc062_artifact,
     prime_even_valuation_anchors,
     prime_valuation_v_p,
+    reprocess_task_tc062_metadata_and_stage_b,
+    verify_anchor_diagonal_identities_and_self_collision_bounds_arb,
+    verify_complete_kernel_unsigned_linear_growth_arb,
     verify_frozen_tc062_protocol_immutability,
     verify_generic_finite_anchor_reindexing_exact,
+    verify_section_3_whole_line_contraction_obstruction,
     verify_stage_b_large_prime_b_jump_identity_arb,
     verify_tc062_review_enclosures_and_lean_anchors,
+    verify_zone1_prime_power_majorant_repair_tc062_arb,
 )
 from tc.liouville_square_dilation import (
     _sci_or_latex_num_to_fraction,
@@ -76,6 +89,7 @@ from tc.mixed_arithmetic_covariance import (
     ExactScaleSpec,
     MIXED_ARITHMETIC_COVARIANCE_ARTIFACT_PATH,
     MIXED_ARITHMETIC_COVARIANCE_PROTOCOL_PATH,
+    certify_exact_scale_cutoffs,
     compute_selberg_centered_remainder_table_fast_arb,
     load_frozen_protocol_rules,
     verify_frozen_protocol_immutability,
@@ -385,19 +399,31 @@ def test_tc062_section_5_unseen_holdouts_witness_preservation_and_resource_seman
 def test_tc062_lean_formalization_registration_and_review_synchronization(
     tc062_artifact: Dict[str, Any],
 ) -> None:
-    """Verify Lean 4 module registration, 7 public theorems, 0 sorry/admit/axioms, and review sync."""
+    """Verify Lean 4 module registration, 8 public theorems, 0 sorry/admit/axioms, and review sync."""
     rel_lean = "formal/RiemannScope/JointPrimeDilationSignedRemainder.lean"
     assert rel_lean in FORMAL_SOURCE_FILES
     assert rel_lean in REQUIRED_FORMAL_SOURCES
     assert TC_062_LEAN_MODULE_PATH.exists()
 
+    assert len(EXPECTED_TC062_THEOREMS) == 8
     spans = extract_lean_declaration_spans_tc062()
     assert spans["hygiene_ok"] is True, spans
     assert spans["public_theorem_count"] == len(EXPECTED_TC062_THEOREMS)
 
+    assert tc062_artifact["repair_task_id"] == TASK_TC_062R_ID
     prov = tc062_artifact["provenance"]
-    assert prov["formal_compiled_theorem_count"] == 829
+    assert prov["reviewed_tc062_tip"] == REVIEWED_TC062_TIP
+    assert prov["reviewed_tc062_implementation"] == REVIEWED_TC062_IMPLEMENTATION
+    assert prov["prior_tc062_producing_commit"] == REVIEWED_TC062_PRODUCING_COMMIT
+    assert prov["formal_compiled_theorem_count"] == 830
     assert prov["formal_build_producing_git_commit"] == prov["numerical_producing_git_commit"]
+    inv62 = prov["tc062r_certificate_impact_inventory"]
+    assert inv62["policy"] == "OPTION_A_FULL_RECOMPUTATION_WITH_REPAIRED_ZONE1_EVALUATORS"
+    assert inv62["prior_tc062_baseline_commit"] == REVIEWED_TC062_TIP
+    assert inv62["recomputed_producing_git_commit"] == prov["numerical_producing_git_commit"]
+    assert inv62["candidate_a2_Y64_counterexample_unaffected"] is True
+    assert inv62["any_probe_kl1_control_or_candidate_verdict_changed"] is False
+    assert sum(inv62["overall_ball_status_counts"].values()) == inv62["total_artifact_arb_balls"]
 
     assert TC_062_REVIEW_DOC_PATH.exists()
     rev_chk = verify_tc062_review_enclosures_and_lean_anchors(
@@ -406,3 +432,343 @@ def test_tc062_lean_formalization_registration_and_review_synchronization(
     assert rev_chk["verified"] is True, rev_chk
     assert rev_chk["checked_holdout_cutoff_count"] == 10
     assert rev_chk["failed_holdout_cutoffs"] == []
+
+
+def test_tc062r_zone1_prime_power_majorant_repair_and_permutations() -> None:
+    """Verify TASK-TC-062R §2: omitted-prime-power reproduction at Y=224 (n0=18), complete
+    reference agreement at n0=0..32 (including n0=3, 9, 18), permutation invariance, Arb panel
+    vector-norm enclosure, and repaired 3-zone vs unsplit agreement at Y=224.
+    """
+    audit = verify_zone1_prime_power_majorant_repair_tc062_arb(prec_bits=256)
+    assert audit["verified"] is True, audit
+    assert audit["reproduced_Y224_n0_18_visited_buggy"] == [2, 4, 8, 16]
+    assert audit["reproduced_Y224_n0_18_omitted_buggy"] == [3, 9, 5, 7, 11, 13, 17]
+    assert audit["reference_and_permutation_invariance_verified"] is True
+    assert audit["panel_signed_vector_norm_enclosure_Y224_verified"] is True
+    assert audit["repaired_three_zone_vs_unsplit_Y224_verified"] is True
+
+    # Explicit boundary check at n0 = 3 where (2,2)->4 > 3 preceded (3,1)->3 in prime_power_pairs_up_to:
+    flint_ctx.prec = 256
+    pp_unsorted = [(2, 10, arb(2).log() ** 2), (4, 5, arb(2).log() ** 2), (3, 6, arb(3).log() ** 2)]
+    phi_demo = [arb(0), arb("1.0"), arb("0.5"), arb("0.25"), arb("0.125")]
+    v_n0_0 = compute_zone1_prime_power_diag_perturbation_tc062_arb(
+        pp_unsorted, 0, phi_demo, arb(1), arb(2)
+    )
+    v_n0_1 = compute_zone1_prime_power_diag_perturbation_tc062_arb(
+        pp_unsorted, 1, phi_demo, arb(1), arb(2)
+    )
+    assert v_n0_0 == arb(0) and v_n0_1 == arb(0)
+    v_n0_3 = compute_zone1_prime_power_diag_perturbation_tc062_arb(
+        pp_unsorted, 3, phi_demo, arb(1), arb(2)
+    )
+    expected_n0_3 = (arb(1) / arb(2)) * (
+        (arb(2).log() ** 2) * (arb("0.5") ** 2) + (arb(3).log() ** 2) * (arb("0.25") ** 2)
+    ).sqrt()
+    assert arb(0) in (v_n0_3 - expected_n0_3) and abs(v_n0_3 - expected_n0_3) < arb("1e-70")
+
+
+def test_tc062r_anchor_diagonal_identities_young_bounds_and_complete_omega_Y(
+    tc062_artifact: Dict[str, Any],
+) -> None:
+    """Verify TASK-TC-062R §§3, 4, 5, 7A, 7B, 7C, 7D repairs in code and generated artifact."""
+    diag_chk = verify_anchor_diagonal_identities_and_self_collision_bounds_arb(prec_bits=256)
+    assert diag_chk["verified"] is True, diag_chk
+    assert diag_chk["retired_erroneous_578_15_log_tau_gt_64"] is True
+    # At m = 3, p = 2 (Y = 8) and m = 33, p = 2 (Y = 64), omitting -4*c(m,m)*[...] strictly fails:
+    for key_d in (
+        "m3_p2_abbreviated_formula_discrepancy_Y8",
+        "m33_p2_abbreviated_formula_discrepancy_Y64",
+    ):
+        disc_lo = _sci_or_latex_num_to_fraction(diag_chk[key_d]["lower_dec"])
+        disc_hi = _sci_or_latex_num_to_fraction(diag_chk[key_d]["upper_dec"])
+        assert disc_hi < 0 or disc_lo > 0
+
+    # Verify 4 * X_self sharp bound (289/15)*log(tau) < (1377/40)*log(tau) < 64:
+    hi_289_15 = _sci_or_latex_num_to_fraction(
+        diag_chk["four_X_self_sharp_bound_289_15_log_tau"]["upper_dec"]
+    )
+    hi_1377_40 = _sci_or_latex_num_to_fraction(
+        diag_chk["four_X_self_envelope_bound_1377_40_log_tau"]["upper_dec"]
+    )
+    assert hi_289_15 < Fraction(36, 1) < hi_1377_40 < Fraction(64, 1)
+
+    # Verify complete-kernel Omega(Y) lower-bound proof audit (avoiding X = 2*sqrt(log 2)*m):
+    omega_chk = verify_complete_kernel_unsigned_linear_growth_arb(prec_bits=256)
+    assert omega_chk["verified"] is True, omega_chk
+    bilin_lo = _sci_or_latex_num_to_fraction(
+        omega_chk["odd_resonant_band_bilinear_lower_bound_Y256"]["lower_dec"]
+    )
+    assert bilin_lo > 0
+
+    # Check Section 3 explicit separation of analytic Gaussian integral from Lean Theorem 4:
+    sec3_live = verify_section_3_whole_line_contraction_obstruction(prec_bits=256)
+    assert sec3_live["all_section_3_checks_pass"] is True
+    assert "ANALYTIC_PROVED_OUTSIDE_LEAN" in sec3_live["epistemic_statuses"]
+    assert (
+        sec3_live["component_epistemic_map"][
+            "improper_halfline_gaussian_integral_to_wholeLineGaussianGram_bridge"
+        ]
+        == "ANALYTIC_PROVED_OUTSIDE_LEAN"
+    )
+    sec3 = tc062_artifact["section_3_whole_line_contraction_obstruction"]
+    assert "ANALYTIC_PROVED_OUTSIDE_LEAN" in sec3["epistemic_statuses"]
+    assert (
+        sec3["component_epistemic_map"][
+            "improper_halfline_gaussian_integral_to_wholeLineGaussianGram_bridge"
+        ]
+        == "ANALYTIC_PROVED_OUTSIDE_LEAN"
+    )
+
+    # Check Section 4 Young boundary accounting & absence of retired false claims:
+    sec4 = tc062_artifact["section_4_quantitative_proof_attempt"]
+    yb = sec4["uncovered_young_boundary_accounting"]
+    assert "delta * D_tilde(Y)" in yb["exact_lean_young_inequalities"]["forward_bound"]
+    assert "1 + 1 / delta" in yb["exact_lean_young_inequalities"]["reverse_bound"]
+
+
+def test_tc062r_shared_outcome_derivation_and_adversarial_scenarios(
+    tc062_artifact: Dict[str, Any], tmp_path
+) -> None:
+    """Test BOTH `generate_task_tc062_artifact` and `reprocess_task_tc062_metadata_and_stage_b`
+    across all 7 required TASK-TC-062R §6 scenarios:
+    1. Complete all-pass coverage;
+    2. One certified failure (completed evaluation, never HOLDOUT_SURVIVAL);
+    3. Unresolved zero-straddling evidence;
+    4. Empty coverage, missing/duplicate/unregistered point IDs, missing candidate entries,
+       and applicable-domain violations;
+    5. Contradictory certificates (cross-tier conflict and tampered margin-vs-verdict mismatch);
+    6. Missing or non-covering (`TIER_LOCAL_SNAPSHOT`) memory measurements;
+    7. Prior decisive failure at Tier 0 followed by unresolved escalation at Tiers 1..2.
+    """
+    from tc.canonical_theta_correlation_bound import serialize_arb_certified
+    from tc.mixed_arithmetic_covariance import strip_enclosure_arb_for_json
+
+    pre_1_4 = (
+        tc062_artifact["section_1_protocols_reassembly_and_complete_kernel"],
+        tc062_artifact["section_2_disjoint_prime_decompositions_and_controls"],
+        tc062_artifact["section_3_whole_line_contraction_obstruction"],
+        tc062_artifact["section_4_quantitative_proof_attempt"],
+    )
+
+    def _run_both_paths(mutated_sec5: Dict[str, Any], **ovr_kwargs: Any) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+        gen_out = generate_task_tc062_artifact(
+            write_output=False,
+            precomputed_sections_1_to_4=pre_1_4,
+            section_5_override=mutated_sec5,
+            **ovr_kwargs,
+        )
+        synth_art = json.loads(json.dumps(tc062_artifact))
+        synth_art["section_5_unseen_validation_and_interval_splits"] = json.loads(
+            json.dumps(mutated_sec5)
+        )
+        p_tmp = tmp_path / "synth_tc062.json"
+        p_tmp.write_text(json.dumps(synth_art), encoding="utf-8")
+        rep_out = reprocess_task_tc062_metadata_and_stage_b(
+            p_tmp,
+            write_output=False,
+            holdout_entries_override=ovr_kwargs.get("holdout_entries_override"),
+        )
+        assert gen_out["completion_outcome_code"] == rep_out["completion_outcome_code"]
+        assert gen_out["research_outcome_class"] == rep_out["research_outcome_class"]
+        assert gen_out["holdout_hypothesis_outcome"] == rep_out["holdout_hypothesis_outcome"]
+        assert gen_out["resource_compliance_status"] == rep_out["resource_compliance_status"]
+        assert (
+            gen_out["execution_and_certification_status"]
+            == rep_out["execution_and_certification_status"]
+        )
+        return gen_out, rep_out
+
+    # Scenario 1: Complete all-pass coverage
+    s1 = json.loads(json.dumps(tc062_artifact["section_5_unseen_validation_and_interval_splits"]))
+    g1, _ = _run_both_paths(s1)
+    assert g1["holdout_hypothesis_outcome"] == "SURVIVED_TESTED_POINTS"
+    assert g1["execution_and_certification_status"] == "CERTIFIED_EVALUATION_COMPLETE"
+    assert g1["resource_compliance_status"] == "WITHIN"
+    assert "HOLDOUT_SURVIVAL" in g1["completion_outcome_code"]
+    assert g1["all_mathematical_and_numerical_checks_pass"] is True
+
+    # Scenario 2: One certified failure (must be CERTIFIED_EVALUATION_COMPLETE, NEVER survival!)
+    flint_ctx.prec = 256
+    pos_margin = strip_enclosure_arb_for_json(serialize_arb_certified(arb("0.25")))
+    s2 = json.loads(json.dumps(s1))
+    r0 = s2["holdout_point_evaluations"][0]
+    r0["accumulated_candidate_verdicts"]["TC062-P-NEG-INT2"] = "FAIL"
+    r0["decisive_witnesses"]["TC062-P-NEG-INT2"]["verdict"] = "FAIL"
+    r0["decisive_witnesses"]["TC062-P-NEG-INT2"]["certified_margin_enclosure"] = pos_margin
+    r0["last_tier_probe_evaluations"]["per_probe"]["TC062-P-NEG-INT2"]["point_verdict"] = "FAIL"
+    r0["last_tier_probe_evaluations"]["per_probe"]["TC062-P-NEG-INT2"]["margin_M_Y"] = pos_margin
+    g2, _ = _run_both_paths(s2)
+    assert g2["holdout_hypothesis_outcome"] == "REFUTED_BY_CERTIFIED_WITNESS"
+    assert g2["execution_and_certification_status"] == "CERTIFIED_EVALUATION_COMPLETE"
+    assert "SURVIVAL" not in g2["completion_outcome_code"]
+    assert "SURVIVED" not in g2["research_outcome_class"]
+    assert g2["all_mathematical_and_numerical_checks_pass"] is True
+
+    # Scenario 3: Unresolved zero-straddling evidence
+    strad_margin = strip_enclosure_arb_for_json(serialize_arb_certified(arb(0, arb("0.01"))))
+    s3 = json.loads(json.dumps(s1))
+    r3 = s3["holdout_point_evaluations"][2]
+    r3["accumulated_candidate_verdicts"]["TC062-P0-INT2"] = "UNRESOLVED"
+    r3["decisive_witnesses"]["TC062-P0-INT2"] = None
+    r3["last_tier_probe_evaluations"]["per_probe"]["TC062-P0-INT2"]["point_verdict"] = "UNRESOLVED"
+    r3["last_tier_probe_evaluations"]["per_probe"]["TC062-P0-INT2"]["margin_M_Y"] = strad_margin
+    g3, _ = _run_both_paths(s3)
+    assert g3["holdout_hypothesis_outcome"] == "UNRESOLVED_EVIDENCE"
+    assert "SURVIVAL" not in g3["completion_outcome_code"]
+    assert "SURVIVED" not in g3["research_outcome_class"]
+    assert g3["all_mathematical_and_numerical_checks_pass"] is False
+
+    # Scenario 4: Empty coverage, missing/duplicate/unregistered point IDs, missing candidate entries,
+    #             and applicable-domain violation
+    s_empty = json.loads(json.dumps(s1))
+    s_empty["holdout_point_evaluations"] = []
+    g_emp_sched, _ = _run_both_paths(s_empty, holdout_entries_override=[])
+    assert g_emp_sched["holdout_hypothesis_outcome"] == "INCOMPLETE_OR_INVALID_COVERAGE"
+    assert "SURVIVAL" not in g_emp_sched["completion_outcome_code"]
+
+    g_emp_rows, _ = _run_both_paths(s_empty)
+    assert g_emp_rows["holdout_hypothesis_outcome"] == "INCOMPLETE_OR_INVALID_COVERAGE"
+    assert "SURVIVAL" not in g_emp_rows["completion_outcome_code"]
+
+    s_miss_pt = json.loads(json.dumps(s1))
+    s_miss_pt["holdout_point_evaluations"].pop()
+    g_mp, _ = _run_both_paths(s_miss_pt)
+    assert g_mp["holdout_hypothesis_outcome"] == "INCOMPLETE_OR_INVALID_COVERAGE"
+
+    s_dup_pt = json.loads(json.dumps(s1))
+    s_dup_pt["holdout_point_evaluations"][-1] = json.loads(
+        json.dumps(s_dup_pt["holdout_point_evaluations"][0])
+    )
+    g_dp, _ = _run_both_paths(s_dup_pt)
+    assert g_dp["holdout_hypothesis_outcome"] == "INCOMPLETE_OR_INVALID_COVERAGE"
+
+    s_unreg = json.loads(json.dumps(s1))
+    s_unreg["holdout_point_evaluations"][0]["point_id"] = "TC062-HO-UNREGISTERED-999"
+    g_ur, _ = _run_both_paths(s_unreg)
+    assert g_ur["holdout_hypothesis_outcome"] == "INCOMPLETE_OR_INVALID_COVERAGE"
+
+    s_miss_cand = json.loads(json.dumps(s1))
+    del s_miss_cand["holdout_point_evaluations"][0]["accumulated_candidate_verdicts"][
+        "KL1_int2_offdiag"
+    ]
+    g_mc, _ = _run_both_paths(s_miss_cand)
+    assert g_mc["holdout_hypothesis_outcome"] == "INCOMPLETE_OR_INVALID_COVERAGE"
+    assert (
+        g_mc["section_5_unseen_validation_and_interval_splits"]["global_candidate_outcomes"][
+            "KL1_int2_offdiag"
+        ]
+        == "UNRESOLVED/INCOMPLETE_COVERAGE"
+    )
+    assert "SURVIVAL" not in g_mc["completion_outcome_code"]
+
+    s_dom_viol = json.loads(json.dumps(s1))
+    s_dom_viol["holdout_point_evaluations"][0]["accumulated_candidate_verdicts"][
+        "TC062-P0-F"
+    ] = "NOT_EVALUATED"
+    s_dom_viol["holdout_point_evaluations"][0]["decisive_witnesses"]["TC062-P0-F"] = None
+    g_dv, _ = _run_both_paths(s_dom_viol)
+    assert g_dv["holdout_hypothesis_outcome"] == "INCOMPLETE_OR_INVALID_COVERAGE"
+
+    # Scenario 5: Contradictory certificates (tampered witness margin > 0 claiming PASS)
+    s_conf = json.loads(json.dumps(s1))
+    s_conf["holdout_point_evaluations"][0]["decisive_witnesses"]["TC062-P0-F"][
+        "certified_margin_enclosure"
+    ] = pos_margin
+    g_cf, _ = _run_both_paths(s_conf)
+    assert g_cf["holdout_hypothesis_outcome"] == "CERTIFICATION_INTEGRITY_CONFLICT"
+    assert g_cf["completion_outcome_code"] == "CERTIFICATION_INTEGRITY_CONFLICT_BLOCKED_GATE_OPEN"
+    assert "SURVIVAL" not in g_cf["completion_outcome_code"]
+    assert g_cf["all_mathematical_and_numerical_checks_pass"] is False
+
+    # Scenario 6: Missing or non-covering (`TIER_LOCAL_SNAPSHOT`) memory measurements
+    s_snap = json.loads(json.dumps(s1))
+    s_snap["holdout_point_evaluations"][0]["tier_escalation_history"][0][
+        "peak_rss_measurement_semantics"
+    ] = "TIER_LOCAL_SNAPSHOT"
+    g_sn, _ = _run_both_paths(s_snap)
+    assert g_sn["holdout_hypothesis_outcome"] == "SURVIVED_TESTED_POINTS"
+    assert g_sn["resource_compliance_status"] == "UNKNOWN"
+    assert "RESOURCE_UNKNOWN" in g_sn["research_outcome_class"]
+
+    s_nomem = json.loads(json.dumps(s1))
+    s_nomem["holdout_point_evaluations"][0]["tier_escalation_history"][0]["peak_rss_mb"] = None
+    g_nm, _ = _run_both_paths(s_nomem)
+    assert g_nm["resource_compliance_status"] == "UNKNOWN"
+
+    # Scenario 7: Prior decisive failure at Tier 0 followed by unresolved escalation at Tiers 1..2
+    proto = json.loads(JOINT_PRIME_DILATION_PROTOCOL_PATH.read_text(encoding="utf-8"))
+    probes = proto["frozen_candidate_probes"]
+    rules = proto["numerical_settings_and_escalation_rules"]
+    tbl_small = compute_selberg_centered_remainder_table_fast_arb(400, prec_bits=288)
+    first_entry = proto["holdout_validation_schedule"]["holdout_entries"][0]
+    sp_first = ExactScaleSpec.from_protocol_entry(first_entry)
+
+    def _eval_fail_then_unresolved(spec, *, tier: int, resolved_settings):
+        cut = certify_exact_scale_cutoffs(spec, base_prec_bits=256)
+        yb = spec.evaluate_arb(256)
+        if tier == 0:
+            return {
+                "cutoffs": cut,
+                "observables": {
+                    "Y_arb": yb,
+                    "E_Y": arb("0.02"),
+                    "D_tilde_Y": arb("0.03"),
+                    "X_self_Y": arb("0.001"),
+                    "J_Y": arb("0.504"),
+                    "F_Y": arb("0.50"),  # Decisive FAIL on TC062-P0-F
+                    "F_int_T_p2": arb("0.14155") + arb(0, arb("0.05")),  # Straddles -> escalates
+                    "diag_int_T_p2": arb("-0.10"),
+                    "offdiag_int_T_p2": arb("-0.01"),
+                    "F_bnd_T_p2": arb("0.35"),
+                    "F_int_T_p23": arb("-0.02"),
+                    "diag_int_T_p23": arb("-0.03"),
+                    "offdiag_int_T_p23": arb("0.01"),
+                    "F_bnd_T_p23": arb("0.52"),
+                    "log_Y_times_D_tilde": arb("0.14155"),
+                },
+            }
+        z_strad = arb(0, arb("1.0"))
+        return {
+            "cutoffs": cut,
+            "observables": {
+                "Y_arb": yb,
+                "E_Y": arb("0.02"),
+                "D_tilde_Y": arb("0.03"),
+                "X_self_Y": arb("0.001"),
+                "J_Y": z_strad,
+                "F_Y": z_strad,
+                "F_int_T_p2": z_strad,
+                "diag_int_T_p2": z_strad,
+                "offdiag_int_T_p2": z_strad,
+                "F_bnd_T_p2": z_strad,
+                "F_int_T_p23": z_strad,
+                "diag_int_T_p23": z_strad,
+                "offdiag_int_T_p23": z_strad,
+                "F_bnd_T_p23": z_strad,
+                "log_Y_times_D_tilde": arb("0.14155"),
+            },
+        }
+
+    row_esc = execute_tc062_holdout_point_with_escalation(
+        str(first_entry["point_id"]),
+        sp_first,
+        probes,
+        rules,
+        selberg_table=tbl_small,
+        evaluator_fn=_eval_fail_then_unresolved,
+    )
+    row_esc["grid_tier"] = str(first_entry["grid_tier"])
+    row_esc["prior_exposure_status"] = str(first_entry["prior_exposure_status"])
+    s7 = json.loads(json.dumps(s1))
+    s7["holdout_point_evaluations"][0] = strip_enclosure_arb_for_json(row_esc)
+    g7, _ = _run_both_paths(s7)
+    assert g7["holdout_hypothesis_outcome"] == "REFUTED_BY_CERTIFIED_WITNESS"
+    assert (
+        g7["section_5_unseen_validation_and_interval_splits"]["global_candidate_outcomes"][
+            "TC062-P0-F"
+        ]
+        == "REFUTED_BY_CERTIFIED_WITNESS"
+    )
+    assert "SURVIVAL" not in g7["completion_outcome_code"]
+    assert "SURVIVED" not in g7["research_outcome_class"]
+
