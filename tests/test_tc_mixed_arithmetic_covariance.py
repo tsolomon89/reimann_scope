@@ -3375,5 +3375,53 @@ def test_tc062r_artifact_revalidation_provenance_and_endpoint_invariants(
         assert (w_lo < p_lo) or (w_hi > p_hi)
 
 
+def test_tc062r2_mixed_covariance_interval_split_branch_role_and_union_containment() -> None:
+    """Verify `TASK-TC-062R2` §§2–3 on `evaluate_interval_via_cutoff_case_split_arb` directly:
+    - Exact boundary split across `Y = 16` (`16^(5/4) = 32`: `(32, 2, 2)` on `[16 - 2^-12, 16]`
+      and `(33, 2, 2)` on `(16, 16 + 2^-12]`),
+    - `D0_eff_fixed == min(D0_raw_fixed, T_fixed - 1)`,
+    - Explicit `branch_role == "REQUIRED_FEASIBLE_SUBDOMAIN"` and `P0_branch_classification`,
+    - Outward decimal containment across all 5 serialized union/branch pairs (`union_E_Y`,
+      `union_D_tilde_Y`, `union_J_Y`, `union_log_Y_times_D_tilde`, `union_M_P0`).
+    """
+    from tc.canonical_theta_correlation_bound import serialize_arb_certified
+    from tc.mixed_arithmetic_covariance import evaluate_interval_via_cutoff_case_split_arb
+
+    flint_ctx.prec = 256
+    tbl = compute_selberg_centered_remainder_table_fast_arb(128, prec_bits=288)
+    sp16 = evaluate_interval_via_cutoff_case_split_arb(
+        Fraction(65535, 4096),
+        Fraction(65537, 4096),
+        selberg_table=tbl,
+        prec_bits=256,
+        quad_tol_bits=180,
+    )
+    assert sp16["active_branch_count"] == 2
+    assert sp16["T_range"] == [32, 33]
+    assert sp16["D0_range"] == [2, 2]
+    assert [(b["T_fixed"], b["D0_raw_fixed"], b["D0_eff_fixed"]) for b in sp16["branches"]] == [
+        (32, 2, 2),
+        (33, 2, 2),
+    ]
+    for br in sp16["branches"]:
+        assert br["branch_role"] == "REQUIRED_FEASIBLE_SUBDOMAIN"
+        assert br["D0_eff_fixed"] == min(br["D0_raw_fixed"], br["T_fixed"] - 1)
+        assert br["P0_branch_classification"]["verdict"] in ("PASS", "FAIL", "UNRESOLVED")
+        for u_key, b_key in (
+            ("union_E_Y", "E_Y"),
+            ("union_D_tilde_Y", "D_tilde_Y"),
+            ("union_J_Y", "J_Y"),
+            ("union_log_Y_times_D_tilde", "log_Y_times_D_tilde"),
+            ("union_M_P0", "M_P0"),
+        ):
+            u_ser = serialize_arb_certified(sp16[u_key])
+            b_ser = serialize_arb_certified(br[b_key])
+            u_lo = _sci_or_latex_num_to_fraction(u_ser["lower_dec"])
+            u_hi = _sci_or_latex_num_to_fraction(u_ser["upper_dec"])
+            b_lo = _sci_or_latex_num_to_fraction(b_ser["lower_dec"])
+            b_hi = _sci_or_latex_num_to_fraction(b_ser["upper_dec"])
+            assert u_lo <= b_lo <= b_hi <= u_hi
+
+
 
 

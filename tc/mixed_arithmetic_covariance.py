@@ -1924,6 +1924,11 @@ def evaluate_interval_via_cutoff_case_split_arb(
                     quad_tol_bits=quad_tol_bits,
                     selberg_table=tbl,
                 )
+                assert int(br_res["D0_eff_fixed"]) == min(
+                    int(br_res["D0_raw_fixed"]), int(br_res["T_fixed"]) - 1
+                ), "Effective cutoff D0_eff_fixed must equal min(D0_raw_fixed, T_fixed - 1)"
+                br_res["branch_role"] = "REQUIRED_FEASIBLE_SUBDOMAIN"
+                br_res["P0_branch_classification"] = classify_probe_margin_arb(br_res["M_P0"])
                 branches.append(br_res)
 
         assert len(branches) >= 1, "At least one active cutoff branch must exist"
@@ -1933,7 +1938,15 @@ def evaluate_interval_via_cutoff_case_split_arb(
             u = branches[0][k]
             for br in branches[1:]:
                 u = u.union(br[k])
-            return +u
+            res_u = +u
+            u_lo, u_hi = _exact_arb_endpoints_as_fractions(res_u)
+            for br in branches:
+                b_lo, b_hi = _exact_arb_endpoints_as_fractions(br[k])
+                if not (u_lo <= b_lo and b_hi <= u_hi):
+                    raise CertificationIntegrityError(
+                        f"Constructed union {k} {res_u} failed to enclose branch {br[k]}"
+                    )
+            return res_u
 
         union_M_P0 = _union_key("M_P0")
         return {
