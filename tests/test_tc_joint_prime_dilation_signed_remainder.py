@@ -49,6 +49,7 @@ from tc.joint_prime_dilation_signed_remainder import (
     FROZEN_TC062_PROTOCOL_ID,
     FROZEN_TC062_PROTOCOL_REGISTRATION_COMMIT,
     FROZEN_TC062_PROTOCOL_SHA256,
+    GLOBAL_CONSEQUENCE_CLASSES,
     JOINT_PRIME_DILATION_ARTIFACT_PATH,
     JOINT_PRIME_DILATION_PROTOCOL_PATH,
     TASK_TC_062_ID,
@@ -63,6 +64,7 @@ from tc.joint_prime_dilation_signed_remainder import (
     prime_valuation_v_p,
     verify_frozen_tc062_protocol_immutability,
     verify_generic_finite_anchor_reindexing_exact,
+    verify_stage_b_large_prime_b_jump_identity_arb,
     verify_tc062_review_enclosures_and_lean_anchors,
 )
 from tc.liouville_square_dilation import (
@@ -100,6 +102,9 @@ def test_tc062_protocols_immutability_hygiene_and_honest_gate_status(
     assert tc062_artifact["parent_subgate"] == PARENT_SUBGATE_ID
     assert tc062_artifact["parent_subgate_status"] == "OPEN"
     assert tc062_artifact["rh_proved"] is False
+    assert "global_consequence_class" not in tc062_artifact
+    assert tc062_artifact["global_energy_improvement_claimed"] is False
+    assert tc062_artifact["global_consequence_classes_enforced"] == list(GLOBAL_CONSEQUENCE_CLASSES)
     assert tc062_artifact["sampled_zeta_zeros_used"] == 0
     assert tc062_artifact["all_mathematical_and_numerical_checks_pass"] is True
 
@@ -219,6 +224,14 @@ def test_tc062_section_4_spillover_fringe_and_candidates_a1_a2(
     assert c_a2["verdict"] == "REFUTED_BY_CERTIFIED_WITNESS"
     lo_m = _sci_or_latex_num_to_fraction(c_a2["margin_Y64"]["lower_dec"])
     assert lo_m > 0
+
+    b_jump = sec4["stage_b_large_prime_b_jump_audit"]
+    assert b_jump["verified"] is True
+    assert b_jump["general_all_m_identity_verified"] is True
+    assert b_jump["odd_valuation_discrepancy_certified"] is True
+    live_b_jump = verify_stage_b_large_prime_b_jump_identity_arb(T_chk=182, D_chk=4, primes=(7, 11, 13))
+    assert live_b_jump["verified"] is True
+    assert [w["m"] for w in live_b_jump["odd_valuation_discrepancy_witnesses"]] == [7, 14, 21]
 
 
 def test_tc062_section_5_unseen_holdouts_witness_preservation_and_resource_semantics(
@@ -391,3 +404,5 @@ def test_tc062_lean_formalization_registration_and_review_synchronization(
         tc062_artifact, TC_062_REVIEW_DOC_PATH, lean_spans=spans
     )
     assert rev_chk["verified"] is True, rev_chk
+    assert rev_chk["checked_holdout_cutoff_count"] == 10
+    assert rev_chk["failed_holdout_cutoffs"] == []

@@ -35,8 +35,10 @@ Sections:
 
 4. Section 4 — Quantitative Proof Attempt (Spillover Reduction, Stages A/B/C, & Literature Audit):
    - Certifies exact spillover support `T < n <= T + floor(T/(D+1))` via `d_q = floor(T/q)` (`q >= 2`),
-     pointwise `|w_{2,lambda}(n)| <= (log n)^2`, PNT/Selberg (`TC-057R` Theorem 4.3(3)) `O(1/log Y)`
-     spillover norm decay, and mixed-covariance-preserving Young equivalence `H(F, D_tilde) <-> H(F_{<=T}, D_tilde)`.
+     pointwise `|w_{2,lambda}(n)| <= (log n)^2`, PNT/Selberg (`TC-057R` Theorem 4.3(3))
+     `||S_{spill,Y}||_Y = O(1/log Y)` (`||S_{spill,Y}||_Y^2 = O((log Y)^{-2})`, Young penalty
+     `(1 + log Y)*||S_{spill,Y}||_Y^2 = O(1/log Y)`) spillover decay, and mixed-covariance-preserving
+     Young equivalence `H(F, D_tilde) <-> H(F_{<=T}, D_tilde)`.
    - Certifies Stage A interior Hilbert-space identity, refutes Candidate Lemma A1 (`m = 1, p = 2`
      anchor diagonal `Delta_{2,2} Hcal_Y(1, 1) > 0` for `Y >= 8`) with proved `O(2^{|S|})` aggregate
      Replacement Lemma A1', refutes Candidate Lemma A2 (`sum |Delta_{2,2} Hcal_Y(m, n)|` certified in
@@ -1638,19 +1640,123 @@ def evaluate_interior_paired_matrix_free_arb(
         flint_ctx.prec = saved
 
 
+def verify_stage_b_large_prime_b_jump_identity_arb(
+    T_chk: int = 182,
+    D_chk: int = 4,
+    primes: Sequence[int] = (7, 11, 13),
+    prec_bits: int = 256,
+    selberg_table: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """Verify the exact Stage B divisor-jump identity for `b_{p*m} - b_m` across ALL positive
+    integers `1 <= m <= floor((T_chk - 1)/p)` when `p > D_chk + 1` (`m = p^a * m_0, p nmid m_0`):
+
+      `b_{p*m} - b_m = c_lambda * (1_{sq}(m) - 1_{sq}(p*m))`
+      `                + (-1)^a * sum_{u_0 | m_0} delta_{sq,2}(p^{a+1} * u_0) * lambda(u_0)`,
+
+    which specializes on even-valuation anchors `2 | v_p(m)` (`a` even, `1_{sq}(p*m) = 0`) to
+    `c_lambda * 1_{sq}(m) + sum_{u_0 | m_0} delta_{sq,2}(p^{a+1} * u_0) * lambda(u_0)`, while
+    recording explicit odd-`v_p(m)` counterexamples (`m = 7, 14, 21` at `p = 7`) against dropping
+    `-1_{sq}(p*m)` or `(-1)^a`.
+    """
+    tbl = (
+        compute_selberg_centered_remainder_table_fast_arb(max(400, 2 * T_chk + 8), prec_bits=prec_bits + 32)
+        if selberg_table is None or len(selberg_table["R"]) <= 2 * T_chk
+        else selberg_table
+    )
+    saved = flint_ctx.prec
+    try:
+        flint_ctx.prec = prec_bits
+        c_lam = tbl["c_lambda"]
+        R_osc = tbl["R_osc"]
+        M_drift = tbl["M_drift"]
+        vecs = compute_complete_core_s_Y_and_beta_Y_arb(T_chk, D_chk, R_osc, prec_bits=prec_bits)
+        b_vec = [arb(0)] + [
+            arb(liouville_lambda_int(n)) * vecs["beta_Y"][n] for n in range(1, 2 * T_chk + 1)
+        ]
+
+        general_all_m_ok = True
+        even_anchor_specialization_ok = True
+        checked_all_m_count = 0
+        checked_even_anchor_count = 0
+        odd_valuation_witnesses: List[Dict[str, Any]] = []
+
+        for p_big in primes:
+            if p_big <= D_chk + 1:
+                raise ValueError(f"Expected p > D_chk + 1 = {D_chk + 1}, got p = {p_big}")
+            max_m = (T_chk - 1) // p_big
+            for m_val in range(1, max_m + 1):
+                checked_all_m_count += 1
+                lhs_bj = b_vec[p_big * m_val] - b_vec[m_val]
+                a_val = prime_valuation_v_p(m_val, p_big)
+                m0 = m_val // (p_big ** a_val)
+                sq_diff = (1 if is_perfect_square_int(m_val) else 0) - (
+                    1 if is_perfect_square_int(p_big * m_val) else 0
+                )
+                parity_sign = 1 if (a_val % 2 == 0) else -1
+                sum_u0 = arb(0)
+                p_pow = p_big ** (a_val + 1)
+                for u0 in range(1, m0 + 1):
+                    if m0 % u0 == 0:
+                        u_full = p_pow * u0
+                        delta_u = M_drift[u_full] - M_drift[u_full - 1]
+                        sum_u0 += delta_u * arb(liouville_lambda_int(u0))
+                rhs_general = arb(sq_diff) * c_lam + arb(parity_sign) * sum_u0
+                res_gen = lhs_bj - rhs_general
+                if not (arb(0) in res_gen and abs(res_gen) < arb("1e-66")):
+                    general_all_m_ok = False
+
+                rhs_even_only = (c_lam if is_perfect_square_int(m_val) else arb(0)) + sum_u0
+                if a_val % 2 == 0:
+                    checked_even_anchor_count += 1
+                    res_even = lhs_bj - rhs_even_only
+                    if not (arb(0) in res_even and abs(res_even) < arb("1e-66")):
+                        even_anchor_specialization_ok = False
+                elif p_big == 7 and m_val in (7, 14, 21):
+                    odd_err = lhs_bj - rhs_even_only
+                    odd_valuation_witnesses.append(
+                        {
+                            "prime_p": p_big,
+                            "m": m_val,
+                            "v_p_m": a_val,
+                            "lhs_minus_even_only_formula_error_float": float(odd_err.mid()),
+                            "nonzero_discrepancy_certified": bool(not (arb(0) in odd_err)),
+                        }
+                    )
+
+        odd_witnesses_ok = bool(
+            len(odd_valuation_witnesses) > 0
+            and all(w["nonzero_discrepancy_certified"] for w in odd_valuation_witnesses)
+        )
+        return {
+            "T_Y": T_chk,
+            "D_min": D_chk,
+            "primes_tested": [int(p) for p in primes],
+            "checked_all_m_count": checked_all_m_count,
+            "checked_even_anchor_count": checked_even_anchor_count,
+            "general_all_m_identity_verified": general_all_m_ok,
+            "even_valuation_anchor_specialization_verified": even_anchor_specialization_ok,
+            "odd_valuation_discrepancy_witnesses": odd_valuation_witnesses,
+            "odd_valuation_discrepancy_certified": odd_witnesses_ok,
+            "verified": bool(general_all_m_ok and even_anchor_specialization_ok and odd_witnesses_ok),
+        }
+    finally:
+        flint_ctx.prec = saved
+
+
 def verify_section_4_quantitative_proof_attempt(
     prec_bits: int = 256,
     selberg_table: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """Execute Section 6 substantive quantitative proof attempt across:
     - 4A: Spillover fringe support `T < n <= T + floor(T/(D+1))`, `q`-reindexing `d_q = floor(T/q)`,
-      `|w_{2,lambda}(n)| <= (log n)^2`, PNT/Selberg `O(1/log Y)` norm decay, and Young mixed-covariance
+      `|w_{2,lambda}(n)| <= (log n)^2`, PNT/Selberg `||S_{spill,Y}||_Y = O(1/log Y)`
+      (`||S_{spill,Y}||_Y^2 = O((log Y)^{-2})`) decay, and Young mixed-covariance
       equivalence `H(F, D_tilde) <-> H(F_{<=T}, D_tilde)`.
     - 4B (Stage A): Interior Hilbert-space identity, Candidate Lemma A1 (`m = 1, p = 2` refutation +
       aggregate `O(2^{|S|})` Replacement Lemma A1'), and Candidate Lemma A2 (256-bit Arb refutation
       of unsigned paired-block sum at `Y = 64` + analytic `Omega(Y)` lower bound).
-    - 4C (Stage B): Coupled 2-prime `(2, 3)` cross-prime terms and `b_{pm} - b_m` divisor-jump law
-      for `p > D + 1`.
+    - 4C (Stage B): Coupled 2-prime `(2, 3)` cross-prime terms and exact `b_{pm} - b_m` divisor-jump
+      law across all `1 <= m <= floor((T-1)/p)` for `p > D + 1` (plus `2 | v_p(m)` specialization).
     - 4D (Stage C): Disjoint 3-prime `S = {2, 3, 5}` (`64`-term) decomposition, harmonic-weighted
       prime-family average, primary literature audit (`arXiv:1503.05121` & `arXiv:1509.05422`), and
       isolation of `TC062-OBL-INTERIOR-PRIME-PAIR-OFFDIAG`.
@@ -1950,32 +2056,14 @@ def verify_section_4_quantitative_proof_attempt(
         cls_cand_a2_64 = classify_probe_margin_arb(margin_cand_a2_64)
         cand_a2_refuted_ok = bool(cls_cand_a2_64["verdict"] == "FAIL")
 
-        # 4C. Stage B: Exact divisor-jump law for b_{pm} - b_m when p > D + 1 and p*m <= T - 1:
-        #     b_{pm} - b_m = c_lambda * 1_{sq}(m) + sum_{u_0 | m / p^{v_p(m)}} delta_{sq,2}(p^{v_p(m)+1} * u_0) * lambda(u_0)
-        T_chk, D_chk = 182, 4
-        vecs_64 = compute_complete_core_s_Y_and_beta_Y_arb(T_chk, D_chk, R_osc, prec_bits=prec_bits)
-        b_64 = [arb(0)] + [
-            arb(liouville_lambda_int(n)) * vecs_64["beta_Y"][n] for n in range(1, 2 * T_chk + 1)
-        ]
-        b_jump_law_ok = True
-        for p_big in (7, 11, 13):  # all > D_chk + 1 = 5
-            for m_a in prime_even_valuation_anchors(T_chk, (p_big,)):
-                if p_big * m_a > T_chk - 1:
-                    break
-                lhs_bj = b_64[p_big * m_a] - b_64[m_a]
-                vp_m = prime_valuation_v_p(m_a, p_big)
-                m0 = m_a // (p_big ** vp_m)
-                rhs_bj = c_lam if is_perfect_square_int(m_a) else arb(0)
-                p_odd = p_big ** (vp_m + 1)
-                for u0 in range(1, m0 + 1):
-                    if m0 % u0 == 0:
-                        u_full = p_odd * u0
-                        delta_u = M_drift[u_full] - M_drift[u_full - 1]
-                        rhs_bj += delta_u * arb(liouville_lambda_int(u0))
-                res_bj = lhs_bj - rhs_bj
-                if not (arb(0) in res_bj and abs(res_bj) < arb("1e-66")):
-                    b_jump_law_ok = False
-                    break
+        # 4C. Stage B: Exact divisor-jump law for b_{pm} - b_m across ALL 1 <= m <= floor((T-1)/p)
+        #     when p > D + 1 (m = p^a * m_0, p nmid m_0):
+        #     b_{pm} - b_m = c_lambda * (1_{sq}(m) - 1_{sq}(p*m))
+        #                    + (-1)^a * sum_{u_0 | m_0} delta_{sq,2}(p^{a+1} * u_0) * lambda(u_0)
+        b_jump_audit = verify_stage_b_large_prime_b_jump_identity_arb(
+            T_chk=182, D_chk=4, primes=(7, 11, 13), prec_bits=prec_bits, selberg_table=tbl
+        )
+        b_jump_law_ok = bool(b_jump_audit["verified"])
 
         # 4D. Stage C: 3-prime S = {2, 3, 5} (64-term) interior check & harmonic prime-family average
         #     sum_{p in {2, 3, 5, 7}} (1/p) * F_int_T(Y; {p}) / sum_{p in {2, 3, 5, 7}} (1/p) at Y = 64:
@@ -2060,13 +2148,16 @@ def verify_section_4_quantitative_proof_attempt(
                 "H(F, D_tilde) <-> H(F_{<=T}, D_tilde), Stage A interior Hilbert identity, m = 1 "
                 "refutation of Candidate A1, Replacement Lemma A1', and exact equivalence "
                 "H(F, D_tilde) <-> H(F_{int,T}(.; {p}), D_tilde) are CONCRETE_ANALYTIC_IN_LEAN "
-                "(Lean Theorems 5, 6, 7) and UNCONDITIONAL_FINITE_ARITHMETIC; PNT/Selberg O(1/log Y) "
-                "spillover decay (via TC-057R Theorem 4.3(3)), Omega(Y) linear growth of the unsigned "
-                "paired majorant, b_{pm} - b_m jump formula, and literature barrier audit are "
-                "ANALYTIC_PROVED_OUTSIDE_LEAN; Route D closure transfer from interior paired remainder "
-                "is CONDITIONAL_IMPLICATION; 256-bit Arb checks (including Candidate A2's Y = 64 "
-                "refutation witness) are CERTIFIED_FINITE_OBSERVATION; and Candidates A1, A2 (refuted) "
-                "and TC062-OBL-INTERIOR-PRIME-PAIR-OFFDIAG (open) are OPEN_CONJECTURE_OR_FAILED_CANDIDATE."
+                "(Lean Theorems 5, 6, 7) and UNCONDITIONAL_FINITE_ARITHMETIC; PNT/Selberg "
+                "||S_{spill,Y}||_Y = O(1/log Y) (||S_{spill,Y}||_Y^2 = O((log Y)^{-2}), Young penalty "
+                "(1 + log Y)*||S_{spill,Y}||_Y^2 = O(1/log Y)) spillover decay (via TC-057R Theorem "
+                "4.3(3)), Omega(Y) linear growth of the unsigned paired majorant, general-m b_{pm} - b_m "
+                "jump formula (with (-1)^{v_p(m)} and 1_{sq}(m) - 1_{sq}(p*m)), and literature barrier "
+                "audit are ANALYTIC_PROVED_OUTSIDE_LEAN; Route D closure transfer from interior paired "
+                "remainder is CONDITIONAL_IMPLICATION; 256-bit Arb checks (including Candidate A2's "
+                "Y = 64 refutation witness) are CERTIFIED_FINITE_OBSERVATION; and Candidates A1, A2 "
+                "(refuted) and TC062-OBL-INTERIOR-PRIME-PAIR-OFFDIAG (open) are "
+                "OPEN_CONJECTURE_OR_FAILED_CANDIDATE."
             ),
             "component_epistemic_map": {
                 "selberg_w2_pointwise_log_sq_bound_and_q_reindexing": "UNCONDITIONAL_FINITE_ARITHMETIC",
@@ -2104,6 +2195,7 @@ def verify_section_4_quantitative_proof_attempt(
                 "analytic_linear_growth_mechanism": "Macroscopic ratio-2 dilation has |Delta_{2,2} G_Y^[0](m, n)| >= c'_2 / Y across Theta(Y^2) resonant anchor pairs (m, n) in [Y, 5Y/4]^2 cap A_2^2, forcing Omega(Y) growth.",
             },
             "stage_b_large_prime_b_jump_identity_verified": b_jump_law_ok,
+            "stage_b_large_prime_b_jump_audit": b_jump_audit,
             "stage_c_multi_prime_and_harmonic_average_Y64": {
                 "three_prime_2_3_5_64_term_F_int_T": serialize_arb_certified(mf64_235["F_int_T"]),
                 "three_prime_2_3_5_diag_int_T": serialize_arb_certified(mf64_235["diag_int_T"]),
@@ -2835,39 +2927,87 @@ def verify_tc062_review_enclosures_and_lean_anchors(
     no_pi = ("\\pi" not in md_text) and ("\u03c0" not in md_text)
 
     checked_intervals = 0
+    untagged_intervals: List[Dict[str, Any]] = []
     failed_intervals: List[Dict[str, Any]] = []
-    for m_tag in _TC_ENCLOSURE_TAG_RE.finditer(md_text):
-        obs_name = m_tag.group("observable")
-        params_str = m_tag.group("params")
-        json_path = m_tag.group("json_path")
-        prefix = md_text[max(0, m_tag.start() - 260) : m_tag.start()]
-        bt_matches = list(_ARB_BACKTICK_INTERVAL_RE.finditer(prefix))
-        lx_matches = list(_LATEX_PM_INTERVAL_RE.finditer(prefix))
-        if bt_matches:
-            disp_str = bt_matches[-1].group(1)
-            d_lo, d_hi = _parse_arb_ball_str_to_fractions(disp_str)
-        elif lx_matches:
-            lm = lx_matches[-1]
-            mid_f = _sci_or_latex_num_to_fraction(lm.group(1))
-            rad_f = _sci_or_latex_num_to_fraction(lm.group(2))
-            d_lo, d_hi = mid_f - rad_f, mid_f + rad_f
-        else:
-            failed_intervals.append({"observable": obs_name, "reason": "NO_PRECEDING_INTERVAL"})
+    for line_idx, line in enumerate(md_text.splitlines(), start=1):
+        line_matches: List[Tuple[int, str, str, str]] = []
+        for m_bt in _ARB_BACKTICK_INTERVAL_RE.finditer(line):
+            line_matches.append(
+                (m_bt.start(), "arb_backtick", m_bt.group("mid") or "0", m_bt.group("rad"))
+            )
+        for m_lx in _LATEX_PM_INTERVAL_RE.finditer(line):
+            line_matches.append(
+                (m_lx.start(), "latex_pm", m_lx.group("mid"), m_lx.group("rad"))
+            )
+        if not line_matches:
+            continue
+        line_matches.sort(key=lambda t: t[0])
+        tags = list(_TC_ENCLOSURE_TAG_RE.finditer(line))
+        if len(tags) != len(line_matches):
+            for pos, fmt_kind, mid_s, rad_s in line_matches:
+                untagged_intervals.append(
+                    {
+                        "line": line_idx,
+                        "column": pos + 1,
+                        "format": fmt_kind,
+                        "mid_str": mid_s,
+                        "rad_str": rad_s,
+                        "tag_count_on_line": len(tags),
+                        "interval_count_on_line": len(line_matches),
+                    }
+                )
             continue
 
-        cert_node = _resolve_report_path_with_param_check(artifact, json_path, params_str)
-        c_lo = _sci_or_latex_num_to_fraction(str(cert_node["lower_dec"]))
-        c_hi = _sci_or_latex_num_to_fraction(str(cert_node["upper_dec"]))
-        checked_intervals += 1
-        if not (d_lo <= c_lo and c_hi <= d_hi):
-            failed_intervals.append(
-                {
-                    "observable": obs_name,
-                    "json_path": json_path,
-                    "displayed": (str(d_lo), str(d_hi)),
-                    "certified": (str(c_lo), str(c_hi)),
-                }
-            )
+        for (_pos, fmt_kind, mid_s, rad_s), m_tag in zip(line_matches, tags):
+            obs_name = m_tag.group("observable")
+            params_str = m_tag.group("params")
+            json_path = m_tag.group("json_path")
+            try:
+                disp_mid = _sci_or_latex_num_to_fraction(mid_s)
+                disp_rad = _sci_or_latex_num_to_fraction(rad_s)
+                d_lo = disp_mid - disp_rad
+                d_hi = disp_mid + disp_rad
+                cert_node, _ = _resolve_report_path_with_param_check(
+                    artifact, json_path=json_path, params_str=params_str, observable=obs_name
+                )
+                gen_low_bs, gen_high_bs, _ = _parse_arb_ball_str_to_fractions(
+                    cert_node["arb_ball_str"]
+                )
+                gen_low_dec = _sci_or_latex_num_to_fraction(str(cert_node["lower_dec"]))
+                gen_high_dec = _sci_or_latex_num_to_fraction(str(cert_node["upper_dec"]))
+                c_lo = max(gen_low_bs, gen_low_dec)
+                c_hi = min(gen_high_bs, gen_high_dec)
+                contains_ok = bool(d_lo <= c_lo and c_hi <= d_hi)
+                sign_ok = True
+                if c_lo > 0 and not (d_lo > 0):
+                    sign_ok = False
+                if c_hi < 0 and not (d_hi < 0):
+                    sign_ok = False
+                checked_intervals += 1
+                if not (contains_ok and sign_ok):
+                    failed_intervals.append(
+                        {
+                            "line": line_idx,
+                            "format": fmt_kind,
+                            "observable": obs_name,
+                            "json_path": json_path,
+                            "displayed": (str(d_lo), str(d_hi)),
+                            "certified": (str(c_lo), str(c_hi)),
+                            "contains_ok": contains_ok,
+                            "sign_ok": sign_ok,
+                        }
+                    )
+            except Exception as exc:  # noqa: BLE001
+                failed_intervals.append(
+                    {
+                        "line": line_idx,
+                        "format": fmt_kind,
+                        "observable": obs_name,
+                        "params": params_str,
+                        "json_path": json_path,
+                        "error": str(exc),
+                    }
+                )
 
     spans = lean_spans if lean_spans is not None else extract_lean_declaration_spans_tc062()
     all_decls = spans.get("all_declarations", {})
@@ -2885,18 +3025,57 @@ def verify_tc062_review_enclosures_and_lean_anchors(
                 {"symbol": sym, "doc_span": (l_st, l_en), "actual": info}
             )
 
+    holdout_cutoffs_by_id: Dict[str, Tuple[int, int]] = {}
+    for h_row in (
+        artifact.get("section_5_unseen_validation_and_interval_splits", {}).get(
+            "holdout_point_evaluations", []
+        )
+    ):
+        c_dict = h_row.get("cutoffs") or {}
+        if "point_id" in h_row and "T_Y" in c_dict and "D0_raw" in c_dict:
+            holdout_cutoffs_by_id[str(h_row["point_id"])] = (
+                int(c_dict["T_Y"]),
+                int(c_dict["D0_raw"]),
+            )
+
+    cutoff_row_re = re.compile(
+        r"^\|\s*`(TC062-HO-[A-Z0-9-]+)`[^|]*\|\s*`\(\s*(\d+)\s*,\s*(\d+)\s*\)`\s*\|",
+        re.MULTILINE,
+    )
+    checked_holdout_cutoffs = 0
+    failed_holdout_cutoffs: List[Dict[str, Any]] = []
+    for mc in cutoff_row_re.finditer(md_text):
+        pid_doc = mc.group(1)
+        t_doc, d0_doc = int(mc.group(2)), int(mc.group(3))
+        checked_holdout_cutoffs += 1
+        actual_td = holdout_cutoffs_by_id.get(pid_doc)
+        if actual_td is None or actual_td != (t_doc, d0_doc):
+            failed_holdout_cutoffs.append(
+                {
+                    "point_id": pid_doc,
+                    "displayed_T_D0": (t_doc, d0_doc),
+                    "certified_T_D0": actual_td,
+                }
+            )
+
     return {
         "review_exists": True,
         "zero_pi_tokens": no_pi,
         "checked_interval_count": checked_intervals,
+        "untagged_intervals": untagged_intervals,
         "failed_intervals": failed_intervals,
         "checked_lean_anchor_count": checked_anchors,
         "failed_lean_anchors": failed_anchors,
+        "checked_holdout_cutoff_count": checked_holdout_cutoffs,
+        "failed_holdout_cutoffs": failed_holdout_cutoffs,
         "verified": bool(
             no_pi
             and checked_intervals > 0
+            and len(untagged_intervals) == 0
             and len(failed_intervals) == 0
             and len(failed_anchors) == 0
+            and checked_holdout_cutoffs == len(holdout_cutoffs_by_id)
+            and len(failed_holdout_cutoffs) == 0
         ),
     }
 
@@ -2954,10 +3133,14 @@ def generate_task_tc062_artifact(
         "parent_subgate": PARENT_SUBGATE_ID,
         "parent_subgate_status": "OPEN",
         "rh_proved": False,
-        "global_consequence_class": "PARTIAL_UNCONDITIONAL_ESTIMATE_AND_EQUIVALENT_REDUCTION_GATE_OPEN"
-        if "PARTIAL_UNCONDITIONAL_ESTIMATE_AND_EQUIVALENT_REDUCTION_GATE_OPEN"
-        in GLOBAL_CONSEQUENCE_CLASSES
-        else GLOBAL_CONSEQUENCE_CLASSES[0],
+        "global_consequence_classes_enforced": list(GLOBAL_CONSEQUENCE_CLASSES),
+        "global_energy_improvement_claimed": False,
+        "completion_outcome_code": (
+            "COMPLETE_SIGNED_KERNEL_PRIME_PAIR_REDUCTION_AND_UNSEEN_HOLDOUT_SURVIVAL_GATE_OPEN"
+        ),
+        "research_outcome_class": (
+            "EXACT_COMPLETE_KERNEL_AND_INTERIOR_PRIME_PAIR_EQUIVALENCE_PROVED_CANDIDATES_A1_A2_REFUTED_UNSEEN_HOLDOUTS_SURVIVED_SUBGATE_OPEN"
+        ),
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "total_generation_wall_seconds": round(time.perf_counter() - t0, 3),
         "circle_constant_convention": "tau_exclusively",
@@ -3027,6 +3210,135 @@ def generate_task_tc062_artifact(
             raise RuntimeError("Forbidden circle-half token detected in TC-062 artifact JSON!")
         JOINT_PRIME_DILATION_ARTIFACT_PATH.write_bytes(out_txt.encode("utf-8"))
 
+    return clean_obj
+
+
+def reprocess_task_tc062_metadata_and_stage_b(
+    artifact_path: Path = JOINT_PRIME_DILATION_ARTIFACT_PATH,
+    *,
+    write_output: bool = True,
+    prec_bits: int = 256,
+) -> Dict[str, Any]:
+    """Source-controlled reprocessing of top-level consequence metadata and Section 4's Stage B
+    all-`m` (`even` + `odd` `v_p(m)`) divisor-jump audit on an existing `TC-062` certificate,
+    preserving all 827 certified 256-bit Arb quadrature enclosures, original execution timestamps,
+    telemetry, and `numerical_producing_git_commit` / `formal_build_producing_git_commit` untouched.
+    """
+    existing = json.loads(artifact_path.read_text(encoding="utf-8"))
+    b_jump_audit = verify_stage_b_large_prime_b_jump_identity_arb(
+        T_chk=182, D_chk=4, primes=(7, 11, 13), prec_bits=prec_bits
+    )
+    if not b_jump_audit["verified"]:
+        raise RuntimeError(f"Stage B general-m b-jump audit failed: {b_jump_audit}")
+
+    sec4 = dict(existing["section_4_quantitative_proof_attempt"])
+    sec4["section_epistemic_scope_note"] = (
+        "Mixed proof-attempt section: spillover fringe support T < n <= T + floor(T/(D+1)), "
+        "q-reindexing, |w_{2,lambda}(n)| <= (log n)^2, mixed-covariance Young equivalence "
+        "H(F, D_tilde) <-> H(F_{<=T}, D_tilde), Stage A interior Hilbert identity, m = 1 "
+        "refutation of Candidate A1, Replacement Lemma A1', and exact equivalence "
+        "H(F, D_tilde) <-> H(F_{int,T}(.; {p}), D_tilde) are CONCRETE_ANALYTIC_IN_LEAN "
+        "(Lean Theorems 5, 6, 7) and UNCONDITIONAL_FINITE_ARITHMETIC; PNT/Selberg "
+        "||S_{spill,Y}||_Y = O(1/log Y) (||S_{spill,Y}||_Y^2 = O((log Y)^{-2}), Young penalty "
+        "(1 + log Y)*||S_{spill,Y}||_Y^2 = O(1/log Y)) spillover decay (via TC-057R Theorem "
+        "4.3(3)), Omega(Y) linear growth of the unsigned paired majorant, general-m b_{pm} - b_m "
+        "jump formula (with (-1)^{v_p(m)} and 1_{sq}(m) - 1_{sq}(p*m)), and literature barrier "
+        "audit are ANALYTIC_PROVED_OUTSIDE_LEAN; Route D closure transfer from interior paired "
+        "remainder is CONDITIONAL_IMPLICATION; 256-bit Arb checks (including Candidate A2's "
+        "Y = 64 refutation witness) are CERTIFIED_FINITE_OBSERVATION; and Candidates A1, A2 "
+        "(refuted) and TC062-OBL-INTERIOR-PRIME-PAIR-OFFDIAG (open) are "
+        "OPEN_CONJECTURE_OR_FAILED_CANDIDATE."
+    )
+    sec4["stage_b_large_prime_b_jump_identity_verified"] = bool(b_jump_audit["verified"])
+    sec4["stage_b_large_prime_b_jump_audit"] = b_jump_audit
+
+    ep_ok, ep_msg = verify_section_epistemic_scope_metadata(sec4)
+    if not ep_ok:
+        raise RuntimeError(f"Invalid epistemic metadata in section_4: {ep_msg}")
+
+    prov = dict(existing["provenance"])
+    prov["metadata_and_stage_b_reprocessed_from_source"] = True
+    prov["hand_edited_enclosures"] = False
+    prov["quadrature_timestamps_reset"] = False
+
+    updated: Dict[str, Any] = {
+        "task_id": existing["task_id"],
+        "epic_id": existing["epic_id"],
+        "parent_subgate": existing["parent_subgate"],
+        "parent_subgate_status": "OPEN",
+        "rh_proved": False,
+        "global_consequence_classes_enforced": list(GLOBAL_CONSEQUENCE_CLASSES),
+        "global_energy_improvement_claimed": False,
+        "completion_outcome_code": (
+            "COMPLETE_SIGNED_KERNEL_PRIME_PAIR_REDUCTION_AND_UNSEEN_HOLDOUT_SURVIVAL_GATE_OPEN"
+        ),
+        "research_outcome_class": (
+            "EXACT_COMPLETE_KERNEL_AND_INTERIOR_PRIME_PAIR_EQUIVALENCE_PROVED_CANDIDATES_A1_A2_REFUTED_UNSEEN_HOLDOUTS_SURVIVED_SUBGATE_OPEN"
+        ),
+        "generated_at_utc": existing["generated_at_utc"],
+        "total_generation_wall_seconds": existing["total_generation_wall_seconds"],
+        "circle_constant_convention": existing["circle_constant_convention"],
+        "grade_variable_convention": existing["grade_variable_convention"],
+        "sampled_zeta_zeros_used": existing["sampled_zeta_zeros_used"],
+        "provenance": prov,
+        "section_1_protocols_reassembly_and_complete_kernel": existing[
+            "section_1_protocols_reassembly_and_complete_kernel"
+        ],
+        "section_2_disjoint_prime_decompositions_and_controls": existing[
+            "section_2_disjoint_prime_decompositions_and_controls"
+        ],
+        "section_3_whole_line_contraction_obstruction": existing[
+            "section_3_whole_line_contraction_obstruction"
+        ],
+        "section_4_quantitative_proof_attempt": sec4,
+        "section_5_unseen_validation_and_interval_splits": existing[
+            "section_5_unseen_validation_and_interval_splits"
+        ],
+        "section_6_lean_formalization_and_gate_accounting": existing[
+            "section_6_lean_formalization_and_gate_accounting"
+        ],
+    }
+
+    def _collect_arb_dicts(node: Any, prefix: str = "") -> Dict[str, Dict[str, Any]]:
+        found: Dict[str, Dict[str, Any]] = {}
+        if isinstance(node, dict):
+            if "lower_dec" in node and "upper_dec" in node and "arb_ball_str" in node:
+                found[prefix] = node
+            else:
+                for k_n, v_n in node.items():
+                    if k_n == "serialized_arb_self_check":
+                        continue
+                    sub_p = f"{prefix}.{k_n}" if prefix else str(k_n)
+                    found.update(_collect_arb_dicts(v_n, sub_p))
+        elif isinstance(node, list):
+            for idx_n, item_n in enumerate(node):
+                found.update(_collect_arb_dicts(item_n, f"{prefix}[{idx_n}]"))
+        return found
+
+    orig_arb_map = _collect_arb_dicts(existing)
+    new_arb_map = _collect_arb_dicts(updated)
+    orig_total_balls = int(existing["serialized_arb_self_check"]["total_certified_arb_balls_checked"])
+    for b_path, b_dict in new_arb_map.items():
+        lo_dec = _sci_or_latex_num_to_fraction(str(b_dict["lower_dec"]))
+        hi_dec = _sci_or_latex_num_to_fraction(str(b_dict["upper_dec"]))
+        b_lo, b_hi, _ = _parse_arb_ball_str_to_fractions(str(b_dict["arb_ball_str"]))
+        if not (lo_dec <= hi_dec and max(lo_dec, b_lo) <= min(hi_dec, b_hi)):
+            raise RuntimeError(f"Serialized Arb enclosure invariant failed at {b_path}: {b_dict}")
+    if new_arb_map != orig_arb_map or len(new_arb_map) != orig_total_balls:
+        raise RuntimeError(
+            f"Metadata reprocessing altered serialized Arb map ({len(new_arb_map)} vs {orig_total_balls})"
+        )
+    updated["serialized_arb_self_check"] = existing["serialized_arb_self_check"]
+    updated["all_mathematical_and_numerical_checks_pass"] = bool(
+        existing["all_mathematical_and_numerical_checks_pass"] and b_jump_audit["verified"]
+    )
+
+    clean_obj = strip_enclosure_arb_for_json(updated)
+    if write_output:
+        out_txt = json.dumps(clean_obj, indent=2, ensure_ascii=True) + "\n"
+        if "\\pi" in out_txt or "\u03c0" in out_txt:
+            raise RuntimeError("Forbidden circle-half token detected in TC-062 artifact JSON!")
+        artifact_path.write_bytes(out_txt.encode("utf-8"))
     return clean_obj
 
 
