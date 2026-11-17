@@ -79,6 +79,142 @@
       "formal_inputs_changed_in_tc061r2": false,
       "formal_inputs_changed_in_tc061r3": false,
       "formal_build_report_path": "formal/build_report.json"
+    },
+    "tc062r_prime_power_majorant_revalidation": {
+      "revalidation_task_id": "TASK-TC-062R",
+      "branch": "task/tc-062r-prime-power-certification-and-diagonal-equivalence-repair",
+      "prior_baseline_git_commit": "6a2f5f519b3f2f4642ea2ce00626832e556953be",
+      "revalidating_git_commit": "4b3df05665e186c85eb54c3822ae1d8c34199a3c",
+      "revalidated_at_utc": "2026-11-17T13:04:39.994154+00:00",
+      "revalidation_wall_sec": 369.7502,
+      "producing_module": "tc/mixed_arithmetic_covariance.py",
+      "producing_function": "revalidate_tc061_prime_power_majorant_impact_arb",
+      "repaired_helper_function": "compute_zone1_prime_power_diag_perturbation_arb",
+      "defect_repaired": "Replaced early-exit `if pk > n0_j: break` over prime-grouped `prime_power_pairs_up_to(T)` in `evaluate_mixed_covariance_point_arb` and `evaluate_control_matched_point_arb` with complete order-independent filtering (`if pk > n0_j: continue`, canonical `(pk, L_pk)` summation order) via `compute_zone1_prime_power_diag_perturbation_arb`.",
+      "enclosure_verification_rule": "Exact outward-rounded Fraction endpoint containment `rep_lo >= max(ret_bs_lo, ret_dec_lo, ret_flt_lo)` and `rep_hi <= min(ret_bs_hi, ret_dec_hi, ret_flt_hi)` plus 256-bit `verify_serialized_arb_roundtrip(B_repaired, retained)` (midpoint-only containment rejected).",
+      "overall_artifact_status": "WIDENED",
+      "total_artifact_arb_balls": 3208,
+      "overall_ball_status_counts": {
+        "unaffected": 930,
+        "revalidated": 2275,
+        "widened": 3,
+        "superseded": 0
+      },
+      "strict_d_tilde_dataflow_ball_status_counts": {
+        "unaffected": 1383,
+        "revalidated": 1822,
+        "widened": 3,
+        "superseded": 0
+      },
+      "live_verified_unaffected_sec5_companion_count": 15,
+      "max_omitted_delta_diag_j_upper": "4.695466075721154e-62",
+      "max_omitted_D_tilde_rad_perturbation_upper": "2.593958134569122e-61",
+      "any_probe_or_kl1_or_control_verdict_changed": false,
+      "any_review_displayed_enclosure_needed_widening": false,
+      "per_section_impact_inventory": {
+        "headline_and_exposure_reconciliation": {
+          "section_status": "REVALIDATED",
+          "total_balls": 10,
+          "unaffected_balls": 6,
+          "revalidated_balls": 4,
+          "widened_balls": 0,
+          "superseded_balls": 0,
+          "scope_and_call_graph_note": "HO_BASE_128 (3 balls, T=431<512 unsplit) and self_collision_constants (3 balls) are UNAFFECTED; HO_EXT_4096 (4 balls, T=32768>=512 three_zone) re-evaluated live."
+        },
+        "section_1_protocol_and_exact_mixed_identity": {
+          "section_status": "UNAFFECTED",
+          "total_balls": 294,
+          "unaffected_balls": 294,
+          "revalidated_balls": 0,
+          "widened_balls": 0,
+          "superseded_balls": 0,
+          "scope_and_call_graph_note": "Y in {2, 4, 8, 16, 32, 64} (T <= 182 < 512, use_three_zone=False): all 294 balls UNAFFECTED."
+        },
+        "section_2_cutoff_and_interval_certification": {
+          "section_status": "WIDENED",
+          "total_balls": 30,
+          "unaffected_balls": 24,
+          "revalidated_balls": 4,
+          "widened_balls": 2,
+          "superseded_balls": 0,
+          "scope_and_call_graph_note": "fast_selberg_sieve_vs_inherited_check (2 balls), straddling_interval_case_splits (20 balls, full-sum evaluate_fixed_cutoff_on_Y_ball_arb with no Zone 1 split), and J_unsplit (2 balls) are UNAFFECTED; three_zone_vs_unsplit_crosschecks 3-zone/difference fields at Y = 64, 128 (6 balls, n0_0 = 5, 10 >= 3) re-evaluated live."
+        },
+        "section_3_preregistered_holdout_experiment": {
+          "section_status": "WIDENED",
+          "total_balls": 2271,
+          "unaffected_balls": 166,
+          "revalidated_balls": 2104,
+          "widened_balls": 1,
+          "superseded_balls": 0,
+          "scope_and_call_graph_note": "HO-BASE-128 (T = 431 < 512, unsplit, 161 balls) and protocol-deviation comparison (5 balls) are UNAFFECTED; remaining 13 holdout points (T >= 518 >= 512, three_zone, 2105 balls) re-evaluated live under frozen protocol settings."
+        },
+        "section_4_controls_and_tc_arithmetic_attribution": {
+          "section_status": "REVALIDATED",
+          "total_balls": 414,
+          "unaffected_balls": 276,
+          "revalidated_balls": 138,
+          "widened_balls": 0,
+          "superseded_balls": 0,
+          "scope_and_call_graph_note": "20 control rows at Y in {16, 32, 64, 128} (T <= 431 < 512, three_zone=False, 276 balls) are UNAFFECTED; 10 control rows at Y in {256, 512} (T in {1024, 2436} >= 512, three_zone=True, 138 balls) re-evaluated live."
+        },
+        "section_5_arithmetic_proof_attempt_and_kernel_reduction": {
+          "section_status": "REVALIDATED",
+          "total_balls": 180,
+          "unaffected_balls": 155,
+          "revalidated_balls": 25,
+          "widened_balls": 0,
+          "superseded_balls": 0,
+          "scope_and_call_graph_note": "Gram kernel checks (33 balls), coprime bridge (72 balls), elementary self-collision proof (3 balls), evaluated_scales at Y <= 128 (32 balls), and X_self_Y / analytic constants at Y >= 256 (15 balls, also live-verified) are UNAFFECTED; 25 D_tilde/X_tilde/J-dependent balls across Y in {256, 512, 1024, 2048, 4096} re-evaluated live."
+        },
+        "section_6_route_d_conditional_transfer_and_scope": {
+          "section_status": "UNAFFECTED",
+          "total_balls": 9,
+          "unaffected_balls": 9,
+          "revalidated_balls": 0,
+          "widened_balls": 0,
+          "superseded_balls": 0,
+          "scope_and_call_graph_note": "route_d_threshold_checks (9 balls, pure zeta''(1+eps) threshold certificates): UNAFFECTED."
+        }
+      },
+      "widened_ball_count": 3,
+      "widened_balls": [
+        {
+          "json_path": "section_2_cutoff_and_interval_certification.three_zone_vs_unsplit_crosschecks[0].D_tilde_difference",
+          "section": "section_2_cutoff_and_interval_certification",
+          "status": "WIDENED",
+          "prior_ball_str": "[+/- 1.40e-55]",
+          "prior_lo_dec": "-1.392388603444122202315666068998269493497e-55",
+          "prior_hi_dec": "1.392388603408373153674733683828832353855e-55",
+          "widened_ball_str": "[+/- 1.40e-55]",
+          "widened_lo_dec": "-1.392388604963413041637233868593988256627e-55",
+          "widened_hi_dec": "1.392388604927663992996301483424551116985e-55",
+          "max_endpoint_excess_over_retained_tight_str": "1.51929083932e-64"
+        },
+        {
+          "json_path": "section_2_cutoff_and_interval_certification.three_zone_vs_unsplit_crosschecks[1].D_tilde_difference",
+          "section": "section_2_cutoff_and_interval_certification",
+          "status": "WIDENED",
+          "prior_ball_str": "[+/- 2.50e-55]",
+          "prior_lo_dec": "-2.496590499619503329330715114797155906774e-55",
+          "prior_hi_dec": "2.496590499754757348227286976625452218074e-55",
+          "widened_ball_str": "[+/- 2.50e-55]",
+          "widened_lo_dec": "-2.496590526966738437118935507520093643113e-55",
+          "widened_hi_dec": "2.496590527101992456015507369348389954413e-55",
+          "max_endpoint_excess_over_retained_tight_str": "2.73472351078e-63"
+        },
+        {
+          "json_path": "section_3_preregistered_holdout_experiment.holdout_point_evaluations[3].J_consistency_residual_2PB",
+          "section": "section_3_preregistered_holdout_experiment",
+          "status": "WIDENED",
+          "prior_ball_str": "[+/- 5.26e-52]",
+          "prior_lo_dec": "-5.258941550479581077602653328325271091656e-52",
+          "prior_hi_dec": "5.258941550479581077602653328325271091656e-52",
+          "widened_ball_str": "[+/- 5.26e-52]",
+          "widened_lo_dec": "-5.258941556702596355463795035469335145436e-52",
+          "widened_hi_dec": "5.258941556702596355463795035469335145436e-52",
+          "max_endpoint_excess_over_retained_tight_str": "6.22301527786e-61"
+        }
+      ]
     }
   },
   "epistemic_categories_enforced": [
@@ -3296,9 +3432,9 @@
         },
         "D_tilde_difference": {
           "mid_float": -1.7874524320466193e-66,
-          "rad_float_outward": 1.3923886034262479e-55,
-          "lower_dec": "-1.392388603444122202315666068998269493497e-55",
-          "upper_dec": "1.392388603408373153674733683828832353855e-55",
+          "rad_float_outward": 1.3923886049455387e-55,
+          "lower_dec": "-1.392388604963413041637233868593988256627e-55",
+          "upper_dec": "1.392388604927663992996301483424551116985e-55",
           "arb_ball_str": "[+/- 1.40e-55]"
         },
         "consistent_zero_in_difference": true
@@ -3329,9 +3465,9 @@
         },
         "D_tilde_difference": {
           "mid_float": 6.762700944828593e-66,
-          "rad_float_outward": 2.4965904996871307e-55,
-          "lower_dec": "-2.496590499619503329330715114797155906774e-55",
-          "upper_dec": "2.496590499754757348227286976625452218074e-55",
+          "rad_float_outward": 2.4965905270343658e-55,
+          "lower_dec": "-2.496590526966738437118935507520093643113e-55",
+          "upper_dec": "2.496590527101992456015507369348389954413e-55",
           "arb_ball_str": "[+/- 2.50e-55]"
         },
         "consistent_zero_in_difference": true
@@ -13109,9 +13245,9 @@
         },
         "J_consistency_residual_2PB": {
           "mid_float": 0.0,
-          "rad_float_outward": 5.258941550479582e-52,
-          "lower_dec": "-5.258941550479581077602653328325271091656e-52",
-          "upper_dec": "5.258941550479581077602653328325271091656e-52",
+          "rad_float_outward": 5.258941556702597e-52,
+          "lower_dec": "-5.258941556702596355463795035469335145436e-52",
+          "upper_dec": "5.258941556702596355463795035469335145436e-52",
           "arb_ball_str": "[+/- 5.26e-52]"
         },
         "algebraic_consistency_verified": true,

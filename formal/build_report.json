@@ -4,12 +4,12 @@
   "status": "passed",
   "command": "lake build",
   "exit_code": 0,
-  "producing_git_commit": "ab7e976b0fc4c822bdfd332a885ff80afe7156c9",
-  "timestamp": "2026-11-17T01:01:40.708502+00:00",
+  "producing_git_commit": "4b3df05665e186c85eb54c3822ae1d8c34199a3c",
+  "timestamp": "2026-11-17T13:04:38.656881+00:00",
   "lake_version": "Lake version 5.0.0-df668f0 (Lean version 4.8.0)",
   "lean_version": "Lean (version 4.8.0, x86_64-w64-windows-gnu, commit df668f00e6c0, Release)",
-  "project_theorem_declarations_compiled": 829,
-  "total_theorems": 829,
+  "project_theorem_declarations_compiled": 830,
+  "total_theorems": 830,
   "formal_source_hashes": {
     "formal/RiemannScope.lean": "b3afa687764ef2130042fe41646735616fd21fe6988060c5e82cc3d0ee2693ee",
     "formal/RiemannScope/Basic.lean": "2f1d9629951152f5a47af073e5e9f703ad76972ebfb376bf28d647bd6674cd2f",
@@ -53,7 +53,7 @@
     "formal/RiemannScope/DyadicPowerLiftPrimitiveCorrelation.lean": "5efdbc3854058b82baab182acf8a614c52c926ac18c09d638afffd0a42f2ceca",
     "formal/RiemannScope/SignedDilationArithmeticEnergy.lean": "741760da7d401ea8cf9bc6becba1bb892a1c3c655d95f17f68e3c140aa370b0f",
     "formal/RiemannScope/MixedArithmeticCovariance.lean": "89d2b874d711bd70a57659bbde6e72422751406dfe5700ef9b19dff8d5d28bec",
-    "formal/RiemannScope/JointPrimeDilationSignedRemainder.lean": "88d942bc6bb1189952996b0fa523c1b30deef7a8abd9aca84c5469508e44c6d4"
+    "formal/RiemannScope/JointPrimeDilationSignedRemainder.lean": "622b3fd07c5399c240c12053d77216a9a1582f3860e4c77972d3f24e502e3bb5"
   },
   "lean_toolchain_hash": "61561b06f5587e027815fac8f59bf6ca160dfbf3f7372fc6297664acfd85b8c0",
   "lakefile_hash": "c942fa180e7d45c5c9c4fc772515bf0b874f8dd8549decd56d65a19bcc89b828",
@@ -62,7 +62,7 @@
     "scripts/build_formal.py": "f8282d1e94a16825dc367ce66874abba4463419e97a6202e5d937ce69ae3c4cf",
     "certification.py": "ce40568b52aced7cfb42975e774d325fe384e592fcf9c17f06af08a7787fbcb7"
   },
-  "build_stdout": "\u2139 [2311/2345] Replayed RiemannScope.ExtremalCorrelation\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:717:0: 'RiemannScope.full_finite_extremal_grade_correlation_theorem' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:718:0: 'RiemannScope.full_finite_correlation_transcendence_contradiction' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:719:0: 'RiemannScope.full_finite_extremal_grade_correlation_theorem_support' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:720:0: 'RiemannScope.tc_extremal_correlation_nonvanishing_corollary' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:721:0: 'RiemannScope.three_coefficient_legal_vanishing' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:722:0: 'RiemannScope.nonzero_legal_has_nonzero_selected_coefficient' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:723:0: 'RiemannScope.scalar_pairwise_sum_identity' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:724:0: 'RiemannScope.legal_unit_scalar_invariant' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:725:0: 'RiemannScope.scalar_bridge_L_invariant' depends on axioms: [propext, Classical.choice, Quot.sound]\n\u2139 [2326/2345] Replayed RiemannScope.LiouvilleSquareDilation\ninfo: .\\.\\.\\.\\RiemannScope\\LiouvilleSquareDilation.lean:5386:94: Try this: ring_nf\ninfo: .\\.\\.\\.\\RiemannScope\\LiouvilleSquareDilation.lean:5412:54: Try this: ring_nf\ninfo: .\\.\\.\\.\\RiemannScope\\LiouvilleSquareDilation.lean:5470:108: Try this: ring_nf\n\u2139 [2333/2345] Replayed RiemannScope.JointPrimeDilationSignedRemainder\ninfo: .\\.\\.\\.\\RiemannScope\\JointPrimeDilationSignedRemainder.lean:1309:4: Try this: ring_nf\n\u2139 [2340/2345] Replayed RiemannScope.UnitRescaling\ninfo: .\\.\\.\\.\\RiemannScope\\UnitRescaling.lean:139:2: Try this: ring_nf\n\u2714 [2344/2345] Built RiemannScope\nBuild completed successfully.",
+  "build_stdout": "\u2139 [2309/2345] Replayed RiemannScope.ExtremalCorrelation\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:717:0: 'RiemannScope.full_finite_extremal_grade_correlation_theorem' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:718:0: 'RiemannScope.full_finite_correlation_transcendence_contradiction' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:719:0: 'RiemannScope.full_finite_extremal_grade_correlation_theorem_support' depends on axioms: [propext,\n Classical.choice,\n Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:720:0: 'RiemannScope.tc_extremal_correlation_nonvanishing_corollary' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:721:0: 'RiemannScope.three_coefficient_legal_vanishing' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:722:0: 'RiemannScope.nonzero_legal_has_nonzero_selected_coefficient' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:723:0: 'RiemannScope.scalar_pairwise_sum_identity' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:724:0: 'RiemannScope.legal_unit_scalar_invariant' depends on axioms: [propext, Classical.choice, Quot.sound]\ninfo: .\\.\\.\\.\\RiemannScope\\ExtremalCorrelation.lean:725:0: 'RiemannScope.scalar_bridge_L_invariant' depends on axioms: [propext, Classical.choice, Quot.sound]\n\u2139 [2318/2345] Replayed RiemannScope.UnitRescaling\ninfo: .\\.\\.\\.\\RiemannScope\\UnitRescaling.lean:139:2: Try this: ring_nf\n\u2139 [2339/2345] Replayed RiemannScope.LiouvilleSquareDilation\ninfo: .\\.\\.\\.\\RiemannScope\\LiouvilleSquareDilation.lean:5386:94: Try this: ring_nf\ninfo: .\\.\\.\\.\\RiemannScope\\LiouvilleSquareDilation.lean:5412:54: Try this: ring_nf\ninfo: .\\.\\.\\.\\RiemannScope\\LiouvilleSquareDilation.lean:5470:108: Try this: ring_nf\n\u2139 [2343/2345] Replayed RiemannScope.JointPrimeDilationSignedRemainder\ninfo: .\\.\\.\\.\\RiemannScope\\JointPrimeDilationSignedRemainder.lean:1311:4: Try this: ring_nf\nBuild completed successfully.",
   "build_stderr": "",
-  "report_hash": "5ac9156bf98356176187c4144b1368871ac0f90eacf3e71055a2f901a096d484"
+  "report_hash": "aeb53eb6f88fc39a8f446fc7b3689afe6e8b4b38acef5de5c8e5666e5c7348f7"
 }
