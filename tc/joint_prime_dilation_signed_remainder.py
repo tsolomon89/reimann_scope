@@ -7058,7 +7058,7 @@ def reprocess_task_tc062_metadata_and_stage_b(
     updated: Dict[str, Any] = {
         "task_id": existing["task_id"],
         "repair_task_id": TASK_TC_062R2_ID,
-        "prior_repair_task_id": existing.get("repair_task_id", TASK_TC_062R_ID),
+        "prior_repair_task_id": TASK_TC_062R_ID,
         "epic_id": existing["epic_id"],
         "parent_subgate": existing["parent_subgate"],
         "parent_subgate_status": "OPEN",
