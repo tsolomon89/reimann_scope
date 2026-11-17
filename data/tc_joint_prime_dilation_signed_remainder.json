@@ -1,6 +1,7 @@
 {
   "task_id": "TASK-TC-062",
-  "repair_task_id": "TASK-TC-062R",
+  "repair_task_id": "TASK-TC-062R2",
+  "prior_repair_task_id": "TASK-TC-062R",
   "epic_id": "EPIC-TC-042",
   "parent_subgate": "SUBGATE-TC-043A",
   "parent_subgate_status": "OPEN",
@@ -98,7 +99,413 @@
           "revalidated": 0,
           "widened": 0
         }
+      },
+      "comparison_status": "COMPLETE_COMPARED",
+      "stable_key_verdict_comparison_v2": {
+        "comparison_id": "TC062R_VS_TC062_STABLE_KEY_V2",
+        "baseline_commit": "0943eb639dd20191f7563ba23f3e2d5d9f999217",
+        "comparison_status": "COMPLETE_COMPARED",
+        "incomparable_reason": null,
+        "any_probe_kl1_control_or_candidate_verdict_changed": false,
+        "any_numerical_enclosure_changed": false,
+        "any_integrity_coverage_or_execution_classification_changed": true,
+        "scope_key_counts": {
+          "in_scope_controls": 37,
+          "candidate_and_section4_classifications": 6,
+          "kl1_diagnostics": 62,
+          "registered_probes_and_point_verdicts": 124,
+          "continuous_interval_classifications": 14
+        },
+        "changed_numerical_enclosures_count": 0,
+        "changed_mathematical_verdicts_count": 0,
+        "corrected_integrity_coverage_or_execution_classifications_count": 1,
+        "schema_only_additions_count": 77,
+        "missing_or_incomparable_entries_count": 0,
+        "changed_numerical_enclosures": [],
+        "changed_mathematical_verdicts": [],
+        "corrected_integrity_coverage_or_execution_classifications": [
+          {
+            "key": "top.research_outcome_class",
+            "scope": "execution_integrity_coverage_resource_status",
+            "prior_value": "EXACT_COMPLETE_KERNEL_AND_INTERIOR_PRIME_PAIR_EQUIVALENCE_PROVED_CANDIDATES_A1_A2_REFUTED_UNSEEN_HOLDOUTS_SURVIVED_SUBGATE_OPEN",
+            "current_value": "EXACT_COMPLETE_KERNEL_AND_OFFDIAG_EQUIVALENCE_PROVED_CANDIDATES_A1_A2_REFUTED_UNSEEN_HOLDOUTS_SURVIVED_RESOURCE_WITHIN_SUBGATE_OPEN"
+          }
+        ],
+        "schema_only_additions": [
+          {
+            "kind": "status_field",
+            "key": "sec5.all_required_applicable_evaluations_resolved",
+            "added_value": true
+          },
+          {
+            "kind": "status_field",
+            "key": "top.execution_and_certification_status",
+            "added_value": "CERTIFIED_EVALUATION_COMPLETE"
+          },
+          {
+            "kind": "status_field",
+            "key": "top.holdout_hypothesis_outcome",
+            "added_value": "SURVIVED_TESTED_POINTS"
+          },
+          {
+            "kind": "status_field",
+            "key": "top.resource_compliance_status",
+            "added_value": "WITHIN"
+          },
+          {
+            "kind": "section_schema_key",
+            "key": "root.execution_and_certification_status"
+          },
+          {
+            "kind": "section_schema_key",
+            "key": "root.holdout_hypothesis_outcome"
+          },
+          {
+            "kind": "section_schema_key",
+            "key": "root.prior_repair_task_id"
+          },
+          {
+            "kind": "section_schema_key",
+            "key": "root.repair_task_id"
+          },
+          {
+            "kind": "section_schema_key",
+            "key": "root.resource_compliance_status"
+          },
+          {
+            "kind": "section_schema_key",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds"
+          },
+          {
+            "kind": "section_schema_key",
+            "key": "section_4_quantitative_proof_attempt.beta_four_piece_endpoint_and_summed_strip_audit"
+          },
+          {
+            "kind": "section_schema_key",
+            "key": "section_4_quantitative_proof_attempt.uncovered_young_boundary_accounting"
+          },
+          {
+            "kind": "section_schema_key",
+            "key": "section_4_quantitative_proof_attempt.zone1_prime_power_majorant_repair_audit"
+          },
+          {
+            "kind": "section_schema_key",
+            "key": "section_5_unseen_validation_and_interval_splits.all_required_applicable_evaluations_resolved"
+          },
+          {
+            "kind": "section_schema_key",
+            "key": "section_5_unseen_validation_and_interval_splits.coverage_audit"
+          },
+          {
+            "kind": "section_schema_key",
+            "key": "section_5_unseen_validation_and_interval_splits.derived_outcome_summary"
+          },
+          {
+            "kind": "section_schema_key",
+            "key": "section_5_unseen_validation_and_interval_splits.detected_integrity_conflicts"
+          },
+          {
+            "kind": "section_schema_key",
+            "key": "section_5_unseen_validation_and_interval_splits.resolution_audit"
+          },
+          {
+            "kind": "section_schema_key",
+            "key": "section_5_unseen_validation_and_interval_splits.six_dimension_closeout_audit"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[Y=64,p=2,m=1].Delta_Hcal_m_m_direct"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[Y=64,p=2,m=1].abbreviated_m1_only_discrepancy"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[Y=64,p=2,m=1].combined_log_form_residual"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[Y=64,p=2,m=1].corrected_c_self_form_residual"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[Y=64,p=2,m=33].Delta_Hcal_m_m_direct"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[Y=64,p=2,m=33].abbreviated_m1_only_discrepancy"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[Y=64,p=2,m=33].combined_log_form_residual"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[Y=64,p=2,m=33].corrected_c_self_form_residual"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[Y=64,p=2,m=35].Delta_Hcal_m_m_direct"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[Y=64,p=2,m=35].abbreviated_m1_only_discrepancy"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[Y=64,p=2,m=35].combined_log_form_residual"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[Y=64,p=2,m=35].corrected_c_self_form_residual"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[Y=64,p=2,m=36].Delta_Hcal_m_m_direct"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[Y=64,p=2,m=36].abbreviated_m1_only_discrepancy"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[Y=64,p=2,m=36].combined_log_form_residual"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[Y=64,p=2,m=36].corrected_c_self_form_residual"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[Y=64,p=3,m=22].Delta_Hcal_m_m_direct"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[Y=64,p=3,m=22].abbreviated_m1_only_discrepancy"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[Y=64,p=3,m=22].combined_log_form_residual"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[Y=64,p=3,m=22].corrected_c_self_form_residual"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[Y=8,p=2,m=1].Delta_Hcal_m_m_direct"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[Y=8,p=2,m=1].abbreviated_m1_only_discrepancy"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[Y=8,p=2,m=1].combined_log_form_residual"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[Y=8,p=2,m=1].corrected_c_self_form_residual"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[Y=8,p=2,m=3].Delta_Hcal_m_m_direct"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[Y=8,p=2,m=3].abbreviated_m1_only_discrepancy"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[Y=8,p=2,m=3].combined_log_form_residual"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[Y=8,p=2,m=3].corrected_c_self_form_residual"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[Y=8,p=2,m=4].Delta_Hcal_m_m_direct"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[Y=8,p=2,m=4].abbreviated_m1_only_discrepancy"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[Y=8,p=2,m=4].combined_log_form_residual"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[Y=8,p=2,m=4].corrected_c_self_form_residual"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[Y=8,p=2,m=5].Delta_Hcal_m_m_direct"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[Y=8,p=2,m=5].abbreviated_m1_only_discrepancy"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[Y=8,p=2,m=5].combined_log_form_residual"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[Y=8,p=2,m=5].corrected_c_self_form_residual"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[Y=8,p=3,m=1].Delta_Hcal_m_m_direct"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[Y=8,p=3,m=1].abbreviated_m1_only_discrepancy"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[Y=8,p=3,m=1].combined_log_form_residual"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[Y=8,p=3,m=1].corrected_c_self_form_residual"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[Y=8,p=3,m=2].Delta_Hcal_m_m_direct"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[Y=8,p=3,m=2].abbreviated_m1_only_discrepancy"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[Y=8,p=3,m=2].combined_log_form_residual"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[Y=8,p=3,m=2].corrected_c_self_form_residual"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[Y=8,p=3,m=4].Delta_Hcal_m_m_direct"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[Y=8,p=3,m=4].abbreviated_m1_only_discrepancy"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[Y=8,p=3,m=4].combined_log_form_residual"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[Y=8,p=3,m=4].corrected_c_self_form_residual"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.four_X_self_envelope_bound_1377_40_log_tau"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.four_X_self_sharp_bound_289_15_log_tau"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.lean_sigma_diag_lower_bound_neg_744_tau_minus_1"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.m33_p2_abbreviated_formula_discrepancy_Y64"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.m3_p2_abbreviated_formula_discrepancy_Y8"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.outside_lean_sigma_diag_lower_bound_neg_289_15_log_tau"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.candidate_a2_unsigned_paired_block_majorant_refutation.complete_kernel_linear_growth_proof.asymptotic_leading_slope_c0_sq_log_4_3_over_50"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.candidate_a2_unsigned_paired_block_majorant_refutation.complete_kernel_linear_growth_proof.odd_resonant_band_bilinear_lower_bound_Y256"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.candidate_a2_unsigned_paired_block_majorant_refutation.complete_kernel_linear_growth_proof.subwindow_pointwise_constant_c0"
+          },
+          {
+            "kind": "added_arb_enclosure",
+            "key": "section_4_quantitative_proof_attempt.candidate_a2_unsigned_paired_block_majorant_refutation.complete_kernel_linear_growth_proof.zero_locus_X_over_m_sqrt_4_3_log_8"
+          }
+        ],
+        "missing_or_incomparable_entries": []
       }
+    },
+    "reviewed_tc062r_delivered_tip": "a8f5887735e59c95af783e61297b7264a4caea5e",
+    "reviewed_tc062r_producing_commit": "4b3df05665e186c85eb54c3822ae1d8c34199a3c",
+    "metadata_and_stage_b_reprocessed_from_source": true,
+    "tc062r2_validation_and_metadata_producing_git_commit": "2ba4f3348ddc7b8b9d731bf189ae20c2af877434",
+    "tc062r2_reprocessed_at_utc": "2026-11-17T21:49:45.677088+00:00",
+    "hand_edited_enclosures": false,
+    "quadrature_timestamps_reset": false,
+    "tc062r2_validation_and_verdict_comparison": {
+      "comparison_id": "TC062R2_VS_TC062R_STABLE_KEY_V1",
+      "baseline_commit": "a8f5887735e59c95af783e61297b7264a4caea5e",
+      "comparison_status": "COMPLETE_COMPARED",
+      "incomparable_reason": null,
+      "any_probe_kl1_control_or_candidate_verdict_changed": false,
+      "any_numerical_enclosure_changed": false,
+      "any_integrity_coverage_or_execution_classification_changed": false,
+      "scope_key_counts": {
+        "in_scope_controls": 37,
+        "candidate_and_section4_classifications": 6,
+        "kl1_diagnostics": 62,
+        "registered_probes_and_point_verdicts": 124,
+        "continuous_interval_classifications": 14
+      },
+      "changed_numerical_enclosures_count": 0,
+      "changed_mathematical_verdicts_count": 0,
+      "corrected_integrity_coverage_or_execution_classifications_count": 0,
+      "schema_only_additions_count": 6,
+      "missing_or_incomparable_entries_count": 0,
+      "changed_numerical_enclosures": [],
+      "changed_mathematical_verdicts": [],
+      "corrected_integrity_coverage_or_execution_classifications": [],
+      "schema_only_additions": [
+        {
+          "kind": "status_field",
+          "key": "sec5.all_required_applicable_evaluations_resolved",
+          "added_value": true
+        },
+        {
+          "kind": "section_schema_key",
+          "key": "root.prior_repair_task_id"
+        },
+        {
+          "kind": "section_schema_key",
+          "key": "section_4_quantitative_proof_attempt.beta_four_piece_endpoint_and_summed_strip_audit"
+        },
+        {
+          "kind": "section_schema_key",
+          "key": "section_5_unseen_validation_and_interval_splits.all_required_applicable_evaluations_resolved"
+        },
+        {
+          "kind": "section_schema_key",
+          "key": "section_5_unseen_validation_and_interval_splits.resolution_audit"
+        },
+        {
+          "kind": "section_schema_key",
+          "key": "section_5_unseen_validation_and_interval_splits.six_dimension_closeout_audit"
+        }
+      ],
+      "missing_or_incomparable_entries": []
     }
   },
   "section_1_protocols_reassembly_and_complete_kernel": {
@@ -2951,7 +3358,7 @@
       },
       "uncovered_strip_norm_disposition": {
         "lean_proved_bound": "||U_{bnd,p,Y}||_Y^2 <= C_strip(p) * (log Y)^2 for all Y >= 2 (Theorem 7(1)), giving Young penalty (1 + log Y)*||U_{bnd,p,Y}||_Y^2 = O_p((log Y)^3) <<_{eta,p} Y^eta.",
-        "elementary_triangle_bound": "||U_{bnd,p,Y}||_Y^2 = O_p(1) via |U_p(T)| <= T and phi_k(X) <= (tau*p)^3 * Y^{-5/4} on k > T/p.",
+        "elementary_triangle_bound": "||U_{bnd,p,Y}||_Y^2 = O_p(1) (ANALYTIC_PROVED_OUTSIDE_LEAN): on k in U_p(T) (T/p < k <= T) and X in [Y, tau*Y] (Y >= 2, T = ceil(Y^(5/4))), phi_k(X) <= tau^(5/2)*p^3 * Y^(5/2)/T^3; hence the bare sum satisfies |sum_{k in U_p(T)} lambda(k)*phi_k(X)| <= |U_p(T)| * tau^(5/2)*p^3 * Y^(5/2)/T^3 <= tau^(5/2)*p^3 * Y^(5/2)/T^2 <= tau^(5/2)*p^3 = O_p(1), and via the 4-component summed bound sum_{k=1}^T |beta_Y(k)| <= C_beta * T * (log T)^2 (with C_beta depending only on |c_lambda|, |c_{1/2}| across square, single endpoint k = T, 1 <= d <= D_min <= log Y small-divisor slice, and all-d|k smooth divisor convolution; whereas multiplying pointwise |beta_Y(k)| << T*(log T)^2 by |U_p(T)| would lose a factor T), |(log X)^(-2) * sum_{k in U_p(T)} beta_Y(k)*phi_k(X)| <= (log Y)^(-2) * C_beta*T*(log T)^2 * tau^(5/2)*p^3 * Y^(5/2)/T^3 <= (81/16)*C_beta*tau^(5/2)*p^3 = O_p(1).",
         "retired_unsupported_sharpening": "Removed unsupported outside-Lean claim ||U_{bnd,p,Y}||_Y^2 = O_p((log Y)^{-2}): unlike pure spillover S_{spill,Y} (which carries a 1/(log X)^2 factor), U_{bnd,p,Y} contains the bare signed Liouville sum sum_{k in U_p(T)} lambda(k)*phi_k(X), which is not controlled to O_p((log Y)^{-2}) by |R_osc(d)| = O(d) triangle estimates alone; Lean's proved O_p((log Y)^2) bound already suffices for two-way H-equivalence."
       }
     },
@@ -4017,7 +4424,149 @@
       "statement": "For fixed prime p = 2 (or any fixed prime p), prove that for every eta > 0 there exist a_eta, b_eta >= 0, 0 < kappa_eta <= 2, and Y_eta >= 2 such that for all real Y >= Y_eta, Sigma_off(Y; p) := sum_{m != n in I_p(T(Y))} lambda(m)*lambda(n)*Delta_{p,p} Hcal_Y(m, n) <= a_eta * Y^eta + b_eta * (log Y)^(2 - kappa_eta) * D_tilde(Y) (retaining D_tilde as the inherited prime-power diagonal).",
       "status": "OPEN"
     },
-    "all_section_4_checks_pass": true
+    "all_section_4_checks_pass": true,
+    "beta_four_piece_endpoint_and_summed_strip_audit": {
+      "epistemic_classification": {
+        "four_piece_all_divisors_identity_including_d_eq_T": "CONCRETE_ANALYTIC_IN_LEAN",
+        "summed_beta_T_logT_sq_and_Op1_strip_energy": "ANALYTIC_PROVED_OUTSIDE_LEAN",
+        "lean_proved_Op_logY_sq_strip_energy": "CONCRETE_ANALYTIC_IN_LEAN"
+      },
+      "endpoint_d_eq_T_convention_checks": [
+        {
+          "Y": 8,
+          "T_Y": 14,
+          "D_min": 2,
+          "full_divisors_identity_holds_1_to_T": true,
+          "truncated_d_le_T_minus_1_fails_at_n_eq_T": true,
+          "exact_n_eq_T_omission_equals_Delta_M_sq2_T": true,
+          "Delta_M_sq2_T_arb_str": "[2.2505921588095540348 +/- 3.13e-20]"
+        },
+        {
+          "Y": 16,
+          "T_Y": 32,
+          "D_min": 2,
+          "full_divisors_identity_holds_1_to_T": true,
+          "truncated_d_le_T_minus_1_fails_at_n_eq_T": true,
+          "exact_n_eq_T_omission_equals_Delta_M_sq2_T": true,
+          "Delta_M_sq2_T_arb_str": "[1.7752278645680623029 +/- 2.73e-20]"
+        },
+        {
+          "Y": 64,
+          "T_Y": 182,
+          "D_min": 4,
+          "full_divisors_identity_holds_1_to_T": true,
+          "truncated_d_le_T_minus_1_fails_at_n_eq_T": true,
+          "exact_n_eq_T_omission_equals_Delta_M_sq2_T": true,
+          "Delta_M_sq2_T_arb_str": "[0.99952837646772470143 +/- 4.38e-21]"
+        }
+      ],
+      "c_32_series_lt_7_verified": true,
+      "uniform_C_beta_formula": "|c_lambda| + 12*(4 + |c_lambda| + |c_{1/2}|) + 7*(8 + |c_{1/2}|)",
+      "uniform_C_beta_arb_str": "[184.23939006281326300 +/- 4.11e-18]",
+      "strip_summed_vs_pointwise_checks": [
+        {
+          "Y": 8,
+          "T_Y": 14,
+          "prime_p": 2,
+          "strip_cardinality": 4,
+          "sum_abs_beta_le_C_beta_T_logT_sq": true,
+          "bare_sup_le_tau52_p3": true,
+          "strip_window_energy_le_uniform_Op1_bound": true,
+          "naive_pointwise_times_card_exceeds_summed_bound": false
+        },
+        {
+          "Y": 8,
+          "T_Y": 14,
+          "prime_p": 3,
+          "strip_cardinality": 8,
+          "sum_abs_beta_le_C_beta_T_logT_sq": true,
+          "bare_sup_le_tau52_p3": true,
+          "strip_window_energy_le_uniform_Op1_bound": true,
+          "naive_pointwise_times_card_exceeds_summed_bound": true
+        },
+        {
+          "Y": 16,
+          "T_Y": 32,
+          "prime_p": 2,
+          "strip_cardinality": 10,
+          "sum_abs_beta_le_C_beta_T_logT_sq": true,
+          "bare_sup_le_tau52_p3": true,
+          "strip_window_energy_le_uniform_Op1_bound": true,
+          "naive_pointwise_times_card_exceeds_summed_bound": true
+        },
+        {
+          "Y": 16,
+          "T_Y": 32,
+          "prime_p": 3,
+          "strip_cardinality": 16,
+          "sum_abs_beta_le_C_beta_T_logT_sq": true,
+          "bare_sup_le_tau52_p3": true,
+          "strip_window_energy_le_uniform_Op1_bound": true,
+          "naive_pointwise_times_card_exceeds_summed_bound": true
+        },
+        {
+          "Y": 64,
+          "T_Y": 182,
+          "prime_p": 2,
+          "strip_cardinality": 60,
+          "sum_abs_beta_le_C_beta_T_logT_sq": true,
+          "bare_sup_le_tau52_p3": true,
+          "strip_window_energy_le_uniform_Op1_bound": true,
+          "naive_pointwise_times_card_exceeds_summed_bound": true
+        },
+        {
+          "Y": 64,
+          "T_Y": 182,
+          "prime_p": 3,
+          "strip_cardinality": 94,
+          "sum_abs_beta_le_C_beta_T_logT_sq": true,
+          "bare_sup_le_tau52_p3": true,
+          "strip_window_energy_le_uniform_Op1_bound": true,
+          "naive_pointwise_times_card_exceeds_summed_bound": true
+        },
+        {
+          "Y": 256,
+          "T_Y": 1024,
+          "prime_p": 2,
+          "strip_cardinality": 342,
+          "sum_abs_beta_le_C_beta_T_logT_sq": true,
+          "bare_sup_le_tau52_p3": true,
+          "strip_window_energy_le_uniform_Op1_bound": true,
+          "naive_pointwise_times_card_exceeds_summed_bound": true
+        },
+        {
+          "Y": 256,
+          "T_Y": 1024,
+          "prime_p": 3,
+          "strip_cardinality": 512,
+          "sum_abs_beta_le_C_beta_T_logT_sq": true,
+          "bare_sup_le_tau52_p3": true,
+          "strip_window_energy_le_uniform_Op1_bound": true,
+          "naive_pointwise_times_card_exceeds_summed_bound": true
+        },
+        {
+          "Y": 1024,
+          "T_Y": 5793,
+          "prime_p": 2,
+          "strip_cardinality": 1931,
+          "sum_abs_beta_le_C_beta_T_logT_sq": true,
+          "bare_sup_le_tau52_p3": true,
+          "strip_window_energy_le_uniform_Op1_bound": true,
+          "naive_pointwise_times_card_exceeds_summed_bound": true
+        },
+        {
+          "Y": 1024,
+          "T_Y": 5793,
+          "prime_p": 3,
+          "strip_cardinality": 2895,
+          "sum_abs_beta_le_C_beta_T_logT_sq": true,
+          "bare_sup_le_tau52_p3": true,
+          "strip_window_energy_le_uniform_Op1_bound": true,
+          "naive_pointwise_times_card_exceeds_summed_bound": true
+        }
+      ],
+      "verified": true
+    }
   },
   "section_5_unseen_validation_and_interval_splits": {
     "epistemic_statuses": [
@@ -4043,7 +4592,18 @@
       "missing_or_invalid_candidate_entries": [],
       "applicable_domains_valid": true,
       "applicable_domain_violations": [],
-      "interval_coverage_complete": true
+      "point_schedule_coverage_complete": true,
+      "interval_coverage_complete": true,
+      "interval_coverage_issues": []
+    },
+    "all_required_applicable_evaluations_resolved": true,
+    "resolution_audit": {
+      "total_applicable_point_candidate_pairs": 60,
+      "resolved_applicable_point_candidate_pairs": 60,
+      "unresolved_applicable_point_candidate_pairs": [],
+      "unresolved_required_interval_branch_margins": [],
+      "unresolved_conservative_extra_margins": [],
+      "all_required_applicable_evaluations_resolved": true
     },
     "certification_integrity_ok": true,
     "detected_integrity_conflicts": [],
@@ -4081,6 +4641,22 @@
       "any_resource_budget_exceeded": false,
       "any_resource_budget_unknown": false,
       "enforcement_mode": "POST_EVALUATION_BUDGET_AUDIT_NO_OS_PREEMPTIVE_KILL"
+    },
+    "six_dimension_closeout_audit": {
+      "certification_integrity_ok": true,
+      "coverage_complete": true,
+      "all_required_applicable_evaluations_resolved": true,
+      "per_candidate_mathematical_outcomes": {
+        "TC062-P0-F": "SURVIVED_TESTED_POINTS",
+        "TC062-P0-INT2": "SURVIVED_TESTED_POINTS",
+        "TC062-P0-INT23": "SURVIVED_TESTED_POINTS",
+        "TC062-P-NEG-INT2": "SURVIVED_TESTED_POINTS",
+        "KL1_int2_diag": "SURVIVED_TESTED_POINTS",
+        "KL1_int2_offdiag": "SURVIVED_TESTED_POINTS",
+        "P0_continuous_intervals": "SURVIVED_TESTED_POINTS"
+      },
+      "resource_compliance_status": "WITHIN",
+      "overall_closeout_readiness": true
     },
     "continuous_straddling_interval_splits": {
       "interval_625_pm_2_neg12_across_T3125": {
@@ -4190,6 +4766,14 @@
               "lower_dec": "-6.521421695542042318294306824100203812124e-1",
               "upper_dec": "-6.520660089732156494690684667148161679505e-1",
               "arb_ball_str": "[-0.6521 +/- 4.22e-5]"
+            },
+            "branch_role": "REQUIRED_FEASIBLE_SUBDOMAIN",
+            "exact_subdomain_notation": "[2559999/4096, 625]",
+            "P0_branch_classification": {
+              "verdict": "PASS"
+            },
+            "TC062_P0_F_branch_classification": {
+              "verdict": "PASS"
             }
           },
           {
@@ -4286,6 +4870,14 @@
               "lower_dec": "-6.479694966631360797393313077918719500305e-1",
               "upper_dec": "-6.478915328902121739673702904838137328623e-1",
               "arb_ball_str": "[-0.6479 +/- 6.95e-5]"
+            },
+            "branch_role": "REQUIRED_FEASIBLE_SUBDOMAIN",
+            "exact_subdomain_notation": "(625, 2560001/4096]",
+            "P0_branch_classification": {
+              "verdict": "PASS"
+            },
+            "TC062_P0_F_branch_classification": {
+              "verdict": "PASS"
             }
           }
         ],
@@ -4347,6 +4939,37 @@
           "verdict": "PASS",
           "reason": "CERTIFIED_UPPER_MARGIN_LE_ZERO",
           "certified_definite": true
+        },
+        "cutoff_partition_audit": {
+          "prescribed_Y_lo": "2559999/4096",
+          "prescribed_Y_hi": "2560001/4096",
+          "derived_T_range": [
+            3125,
+            3126
+          ],
+          "derived_D0_range": [
+            6,
+            6
+          ],
+          "required_feasible_subdomains": [
+            {
+              "cutoff_triple": [
+                3125,
+                6,
+                6
+              ],
+              "subdomain_notation": "[2559999/4096, 625]"
+            },
+            {
+              "cutoff_triple": [
+                3126,
+                6,
+                6
+              ],
+              "subdomain_notation": "(625, 2560001/4096]"
+            }
+          ],
+          "infeasible_triples_in_grid": []
         }
       },
       "interval_403_40_to_403_46_across_e6": {
@@ -4456,6 +5079,14 @@
               "lower_dec": "-4.329036716595002776131195787456817924978e-1",
               "upper_dec": "-4.204073041260418253095565432886360213159e-1",
               "arb_ball_str": "[-0.4 +/- 0.0330]"
+            },
+            "branch_role": "REQUIRED_FEASIBLE_SUBDOMAIN",
+            "exact_subdomain_notation": "[2017/5, 1808^(4/5)]",
+            "P0_branch_classification": {
+              "verdict": "PASS"
+            },
+            "TC062_P0_F_branch_classification": {
+              "verdict": "PASS"
             }
           },
           {
@@ -4552,6 +5183,14 @@
               "lower_dec": "-4.419636885118804481287213548057479783894e-1",
               "upper_dec": "-4.376118032865475848680603121465537697075e-1",
               "arb_ball_str": "[-0.44 +/- 2.39e-3]"
+            },
+            "branch_role": "REQUIRED_FEASIBLE_SUBDOMAIN",
+            "exact_subdomain_notation": "(1808^(4/5), exp(6))",
+            "P0_branch_classification": {
+              "verdict": "PASS"
+            },
+            "TC062_P0_F_branch_classification": {
+              "verdict": "PASS"
             }
           },
           {
@@ -4648,6 +5287,14 @@
               "lower_dec": "-4.478614837239368595689370522450190037490e-1",
               "upper_dec": "-4.301051503530109454409569025301607325672e-1",
               "arb_ball_str": "[-0.4 +/- 0.0479]"
+            },
+            "branch_role": "REQUIRED_FEASIBLE_SUBDOMAIN",
+            "exact_subdomain_notation": "[exp(6), 20173/50]",
+            "P0_branch_classification": {
+              "verdict": "PASS"
+            },
+            "TC062_P0_F_branch_classification": {
+              "verdict": "PASS"
             }
           }
         ],
@@ -4709,10 +5356,161 @@
           "verdict": "PASS",
           "reason": "CERTIFIED_UPPER_MARGIN_LE_ZERO",
           "certified_definite": true
+        },
+        "cutoff_partition_audit": {
+          "prescribed_Y_lo": "2017/5",
+          "prescribed_Y_hi": "20173/50",
+          "derived_T_range": [
+            1808,
+            1809
+          ],
+          "derived_D0_range": [
+            5,
+            6
+          ],
+          "required_feasible_subdomains": [
+            {
+              "cutoff_triple": [
+                1808,
+                5,
+                5
+              ],
+              "subdomain_notation": "[2017/5, 1808^(4/5)]"
+            },
+            {
+              "cutoff_triple": [
+                1809,
+                5,
+                5
+              ],
+              "subdomain_notation": "(1808^(4/5), exp(6))"
+            },
+            {
+              "cutoff_triple": [
+                1809,
+                6,
+                6
+              ],
+              "subdomain_notation": "[exp(6), 20173/50]"
+            }
+          ],
+          "infeasible_triples_in_grid": [
+            [
+              1808,
+              6,
+              6
+            ]
+          ]
         }
       },
       "any_interval_fail": false,
-      "verified": true
+      "verified": true,
+      "P0_continuous_interval_outcome": "SURVIVED_TESTED_POINTS",
+      "TC062_P0_F_continuous_interval_outcome": "SURVIVED_TESTED_POINTS",
+      "interval_split_audits": {
+        "interval_625_pm_2_neg12_across_T3125": {
+          "interval_key": "interval_625_pm_2_neg12_across_T3125",
+          "integrity_conflicts": [],
+          "coverage_issues": [],
+          "coverage_complete": true,
+          "integrity_ok": true,
+          "probe_effective_verdicts": {
+            "P0": "PASS",
+            "TC062_P0_F": "PASS"
+          },
+          "unresolved_required_branch_margins": [],
+          "unresolved_conservative_extra_margins": [],
+          "partition_summary": {
+            "prescribed_Y_lo": "2559999/4096",
+            "prescribed_Y_hi": "2560001/4096",
+            "derived_T_range": [
+              3125,
+              3126
+            ],
+            "derived_D0_range": [
+              6,
+              6
+            ],
+            "required_feasible_subdomains": [
+              {
+                "cutoff_triple": [
+                  3125,
+                  6,
+                  6
+                ],
+                "subdomain_notation": "[2559999/4096, 625]"
+              },
+              {
+                "cutoff_triple": [
+                  3126,
+                  6,
+                  6
+                ],
+                "subdomain_notation": "(625, 2560001/4096]"
+              }
+            ],
+            "infeasible_triples_in_grid": []
+          }
+        },
+        "interval_403_40_to_403_46_across_e6": {
+          "interval_key": "interval_403_40_to_403_46_across_e6",
+          "integrity_conflicts": [],
+          "coverage_issues": [],
+          "coverage_complete": true,
+          "integrity_ok": true,
+          "probe_effective_verdicts": {
+            "P0": "PASS",
+            "TC062_P0_F": "PASS"
+          },
+          "unresolved_required_branch_margins": [],
+          "unresolved_conservative_extra_margins": [],
+          "partition_summary": {
+            "prescribed_Y_lo": "2017/5",
+            "prescribed_Y_hi": "20173/50",
+            "derived_T_range": [
+              1808,
+              1809
+            ],
+            "derived_D0_range": [
+              5,
+              6
+            ],
+            "required_feasible_subdomains": [
+              {
+                "cutoff_triple": [
+                  1808,
+                  5,
+                  5
+                ],
+                "subdomain_notation": "[2017/5, 1808^(4/5)]"
+              },
+              {
+                "cutoff_triple": [
+                  1809,
+                  5,
+                  5
+                ],
+                "subdomain_notation": "(1808^(4/5), exp(6))"
+              },
+              {
+                "cutoff_triple": [
+                  1809,
+                  6,
+                  6
+                ],
+                "subdomain_notation": "[exp(6), 20173/50]"
+              }
+            ],
+            "infeasible_triples_in_grid": [
+              [
+                1808,
+                6,
+                6
+              ]
+            ]
+          }
+        }
+      }
     },
     "holdout_point_evaluations": [
       {
@@ -10716,897 +11514,8 @@
   },
   "serialized_arb_self_check": {
     "total_certified_arb_balls_checked": 885,
-    "compared_against_live_original_arb_count": 885,
-    "live_original_count_matches_enumerated_total": true,
-    "all_enclose_original_256bit_arb_ball": true,
     "failed_paths": [],
-    "checked_paths": [
-      "section_1_protocols_reassembly_and_complete_kernel.pointwise_A_Y_reassembly_checks[0].A_norm_sq",
-      "section_1_protocols_reassembly_and_complete_kernel.pointwise_A_Y_reassembly_checks[0].max_alpha_A_plus_beta_Y_abs",
-      "section_1_protocols_reassembly_and_complete_kernel.pointwise_A_Y_reassembly_checks[0].max_pointwise_A_reassembly_abs_error",
-      "section_1_protocols_reassembly_and_complete_kernel.pointwise_A_Y_reassembly_checks[1].A_norm_sq",
-      "section_1_protocols_reassembly_and_complete_kernel.pointwise_A_Y_reassembly_checks[1].max_alpha_A_plus_beta_Y_abs",
-      "section_1_protocols_reassembly_and_complete_kernel.pointwise_A_Y_reassembly_checks[1].max_pointwise_A_reassembly_abs_error",
-      "section_1_protocols_reassembly_and_complete_kernel.pointwise_A_Y_reassembly_checks[2].A_norm_sq",
-      "section_1_protocols_reassembly_and_complete_kernel.pointwise_A_Y_reassembly_checks[2].max_alpha_A_plus_beta_Y_abs",
-      "section_1_protocols_reassembly_and_complete_kernel.pointwise_A_Y_reassembly_checks[2].max_pointwise_A_reassembly_abs_error",
-      "section_1_protocols_reassembly_and_complete_kernel.pointwise_A_Y_reassembly_checks[3].A_norm_sq",
-      "section_1_protocols_reassembly_and_complete_kernel.pointwise_A_Y_reassembly_checks[3].max_alpha_A_plus_beta_Y_abs",
-      "section_1_protocols_reassembly_and_complete_kernel.pointwise_A_Y_reassembly_checks[3].max_pointwise_A_reassembly_abs_error",
-      "section_1_protocols_reassembly_and_complete_kernel.pointwise_A_Y_reassembly_checks[4].A_norm_sq",
-      "section_1_protocols_reassembly_and_complete_kernel.pointwise_A_Y_reassembly_checks[4].max_alpha_A_plus_beta_Y_abs",
-      "section_1_protocols_reassembly_and_complete_kernel.pointwise_A_Y_reassembly_checks[4].max_pointwise_A_reassembly_abs_error",
-      "section_1_protocols_reassembly_and_complete_kernel.pointwise_A_Y_reassembly_checks[5].A_norm_sq",
-      "section_1_protocols_reassembly_and_complete_kernel.pointwise_A_Y_reassembly_checks[5].max_alpha_A_plus_beta_Y_abs",
-      "section_1_protocols_reassembly_and_complete_kernel.pointwise_A_Y_reassembly_checks[5].max_pointwise_A_reassembly_abs_error",
-      "section_1_protocols_reassembly_and_complete_kernel.complete_kernel_assembly_checks[0].D_tilde_Y",
-      "section_1_protocols_reassembly_and_complete_kernel.complete_kernel_assembly_checks[0].X_self_Y",
-      "section_1_protocols_reassembly_and_complete_kernel.complete_kernel_assembly_checks[0].F_direct_1d",
-      "section_1_protocols_reassembly_and_complete_kernel.complete_kernel_assembly_checks[0].F_complete_kernel_sum",
-      "section_1_protocols_reassembly_and_complete_kernel.complete_kernel_assembly_checks[0].F_kernel_minus_1d_residual",
-      "section_1_protocols_reassembly_and_complete_kernel.complete_kernel_assembly_checks[1].D_tilde_Y",
-      "section_1_protocols_reassembly_and_complete_kernel.complete_kernel_assembly_checks[1].X_self_Y",
-      "section_1_protocols_reassembly_and_complete_kernel.complete_kernel_assembly_checks[1].F_direct_1d",
-      "section_1_protocols_reassembly_and_complete_kernel.complete_kernel_assembly_checks[1].F_complete_kernel_sum",
-      "section_1_protocols_reassembly_and_complete_kernel.complete_kernel_assembly_checks[1].F_kernel_minus_1d_residual",
-      "section_1_protocols_reassembly_and_complete_kernel.complete_kernel_assembly_checks[2].D_tilde_Y",
-      "section_1_protocols_reassembly_and_complete_kernel.complete_kernel_assembly_checks[2].X_self_Y",
-      "section_1_protocols_reassembly_and_complete_kernel.complete_kernel_assembly_checks[2].F_direct_1d",
-      "section_1_protocols_reassembly_and_complete_kernel.complete_kernel_assembly_checks[2].F_complete_kernel_sum",
-      "section_1_protocols_reassembly_and_complete_kernel.complete_kernel_assembly_checks[2].F_kernel_minus_1d_residual",
-      "section_1_protocols_reassembly_and_complete_kernel.complete_kernel_assembly_checks[3].D_tilde_Y",
-      "section_1_protocols_reassembly_and_complete_kernel.complete_kernel_assembly_checks[3].X_self_Y",
-      "section_1_protocols_reassembly_and_complete_kernel.complete_kernel_assembly_checks[3].F_direct_1d",
-      "section_1_protocols_reassembly_and_complete_kernel.complete_kernel_assembly_checks[3].F_complete_kernel_sum",
-      "section_1_protocols_reassembly_and_complete_kernel.complete_kernel_assembly_checks[3].F_kernel_minus_1d_residual",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[0].F_direct_1d",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[0].one_prime_decompositions.2.F_paired_total",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[0].one_prime_decompositions.2.F_outer_N_interior",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[0].one_prime_decompositions.2.F_outer_N_terminal_boundary",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[0].one_prime_decompositions.2.F_inner_T_interior",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[0].one_prime_decompositions.2.F_inner_T_cutoff_and_spillover_boundary",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[0].one_prime_decompositions.2.paired_minus_F_1d_residual",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[0].one_prime_decompositions.3.F_paired_total",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[0].one_prime_decompositions.3.F_outer_N_interior",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[0].one_prime_decompositions.3.F_outer_N_terminal_boundary",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[0].one_prime_decompositions.3.F_inner_T_interior",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[0].one_prime_decompositions.3.F_inner_T_cutoff_and_spillover_boundary",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[0].one_prime_decompositions.3.paired_minus_F_1d_residual",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[0].two_prime_2_3_sixteen_term.F_paired_16_term_total",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[0].two_prime_2_3_sixteen_term.F_inner_T_interior",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[0].two_prime_2_3_sixteen_term.F_inner_T_boundary",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[0].two_prime_2_3_sixteen_term.paired_16_minus_F_1d_residual",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[1].F_direct_1d",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[1].one_prime_decompositions.2.F_paired_total",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[1].one_prime_decompositions.2.F_outer_N_interior",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[1].one_prime_decompositions.2.F_outer_N_terminal_boundary",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[1].one_prime_decompositions.2.F_inner_T_interior",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[1].one_prime_decompositions.2.F_inner_T_cutoff_and_spillover_boundary",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[1].one_prime_decompositions.2.paired_minus_F_1d_residual",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[1].one_prime_decompositions.3.F_paired_total",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[1].one_prime_decompositions.3.F_outer_N_interior",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[1].one_prime_decompositions.3.F_outer_N_terminal_boundary",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[1].one_prime_decompositions.3.F_inner_T_interior",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[1].one_prime_decompositions.3.F_inner_T_cutoff_and_spillover_boundary",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[1].one_prime_decompositions.3.paired_minus_F_1d_residual",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[1].two_prime_2_3_sixteen_term.F_paired_16_term_total",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[1].two_prime_2_3_sixteen_term.F_inner_T_interior",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[1].two_prime_2_3_sixteen_term.F_inner_T_boundary",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[1].two_prime_2_3_sixteen_term.paired_16_minus_F_1d_residual",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[2].F_direct_1d",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[2].one_prime_decompositions.2.F_paired_total",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[2].one_prime_decompositions.2.F_outer_N_interior",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[2].one_prime_decompositions.2.F_outer_N_terminal_boundary",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[2].one_prime_decompositions.2.F_inner_T_interior",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[2].one_prime_decompositions.2.F_inner_T_cutoff_and_spillover_boundary",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[2].one_prime_decompositions.2.paired_minus_F_1d_residual",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[2].one_prime_decompositions.3.F_paired_total",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[2].one_prime_decompositions.3.F_outer_N_interior",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[2].one_prime_decompositions.3.F_outer_N_terminal_boundary",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[2].one_prime_decompositions.3.F_inner_T_interior",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[2].one_prime_decompositions.3.F_inner_T_cutoff_and_spillover_boundary",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[2].one_prime_decompositions.3.paired_minus_F_1d_residual",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[2].two_prime_2_3_sixteen_term.F_paired_16_term_total",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[2].two_prime_2_3_sixteen_term.F_inner_T_interior",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[2].two_prime_2_3_sixteen_term.F_inner_T_boundary",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[2].two_prime_2_3_sixteen_term.paired_16_minus_F_1d_residual",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[3].F_direct_1d",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[3].one_prime_decompositions.2.F_paired_total",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[3].one_prime_decompositions.2.F_outer_N_interior",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[3].one_prime_decompositions.2.F_outer_N_terminal_boundary",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[3].one_prime_decompositions.2.F_inner_T_interior",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[3].one_prime_decompositions.2.F_inner_T_cutoff_and_spillover_boundary",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[3].one_prime_decompositions.2.paired_minus_F_1d_residual",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[3].one_prime_decompositions.3.F_paired_total",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[3].one_prime_decompositions.3.F_outer_N_interior",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[3].one_prime_decompositions.3.F_outer_N_terminal_boundary",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[3].one_prime_decompositions.3.F_inner_T_interior",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[3].one_prime_decompositions.3.F_inner_T_cutoff_and_spillover_boundary",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[3].one_prime_decompositions.3.paired_minus_F_1d_residual",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[3].two_prime_2_3_sixteen_term.F_paired_16_term_total",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[3].two_prime_2_3_sixteen_term.F_inner_T_interior",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[3].two_prime_2_3_sixteen_term.F_inner_T_boundary",
-      "section_2_disjoint_prime_decompositions_and_controls.liouville_complete_kernel_pairing_rows[3].two_prime_2_3_sixteen_term.paired_16_minus_F_1d_residual",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_prime_pair_sign_checks[0].F_control_direct_1d",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_prime_pair_sign_checks[0].F_control_matched_sign_paired",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_prime_pair_sign_checks[0].matched_sign_residual",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_prime_pair_sign_checks[0].misapplied_all_minus_paired_value",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_prime_pair_sign_checks[0].misapplied_all_minus_discrepancy",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_prime_pair_sign_checks[1].F_control_direct_1d",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_prime_pair_sign_checks[1].F_control_matched_sign_paired",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_prime_pair_sign_checks[1].matched_sign_residual",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_prime_pair_sign_checks[1].misapplied_all_minus_paired_value",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_prime_pair_sign_checks[1].misapplied_all_minus_discrepancy",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_prime_pair_sign_checks[2].F_control_direct_1d",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_prime_pair_sign_checks[2].F_control_matched_sign_paired",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_prime_pair_sign_checks[2].matched_sign_residual",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_prime_pair_sign_checks[2].misapplied_all_minus_paired_value",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_prime_pair_sign_checks[2].misapplied_all_minus_discrepancy",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_prime_pair_sign_checks[3].F_control_direct_1d",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_prime_pair_sign_checks[3].F_control_matched_sign_paired",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_prime_pair_sign_checks[3].matched_sign_residual",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_prime_pair_sign_checks[3].misapplied_all_minus_paired_value",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_prime_pair_sign_checks[3].misapplied_all_minus_discrepancy",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_prime_pair_sign_checks[4].F_control_direct_1d",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_prime_pair_sign_checks[4].F_control_matched_sign_paired",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_prime_pair_sign_checks[4].matched_sign_residual",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_prime_pair_sign_checks[4].misapplied_all_minus_paired_value",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_prime_pair_sign_checks[4].misapplied_all_minus_discrepancy",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_prime_pair_sign_checks[5].F_control_direct_1d",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_prime_pair_sign_checks[5].F_control_matched_sign_paired",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_prime_pair_sign_checks[5].matched_sign_residual",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_prime_pair_sign_checks[5].misapplied_all_minus_paired_value",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_prime_pair_sign_checks[5].misapplied_all_minus_discrepancy",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[0].F_Y",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[0].log_Y_times_D_tilde",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[0].F_over_log_Y_D_tilde.ratio",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[0].TC062_P0_F_margin",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[1].F_Y",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[1].log_Y_times_D_tilde",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[1].F_over_log_Y_D_tilde.ratio",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[1].TC062_P0_F_margin",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[2].F_Y",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[2].log_Y_times_D_tilde",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[2].F_over_log_Y_D_tilde.ratio",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[2].TC062_P0_F_margin",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[3].F_Y",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[3].log_Y_times_D_tilde",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[3].F_over_log_Y_D_tilde.ratio",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[3].TC062_P0_F_margin",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[4].F_Y",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[4].log_Y_times_D_tilde",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[4].F_over_log_Y_D_tilde.ratio",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[4].TC062_P0_F_margin",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[5].F_Y",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[5].log_Y_times_D_tilde",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[5].F_over_log_Y_D_tilde.ratio",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[5].TC062_P0_F_margin",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[6].F_Y",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[6].log_Y_times_D_tilde",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[6].F_over_log_Y_D_tilde.ratio",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[6].TC062_P0_F_margin",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[7].F_Y",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[7].log_Y_times_D_tilde",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[7].F_over_log_Y_D_tilde.ratio",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[7].TC062_P0_F_margin",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[8].F_Y",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[8].log_Y_times_D_tilde",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[8].F_over_log_Y_D_tilde.ratio",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[8].TC062_P0_F_margin",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[9].F_Y",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[9].log_Y_times_D_tilde",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[9].F_over_log_Y_D_tilde.ratio",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[9].TC062_P0_F_margin",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[10].F_Y",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[10].log_Y_times_D_tilde",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[10].F_over_log_Y_D_tilde.ratio",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[10].TC062_P0_F_margin",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[11].F_Y",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[11].log_Y_times_D_tilde",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[11].F_over_log_Y_D_tilde.ratio",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[11].TC062_P0_F_margin",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[12].F_Y",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[12].log_Y_times_D_tilde",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[12].F_over_log_Y_D_tilde.ratio",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[12].TC062_P0_F_margin",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[13].F_Y",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[13].log_Y_times_D_tilde",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[13].F_over_log_Y_D_tilde.ratio",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[13].TC062_P0_F_margin",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[14].F_Y",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[14].log_Y_times_D_tilde",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[14].F_over_log_Y_D_tilde.ratio",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[14].TC062_P0_F_margin",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[15].F_Y",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[15].log_Y_times_D_tilde",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[15].F_over_log_Y_D_tilde.ratio",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[15].TC062_P0_F_margin",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[16].F_Y",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[16].log_Y_times_D_tilde",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[16].F_over_log_Y_D_tilde.ratio",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[16].TC062_P0_F_margin",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[17].F_Y",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[17].log_Y_times_D_tilde",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[17].F_over_log_Y_D_tilde.ratio",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[17].TC062_P0_F_margin",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[18].F_Y",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[18].log_Y_times_D_tilde",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[18].F_over_log_Y_D_tilde.ratio",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[18].TC062_P0_F_margin",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[19].F_Y",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[19].log_Y_times_D_tilde",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[19].F_over_log_Y_D_tilde.ratio",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[19].TC062_P0_F_margin",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[20].F_Y",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[20].log_Y_times_D_tilde",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[20].F_over_log_Y_D_tilde.ratio",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[20].TC062_P0_F_margin",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[21].F_Y",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[21].log_Y_times_D_tilde",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[21].F_over_log_Y_D_tilde.ratio",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[21].TC062_P0_F_margin",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[22].F_Y",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[22].log_Y_times_D_tilde",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[22].F_over_log_Y_D_tilde.ratio",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[22].TC062_P0_F_margin",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[23].F_Y",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[23].log_Y_times_D_tilde",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[23].F_over_log_Y_D_tilde.ratio",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[23].TC062_P0_F_margin",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[24].F_Y",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[24].log_Y_times_D_tilde",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[24].F_over_log_Y_D_tilde.ratio",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[24].TC062_P0_F_margin",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[25].F_Y",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[25].log_Y_times_D_tilde",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[25].F_over_log_Y_D_tilde.ratio",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[25].TC062_P0_F_margin",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[26].F_Y",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[26].log_Y_times_D_tilde",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[26].F_over_log_Y_D_tilde.ratio",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[26].TC062_P0_F_margin",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[27].F_Y",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[27].log_Y_times_D_tilde",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[27].F_over_log_Y_D_tilde.ratio",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[27].TC062_P0_F_margin",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[28].F_Y",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[28].log_Y_times_D_tilde",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[28].F_over_log_Y_D_tilde.ratio",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[28].TC062_P0_F_margin",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[29].F_Y",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[29].log_Y_times_D_tilde",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[29].F_over_log_Y_D_tilde.ratio",
-      "section_2_disjoint_prime_decompositions_and_controls.matched_control_F_grid_rows[29].TC062_P0_F_margin",
-      "section_3_whole_line_contraction_obstruction.enclosure_rows[0].enclosure",
-      "section_3_whole_line_contraction_obstruction.enclosure_rows[1].enclosure",
-      "section_3_whole_line_contraction_obstruction.enclosure_rows[2].enclosure",
-      "section_3_whole_line_contraction_obstruction.enclosure_rows[3].enclosure",
-      "section_3_whole_line_contraction_obstruction.enclosure_rows[4].enclosure",
-      "section_3_whole_line_contraction_obstruction.r_2_3_5_7_extension",
-      "section_3_whole_line_contraction_obstruction.r_2_3_minus_r2_times_r3_gap",
-      "section_3_whole_line_contraction_obstruction.cross_prime_coupling_decomposition.inner_product_g1_D3g1",
-      "section_3_whole_line_contraction_obstruction.cross_prime_coupling_decomposition.dominant_same_octave_2_3_term_neg_Ginf_2_3",
-      "section_3_whole_line_contraction_obstruction.cross_prime_coupling_decomposition.r_2_3_minus_r_2_excess",
-      "section_3_whole_line_contraction_obstruction.cross_prime_coupling_decomposition.formula_minus_direct_residual",
-      "section_4_quantitative_proof_attempt.spillover_fringe_and_young_reduction_rows[0].S_spill_norm_sq_direct",
-      "section_4_quantitative_proof_attempt.spillover_fringe_and_young_reduction_rows[0].S_spill_norm_sq_analytic_upper",
-      "section_4_quantitative_proof_attempt.spillover_fringe_and_young_reduction_rows[0].young_mixed_covariance_penalty_1_plus_logY_norm_sq",
-      "section_4_quantitative_proof_attempt.spillover_fringe_and_young_reduction_rows[1].S_spill_norm_sq_direct",
-      "section_4_quantitative_proof_attempt.spillover_fringe_and_young_reduction_rows[1].S_spill_norm_sq_analytic_upper",
-      "section_4_quantitative_proof_attempt.spillover_fringe_and_young_reduction_rows[1].young_mixed_covariance_penalty_1_plus_logY_norm_sq",
-      "section_4_quantitative_proof_attempt.spillover_fringe_and_young_reduction_rows[2].S_spill_norm_sq_direct",
-      "section_4_quantitative_proof_attempt.spillover_fringe_and_young_reduction_rows[2].S_spill_norm_sq_analytic_upper",
-      "section_4_quantitative_proof_attempt.spillover_fringe_and_young_reduction_rows[2].young_mixed_covariance_penalty_1_plus_logY_norm_sq",
-      "section_4_quantitative_proof_attempt.spillover_fringe_and_young_reduction_rows[3].S_spill_norm_sq_direct",
-      "section_4_quantitative_proof_attempt.spillover_fringe_and_young_reduction_rows[3].S_spill_norm_sq_analytic_upper",
-      "section_4_quantitative_proof_attempt.spillover_fringe_and_young_reduction_rows[3].young_mixed_covariance_penalty_1_plus_logY_norm_sq",
-      "section_4_quantitative_proof_attempt.spillover_fringe_and_young_reduction_rows[4].S_spill_norm_sq_direct",
-      "section_4_quantitative_proof_attempt.spillover_fringe_and_young_reduction_rows[4].S_spill_norm_sq_analytic_upper",
-      "section_4_quantitative_proof_attempt.spillover_fringe_and_young_reduction_rows[4].young_mixed_covariance_penalty_1_plus_logY_norm_sq",
-      "section_4_quantitative_proof_attempt.spillover_fringe_and_young_reduction_rows[5].S_spill_norm_sq_direct",
-      "section_4_quantitative_proof_attempt.spillover_fringe_and_young_reduction_rows[5].S_spill_norm_sq_analytic_upper",
-      "section_4_quantitative_proof_attempt.spillover_fringe_and_young_reduction_rows[5].young_mixed_covariance_penalty_1_plus_logY_norm_sq",
-      "section_4_quantitative_proof_attempt.spillover_fringe_and_young_reduction_rows[6].S_spill_norm_sq_direct",
-      "section_4_quantitative_proof_attempt.spillover_fringe_and_young_reduction_rows[6].S_spill_norm_sq_analytic_upper",
-      "section_4_quantitative_proof_attempt.spillover_fringe_and_young_reduction_rows[6].young_mixed_covariance_penalty_1_plus_logY_norm_sq",
-      "section_4_quantitative_proof_attempt.spillover_fringe_and_young_reduction_rows[7].S_spill_norm_sq_direct",
-      "section_4_quantitative_proof_attempt.spillover_fringe_and_young_reduction_rows[7].S_spill_norm_sq_analytic_upper",
-      "section_4_quantitative_proof_attempt.spillover_fringe_and_young_reduction_rows[7].young_mixed_covariance_penalty_1_plus_logY_norm_sq",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[0].Delta_Hcal_m_m_direct",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[0].combined_log_form_residual",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[0].corrected_c_self_form_residual",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[0].abbreviated_m1_only_discrepancy",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[1].Delta_Hcal_m_m_direct",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[1].combined_log_form_residual",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[1].corrected_c_self_form_residual",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[1].abbreviated_m1_only_discrepancy",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[2].Delta_Hcal_m_m_direct",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[2].combined_log_form_residual",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[2].corrected_c_self_form_residual",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[2].abbreviated_m1_only_discrepancy",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[3].Delta_Hcal_m_m_direct",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[3].combined_log_form_residual",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[3].corrected_c_self_form_residual",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[3].abbreviated_m1_only_discrepancy",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[4].Delta_Hcal_m_m_direct",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[4].combined_log_form_residual",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[4].corrected_c_self_form_residual",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[4].abbreviated_m1_only_discrepancy",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[5].Delta_Hcal_m_m_direct",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[5].combined_log_form_residual",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[5].corrected_c_self_form_residual",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[5].abbreviated_m1_only_discrepancy",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[6].Delta_Hcal_m_m_direct",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[6].combined_log_form_residual",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[6].corrected_c_self_form_residual",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y8[6].abbreviated_m1_only_discrepancy",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[0].Delta_Hcal_m_m_direct",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[0].combined_log_form_residual",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[0].corrected_c_self_form_residual",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[0].abbreviated_m1_only_discrepancy",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[1].Delta_Hcal_m_m_direct",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[1].combined_log_form_residual",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[1].corrected_c_self_form_residual",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[1].abbreviated_m1_only_discrepancy",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[2].Delta_Hcal_m_m_direct",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[2].combined_log_form_residual",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[2].corrected_c_self_form_residual",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[2].abbreviated_m1_only_discrepancy",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[3].Delta_Hcal_m_m_direct",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[3].combined_log_form_residual",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[3].corrected_c_self_form_residual",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[3].abbreviated_m1_only_discrepancy",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[4].Delta_Hcal_m_m_direct",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[4].combined_log_form_residual",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[4].corrected_c_self_form_residual",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.anchor_rows_Y64[4].abbreviated_m1_only_discrepancy",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.m3_p2_abbreviated_formula_discrepancy_Y8",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.m33_p2_abbreviated_formula_discrepancy_Y64",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.four_X_self_sharp_bound_289_15_log_tau",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.four_X_self_envelope_bound_1377_40_log_tau",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.lean_sigma_diag_lower_bound_neg_744_tau_minus_1",
-      "section_4_quantitative_proof_attempt.anchor_diagonal_identities_and_self_collision_bounds.outside_lean_sigma_diag_lower_bound_neg_289_15_log_tau",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[0].exp_half_Y2_times_m1_p2_Delta_Hcal_1_1",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[0].m1_p2_Delta_Hcal_1_1",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[0].aggregate_diag_int_T_p2",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[0].F_int_T_p2",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[0].offdiag_int_T_p2",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[1].exp_half_Y2_times_m1_p2_Delta_Hcal_1_1",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[1].m1_p2_Delta_Hcal_1_1",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[1].aggregate_diag_int_T_p2",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[1].F_int_T_p2",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[1].offdiag_int_T_p2",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[2].exp_half_Y2_times_m1_p2_Delta_Hcal_1_1",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[2].m1_p2_Delta_Hcal_1_1",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[2].aggregate_diag_int_T_p2",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[2].F_int_T_p2",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[2].offdiag_int_T_p2",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[3].exp_half_Y2_times_m1_p2_Delta_Hcal_1_1",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[3].m1_p2_Delta_Hcal_1_1",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[3].aggregate_diag_int_T_p2",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[3].F_int_T_p2",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[3].offdiag_int_T_p2",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[4].exp_half_Y2_times_m1_p2_Delta_Hcal_1_1",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[4].m1_p2_Delta_Hcal_1_1",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[4].aggregate_diag_int_T_p2",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[4].F_int_T_p2",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[4].offdiag_int_T_p2",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[5].exp_half_Y2_times_m1_p2_Delta_Hcal_1_1",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[5].m1_p2_Delta_Hcal_1_1",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[5].aggregate_diag_int_T_p2",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[5].F_int_T_p2",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[5].offdiag_int_T_p2",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[6].exp_half_Y2_times_m1_p2_Delta_Hcal_1_1",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[6].m1_p2_Delta_Hcal_1_1",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[6].aggregate_diag_int_T_p2",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[6].F_int_T_p2",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[6].offdiag_int_T_p2",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[7].exp_half_Y2_times_m1_p2_Delta_Hcal_1_1",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[7].m1_p2_Delta_Hcal_1_1",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[7].aggregate_diag_int_T_p2",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[7].F_int_T_p2",
-      "section_4_quantitative_proof_attempt.candidate_a1_pointwise_anchor_diagonal_refutation_and_replacement.rows[7].offdiag_int_T_p2",
-      "section_4_quantitative_proof_attempt.candidate_a2_unsigned_paired_block_majorant_refutation.certified_unsigned_paired_sum_Y64",
-      "section_4_quantitative_proof_attempt.candidate_a2_unsigned_paired_block_majorant_refutation.rhs_budget_Y64",
-      "section_4_quantitative_proof_attempt.candidate_a2_unsigned_paired_block_majorant_refutation.margin_Y64",
-      "section_4_quantitative_proof_attempt.candidate_a2_unsigned_paired_block_majorant_refutation.complete_kernel_linear_growth_proof.zero_locus_X_over_m_sqrt_4_3_log_8",
-      "section_4_quantitative_proof_attempt.candidate_a2_unsigned_paired_block_majorant_refutation.complete_kernel_linear_growth_proof.subwindow_pointwise_constant_c0",
-      "section_4_quantitative_proof_attempt.candidate_a2_unsigned_paired_block_majorant_refutation.complete_kernel_linear_growth_proof.asymptotic_leading_slope_c0_sq_log_4_3_over_50",
-      "section_4_quantitative_proof_attempt.candidate_a2_unsigned_paired_block_majorant_refutation.complete_kernel_linear_growth_proof.odd_resonant_band_bilinear_lower_bound_Y256",
-      "section_4_quantitative_proof_attempt.stage_c_multi_prime_and_harmonic_average_Y64.three_prime_2_3_5_64_term_F_int_T",
-      "section_4_quantitative_proof_attempt.stage_c_multi_prime_and_harmonic_average_Y64.three_prime_2_3_5_diag_int_T",
-      "section_4_quantitative_proof_attempt.stage_c_multi_prime_and_harmonic_average_Y64.three_prime_2_3_5_offdiag_int_T",
-      "section_4_quantitative_proof_attempt.stage_c_multi_prime_and_harmonic_average_Y64.harmonic_weighted_F_int_T",
-      "section_4_quantitative_proof_attempt.stage_c_multi_prime_and_harmonic_average_Y64.harmonic_weighted_F_bnd_T",
-      "section_4_quantitative_proof_attempt.stage_c_multi_prime_and_harmonic_average_Y64.harmonic_reassembly_minus_F_64_residual",
-      "section_4_quantitative_proof_attempt.stage_c_multi_prime_and_harmonic_average_Y64.per_prime_rows[0].F_int_T_p",
-      "section_4_quantitative_proof_attempt.stage_c_multi_prime_and_harmonic_average_Y64.per_prime_rows[0].F_bnd_T_p",
-      "section_4_quantitative_proof_attempt.stage_c_multi_prime_and_harmonic_average_Y64.per_prime_rows[1].F_int_T_p",
-      "section_4_quantitative_proof_attempt.stage_c_multi_prime_and_harmonic_average_Y64.per_prime_rows[1].F_bnd_T_p",
-      "section_4_quantitative_proof_attempt.stage_c_multi_prime_and_harmonic_average_Y64.per_prime_rows[2].F_int_T_p",
-      "section_4_quantitative_proof_attempt.stage_c_multi_prime_and_harmonic_average_Y64.per_prime_rows[2].F_bnd_T_p",
-      "section_4_quantitative_proof_attempt.stage_c_multi_prime_and_harmonic_average_Y64.per_prime_rows[3].F_int_T_p",
-      "section_4_quantitative_proof_attempt.stage_c_multi_prime_and_harmonic_average_Y64.per_prime_rows[3].F_bnd_T_p",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.branches[0].Y_sub_ball",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.branches[0].E_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.branches[0].D_tilde_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.branches[0].X_tilde_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.branches[0].A_norm_sq",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.branches[0].B_norm_sq",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.branches[0].pair_P_B",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.branches[0].J_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.branches[0].log_Y_times_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.branches[0].M_P0",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.branches[0].X_self_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.branches[0].F_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.branches[0].M_P0_F",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.branches[1].Y_sub_ball",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.branches[1].E_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.branches[1].D_tilde_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.branches[1].X_tilde_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.branches[1].A_norm_sq",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.branches[1].B_norm_sq",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.branches[1].pair_P_B",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.branches[1].J_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.branches[1].log_Y_times_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.branches[1].M_P0",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.branches[1].X_self_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.branches[1].F_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.branches[1].M_P0_F",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.union_E_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.union_D_tilde_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.union_J_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.union_log_Y_times_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.union_M_P0",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.union_F_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_625_pm_2_neg12_across_T3125.union_M_P0_F",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[0].Y_sub_ball",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[0].E_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[0].D_tilde_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[0].X_tilde_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[0].A_norm_sq",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[0].B_norm_sq",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[0].pair_P_B",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[0].J_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[0].log_Y_times_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[0].M_P0",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[0].X_self_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[0].F_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[0].M_P0_F",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[1].Y_sub_ball",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[1].E_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[1].D_tilde_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[1].X_tilde_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[1].A_norm_sq",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[1].B_norm_sq",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[1].pair_P_B",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[1].J_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[1].log_Y_times_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[1].M_P0",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[1].X_self_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[1].F_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[1].M_P0_F",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[2].Y_sub_ball",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[2].E_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[2].D_tilde_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[2].X_tilde_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[2].A_norm_sq",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[2].B_norm_sq",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[2].pair_P_B",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[2].J_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[2].log_Y_times_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[2].M_P0",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[2].X_self_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[2].F_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.branches[2].M_P0_F",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.union_E_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.union_D_tilde_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.union_J_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.union_log_Y_times_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.union_M_P0",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.union_F_Y",
-      "section_5_unseen_validation_and_interval_splits.continuous_straddling_interval_splits.interval_403_40_to_403_46_across_e6.union_M_P0_F",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].decisive_witnesses.TC062-P0-F.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].decisive_witnesses.TC062-P0-INT2.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].decisive_witnesses.TC062-P0-INT23.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].decisive_witnesses.TC062-P-NEG-INT2.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].decisive_witnesses.KL1_int2_diag.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].decisive_witnesses.KL1_int2_offdiag.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].observables.E_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].observables.D_tilde_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].observables.X_self_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].observables.J_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].observables.F_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].observables.F_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].observables.diag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].observables.offdiag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].observables.F_bnd_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].observables.F_int_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].observables.diag_int_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].observables.offdiag_int_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].observables.F_bnd_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].observables.log_Y_times_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].last_tier_probe_evaluations.per_probe.TC062-P0-F.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].last_tier_probe_evaluations.per_probe.TC062-P0-F.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].last_tier_probe_evaluations.per_probe.TC062-P0-F.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].last_tier_probe_evaluations.per_probe.TC062-P0-INT2.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].last_tier_probe_evaluations.per_probe.TC062-P0-INT2.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].last_tier_probe_evaluations.per_probe.TC062-P0-INT2.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].last_tier_probe_evaluations.per_probe.TC062-P0-INT23.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].last_tier_probe_evaluations.per_probe.TC062-P0-INT23.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].last_tier_probe_evaluations.per_probe.TC062-P0-INT23.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].last_tier_probe_evaluations.per_probe.TC062-P-NEG-INT2.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].last_tier_probe_evaluations.per_probe.TC062-P-NEG-INT2.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].last_tier_probe_evaluations.per_probe.TC062-P-NEG-INT2.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.diag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.diag_rhs_1_4_logY_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.diag_margin",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.offdiag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.offdiag_rhs_3_4_logY_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.offdiag_margin",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].last_tier_probe_evaluations.F_over_log_Y_D_tilde.ratio",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[0].last_tier_probe_evaluations.F_int2_over_log_Y_D_tilde.ratio",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].decisive_witnesses.TC062-P0-F.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].decisive_witnesses.TC062-P0-INT2.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].decisive_witnesses.TC062-P0-INT23.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].decisive_witnesses.TC062-P-NEG-INT2.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].decisive_witnesses.KL1_int2_diag.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].decisive_witnesses.KL1_int2_offdiag.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].observables.E_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].observables.D_tilde_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].observables.X_self_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].observables.J_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].observables.F_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].observables.F_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].observables.diag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].observables.offdiag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].observables.F_bnd_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].observables.F_int_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].observables.diag_int_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].observables.offdiag_int_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].observables.F_bnd_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].observables.log_Y_times_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].last_tier_probe_evaluations.per_probe.TC062-P0-F.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].last_tier_probe_evaluations.per_probe.TC062-P0-F.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].last_tier_probe_evaluations.per_probe.TC062-P0-F.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].last_tier_probe_evaluations.per_probe.TC062-P0-INT2.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].last_tier_probe_evaluations.per_probe.TC062-P0-INT2.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].last_tier_probe_evaluations.per_probe.TC062-P0-INT2.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].last_tier_probe_evaluations.per_probe.TC062-P0-INT23.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].last_tier_probe_evaluations.per_probe.TC062-P0-INT23.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].last_tier_probe_evaluations.per_probe.TC062-P0-INT23.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].last_tier_probe_evaluations.per_probe.TC062-P-NEG-INT2.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].last_tier_probe_evaluations.per_probe.TC062-P-NEG-INT2.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].last_tier_probe_evaluations.per_probe.TC062-P-NEG-INT2.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.diag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.diag_rhs_1_4_logY_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.diag_margin",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.offdiag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.offdiag_rhs_3_4_logY_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.offdiag_margin",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].last_tier_probe_evaluations.F_over_log_Y_D_tilde.ratio",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[1].last_tier_probe_evaluations.F_int2_over_log_Y_D_tilde.ratio",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].decisive_witnesses.TC062-P0-F.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].decisive_witnesses.TC062-P0-INT2.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].decisive_witnesses.TC062-P0-INT23.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].decisive_witnesses.TC062-P-NEG-INT2.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].decisive_witnesses.KL1_int2_diag.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].decisive_witnesses.KL1_int2_offdiag.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].observables.E_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].observables.D_tilde_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].observables.X_self_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].observables.J_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].observables.F_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].observables.F_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].observables.diag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].observables.offdiag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].observables.F_bnd_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].observables.F_int_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].observables.diag_int_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].observables.offdiag_int_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].observables.F_bnd_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].observables.log_Y_times_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].last_tier_probe_evaluations.per_probe.TC062-P0-F.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].last_tier_probe_evaluations.per_probe.TC062-P0-F.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].last_tier_probe_evaluations.per_probe.TC062-P0-F.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].last_tier_probe_evaluations.per_probe.TC062-P0-INT2.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].last_tier_probe_evaluations.per_probe.TC062-P0-INT2.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].last_tier_probe_evaluations.per_probe.TC062-P0-INT2.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].last_tier_probe_evaluations.per_probe.TC062-P0-INT23.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].last_tier_probe_evaluations.per_probe.TC062-P0-INT23.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].last_tier_probe_evaluations.per_probe.TC062-P0-INT23.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].last_tier_probe_evaluations.per_probe.TC062-P-NEG-INT2.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].last_tier_probe_evaluations.per_probe.TC062-P-NEG-INT2.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].last_tier_probe_evaluations.per_probe.TC062-P-NEG-INT2.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.diag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.diag_rhs_1_4_logY_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.diag_margin",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.offdiag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.offdiag_rhs_3_4_logY_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.offdiag_margin",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].last_tier_probe_evaluations.F_over_log_Y_D_tilde.ratio",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[2].last_tier_probe_evaluations.F_int2_over_log_Y_D_tilde.ratio",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].decisive_witnesses.TC062-P0-F.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].decisive_witnesses.TC062-P0-INT2.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].decisive_witnesses.TC062-P0-INT23.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].decisive_witnesses.TC062-P-NEG-INT2.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].decisive_witnesses.KL1_int2_diag.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].decisive_witnesses.KL1_int2_offdiag.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].observables.E_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].observables.D_tilde_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].observables.X_self_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].observables.J_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].observables.F_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].observables.F_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].observables.diag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].observables.offdiag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].observables.F_bnd_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].observables.F_int_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].observables.diag_int_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].observables.offdiag_int_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].observables.F_bnd_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].observables.log_Y_times_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].last_tier_probe_evaluations.per_probe.TC062-P0-F.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].last_tier_probe_evaluations.per_probe.TC062-P0-F.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].last_tier_probe_evaluations.per_probe.TC062-P0-F.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].last_tier_probe_evaluations.per_probe.TC062-P0-INT2.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].last_tier_probe_evaluations.per_probe.TC062-P0-INT2.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].last_tier_probe_evaluations.per_probe.TC062-P0-INT2.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].last_tier_probe_evaluations.per_probe.TC062-P0-INT23.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].last_tier_probe_evaluations.per_probe.TC062-P0-INT23.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].last_tier_probe_evaluations.per_probe.TC062-P0-INT23.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].last_tier_probe_evaluations.per_probe.TC062-P-NEG-INT2.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].last_tier_probe_evaluations.per_probe.TC062-P-NEG-INT2.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].last_tier_probe_evaluations.per_probe.TC062-P-NEG-INT2.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.diag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.diag_rhs_1_4_logY_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.diag_margin",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.offdiag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.offdiag_rhs_3_4_logY_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.offdiag_margin",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].last_tier_probe_evaluations.F_over_log_Y_D_tilde.ratio",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[3].last_tier_probe_evaluations.F_int2_over_log_Y_D_tilde.ratio",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].decisive_witnesses.TC062-P0-F.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].decisive_witnesses.TC062-P0-INT2.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].decisive_witnesses.TC062-P0-INT23.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].decisive_witnesses.TC062-P-NEG-INT2.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].decisive_witnesses.KL1_int2_diag.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].decisive_witnesses.KL1_int2_offdiag.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].observables.E_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].observables.D_tilde_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].observables.X_self_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].observables.J_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].observables.F_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].observables.F_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].observables.diag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].observables.offdiag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].observables.F_bnd_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].observables.F_int_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].observables.diag_int_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].observables.offdiag_int_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].observables.F_bnd_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].observables.log_Y_times_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].last_tier_probe_evaluations.per_probe.TC062-P0-F.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].last_tier_probe_evaluations.per_probe.TC062-P0-F.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].last_tier_probe_evaluations.per_probe.TC062-P0-F.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].last_tier_probe_evaluations.per_probe.TC062-P0-INT2.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].last_tier_probe_evaluations.per_probe.TC062-P0-INT2.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].last_tier_probe_evaluations.per_probe.TC062-P0-INT2.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].last_tier_probe_evaluations.per_probe.TC062-P0-INT23.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].last_tier_probe_evaluations.per_probe.TC062-P0-INT23.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].last_tier_probe_evaluations.per_probe.TC062-P0-INT23.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].last_tier_probe_evaluations.per_probe.TC062-P-NEG-INT2.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].last_tier_probe_evaluations.per_probe.TC062-P-NEG-INT2.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].last_tier_probe_evaluations.per_probe.TC062-P-NEG-INT2.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.diag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.diag_rhs_1_4_logY_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.diag_margin",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.offdiag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.offdiag_rhs_3_4_logY_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.offdiag_margin",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].last_tier_probe_evaluations.F_over_log_Y_D_tilde.ratio",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[4].last_tier_probe_evaluations.F_int2_over_log_Y_D_tilde.ratio",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].decisive_witnesses.TC062-P0-F.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].decisive_witnesses.TC062-P0-INT2.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].decisive_witnesses.TC062-P0-INT23.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].decisive_witnesses.TC062-P-NEG-INT2.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].decisive_witnesses.KL1_int2_diag.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].decisive_witnesses.KL1_int2_offdiag.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].observables.E_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].observables.D_tilde_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].observables.X_self_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].observables.J_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].observables.F_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].observables.F_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].observables.diag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].observables.offdiag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].observables.F_bnd_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].observables.F_int_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].observables.diag_int_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].observables.offdiag_int_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].observables.F_bnd_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].observables.log_Y_times_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].last_tier_probe_evaluations.per_probe.TC062-P0-F.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].last_tier_probe_evaluations.per_probe.TC062-P0-F.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].last_tier_probe_evaluations.per_probe.TC062-P0-F.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].last_tier_probe_evaluations.per_probe.TC062-P0-INT2.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].last_tier_probe_evaluations.per_probe.TC062-P0-INT2.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].last_tier_probe_evaluations.per_probe.TC062-P0-INT2.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].last_tier_probe_evaluations.per_probe.TC062-P0-INT23.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].last_tier_probe_evaluations.per_probe.TC062-P0-INT23.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].last_tier_probe_evaluations.per_probe.TC062-P0-INT23.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].last_tier_probe_evaluations.per_probe.TC062-P-NEG-INT2.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].last_tier_probe_evaluations.per_probe.TC062-P-NEG-INT2.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].last_tier_probe_evaluations.per_probe.TC062-P-NEG-INT2.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.diag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.diag_rhs_1_4_logY_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.diag_margin",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.offdiag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.offdiag_rhs_3_4_logY_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.offdiag_margin",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].last_tier_probe_evaluations.F_over_log_Y_D_tilde.ratio",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[5].last_tier_probe_evaluations.F_int2_over_log_Y_D_tilde.ratio",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].decisive_witnesses.TC062-P0-F.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].decisive_witnesses.TC062-P0-INT2.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].decisive_witnesses.TC062-P0-INT23.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].decisive_witnesses.TC062-P-NEG-INT2.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].decisive_witnesses.KL1_int2_diag.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].decisive_witnesses.KL1_int2_offdiag.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].observables.E_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].observables.D_tilde_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].observables.X_self_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].observables.J_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].observables.F_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].observables.F_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].observables.diag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].observables.offdiag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].observables.F_bnd_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].observables.F_int_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].observables.diag_int_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].observables.offdiag_int_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].observables.F_bnd_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].observables.log_Y_times_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].last_tier_probe_evaluations.per_probe.TC062-P0-F.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].last_tier_probe_evaluations.per_probe.TC062-P0-F.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].last_tier_probe_evaluations.per_probe.TC062-P0-F.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].last_tier_probe_evaluations.per_probe.TC062-P0-INT2.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].last_tier_probe_evaluations.per_probe.TC062-P0-INT2.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].last_tier_probe_evaluations.per_probe.TC062-P0-INT2.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].last_tier_probe_evaluations.per_probe.TC062-P0-INT23.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].last_tier_probe_evaluations.per_probe.TC062-P0-INT23.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].last_tier_probe_evaluations.per_probe.TC062-P0-INT23.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].last_tier_probe_evaluations.per_probe.TC062-P-NEG-INT2.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].last_tier_probe_evaluations.per_probe.TC062-P-NEG-INT2.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].last_tier_probe_evaluations.per_probe.TC062-P-NEG-INT2.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.diag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.diag_rhs_1_4_logY_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.diag_margin",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.offdiag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.offdiag_rhs_3_4_logY_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.offdiag_margin",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].last_tier_probe_evaluations.F_over_log_Y_D_tilde.ratio",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[6].last_tier_probe_evaluations.F_int2_over_log_Y_D_tilde.ratio",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].decisive_witnesses.TC062-P0-F.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].decisive_witnesses.TC062-P0-INT2.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].decisive_witnesses.TC062-P0-INT23.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].decisive_witnesses.TC062-P-NEG-INT2.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].decisive_witnesses.KL1_int2_diag.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].decisive_witnesses.KL1_int2_offdiag.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].observables.E_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].observables.D_tilde_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].observables.X_self_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].observables.J_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].observables.F_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].observables.F_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].observables.diag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].observables.offdiag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].observables.F_bnd_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].observables.F_int_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].observables.diag_int_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].observables.offdiag_int_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].observables.F_bnd_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].observables.log_Y_times_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].last_tier_probe_evaluations.per_probe.TC062-P0-F.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].last_tier_probe_evaluations.per_probe.TC062-P0-F.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].last_tier_probe_evaluations.per_probe.TC062-P0-F.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].last_tier_probe_evaluations.per_probe.TC062-P0-INT2.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].last_tier_probe_evaluations.per_probe.TC062-P0-INT2.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].last_tier_probe_evaluations.per_probe.TC062-P0-INT2.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].last_tier_probe_evaluations.per_probe.TC062-P0-INT23.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].last_tier_probe_evaluations.per_probe.TC062-P0-INT23.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].last_tier_probe_evaluations.per_probe.TC062-P0-INT23.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].last_tier_probe_evaluations.per_probe.TC062-P-NEG-INT2.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].last_tier_probe_evaluations.per_probe.TC062-P-NEG-INT2.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].last_tier_probe_evaluations.per_probe.TC062-P-NEG-INT2.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.diag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.diag_rhs_1_4_logY_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.diag_margin",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.offdiag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.offdiag_rhs_3_4_logY_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.offdiag_margin",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].last_tier_probe_evaluations.F_over_log_Y_D_tilde.ratio",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[7].last_tier_probe_evaluations.F_int2_over_log_Y_D_tilde.ratio",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].decisive_witnesses.TC062-P0-F.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].decisive_witnesses.TC062-P0-INT2.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].decisive_witnesses.TC062-P0-INT23.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].decisive_witnesses.TC062-P-NEG-INT2.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].decisive_witnesses.KL1_int2_diag.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].decisive_witnesses.KL1_int2_offdiag.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].observables.E_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].observables.D_tilde_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].observables.X_self_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].observables.J_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].observables.F_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].observables.F_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].observables.diag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].observables.offdiag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].observables.F_bnd_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].observables.F_int_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].observables.diag_int_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].observables.offdiag_int_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].observables.F_bnd_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].observables.log_Y_times_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].last_tier_probe_evaluations.per_probe.TC062-P0-F.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].last_tier_probe_evaluations.per_probe.TC062-P0-F.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].last_tier_probe_evaluations.per_probe.TC062-P0-F.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].last_tier_probe_evaluations.per_probe.TC062-P0-INT2.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].last_tier_probe_evaluations.per_probe.TC062-P0-INT2.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].last_tier_probe_evaluations.per_probe.TC062-P0-INT2.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].last_tier_probe_evaluations.per_probe.TC062-P0-INT23.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].last_tier_probe_evaluations.per_probe.TC062-P0-INT23.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].last_tier_probe_evaluations.per_probe.TC062-P0-INT23.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].last_tier_probe_evaluations.per_probe.TC062-P-NEG-INT2.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].last_tier_probe_evaluations.per_probe.TC062-P-NEG-INT2.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].last_tier_probe_evaluations.per_probe.TC062-P-NEG-INT2.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.diag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.diag_rhs_1_4_logY_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.diag_margin",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.offdiag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.offdiag_rhs_3_4_logY_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.offdiag_margin",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].last_tier_probe_evaluations.F_over_log_Y_D_tilde.ratio",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[8].last_tier_probe_evaluations.F_int2_over_log_Y_D_tilde.ratio",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].decisive_witnesses.TC062-P0-F.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].decisive_witnesses.TC062-P0-INT2.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].decisive_witnesses.TC062-P0-INT23.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].decisive_witnesses.TC062-P-NEG-INT2.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].decisive_witnesses.KL1_int2_diag.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].decisive_witnesses.KL1_int2_offdiag.certified_margin_enclosure",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].observables.E_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].observables.D_tilde_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].observables.X_self_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].observables.J_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].observables.F_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].observables.F_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].observables.diag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].observables.offdiag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].observables.F_bnd_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].observables.F_int_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].observables.diag_int_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].observables.offdiag_int_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].observables.F_bnd_T_p23",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].observables.log_Y_times_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].last_tier_probe_evaluations.per_probe.TC062-P0-F.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].last_tier_probe_evaluations.per_probe.TC062-P0-F.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].last_tier_probe_evaluations.per_probe.TC062-P0-F.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].last_tier_probe_evaluations.per_probe.TC062-P0-INT2.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].last_tier_probe_evaluations.per_probe.TC062-P0-INT2.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].last_tier_probe_evaluations.per_probe.TC062-P0-INT2.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].last_tier_probe_evaluations.per_probe.TC062-P0-INT23.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].last_tier_probe_evaluations.per_probe.TC062-P0-INT23.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].last_tier_probe_evaluations.per_probe.TC062-P0-INT23.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].last_tier_probe_evaluations.per_probe.TC062-P-NEG-INT2.lhs_value",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].last_tier_probe_evaluations.per_probe.TC062-P-NEG-INT2.rhs_budget",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].last_tier_probe_evaluations.per_probe.TC062-P-NEG-INT2.margin_M_Y",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.diag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.diag_rhs_1_4_logY_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.diag_margin",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.offdiag_int_T_p2",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.offdiag_rhs_3_4_logY_D_tilde",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].last_tier_probe_evaluations.mechanism_kl1_sub_budgets.offdiag_margin",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].last_tier_probe_evaluations.F_over_log_Y_D_tilde.ratio",
-      "section_5_unseen_validation_and_interval_splits.holdout_point_evaluations[9].last_tier_probe_evaluations.F_int2_over_log_Y_D_tilde.ratio"
-    ]
+    "all_enclose_original_256bit_arb_ball": true
   },
   "all_mathematical_and_numerical_checks_pass": true
 }
