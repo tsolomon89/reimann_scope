@@ -417,7 +417,8 @@ def test_tc062_lean_formalization_registration_and_review_synchronization(
     assert spans["hygiene_ok"] is True, spans
     assert spans["public_theorem_count"] == len(EXPECTED_TC062_THEOREMS)
 
-    assert tc062_artifact["repair_task_id"] == TASK_TC_062R_ID
+    assert tc062_artifact["repair_task_id"] == TASK_TC_062R2_ID
+    assert tc062_artifact["prior_repair_task_id"] == TASK_TC_062R_ID
     prov = tc062_artifact["provenance"]
     assert prov["reviewed_tc062_tip"] == REVIEWED_TC062_TIP
     assert prov["reviewed_tc062_implementation"] == REVIEWED_TC062_IMPLEMENTATION
@@ -1223,6 +1224,86 @@ def test_tc062r2_interval_containment_exact_cutoff_partition_and_extra_branch_se
     g_exbw, _ = _both(s_extra_badw, "false_witness_extra")
     assert g_exbw["holdout_hypothesis_outcome"] == "CERTIFICATION_INTEGRITY_CONFLICT"
 
+    # 11. Cross-representation forgery exploits (1A: wide dec over disjoint arb_ball_str; 1B: float
+    #     narrowing zero-straddling ball to PASS; 1C: wide dec + positive arb_ball_str claiming FAIL
+    #     over negative PASS branches; 1D: omitted float keys) -> ALL blocked with CERTIFICATION_INTEGRITY_CONFLICT:
+    s_ex1a = json.loads(json.dumps(s_base))
+    s_ex1a["continuous_straddling_interval_splits"][
+        "interval_625_pm_2_neg12_across_T3125"
+    ]["union_M_P0_F"] = {
+        "lower_dec": "-1000.0",
+        "upper_dec": "0.0",
+        "arb_ball_str": "[-0.10 +/- 0.001]",
+        "mid_float": -0.10,
+        "rad_float_outward": 0.002,
+    }
+    g_1a, _ = _both(s_ex1a, "exploit_1a_wide_dec_disjoint_bs")
+    assert g_1a["holdout_hypothesis_outcome"] == "CERTIFICATION_INTEGRITY_CONFLICT"
+    assert g_1a["serialized_arb_self_check"]["all_enclose_original_256bit_arb_ball"] is False
+    assert g_1a["all_mathematical_and_numerical_checks_pass"] is False
+
+    s_ex1b = json.loads(json.dumps(s_base))
+    forged_1b = _ser(arb("0", arb("1.0")))
+    forged_1b["mid_float"] = -0.65
+    forged_1b["rad_float_outward"] = 0.01
+    s_ex1b["continuous_straddling_interval_splits"][
+        "interval_625_pm_2_neg12_across_T3125"
+    ]["union_M_P0_F"] = forged_1b
+    g_1b, _ = _both(s_ex1b, "exploit_1b_float_narrowed")
+    assert g_1b["holdout_hypothesis_outcome"] == "CERTIFICATION_INTEGRITY_CONFLICT"
+    assert g_1b["serialized_arb_self_check"]["all_enclose_original_256bit_arb_ball"] is False
+    assert g_1b["all_mathematical_and_numerical_checks_pass"] is False
+
+    s_ex1c = json.loads(json.dumps(s_base))
+    sp_1c = s_ex1c["continuous_straddling_interval_splits"][
+        "interval_625_pm_2_neg12_across_T3125"
+    ]
+    sp_1c["union_M_P0_F"] = {
+        "lower_dec": "-1000.0",
+        "upper_dec": "1000.0",
+        "arb_ball_str": "[0.15 +/- 0.005]",
+        "mid_float": 0.15,
+        "rad_float_outward": 0.01,
+    }
+    sp_1c["TC062_P0_F_interval_classification"] = {"verdict": "FAIL"}
+    g_1c, _ = _both(s_ex1c, "exploit_1c_fail_union_over_pass_branches")
+    assert g_1c["holdout_hypothesis_outcome"] == "CERTIFICATION_INTEGRITY_CONFLICT"
+    assert g_1c["serialized_arb_self_check"]["all_enclose_original_256bit_arb_ball"] is False
+    assert g_1c["all_mathematical_and_numerical_checks_pass"] is False
+
+    s_ex1d = json.loads(json.dumps(s_base))
+    no_fl_ball = dict(
+        s_ex1d["continuous_straddling_interval_splits"][
+            "interval_625_pm_2_neg12_across_T3125"
+        ]["union_M_P0_F"]
+    )
+    del no_fl_ball["mid_float"]
+    s_ex1d["continuous_straddling_interval_splits"][
+        "interval_625_pm_2_neg12_across_T3125"
+    ]["union_M_P0_F"] = no_fl_ball
+    g_1d, _ = _both(s_ex1d, "exploit_1d_missing_float_keys")
+    assert g_1d["holdout_hypothesis_outcome"] == "CERTIFICATION_INTEGRITY_CONFLICT"
+    assert g_1d["serialized_arb_self_check"]["all_enclose_original_256bit_arb_ball"] is False
+
+    # 12. Strict integer validation on T_range, D0_range, T_fixed, and active_branch_count (zero
+    #     unhandled ValueError/TypeError and zero silent float/bool coercion):
+    for bad_tag, mut_fn in (
+        ("t_range_strings", lambda sp: sp.update({"T_range": ["bad", "val"]})),
+        ("t_range_floats", lambda sp: sp.update({"T_range": [3125.9, 3126.9]})),
+        ("d0_range_bools", lambda sp: sp.update({"D0_range": [True, 6]})),
+        ("t_fixed_float", lambda sp: sp["branches"][0].update({"T_fixed": 3125.9})),
+        ("active_cnt_float", lambda sp: sp.update({"active_branch_count": 2.0})),
+    ):
+        s_bad_int = json.loads(json.dumps(s_base))
+        mut_fn(
+            s_bad_int["continuous_straddling_interval_splits"][
+                "interval_625_pm_2_neg12_across_T3125"
+            ]
+        )
+        g_bi, _ = _both(s_bad_int, f"strict_int_{bad_tag}")
+        assert g_bi["holdout_hypothesis_outcome"] == "CERTIFICATION_INTEGRITY_CONFLICT"
+        assert g_bi["all_mathematical_and_numerical_checks_pass"] is False
+
 
 def test_tc062r2_granular_resolution_partial_certification_and_out_of_domain(
     tc062_artifact: Dict[str, Any], tmp_path
@@ -1439,6 +1520,23 @@ def test_tc062r2_granular_resolution_partial_certification_and_out_of_domain(
     )
     assert g_contra["all_mathematical_and_numerical_checks_pass"] is False
 
+    # 3c. Decisive last-tier `FAIL` margin masked as `accumulated_candidate_verdicts = "UNRESOLVED"`
+    #     with `decisive_witnesses = None` -> `CERTIFICATION_INTEGRITY_CONFLICT` (never silently
+    #     downgraded to `UNRESOLVED_EVIDENCE`):
+    s_masked_lt = json.loads(json.dumps(s_base))
+    r0_mlt = s_masked_lt["holdout_point_evaluations"][0]
+    r0_mlt["accumulated_candidate_verdicts"]["TC062-P-NEG-INT2"] = "UNRESOLVED"
+    r0_mlt["decisive_witnesses"]["TC062-P-NEG-INT2"] = None
+    r0_mlt["last_tier_probe_evaluations"]["per_probe"]["TC062-P-NEG-INT2"]["point_verdict"] = "FAIL"
+    r0_mlt["last_tier_probe_evaluations"]["per_probe"]["TC062-P-NEG-INT2"]["margin_M_Y"] = pos_margin
+    g_mlt, _ = _both(s_masked_lt, "masked_decisive_last_tier_as_unresolved")
+    assert g_mlt["holdout_hypothesis_outcome"] == "CERTIFICATION_INTEGRITY_CONFLICT"
+    assert (
+        g_mlt["execution_and_certification_status"]
+        == "CERTIFICATION_INTEGRITY_CONFLICT_BLOCKED"
+    )
+    assert g_mlt["all_mathematical_and_numerical_checks_pass"] is False
+
     # 4. Out-of-domain (`Y = 8 < 64`) entry handling:
     entries_with_ood = list(proto["holdout_validation_schedule"]["holdout_entries"]) + [
         {
@@ -1534,18 +1632,26 @@ def test_tc062r2_stable_key_verdict_comparison_and_endpoint_strip_mathematics(
     assert c_same["changed_mathematical_verdicts_count"] == 0
     assert c_same["changed_numerical_enclosures_count"] == 0
 
-    # 1c. Changed mathematical verdict across probe, control, Candidate A2, and interval branch:
+    # 1c. Changed mathematical verdict across probe, control, Candidate A2, and interval branch
+    #     (with coherent margin enclosures matching the changed verdicts):
     mut_v = json.loads(json.dumps(base_art))
+    neg_m = strip_enclosure_arb_for_json(serialize_arb_certified(arb("-0.15")))
+    pos_m = strip_enclosure_arb_for_json(serialize_arb_certified(arb("0.15")))
+    mut_v["section_2_disjoint_prime_decompositions_and_controls"]["matched_control_F_grid_rows"][
+        -1
+    ]["TC062_P0_F_margin"] = neg_m
     mut_v["section_2_disjoint_prime_decompositions_and_controls"]["matched_control_F_grid_rows"][
         -1
     ]["TC062_P0_F_verdict"] = "PASS"
+    mut_v["section_4_quantitative_proof_attempt"][
+        "candidate_a2_unsigned_paired_block_majorant_refutation"
+    ]["margin_Y64"] = neg_m
     mut_v["section_4_quantitative_proof_attempt"][
         "candidate_a2_unsigned_paired_block_majorant_refutation"
     ]["verdict"] = "SURVIVED_TESTED_POINTS"
     mut_v["section_5_unseen_validation_and_interval_splits"]["global_candidate_outcomes"][
         "KL1_int2_offdiag"
     ] = "REFUTED_BY_CERTIFIED_WITNESS"
-    pos_m = strip_enclosure_arb_for_json(serialize_arb_certified(arb("0.15")))
     mut_v["section_5_unseen_validation_and_interval_splits"][
         "continuous_straddling_interval_splits"
     ]["interval_625_pm_2_neg12_across_T3125"]["branches"][1]["M_P0_F"] = pos_m
@@ -1564,7 +1670,7 @@ def test_tc062r2_stable_key_verdict_comparison_and_endpoint_strip_mathematics(
         "continuous_interval_classifications",
     }.issubset(changed_scopes)
 
-    # 1d. Missing / renamed entry -> INCOMPLETE_COMPARISON and None (never False):
+    # 1d. Missing / renamed entry in current OR in prior (`cur_v - old_v`) -> INCOMPLETE_COMPARISON and None:
     mut_miss = json.loads(json.dumps(base_art))
     mut_miss["section_5_unseen_validation_and_interval_splits"][
         "holdout_point_evaluations"
@@ -1575,6 +1681,29 @@ def test_tc062r2_stable_key_verdict_comparison_and_endpoint_strip_mathematics(
     assert c_miss["comparison_status"] == "INCOMPLETE_COMPARISON"
     assert c_miss["any_probe_kl1_control_or_candidate_verdict_changed"] is None
     assert c_miss["missing_or_incomparable_entries_count"] > 0
+
+    prior_miss_ctrl = json.loads(json.dumps(base_art))
+    prior_miss_ctrl["section_2_disjoint_prime_decompositions_and_controls"][
+        "matched_control_F_grid_rows"
+    ].pop()
+    c_miss_prior = compare_tc062_artifacts_by_stable_key(
+        base_art, prior_miss_ctrl, baseline_commit=REVIEWED_TC062R_DELIVERED_TIP
+    )
+    assert c_miss_prior["comparison_status"] == "INCOMPLETE_COMPARISON"
+    assert c_miss_prior["any_probe_kl1_control_or_candidate_verdict_changed"] is None
+    assert c_miss_prior["missing_or_incomparable_entries_count"] > 0
+
+    # 1d-bis. Tampered stored verdict string contradicting its serialized margin enclosure ->
+    #         flagged as CERTIFICATION_INTEGRITY_CONFLICT -> INCOMPLETE_COMPARISON and None:
+    mut_tampered_v = json.loads(json.dumps(base_art))
+    mut_tampered_v["section_2_disjoint_prime_decompositions_and_controls"][
+        "matched_control_F_grid_rows"
+    ][-1]["TC062_P0_F_verdict"] = "PASS"  # contradicts positive TC062_P0_F_margin!
+    c_tamp = compare_tc062_artifacts_by_stable_key(
+        mut_tampered_v, base_art, baseline_commit=REVIEWED_TC062R_DELIVERED_TIP
+    )
+    assert c_tamp["comparison_status"] == "INCOMPLETE_COMPARISON"
+    assert c_tamp["any_probe_kl1_control_or_candidate_verdict_changed"] is None
 
     # 1e. Status-only classification correction (0 mathematical verdict changes):
     mut_stat = json.loads(json.dumps(base_art))

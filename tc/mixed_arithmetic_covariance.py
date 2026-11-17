@@ -1903,6 +1903,30 @@ def evaluate_interval_via_cutoff_case_split_arb(
             t_lo_b = (arb(T_c - 1) ** (arb(4) / arb(5))) if T_c > 1 else arb(0)
             t_hi_b = arb(T_c) ** (arb(4) / arb(5))
             for D0_c in range(D0_min, D0_max + 1):
+                # By Helly's theorem on R, since `[Y_lo_frac, Y_hi_frac]` already intersects both
+                # `((T_c - 1)^(4/5), T_c^(4/5)]` and `[exp(D0_c), exp(D0_c + 1))`, the triple
+                # intersection is nonempty iff `T_c^4 >= exp(5 * D0_c)` and `(T_c - 1)^4 < exp(5 * (D0_c + 1))`.
+                # Certify feasibility via adaptive precision escalation (Hermite-Lindemann guarantees
+                # strict inequality for `D0_c >= 1`, `T_c >= 2`):
+                feas_status: Optional[bool] = None
+                t4_int = int(T_c) ** 4
+                tm1_4_int = int(T_c - 1) ** 4
+                for p_sep in (256, 512, 1024, 2048, 4096, 8192, 16384):
+                    flint_ctx.prec = p_sep
+                    lo_sep = True if D0_c == 0 else bool(arb(5 * int(D0_c)).exp() < arb(t4_int))
+                    lo_infeas = False if D0_c == 0 else bool(arb(t4_int) < arb(5 * int(D0_c)).exp())
+                    hi_sep = True if T_c <= 1 else bool(arb(tm1_4_int) < arb(5 * int(D0_c + 1)).exp())
+                    hi_infeas = False if T_c <= 1 else bool(arb(5 * int(D0_c + 1)).exp() <= arb(tm1_4_int))
+                    if lo_infeas or hi_infeas:
+                        feas_status = False
+                        break
+                    if lo_sep and hi_sep:
+                        feas_status = True
+                        break
+                flint_ctx.prec = prec_bits + 64
+                if feas_status is False:
+                    continue
+
                 d_lo_b = arb(D0_c).exp()
                 d_hi_b = arb(D0_c + 1).exp()
                 lo_cand = max(
@@ -1927,7 +1951,11 @@ def evaluate_interval_via_cutoff_case_split_arb(
                 assert int(br_res["D0_eff_fixed"]) == min(
                     int(br_res["D0_raw_fixed"]), int(br_res["T_fixed"]) - 1
                 ), "Effective cutoff D0_eff_fixed must equal min(D0_raw_fixed, T_fixed - 1)"
-                br_res["branch_role"] = "REQUIRED_FEASIBLE_SUBDOMAIN"
+                br_res["branch_role"] = (
+                    "REQUIRED_FEASIBLE_SUBDOMAIN"
+                    if feas_status is True
+                    else "POSSIBLY_EMPTY_CONSERVATIVE_BRANCH"
+                )
                 br_res["P0_branch_classification"] = classify_probe_margin_arb(br_res["M_P0"])
                 branches.append(br_res)
 

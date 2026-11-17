@@ -3563,78 +3563,94 @@ def _parse_serialized_arb_enclosure_tc062(
     - `lo_dec`, `hi_dec`: outward 40-digit decimal endpoints (monotone with respect to Arb
       interval containment `[a, b] subseteq [c, d] => c_lo_dec <= a_lo_dec <= a_hi_dec <= c_hi_dec`),
     - `lo_bs`, `hi_bs`: endpoints parsed from `arb_ball_str`,
+    - `lo_fl`, `hi_fl`: endpoints parsed from `arb(mid_float, rad_float_outward)`,
     - `c_lo`, `c_hi`: tightest verified outward intersection across `dec`, `arb_ball_str`,
-      and `arb(mid_float, rad_float_outward)` (if float fields are present),
+      and `arb(mid_float, rad_float_outward)`,
     - `verdict`: `'PASS'` (`<= 0`), `'FAIL'` (`> 0`), or `'UNRESOLVED'` (`0` interior/left-straddle),
-    or `None` if malformed, non-finite, or internally contradictory across representations.
+    or `None` if malformed, missing float fields, non-finite, or internally contradictory across
+    representations.
     """
     if not isinstance(ball_dict, dict):
         return None
-    if not all(k in ball_dict for k in ("lower_dec", "upper_dec", "arb_ball_str")):
+    req_keys = ("lower_dec", "upper_dec", "arb_ball_str", "mid_float", "rad_float_outward")
+    if not all(k in ball_dict and ball_dict[k] is not None for k in req_keys):
+        return None
+    if isinstance(ball_dict["mid_float"], bool) or isinstance(ball_dict["rad_float_outward"], bool):
         return None
     if "is_finite" in ball_dict and not bool(ball_dict["is_finite"]):
         return None
     try:
         lo_dec = _sci_or_latex_num_to_fraction(str(ball_dict["lower_dec"]))
         hi_dec = _sci_or_latex_num_to_fraction(str(ball_dict["upper_dec"]))
-        lo_bs, hi_bs, _ = _parse_arb_ball_str_to_fractions(str(ball_dict["arb_ball_str"]))
-        lo_list = [lo_dec, lo_bs]
-        hi_list = [hi_dec, hi_bs]
-        if "mid_float" in ball_dict and "rad_float_outward" in ball_dict:
-            mf = float(ball_dict["mid_float"])
-            rf = float(ball_dict["rad_float_outward"])
-            if (not math.isfinite(mf)) or (not math.isfinite(rf)) or rf < 0.0:
+        bs_str = str(ball_dict["arb_ball_str"]).strip()
+        lo_bs, hi_bs, _ = _parse_arb_ball_str_to_fractions(bs_str)
+        mf = float(ball_dict["mid_float"])
+        rf = float(ball_dict["rad_float_outward"])
+        if (not math.isfinite(mf)) or (not math.isfinite(rf)) or rf < 0.0:
+            return None
+        saved_p = flint_ctx.prec
+        try:
+            flint_ctx.prec = 256
+            rec_ball = arb(mf, rf)
+            if not rec_ball.is_finite():
                 return None
-            saved_p = flint_ctx.prec
-            try:
-                flint_ctx.prec = 256
-                rec_ball = arb(mf, rf)
-                if not rec_ball.is_finite():
-                    return None
-                lo_fl, hi_fl = _exact_arb_endpoints_as_fractions(rec_ball)
-            finally:
-                flint_ctx.prec = saved_p
-            lo_list.append(lo_fl)
-            hi_list.append(hi_fl)
+            lo_fl, hi_fl = _exact_arb_endpoints_as_fractions(rec_ball)
+        finally:
+            flint_ctx.prec = saved_p
     except Exception:  # noqa: BLE001
         return None
 
-    if not (lo_dec <= hi_dec and lo_bs <= hi_bs):
-        return None
-    if len(lo_list) == 3 and not (lo_list[2] <= hi_list[2]):
+    if not (lo_dec <= hi_dec and lo_bs <= hi_bs and lo_fl <= hi_fl):
         return None
 
-    c_lo = max(lo_list)
-    c_hi = min(hi_list)
+    c_lo = max(lo_dec, lo_bs, lo_fl)
+    c_hi = min(hi_dec, hi_bs, hi_fl)
     if not (c_lo <= c_hi):
         return None
 
-    # Guard against forged cross-field discrepancies where one representation is far wider/shifted
-    # relative to another while sharing a tiny overlap:
-    w_dec = hi_dec - lo_dec
-    w_bs = hi_bs - lo_bs
-    w_max_pair = max(w_dec, w_bs)
-    if w_max_pair > 0:
-        slack_tol = max(Fraction(64, 1) * min(w_dec, w_bs), Fraction(1, 10**34))
-        if abs(lo_dec - lo_bs) > max(Fraction(32, 1) * w_max_pair, slack_tol):
+    # Enforce tight cross-representation consistency across all 3 outward representations:
+    scale = max(abs(c_lo), abs(c_hi), Fraction(1, 10**70))
+    ulp_53 = max(scale * Fraction(1, 2**49), Fraction(1, 2**1000))
+    w_core = c_hi - c_lo
+
+    # (a) `arb(mid_float, rad_float_outward)` must enclose `[lo_dec, hi_dec]` up to 53-bit ulp
+    #     (prevents narrowing a zero-straddling `dec`/`arb_ball_str` interval via float fields):
+    if lo_fl > lo_dec + ulp_53 or hi_fl < hi_dec - ulp_53:
+        return None
+
+    # (b) Neither `[lo_dec, hi_dec]` nor `[lo_fl, hi_fl]` may carry forged wide padding beyond
+    #     `[c_lo, c_hi]` + outward 53-bit ulp (prevents wide `dec` masking a disjoint `arb_ball_str`):
+    max_dec_fl_slack = Fraction(4, 1) * w_core + ulp_53
+    if (c_lo - lo_dec) > max_dec_fl_slack or (hi_dec - c_hi) > max_dec_fl_slack:
+        return None
+    if (c_lo - lo_fl) > max_dec_fl_slack or (hi_fl - c_hi) > max_dec_fl_slack:
+        return None
+
+    # (c) `arb_ball_str` (`ball.str(40, radius=True)`) must tightly track `[c_lo, c_hi]`:
+    if bs_str.startswith("[+/-"):
+        if (c_lo > 0 or c_hi < 0) and w_core < scale * Fraction(1, 1000):
             return None
-        if abs(hi_dec - hi_bs) > max(Fraction(32, 1) * w_max_pair, slack_tol):
+        max_bs_half = Fraction(2, 1) * scale + Fraction(4, 1) * w_core + ulp_53
+        if (-lo_bs) > max_bs_half or hi_bs > max_bs_half:
+            return None
+    else:
+        max_bs_slack = Fraction(32, 1) * w_core + ulp_53
+        if (c_lo - lo_bs) > max_bs_slack or (hi_bs - c_hi) > max_bs_slack:
             return None
 
-    # Sign classification must agree between `[c_lo, c_hi]` and `[lo_dec, hi_dec]` unless zero lies
-    # within the 40-digit decimal rounding ulp:
-    if c_hi <= 0:
-        verdict = "PASS"
-    elif c_lo > 0:
-        verdict = "FAIL"
-    else:
-        verdict = "UNRESOLVED"
+    # (d) Sign classification must agree identically between `[c_lo, c_hi]` and `[lo_dec, hi_dec]`:
+    verdict = "PASS" if c_hi <= 0 else ("FAIL" if c_lo > 0 else "UNRESOLVED")
+    verdict_dec = "PASS" if hi_dec <= 0 else ("FAIL" if lo_dec > 0 else "UNRESOLVED")
+    if verdict != verdict_dec:
+        return None
 
     return {
         "lo_dec": lo_dec,
         "hi_dec": hi_dec,
         "lo_bs": lo_bs,
         "hi_bs": hi_bs,
+        "lo_fl": lo_fl,
+        "hi_fl": hi_fl,
         "c_lo": c_lo,
         "c_hi": c_hi,
         "verdict": verdict,
@@ -3667,17 +3683,20 @@ def _serialized_union_contains_branch_tc062(
     b_parsed: Dict[str, Any],
 ) -> bool:
     """Check outward serialized containment `branch subseteq union` across all verdicts (`PASS`,
-    `FAIL`, `UNRESOLVED`).
-
-    In `serialize_arb_certified(ball, dec_digits=40)`, `lower_dec = R_{40}^-(ball.lower())` and
-    `upper_dec = R_{40}^+(ball.upper())` are monotone outward roundings on `R`: whenever an Arb
-    union `U` encloses a branch `B`, `U.lo_dec <= B.lo_dec <= B.hi_dec <= U.hi_dec` holds
-    identically (`arb_ball_str` rounds its printed midpoint to `U`'s radius scale and is already
-    cross-validated against `dec` inside `_parse_serialized_arb_enclosure_tc062`).
+    `FAIL`, `UNRESOLVED`) and all three serialized representations (`dec`, `arb_ball_str`, and
+    `mid_float/rad_float_outward`).
     """
+    b_scale = max(abs(b_parsed["c_lo"]), abs(b_parsed["c_hi"]), Fraction(1, 10**70))
+    b_dec_ulp = b_scale * Fraction(1, 10**38)
     return bool(
         u_parsed["lo_dec"] <= b_parsed["lo_dec"]
         and b_parsed["hi_dec"] <= u_parsed["hi_dec"]
+        and u_parsed["c_lo"] <= b_parsed["c_lo"] + b_dec_ulp
+        and b_parsed["c_hi"] - b_dec_ulp <= u_parsed["c_hi"]
+        and u_parsed["lo_bs"] <= b_parsed["c_lo"] + b_dec_ulp
+        and b_parsed["c_hi"] - b_dec_ulp <= u_parsed["hi_bs"]
+        and u_parsed["lo_fl"] <= b_parsed["c_lo"] + b_dec_ulp
+        and b_parsed["c_hi"] - b_dec_ulp <= u_parsed["hi_fl"]
     )
 
 
@@ -4047,6 +4066,9 @@ def audit_continuous_interval_split_certificate_tc062(
             }
         )
 
+    def _is_strict_int(val: Any) -> bool:
+        return isinstance(val, int) and not isinstance(val, bool)
+
     # 2. Check `branches` list and `active_branch_count` summary consistency:
     branches = sp_obj.get("branches")
     act_cnt = sp_obj.get("active_branch_count")
@@ -4054,7 +4076,7 @@ def audit_continuous_interval_split_certificate_tc062(
         coverage_issues.append(
             {"issue_type": "MISSING_BRANCH_LIST", "interval_key": split_key}
         )
-        if act_cnt not in (None, 0):
+        if act_cnt is not None and not (_is_strict_int(act_cnt) and act_cnt == 0):
             integrity_conflicts.append(
                 {
                     "conflict_type": "INTERVAL_SPLIT_MALFORMED_BRANCHES",
@@ -4064,7 +4086,7 @@ def audit_continuous_interval_split_certificate_tc062(
             )
         branches = []
     else:
-        if act_cnt != len(branches):
+        if (not _is_strict_int(act_cnt)) or act_cnt != len(branches):
             integrity_conflicts.append(
                 {
                     "conflict_type": "INTERVAL_SPLIT_BRANCH_COUNT_MISMATCH",
@@ -4101,11 +4123,7 @@ def audit_continuous_interval_split_certificate_tc062(
             )
             continue
 
-        try:
-            t_f = int(br["T_fixed"])
-            d0_f = int(br["D0_raw_fixed"])
-            deff_f = int(br["D0_eff_fixed"])
-        except Exception:  # noqa: BLE001
+        if not all(_is_strict_int(br.get(k)) for k in ("T_fixed", "D0_raw_fixed", "D0_eff_fixed")):
             integrity_conflicts.append(
                 {
                     "conflict_type": "INTERVAL_SPLIT_MALFORMED_BRANCH_CUTOFFS",
@@ -4114,6 +4132,9 @@ def audit_continuous_interval_split_certificate_tc062(
                 }
             )
             continue
+        t_f = int(br["T_fixed"])
+        d0_f = int(br["D0_raw_fixed"])
+        deff_f = int(br["D0_eff_fixed"])
 
         observed_Ts.append(t_f)
         observed_D0s.append(d0_f)
@@ -4296,18 +4317,26 @@ def audit_continuous_interval_split_certificate_tc062(
                 }
             )
 
-    # 5. Check `T_range` and `D0_range` summary headers against observed branches (and against
-    #    derived partition when endpoints match):
+    # 5. Check `T_range` and `D0_range` summary headers against observed branches (and reject any
+    #    non-integer / float / boolean / string entries without unhandled exceptions):
     t_range_obs = sp_obj.get("T_range")
     d0_range_obs = sp_obj.get("D0_range")
+    t_range_valid_pair = (
+        isinstance(t_range_obs, list)
+        and len(t_range_obs) == 2
+        and _is_strict_int(t_range_obs[0])
+        and _is_strict_int(t_range_obs[1])
+    )
+    d0_range_valid_pair = (
+        isinstance(d0_range_obs, list)
+        and len(d0_range_obs) == 2
+        and _is_strict_int(d0_range_obs[0])
+        and _is_strict_int(d0_range_obs[1])
+    )
     if observed_Ts:
         exp_t_span = [min(observed_Ts), max(observed_Ts)]
         exp_d0_span = [min(observed_D0s), max(observed_D0s)]
-        if (
-            not isinstance(t_range_obs, list)
-            or len(t_range_obs) != 2
-            or [int(t_range_obs[0]), int(t_range_obs[1])] != exp_t_span
-        ):
+        if (not t_range_valid_pair) or [t_range_obs[0], t_range_obs[1]] != exp_t_span:
             integrity_conflicts.append(
                 {
                     "conflict_type": "INTERVAL_SPLIT_T_RANGE_SUMMARY_MISMATCH",
@@ -4316,17 +4345,30 @@ def audit_continuous_interval_split_certificate_tc062(
                     "observed_branch_T_span": exp_t_span,
                 }
             )
-        if (
-            not isinstance(d0_range_obs, list)
-            or len(d0_range_obs) != 2
-            or [int(d0_range_obs[0]), int(d0_range_obs[1])] != exp_d0_span
-        ):
+        if (not d0_range_valid_pair) or [d0_range_obs[0], d0_range_obs[1]] != exp_d0_span:
             integrity_conflicts.append(
                 {
                     "conflict_type": "INTERVAL_SPLIT_D0_RANGE_SUMMARY_MISMATCH",
                     "interval_key": split_key,
                     "D0_range": d0_range_obs,
                     "observed_branch_D0_span": exp_d0_span,
+                }
+            )
+    else:
+        if t_range_obs is not None and not t_range_valid_pair:
+            integrity_conflicts.append(
+                {
+                    "conflict_type": "INTERVAL_SPLIT_T_RANGE_SUMMARY_MISMATCH",
+                    "interval_key": split_key,
+                    "T_range": t_range_obs,
+                }
+            )
+        if d0_range_obs is not None and not d0_range_valid_pair:
+            integrity_conflicts.append(
+                {
+                    "conflict_type": "INTERVAL_SPLIT_D0_RANGE_SUMMARY_MISMATCH",
+                    "interval_key": split_key,
+                    "D0_range": d0_range_obs,
                 }
             )
 
@@ -4408,6 +4450,7 @@ def audit_continuous_interval_split_certificate_tc062(
             probe_effective_verdicts[probe_tag] = CERTIFICATION_INTEGRITY_CONFLICT_VERDICT
             continue
 
+        all_branch_verdicts: List[str] = []
         feasible_verdicts: List[str] = []
         any_certifying_fail = False
         for rec in branch_records:
@@ -4416,6 +4459,7 @@ def audit_continuous_interval_split_certificate_tc062(
             if b_p is None:
                 continue
             bv = str(b_p["verdict"])
+            all_branch_verdicts.append(bv)
             if rec["is_feasible_required"]:
                 feasible_verdicts.append(bv)
                 if bv == "UNRESOLVED":
@@ -4440,6 +4484,23 @@ def audit_continuous_interval_split_certificate_tc062(
                     )
             if bv == "FAIL" and rec["can_certify_refutation"]:
                 any_certifying_fail = True
+
+        # Enforce direct union-vs-branch verdict monotonicity: a `PASS` (`<= 0`) union cannot
+        # enclose any non-`PASS` branch, and a `FAIL` (`> 0`) union cannot enclose any non-`FAIL` branch:
+        if all_branch_verdicts and (
+            (u_p["verdict"] == "PASS" and any(v != "PASS" for v in all_branch_verdicts))
+            or (u_p["verdict"] == "FAIL" and any(v != "FAIL" for v in all_branch_verdicts))
+        ):
+            integrity_conflicts.append(
+                {
+                    "conflict_type": "INTERVAL_SPLIT_UNION_BRANCH_VERDICT_CONTRADICTION",
+                    "interval_key": split_key,
+                    "union_key": u_key,
+                    "union_verdict": u_p["verdict"],
+                    "branch_verdicts": all_branch_verdicts,
+                }
+            )
+            integrity_ok = False
 
         if not integrity_ok:
             probe_effective_verdicts[probe_tag] = CERTIFICATION_INTEGRITY_CONFLICT_VERDICT
@@ -4716,22 +4777,35 @@ def aggregate_tc062_section5_and_derive_outcomes(
                         }
                     )
                     acc_map[cid] = CERTIFICATION_INTEGRITY_CONFLICT_VERDICT
-                elif (
-                    last_in_dom
-                    and parsed_last in ("PASS", "FAIL")
-                    and acc_map.get(cid) in ("PASS", "FAIL")
-                    and parsed_last != acc_map.get(cid)
-                ):
-                    row_conflicts.append(
-                        {
-                            "conflict_type": "CONTRADICTORY_LAST_TIER_AND_ACCUMULATED_VERDICT",
-                            "point_id": pid,
-                            "candidate_id": cid,
-                            "last_tier": parsed_last,
-                            "accumulated": acc_map.get(cid),
-                        }
-                    )
-                    acc_map[cid] = CERTIFICATION_INTEGRITY_CONFLICT_VERDICT
+                elif last_in_dom and parsed_last in ("PASS", "FAIL"):
+                    if acc_map.get(cid) == "UNRESOLVED" or (
+                        acc_map.get(cid) in ("PASS", "FAIL") and w_obj is None
+                    ):
+                        row_conflicts.append(
+                            {
+                                "conflict_type": "DECISIVE_LAST_TIER_MASKED_AS_UNRESOLVED",
+                                "point_id": pid,
+                                "candidate_id": cid,
+                                "last_tier": parsed_last,
+                                "accumulated": acc_map.get(cid),
+                                "has_decisive_witness": w_obj is not None,
+                            }
+                        )
+                        acc_map[cid] = CERTIFICATION_INTEGRITY_CONFLICT_VERDICT
+                    elif (
+                        acc_map.get(cid) in ("PASS", "FAIL")
+                        and parsed_last != acc_map.get(cid)
+                    ):
+                        row_conflicts.append(
+                            {
+                                "conflict_type": "CONTRADICTORY_LAST_TIER_AND_ACCUMULATED_VERDICT",
+                                "point_id": pid,
+                                "candidate_id": cid,
+                                "last_tier": parsed_last,
+                                "accumulated": acc_map.get(cid),
+                            }
+                        )
+                        acc_map[cid] = CERTIFICATION_INTEGRITY_CONFLICT_VERDICT
 
         r["accumulated_candidate_verdicts"] = acc_map
         r["integrity_conflicts"] = row_conflicts
@@ -5810,17 +5884,45 @@ def _extract_tc062_stable_key_maps(
             if w_obj is None:
                 _put_v(k_wit, "NO_DECISIVE_WITNESS", sc_name)
             elif isinstance(w_obj, dict) and "verdict" in w_obj:
-                _put_v(k_wit, str(w_obj["verdict"]), sc_name)
+                w_claimed = str(w_obj["verdict"])
+                w_parsed = _audit_serialized_margin_verdict_tc062(
+                    w_obj.get("certified_margin_enclosure")
+                )
+                if w_parsed == "CONFLICT" or w_parsed != w_claimed:
+                    _put_v(k_wit, CERTIFICATION_INTEGRITY_CONFLICT_VERDICT, sc_name)
+                else:
+                    _put_v(k_wit, w_claimed, sc_name)
             else:
                 incomparable.append({"key": k_wit, "reason": "MALFORMED_DECISIVE_WITNESS"})
 
             k_lt = f"sec5.point_last_tier::{pid_reg}::{cid}"
-            if cid in per_p_last and isinstance(per_p_last[cid], dict) and "point_verdict" in per_p_last[cid]:
-                _put_v(k_lt, str(per_p_last[cid]["point_verdict"]), sc_name)
+            if (
+                cid in per_p_last
+                and isinstance(per_p_last[cid], dict)
+                and "point_verdict" in per_p_last[cid]
+            ):
+                lt_claimed = str(per_p_last[cid]["point_verdict"])
+                lt_parsed = _audit_serialized_margin_verdict_tc062(
+                    per_p_last[cid].get("margin_M_Y")
+                )
+                if lt_parsed == "CONFLICT" or lt_parsed != lt_claimed:
+                    _put_v(k_lt, CERTIFICATION_INTEGRITY_CONFLICT_VERDICT, sc_name)
+                else:
+                    _put_v(k_lt, lt_claimed, sc_name)
             elif cid == "KL1_int2_diag" and "diag_verdict" in kl_last:
-                _put_v(k_lt, str(kl_last["diag_verdict"]), sc_name)
+                lt_claimed = str(kl_last["diag_verdict"])
+                lt_parsed = _audit_serialized_margin_verdict_tc062(kl_last.get("diag_margin"))
+                if lt_parsed == "CONFLICT" or lt_parsed != lt_claimed:
+                    _put_v(k_lt, CERTIFICATION_INTEGRITY_CONFLICT_VERDICT, sc_name)
+                else:
+                    _put_v(k_lt, lt_claimed, sc_name)
             elif cid == "KL1_int2_offdiag" and "offdiag_verdict" in kl_last:
-                _put_v(k_lt, str(kl_last["offdiag_verdict"]), sc_name)
+                lt_claimed = str(kl_last["offdiag_verdict"])
+                lt_parsed = _audit_serialized_margin_verdict_tc062(kl_last.get("offdiag_margin"))
+                if lt_parsed == "CONFLICT" or lt_parsed != lt_claimed:
+                    _put_v(k_lt, CERTIFICATION_INTEGRITY_CONFLICT_VERDICT, sc_name)
+                else:
+                    _put_v(k_lt, lt_claimed, sc_name)
             else:
                 incomparable.append({"key": k_lt, "reason": "MISSING_LAST_TIER_VERDICT"})
 
@@ -5831,6 +5933,12 @@ def _extract_tc062_stable_key_maps(
             )
 
     # Scope 3: In-scope controls (`Y >= 64` negative controls + sign checks + diagnostic grid):
+    expected_ctrl_modes = ("liouville", "unsigned_1", "a2", "a_3_5_7", "hybrid_a2_liouville")
+    expected_ctrl_scales = (16, 32, 64, 128, 256, 512)
+    expected_sign_triples = [
+        (m_s, p_s, 8) for m_s in ("unsigned_1", "a2", "a_3_5_7") for p_s in (2, 3)
+    ]
+
     sec2 = art.get("section_2_disjoint_prime_decompositions_and_controls")
     if isinstance(sec2, dict):
         if "all_negative_controls_refuted_on_F_for_Y_ge_64" in sec2:
@@ -5847,6 +5955,7 @@ def _extract_tc062_stable_key_maps(
                 }
             )
         ctrl_rows = sec2.get("matched_control_F_grid_rows")
+        seen_ctrl_pairs: set[Tuple[str, int]] = set()
         if isinstance(ctrl_rows, list):
             for c_row in ctrl_rows:
                 if not isinstance(c_row, dict) or "mode" not in c_row or "Y" not in c_row:
@@ -5856,6 +5965,15 @@ def _extract_tc062_stable_key_maps(
                     continue
                 mode_s = str(c_row["mode"])
                 y_val = int(c_row["Y"])
+                if (mode_s, y_val) in seen_ctrl_pairs:
+                    incomparable.append(
+                        {
+                            "key": f"sec2.control::{mode_s}::Y={y_val}",
+                            "reason": "DUPLICATE_CONTROL_ROW",
+                        }
+                    )
+                    continue
+                seen_ctrl_pairs.add((mode_s, y_val))
                 tag_kind = (
                     "in_scope_control_F_verdict"
                     if (mode_s != "liouville" and y_val >= 64)
@@ -5863,15 +5981,30 @@ def _extract_tc062_stable_key_maps(
                 )
                 k_cr = f"sec2.{tag_kind}::{mode_s}::Y={y_val}"
                 if "TC062_P0_F_verdict" in c_row:
-                    _put_v(k_cr, str(c_row["TC062_P0_F_verdict"]), "in_scope_controls")
+                    c_claimed = str(c_row["TC062_P0_F_verdict"])
+                    c_parsed = _audit_serialized_margin_verdict_tc062(c_row.get("TC062_P0_F_margin"))
+                    if c_parsed == "CONFLICT" or c_parsed != c_claimed:
+                        _put_v(k_cr, CERTIFICATION_INTEGRITY_CONFLICT_VERDICT, "in_scope_controls")
+                    else:
+                        _put_v(k_cr, c_claimed, "in_scope_controls")
                 else:
                     incomparable.append({"key": k_cr, "reason": "MISSING_CONTROL_VERDICT"})
+            for y_exp in expected_ctrl_scales:
+                for m_exp in expected_ctrl_modes:
+                    if (m_exp, y_exp) not in seen_ctrl_pairs:
+                        incomparable.append(
+                            {
+                                "key": f"sec2.control::{m_exp}::Y={y_exp}",
+                                "reason": "MISSING_EXPECTED_CONTROL_ROW",
+                            }
+                        )
         else:
             incomparable.append(
                 {"key": "sec2.matched_control_F_grid_rows", "reason": "MISSING_CONTROL_ROWS"}
             )
 
         sign_rows = sec2.get("matched_control_prime_pair_sign_checks")
+        seen_sign_triples: set[Tuple[str, int, int]] = set()
         if isinstance(sign_rows, list):
             for s_row in sign_rows:
                 if (
@@ -5882,11 +6015,24 @@ def _extract_tc062_stable_key_maps(
                         {"key": "sec2.matched_control_prime_pair_sign_checks", "reason": "MALFORMED_SIGN_ROW"}
                     )
                     continue
+                s_tr = (str(s_row["mode"]), int(s_row["prime_p"]), int(s_row["Y"]))
+                seen_sign_triples.add(s_tr)
                 k_sr = (
-                    f"sec2.control_sign_law_verified::{s_row['mode']}::"
-                    f"p={int(s_row['prime_p'])}::Y={int(s_row['Y'])}"
+                    f"sec2.control_sign_law_verified::{s_tr[0]}::"
+                    f"p={s_tr[1]}::Y={s_tr[2]}"
                 )
                 _put_v(k_sr, bool(s_row["verified"]), "in_scope_controls")
+            for exp_s_tr in expected_sign_triples:
+                if exp_s_tr not in seen_sign_triples:
+                    incomparable.append(
+                        {
+                            "key": (
+                                f"sec2.control_sign_law_verified::{exp_s_tr[0]}::"
+                                f"p={exp_s_tr[1]}::Y={exp_s_tr[2]}"
+                            ),
+                            "reason": "MISSING_EXPECTED_SIGN_CHECK_ROW",
+                        }
+                    )
         else:
             incomparable.append(
                 {"key": "sec2.matched_control_prime_pair_sign_checks", "reason": "MISSING_SIGN_ROWS"}
@@ -5919,11 +6065,25 @@ def _extract_tc062_stable_key_maps(
 
         a2 = sec4.get("candidate_a2_unsigned_paired_block_majorant_refutation")
         if isinstance(a2, dict) and "verdict" in a2:
-            _put_v(
-                "sec4.candidate_a2.verdict",
-                str(a2["verdict"]),
-                "candidate_and_section4_classifications",
-            )
+            a2_claimed = str(a2["verdict"])
+            a2_m_parsed = _audit_serialized_margin_verdict_tc062(a2.get("margin_Y64"))
+            expected_a2_from_m = {
+                "FAIL": "REFUTED_BY_CERTIFIED_WITNESS",
+                "PASS": "SURVIVED_TESTED_POINTS",
+                "UNRESOLVED": "UNRESOLVED_EVIDENCE",
+            }.get(a2_m_parsed)
+            if expected_a2_from_m is None or expected_a2_from_m != a2_claimed:
+                _put_v(
+                    "sec4.candidate_a2.verdict",
+                    CERTIFICATION_INTEGRITY_CONFLICT_VERDICT,
+                    "candidate_and_section4_classifications",
+                )
+            else:
+                _put_v(
+                    "sec4.candidate_a2.verdict",
+                    a2_claimed,
+                    "candidate_and_section4_classifications",
+                )
         else:
             incomparable.append({"key": "sec4.candidate_a2.verdict", "reason": "MISSING_A2_VERDICT"})
 
@@ -5956,14 +6116,23 @@ def _extract_tc062_stable_key_maps(
                 {"key": f"sec5.interval::{split_key}", "reason": "MISSING_PRESCRIBED_INTERVAL_SPLIT"}
             )
             continue
-        for p_tag, cls_k in (
-            ("P0", "P0_interval_classification"),
-            ("TC062_P0_F", "TC062_P0_F_interval_classification"),
+        for p_tag, cls_k, u_m_k in (
+            ("P0", "P0_interval_classification", "union_M_P0"),
+            ("TC062_P0_F", "TC062_P0_F_interval_classification", "union_M_P0_F"),
         ):
             k_iu = f"sec5.interval_union::{split_key}::{p_tag}"
             cls_o = sp_o.get(cls_k)
             if isinstance(cls_o, dict) and "verdict" in cls_o:
-                _put_v(k_iu, str(cls_o["verdict"]), "continuous_interval_classifications")
+                iu_claimed = str(cls_o["verdict"])
+                iu_parsed = _audit_serialized_margin_verdict_tc062(sp_o.get(u_m_k))
+                if iu_parsed == "CONFLICT" or iu_parsed != iu_claimed:
+                    _put_v(
+                        k_iu,
+                        CERTIFICATION_INTEGRITY_CONFLICT_VERDICT,
+                        "continuous_interval_classifications",
+                    )
+                else:
+                    _put_v(k_iu, iu_claimed, "continuous_interval_classifications")
             else:
                 incomparable.append({"key": k_iu, "reason": "MISSING_INTERVAL_UNION_CLASSIFICATION"})
 
@@ -6203,6 +6372,11 @@ def compare_tc062_artifacts_by_stable_key(
         if k_old not in cur_v:
             missing_or_incomparable.append(
                 {"side": "current", "key": k_old, "reason": "MISSING_PRIOR_VERDICT_KEY"}
+            )
+    for k_cur in sorted(cur_v.keys()):
+        if k_cur not in old_v:
+            missing_or_incomparable.append(
+                {"side": "prior", "key": k_cur, "reason": "MISSING_IN_PRIOR_VERDICT_KEYS"}
             )
 
     error_status_labels = {
