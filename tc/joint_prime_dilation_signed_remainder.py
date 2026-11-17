@@ -3285,30 +3285,42 @@ def execute_tc062_holdout_point_with_escalation(
     }
 
 
-def _audit_serialized_margin_verdict_tc062(margin_dict: Any) -> str:
+def _parse_certified_margin_bounds_tc062(
+    margin_dict: Any,
+) -> Optional[Tuple[Fraction, Fraction, str]]:
     """Re-parse a serialized Arb margin dict (`lower_dec`, `upper_dec`, `arb_ball_str`) in exact
-    `Fraction` arithmetic and return `'PASS'`, `'FAIL'`, `'UNRESOLVED'`, or `'CONFLICT'` (malformed).
+    `Fraction` arithmetic and return `(c_lo, c_hi, verdict)` where `verdict` is `'PASS'`, `'FAIL'`,
+    or `'UNRESOLVED'`, or `None` if malformed / self-inconsistent.
     """
     if not isinstance(margin_dict, dict):
-        return "CONFLICT"
+        return None
     if not all(k in margin_dict for k in ("lower_dec", "upper_dec", "arb_ball_str")):
-        return "CONFLICT"
+        return None
     try:
         lo_dec = _sci_or_latex_num_to_fraction(str(margin_dict["lower_dec"]))
         hi_dec = _sci_or_latex_num_to_fraction(str(margin_dict["upper_dec"]))
         lo_bs, hi_bs, _ = _parse_arb_ball_str_to_fractions(str(margin_dict["arb_ball_str"]))
     except Exception:  # noqa: BLE001
-        return "CONFLICT"
+        return None
     if not (lo_dec <= hi_dec and lo_bs <= hi_bs and max(lo_dec, lo_bs) <= min(hi_dec, hi_bs)):
-        return "CONFLICT"
-    # Use the tightest certified enclosure intersection of the two outward representations:
+        return None
     c_lo = max(lo_dec, lo_bs)
     c_hi = min(hi_dec, hi_bs)
     if c_hi <= 0:
-        return "PASS"
-    if c_lo > 0:
-        return "FAIL"
-    return "UNRESOLVED"
+        verdict = "PASS"
+    elif c_lo > 0:
+        verdict = "FAIL"
+    else:
+        verdict = "UNRESOLVED"
+    return (c_lo, c_hi, verdict)
+
+
+def _audit_serialized_margin_verdict_tc062(margin_dict: Any) -> str:
+    """Re-parse a serialized Arb margin dict (`lower_dec`, `upper_dec`, `arb_ball_str`) in exact
+    `Fraction` arithmetic and return `'PASS'`, `'FAIL'`, `'UNRESOLVED'`, or `'CONFLICT'` (malformed).
+    """
+    parsed = _parse_certified_margin_bounds_tc062(margin_dict)
+    return parsed[2] if parsed is not None else "CONFLICT"
 
 
 def aggregate_tc062_section5_and_derive_outcomes(
@@ -3560,11 +3572,136 @@ def aggregate_tc062_section5_and_derive_outcomes(
             detected_conflicts.extend(row_conflicts)
         audited_rows.append(r)
 
+    # Re-audit continuous straddling interval splits from serialized Arb enclosures and branches
+    # (never trusting cached `.get("verdict")` strings alone):
+    interval_coverage_complete = True
+    iv_verdicts: List[str] = []
+    if not isinstance(continuous_straddling_interval_splits, dict):
+        interval_coverage_complete = False
+        int_splits_out: Dict[str, Any] = {}
+    else:
+        int_splits_out = dict(continuous_straddling_interval_splits)
+        for split_key, exact_br, min_br in (
+            ("interval_625_pm_2_neg12_across_T3125", 2, 2),
+            ("interval_403_40_to_403_46_across_e6", None, 2),
+        ):
+            sp_obj = continuous_straddling_interval_splits.get(split_key)
+            if not isinstance(sp_obj, dict):
+                interval_coverage_complete = False
+                iv_verdicts.extend(["UNRESOLVED", "UNRESOLVED"])
+                continue
+            branches = sp_obj.get("branches")
+            act_cnt = sp_obj.get("active_branch_count")
+            if not isinstance(branches, list):
+                interval_coverage_complete = False
+                if act_cnt not in (None, 0):
+                    detected_conflicts.append(
+                        {
+                            "conflict_type": "INTERVAL_SPLIT_MALFORMED_BRANCHES",
+                            "interval_key": split_key,
+                            "active_branch_count": act_cnt,
+                        }
+                    )
+                iv_verdicts.extend(["UNRESOLVED", "UNRESOLVED"])
+                continue
+            if act_cnt != len(branches):
+                detected_conflicts.append(
+                    {
+                        "conflict_type": "INTERVAL_SPLIT_BRANCH_COUNT_MISMATCH",
+                        "interval_key": split_key,
+                        "active_branch_count": act_cnt,
+                        "observed_branch_len": len(branches),
+                    }
+                )
+            if len(branches) < min_br or (exact_br is not None and len(branches) != exact_br):
+                interval_coverage_complete = False
+                iv_verdicts.extend(["UNRESOLVED", "UNRESOLVED"])
+                continue
+
+            for u_key, cls_key, br_key in (
+                ("union_M_P0", "P0_interval_classification", "M_P0"),
+                ("union_M_P0_F", "TC062_P0_F_interval_classification", "M_P0_F"),
+            ):
+                cls_dict = sp_obj.get(cls_key)
+                claimed_iv = (
+                    str(cls_dict.get("verdict"))
+                    if (isinstance(cls_dict, dict) and "verdict" in cls_dict)
+                    else None
+                )
+                u_parsed = _parse_certified_margin_bounds_tc062(sp_obj.get(u_key))
+                if (
+                    u_parsed is None
+                    or claimed_iv not in ("PASS", "FAIL", "UNRESOLVED")
+                    or u_parsed[2] != claimed_iv
+                ):
+                    detected_conflicts.append(
+                        {
+                            "conflict_type": "INTERVAL_SPLIT_UNION_MARGIN_VERDICT_MISMATCH",
+                            "interval_key": split_key,
+                            "union_key": u_key,
+                            "claimed_verdict": claimed_iv,
+                            "parsed_verdict": u_parsed[2] if u_parsed is not None else "CONFLICT",
+                        }
+                    )
+                    iv_verdicts.append(CERTIFICATION_INTEGRITY_CONFLICT_VERDICT)
+                    continue
+
+                u_lo, u_hi, u_v = u_parsed
+                branch_conflict = False
+                any_branch_fail = False
+                for b_idx, br in enumerate(branches):
+                    br_parsed = (
+                        _parse_certified_margin_bounds_tc062(br.get(br_key))
+                        if isinstance(br, dict)
+                        else None
+                    )
+                    if br_parsed is None:
+                        detected_conflicts.append(
+                            {
+                                "conflict_type": "INTERVAL_SPLIT_BRANCH_MARGIN_MALFORMED",
+                                "interval_key": split_key,
+                                "branch_index": b_idx,
+                                "branch_key": br_key,
+                            }
+                        )
+                        branch_conflict = True
+                        break
+                    b_lo, b_hi, b_v = br_parsed
+                    if b_v == "FAIL":
+                        any_branch_fail = True
+                    # Whenever the union claims PASS (or UNRESOLVED with a certified FAIL branch),
+                    # verify exact branch-to-union containment / non-contradiction:
+                    if u_v == "PASS" and (
+                        b_v != "PASS" or not (u_lo <= b_lo and b_hi <= u_hi)
+                    ):
+                        detected_conflicts.append(
+                            {
+                                "conflict_type": "INTERVAL_SPLIT_UNION_DOES_NOT_ENCLOSE_BRANCH",
+                                "interval_key": split_key,
+                                "branch_index": b_idx,
+                                "branch_key": br_key,
+                                "union_verdict": u_v,
+                                "branch_verdict": b_v,
+                            }
+                        )
+                        branch_conflict = True
+                        break
+
+                if branch_conflict:
+                    iv_verdicts.append(CERTIFICATION_INTEGRITY_CONFLICT_VERDICT)
+                elif any_branch_fail and u_v == "UNRESOLVED":
+                    iv_verdicts.append("FAIL")
+                else:
+                    iv_verdicts.append(u_v)
+
     cert_integrity_ok = len(detected_conflicts) == 0
     candidate_entries_complete = len(missing_or_invalid_candidate_entries) == 0
     applicable_domains_valid = len(applicable_domain_violations) == 0
     coverage_complete = bool(
-        exact_point_bijection and candidate_entries_complete and applicable_domains_valid
+        exact_point_bijection
+        and candidate_entries_complete
+        and applicable_domains_valid
+        and interval_coverage_complete
     )
 
     global_outcomes: Dict[str, str] = {}
@@ -3605,22 +3742,13 @@ def aggregate_tc062_section5_and_derive_outcomes(
         distinct_evaluated_count=distinct_valid_reg,
     )
 
-    # Audit continuous straddling interval splits:
-    sp625 = continuous_straddling_interval_splits.get("interval_625_pm_2_neg12_across_T3125") or {}
-    sp_e6 = continuous_straddling_interval_splits.get("interval_403_40_to_403_46_across_e6") or {}
-    iv_verdicts = [
-        str((sp625.get("P0_interval_classification") or {}).get("verdict", "UNRESOLVED")),
-        str((sp625.get("TC062_P0_F_interval_classification") or {}).get("verdict", "UNRESOLVED")),
-        str((sp_e6.get("P0_interval_classification") or {}).get("verdict", "UNRESOLVED")),
-        str((sp_e6.get("TC062_P0_F_interval_classification") or {}).get("verdict", "UNRESOLVED")),
-    ]
-    any_interval_fail = "FAIL" in iv_verdicts
+    any_interval_fail = cert_integrity_ok and ("FAIL" in iv_verdicts)
     interval_splits_ok = bool(
-        sp625.get("active_branch_count") == 2
-        and sp_e6.get("active_branch_count", 0) >= 2
+        cert_integrity_ok
+        and interval_coverage_complete
+        and len(iv_verdicts) == 4
         and all(v == "PASS" for v in iv_verdicts)
     )
-    int_splits_out = dict(continuous_straddling_interval_splits)
     int_splits_out["any_interval_fail"] = any_interval_fail
     int_splits_out["verified"] = interval_splits_ok
 
@@ -3633,6 +3761,7 @@ def aggregate_tc062_section5_and_derive_outcomes(
             for v in global_outcomes.values()
         )
         and (interval_splits_ok or any_interval_fail)
+        and resource_summary["overall_resource_budget_status"] == "WITHIN"
     )
 
     sec5_base: Dict[str, Any] = {
@@ -3659,6 +3788,7 @@ def aggregate_tc062_section5_and_derive_outcomes(
             "missing_or_invalid_candidate_entries": missing_or_invalid_candidate_entries,
             "applicable_domains_valid": applicable_domains_valid,
             "applicable_domain_violations": applicable_domain_violations,
+            "interval_coverage_complete": interval_coverage_complete,
         },
         "certification_integrity_ok": cert_integrity_ok,
         "detected_integrity_conflicts": detected_conflicts,
@@ -3685,8 +3815,9 @@ def derive_tc062_outcome_summaries(
     (`TASK-TC-062R` §6).
 
     Guarantees:
-    - Never emits `HOLDOUT_SURVIVAL` or `SURVIVED` on a certified refutation, unresolved evidence,
-      empty/incomplete/duplicate/unregistered coverage, missing candidate entry, or integrity conflict.
+    - Never emits `HOLDOUT_SURVIVAL` in `completion_outcome_code` on a certified refutation,
+      unresolved evidence, empty/incomplete/duplicate/unregistered coverage, missing candidate entry,
+      integrity conflict, or `UNKNOWN` / `EXCEEDED` resource telemetry.
     - Separates certification/execution completion (a certified refutation IS a completed evaluation),
       hypothesis survival/refutation, and 3-valued (`WITHIN`, `EXCEEDED`, `UNKNOWN`) resource compliance.
     """
@@ -3749,11 +3880,14 @@ def derive_tc062_outcome_summaries(
             f"(resource compliance: {res_status}; evaluation blocked)"
         )
     elif any_refuted:
-        exec_status = (
-            "CERTIFIED_EVALUATION_COMPLETE"
-            if (cov_ok and all_expected_cids_present)
-            else "CERTIFIED_REFUTATION_WITH_INCOMPLETE_REMAINING_GRID"
-        )
+        if not (cov_ok and all_expected_cids_present):
+            exec_status = "CERTIFIED_REFUTATION_WITH_INCOMPLETE_REMAINING_GRID"
+        elif res_status == "WITHIN":
+            exec_status = "CERTIFIED_EVALUATION_COMPLETE"
+        elif res_status == "EXCEEDED":
+            exec_status = "CERTIFIED_EVALUATION_COMPLETE_RESOURCE_BUDGET_EXCEEDED"
+        else:
+            exec_status = "CERTIFIED_EVALUATION_COMPLETE_RESOURCE_TELEMETRY_UNKNOWN"
         hyp_outcome = "REFUTED_BY_CERTIFIED_WITNESS"
         comp_code = (
             "COMPLETE_SIGNED_KERNEL_PRIME_PAIR_REDUCTION_AND_HOLDOUT_CANDIDATE_REFUTED_GATE_OPEN"
@@ -3782,11 +3916,22 @@ def derive_tc062_outcome_summaries(
             f"resource compliance: {res_status})"
         )
     elif all_survived:
-        exec_status = "CERTIFIED_EVALUATION_COMPLETE"
         hyp_outcome = "SURVIVED_TESTED_POINTS"
-        comp_code = (
-            "COMPLETE_SIGNED_KERNEL_PRIME_PAIR_REDUCTION_AND_UNSEEN_HOLDOUT_SURVIVAL_GATE_OPEN"
-        )
+        if res_status == "WITHIN":
+            exec_status = "CERTIFIED_EVALUATION_COMPLETE"
+            comp_code = (
+                "COMPLETE_SIGNED_KERNEL_PRIME_PAIR_REDUCTION_AND_UNSEEN_HOLDOUT_SURVIVAL_GATE_OPEN"
+            )
+        elif res_status == "EXCEEDED":
+            exec_status = "CERTIFIED_EVALUATION_COMPLETE_RESOURCE_BUDGET_EXCEEDED"
+            comp_code = (
+                "COMPLETE_SIGNED_KERNEL_PRIME_PAIR_REDUCTION_RESOURCE_BUDGET_EXCEEDED_GATE_OPEN"
+            )
+        else:
+            exec_status = "CERTIFIED_EVALUATION_COMPLETE_RESOURCE_TELEMETRY_UNKNOWN"
+            comp_code = (
+                "COMPLETE_SIGNED_KERNEL_PRIME_PAIR_REDUCTION_RESOURCE_TELEMETRY_UNKNOWN_GATE_OPEN"
+            )
         res_class = (
             "EXACT_COMPLETE_KERNEL_AND_OFFDIAG_EQUIVALENCE_PROVED_CANDIDATES_A1_A2_REFUTED_"
             f"UNSEEN_HOLDOUTS_SURVIVED_RESOURCE_{res_status}_SUBGATE_OPEN"

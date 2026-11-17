@@ -669,7 +669,8 @@ def test_tc062r_shared_outcome_derivation_and_adversarial_scenarios(
     g_dv, _ = _run_both_paths(s_dom_viol)
     assert g_dv["holdout_hypothesis_outcome"] == "INCOMPLETE_OR_INVALID_COVERAGE"
 
-    # Scenario 5: Contradictory certificates (tampered witness margin > 0 claiming PASS)
+    # Scenario 5: Contradictory certificates (tampered witness margin > 0 claiming PASS,
+    #             plus interval-split union/branch/count tamper checks — Defect 3B)
     s_conf = json.loads(json.dumps(s1))
     s_conf["holdout_point_evaluations"][0]["decisive_witnesses"]["TC062-P0-F"][
         "certified_margin_enclosure"
@@ -680,7 +681,54 @@ def test_tc062r_shared_outcome_derivation_and_adversarial_scenarios(
     assert "SURVIVAL" not in g_cf["completion_outcome_code"]
     assert g_cf["all_mathematical_and_numerical_checks_pass"] is False
 
-    # Scenario 6: Missing or non-covering (`TIER_LOCAL_SNAPSHOT`) memory measurements
+    s_iv_union_conf = json.loads(json.dumps(s1))
+    s_iv_union_conf["continuous_straddling_interval_splits"][
+        "interval_625_pm_2_neg12_across_T3125"
+    ]["union_M_P0_F"] = pos_margin
+    g_iv_uc, _ = _run_both_paths(s_iv_union_conf)
+    assert g_iv_uc["holdout_hypothesis_outcome"] == "CERTIFICATION_INTEGRITY_CONFLICT"
+    assert g_iv_uc["completion_outcome_code"] == "CERTIFICATION_INTEGRITY_CONFLICT_BLOCKED_GATE_OPEN"
+    assert "SURVIVAL" not in g_iv_uc["completion_outcome_code"]
+    assert g_iv_uc["all_mathematical_and_numerical_checks_pass"] is False
+
+    s_iv_br_conf = json.loads(json.dumps(s1))
+    s_iv_br_conf["continuous_straddling_interval_splits"][
+        "interval_625_pm_2_neg12_across_T3125"
+    ]["branches"][0]["M_P0_F"] = pos_margin
+    g_iv_bc, _ = _run_both_paths(s_iv_br_conf)
+    assert g_iv_bc["holdout_hypothesis_outcome"] == "CERTIFICATION_INTEGRITY_CONFLICT"
+    assert g_iv_bc["completion_outcome_code"] == "CERTIFICATION_INTEGRITY_CONFLICT_BLOCKED_GATE_OPEN"
+    assert g_iv_bc["all_mathematical_and_numerical_checks_pass"] is False
+
+    s_iv_cnt_conf = json.loads(json.dumps(s1))
+    s_iv_cnt_conf["continuous_straddling_interval_splits"][
+        "interval_625_pm_2_neg12_across_T3125"
+    ]["branches"] = []
+    g_iv_cc, _ = _run_both_paths(s_iv_cnt_conf)
+    assert g_iv_cc["holdout_hypothesis_outcome"] == "CERTIFICATION_INTEGRITY_CONFLICT"
+    assert g_iv_cc["all_mathematical_and_numerical_checks_pass"] is False
+
+    s_iv_missing = json.loads(json.dumps(s1))
+    s_iv_missing["continuous_straddling_interval_splits"] = {}
+    g_iv_miss, _ = _run_both_paths(s_iv_missing)
+    assert g_iv_miss["holdout_hypothesis_outcome"] == "INCOMPLETE_OR_INVALID_COVERAGE"
+    assert "SURVIVAL" not in g_iv_miss["completion_outcome_code"]
+    assert g_iv_miss["all_mathematical_and_numerical_checks_pass"] is False
+
+    s_iv_fail = json.loads(json.dumps(s1))
+    s_iv_fail["continuous_straddling_interval_splits"][
+        "interval_625_pm_2_neg12_across_T3125"
+    ]["union_M_P0_F"] = pos_margin
+    s_iv_fail["continuous_straddling_interval_splits"][
+        "interval_625_pm_2_neg12_across_T3125"
+    ]["TC062_P0_F_interval_classification"]["verdict"] = "FAIL"
+    g_iv_f, _ = _run_both_paths(s_iv_fail)
+    assert g_iv_f["holdout_hypothesis_outcome"] == "REFUTED_BY_CERTIFIED_WITNESS"
+    assert "SURVIVAL" not in g_iv_f["completion_outcome_code"]
+    assert g_iv_f["all_mathematical_and_numerical_checks_pass"] is True
+
+    # Scenario 6: Missing, non-covering (`TIER_LOCAL_SNAPSHOT`), or EXCEEDED resource telemetry
+    #             (including secondary wall-time fields — Defects 3A & 3C)
     s_snap = json.loads(json.dumps(s1))
     s_snap["holdout_point_evaluations"][0]["tier_escalation_history"][0][
         "peak_rss_measurement_semantics"
@@ -689,11 +737,36 @@ def test_tc062r_shared_outcome_derivation_and_adversarial_scenarios(
     assert g_sn["holdout_hypothesis_outcome"] == "SURVIVED_TESTED_POINTS"
     assert g_sn["resource_compliance_status"] == "UNKNOWN"
     assert "RESOURCE_UNKNOWN" in g_sn["research_outcome_class"]
+    assert "SURVIVAL" not in g_sn["completion_outcome_code"]
+    assert g_sn["all_mathematical_and_numerical_checks_pass"] is False
 
     s_nomem = json.loads(json.dumps(s1))
     s_nomem["holdout_point_evaluations"][0]["tier_escalation_history"][0]["peak_rss_mb"] = None
     g_nm, _ = _run_both_paths(s_nomem)
     assert g_nm["resource_compliance_status"] == "UNKNOWN"
+    assert "SURVIVAL" not in g_nm["completion_outcome_code"]
+    assert g_nm["all_mathematical_and_numerical_checks_pass"] is False
+
+    s_rss_ex = json.loads(json.dumps(s1))
+    s_rss_ex["holdout_point_evaluations"][0]["tier_escalation_history"][0]["peak_rss_mb"] = 5000.0
+    g_rx, _ = _run_both_paths(s_rss_ex)
+    assert g_rx["resource_compliance_status"] == "EXCEEDED"
+    assert "RESOURCE_EXCEEDED" in g_rx["research_outcome_class"]
+    assert "SURVIVAL" not in g_rx["completion_outcome_code"]
+    assert g_rx["all_mathematical_and_numerical_checks_pass"] is False
+
+    s_sec_wall_ex = json.loads(json.dumps(s1))
+    s_sec_wall_ex["holdout_point_evaluations"][0]["tier_escalation_history"][0][
+        "tier_wall_seconds"
+    ] = 500.0
+    s_sec_wall_ex["holdout_point_evaluations"][0]["tier_escalation_history"][0][
+        "cumulative_wall_seconds"
+    ] = 500.0
+    g_swx, _ = _run_both_paths(s_sec_wall_ex)
+    assert g_swx["resource_compliance_status"] == "EXCEEDED"
+    assert "RESOURCE_EXCEEDED" in g_swx["research_outcome_class"]
+    assert "SURVIVAL" not in g_swx["completion_outcome_code"]
+    assert g_swx["all_mathematical_and_numerical_checks_pass"] is False
 
     # Scenario 7: Prior decisive failure at Tier 0 followed by unresolved escalation at Tiers 1..2
     proto = json.loads(JOINT_PRIME_DILATION_PROTOCOL_PATH.read_text(encoding="utf-8"))

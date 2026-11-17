@@ -2663,22 +2663,77 @@ def evaluate_point_resource_compliance(
       NOT establish peak coverage and leave memory compliance `UNKNOWN` unless covered by a valid,
       monotonically consistent final-tier `PROCESS_LIFETIME_HIGH_WATER_MARK` reading in the same process.
     """
-    any_wall_invalid = any(
-        h.get("elapsed_sec") is not None and not _is_valid_nonneg_real(h.get("elapsed_sec"))
-        for h in history
-    )
-    valid_walls = [
-        float(h["elapsed_sec"])
-        for h in history
-        if _is_valid_nonneg_real(h.get("elapsed_sec"))
-    ]
+    any_wall_invalid = False
+    valid_walls: List[float] = []
+    valid_observed_walls: List[float] = []
+    wall_consistency_ok = True
+    prev_cum_wall = -1.0
+    for h in history:
+        has_e = "elapsed_sec" in h
+        e_val = h.get("elapsed_sec")
+        e_ok = _is_valid_nonneg_real(e_val)
+        if (not has_e) or e_val is None or (not e_ok):
+            any_wall_invalid = True
+        else:
+            valid_observed_walls.append(float(e_val))
+
+        tw_ok = False
+        if "tier_wall_seconds" in h:
+            tw_val = h.get("tier_wall_seconds")
+            tw_ok = _is_valid_nonneg_real(tw_val)
+            if tw_val is None or (not tw_ok):
+                any_wall_invalid = True
+            else:
+                valid_observed_walls.append(float(tw_val))
+                if e_ok and abs(float(tw_val) - float(e_val)) > 1e-3:
+                    wall_consistency_ok = False
+
+        if e_ok and tw_ok:
+            tier_eff: Optional[float] = max(float(e_val), float(h["tier_wall_seconds"]))
+            valid_walls.append(tier_eff)
+        elif e_ok:
+            tier_eff = float(e_val)
+            valid_walls.append(tier_eff)
+        elif tw_ok:
+            tier_eff = float(h["tier_wall_seconds"])
+            valid_walls.append(tier_eff)
+        else:
+            tier_eff = None
+
+        if "cumulative_wall_seconds" in h:
+            cw_val = h.get("cumulative_wall_seconds")
+            cw_ok = _is_valid_nonneg_real(cw_val)
+            if cw_val is None or (not cw_ok):
+                any_wall_invalid = True
+            else:
+                cw_f = float(cw_val)
+                valid_observed_walls.append(cw_f)
+                if tier_eff is not None and cw_f + 1e-3 < tier_eff:
+                    wall_consistency_ok = False
+                if prev_cum_wall >= 0.0 and cw_f + 1e-3 < prev_cum_wall:
+                    wall_consistency_ok = False
+                prev_cum_wall = max(prev_cum_wall, cw_f)
+
     all_tiers_have_valid_wall = bool(
-        len(history) > 0 and (not any_wall_invalid) and len(valid_walls) == len(history)
+        len(history) > 0
+        and (not any_wall_invalid)
+        and wall_consistency_ok
+        and len(valid_walls) == len(history)
     )
-    partial_wall_sum: Optional[float] = round(sum(valid_walls), 6) if valid_walls else None
+    max_observed_cum_wall: Optional[float] = (
+        round(max(valid_walls + ([prev_cum_wall] if prev_cum_wall >= 0.0 else [])), 6)
+        if (valid_walls or prev_cum_wall >= 0.0)
+        else None
+    )
+    partial_wall_sum: Optional[float] = (
+        round(max(sum(valid_walls), prev_cum_wall if prev_cum_wall >= 0.0 else 0.0), 6)
+        if (valid_walls or prev_cum_wall >= 0.0)
+        else None
+    )
     any_wall_exceeded = bool(
-        any(w > max_wall_sec for w in valid_walls)
+        any(w > max_wall_sec for w in valid_observed_walls)
         or (partial_wall_sum is not None and partial_wall_sum > max_wall_sec)
+        or (max_observed_cum_wall is not None and max_observed_cum_wall > max_wall_sec)
     )
     if any_wall_exceeded:
         wall_status = "EXCEEDED"
