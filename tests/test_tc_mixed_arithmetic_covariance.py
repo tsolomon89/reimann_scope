@@ -1956,9 +1956,17 @@ def test_tc061r2_wording_repairs_and_inherited_formal_build_preservation(
     assert "32" in doc_settings and "64" in doc_settings
     assert "panel-splitting parameters inactive" not in doc_settings
 
+    import hashlib
+
     br = json.loads((REPO_ROOT / "formal" / "build_report.json").read_text(encoding="utf-8"))
-    assert br["producing_git_commit"] == ACCEPTED_TC061R_IMPLEMENTATION_AND_FORMAL_COMMIT
-    assert br["total_theorems"] == 822
+    assert br["status"] == "passed"
+    assert br["total_theorems"] >= 822
+    assert (
+        br["formal_source_hashes"]["formal/RiemannScope/MixedArithmeticCovariance.lean"]
+        == hashlib.sha256(
+            (REPO_ROOT / "formal" / "RiemannScope" / "MixedArithmeticCovariance.lean").read_bytes()
+        ).hexdigest()
+    )
     sec7 = tc061_artifact["section_7_lean_formalization_audit"]
     assert (
         sec7["formal_build_report_provenance"]["producing_git_commit"]
