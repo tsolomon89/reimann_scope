@@ -1,7 +1,7 @@
 {
   "task_id": "TASK-TC-062",
-  "repair_task_id": "TASK-TC-062R3",
-  "prior_repair_task_id": "TASK-TC-062R2",
+  "repair_task_id": "TASK-TC-062R4",
+  "prior_repair_task_id": "TASK-TC-062R3",
   "epic_id": "EPIC-TC-042",
   "parent_subgate": "SUBGATE-TC-043A",
   "parent_subgate_status": "OPEN",
@@ -56,7 +56,7 @@
       },
       "superseded_changed_arb_ball_str_count": 0,
       "superseded_changed_decimal_endpoint_count": 0,
-      "any_probe_kl1_control_or_candidate_verdict_changed": false,
+      "any_probe_kl1_control_or_candidate_verdict_changed": null,
       "candidate_a2_Y64_counterexample_unaffected": true,
       "per_section_impact_inventory": {
         "section_1_protocols_reassembly_and_complete_kernel": {
@@ -100,14 +100,16 @@
           "widened": 0
         }
       },
-      "comparison_status": "COMPLETE_COMPARED",
+      "comparison_status": "INCOMPLETE_COMPARISON",
       "stable_key_verdict_comparison_v2": {
         "comparison_id": "TC062R_VS_TC062_STABLE_KEY_V2",
         "baseline_commit": "0943eb639dd20191f7563ba23f3e2d5d9f999217",
-        "comparison_status": "COMPLETE_COMPARED",
-        "incomparable_reason": null,
-        "any_probe_kl1_control_or_candidate_verdict_changed": false,
-        "any_numerical_enclosure_changed": false,
+        "comparison_status": "INCOMPLETE_COMPARISON",
+        "incomparable_reason": "MISSING_OR_BLOCKED_COMPARISON_KEYS",
+        "any_probe_kl1_control_or_candidate_verdict_changed": null,
+        "any_numerical_enclosure_changed": null,
+        "enclosure_comparison_complete": true,
+        "any_numerical_enclosure_changed_on_comparable_balls": false,
         "any_integrity_coverage_or_execution_classification_changed": true,
         "scope_key_counts": {
           "in_scope_controls": 37,
@@ -118,14 +120,202 @@
         },
         "changed_numerical_enclosures_count": 0,
         "changed_mathematical_verdicts_count": 0,
-        "corrected_integrity_coverage_or_execution_classifications_count": 1,
+        "raw_branch_margin_sign_verdicts_changed_count": 0,
+        "branch_coverage_classifications_changed_count": 5,
+        "provenance_changes_count": 17,
+        "corrected_integrity_coverage_or_execution_classifications_count": 11,
         "schema_only_additions_count": 77,
         "removed_status_or_schema_fields_count": 0,
         "retired_optional_fields_count": 0,
-        "missing_or_incomparable_entries_count": 0,
+        "missing_or_incomparable_entries_count": 10,
         "changed_numerical_enclosures": [],
         "changed_mathematical_verdicts": [],
+        "raw_branch_margin_sign_verdicts_changed": [],
+        "branch_coverage_classifications_changed": [
+          {
+            "key": "sec5.interval_branch_coverage::interval_403_40_to_403_46_across_e6::(1808, 5, 5)",
+            "prior_coverage_status": "UNCERTIFIED_COVERAGE",
+            "current_coverage_status": "CERTIFIED_COMPLETE_COVERAGE"
+          },
+          {
+            "key": "sec5.interval_branch_coverage::interval_403_40_to_403_46_across_e6::(1809, 5, 5)",
+            "prior_coverage_status": "UNCERTIFIED_COVERAGE",
+            "current_coverage_status": "CERTIFIED_COMPLETE_COVERAGE"
+          },
+          {
+            "key": "sec5.interval_branch_coverage::interval_403_40_to_403_46_across_e6::(1809, 6, 6)",
+            "prior_coverage_status": "UNCERTIFIED_COVERAGE",
+            "current_coverage_status": "CERTIFIED_COMPLETE_COVERAGE"
+          },
+          {
+            "key": "sec5.interval_branch_coverage::interval_625_pm_2_neg12_across_T3125::(3125, 6, 6)",
+            "prior_coverage_status": "UNCERTIFIED_COVERAGE",
+            "current_coverage_status": "CERTIFIED_COMPLETE_COVERAGE"
+          },
+          {
+            "key": "sec5.interval_branch_coverage::interval_625_pm_2_neg12_across_T3125::(3126, 6, 6)",
+            "prior_coverage_status": "UNCERTIFIED_COVERAGE",
+            "current_coverage_status": "CERTIFIED_COMPLETE_COVERAGE"
+          }
+        ],
+        "provenance_changes": [
+          {
+            "key": "certificate_recomputation_status",
+            "prior_value": null,
+            "current_value": "SUPERSEDED_BY_REPAIRED_EVALUATOR_ON_THREE_ZONE_ENTRIES_UNAFFECTED_ON_UNSPLIT_AND_INTERVALS"
+          },
+          {
+            "key": "formal_build_producing_git_commit",
+            "prior_value": "ab7e976b0fc4c822bdfd332a885ff80afe7156c9",
+            "current_value": "4b3df05665e186c85eb54c3822ae1d8c34199a3c"
+          },
+          {
+            "key": "formal_compiled_theorem_count",
+            "prior_value": 829,
+            "current_value": 830
+          },
+          {
+            "key": "numerical_producing_git_commit",
+            "prior_value": "ab7e976b0fc4c822bdfd332a885ff80afe7156c9",
+            "current_value": "4b3df05665e186c85eb54c3822ae1d8c34199a3c"
+          },
+          {
+            "key": "prior_tc062_producing_commit",
+            "prior_value": null,
+            "current_value": "ab7e976b0fc4c822bdfd332a885ff80afe7156c9"
+          },
+          {
+            "key": "reviewed_tc062_implementation",
+            "prior_value": null,
+            "current_value": "a681365e0b44830bddb9349bbc9e361ac72b0679"
+          },
+          {
+            "key": "reviewed_tc062_tip",
+            "prior_value": null,
+            "current_value": "0943eb639dd20191f7563ba23f3e2d5d9f999217"
+          },
+          {
+            "key": "reviewed_tc062r2_delivered_tip",
+            "prior_value": null,
+            "current_value": "a742aecea3fe737074231ecb2f501a959bbc2693"
+          },
+          {
+            "key": "reviewed_tc062r2_validation_commit",
+            "prior_value": null,
+            "current_value": "2ba4f3348ddc7b8b9d731bf189ae20c2af877434"
+          },
+          {
+            "key": "reviewed_tc062r3_delivered_tip",
+            "prior_value": null,
+            "current_value": "c87d464f4d9c030259a69142306cf4bef90fc581"
+          },
+          {
+            "key": "reviewed_tc062r3_validation_commit",
+            "prior_value": null,
+            "current_value": "8c08a56d11ee5524904bcc23ed56d6b5583794fc"
+          },
+          {
+            "key": "reviewed_tc062r_delivered_tip",
+            "prior_value": null,
+            "current_value": "a8f5887735e59c95af783e61297b7264a4caea5e"
+          },
+          {
+            "key": "reviewed_tc062r_producing_commit",
+            "prior_value": null,
+            "current_value": "4b3df05665e186c85eb54c3822ae1d8c34199a3c"
+          },
+          {
+            "key": "tc062r2_validation_and_metadata_producing_git_commit",
+            "prior_value": null,
+            "current_value": "2ba4f3348ddc7b8b9d731bf189ae20c2af877434"
+          },
+          {
+            "key": "tc062r3_validation_and_metadata_producing_git_commit",
+            "prior_value": null,
+            "current_value": "8c08a56d11ee5524904bcc23ed56d6b5583794fc"
+          },
+          {
+            "key": "tc062r4_domain_reconstructed_at_utc",
+            "prior_value": null,
+            "current_value": "2026-11-18T20:12:30.472231+00:00"
+          },
+          {
+            "key": "tc062r4_validation_and_reconstruction_producing_git_commit",
+            "prior_value": null,
+            "current_value": "2e48474d17e5223331606d1b8c86be4b937e7a8e"
+          }
+        ],
         "corrected_integrity_coverage_or_execution_classifications": [
+          {
+            "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1808, 5, 5)::M_P0",
+            "scope": "continuous_interval_classifications",
+            "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+            "current_value": "PASS",
+            "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+          },
+          {
+            "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1808, 5, 5)::M_P0_F",
+            "scope": "continuous_interval_classifications",
+            "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+            "current_value": "PASS",
+            "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+          },
+          {
+            "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1809, 5, 5)::M_P0",
+            "scope": "continuous_interval_classifications",
+            "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+            "current_value": "PASS",
+            "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+          },
+          {
+            "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1809, 5, 5)::M_P0_F",
+            "scope": "continuous_interval_classifications",
+            "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+            "current_value": "PASS",
+            "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+          },
+          {
+            "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1809, 6, 6)::M_P0",
+            "scope": "continuous_interval_classifications",
+            "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+            "current_value": "PASS",
+            "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+          },
+          {
+            "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1809, 6, 6)::M_P0_F",
+            "scope": "continuous_interval_classifications",
+            "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+            "current_value": "PASS",
+            "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+          },
+          {
+            "key": "sec5.interval_branch::interval_625_pm_2_neg12_across_T3125::(3125, 6, 6)::M_P0",
+            "scope": "continuous_interval_classifications",
+            "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+            "current_value": "PASS",
+            "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+          },
+          {
+            "key": "sec5.interval_branch::interval_625_pm_2_neg12_across_T3125::(3125, 6, 6)::M_P0_F",
+            "scope": "continuous_interval_classifications",
+            "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+            "current_value": "PASS",
+            "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+          },
+          {
+            "key": "sec5.interval_branch::interval_625_pm_2_neg12_across_T3125::(3126, 6, 6)::M_P0",
+            "scope": "continuous_interval_classifications",
+            "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+            "current_value": "PASS",
+            "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+          },
+          {
+            "key": "sec5.interval_branch::interval_625_pm_2_neg12_across_T3125::(3126, 6, 6)::M_P0_F",
+            "scope": "continuous_interval_classifications",
+            "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+            "current_value": "PASS",
+            "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+          },
           {
             "key": "top.research_outcome_class",
             "scope": "execution_integrity_coverage_resource_status",
@@ -449,8 +639,60 @@
         ],
         "removed_status_or_schema_fields": [],
         "retired_optional_fields": [],
-        "missing_or_incomparable_entries": []
-      }
+        "missing_or_incomparable_entries": [
+          {
+            "side": "transition",
+            "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1808, 5, 5)::M_P0",
+            "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+          },
+          {
+            "side": "transition",
+            "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1808, 5, 5)::M_P0_F",
+            "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+          },
+          {
+            "side": "transition",
+            "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1809, 5, 5)::M_P0",
+            "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+          },
+          {
+            "side": "transition",
+            "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1809, 5, 5)::M_P0_F",
+            "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+          },
+          {
+            "side": "transition",
+            "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1809, 6, 6)::M_P0",
+            "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+          },
+          {
+            "side": "transition",
+            "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1809, 6, 6)::M_P0_F",
+            "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+          },
+          {
+            "side": "transition",
+            "key": "sec5.interval_branch::interval_625_pm_2_neg12_across_T3125::(3125, 6, 6)::M_P0",
+            "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+          },
+          {
+            "side": "transition",
+            "key": "sec5.interval_branch::interval_625_pm_2_neg12_across_T3125::(3125, 6, 6)::M_P0_F",
+            "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+          },
+          {
+            "side": "transition",
+            "key": "sec5.interval_branch::interval_625_pm_2_neg12_across_T3125::(3126, 6, 6)::M_P0",
+            "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+          },
+          {
+            "side": "transition",
+            "key": "sec5.interval_branch::interval_625_pm_2_neg12_across_T3125::(3126, 6, 6)::M_P0_F",
+            "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+          }
+        ]
+      },
+      "raw_branch_margin_sign_verdicts_changed_count": 0
     },
     "reviewed_tc062r_delivered_tip": "a8f5887735e59c95af783e61297b7264a4caea5e",
     "reviewed_tc062r_producing_commit": "4b3df05665e186c85eb54c3822ae1d8c34199a3c",
@@ -462,11 +704,13 @@
     "tc062r2_validation_and_verdict_comparison": {
       "comparison_id": "TC062R2_VS_TC062R_STABLE_KEY_V1",
       "baseline_commit": "a8f5887735e59c95af783e61297b7264a4caea5e",
-      "comparison_status": "COMPLETE_COMPARED",
-      "incomparable_reason": null,
-      "any_probe_kl1_control_or_candidate_verdict_changed": false,
-      "any_numerical_enclosure_changed": false,
-      "any_integrity_coverage_or_execution_classification_changed": false,
+      "comparison_status": "INCOMPLETE_COMPARISON",
+      "incomparable_reason": "MISSING_OR_BLOCKED_COMPARISON_KEYS",
+      "any_probe_kl1_control_or_candidate_verdict_changed": null,
+      "any_numerical_enclosure_changed": null,
+      "enclosure_comparison_complete": true,
+      "any_numerical_enclosure_changed_on_comparable_balls": false,
+      "any_integrity_coverage_or_execution_classification_changed": true,
       "scope_key_counts": {
         "in_scope_controls": 37,
         "candidate_and_section4_classifications": 6,
@@ -476,44 +720,193 @@
       },
       "changed_numerical_enclosures_count": 0,
       "changed_mathematical_verdicts_count": 0,
-      "corrected_integrity_coverage_or_execution_classifications_count": 0,
-      "schema_only_additions_count": 6,
+      "raw_branch_margin_sign_verdicts_changed_count": 0,
+      "branch_coverage_classifications_changed_count": 5,
+      "provenance_changes_count": 4,
+      "corrected_integrity_coverage_or_execution_classifications_count": 10,
+      "schema_only_additions_count": 0,
       "removed_status_or_schema_fields_count": 0,
       "retired_optional_fields_count": 0,
-      "missing_or_incomparable_entries_count": 0,
+      "missing_or_incomparable_entries_count": 10,
       "changed_numerical_enclosures": [],
       "changed_mathematical_verdicts": [],
-      "corrected_integrity_coverage_or_execution_classifications": [],
-      "schema_only_additions": [
+      "raw_branch_margin_sign_verdicts_changed": [],
+      "branch_coverage_classifications_changed": [
         {
-          "kind": "status_field",
-          "key": "sec5.all_required_applicable_evaluations_resolved",
-          "added_value": true
+          "key": "sec5.interval_branch_coverage::interval_403_40_to_403_46_across_e6::(1808, 5, 5)",
+          "prior_coverage_status": "UNCERTIFIED_COVERAGE",
+          "current_coverage_status": "CERTIFIED_COMPLETE_COVERAGE"
         },
         {
-          "kind": "section_schema_key",
-          "key": "root.prior_repair_task_id"
+          "key": "sec5.interval_branch_coverage::interval_403_40_to_403_46_across_e6::(1809, 5, 5)",
+          "prior_coverage_status": "UNCERTIFIED_COVERAGE",
+          "current_coverage_status": "CERTIFIED_COMPLETE_COVERAGE"
         },
         {
-          "kind": "section_schema_key",
-          "key": "section_4_quantitative_proof_attempt.beta_four_piece_endpoint_and_summed_strip_audit"
+          "key": "sec5.interval_branch_coverage::interval_403_40_to_403_46_across_e6::(1809, 6, 6)",
+          "prior_coverage_status": "UNCERTIFIED_COVERAGE",
+          "current_coverage_status": "CERTIFIED_COMPLETE_COVERAGE"
         },
         {
-          "kind": "section_schema_key",
-          "key": "section_5_unseen_validation_and_interval_splits.all_required_applicable_evaluations_resolved"
+          "key": "sec5.interval_branch_coverage::interval_625_pm_2_neg12_across_T3125::(3125, 6, 6)",
+          "prior_coverage_status": "UNCERTIFIED_COVERAGE",
+          "current_coverage_status": "CERTIFIED_COMPLETE_COVERAGE"
         },
         {
-          "kind": "section_schema_key",
-          "key": "section_5_unseen_validation_and_interval_splits.resolution_audit"
-        },
-        {
-          "kind": "section_schema_key",
-          "key": "section_5_unseen_validation_and_interval_splits.six_dimension_closeout_audit"
+          "key": "sec5.interval_branch_coverage::interval_625_pm_2_neg12_across_T3125::(3126, 6, 6)",
+          "prior_coverage_status": "UNCERTIFIED_COVERAGE",
+          "current_coverage_status": "CERTIFIED_COMPLETE_COVERAGE"
         }
       ],
+      "provenance_changes": [
+        {
+          "key": "reviewed_tc062r3_delivered_tip",
+          "prior_value": null,
+          "current_value": "c87d464f4d9c030259a69142306cf4bef90fc581"
+        },
+        {
+          "key": "reviewed_tc062r3_validation_commit",
+          "prior_value": null,
+          "current_value": "8c08a56d11ee5524904bcc23ed56d6b5583794fc"
+        },
+        {
+          "key": "tc062r4_domain_reconstructed_at_utc",
+          "prior_value": null,
+          "current_value": "2026-11-18T20:12:30.472231+00:00"
+        },
+        {
+          "key": "tc062r4_validation_and_reconstruction_producing_git_commit",
+          "prior_value": null,
+          "current_value": "2e48474d17e5223331606d1b8c86be4b937e7a8e"
+        }
+      ],
+      "corrected_integrity_coverage_or_execution_classifications": [
+        {
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1808, 5, 5)::M_P0",
+          "scope": "continuous_interval_classifications",
+          "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+          "current_value": "PASS",
+          "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+        },
+        {
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1808, 5, 5)::M_P0_F",
+          "scope": "continuous_interval_classifications",
+          "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+          "current_value": "PASS",
+          "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+        },
+        {
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1809, 5, 5)::M_P0",
+          "scope": "continuous_interval_classifications",
+          "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+          "current_value": "PASS",
+          "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+        },
+        {
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1809, 5, 5)::M_P0_F",
+          "scope": "continuous_interval_classifications",
+          "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+          "current_value": "PASS",
+          "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+        },
+        {
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1809, 6, 6)::M_P0",
+          "scope": "continuous_interval_classifications",
+          "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+          "current_value": "PASS",
+          "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+        },
+        {
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1809, 6, 6)::M_P0_F",
+          "scope": "continuous_interval_classifications",
+          "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+          "current_value": "PASS",
+          "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+        },
+        {
+          "key": "sec5.interval_branch::interval_625_pm_2_neg12_across_T3125::(3125, 6, 6)::M_P0",
+          "scope": "continuous_interval_classifications",
+          "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+          "current_value": "PASS",
+          "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+        },
+        {
+          "key": "sec5.interval_branch::interval_625_pm_2_neg12_across_T3125::(3125, 6, 6)::M_P0_F",
+          "scope": "continuous_interval_classifications",
+          "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+          "current_value": "PASS",
+          "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+        },
+        {
+          "key": "sec5.interval_branch::interval_625_pm_2_neg12_across_T3125::(3126, 6, 6)::M_P0",
+          "scope": "continuous_interval_classifications",
+          "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+          "current_value": "PASS",
+          "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+        },
+        {
+          "key": "sec5.interval_branch::interval_625_pm_2_neg12_across_T3125::(3126, 6, 6)::M_P0_F",
+          "scope": "continuous_interval_classifications",
+          "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+          "current_value": "PASS",
+          "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+        }
+      ],
+      "schema_only_additions": [],
       "removed_status_or_schema_fields": [],
       "retired_optional_fields": [],
-      "missing_or_incomparable_entries": []
+      "missing_or_incomparable_entries": [
+        {
+          "side": "transition",
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1808, 5, 5)::M_P0",
+          "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+        },
+        {
+          "side": "transition",
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1808, 5, 5)::M_P0_F",
+          "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+        },
+        {
+          "side": "transition",
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1809, 5, 5)::M_P0",
+          "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+        },
+        {
+          "side": "transition",
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1809, 5, 5)::M_P0_F",
+          "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+        },
+        {
+          "side": "transition",
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1809, 6, 6)::M_P0",
+          "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+        },
+        {
+          "side": "transition",
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1809, 6, 6)::M_P0_F",
+          "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+        },
+        {
+          "side": "transition",
+          "key": "sec5.interval_branch::interval_625_pm_2_neg12_across_T3125::(3125, 6, 6)::M_P0",
+          "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+        },
+        {
+          "side": "transition",
+          "key": "sec5.interval_branch::interval_625_pm_2_neg12_across_T3125::(3125, 6, 6)::M_P0_F",
+          "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+        },
+        {
+          "side": "transition",
+          "key": "sec5.interval_branch::interval_625_pm_2_neg12_across_T3125::(3126, 6, 6)::M_P0",
+          "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+        },
+        {
+          "side": "transition",
+          "key": "sec5.interval_branch::interval_625_pm_2_neg12_across_T3125::(3126, 6, 6)::M_P0_F",
+          "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+        }
+      ]
     },
     "reviewed_tc062r2_delivered_tip": "a742aecea3fe737074231ecb2f501a959bbc2693",
     "reviewed_tc062r2_validation_commit": "2ba4f3348ddc7b8b9d731bf189ae20c2af877434",
@@ -522,10 +915,593 @@
     "tc062r3_validation_and_verdict_comparison": {
       "comparison_id": "TC062R3_VS_TC062R2_STABLE_KEY_V1",
       "baseline_commit": "a742aecea3fe737074231ecb2f501a959bbc2693",
+      "comparison_status": "INCOMPLETE_COMPARISON",
+      "incomparable_reason": "MISSING_OR_BLOCKED_COMPARISON_KEYS",
+      "any_probe_kl1_control_or_candidate_verdict_changed": null,
+      "any_numerical_enclosure_changed": null,
+      "enclosure_comparison_complete": true,
+      "any_numerical_enclosure_changed_on_comparable_balls": false,
+      "any_integrity_coverage_or_execution_classification_changed": true,
+      "scope_key_counts": {
+        "in_scope_controls": 37,
+        "candidate_and_section4_classifications": 6,
+        "kl1_diagnostics": 62,
+        "registered_probes_and_point_verdicts": 124,
+        "continuous_interval_classifications": 14
+      },
+      "changed_numerical_enclosures_count": 0,
+      "changed_mathematical_verdicts_count": 0,
+      "raw_branch_margin_sign_verdicts_changed_count": 0,
+      "branch_coverage_classifications_changed_count": 5,
+      "provenance_changes_count": 4,
+      "corrected_integrity_coverage_or_execution_classifications_count": 10,
+      "schema_only_additions_count": 0,
+      "removed_status_or_schema_fields_count": 0,
+      "retired_optional_fields_count": 0,
+      "missing_or_incomparable_entries_count": 10,
+      "changed_numerical_enclosures": [],
+      "changed_mathematical_verdicts": [],
+      "raw_branch_margin_sign_verdicts_changed": [],
+      "branch_coverage_classifications_changed": [
+        {
+          "key": "sec5.interval_branch_coverage::interval_403_40_to_403_46_across_e6::(1808, 5, 5)",
+          "prior_coverage_status": "UNCERTIFIED_COVERAGE",
+          "current_coverage_status": "CERTIFIED_COMPLETE_COVERAGE"
+        },
+        {
+          "key": "sec5.interval_branch_coverage::interval_403_40_to_403_46_across_e6::(1809, 5, 5)",
+          "prior_coverage_status": "UNCERTIFIED_COVERAGE",
+          "current_coverage_status": "CERTIFIED_COMPLETE_COVERAGE"
+        },
+        {
+          "key": "sec5.interval_branch_coverage::interval_403_40_to_403_46_across_e6::(1809, 6, 6)",
+          "prior_coverage_status": "UNCERTIFIED_COVERAGE",
+          "current_coverage_status": "CERTIFIED_COMPLETE_COVERAGE"
+        },
+        {
+          "key": "sec5.interval_branch_coverage::interval_625_pm_2_neg12_across_T3125::(3125, 6, 6)",
+          "prior_coverage_status": "UNCERTIFIED_COVERAGE",
+          "current_coverage_status": "CERTIFIED_COMPLETE_COVERAGE"
+        },
+        {
+          "key": "sec5.interval_branch_coverage::interval_625_pm_2_neg12_across_T3125::(3126, 6, 6)",
+          "prior_coverage_status": "UNCERTIFIED_COVERAGE",
+          "current_coverage_status": "CERTIFIED_COMPLETE_COVERAGE"
+        }
+      ],
+      "provenance_changes": [
+        {
+          "key": "reviewed_tc062r3_delivered_tip",
+          "prior_value": null,
+          "current_value": "c87d464f4d9c030259a69142306cf4bef90fc581"
+        },
+        {
+          "key": "reviewed_tc062r3_validation_commit",
+          "prior_value": null,
+          "current_value": "8c08a56d11ee5524904bcc23ed56d6b5583794fc"
+        },
+        {
+          "key": "tc062r4_domain_reconstructed_at_utc",
+          "prior_value": null,
+          "current_value": "2026-11-18T20:12:30.472231+00:00"
+        },
+        {
+          "key": "tc062r4_validation_and_reconstruction_producing_git_commit",
+          "prior_value": null,
+          "current_value": "2e48474d17e5223331606d1b8c86be4b937e7a8e"
+        }
+      ],
+      "corrected_integrity_coverage_or_execution_classifications": [
+        {
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1808, 5, 5)::M_P0",
+          "scope": "continuous_interval_classifications",
+          "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+          "current_value": "PASS",
+          "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+        },
+        {
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1808, 5, 5)::M_P0_F",
+          "scope": "continuous_interval_classifications",
+          "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+          "current_value": "PASS",
+          "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+        },
+        {
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1809, 5, 5)::M_P0",
+          "scope": "continuous_interval_classifications",
+          "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+          "current_value": "PASS",
+          "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+        },
+        {
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1809, 5, 5)::M_P0_F",
+          "scope": "continuous_interval_classifications",
+          "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+          "current_value": "PASS",
+          "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+        },
+        {
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1809, 6, 6)::M_P0",
+          "scope": "continuous_interval_classifications",
+          "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+          "current_value": "PASS",
+          "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+        },
+        {
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1809, 6, 6)::M_P0_F",
+          "scope": "continuous_interval_classifications",
+          "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+          "current_value": "PASS",
+          "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+        },
+        {
+          "key": "sec5.interval_branch::interval_625_pm_2_neg12_across_T3125::(3125, 6, 6)::M_P0",
+          "scope": "continuous_interval_classifications",
+          "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+          "current_value": "PASS",
+          "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+        },
+        {
+          "key": "sec5.interval_branch::interval_625_pm_2_neg12_across_T3125::(3125, 6, 6)::M_P0_F",
+          "scope": "continuous_interval_classifications",
+          "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+          "current_value": "PASS",
+          "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+        },
+        {
+          "key": "sec5.interval_branch::interval_625_pm_2_neg12_across_T3125::(3126, 6, 6)::M_P0",
+          "scope": "continuous_interval_classifications",
+          "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+          "current_value": "PASS",
+          "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+        },
+        {
+          "key": "sec5.interval_branch::interval_625_pm_2_neg12_across_T3125::(3126, 6, 6)::M_P0_F",
+          "scope": "continuous_interval_classifications",
+          "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+          "current_value": "PASS",
+          "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+        }
+      ],
+      "schema_only_additions": [],
+      "removed_status_or_schema_fields": [],
+      "retired_optional_fields": [],
+      "missing_or_incomparable_entries": [
+        {
+          "side": "transition",
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1808, 5, 5)::M_P0",
+          "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+        },
+        {
+          "side": "transition",
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1808, 5, 5)::M_P0_F",
+          "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+        },
+        {
+          "side": "transition",
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1809, 5, 5)::M_P0",
+          "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+        },
+        {
+          "side": "transition",
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1809, 5, 5)::M_P0_F",
+          "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+        },
+        {
+          "side": "transition",
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1809, 6, 6)::M_P0",
+          "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+        },
+        {
+          "side": "transition",
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1809, 6, 6)::M_P0_F",
+          "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+        },
+        {
+          "side": "transition",
+          "key": "sec5.interval_branch::interval_625_pm_2_neg12_across_T3125::(3125, 6, 6)::M_P0",
+          "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+        },
+        {
+          "side": "transition",
+          "key": "sec5.interval_branch::interval_625_pm_2_neg12_across_T3125::(3125, 6, 6)::M_P0_F",
+          "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+        },
+        {
+          "side": "transition",
+          "key": "sec5.interval_branch::interval_625_pm_2_neg12_across_T3125::(3126, 6, 6)::M_P0",
+          "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+        },
+        {
+          "side": "transition",
+          "key": "sec5.interval_branch::interval_625_pm_2_neg12_across_T3125::(3126, 6, 6)::M_P0_F",
+          "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+        }
+      ]
+    },
+    "tc062r4_domain_reconstructed_at_utc": "2026-11-18T20:12:30.472231+00:00",
+    "tc062r4_legacy_domain_reconstruction_summary": {
+      "evidence_origin": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+      "historical_numerical_producer_commit": "4b3df05665e186c85eb54c3822ae1d8c34199a3c",
+      "historical_generated_at_utc": "2026-11-17T13:21:54.466739+00:00",
+      "reconstruction_validation_commit": "2e48474d17e5223331606d1b8c86be4b937e7a8e",
+      "reconstructed_branch_count": 5,
+      "recomputed_branch_count": 0,
+      "pre_reconstruction_branch_coverage_statuses": [
+        "UNCERTIFIED_COVERAGE",
+        "UNCERTIFIED_COVERAGE",
+        "UNCERTIFIED_COVERAGE",
+        "UNCERTIFIED_COVERAGE",
+        "UNCERTIFIED_COVERAGE"
+      ],
+      "five_branch_domain_evidence_table": [
+        {
+          "interval_key": "interval_625_pm_2_neg12_across_T3125",
+          "cutoff_triple": [
+            3125,
+            6,
+            6
+          ],
+          "required_cell_A": "[2559999/4096, 625]",
+          "pre_reconstruction_coverage_status": "UNCERTIFIED_COVERAGE",
+          "evaluation_domain_evidence": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+          "reconstructed_sub_ball_mid_man_exp": [
+            1303702770224574053401044457026290971900669640512649992165098558069247862550873021540286047715331,
+            -310
+          ],
+          "reconstructed_sub_ball_rad_man_exp": [
+            536870915,
+            -42
+          ],
+          "reconstructed_B_eval_exact_dyadic_fractions": [
+            "1303702515595075588737091125329170555888135722322089082941495657160440776398418261886660759257091/2085924839766513752338888384931203236916703635113918720651407820138886450957656787131798913024",
+            "1303703024854072518064997788723411387913203558703210901388701458978054948703327781193911336173571/2085924839766513752338888384931203236916703635113918720651407820138886450957656787131798913024"
+          ],
+          "stored_Y_sub_ball_5field_exact_match": true,
+          "preserved_12_observable_enclosures_sha256": "cb28836b6b38544c52b63ebff39339452975f99fb525823f7e0e8a36b3a5b4ac",
+          "inclusion_result": "CERTIFIED_COMPLETE_COVERAGE (closure(A) subseteq B_eval)",
+          "margin_status": "PRESERVED_WITHOUT_RECOMPUTATION",
+          "historical_numerical_producer_commit": "4b3df05665e186c85eb54c3822ae1d8c34199a3c",
+          "reconstruction_validation_commit": "2e48474d17e5223331606d1b8c86be4b937e7a8e"
+        },
+        {
+          "interval_key": "interval_625_pm_2_neg12_across_T3125",
+          "cutoff_triple": [
+            3126,
+            6,
+            6
+          ],
+          "required_cell_A": "(625, 2560001/4096]",
+          "pre_reconstruction_coverage_status": "UNCERTIFIED_COVERAGE",
+          "evaluation_domain_evidence": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+          "reconstructed_sub_ball_mid_man_exp": [
+            81481454967723008563910376508607067140325618961234275540572576069022512571637372648403912097791,
+            -306
+          ],
+          "reconstructed_sub_ball_rad_man_exp": [
+            536870915,
+            -42
+          ],
+          "reconstructed_B_eval_exact_dyadic_fractions": [
+            "81481439053379354522413293277537041139542249074324218714097394762222069687108950170052331569151/130370302485407109521180524058200202307293977194619920040712988758680403184853549195737432064",
+            "81481470882066662605407459739677093141108988848144332367047757375822955456165795126755492626431/130370302485407109521180524058200202307293977194619920040712988758680403184853549195737432064"
+          ],
+          "stored_Y_sub_ball_5field_exact_match": true,
+          "preserved_12_observable_enclosures_sha256": "0a9b492de943ef45d168c76fd51be855e44526e6e037fce532ee243f34f413ac",
+          "inclusion_result": "CERTIFIED_COMPLETE_COVERAGE (closure(A) subseteq B_eval)",
+          "margin_status": "PRESERVED_WITHOUT_RECOMPUTATION",
+          "historical_numerical_producer_commit": "4b3df05665e186c85eb54c3822ae1d8c34199a3c",
+          "reconstruction_validation_commit": "2e48474d17e5223331606d1b8c86be4b937e7a8e"
+        },
+        {
+          "interval_key": "interval_403_40_to_403_46_across_e6",
+          "cutoff_triple": [
+            1808,
+            5,
+            5
+          ],
+          "required_cell_A": "[2017/5, 1808^(4/5)]",
+          "pre_reconstruction_coverage_status": "UNCERTIFIED_COVERAGE",
+          "evaluation_domain_evidence": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+          "reconstructed_sub_ball_mid_man_exp": [
+            1682968428886973159619212016407344029248695054133382943678394286892062849326147191104322875824511,
+            -311
+          ],
+          "reconstructed_sub_ball_rad_man_exp": [
+            729193347,
+            -36
+          ],
+          "reconstructed_B_eval_exact_dyadic_fractions": [
+            "1682924160723484570192313923819991665377137167971660939930737643557035547857027146461616069548415/4171849679533027504677776769862406473833407270227837441302815640277772901915313574263597826048",
+            "1683012697050461749046110108994696393120252940295104947426050930227090150795267235747029682100607/4171849679533027504677776769862406473833407270227837441302815640277772901915313574263597826048"
+          ],
+          "stored_Y_sub_ball_5field_exact_match": true,
+          "preserved_12_observable_enclosures_sha256": "ad956f647773eaccd57d483585ad6966f1dc3493b48432b04ce75f94e8569e64",
+          "inclusion_result": "CERTIFIED_COMPLETE_COVERAGE (closure(A) subseteq B_eval)",
+          "margin_status": "PRESERVED_WITHOUT_RECOMPUTATION",
+          "historical_numerical_producer_commit": "4b3df05665e186c85eb54c3822ae1d8c34199a3c",
+          "reconstruction_validation_commit": "2e48474d17e5223331606d1b8c86be4b937e7a8e"
+        },
+        {
+          "interval_key": "interval_403_40_to_403_46_across_e6",
+          "cutoff_triple": [
+            1809,
+            5,
+            5
+          ],
+          "required_cell_A": "(1808^(4/5), exp(6))",
+          "pre_reconstruction_coverage_status": "UNCERTIFIED_COVERAGE",
+          "evaluation_domain_evidence": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+          "reconstructed_sub_ball_mid_man_exp": [
+            1683028489948692988523916647384959577361568010195622525130997820513949489117670065719317152314065,
+            -311
+          ],
+          "reconstructed_sub_ball_rad_man_exp": [
+            1040574131,
+            -38
+          ],
+          "reconstructed_B_eval_exact_dyadic_fractions": [
+            "1683012697050299640706074354756485511063469248534495219373607059883242933834361709578772907733713/4171849679533027504677776769862406473833407270227837441302815640277772901915313574263597826048",
+            "1683044282847086336341758940013433643659666771856749830888388581144656044400978421859861396894417/4171849679533027504677776769862406473833407270227837441302815640277772901915313574263597826048"
+          ],
+          "stored_Y_sub_ball_5field_exact_match": true,
+          "preserved_12_observable_enclosures_sha256": "c1d203d9e1f6e26d3577c47fbe9268430c511cdfffef71fbbd08353c69495ec5",
+          "inclusion_result": "CERTIFIED_COMPLETE_COVERAGE (closure(A) subseteq B_eval)",
+          "margin_status": "PRESERVED_WITHOUT_RECOMPUTATION",
+          "historical_numerical_producer_commit": "4b3df05665e186c85eb54c3822ae1d8c34199a3c",
+          "reconstruction_validation_commit": "2e48474d17e5223331606d1b8c86be4b937e7a8e"
+        },
+        {
+          "interval_key": "interval_403_40_to_403_46_across_e6",
+          "cutoff_triple": [
+            1809,
+            6,
+            6
+          ],
+          "required_cell_A": "[exp(6), 20173/50]",
+          "pre_reconstruction_coverage_status": "UNCERTIFIED_COVERAGE",
+          "evaluation_domain_evidence": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+          "reconstructed_sub_ball_mid_man_exp": [
+            1683109377275729115116860113243206191851484451090256040397398447379148561611217829880157547452115,
+            -311
+          ],
+          "reconstructed_sub_ball_rad_man_exp": [
+            1072247427,
+            -36
+          ],
+          "reconstructed_B_eval_exact_dyadic_fractions": [
+            "1683044282846941553295000972819649440854899039404560388531132595264291398803042499912058555258579/4171849679533027504677776769862406473833407270227837441302815640277772901915313574263597826048",
+            "1683174471704516676938719253666762942848069862775951692263664299494005724419393159848256539645651/4171849679533027504677776769862406473833407270227837441302815640277772901915313574263597826048"
+          ],
+          "stored_Y_sub_ball_5field_exact_match": true,
+          "preserved_12_observable_enclosures_sha256": "56de79e6b91fb41546e5d2eccba870df84e163d8c6950f111361ecfebf919e68",
+          "inclusion_result": "CERTIFIED_COMPLETE_COVERAGE (closure(A) subseteq B_eval)",
+          "margin_status": "PRESERVED_WITHOUT_RECOMPUTATION",
+          "historical_numerical_producer_commit": "4b3df05665e186c85eb54c3822ae1d8c34199a3c",
+          "reconstruction_validation_commit": "2e48474d17e5223331606d1b8c86be4b937e7a8e"
+        }
+      ]
+    },
+    "reviewed_tc062r3_delivered_tip": "c87d464f4d9c030259a69142306cf4bef90fc581",
+    "reviewed_tc062r3_validation_commit": "8c08a56d11ee5524904bcc23ed56d6b5583794fc",
+    "tc062r4_validation_and_reconstruction_producing_git_commit": "2e48474d17e5223331606d1b8c86be4b937e7a8e",
+    "tc062r4_reprocessed_at_utc": "2026-11-18T20:12:35.912339+00:00",
+    "tc062r4_validation_and_verdict_comparison": {
+      "comparison_id": "TC062R4_VS_TC062R3_AS_SUPPLIED_STABLE_KEY_V1",
+      "baseline_commit": "c87d464f4d9c030259a69142306cf4bef90fc581",
+      "comparison_status": "INCOMPLETE_COMPARISON",
+      "incomparable_reason": "MISSING_OR_BLOCKED_COMPARISON_KEYS",
+      "any_probe_kl1_control_or_candidate_verdict_changed": null,
+      "any_numerical_enclosure_changed": null,
+      "enclosure_comparison_complete": true,
+      "any_numerical_enclosure_changed_on_comparable_balls": false,
+      "any_integrity_coverage_or_execution_classification_changed": true,
+      "scope_key_counts": {
+        "in_scope_controls": 37,
+        "candidate_and_section4_classifications": 6,
+        "kl1_diagnostics": 62,
+        "registered_probes_and_point_verdicts": 124,
+        "continuous_interval_classifications": 14
+      },
+      "changed_numerical_enclosures_count": 0,
+      "changed_mathematical_verdicts_count": 0,
+      "raw_branch_margin_sign_verdicts_changed_count": 0,
+      "branch_coverage_classifications_changed_count": 5,
+      "provenance_changes_count": 4,
+      "corrected_integrity_coverage_or_execution_classifications_count": 10,
+      "schema_only_additions_count": 0,
+      "removed_status_or_schema_fields_count": 0,
+      "retired_optional_fields_count": 0,
+      "missing_or_incomparable_entries_count": 10,
+      "changed_numerical_enclosures": [],
+      "changed_mathematical_verdicts": [],
+      "raw_branch_margin_sign_verdicts_changed": [],
+      "branch_coverage_classifications_changed": [
+        {
+          "key": "sec5.interval_branch_coverage::interval_403_40_to_403_46_across_e6::(1808, 5, 5)",
+          "prior_coverage_status": "UNCERTIFIED_COVERAGE",
+          "current_coverage_status": "CERTIFIED_COMPLETE_COVERAGE"
+        },
+        {
+          "key": "sec5.interval_branch_coverage::interval_403_40_to_403_46_across_e6::(1809, 5, 5)",
+          "prior_coverage_status": "UNCERTIFIED_COVERAGE",
+          "current_coverage_status": "CERTIFIED_COMPLETE_COVERAGE"
+        },
+        {
+          "key": "sec5.interval_branch_coverage::interval_403_40_to_403_46_across_e6::(1809, 6, 6)",
+          "prior_coverage_status": "UNCERTIFIED_COVERAGE",
+          "current_coverage_status": "CERTIFIED_COMPLETE_COVERAGE"
+        },
+        {
+          "key": "sec5.interval_branch_coverage::interval_625_pm_2_neg12_across_T3125::(3125, 6, 6)",
+          "prior_coverage_status": "UNCERTIFIED_COVERAGE",
+          "current_coverage_status": "CERTIFIED_COMPLETE_COVERAGE"
+        },
+        {
+          "key": "sec5.interval_branch_coverage::interval_625_pm_2_neg12_across_T3125::(3126, 6, 6)",
+          "prior_coverage_status": "UNCERTIFIED_COVERAGE",
+          "current_coverage_status": "CERTIFIED_COMPLETE_COVERAGE"
+        }
+      ],
+      "provenance_changes": [
+        {
+          "key": "reviewed_tc062r3_delivered_tip",
+          "prior_value": null,
+          "current_value": "c87d464f4d9c030259a69142306cf4bef90fc581"
+        },
+        {
+          "key": "reviewed_tc062r3_validation_commit",
+          "prior_value": null,
+          "current_value": "8c08a56d11ee5524904bcc23ed56d6b5583794fc"
+        },
+        {
+          "key": "tc062r4_domain_reconstructed_at_utc",
+          "prior_value": null,
+          "current_value": "2026-11-18T20:12:30.472231+00:00"
+        },
+        {
+          "key": "tc062r4_validation_and_reconstruction_producing_git_commit",
+          "prior_value": null,
+          "current_value": "2e48474d17e5223331606d1b8c86be4b937e7a8e"
+        }
+      ],
+      "corrected_integrity_coverage_or_execution_classifications": [
+        {
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1808, 5, 5)::M_P0",
+          "scope": "continuous_interval_classifications",
+          "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+          "current_value": "PASS",
+          "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+        },
+        {
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1808, 5, 5)::M_P0_F",
+          "scope": "continuous_interval_classifications",
+          "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+          "current_value": "PASS",
+          "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+        },
+        {
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1809, 5, 5)::M_P0",
+          "scope": "continuous_interval_classifications",
+          "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+          "current_value": "PASS",
+          "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+        },
+        {
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1809, 5, 5)::M_P0_F",
+          "scope": "continuous_interval_classifications",
+          "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+          "current_value": "PASS",
+          "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+        },
+        {
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1809, 6, 6)::M_P0",
+          "scope": "continuous_interval_classifications",
+          "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+          "current_value": "PASS",
+          "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+        },
+        {
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1809, 6, 6)::M_P0_F",
+          "scope": "continuous_interval_classifications",
+          "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+          "current_value": "PASS",
+          "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+        },
+        {
+          "key": "sec5.interval_branch::interval_625_pm_2_neg12_across_T3125::(3125, 6, 6)::M_P0",
+          "scope": "continuous_interval_classifications",
+          "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+          "current_value": "PASS",
+          "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+        },
+        {
+          "key": "sec5.interval_branch::interval_625_pm_2_neg12_across_T3125::(3125, 6, 6)::M_P0_F",
+          "scope": "continuous_interval_classifications",
+          "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+          "current_value": "PASS",
+          "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+        },
+        {
+          "key": "sec5.interval_branch::interval_625_pm_2_neg12_across_T3125::(3126, 6, 6)::M_P0",
+          "scope": "continuous_interval_classifications",
+          "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+          "current_value": "PASS",
+          "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+        },
+        {
+          "key": "sec5.interval_branch::interval_625_pm_2_neg12_across_T3125::(3126, 6, 6)::M_P0_F",
+          "scope": "continuous_interval_classifications",
+          "prior_value": "INCOMPLETE_OR_INVALID_COVERAGE",
+          "current_value": "PASS",
+          "classification_kind": "INTEGRITY_OR_COVERAGE_VERDICT_GUARD"
+        }
+      ],
+      "schema_only_additions": [],
+      "removed_status_or_schema_fields": [],
+      "retired_optional_fields": [],
+      "missing_or_incomparable_entries": [
+        {
+          "side": "transition",
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1808, 5, 5)::M_P0",
+          "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+        },
+        {
+          "side": "transition",
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1808, 5, 5)::M_P0_F",
+          "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+        },
+        {
+          "side": "transition",
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1809, 5, 5)::M_P0",
+          "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+        },
+        {
+          "side": "transition",
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1809, 5, 5)::M_P0_F",
+          "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+        },
+        {
+          "side": "transition",
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1809, 6, 6)::M_P0",
+          "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+        },
+        {
+          "side": "transition",
+          "key": "sec5.interval_branch::interval_403_40_to_403_46_across_e6::(1809, 6, 6)::M_P0_F",
+          "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+        },
+        {
+          "side": "transition",
+          "key": "sec5.interval_branch::interval_625_pm_2_neg12_across_T3125::(3125, 6, 6)::M_P0",
+          "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+        },
+        {
+          "side": "transition",
+          "key": "sec5.interval_branch::interval_625_pm_2_neg12_across_T3125::(3125, 6, 6)::M_P0_F",
+          "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+        },
+        {
+          "side": "transition",
+          "key": "sec5.interval_branch::interval_625_pm_2_neg12_across_T3125::(3126, 6, 6)::M_P0",
+          "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+        },
+        {
+          "side": "transition",
+          "key": "sec5.interval_branch::interval_625_pm_2_neg12_across_T3125::(3126, 6, 6)::M_P0_F",
+          "reason": "VERDICT_BLOCKED_BY_INTEGRITY_OR_COVERAGE_STATUS"
+        }
+      ]
+    },
+    "tc062r4_post_domain_recovery_verdict_comparison": {
+      "comparison_id": "TC062R4_VS_TC062R3_POST_DOMAIN_RECOVERY_STABLE_KEY_V1",
+      "baseline_commit": "c87d464f4d9c030259a69142306cf4bef90fc581",
       "comparison_status": "COMPLETE_COMPARED",
       "incomparable_reason": null,
       "any_probe_kl1_control_or_candidate_verdict_changed": false,
       "any_numerical_enclosure_changed": false,
+      "enclosure_comparison_complete": true,
+      "any_numerical_enclosure_changed_on_comparable_balls": false,
       "any_integrity_coverage_or_execution_classification_changed": false,
       "scope_key_counts": {
         "in_scope_controls": 37,
@@ -536,6 +1512,9 @@
       },
       "changed_numerical_enclosures_count": 0,
       "changed_mathematical_verdicts_count": 0,
+      "raw_branch_margin_sign_verdicts_changed_count": 0,
+      "branch_coverage_classifications_changed_count": 0,
+      "provenance_changes_count": 4,
       "corrected_integrity_coverage_or_execution_classifications_count": 0,
       "schema_only_additions_count": 0,
       "removed_status_or_schema_fields_count": 0,
@@ -543,11 +1522,36 @@
       "missing_or_incomparable_entries_count": 0,
       "changed_numerical_enclosures": [],
       "changed_mathematical_verdicts": [],
+      "raw_branch_margin_sign_verdicts_changed": [],
+      "branch_coverage_classifications_changed": [],
+      "provenance_changes": [
+        {
+          "key": "reviewed_tc062r3_delivered_tip",
+          "prior_value": null,
+          "current_value": "c87d464f4d9c030259a69142306cf4bef90fc581"
+        },
+        {
+          "key": "reviewed_tc062r3_validation_commit",
+          "prior_value": null,
+          "current_value": "8c08a56d11ee5524904bcc23ed56d6b5583794fc"
+        },
+        {
+          "key": "tc062r4_domain_reconstructed_at_utc",
+          "prior_value": "2026-11-17T13:21:54.466739+00:00",
+          "current_value": "2026-11-18T20:12:30.472231+00:00"
+        },
+        {
+          "key": "tc062r4_validation_and_reconstruction_producing_git_commit",
+          "prior_value": null,
+          "current_value": "2e48474d17e5223331606d1b8c86be4b937e7a8e"
+        }
+      ],
       "corrected_integrity_coverage_or_execution_classifications": [],
       "schema_only_additions": [],
       "removed_status_or_schema_fields": [],
       "retired_optional_fields": [],
-      "missing_or_incomparable_entries": []
+      "missing_or_incomparable_entries": [],
+      "comparison_basis": "POST_HISTORICAL_DOMAIN_RECOVERY_ON_PRIOR_TC062R3"
     }
   },
   "section_1_protocols_reassembly_and_complete_kernel": {
@@ -4828,14 +5832,50 @@
               "is_feasible_required": true,
               "subdomain_notation": "[2559999/4096, 625]",
               "subdomain_is_nonempty": true,
-              "domain_evidence_source": "SERIALIZED_ARB_OUTWARD_BALL",
+              "domain_evidence_source": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+              "coverage_evidence_source": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+              "historical_reconstruction_status": "VERIFIED_LINKED_TO_4B3DF056",
               "admissibility_status": "CERTIFIED_NONEMPTY_INTERSECTION",
-              "admissibility_reason": "CERTIFIED_INTERIOR_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
+              "admissibility_reason": "EXACT_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
+              "coverage_status": "CERTIFIED_COMPLETE_COVERAGE",
+              "coverage_reason": "HISTORICAL_PRODUCER_RECONSTRUCTED_DOMAIN_CONTAINS_SUBDOMAIN",
               "complete_subdomain_coverage": true,
               "has_certified_admissible_evaluated_witness": true,
               "can_certify_refutation": true,
-              "certified_witness_Y": "5119999/8192",
+              "certified_witness_Y": "35336934393821339801102162580102508039524225486403406992045568863328171720701/56539106072908298546665520023773392506479484700019806659891398441363832832",
               "supplied_witness_check": null
+            },
+            "historical_domain_reconstruction": {
+              "evidence_origin": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+              "reconstruction_task_id": "TASK-TC-062R4",
+              "historical_numerical_producer_commit": "4b3df05665e186c85eb54c3822ae1d8c34199a3c",
+              "historical_generated_at_utc": "2026-11-17T13:21:54.466739+00:00",
+              "reconstruction_validation_commit": "2e48474d17e5223331606d1b8c86be4b937e7a8e",
+              "reconstructed_at_utc": "2026-11-18T20:12:30.472231+00:00",
+              "historical_constructor": "tc.mixed_arithmetic_covariance.evaluate_interval_via_cutoff_case_split_arb (flint_ctx.prec=320 sub_ball=lo_cand.union(hi_cand)) -> evaluate_fixed_cutoff_on_Y_ball_arb (flint_ctx.prec=256 Y_sub_ball=+sub_ball) -> _enrich_and_serialize_interval_split (ambient flint_ctx.prec=53 serialize_arb_certified)",
+              "cutoff_triple": [
+                3125,
+                6,
+                6
+              ],
+              "required_subdomain_notation": "[2559999/4096, 625]",
+              "reconstructed_sub_ball_mid_man_exp": [
+                1303702770224574053401044457026290971900669640512649992165098558069247862550873021540286047715331,
+                -310
+              ],
+              "reconstructed_sub_ball_rad_man_exp": [
+                536870915,
+                -42
+              ],
+              "reconstructed_sub_ball_exact_dyadic_fractions": [
+                "1303702515595075588737091125329170555888135722322089082941495657160440776398418261886660759257091/2085924839766513752338888384931203236916703635113918720651407820138886450957656787131798913024",
+                "1303703024854072518064997788723411387913203558703210901388701458978054948703327781193911336173571/2085924839766513752338888384931203236916703635113918720651407820138886450957656787131798913024"
+              ],
+              "constructor_coverage_proof": "lo_cand = max(y_lo_b.lower(), t_lo_b.lower(), d_lo_b.lower()) <= inf(A), hi_cand = min(y_hi_b.upper(), t_hi_b.upper(), d_hi_b.upper()) >= sup(A), and outward Arb union satisfies lo(sub_ball) <= lo_cand and hi(sub_ball) >= hi_cand, hence closure(A) subseteq sub_ball = B_eval subseteq y_ret (X_self_Y input).",
+              "stored_Y_sub_ball_5field_exact_match": true,
+              "preserved_12_observable_enclosures_sha256": "cb28836b6b38544c52b63ebff39339452975f99fb525823f7e0e8a36b3a5b4ac",
+              "inclusion_A_subseteq_B_eval_verified": true,
+              "margin_recomputation_status": "PRESERVED_WITHOUT_RECOMPUTATION"
             }
           },
           {
@@ -4952,14 +5992,50 @@
               "is_feasible_required": true,
               "subdomain_notation": "(625, 2560001/4096]",
               "subdomain_is_nonempty": true,
-              "domain_evidence_source": "SERIALIZED_ARB_OUTWARD_BALL",
+              "domain_evidence_source": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+              "coverage_evidence_source": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+              "historical_reconstruction_status": "VERIFIED_LINKED_TO_4B3DF056",
               "admissibility_status": "CERTIFIED_NONEMPTY_INTERSECTION",
-              "admissibility_reason": "CERTIFIED_INTERIOR_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
+              "admissibility_reason": "EXACT_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
+              "coverage_status": "CERTIFIED_COMPLETE_COVERAGE",
+              "coverage_reason": "HISTORICAL_PRODUCER_RECONSTRUCTED_DOMAIN_CONTAINS_SUBDOMAIN",
               "complete_subdomain_coverage": true,
               "has_certified_admissible_evaluated_witness": true,
               "can_certify_refutation": true,
-              "certified_witness_Y": "12500002441406248863131622783839702606201/20000000000000000000000000000000000000",
+              "certified_witness_Y": "35336948197314033382229737449614232593575130388621351332818679188376619319293/56539106072908298546665520023773392506479484700019806659891398441363832832",
               "supplied_witness_check": null
+            },
+            "historical_domain_reconstruction": {
+              "evidence_origin": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+              "reconstruction_task_id": "TASK-TC-062R4",
+              "historical_numerical_producer_commit": "4b3df05665e186c85eb54c3822ae1d8c34199a3c",
+              "historical_generated_at_utc": "2026-11-17T13:21:54.466739+00:00",
+              "reconstruction_validation_commit": "2e48474d17e5223331606d1b8c86be4b937e7a8e",
+              "reconstructed_at_utc": "2026-11-18T20:12:30.472231+00:00",
+              "historical_constructor": "tc.mixed_arithmetic_covariance.evaluate_interval_via_cutoff_case_split_arb (flint_ctx.prec=320 sub_ball=lo_cand.union(hi_cand)) -> evaluate_fixed_cutoff_on_Y_ball_arb (flint_ctx.prec=256 Y_sub_ball=+sub_ball) -> _enrich_and_serialize_interval_split (ambient flint_ctx.prec=53 serialize_arb_certified)",
+              "cutoff_triple": [
+                3126,
+                6,
+                6
+              ],
+              "required_subdomain_notation": "(625, 2560001/4096]",
+              "reconstructed_sub_ball_mid_man_exp": [
+                81481454967723008563910376508607067140325618961234275540572576069022512571637372648403912097791,
+                -306
+              ],
+              "reconstructed_sub_ball_rad_man_exp": [
+                536870915,
+                -42
+              ],
+              "reconstructed_sub_ball_exact_dyadic_fractions": [
+                "81481439053379354522413293277537041139542249074324218714097394762222069687108950170052331569151/130370302485407109521180524058200202307293977194619920040712988758680403184853549195737432064",
+                "81481470882066662605407459739677093141108988848144332367047757375822955456165795126755492626431/130370302485407109521180524058200202307293977194619920040712988758680403184853549195737432064"
+              ],
+              "constructor_coverage_proof": "lo_cand = max(y_lo_b.lower(), t_lo_b.lower(), d_lo_b.lower()) <= inf(A), hi_cand = min(y_hi_b.upper(), t_hi_b.upper(), d_hi_b.upper()) >= sup(A), and outward Arb union satisfies lo(sub_ball) <= lo_cand and hi(sub_ball) >= hi_cand, hence closure(A) subseteq sub_ball = B_eval subseteq y_ret (X_self_Y input).",
+              "stored_Y_sub_ball_5field_exact_match": true,
+              "preserved_12_observable_enclosures_sha256": "0a9b492de943ef45d168c76fd51be855e44526e6e037fce532ee243f34f413ac",
+              "inclusion_A_subseteq_B_eval_verified": true,
+              "margin_recomputation_status": "PRESERVED_WITHOUT_RECOMPUTATION"
             }
           }
         ],
@@ -5181,14 +6257,50 @@
               "is_feasible_required": true,
               "subdomain_notation": "[2017/5, 1808^(4/5)]",
               "subdomain_is_nonempty": true,
-              "domain_evidence_source": "SERIALIZED_ARB_OUTWARD_BALL",
+              "domain_evidence_source": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+              "coverage_evidence_source": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+              "historical_reconstruction_status": "VERIFIED_LINKED_TO_4B3DF056",
               "admissibility_status": "CERTIFIED_NONEMPTY_INTERSECTION",
-              "admissibility_reason": "CERTIFIED_INTERIOR_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
+              "admissibility_reason": "EXACT_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
+              "coverage_status": "CERTIFIED_COMPLETE_COVERAGE",
+              "coverage_reason": "HISTORICAL_PRODUCER_RECONSTRUCTED_DOMAIN_CONTAINS_SUBDOMAIN",
               "complete_subdomain_coverage": true,
               "has_certified_admissible_evaluated_witness": true,
               "can_certify_refutation": true,
-              "certified_witness_Y": "4034106111597373853783210506662726402283/10000000000000000000000000000000000000",
+              "certified_witness_Y": "91233901341188623834201717176117624384000735149443205348248171526361345667619/226156424291633194186662080095093570025917938800079226639565593765455331328",
               "supplied_witness_check": null
+            },
+            "historical_domain_reconstruction": {
+              "evidence_origin": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+              "reconstruction_task_id": "TASK-TC-062R4",
+              "historical_numerical_producer_commit": "4b3df05665e186c85eb54c3822ae1d8c34199a3c",
+              "historical_generated_at_utc": "2026-11-17T13:21:54.466739+00:00",
+              "reconstruction_validation_commit": "2e48474d17e5223331606d1b8c86be4b937e7a8e",
+              "reconstructed_at_utc": "2026-11-18T20:12:30.472231+00:00",
+              "historical_constructor": "tc.mixed_arithmetic_covariance.evaluate_interval_via_cutoff_case_split_arb (flint_ctx.prec=320 sub_ball=lo_cand.union(hi_cand)) -> evaluate_fixed_cutoff_on_Y_ball_arb (flint_ctx.prec=256 Y_sub_ball=+sub_ball) -> _enrich_and_serialize_interval_split (ambient flint_ctx.prec=53 serialize_arb_certified)",
+              "cutoff_triple": [
+                1808,
+                5,
+                5
+              ],
+              "required_subdomain_notation": "[2017/5, 1808^(4/5)]",
+              "reconstructed_sub_ball_mid_man_exp": [
+                1682968428886973159619212016407344029248695054133382943678394286892062849326147191104322875824511,
+                -311
+              ],
+              "reconstructed_sub_ball_rad_man_exp": [
+                729193347,
+                -36
+              ],
+              "reconstructed_sub_ball_exact_dyadic_fractions": [
+                "1682924160723484570192313923819991665377137167971660939930737643557035547857027146461616069548415/4171849679533027504677776769862406473833407270227837441302815640277772901915313574263597826048",
+                "1683012697050461749046110108994696393120252940295104947426050930227090150795267235747029682100607/4171849679533027504677776769862406473833407270227837441302815640277772901915313574263597826048"
+              ],
+              "constructor_coverage_proof": "lo_cand = max(y_lo_b.lower(), t_lo_b.lower(), d_lo_b.lower()) <= inf(A), hi_cand = min(y_hi_b.upper(), t_hi_b.upper(), d_hi_b.upper()) >= sup(A), and outward Arb union satisfies lo(sub_ball) <= lo_cand and hi(sub_ball) >= hi_cand, hence closure(A) subseteq sub_ball = B_eval subseteq y_ret (X_self_Y input).",
+              "stored_Y_sub_ball_5field_exact_match": true,
+              "preserved_12_observable_enclosures_sha256": "ad956f647773eaccd57d483585ad6966f1dc3493b48432b04ce75f94e8569e64",
+              "inclusion_A_subseteq_B_eval_verified": true,
+              "margin_recomputation_status": "PRESERVED_WITHOUT_RECOMPUTATION"
             }
           },
           {
@@ -5305,14 +6417,50 @@
               "is_feasible_required": true,
               "subdomain_notation": "(1808^(4/5), exp(6))",
               "subdomain_is_nonempty": true,
-              "domain_evidence_source": "SERIALIZED_ARB_OUTWARD_BALL",
+              "domain_evidence_source": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+              "coverage_evidence_source": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+              "historical_reconstruction_status": "VERIFIED_LINKED_TO_4B3DF056",
               "admissibility_status": "CERTIFIED_NONEMPTY_INTERSECTION",
-              "admissibility_reason": "CERTIFIED_INTERIOR_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
+              "admissibility_reason": "EXACT_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
+              "coverage_status": "CERTIFIED_COMPLETE_COVERAGE",
+              "coverage_reason": "HISTORICAL_PRODUCER_RECONSTRUCTED_DOMAIN_CONTAINS_SUBDOMAIN",
               "complete_subdomain_coverage": true,
               "has_certified_admissible_evaluated_witness": true,
               "can_certify_refutation": true,
-              "certified_witness_Y": "4034250079061049234496749704703688621521/10000000000000000000000000000000000000",
+              "certified_witness_Y": "91237157257868545057487982883441512264430587328770817634362447717569433056981/226156424291633194186662080095093570025917938800079226639565593765455331328",
               "supplied_witness_check": null
+            },
+            "historical_domain_reconstruction": {
+              "evidence_origin": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+              "reconstruction_task_id": "TASK-TC-062R4",
+              "historical_numerical_producer_commit": "4b3df05665e186c85eb54c3822ae1d8c34199a3c",
+              "historical_generated_at_utc": "2026-11-17T13:21:54.466739+00:00",
+              "reconstruction_validation_commit": "2e48474d17e5223331606d1b8c86be4b937e7a8e",
+              "reconstructed_at_utc": "2026-11-18T20:12:30.472231+00:00",
+              "historical_constructor": "tc.mixed_arithmetic_covariance.evaluate_interval_via_cutoff_case_split_arb (flint_ctx.prec=320 sub_ball=lo_cand.union(hi_cand)) -> evaluate_fixed_cutoff_on_Y_ball_arb (flint_ctx.prec=256 Y_sub_ball=+sub_ball) -> _enrich_and_serialize_interval_split (ambient flint_ctx.prec=53 serialize_arb_certified)",
+              "cutoff_triple": [
+                1809,
+                5,
+                5
+              ],
+              "required_subdomain_notation": "(1808^(4/5), exp(6))",
+              "reconstructed_sub_ball_mid_man_exp": [
+                1683028489948692988523916647384959577361568010195622525130997820513949489117670065719317152314065,
+                -311
+              ],
+              "reconstructed_sub_ball_rad_man_exp": [
+                1040574131,
+                -38
+              ],
+              "reconstructed_sub_ball_exact_dyadic_fractions": [
+                "1683012697050299640706074354756485511063469248534495219373607059883242933834361709578772907733713/4171849679533027504677776769862406473833407270227837441302815640277772901915313574263597826048",
+                "1683044282847086336341758940013433643659666771856749830888388581144656044400978421859861396894417/4171849679533027504677776769862406473833407270227837441302815640277772901915313574263597826048"
+              ],
+              "constructor_coverage_proof": "lo_cand = max(y_lo_b.lower(), t_lo_b.lower(), d_lo_b.lower()) <= inf(A), hi_cand = min(y_hi_b.upper(), t_hi_b.upper(), d_hi_b.upper()) >= sup(A), and outward Arb union satisfies lo(sub_ball) <= lo_cand and hi(sub_ball) >= hi_cand, hence closure(A) subseteq sub_ball = B_eval subseteq y_ret (X_self_Y input).",
+              "stored_Y_sub_ball_5field_exact_match": true,
+              "preserved_12_observable_enclosures_sha256": "c1d203d9e1f6e26d3577c47fbe9268430c511cdfffef71fbbd08353c69495ec5",
+              "inclusion_A_subseteq_B_eval_verified": true,
+              "margin_recomputation_status": "PRESERVED_WITHOUT_RECOMPUTATION"
             }
           },
           {
@@ -5429,14 +6577,50 @@
               "is_feasible_required": true,
               "subdomain_notation": "[exp(6), 20173/50]",
               "subdomain_is_nonempty": true,
-              "domain_evidence_source": "SERIALIZED_ARB_OUTWARD_BALL",
+              "domain_evidence_source": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+              "coverage_evidence_source": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+              "historical_reconstruction_status": "VERIFIED_LINKED_TO_4B3DF056",
               "admissibility_status": "CERTIFIED_NONEMPTY_INTERSECTION",
-              "admissibility_reason": "CERTIFIED_INTERIOR_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
+              "admissibility_reason": "EXACT_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
+              "coverage_status": "CERTIFIED_COMPLETE_COVERAGE",
+              "coverage_reason": "HISTORICAL_PRODUCER_RECONSTRUCTED_DOMAIN_CONTAINS_SUBDOMAIN",
               "complete_subdomain_coverage": true,
               "has_certified_admissible_evaluated_witness": true,
               "can_certify_refutation": true,
-              "certified_witness_Y": "1008610991865918933285684033762663602829/2500000000000000000000000000000000000",
+              "certified_witness_Y": "11405192771081687594251418585010935854498240778680446836164277960500716463377/28269553036454149273332760011886696253239742350009903329945699220681916416",
               "supplied_witness_check": null
+            },
+            "historical_domain_reconstruction": {
+              "evidence_origin": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+              "reconstruction_task_id": "TASK-TC-062R4",
+              "historical_numerical_producer_commit": "4b3df05665e186c85eb54c3822ae1d8c34199a3c",
+              "historical_generated_at_utc": "2026-11-17T13:21:54.466739+00:00",
+              "reconstruction_validation_commit": "2e48474d17e5223331606d1b8c86be4b937e7a8e",
+              "reconstructed_at_utc": "2026-11-18T20:12:30.472231+00:00",
+              "historical_constructor": "tc.mixed_arithmetic_covariance.evaluate_interval_via_cutoff_case_split_arb (flint_ctx.prec=320 sub_ball=lo_cand.union(hi_cand)) -> evaluate_fixed_cutoff_on_Y_ball_arb (flint_ctx.prec=256 Y_sub_ball=+sub_ball) -> _enrich_and_serialize_interval_split (ambient flint_ctx.prec=53 serialize_arb_certified)",
+              "cutoff_triple": [
+                1809,
+                6,
+                6
+              ],
+              "required_subdomain_notation": "[exp(6), 20173/50]",
+              "reconstructed_sub_ball_mid_man_exp": [
+                1683109377275729115116860113243206191851484451090256040397398447379148561611217829880157547452115,
+                -311
+              ],
+              "reconstructed_sub_ball_rad_man_exp": [
+                1072247427,
+                -36
+              ],
+              "reconstructed_sub_ball_exact_dyadic_fractions": [
+                "1683044282846941553295000972819649440854899039404560388531132595264291398803042499912058555258579/4171849679533027504677776769862406473833407270227837441302815640277772901915313574263597826048",
+                "1683174471704516676938719253666762942848069862775951692263664299494005724419393159848256539645651/4171849679533027504677776769862406473833407270227837441302815640277772901915313574263597826048"
+              ],
+              "constructor_coverage_proof": "lo_cand = max(y_lo_b.lower(), t_lo_b.lower(), d_lo_b.lower()) <= inf(A), hi_cand = min(y_hi_b.upper(), t_hi_b.upper(), d_hi_b.upper()) >= sup(A), and outward Arb union satisfies lo(sub_ball) <= lo_cand and hi(sub_ball) >= hi_cand, hence closure(A) subseteq sub_ball = B_eval subseteq y_ret (X_self_Y input).",
+              "stored_Y_sub_ball_5field_exact_match": true,
+              "preserved_12_observable_enclosures_sha256": "56de79e6b91fb41546e5d2eccba870df84e163d8c6950f111361ecfebf919e68",
+              "inclusion_A_subseteq_B_eval_verified": true,
+              "margin_recomputation_status": "PRESERVED_WITHOUT_RECOMPUTATION"
             }
           }
         ],
@@ -5568,13 +6752,17 @@
               "is_feasible_required": true,
               "subdomain_notation": "[2559999/4096, 625]",
               "subdomain_is_nonempty": true,
-              "domain_evidence_source": "SERIALIZED_ARB_OUTWARD_BALL",
+              "domain_evidence_source": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+              "coverage_evidence_source": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+              "historical_reconstruction_status": "VERIFIED_LINKED_TO_4B3DF056",
               "admissibility_status": "CERTIFIED_NONEMPTY_INTERSECTION",
-              "admissibility_reason": "CERTIFIED_INTERIOR_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
+              "admissibility_reason": "EXACT_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
+              "coverage_status": "CERTIFIED_COMPLETE_COVERAGE",
+              "coverage_reason": "HISTORICAL_PRODUCER_RECONSTRUCTED_DOMAIN_CONTAINS_SUBDOMAIN",
               "complete_subdomain_coverage": true,
               "has_certified_admissible_evaluated_witness": true,
               "can_certify_refutation": true,
-              "certified_witness_Y": "5119999/8192",
+              "certified_witness_Y": "35336934393821339801102162580102508039524225486403406992045568863328171720701/56539106072908298546665520023773392506479484700019806659891398441363832832",
               "supplied_witness_check": null
             },
             {
@@ -5588,13 +6776,17 @@
               "is_feasible_required": true,
               "subdomain_notation": "(625, 2560001/4096]",
               "subdomain_is_nonempty": true,
-              "domain_evidence_source": "SERIALIZED_ARB_OUTWARD_BALL",
+              "domain_evidence_source": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+              "coverage_evidence_source": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+              "historical_reconstruction_status": "VERIFIED_LINKED_TO_4B3DF056",
               "admissibility_status": "CERTIFIED_NONEMPTY_INTERSECTION",
-              "admissibility_reason": "CERTIFIED_INTERIOR_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
+              "admissibility_reason": "EXACT_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
+              "coverage_status": "CERTIFIED_COMPLETE_COVERAGE",
+              "coverage_reason": "HISTORICAL_PRODUCER_RECONSTRUCTED_DOMAIN_CONTAINS_SUBDOMAIN",
               "complete_subdomain_coverage": true,
               "has_certified_admissible_evaluated_witness": true,
               "can_certify_refutation": true,
-              "certified_witness_Y": "12500002441406248863131622783839702606201/20000000000000000000000000000000000000",
+              "certified_witness_Y": "35336948197314033382229737449614232593575130388621351332818679188376619319293/56539106072908298546665520023773392506479484700019806659891398441363832832",
               "supplied_witness_check": null
             }
           ],
@@ -5654,13 +6846,17 @@
               "is_feasible_required": true,
               "subdomain_notation": "[2017/5, 1808^(4/5)]",
               "subdomain_is_nonempty": true,
-              "domain_evidence_source": "SERIALIZED_ARB_OUTWARD_BALL",
+              "domain_evidence_source": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+              "coverage_evidence_source": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+              "historical_reconstruction_status": "VERIFIED_LINKED_TO_4B3DF056",
               "admissibility_status": "CERTIFIED_NONEMPTY_INTERSECTION",
-              "admissibility_reason": "CERTIFIED_INTERIOR_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
+              "admissibility_reason": "EXACT_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
+              "coverage_status": "CERTIFIED_COMPLETE_COVERAGE",
+              "coverage_reason": "HISTORICAL_PRODUCER_RECONSTRUCTED_DOMAIN_CONTAINS_SUBDOMAIN",
               "complete_subdomain_coverage": true,
               "has_certified_admissible_evaluated_witness": true,
               "can_certify_refutation": true,
-              "certified_witness_Y": "4034106111597373853783210506662726402283/10000000000000000000000000000000000000",
+              "certified_witness_Y": "91233901341188623834201717176117624384000735149443205348248171526361345667619/226156424291633194186662080095093570025917938800079226639565593765455331328",
               "supplied_witness_check": null
             },
             {
@@ -5674,13 +6870,17 @@
               "is_feasible_required": true,
               "subdomain_notation": "(1808^(4/5), exp(6))",
               "subdomain_is_nonempty": true,
-              "domain_evidence_source": "SERIALIZED_ARB_OUTWARD_BALL",
+              "domain_evidence_source": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+              "coverage_evidence_source": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+              "historical_reconstruction_status": "VERIFIED_LINKED_TO_4B3DF056",
               "admissibility_status": "CERTIFIED_NONEMPTY_INTERSECTION",
-              "admissibility_reason": "CERTIFIED_INTERIOR_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
+              "admissibility_reason": "EXACT_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
+              "coverage_status": "CERTIFIED_COMPLETE_COVERAGE",
+              "coverage_reason": "HISTORICAL_PRODUCER_RECONSTRUCTED_DOMAIN_CONTAINS_SUBDOMAIN",
               "complete_subdomain_coverage": true,
               "has_certified_admissible_evaluated_witness": true,
               "can_certify_refutation": true,
-              "certified_witness_Y": "4034250079061049234496749704703688621521/10000000000000000000000000000000000000",
+              "certified_witness_Y": "91237157257868545057487982883441512264430587328770817634362447717569433056981/226156424291633194186662080095093570025917938800079226639565593765455331328",
               "supplied_witness_check": null
             },
             {
@@ -5694,13 +6894,17 @@
               "is_feasible_required": true,
               "subdomain_notation": "[exp(6), 20173/50]",
               "subdomain_is_nonempty": true,
-              "domain_evidence_source": "SERIALIZED_ARB_OUTWARD_BALL",
+              "domain_evidence_source": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+              "coverage_evidence_source": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+              "historical_reconstruction_status": "VERIFIED_LINKED_TO_4B3DF056",
               "admissibility_status": "CERTIFIED_NONEMPTY_INTERSECTION",
-              "admissibility_reason": "CERTIFIED_INTERIOR_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
+              "admissibility_reason": "EXACT_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
+              "coverage_status": "CERTIFIED_COMPLETE_COVERAGE",
+              "coverage_reason": "HISTORICAL_PRODUCER_RECONSTRUCTED_DOMAIN_CONTAINS_SUBDOMAIN",
               "complete_subdomain_coverage": true,
               "has_certified_admissible_evaluated_witness": true,
               "can_certify_refutation": true,
-              "certified_witness_Y": "1008610991865918933285684033762663602829/2500000000000000000000000000000000000",
+              "certified_witness_Y": "11405192771081687594251418585010935854498240778680446836164277960500716463377/28269553036454149273332760011886696253239742350009903329945699220681916416",
               "supplied_witness_check": null
             }
           ],
