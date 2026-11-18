@@ -8040,7 +8040,9 @@ def _extract_tc062_stable_key_maps(
     prov_art = art.get("provenance")
     if isinstance(prov_art, dict):
         for pk, pv in prov_art.items():
-            if isinstance(pv, (str, int, float, bool)):
+            if isinstance(pv, (str, int, float, bool)) and not str(pk).endswith(
+                "_reprocessed_at_utc"
+            ):
                 provenance_scalars[str(pk)] = pv
 
     return {

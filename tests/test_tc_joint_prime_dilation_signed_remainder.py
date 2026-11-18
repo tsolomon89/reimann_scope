@@ -3134,12 +3134,16 @@ def test_tc062r4_exact_evaluation_domain_coverage_and_legacy_recovery(
     )
     assert g_runk["all_mathematical_and_numerical_checks_pass"] is False
 
-    # 13. Section 5.13: Repeated metadata reprocessing is semantically idempotent modulo
-    #     `provenance.tc062r4_reprocessed_at_utc`:
+    # 13. Section 5.13: Repeated metadata reprocessing (both standalone and with `prior_artifact_for_comparison`
+    #     mirroring production reprocessing) is semantically idempotent modulo `provenance.tc062r4_reprocessed_at_utc`:
     p_id = tmp_path / "tc062r4_idem.json"
     p_id.write_bytes(JOINT_PRIME_DILATION_ARTIFACT_PATH.read_bytes())
-    out_1 = reprocess_task_tc062_metadata_and_stage_b(p_id, write_output=True)
-    out_2 = reprocess_task_tc062_metadata_and_stage_b(p_id, write_output=True)
+    out_1 = reprocess_task_tc062_metadata_and_stage_b(
+        p_id, write_output=True, prior_artifact_for_comparison=raw_tc062r3
+    )
+    out_2 = reprocess_task_tc062_metadata_and_stage_b(
+        p_id, write_output=True, prior_artifact_for_comparison=raw_tc062r3
+    )
     d_1 = json.loads(json.dumps(out_1))
     d_2 = json.loads(json.dumps(out_2))
     t_1 = d_1["provenance"].pop("tc062r4_reprocessed_at_utc")
