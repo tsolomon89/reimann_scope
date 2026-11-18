@@ -2161,6 +2161,85 @@ def test_tc062r3_refutation_domain_admissibility_and_boundary_ownership(
     assert isinstance(ts1, str) and isinstance(ts2, str)
     assert c1 == c2
 
+    # 10. Contradictory duplicate cutoff branch (`(3125, 6, 6)` with `PASS` and overlapping `[625, 625]`
+    #     with `FAIL`, in BOTH branch orders) -> `CERTIFICATION_INTEGRITY_CONFLICT` (never refutation),
+    #     and disjoint-box duplicate `FAIL` -> `INCOMPLETE_OR_INVALID_COVERAGE` (never refutation):
+    s_dup_contra = json.loads(json.dumps(s_base))
+    sp_dc = s_dup_contra["continuous_straddling_interval_splits"][
+        "interval_625_pm_2_neg12_across_T3125"
+    ]
+    dup_fail_br = json.loads(json.dumps(sp_dc["branches"][0]))
+    dup_fail_br["Y_sub_ball"] = _ser(arb(625))
+    dup_fail_br["F_Y"] = _ser(pos_f)
+    dup_fail_br["M_P0_F"] = _ser(pos_m)
+    dup_fail_br["TC062_P0_F_branch_classification"] = {"verdict": "FAIL"}
+    sp_dc["branches"].append(dup_fail_br)
+    sp_dc["active_branch_count"] = 3
+    sp_dc["union_F_Y"] = _ser(arb("-0.40").union(pos_f))
+    sp_dc["union_M_P0_F"] = _ser(neg_m_wide.union(pos_m))
+    sp_dc["TC062_P0_F_interval_classification"] = {"verdict": "UNRESOLVED"}
+    g_dc, _ = _both(s_dup_contra, "dup_branch_contradiction_pass_then_fail")
+    assert g_dc["holdout_hypothesis_outcome"] == "CERTIFICATION_INTEGRITY_CONFLICT"
+    assert g_dc["holdout_hypothesis_outcome"] != "REFUTED_BY_CERTIFIED_WITNESS"
+    assert any(
+        c["conflict_type"] == "INTERVAL_SPLIT_DUPLICATE_BRANCH_CONTRADICTION"
+        for c in g_dc["section_5_unseen_validation_and_interval_splits"][
+            "detected_integrity_conflicts"
+        ]
+    )
+
+    s_dup_contra_rev = json.loads(json.dumps(s_dup_contra))
+    sp_dcr = s_dup_contra_rev["continuous_straddling_interval_splits"][
+        "interval_625_pm_2_neg12_across_T3125"
+    ]
+    sp_dcr["branches"] = list(reversed(sp_dcr["branches"]))
+    g_dcr, _ = _both(s_dup_contra_rev, "dup_branch_contradiction_fail_then_pass")
+    assert g_dcr["holdout_hypothesis_outcome"] == "CERTIFICATION_INTEGRITY_CONFLICT"
+
+    # 11. Zero-radius float (`rad_float_outward = 0.0`) on boundary-spilling `625 - 2^-200` ball
+    #     is rejected across BOTH generator and reprocessor (never promoted to `SERIALIZED_ARB_EXACT_POINT`):
+    s_rf0 = json.loads(json.dumps(s_pad_625))
+    sp_rf0 = s_rf0["continuous_straddling_interval_splits"][
+        "interval_625_pm_2_neg12_across_T3125"
+    ]
+    sp_rf0["branches"][1]["Y_sub_ball"]["mid_float"] = 625.0
+    sp_rf0["branches"][1]["Y_sub_ball"]["rad_float_outward"] = 0.0
+    g_rf0, r_rf0 = _both(s_rf0, "zero_rad_float_outward_rejected")
+    assert g_rf0["holdout_hypothesis_outcome"] == "CERTIFICATION_INTEGRITY_CONFLICT"
+    assert g_rf0["serialized_arb_self_check"]["all_enclose_original_256bit_arb_ball"] is False
+    assert r_rf0["serialized_arb_self_check"]["all_enclose_original_256bit_arb_ball"] is False
+
+    # 12. Arbitrarily narrow exact rational intersection (`width = 2^-3000`) produces a verified
+    #     rational witness `Y_w in A cap B` without precision exhaustion:
+    s_narrow = json.loads(json.dumps(s_base))
+    sp_nar = s_narrow["continuous_straddling_interval_splits"][
+        "interval_625_pm_2_neg12_across_T3125"
+    ]
+    q_nar_lo = Fraction(625, 1) + Fraction(1, 2**15)
+    q_nar_hi = q_nar_lo + Fraction(1, 2**3000)
+    sp_nar["branches"][1]["evaluated_Y_interval_exact_fractions"] = [
+        f"{q_nar_lo.numerator}/{q_nar_lo.denominator}",
+        f"{q_nar_hi.numerator}/{q_nar_hi.denominator}",
+    ]
+    sp_nar["branches"][1]["Y_sub_ball"] = _ser(_q_arb(q_nar_lo).union(_q_arb(q_nar_hi)))
+    sp_nar["branches"][1]["F_Y"] = _ser(pos_f)
+    sp_nar["union_F_Y"] = _ser(arb("-0.40").union(pos_f))
+    sp_nar["branches"][1]["M_P0_F"] = _ser(pos_m)
+    sp_nar["branches"][1]["TC062_P0_F_branch_classification"] = {"verdict": "FAIL"}
+    sp_nar["union_M_P0_F"] = _ser(neg_m_wide.union(pos_m))
+    sp_nar["TC062_P0_F_interval_classification"] = {"verdict": "UNRESOLVED"}
+    aud_nar = audit_continuous_interval_split_certificate_tc062(
+        "interval_625_pm_2_neg12_across_T3125",
+        sp_nar,
+        prescribed_Y_lo=Fraction(2559999, 4096),
+        prescribed_Y_hi=Fraction(2560001, 4096),
+    )
+    adm_nar = aud_nar["branch_domain_admissibility"][1]
+    assert adm_nar["admissibility_status"] == "CERTIFIED_NONEMPTY_INTERSECTION"
+    assert adm_nar["certified_witness_Y"] is not None
+    q_wit_nar = Fraction(adm_nar["certified_witness_Y"])
+    assert q_nar_lo < q_wit_nar < q_nar_hi
+
 
 def test_tc062r3_deleted_renamed_and_retired_status_provenance_comparison(
     tc062_artifact: Dict[str, Any],
@@ -2321,6 +2400,97 @@ def test_tc062r3_deleted_renamed_and_retired_status_provenance_comparison(
     assert comp_r3["any_numerical_enclosure_changed"] is False
     assert comp_r3["any_integrity_coverage_or_execution_classification_changed"] is False
     assert comp_r3["removed_status_or_schema_fields_count"] == 0
+
+    # 7. Overwriting required or optional status fields with `None` or wrong types is caught as
+    #    `INCOMPLETE_COMPARISON` with `None` (never accepted as a valid present scalar):
+    cur_null_top = json.loads(json.dumps(base))
+    cur_null_top["execution_and_certification_status"] = None
+    c_null_top = compare_tc062_artifacts_by_stable_key(
+        cur_null_top, base, baseline_commit=REVIEWED_TC062R2_DELIVERED_TIP
+    )
+    assert c_null_top["comparison_status"] == "INCOMPLETE_COMPARISON"
+    assert c_null_top["any_integrity_coverage_or_execution_classification_changed"] is None
+    assert any(
+        r["key"] == "top.execution_and_certification_status"
+        and "NULL_OR_MALFORMED_REQUIRED_STATUS_FIELD" in r["reason"]
+        for r in c_null_top["removed_status_or_schema_fields"]
+    )
+
+    cur_null_s5 = json.loads(json.dumps(base))
+    cur_null_s5["section_5_unseen_validation_and_interval_splits"][
+        "all_required_applicable_evaluations_resolved"
+    ] = None
+    c_null_s5 = compare_tc062_artifacts_by_stable_key(
+        cur_null_s5, base, baseline_commit=REVIEWED_TC062R2_DELIVERED_TIP
+    )
+    assert c_null_s5["comparison_status"] == "INCOMPLETE_COMPARISON"
+    assert c_null_s5["any_integrity_coverage_or_execution_classification_changed"] is None
+
+    cur_bad_type = json.loads(json.dumps(base))
+    cur_bad_type["section_5_unseen_validation_and_interval_splits"][
+        "evaluated_unseen_point_count"
+    ] = True
+    c_bad_type = compare_tc062_artifacts_by_stable_key(
+        cur_bad_type, base, baseline_commit=REVIEWED_TC062R2_DELIVERED_TIP
+    )
+    assert c_bad_type["comparison_status"] == "INCOMPLETE_COMPARISON"
+
+    # 8. Interval `P0` admissibility-driven refutation flip (`[625, 625]` refutes vs `[2, 2]` disjoint)
+    #    and duplicate interval branch detection in `compare_tc062_artifacts_by_stable_key`:
+    from tc.canonical_theta_correlation_bound import serialize_arb_certified
+    from tc.mixed_arithmetic_covariance import strip_enclosure_arb_for_json
+
+    flint_ctx.prec = 256
+    pos_p0 = strip_enclosure_arb_for_json(serialize_arb_certified(arb("0.20", arb("0.005"))))
+    art_p0_valid = json.loads(json.dumps(base))
+    sp_p0_v = art_p0_valid["section_5_unseen_validation_and_interval_splits"][
+        "continuous_straddling_interval_splits"
+    ]["interval_625_pm_2_neg12_across_T3125"]
+    sp_p0_v["branches"][0]["Y_sub_ball"] = strip_enclosure_arb_for_json(
+        serialize_arb_certified(arb(625))
+    )
+    sp_p0_v["branches"][0]["M_P0"] = pos_p0
+
+    art_p0_disjoint = json.loads(json.dumps(art_p0_valid))
+    art_p0_disjoint["section_5_unseen_validation_and_interval_splits"][
+        "continuous_straddling_interval_splits"
+    ]["interval_625_pm_2_neg12_across_T3125"]["branches"][0]["Y_sub_ball"] = (
+        strip_enclosure_arb_for_json(serialize_arb_certified(arb(2)))
+    )
+
+    c_p0_vs_base = compare_tc062_artifacts_by_stable_key(
+        art_p0_valid, base, baseline_commit=REVIEWED_TC062R2_DELIVERED_TIP
+    )
+    assert c_p0_vs_base["comparison_status"] == "INCOMPLETE_COMPARISON"
+    assert c_p0_vs_base["any_probe_kl1_control_or_candidate_verdict_changed"] is True
+
+    art_p0_full = json.loads(json.dumps(base))
+    art_p0_full["section_5_unseen_validation_and_interval_splits"][
+        "continuous_straddling_interval_splits"
+    ]["interval_625_pm_2_neg12_across_T3125"]["branches"][0]["M_P0"] = pos_p0
+    c_p0_full_vs_base = compare_tc062_artifacts_by_stable_key(
+        art_p0_full, base, baseline_commit=REVIEWED_TC062R2_DELIVERED_TIP
+    )
+    assert c_p0_full_vs_base["comparison_status"] == "COMPLETE_COMPARED"
+    assert c_p0_full_vs_base["any_probe_kl1_control_or_candidate_verdict_changed"] is True
+
+    c_p0_flip = compare_tc062_artifacts_by_stable_key(
+        art_p0_disjoint, art_p0_valid, baseline_commit=REVIEWED_TC062R2_DELIVERED_TIP
+    )
+    assert c_p0_flip["comparison_status"] == "INCOMPLETE_COMPARISON"
+    assert c_p0_flip["any_probe_kl1_control_or_candidate_verdict_changed"] is None
+    assert c_p0_flip["any_integrity_coverage_or_execution_classification_changed"] is True
+
+    art_dup_iv = json.loads(json.dumps(base))
+    sp_dup_iv = art_dup_iv["section_5_unseen_validation_and_interval_splits"][
+        "continuous_straddling_interval_splits"
+    ]["interval_625_pm_2_neg12_across_T3125"]
+    sp_dup_iv["branches"].append(json.loads(json.dumps(sp_dup_iv["branches"][0])))
+    c_dup_iv = compare_tc062_artifacts_by_stable_key(
+        art_dup_iv, base, baseline_commit=REVIEWED_TC062R2_DELIVERED_TIP
+    )
+    assert c_dup_iv["comparison_status"] == "INCOMPLETE_COMPARISON"
+    assert c_dup_iv["any_probe_kl1_control_or_candidate_verdict_changed"] is None
 
 
 

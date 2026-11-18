@@ -3616,7 +3616,7 @@ def _parse_serialized_arb_enclosure_tc062(
         lo_bs, hi_bs, _ = _parse_arb_ball_str_to_fractions(bs_str)
         mf = float(ball_dict["mid_float"])
         rf = float(ball_dict["rad_float_outward"])
-        if (not math.isfinite(mf)) or (not math.isfinite(rf)) or rf < 0.0:
+        if (not math.isfinite(mf)) or (not math.isfinite(rf)) or rf <= 0.0:
             return None
         saved_p = flint_ctx.prec
         try:
@@ -3644,8 +3644,12 @@ def _parse_serialized_arb_enclosure_tc062(
     w_core = c_hi - c_lo
 
     # (a) `arb(mid_float, rad_float_outward)` must enclose `[lo_dec, hi_dec]` up to 53-bit ulp
-    #     (prevents narrowing a zero-straddling `dec`/`arb_ball_str` interval via float fields):
+    #     (prevents narrowing a zero-straddling `dec`/`arb_ball_str` interval via float fields),
+    #     and when `arb_ball_str` is an exact radius-free decimal point (`lo_bs == hi_bs`),
+    #     `[lo_fl, hi_fl]` must enclose `lo_bs` directly:
     if lo_fl > lo_dec + ulp_53 or hi_fl < hi_dec - ulp_53:
+        return None
+    if lo_bs == hi_bs and not (lo_fl <= lo_bs <= hi_fl):
         return None
 
     # (b) Neither `[lo_dec, hi_dec]` nor `[lo_fl, hi_fl]` may carry forged wide padding beyond
@@ -3760,7 +3764,7 @@ def _exact_floor_log_rational(y_q: Fraction) -> int:
     d_guess = max(0, int(math.floor(math.log(float(y_q)))) - 1)
     saved_p = flint_ctx.prec
     try:
-        for prec in (256, 512, 1024, 2048, 4096):
+        for prec in (256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536):
             flint_ctx.prec = prec
             y_b = _frac_to_arb(y_q)
             for cand in (d_guess, d_guess + 1, d_guess + 2):
@@ -3781,7 +3785,7 @@ def _compare_rational_vs_exp_int(q_val: Fraction, k_exp: int) -> int:
         return -1 if q_val < 1 else (0 if q_val == 1 else 1)
     saved_p = flint_ctx.prec
     try:
-        for prec in (256, 512, 1024, 2048, 4096):
+        for prec in (256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536):
             flint_ctx.prec = prec
             qb = _frac_to_arb(q_val)
             eb = arb(k_exp).exp()
@@ -4206,6 +4210,19 @@ def _certified_witness_from_nonempty_intersection(
     if rel["cmp_i_lo_hi"] == 0:
         return _format_symbolic_cutoff_bound(rel["i_lo"])
 
+    if rel["i_lo"][0] == "rational" and rel["i_hi"][0] == "rational":
+        q_mid = (Fraction(rel["i_lo"][1]) + Fraction(rel["i_hi"][1])) / 2
+        w_mid: Tuple[str, Union[Fraction, int]] = ("rational", q_mid)
+        in_A_q = _symbolic_subdomain_vs_closed_box_relations(subdomain_A, w_mid, w_mid)[
+            "exact_intersects"
+        ]
+        in_B_q = (
+            _compare_symbolic_cutoff_bound(box_lo, w_mid) <= 0
+            and _compare_symbolic_cutoff_bound(w_mid, box_hi) <= 0
+        )
+        if in_A_q and in_B_q:
+            return f"{q_mid.numerator}/{q_mid.denominator}"
+
     def _bound_to_arb(b_sym: Tuple[str, Union[Fraction, int]]) -> arb:
         k_s, v_s = b_sym
         if k_s == "rational":
@@ -4218,7 +4235,7 @@ def _certified_witness_from_nonempty_intersection(
 
     saved_p = flint_ctx.prec
     try:
-        for prec in (256, 512, 1024, 2048):
+        for prec in (256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536):
             flint_ctx.prec = prec
             b1_a = _bound_to_arb(rel["i_lo"])
             b2_a = _bound_to_arb(rel["i_hi"])
@@ -4297,11 +4314,16 @@ def _evaluate_branch_domain_admissibility_tc062(
     has_nonempty_inner = b_inner_lo_q <= b_inner_hi_q
 
     # Parse and cross-validate optional exact/symbolic evaluation-domain provenance if supplied:
+    is_exact_serialized_point = bool(
+        y_sub_parsed["lo_bs"] == y_sub_parsed["hi_bs"]
+        and c_lo == c_hi
+        and c_lo == y_sub_parsed["lo_bs"]
+    )
     exact_frac_raw = br.get("evaluated_Y_interval_exact_fractions")
     sym_bounds_raw = br.get("evaluated_Y_symbolic_bounds")
     exact_box: Optional[Tuple[Tuple[str, Union[Fraction, int]], Tuple[str, Union[Fraction, int]]]] = None
     domain_evidence_source = (
-        "SERIALIZED_ARB_EXACT_POINT" if c_lo == c_hi else "SERIALIZED_ARB_OUTWARD_BALL"
+        "SERIALIZED_ARB_EXACT_POINT" if is_exact_serialized_point else "SERIALIZED_ARB_OUTWARD_BALL"
     )
 
     if exact_frac_raw is not None:
@@ -4388,7 +4410,7 @@ def _evaluate_branch_domain_admissibility_tc062(
             )
             exact_box = None
 
-    if exact_box is None and c_lo == c_hi:
+    if exact_box is None and is_exact_serialized_point and not conflicts:
         exact_box = (("rational", c_lo), ("rational", c_hi))
 
     # Audit optional supplied `admissible_witness_Y` against BOTH `A` and certified `B`:
@@ -4603,7 +4625,14 @@ def _evaluate_branch_domain_admissibility_tc062(
             "conflicts": [],
         }
 
-    if rel_out["box_subset_of_A"]:
+    full_dec_bs_outer_box = (
+        ("rational", min(lo_dec, y_sub_parsed["lo_bs"])),
+        ("rational", max(hi_dec, y_sub_parsed["hi_bs"])),
+    )
+    rel_full_outer = _symbolic_subdomain_vs_closed_box_relations(
+        subdomain_A, full_dec_bs_outer_box[0], full_dec_bs_outer_box[1]
+    )
+    if rel_out["box_subset_of_A"] and rel_full_outer["box_subset_of_A"]:
         # Every point of outward enclosure `B_outer` lies in `A`, and `emptyset != B_eval subseteq B_outer`,
         # so `A cap B_eval = B_eval != emptyset` without manufacturing any midpoint witness:
         return {
@@ -4765,6 +4794,18 @@ def audit_continuous_interval_split_certificate_tc062(
 
     # 3. Audit individual branches: cutoff definitions, duplicate identities, feasible subdomain
     #    coverage, conservative extra-branch semantics, and per-branch stored classifications:
+    triple_occurrence_counts: Dict[Tuple[int, int, int], int] = {}
+    for br_pre in branches:
+        if isinstance(br_pre, dict) and all(
+            _is_strict_int(br_pre.get(k)) for k in ("T_fixed", "D0_raw_fixed", "D0_eff_fixed")
+        ):
+            tr_pre = (
+                int(br_pre["T_fixed"]),
+                int(br_pre["D0_raw_fixed"]),
+                int(br_pre["D0_eff_fixed"]),
+            )
+            triple_occurrence_counts[tr_pre] = triple_occurrence_counts.get(tr_pre, 0) + 1
+
     seen_triples: Dict[Tuple[int, int, int], int] = {}
     branch_records: List[Dict[str, Any]] = []
     observed_Ts: List[int] = []
@@ -4864,8 +4905,10 @@ def audit_continuous_interval_split_certificate_tc062(
                     **c_adm,
                 }
             )
-        can_certify_refutation = bool(adm["can_certify_refutation"]) and (
-            len(adm["conflicts"]) == 0
+        can_certify_refutation = (
+            bool(adm["can_certify_refutation"])
+            and (len(adm["conflicts"]) == 0)
+            and triple_occurrence_counts.get(triple, 0) == 1
         )
 
         if is_feasible_required:
@@ -4999,6 +5042,7 @@ def audit_continuous_interval_split_certificate_tc062(
             {
                 "branch_index": b_idx,
                 "branch": br,
+                "y_sub_parsed": y_sub_parsed,
                 "cutoff_triple": triple,
                 "is_feasible_required": is_feasible_required,
                 "can_certify_refutation": can_certify_refutation,
@@ -5118,6 +5162,41 @@ def audit_continuous_interval_split_certificate_tc062(
                         "branch_verdict": b_p["verdict"],
                     }
                 )
+
+    # 6b. Detect contradictory duplicate cutoff branches with overlapping `Y_sub_ball` domains:
+    for i_rec in range(len(branch_records)):
+        for j_rec in range(i_rec + 1, len(branch_records)):
+            r1 = branch_records[i_rec]
+            r2 = branch_records[j_rec]
+            if r1["cutoff_triple"] != r2["cutoff_triple"]:
+                continue
+            y1 = r1["y_sub_parsed"]
+            y2 = r2["y_sub_parsed"]
+            if y1 is None or y2 is None:
+                continue
+            if max(y1["c_lo"], y2["c_lo"]) > min(y1["c_hi"], y2["c_hi"]):
+                continue
+            for _, br_key in REQUIRED_INTERVAL_UNION_BRANCH_PAIRS:
+                o1 = parsed_branch_obs.get((r1["branch_index"], br_key))
+                o2 = parsed_branch_obs.get((r2["branch_index"], br_key))
+                if o1 is None or o2 is None:
+                    continue
+                obs_disjoint = max(o1["c_lo"], o2["c_lo"]) > min(o1["c_hi"], o2["c_hi"])
+                verdict_contra = {o1["verdict"], o2["verdict"]} == {"PASS", "FAIL"}
+                if obs_disjoint or verdict_contra:
+                    integrity_conflicts.append(
+                        {
+                            "conflict_type": "INTERVAL_SPLIT_DUPLICATE_BRANCH_CONTRADICTION",
+                            "interval_key": split_key,
+                            "cutoff_triple": list(r1["cutoff_triple"]),
+                            "first_branch_index": r1["branch_index"],
+                            "second_branch_index": r2["branch_index"],
+                            "branch_key": br_key,
+                            "first_verdict": o1["verdict"],
+                            "second_verdict": o2["verdict"],
+                        }
+                    )
+                    break
 
     # 7. Audit stored interval probe classifications (`P0` and `TC062_P0_F`) and compute effective
     #    verdicts + granular branch resolution:
@@ -6434,19 +6513,39 @@ def verify_tc062_review_enclosures_and_lean_anchors(
                 )
 
     spans = lean_spans if lean_spans is not None else extract_lean_declaration_spans_tc062()
-    all_decls = spans.get("all_declarations", {})
+    decls_by_module: Dict[str, Dict[str, Any]] = {
+        TC_062_LEAN_MODULE_PATH.name: spans.get("all_declarations", {})
+    }
     anchor_re = re.compile(
-        r"\[`([A-Za-z0-9_']+)`\]\([^)]*JointPrimeDilationSignedRemainder\.lean#L(\d+)-L(\d+)\)"
+        r"\[`([A-Za-z0-9_']+)`\]\([^)]*formal/RiemannScope/([A-Za-z0-9_]+\.lean)#L(\d+)-L(\d+)\)"
     )
     checked_anchors = 0
     failed_anchors: List[Dict[str, Any]] = []
     for ma in anchor_re.finditer(md_text):
-        sym, l_st, l_en = ma.group(1), int(ma.group(2)), int(ma.group(3))
+        sym, mod_name, l_st, l_en = (
+            ma.group(1),
+            ma.group(2),
+            int(ma.group(3)),
+            int(ma.group(4)),
+        )
         checked_anchors += 1
-        info = all_decls.get(sym)
+        if mod_name not in decls_by_module:
+            mod_path = REPO_ROOT / "formal" / "RiemannScope" / mod_name
+            mod_spans = (
+                extract_lean_declaration_spans_tc062(mod_path)
+                if mod_path.exists()
+                else {"all_declarations": {}}
+            )
+            decls_by_module[mod_name] = mod_spans.get("all_declarations", {})
+        info = decls_by_module[mod_name].get(sym)
         if info is None or info["start_line"] != l_st or info["end_line"] != l_en:
             failed_anchors.append(
-                {"symbol": sym, "doc_span": (l_st, l_en), "actual": info}
+                {
+                    "module": mod_name,
+                    "symbol": sym,
+                    "doc_span": (l_st, l_en),
+                    "actual": info,
+                }
             )
 
     holdout_cutoffs_by_id: Dict[str, Tuple[int, int]] = {}
@@ -6870,34 +6969,107 @@ def _extract_tc062_stable_key_maps(
                 incomparable.append({"key": k_iu, "reason": "MISSING_INTERVAL_UNION_CLASSIFICATION"})
 
         part_req = derive_exact_interval_cutoff_partition(ylo_p, yhi_p)["feasible_triples"]
+        part_req_set = set(part_req)
         br_by_tr: Dict[Tuple[int, int, int], Dict[str, Any]] = {}
-        for br_o in sp_o.get("branches") or []:
-            if isinstance(br_o, dict) and all(
-                k in br_o for k in ("T_fixed", "D0_raw_fixed", "D0_eff_fixed")
-            ):
-                tr_b = (
-                    int(br_o["T_fixed"]),
-                    int(br_o["D0_raw_fixed"]),
-                    int(br_o["D0_eff_fixed"]),
+        dup_tr_set: set[Tuple[int, int, int]] = set()
+        raw_br_list = sp_o.get("branches")
+        if not isinstance(raw_br_list, list):
+            incomparable.append(
+                {
+                    "key": f"sec5.interval_branch_list::{split_key}",
+                    "reason": "MISSING_OR_NON_LIST_INTERVAL_BRANCHES",
+                }
+            )
+            raw_br_list = []
+        for b_idx_o, br_o in enumerate(raw_br_list):
+            if not (
+                isinstance(br_o, dict)
+                and all(
+                    isinstance(br_o.get(k), int) and not isinstance(br_o.get(k), bool)
+                    for k in ("T_fixed", "D0_raw_fixed", "D0_eff_fixed")
                 )
-                if tr_b not in br_by_tr:
-                    br_by_tr[tr_b] = br_o
+            ):
+                incomparable.append(
+                    {
+                        "key": f"sec5.interval_branch_raw::{split_key}[{b_idx_o}]",
+                        "reason": "MALFORMED_INTERVAL_BRANCH_CUTOFFS",
+                    }
+                )
+                continue
+            tr_b = (
+                int(br_o["T_fixed"]),
+                int(br_o["D0_raw_fixed"]),
+                int(br_o["D0_eff_fixed"]),
+            )
+            if tr_b in br_by_tr or tr_b in dup_tr_set:
+                dup_tr_set.add(tr_b)
+                br_by_tr.pop(tr_b, None)
+                incomparable.append(
+                    {
+                        "key": f"sec5.interval_branch_dup::{split_key}::{tr_b}",
+                        "reason": "DUPLICATE_INTERVAL_BRANCH_CUTOFF_IN_ARTIFACT",
+                    }
+                )
+            else:
+                br_by_tr[tr_b] = br_o
+
+        def _audited_branch_margin_verdict(
+            br_dict: Dict[str, Any], tr_tuple: Tuple[int, int, int], m_k: str
+        ) -> Optional[str]:
+            pv_raw = _audit_serialized_margin_verdict_tc062(br_dict.get(m_k))
+            if pv_raw == "CONFLICT":
+                return None
+            ys_p = _parse_serialized_arb_enclosure_tc062(br_dict.get("Y_sub_ball"))
+            adm_b = _evaluate_branch_domain_admissibility_tc062(
+                br_dict,
+                y_sub_parsed=ys_p,
+                prescribed_Y_lo=ylo_p,
+                prescribed_Y_hi=yhi_p,
+                cutoff_triple=tr_tuple,
+            )
+            if adm_b["conflicts"]:
+                return CERTIFICATION_INTEGRITY_CONFLICT_VERDICT
+            if pv_raw == "FAIL" and not adm_b["can_certify_refutation"]:
+                return "INCOMPLETE_OR_INVALID_COVERAGE"
+            if (
+                tr_tuple in part_req_set
+                and pv_raw == "PASS"
+                and not adm_b["complete_subdomain_coverage"]
+            ):
+                return "INCOMPLETE_OR_INVALID_COVERAGE"
+            return pv_raw
+
         for tr_req in part_req:
             br_m = br_by_tr.get(tr_req)
             for m_key in ("M_P0", "M_P0_F"):
                 k_ib = f"sec5.interval_branch::{split_key}::{tr_req}::{m_key}"
                 if br_m is None:
-                    incomparable.append({"key": k_ib, "reason": "MISSING_REQUIRED_FEASIBLE_BRANCH"})
+                    reason_ib = (
+                        "DUPLICATE_INTERVAL_BRANCH_CUTOFF_IN_ARTIFACT"
+                        if tr_req in dup_tr_set
+                        else "MISSING_REQUIRED_FEASIBLE_BRANCH"
+                    )
+                    incomparable.append({"key": k_ib, "reason": reason_ib})
                 else:
-                    pv = _audit_serialized_margin_verdict_tc062(br_m.get(m_key))
-                    if pv == "CONFLICT":
+                    eff_pv = _audited_branch_margin_verdict(br_m, tr_req, m_key)
+                    if eff_pv is None:
                         incomparable.append({"key": k_ib, "reason": "MALFORMED_BRANCH_MARGIN"})
                     else:
-                        _put_v(k_ib, pv, "continuous_interval_classifications")
+                        _put_v(k_ib, eff_pv, "continuous_interval_classifications")
+
+        for tr_extra in sorted(set(br_by_tr.keys()) - part_req_set):
+            br_ex = br_by_tr[tr_extra]
+            for m_key in ("M_P0", "M_P0_F"):
+                k_ex = f"sec5.interval_extra_branch::{split_key}::{tr_extra}::{m_key}"
+                eff_pv_ex = _audited_branch_margin_verdict(br_ex, tr_extra, m_key)
+                if eff_pv_ex is None:
+                    incomparable.append({"key": k_ex, "reason": "MALFORMED_EXTRA_BRANCH_MARGIN"})
+                else:
+                    _put_v(k_ex, eff_pv_ex, "continuous_interval_classifications")
 
     # Execution / integrity / coverage / resource status classifications (as supplied — never
-    # recreating deleted fields):
-    non_status_root_scalars = {
+    # recreating deleted fields, and rejecting `None` / wrong-typed status values):
+    non_status_root_keys = {
         "task_id",
         "repair_task_id",
         "prior_repair_task_id",
@@ -6908,19 +7080,97 @@ def _extract_tc062_stable_key_maps(
         "circle_constant_convention",
         "grade_variable_convention",
         "sampled_zeta_zeros_used",
+        "global_consequence_classes_enforced",
+        "provenance",
+        "serialized_arb_self_check",
+        "section_1_protocols_reassembly_and_complete_kernel",
+        "section_2_disjoint_prime_decompositions_and_controls",
+        "section_3_whole_line_contraction_obstruction",
+        "section_4_quantitative_proof_attempt",
+        "section_5_unseen_validation_and_interval_splits",
+        "section_6_lean_formalization_and_gate_accounting",
     }
-    non_status_sec5_scalars = {"section_epistemic_scope_note"}
+    non_status_sec5_keys = {
+        "section_epistemic_scope_note",
+        "epistemic_statuses",
+        "component_epistemic_map",
+        "lean_theorems",
+        "holdout_point_evaluations",
+        "continuous_straddling_interval_splits",
+        "global_candidate_outcomes",
+        "coverage_audit",
+        "resolution_audit",
+        "resource_compliance_audit",
+        "resource_compliance_summary",
+        "derived_outcome_summary",
+        "detected_integrity_conflicts",
+        "six_dimension_closeout_audit",
+    }
+    required_str_status_keys = {
+        "top.execution_and_certification_status",
+        "top.holdout_hypothesis_outcome",
+        "top.resource_compliance_status",
+        "top.completion_outcome_code",
+        "top.research_outcome_class",
+        "top.parent_subgate_status",
+    }
+    required_bool_status_keys = {
+        "top.all_mathematical_and_numerical_checks_pass",
+        "top.rh_proved",
+        "top.global_energy_improvement_claimed",
+        "sec5.coverage_complete",
+        "sec5.certification_integrity_ok",
+        "sec5.all_required_applicable_evaluations_resolved",
+        "sec5.all_section_5_checks_pass",
+    }
+    required_int_status_keys = {
+        "sec5.registered_unseen_point_count",
+        "sec5.evaluated_unseen_point_count",
+    }
+
+    def _is_valid_status_scalar(st_k: str, val: Any) -> bool:
+        if val is None:
+            return False
+        if st_k in required_str_status_keys:
+            return isinstance(val, str) and len(val.strip()) > 0
+        if st_k in required_bool_status_keys:
+            return isinstance(val, bool)
+        if st_k in required_int_status_keys:
+            return isinstance(val, int) and (not isinstance(val, bool)) and val >= 0
+        return isinstance(val, (bool, str, int, float))
+
     status_classifications: Dict[str, Any] = {}
+    invalid_status_fields: Dict[str, Dict[str, Any]] = {}
     for top_k, top_v in art.items():
-        if top_k in non_status_root_scalars:
+        if top_k in non_status_root_keys:
             continue
-        if top_v is None or isinstance(top_v, (bool, str, int, float)):
-            status_classifications[f"top.{top_k}"] = top_v
+        sk_t = f"top.{top_k}"
+        if _is_valid_status_scalar(sk_t, top_v):
+            status_classifications[sk_t] = top_v
+        else:
+            invalid_status_fields[sk_t] = {
+                "value": top_v,
+                "reason": (
+                    "NULL_STATUS_FIELD_VALUE"
+                    if top_v is None
+                    else "MALFORMED_STATUS_FIELD_TYPE"
+                ),
+            }
     for s5_k, s5_v in sec5.items():
-        if s5_k in non_status_sec5_scalars:
+        if s5_k in non_status_sec5_keys:
             continue
-        if s5_v is None or isinstance(s5_v, (bool, str, int, float)):
-            status_classifications[f"sec5.{s5_k}"] = s5_v
+        sk_5 = f"sec5.{s5_k}"
+        if _is_valid_status_scalar(sk_5, s5_v):
+            status_classifications[sk_5] = s5_v
+        else:
+            invalid_status_fields[sk_5] = {
+                "value": s5_v,
+                "reason": (
+                    "NULL_STATUS_FIELD_VALUE"
+                    if s5_v is None
+                    else "MALFORMED_STATUS_FIELD_TYPE"
+                ),
+            }
 
     # Stable-keyed numerical enclosures:
     def _stable_balls(node: Any, prefix: str = "") -> Dict[str, Dict[str, Any]]:
@@ -6990,6 +7240,7 @@ def _extract_tc062_stable_key_maps(
         "verdicts": verdicts,
         "scope_of_key": scope_of_key,
         "status_classifications": status_classifications,
+        "invalid_status_fields": invalid_status_fields,
         "balls": _stable_balls(art),
         "schema_keys": schema_keys,
         "incomparable": incomparable,
@@ -7200,7 +7451,43 @@ def compare_tc062_artifacts_by_stable_key(
             return "section_5_unseen_validation_and_interval_splits." + st_key[len("sec5.") :]
         return None
 
+    old_inv_st = old_ext.get("invalid_status_fields", {})
+    cur_inv_st = cur_ext.get("invalid_status_fields", {})
+    for inv_k, inv_info in sorted(old_inv_st.items()):
+        missing_or_incomparable.append(
+            {
+                "side": "prior",
+                "key": inv_k,
+                "reason": f"PRIOR_{inv_info['reason']}",
+            }
+        )
+    for inv_k, inv_info in sorted(cur_inv_st.items()):
+        is_req_inv = inv_k in required_status_set
+        inv_reason = (
+            f"NULL_OR_MALFORMED_REQUIRED_STATUS_FIELD_{inv_info['reason']}"
+            if is_req_inv
+            else f"NULL_OR_MALFORMED_STATUS_FIELD_{inv_info['reason']}"
+        )
+        sch_eq_inv = _status_key_to_schema_key(inv_k)
+        if sch_eq_inv is not None:
+            corresponding_removed_schema_keys.add(sch_eq_inv)
+        removed_status_or_schema_fields.append(
+            {
+                "kind": "invalid_or_null_status_field",
+                "key": inv_k,
+                "prior_value": old_st.get(inv_k),
+                "invalid_current_value": inv_info["value"],
+                "required": is_req_inv,
+                "reason": inv_reason,
+            }
+        )
+        missing_or_incomparable.append(
+            {"side": "current", "key": inv_k, "reason": inv_reason}
+        )
+
     for sk in sorted(set(old_st.keys()) | set(cur_st.keys())):
+        if sk in cur_inv_st:
+            continue
         if sk not in old_st:
             schema_only_additions.append(
                 {"kind": "status_field", "key": sk, "added_value": cur_st[sk]}
@@ -7250,7 +7537,7 @@ def compare_tc062_artifacts_by_stable_key(
     # Even if a prior historical baseline predated a now-required status field, deleting that
     # required status field from `current_artifact` still makes `current_artifact` incomplete:
     for req_sk in sorted(required_status_set):
-        if req_sk not in cur_st and req_sk not in old_st:
+        if req_sk not in cur_st and req_sk not in old_st and req_sk not in cur_inv_st:
             removed_status_or_schema_fields.append(
                 {
                     "kind": "missing_required_current_status_field",
