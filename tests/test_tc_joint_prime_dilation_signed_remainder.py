@@ -45,6 +45,7 @@ from tc.dyadic_power_lift_primitive_correlation import EPISTEMIC_CATEGORIES, PAR
 from tc.joint_prime_dilation_signed_remainder import (
     ACCEPTED_TC061R3_IMPLEMENTATION,
     ACCEPTED_TC061R3_TIP,
+    BRANCH_ADMISSIBILITY_STATUSES,
     EXPECTED_TC062_THEOREMS,
     FROZEN_TC062_PROTOCOL_ID,
     FROZEN_TC062_PROTOCOL_REGISTRATION_COMMIT,
@@ -52,14 +53,18 @@ from tc.joint_prime_dilation_signed_remainder import (
     GLOBAL_CONSEQUENCE_CLASSES,
     JOINT_PRIME_DILATION_ARTIFACT_PATH,
     JOINT_PRIME_DILATION_PROTOCOL_PATH,
+    REQUIRED_CURRENT_TC062_STATUS_KEYS,
     REVIEWED_TC062_IMPLEMENTATION,
     REVIEWED_TC062_PRODUCING_COMMIT,
     REVIEWED_TC062_TIP,
     REVIEWED_TC062R_DELIVERED_TIP,
     REVIEWED_TC062R_PRODUCING_COMMIT,
+    REVIEWED_TC062R2_DELIVERED_TIP,
+    REVIEWED_TC062R2_VALIDATION_COMMIT,
     TASK_TC_062_ID,
     TASK_TC_062R_ID,
     TASK_TC_062R2_ID,
+    TASK_TC_062R3_ID,
     TC_062_LEAN_MODULE_PATH,
     TC_062_REVIEW_DOC_PATH,
     aggregate_tc062_section5_and_derive_outcomes,
@@ -417,12 +422,17 @@ def test_tc062_lean_formalization_registration_and_review_synchronization(
     assert spans["hygiene_ok"] is True, spans
     assert spans["public_theorem_count"] == len(EXPECTED_TC062_THEOREMS)
 
-    assert tc062_artifact["repair_task_id"] == TASK_TC_062R2_ID
-    assert tc062_artifact["prior_repair_task_id"] == TASK_TC_062R_ID
+    assert tc062_artifact["repair_task_id"] == TASK_TC_062R3_ID
+    assert tc062_artifact["prior_repair_task_id"] == TASK_TC_062R2_ID
     prov = tc062_artifact["provenance"]
     assert prov["reviewed_tc062_tip"] == REVIEWED_TC062_TIP
     assert prov["reviewed_tc062_implementation"] == REVIEWED_TC062_IMPLEMENTATION
     assert prov["prior_tc062_producing_commit"] == REVIEWED_TC062_PRODUCING_COMMIT
+    assert prov["reviewed_tc062r_delivered_tip"] == REVIEWED_TC062R_DELIVERED_TIP
+    assert prov["reviewed_tc062r_producing_commit"] == REVIEWED_TC062R_PRODUCING_COMMIT
+    assert prov["reviewed_tc062r2_delivered_tip"] == REVIEWED_TC062R2_DELIVERED_TIP
+    assert prov["reviewed_tc062r2_validation_commit"] == REVIEWED_TC062R2_VALIDATION_COMMIT
+    assert prov["tc062r3_validation_and_verdict_comparison"]["comparison_status"] == "COMPLETE_COMPARED"
     assert prov["formal_compiled_theorem_count"] == 830
     assert prov["formal_build_producing_git_commit"] == prov["numerical_producing_git_commit"]
     inv62 = prov["tc062r_certificate_impact_inventory"]
@@ -1734,5 +1744,583 @@ def test_tc062r2_stable_key_verdict_comparison_and_endpoint_strip_mathematics(
         assert st_row["strip_window_energy_le_uniform_Op1_bound"] is True
         if st_row["Y"] >= 16:
             assert st_row["naive_pointwise_times_card_exceeds_summed_bound"] is True
+
+
+def test_tc062r3_refutation_domain_admissibility_and_boundary_ownership(
+    tc062_artifact: Dict[str, Any], tmp_path
+) -> None:
+    """Adversarial regression suite for `TASK-TC-062R3` §2 across `audit_continuous_interval_split_certificate_tc062`,
+    `generate_task_tc062_artifact`, and `reprocess_task_tc062_metadata_and_stage_b`:
+    - 2A: Disjoint evaluation box `[2, 2]` on `(3125, 6, 6)` with positive `M_P0_F` / `M_P0` cannot refute;
+    - 2B: Wrong boundary ownership `[625, 625]` on `(3126, 6, 6)` with positive `M_P0_F` / `M_P0` cannot refute;
+    - Exact boundary ownership at `Y = 625` (`T = 3125` admissible vs `T = 3126` inadmissible);
+    - Exact boundary ownership at `exp(6)` (`D0 = 6` owns equality, `D0 = 5` excluded);
+    - Genuinely overlapping partial box with positive `M_P0_F` or `M_P0` refutes while coverage stays incomplete;
+    - Witness satisfying cutoff predicates (`Y_w in A`) but outside certified `B` is rejected;
+    - Witness in certified `B` (`Y_w in B`) but outside prescribed interval or cutoff domain (`Y_w notin A`) is rejected;
+    - Four distinct admissibility statuses (`DISJOINT_EVALUATION_DOMAIN`, `EXCLUDED_BOUNDARY_ONLY_INTERSECTION`,
+      `UNCERTIFIED_INTERSECTION`, `CERTIFIED_NONEMPTY_INTERSECTION`);
+    - Apparent overlap supplied solely by outward serialization padding cannot certify a witness;
+    - Valid mixed-sign branches under an `UNRESOLVED` union, live producing-path provenance, and repeated
+      reprocessing semantic idempotence.
+    """
+    from tc.canonical_theta_correlation_bound import serialize_arb_certified
+    from tc.liouville_square_dilation import _exact_arb_endpoints_as_fractions
+    from tc.mixed_arithmetic_covariance import (
+        evaluate_interval_via_cutoff_case_split_arb,
+        strip_enclosure_arb_for_json,
+    )
+
+    flint_ctx.prec = 256
+    pre_1_4 = (
+        tc062_artifact["section_1_protocols_reassembly_and_complete_kernel"],
+        tc062_artifact["section_2_disjoint_prime_decompositions_and_controls"],
+        tc062_artifact["section_3_whole_line_contraction_obstruction"],
+        tc062_artifact["section_4_quantitative_proof_attempt"],
+    )
+    s_base = json.loads(
+        json.dumps(tc062_artifact["section_5_unseen_validation_and_interval_splits"])
+    )
+
+    def _ser(ball: arb) -> Dict[str, Any]:
+        return strip_enclosure_arb_for_json(serialize_arb_certified(ball))
+
+    def _q_arb(q: Fraction) -> arb:
+        return arb(q.numerator) / arb(q.denominator)
+
+    def _both(sec5_mut: Dict[str, Any], tag: str) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+        g = generate_task_tc062_artifact(
+            write_output=False,
+            precomputed_sections_1_to_4=pre_1_4,
+            section_5_override=sec5_mut,
+        )
+        art_tmp = json.loads(json.dumps(tc062_artifact))
+        art_tmp["section_5_unseen_validation_and_interval_splits"] = json.loads(
+            json.dumps(sec5_mut)
+        )
+        p_f = tmp_path / f"tc062r3_{tag}.json"
+        p_f.write_text(json.dumps(art_tmp), encoding="utf-8")
+        r = reprocess_task_tc062_metadata_and_stage_b(p_f, write_output=False)
+        assert g["holdout_hypothesis_outcome"] == r["holdout_hypothesis_outcome"]
+        assert g["execution_and_certification_status"] == r["execution_and_certification_status"]
+        assert g["completion_outcome_code"] == r["completion_outcome_code"]
+        assert (
+            g["all_mathematical_and_numerical_checks_pass"]
+            == r["all_mathematical_and_numerical_checks_pass"]
+        )
+        return g, r
+
+    pos_m = arb("0.20", arb("0.005"))
+    neg_m_wide = arb("-1.0").union(arb("-0.05"))
+    pos_f = arb("0.92", arb("0.005"))
+    pos_j = arb("0.96", arb("0.005"))
+
+    # 1. Reproduction 2A: Disjoint evaluation box `[2, 2]` on `(3125, 6, 6)` (for BOTH `P0_F` and `P0`):
+    s_2a = json.loads(json.dumps(s_base))
+    sp_2a = s_2a["continuous_straddling_interval_splits"]["interval_625_pm_2_neg12_across_T3125"]
+    sp_2a["branches"][0]["Y_sub_ball"] = _ser(arb(2))
+    sp_2a["branches"][0]["F_Y"] = _ser(pos_f)
+    sp_2a["union_F_Y"] = _ser(arb("-0.40").union(pos_f))
+    sp_2a["branches"][0]["M_P0_F"] = _ser(pos_m)
+    sp_2a["branches"][0]["TC062_P0_F_branch_classification"] = {"verdict": "FAIL"}
+    sp_2a["union_M_P0_F"] = _ser(neg_m_wide.union(pos_m))
+    sp_2a["TC062_P0_F_interval_classification"] = {"verdict": "UNRESOLVED"}
+    aud_2a = audit_continuous_interval_split_certificate_tc062(
+        "interval_625_pm_2_neg12_across_T3125",
+        sp_2a,
+        prescribed_Y_lo=Fraction(2559999, 4096),
+        prescribed_Y_hi=Fraction(2560001, 4096),
+    )
+    assert aud_2a["integrity_ok"] is True
+    assert aud_2a["coverage_complete"] is False
+    adm_2a = aud_2a["branch_domain_admissibility"][0]
+    assert adm_2a["admissibility_status"] == "DISJOINT_EVALUATION_DOMAIN"
+    assert adm_2a["can_certify_refutation"] is False
+    assert aud_2a["probe_effective_verdicts"] == {
+        "P0": "INCOMPLETE_OR_INVALID_COVERAGE",
+        "TC062_P0_F": "INCOMPLETE_OR_INVALID_COVERAGE",
+    }
+    g_2a, _ = _both(s_2a, "repro_2a_disjoint_p0f")
+    assert g_2a["holdout_hypothesis_outcome"] == "INCOMPLETE_OR_INVALID_COVERAGE"
+    assert g_2a["execution_and_certification_status"] == "INCOMPLETE_HOLDOUT_COVERAGE"
+    assert g_2a["all_mathematical_and_numerical_checks_pass"] is False
+
+    # Same disjoint `[2, 2]` with positive `M_P0` as well:
+    s_2a_p0 = json.loads(json.dumps(s_2a))
+    sp_2a_p0 = s_2a_p0["continuous_straddling_interval_splits"][
+        "interval_625_pm_2_neg12_across_T3125"
+    ]
+    sp_2a_p0["branches"][0]["J_Y"] = _ser(pos_j)
+    sp_2a_p0["union_J_Y"] = _ser(arb("-1.0").union(pos_j))
+    sp_2a_p0["branches"][0]["M_P0"] = _ser(pos_m)
+    sp_2a_p0["branches"][0]["P0_branch_classification"] = {"verdict": "FAIL"}
+    sp_2a_p0["union_M_P0"] = _ser(neg_m_wide.union(pos_m))
+    sp_2a_p0["P0_interval_classification"] = {"verdict": "UNRESOLVED"}
+    g_2a_p0, _ = _both(s_2a_p0, "repro_2a_disjoint_p0_and_p0f")
+    assert g_2a_p0["holdout_hypothesis_outcome"] == "INCOMPLETE_OR_INVALID_COVERAGE"
+
+    # 2. Reproduction 2B: Wrong boundary ownership `[625, 625]` on `(3126, 6, 6)` (`(625, 625 + 2^-12]`):
+    s_2b = json.loads(json.dumps(s_base))
+    sp_2b = s_2b["continuous_straddling_interval_splits"]["interval_625_pm_2_neg12_across_T3125"]
+    sp_2b["branches"][1]["Y_sub_ball"] = _ser(arb(625))
+    sp_2b["branches"][1]["F_Y"] = _ser(pos_f)
+    sp_2b["union_F_Y"] = _ser(arb("-0.40").union(pos_f))
+    sp_2b["branches"][1]["M_P0_F"] = _ser(pos_m)
+    sp_2b["branches"][1]["TC062_P0_F_branch_classification"] = {"verdict": "FAIL"}
+    sp_2b["union_M_P0_F"] = _ser(neg_m_wide.union(pos_m))
+    sp_2b["TC062_P0_F_interval_classification"] = {"verdict": "UNRESOLVED"}
+    aud_2b = audit_continuous_interval_split_certificate_tc062(
+        "interval_625_pm_2_neg12_across_T3125",
+        sp_2b,
+        prescribed_Y_lo=Fraction(2559999, 4096),
+        prescribed_Y_hi=Fraction(2560001, 4096),
+    )
+    assert aud_2b["integrity_ok"] is True
+    assert aud_2b["coverage_complete"] is False
+    adm_2b = aud_2b["branch_domain_admissibility"][1]
+    assert adm_2b["admissibility_status"] == "EXCLUDED_BOUNDARY_ONLY_INTERSECTION"
+    assert adm_2b["can_certify_refutation"] is False
+    assert aud_2b["probe_effective_verdicts"]["TC062_P0_F"] == "INCOMPLETE_OR_INVALID_COVERAGE"
+    g_2b, _ = _both(s_2b, "repro_2b_wrong_boundary_625_on_3126")
+    assert g_2b["holdout_hypothesis_outcome"] == "INCOMPLETE_OR_INVALID_COVERAGE"
+    assert g_2b["execution_and_certification_status"] == "INCOMPLETE_HOLDOUT_COVERAGE"
+
+    # 3. `Y = 625` IS admissible on `T = 3125` (`[625 - 2^-12, 625]` owns right endpoint `625`),
+    #    certifying partial-domain refutation while overall coverage stays incomplete:
+    s_625_ok = json.loads(json.dumps(s_base))
+    sp_625_ok = s_625_ok["continuous_straddling_interval_splits"][
+        "interval_625_pm_2_neg12_across_T3125"
+    ]
+    sp_625_ok["branches"][0]["Y_sub_ball"] = _ser(arb(625))
+    sp_625_ok["branches"][0]["F_Y"] = _ser(pos_f)
+    sp_625_ok["union_F_Y"] = _ser(arb("-0.40").union(pos_f))
+    sp_625_ok["branches"][0]["M_P0_F"] = _ser(pos_m)
+    sp_625_ok["branches"][0]["TC062_P0_F_branch_classification"] = {"verdict": "FAIL"}
+    sp_625_ok["union_M_P0_F"] = _ser(neg_m_wide.union(pos_m))
+    sp_625_ok["TC062_P0_F_interval_classification"] = {"verdict": "UNRESOLVED"}
+    aud_625_ok = audit_continuous_interval_split_certificate_tc062(
+        "interval_625_pm_2_neg12_across_T3125",
+        sp_625_ok,
+        prescribed_Y_lo=Fraction(2559999, 4096),
+        prescribed_Y_hi=Fraction(2560001, 4096),
+    )
+    assert aud_625_ok["integrity_ok"] is True
+    assert aud_625_ok["coverage_complete"] is False
+    adm_625_0 = aud_625_ok["branch_domain_admissibility"][0]
+    assert adm_625_0["admissibility_status"] == "CERTIFIED_NONEMPTY_INTERSECTION"
+    assert adm_625_0["certified_witness_Y"] == "625"
+    assert adm_625_0["complete_subdomain_coverage"] is False
+    assert adm_625_0["can_certify_refutation"] is True
+    assert aud_625_ok["probe_effective_verdicts"]["TC062_P0_F"] == "FAIL"
+    g_625_ok, _ = _both(s_625_ok, "valid_625_endpoint_on_3125")
+    assert g_625_ok["holdout_hypothesis_outcome"] == "REFUTED_BY_CERTIFIED_WITNESS"
+    assert (
+        g_625_ok["execution_and_certification_status"]
+        == "CERTIFIED_REFUTATION_WITH_INCOMPLETE_REMAINING_GRID"
+    )
+    assert g_625_ok["all_mathematical_and_numerical_checks_pass"] is False
+
+    # 4. Exact boundary ownership at `exp(6)`: `D0 = 6` (`(1809, 6, 6)`, `[exp(6), 20173/50]`) owns
+    #    equality `Y = exp(6)`, whereas `D0 = 5` (`(1809, 5, 5)`, `(1808^(4/5), exp(6))`) does NOT:
+    e6_ball = arb(6).exp()
+    s_e6_d6 = json.loads(json.dumps(s_base))
+    sp_e6_d6 = s_e6_d6["continuous_straddling_interval_splits"][
+        "interval_403_40_to_403_46_across_e6"
+    ]
+    sp_e6_d6["branches"][2]["Y_sub_ball"] = _ser(e6_ball)
+    sp_e6_d6["branches"][2]["evaluated_Y_symbolic_bounds"] = [["exp", 6], ["exp", 6]]
+    sp_e6_d6["branches"][2]["F_Y"] = _ser(pos_f)
+    sp_e6_d6["union_F_Y"] = _ser(arb("-0.40").union(pos_f))
+    sp_e6_d6["branches"][2]["M_P0_F"] = _ser(pos_m)
+    sp_e6_d6["branches"][2]["TC062_P0_F_branch_classification"] = {"verdict": "FAIL"}
+    sp_e6_d6["union_M_P0_F"] = _ser(neg_m_wide.union(pos_m))
+    sp_e6_d6["TC062_P0_F_interval_classification"] = {"verdict": "UNRESOLVED"}
+    g_e6_d6, _ = _both(s_e6_d6, "exp6_owned_by_D0_6")
+    aud_e6_d6 = g_e6_d6["section_5_unseen_validation_and_interval_splits"][
+        "continuous_straddling_interval_splits"
+    ]["interval_split_audits"]["interval_403_40_to_403_46_across_e6"]
+    assert (
+        aud_e6_d6["branch_domain_admissibility"][2]["admissibility_status"]
+        == "CERTIFIED_NONEMPTY_INTERSECTION"
+    )
+    assert aud_e6_d6["branch_domain_admissibility"][2]["certified_witness_Y"] == "exp(6)"
+    assert g_e6_d6["holdout_hypothesis_outcome"] == "REFUTED_BY_CERTIFIED_WITNESS"
+    assert (
+        g_e6_d6["execution_and_certification_status"]
+        == "CERTIFIED_REFUTATION_WITH_INCOMPLETE_REMAINING_GRID"
+    )
+
+    s_e6_d5 = json.loads(json.dumps(s_base))
+    sp_e6_d5 = s_e6_d5["continuous_straddling_interval_splits"][
+        "interval_403_40_to_403_46_across_e6"
+    ]
+    sp_e6_d5["branches"][1]["Y_sub_ball"] = _ser(e6_ball)
+    sp_e6_d5["branches"][1]["evaluated_Y_symbolic_bounds"] = [["exp", 6], ["exp", 6]]
+    sp_e6_d5["branches"][1]["F_Y"] = _ser(pos_f)
+    sp_e6_d5["union_F_Y"] = _ser(arb("-0.40").union(pos_f))
+    sp_e6_d5["branches"][1]["M_P0_F"] = _ser(pos_m)
+    sp_e6_d5["branches"][1]["TC062_P0_F_branch_classification"] = {"verdict": "FAIL"}
+    sp_e6_d5["union_M_P0_F"] = _ser(neg_m_wide.union(pos_m))
+    sp_e6_d5["TC062_P0_F_interval_classification"] = {"verdict": "UNRESOLVED"}
+    g_e6_d5, _ = _both(s_e6_d5, "exp6_excluded_from_D0_5")
+    aud_e6_d5 = g_e6_d5["section_5_unseen_validation_and_interval_splits"][
+        "continuous_straddling_interval_splits"
+    ]["interval_split_audits"]["interval_403_40_to_403_46_across_e6"]
+    assert (
+        aud_e6_d5["branch_domain_admissibility"][1]["admissibility_status"]
+        == "EXCLUDED_BOUNDARY_ONLY_INTERSECTION"
+    )
+    assert aud_e6_d5["branch_domain_admissibility"][1]["can_certify_refutation"] is False
+    assert g_e6_d5["holdout_hypothesis_outcome"] == "INCOMPLETE_OR_INVALID_COVERAGE"
+
+    # 5. Genuinely overlapping partial box `[625 + 2^-16, 625 + 2^-13]` on `(3126, 6, 6)` with
+    #    positive `M_P0` ONLY (while `M_P0_F` stays `PASS`) ALSO refutes while coverage stays incomplete:
+    part_ball = _q_arb(Fraction(625, 1) + Fraction(1, 2**16)).union(
+        _q_arb(Fraction(625, 1) + Fraction(1, 2**13))
+    )
+    s_part_p0 = json.loads(json.dumps(s_base))
+    sp_pp0 = s_part_p0["continuous_straddling_interval_splits"][
+        "interval_625_pm_2_neg12_across_T3125"
+    ]
+    sp_pp0["branches"][1]["Y_sub_ball"] = _ser(part_ball)
+    sp_pp0["branches"][1]["J_Y"] = _ser(pos_j)
+    sp_pp0["union_J_Y"] = _ser(arb("-1.0").union(pos_j))
+    sp_pp0["branches"][1]["M_P0"] = _ser(pos_m)
+    sp_pp0["branches"][1]["P0_branch_classification"] = {"verdict": "FAIL"}
+    sp_pp0["union_M_P0"] = _ser(neg_m_wide.union(pos_m))
+    sp_pp0["P0_interval_classification"] = {"verdict": "UNRESOLVED"}
+    g_pp0, _ = _both(s_part_p0, "partial_box_p0_refutation")
+    assert g_pp0["holdout_hypothesis_outcome"] == "REFUTED_BY_CERTIFIED_WITNESS"
+    assert (
+        g_pp0["execution_and_certification_status"]
+        == "CERTIFIED_REFUTATION_WITH_INCOMPLETE_REMAINING_GRID"
+    )
+    assert g_pp0["section_5_unseen_validation_and_interval_splits"]["coverage_complete"] is False
+    assert (
+        g_pp0["section_5_unseen_validation_and_interval_splits"][
+            "continuous_straddling_interval_splits"
+        ]["P0_continuous_interval_outcome"]
+        == "REFUTED_BY_CERTIFIED_WITNESS"
+    )
+
+    # 6. Supplied witness in `A` (`Y_w = 625` on `(3125, 6, 6)`) but outside certified `B` (`[625 - 2^-12, 624.9999]`)
+    #    is rejected with `CERTIFICATION_INTEGRITY_CONFLICT`:
+    s_w_out_b = json.loads(json.dumps(s_base))
+    sp_wb = s_w_out_b["continuous_straddling_interval_splits"][
+        "interval_625_pm_2_neg12_across_T3125"
+    ]
+    sp_wb["branches"][0]["Y_sub_ball"] = _ser(
+        _q_arb(Fraction(2559999, 4096)).union(_q_arb(Fraction(6249999, 10000)))
+    )
+    sp_wb["branches"][0]["admissible_witness_Y"] = "625"
+    g_wb, _ = _both(s_w_out_b, "witness_in_A_outside_B")
+    assert g_wb["holdout_hypothesis_outcome"] == "CERTIFICATION_INTEGRITY_CONFLICT"
+    assert any(
+        c["conflict_type"] == "INVALID_BRANCH_ADMISSIBLE_WITNESS"
+        and c["reason"] == "WITNESS_NOT_CERTIFIED_IN_EVALUATION_DOMAIN_B"
+        for c in g_wb["section_5_unseen_validation_and_interval_splits"][
+            "detected_integrity_conflicts"
+        ]
+    )
+
+    # 7. Supplied witness in certified `B` (`[624.9999, 625.0001]`) but outside `A` (`Y_w = 625` on `(3126, 6, 6)`
+    #    and `Y_w = 626` outside prescribed interval) is rejected with `CERTIFICATION_INTEGRITY_CONFLICT`:
+    s_w_out_a = json.loads(json.dumps(s_base))
+    sp_wa = s_w_out_a["continuous_straddling_interval_splits"][
+        "interval_625_pm_2_neg12_across_T3125"
+    ]
+    sp_wa["branches"][1]["Y_sub_ball"] = _ser(
+        _q_arb(Fraction(6249999, 10000)).union(_q_arb(Fraction(6250001, 10000)))
+    )
+    sp_wa["branches"][1]["admissible_witness_Y"] = "625"
+    g_wa, _ = _both(s_w_out_a, "witness_in_B_outside_cutoff_A")
+    assert g_wa["holdout_hypothesis_outcome"] == "CERTIFICATION_INTEGRITY_CONFLICT"
+    assert any(
+        c["conflict_type"] == "INVALID_BRANCH_ADMISSIBLE_WITNESS"
+        and c["reason"] == "WITNESS_OUTSIDE_ADMISSIBLE_SUBDOMAIN_A"
+        for c in g_wa["section_5_unseen_validation_and_interval_splits"][
+            "detected_integrity_conflicts"
+        ]
+    )
+
+    s_w_out_iv = json.loads(json.dumps(s_base))
+    sp_wiv = s_w_out_iv["continuous_straddling_interval_splits"][
+        "interval_625_pm_2_neg12_across_T3125"
+    ]
+    sp_wiv["branches"][1]["Y_sub_ball"] = _ser(
+        _q_arb(Fraction(6250001, 10000)).union(_q_arb(Fraction(6265, 10)))
+    )
+    sp_wiv["branches"][1]["admissible_witness_Y"] = "626"
+    g_wiv, _ = _both(s_w_out_iv, "witness_in_B_outside_prescribed_interval")
+    assert g_wiv["holdout_hypothesis_outcome"] == "CERTIFICATION_INTEGRITY_CONFLICT"
+
+    # 8. Outward serialization padding alone CANNOT certify a witness, and all 4 admissibility
+    #    statuses (`DISJOINT`, `EXCLUDED_BOUNDARY_ONLY`, `UNCERTIFIED_INTERSECTION`, `CERTIFIED_NONEMPTY`)
+    #    are distinct:
+    # (8a) `625 - 2^-200 < 625` serialized to 40-digit decimal / 53-bit float straddles `625`:
+    s_pad_625 = json.loads(json.dumps(s_base))
+    sp_p625 = s_pad_625["continuous_straddling_interval_splits"][
+        "interval_625_pm_2_neg12_across_T3125"
+    ]
+    sp_p625["branches"][1]["Y_sub_ball"] = _ser(arb(625) - arb(2) ** (-200))
+    sp_p625["branches"][1]["F_Y"] = _ser(pos_f)
+    sp_p625["union_F_Y"] = _ser(arb("-0.40").union(pos_f))
+    sp_p625["branches"][1]["M_P0_F"] = _ser(pos_m)
+    sp_p625["branches"][1]["TC062_P0_F_branch_classification"] = {"verdict": "FAIL"}
+    sp_p625["union_M_P0_F"] = _ser(neg_m_wide.union(pos_m))
+    sp_p625["TC062_P0_F_interval_classification"] = {"verdict": "UNRESOLVED"}
+    g_p625, _ = _both(s_pad_625, "outward_padding_only_across_625")
+    aud_p625 = g_p625["section_5_unseen_validation_and_interval_splits"][
+        "continuous_straddling_interval_splits"
+    ]["interval_split_audits"]["interval_625_pm_2_neg12_across_T3125"]
+    adm_p625 = aud_p625["branch_domain_admissibility"][1]
+    assert adm_p625["admissibility_status"] == "UNCERTIFIED_INTERSECTION"
+    assert adm_p625["admissibility_reason"] == "UNCERTIFIED_OUTWARD_SERIALIZATION_PADDING_OVERLAP"
+    assert adm_p625["can_certify_refutation"] is False
+    assert g_p625["holdout_hypothesis_outcome"] == "INCOMPLETE_OR_INVALID_COVERAGE"
+
+    # (8b) Rational `q_minus < exp(6)` (`10^-42` below `exp(6)`) whose 40-digit decimal box spills above `exp(6)`:
+    flint_ctx.prec = 512
+    e6_lo_512, _ = _exact_arb_endpoints_as_fractions(arb(6).exp())
+    q_below_e6 = Fraction((e6_lo_512.numerator * (10**42)) // e6_lo_512.denominator, 10**42)
+    flint_ctx.prec = 256
+    s_pad_e6 = json.loads(json.dumps(s_base))
+    sp_pe6 = s_pad_e6["continuous_straddling_interval_splits"][
+        "interval_403_40_to_403_46_across_e6"
+    ]
+    sp_pe6["branches"][2]["Y_sub_ball"] = _ser(_q_arb(q_below_e6))
+    sp_pe6["branches"][2]["F_Y"] = _ser(pos_f)
+    sp_pe6["union_F_Y"] = _ser(arb("-0.40").union(pos_f))
+    sp_pe6["branches"][2]["M_P0_F"] = _ser(pos_m)
+    sp_pe6["branches"][2]["TC062_P0_F_branch_classification"] = {"verdict": "FAIL"}
+    sp_pe6["union_M_P0_F"] = _ser(neg_m_wide.union(pos_m))
+    sp_pe6["TC062_P0_F_interval_classification"] = {"verdict": "UNRESOLVED"}
+    g_pe6, _ = _both(s_pad_e6, "outward_padding_only_across_exp6")
+    aud_pe6 = g_pe6["section_5_unseen_validation_and_interval_splits"][
+        "continuous_straddling_interval_splits"
+    ]["interval_split_audits"]["interval_403_40_to_403_46_across_e6"]
+    assert (
+        aud_pe6["branch_domain_admissibility"][2]["admissibility_status"]
+        == "UNCERTIFIED_INTERSECTION"
+    )
+    assert g_pe6["holdout_hypothesis_outcome"] == "INCOMPLETE_OR_INVALID_COVERAGE"
+
+    # (8c) Swapping branch 0's `mag_t`-padded `Y_sub_ball` (`hi_dec = 625 + 9.09e-13`) onto branch 1 `(3126, 6, 6)`:
+    s_swap_pad = json.loads(json.dumps(s_p625 if "s_p625" in locals() else s_pad_625))
+    s_swap_pad["continuous_straddling_interval_splits"]["interval_625_pm_2_neg12_across_T3125"][
+        "branches"
+    ][1]["Y_sub_ball"] = json.loads(
+        json.dumps(
+            s_base["continuous_straddling_interval_splits"][
+                "interval_625_pm_2_neg12_across_T3125"
+            ]["branches"][0]["Y_sub_ball"]
+        )
+    )
+    g_swp, _ = _both(s_swap_pad, "swapped_branch0_padded_box_onto_3126")
+    aud_swp = g_swp["section_5_unseen_validation_and_interval_splits"][
+        "continuous_straddling_interval_splits"
+    ]["interval_split_audits"]["interval_625_pm_2_neg12_across_T3125"]
+    assert (
+        aud_swp["branch_domain_admissibility"][1]["admissibility_status"]
+        == "UNCERTIFIED_INTERSECTION"
+    )
+    assert g_swp["holdout_hypothesis_outcome"] == "INCOMPLETE_OR_INVALID_COVERAGE"
+
+    observed_statuses = {
+        adm_2a["admissibility_status"],
+        adm_2b["admissibility_status"],
+        adm_p625["admissibility_status"],
+        adm_625_0["admissibility_status"],
+    }
+    assert len(observed_statuses) == 4
+    assert observed_statuses.issubset(set(BRANCH_ADMISSIBILITY_STATUSES))
+
+    # 9. Live producing-path provenance (`evaluate_interval_via_cutoff_case_split_arb`) + semantic
+    #    idempotence of repeated `reprocess_task_tc062_metadata_and_stage_b`:
+    tbl_small = compute_selberg_centered_remainder_table_fast_arb(40, prec_bits=288)
+    raw_16 = evaluate_interval_via_cutoff_case_split_arb(
+        Fraction(16, 1) - Fraction(1, 4096),
+        Fraction(16, 1) + Fraction(1, 4096),
+        prec_bits=256,
+        quad_tol_bits=110,
+        selberg_table=tbl_small,
+    )
+    for br16 in raw_16["branches"]:
+        ef16 = br16["evaluated_Y_interval_exact_fractions"]
+        assert isinstance(ef16, list) and len(ef16) == 2
+        assert Fraction(ef16[0]) <= Fraction(ef16[1])
+
+    p_idem = tmp_path / "idem_tc062.json"
+    p_idem.write_bytes(JOINT_PRIME_DILATION_ARTIFACT_PATH.read_bytes())
+    r_idem_1 = reprocess_task_tc062_metadata_and_stage_b(p_idem, write_output=True)
+    r_idem_2 = reprocess_task_tc062_metadata_and_stage_b(p_idem, write_output=True)
+    c1 = json.loads(json.dumps(r_idem_1))
+    c2 = json.loads(json.dumps(r_idem_2))
+    ts1 = c1["provenance"].pop("tc062r3_reprocessed_at_utc")
+    ts2 = c2["provenance"].pop("tc062r3_reprocessed_at_utc")
+    assert isinstance(ts1, str) and isinstance(ts2, str)
+    assert c1 == c2
+
+
+def test_tc062r3_deleted_renamed_and_retired_status_provenance_comparison(
+    tc062_artifact: Dict[str, Any],
+) -> None:
+    """Regression suite for `TASK-TC-062R3` §3 (`compare_tc062_artifacts_by_stable_key`):
+    - Deleted top-level `execution_and_certification_status` -> `INCOMPLETE_COMPARISON`, `None` (never `False`);
+    - Deleted Section 5 `all_required_applicable_evaluations_resolved` -> `INCOMPLETE_COMPARISON`, `None`;
+    - Renamed status field -> `INCOMPLETE_COMPARISON` with both removal and addition recorded;
+    - Changed status value -> `COMPLETE_COMPARED` with status change isolated from verdict/enclosure changes;
+    - Explicit optional retirement rule vs refusal to retire required status fields;
+    - Unchanged baseline & actual historical comparisons (`TC062`, `TC062R`, `TC062R2`).
+    """
+    base = json.loads(json.dumps(tc062_artifact))
+
+    # 1. Deleted top-level `execution_and_certification_status` (audit as supplied, never recreated):
+    cur_del_top = json.loads(json.dumps(base))
+    del cur_del_top["execution_and_certification_status"]
+    c_del_top = compare_tc062_artifacts_by_stable_key(
+        cur_del_top, base, baseline_commit=REVIEWED_TC062R2_DELIVERED_TIP
+    )
+    assert "execution_and_certification_status" not in cur_del_top
+    assert c_del_top["comparison_status"] == "INCOMPLETE_COMPARISON"
+    assert c_del_top["any_probe_kl1_control_or_candidate_verdict_changed"] is None
+    assert c_del_top["any_numerical_enclosure_changed"] is None
+    assert c_del_top["any_integrity_coverage_or_execution_classification_changed"] is None
+    assert any(
+        r["key"] == "top.execution_and_certification_status"
+        and r["reason"] == "REMOVED_REQUIRED_STATUS_FIELD"
+        for r in c_del_top["removed_status_or_schema_fields"]
+    )
+    assert any(
+        m["key"] == "top.execution_and_certification_status"
+        for m in c_del_top["missing_or_incomparable_entries"]
+    )
+
+    # 2. Deleted Section 5 `all_required_applicable_evaluations_resolved` (against BOTH prior with
+    #    that field AND prior predating that field):
+    cur_del_s5 = json.loads(json.dumps(base))
+    del cur_del_s5["section_5_unseen_validation_and_interval_splits"][
+        "all_required_applicable_evaluations_resolved"
+    ]
+    c_del_s5 = compare_tc062_artifacts_by_stable_key(
+        cur_del_s5, base, baseline_commit=REVIEWED_TC062R2_DELIVERED_TIP
+    )
+    assert (
+        "all_required_applicable_evaluations_resolved"
+        not in cur_del_s5["section_5_unseen_validation_and_interval_splits"]
+    )
+    assert c_del_s5["comparison_status"] == "INCOMPLETE_COMPARISON"
+    assert c_del_s5["any_integrity_coverage_or_execution_classification_changed"] is None
+    assert any(
+        r["key"] == "sec5.all_required_applicable_evaluations_resolved"
+        and r["reason"] == "REMOVED_REQUIRED_STATUS_FIELD"
+        for r in c_del_s5["removed_status_or_schema_fields"]
+    )
+
+    prior_without_s5_res = json.loads(json.dumps(base))
+    del prior_without_s5_res["section_5_unseen_validation_and_interval_splits"][
+        "all_required_applicable_evaluations_resolved"
+    ]
+    c_del_s5_vs_older = compare_tc062_artifacts_by_stable_key(
+        cur_del_s5, prior_without_s5_res, baseline_commit=REVIEWED_TC062R_DELIVERED_TIP
+    )
+    assert c_del_s5_vs_older["comparison_status"] == "INCOMPLETE_COMPARISON"
+    assert any(
+        r["key"] == "sec5.all_required_applicable_evaluations_resolved"
+        and r["reason"] == "MISSING_REQUIRED_CURRENT_STATUS_FIELD"
+        for r in c_del_s5_vs_older["removed_status_or_schema_fields"]
+    )
+
+    # 3. Renamed status field (`execution_and_certification_status` -> `execution_status_renamed`,
+    #    and custom status field `experimental_status` -> `experimental_state`):
+    cur_ren = json.loads(json.dumps(base))
+    cur_ren["execution_status_renamed"] = cur_ren.pop("execution_and_certification_status")
+    c_ren = compare_tc062_artifacts_by_stable_key(
+        cur_ren, base, baseline_commit=REVIEWED_TC062R2_DELIVERED_TIP
+    )
+    assert c_ren["comparison_status"] == "INCOMPLETE_COMPARISON"
+    assert c_ren["any_integrity_coverage_or_execution_classification_changed"] is None
+    assert any(
+        r["key"] == "top.execution_and_certification_status"
+        for r in c_ren["removed_status_or_schema_fields"]
+    )
+    assert any(
+        a["kind"] == "status_field" and a["key"] == "top.execution_status_renamed"
+        for a in c_ren["schema_only_additions"]
+    )
+
+    prior_opt = json.loads(json.dumps(base))
+    prior_opt["experimental_status"] = "ACTIVE"
+    cur_opt_ren = json.loads(json.dumps(base))
+    cur_opt_ren["experimental_state"] = "ACTIVE"
+    c_opt_ren = compare_tc062_artifacts_by_stable_key(
+        cur_opt_ren, prior_opt, baseline_commit=REVIEWED_TC062R2_DELIVERED_TIP
+    )
+    assert c_opt_ren["comparison_status"] == "INCOMPLETE_COMPARISON"
+    assert any(
+        r["key"] == "top.experimental_status" for r in c_opt_ren["removed_status_or_schema_fields"]
+    )
+    assert any(
+        a["kind"] == "status_field" and a["key"] == "top.experimental_state"
+        for a in c_opt_ren["schema_only_additions"]
+    )
+
+    # 4. Explicit retirement rule for an optional field vs refusal to retire a required status field:
+    c_opt_retired = compare_tc062_artifacts_by_stable_key(
+        base,
+        prior_opt,
+        baseline_commit=REVIEWED_TC062R2_DELIVERED_TIP,
+        explicitly_retired_optional_keys={
+            "top.experimental_status": "RETIRED_OPTIONAL_DIAGNOSTIC_V2"
+        },
+    )
+    assert c_opt_retired["comparison_status"] == "COMPLETE_COMPARED"
+    assert c_opt_retired["retired_optional_fields_count"] == 1
+    assert c_opt_retired["removed_status_or_schema_fields_count"] == 0
+    assert c_opt_retired["any_integrity_coverage_or_execution_classification_changed"] is False
+
+    c_req_cannot_retire = compare_tc062_artifacts_by_stable_key(
+        cur_del_top,
+        base,
+        baseline_commit=REVIEWED_TC062R2_DELIVERED_TIP,
+        explicitly_retired_optional_keys={
+            "top.execution_and_certification_status": "ATTEMPTED_REQUIRED_RETIREMENT"
+        },
+    )
+    assert c_req_cannot_retire["comparison_status"] == "INCOMPLETE_COMPARISON"
+
+    # 5. Changed status value isolated from verdict/enclosure/schema changes:
+    cur_chg_val = json.loads(json.dumps(base))
+    cur_chg_val["execution_and_certification_status"] = "UNRESOLVED_HOLDOUT_EVIDENCE"
+    c_chg_val = compare_tc062_artifacts_by_stable_key(
+        cur_chg_val, base, baseline_commit=REVIEWED_TC062R2_DELIVERED_TIP
+    )
+    assert c_chg_val["comparison_status"] == "COMPLETE_COMPARED"
+    assert c_chg_val["any_integrity_coverage_or_execution_classification_changed"] is True
+    assert c_chg_val["any_probe_kl1_control_or_candidate_verdict_changed"] is False
+    assert c_chg_val["any_numerical_enclosure_changed"] is False
+    assert c_chg_val["removed_status_or_schema_fields_count"] == 0
+    assert c_chg_val["schema_only_additions_count"] == 0
+
+    # 6. Unchanged baseline & actual stored provenance comparisons:
+    assert len(REQUIRED_CURRENT_TC062_STATUS_KEYS) >= 13
+    c_unch = compare_tc062_artifacts_by_stable_key(
+        base, base, baseline_commit=REVIEWED_TC062R2_DELIVERED_TIP
+    )
+    assert c_unch["comparison_status"] == "COMPLETE_COMPARED"
+    assert c_unch["any_probe_kl1_control_or_candidate_verdict_changed"] is False
+    assert c_unch["any_numerical_enclosure_changed"] is False
+    assert c_unch["any_integrity_coverage_or_execution_classification_changed"] is False
+    assert c_unch["removed_status_or_schema_fields_count"] == 0
+
+    comp_r3 = tc062_artifact["provenance"]["tc062r3_validation_and_verdict_comparison"]
+    assert comp_r3["comparison_id"] == "TC062R3_VS_TC062R2_STABLE_KEY_V1"
+    assert comp_r3["baseline_commit"] == REVIEWED_TC062R2_DELIVERED_TIP
+    assert comp_r3["comparison_status"] == "COMPLETE_COMPARED"
+    assert comp_r3["any_probe_kl1_control_or_candidate_verdict_changed"] is False
+    assert comp_r3["any_numerical_enclosure_changed"] is False
+    assert comp_r3["any_integrity_coverage_or_execution_classification_changed"] is False
+    assert comp_r3["removed_status_or_schema_fields_count"] == 0
+
 
 

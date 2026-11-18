@@ -163,9 +163,11 @@ from tc.signed_dilation_arithmetic_energy import (
 TASK_TC_062_ID = "TASK-TC-062"
 TASK_TC_062R_ID = "TASK-TC-062R"
 TASK_TC_062R2_ID = "TASK-TC-062R2"
+TASK_TC_062R3_ID = "TASK-TC-062R3"
 PROPOSED_TC062_BRANCH = "task/tc-062-joint-prime-dilation-signed-remainder"
 PROPOSED_TC062R_BRANCH = "task/tc-062r-prime-power-certification-and-diagonal-equivalence-repair"
 PROPOSED_TC062R2_BRANCH = "task/tc-062r2-interval-integrity-coverage-and-report-closeout"
+PROPOSED_TC062R3_BRANCH = "task/tc-062r3-witness-domain-and-provenance-closeout"
 ACCEPTED_TC061R3_TIP = "6a2f5f519b3f2f4642ea2ce00626832e556953be"
 ACCEPTED_TC061R3_IMPLEMENTATION = "c2691d0d9e9aee2e148af2c7ec4908f0ebd52521"
 REVIEWED_TC062_TIP = "0943eb639dd20191f7563ba23f3e2d5d9f999217"
@@ -173,6 +175,34 @@ REVIEWED_TC062_IMPLEMENTATION = "a681365e0b44830bddb9349bbc9e361ac72b0679"
 REVIEWED_TC062_PRODUCING_COMMIT = "ab7e976b0fc4c822bdfd332a885ff80afe7156c9"
 REVIEWED_TC062R_DELIVERED_TIP = "a8f5887735e59c95af783e61297b7264a4caea5e"
 REVIEWED_TC062R_PRODUCING_COMMIT = "4b3df05665e186c85eb54c3822ae1d8c34199a3c"
+REVIEWED_TC062R2_DELIVERED_TIP = "a742aecea3fe737074231ecb2f501a959bbc2693"
+REVIEWED_TC062R2_VALIDATION_COMMIT = "2ba4f3348ddc7b8b9d731bf189ae20c2af877434"
+
+BRANCH_ADMISSIBILITY_STATUSES: Tuple[str, ...] = (
+    "CERTIFIED_NONEMPTY_INTERSECTION",
+    "DISJOINT_EVALUATION_DOMAIN",
+    "EXCLUDED_BOUNDARY_ONLY_INTERSECTION",
+    "UNCERTIFIED_INTERSECTION",
+    "INVALID_DOMAIN_OR_WITNESS_CONFLICT",
+)
+
+REQUIRED_CURRENT_TC062_STATUS_KEYS: Tuple[str, ...] = (
+    "top.execution_and_certification_status",
+    "top.holdout_hypothesis_outcome",
+    "top.resource_compliance_status",
+    "top.completion_outcome_code",
+    "top.research_outcome_class",
+    "top.all_mathematical_and_numerical_checks_pass",
+    "top.parent_subgate_status",
+    "top.rh_proved",
+    "top.global_energy_improvement_claimed",
+    "sec5.registered_unseen_point_count",
+    "sec5.evaluated_unseen_point_count",
+    "sec5.coverage_complete",
+    "sec5.certification_integrity_ok",
+    "sec5.all_required_applicable_evaluations_resolved",
+    "sec5.all_section_5_checks_pass",
+)
 
 PRESCRIBED_TC062_INTERVAL_SPLITS: Dict[str, Tuple[Fraction, Fraction]] = {
     "interval_625_pm_2_neg12_across_T3125": (Fraction(2559999, 4096), Fraction(2560001, 4096)),
@@ -3949,30 +3979,662 @@ def _rational_box_covers_exact_subdomain(
     return (covers_lo, covers_hi)
 
 
-def _verify_admissible_witness_on_branch_tc062(
-    witness_spec: Any,
-    *,
-    Y_lo: Fraction,
-    Y_hi: Fraction,
-    cutoff_triple: Tuple[int, int, int],
-) -> Optional[bool]:
-    """If a conservative extra branch supplies `admissible_witness_Y` (rational string), verify
-    whether `Y_w in [Y_lo, Y_hi]` and `(T(Y_w), D0(Y_w), D_eff(Y_w)) == cutoff_triple`.
-    Returns `None` if no witness field is supplied, `True` if verified admissible, `False` if
-    malformed or inadmissible (integrity conflict).
+def _derive_exact_branch_admissible_subdomain(
+    prescribed_Y_lo: Fraction,
+    prescribed_Y_hi: Fraction,
+    T_fixed: int,
+    D0_raw_fixed: int,
+    D0_eff_fixed: int,
+) -> Dict[str, Any]:
+    """Compute the exact mathematical admissible subdomain
+      `A = [prescribed_Y_lo, prescribed_Y_hi] cap ((T_fixed - 1)^(4/5), T_fixed^(4/5)] cap [exp(D0_raw_fixed), exp(D0_raw_fixed + 1))`
+    with `D0_eff_fixed == min(D0_raw_fixed, T_fixed - 1)`, preserving exact open/closed endpoint
+    ownership across rational, algebraic `m^(4/5)`, and transcendental `exp(k)` boundaries.
     """
-    if witness_spec is None:
+    y_lo_q = Fraction(prescribed_Y_lo)
+    y_hi_q = Fraction(prescribed_Y_hi)
+    if (
+        y_lo_q < Fraction(2, 1)
+        or y_lo_q > y_hi_q
+        or T_fixed < 1
+        or D0_raw_fixed < 0
+        or D0_eff_fixed != min(D0_raw_fixed, T_fixed - 1)
+    ):
+        return {
+            "cutoff_triple": (T_fixed, D0_raw_fixed, D0_eff_fixed),
+            "is_nonempty": False,
+            "is_singleton_point": False,
+            "lower_bound": None,
+            "lower_closed": False,
+            "upper_bound": None,
+            "upper_closed": False,
+            "subdomain_notation": "EMPTY",
+        }
+
+    lo_cands: List[Tuple[Tuple[str, Union[Fraction, int]], bool]] = [
+        (("rational", y_lo_q), True),
+        (("alg_4_5", T_fixed - 1), False),
+        (("exp", D0_raw_fixed), True),
+    ]
+    hi_cands: List[Tuple[Tuple[str, Union[Fraction, int]], bool]] = [
+        (("rational", y_hi_q), True),
+        (("alg_4_5", T_fixed), True),
+        (("exp", D0_raw_fixed + 1), False),
+    ]
+
+    best_lo_b, best_lo_closed = lo_cands[0]
+    for cand_b, cand_closed in lo_cands[1:]:
+        cmp_l = _compare_symbolic_cutoff_bound(cand_b, best_lo_b)
+        if cmp_l > 0:
+            best_lo_b, best_lo_closed = cand_b, cand_closed
+        elif cmp_l == 0 and (not cand_closed):
+            best_lo_closed = False
+
+    best_hi_b, best_hi_closed = hi_cands[0]
+    for cand_b, cand_closed in hi_cands[1:]:
+        cmp_u = _compare_symbolic_cutoff_bound(cand_b, best_hi_b)
+        if cmp_u < 0:
+            best_hi_b, best_hi_closed = cand_b, cand_closed
+        elif cmp_u == 0 and (not cand_closed):
+            best_hi_closed = False
+
+    cmp_lu = _compare_symbolic_cutoff_bound(best_lo_b, best_hi_b)
+    is_nonempty = (cmp_lu < 0) or (cmp_lu == 0 and best_lo_closed and best_hi_closed)
+    if not is_nonempty:
+        return {
+            "cutoff_triple": (T_fixed, D0_raw_fixed, D0_eff_fixed),
+            "is_nonempty": False,
+            "is_singleton_point": False,
+            "lower_bound": best_lo_b,
+            "lower_closed": best_lo_closed,
+            "upper_bound": best_hi_b,
+            "upper_closed": best_hi_closed,
+            "subdomain_notation": "EMPTY",
+        }
+
+    br_l = "[" if best_lo_closed else "("
+    br_r = "]" if best_hi_closed else ")"
+    return {
+        "cutoff_triple": (T_fixed, D0_raw_fixed, D0_eff_fixed),
+        "is_nonempty": True,
+        "is_singleton_point": cmp_lu == 0,
+        "lower_bound": best_lo_b,
+        "lower_closed": best_lo_closed,
+        "upper_bound": best_hi_b,
+        "upper_closed": best_hi_closed,
+        "subdomain_notation": (
+            f"{br_l}{_format_symbolic_cutoff_bound(best_lo_b)}, "
+            f"{_format_symbolic_cutoff_bound(best_hi_b)}{br_r}"
+        ),
+    }
+
+
+def _parse_symbolic_cutoff_bound_spec_tc062(
+    spec: Any,
+) -> Optional[Tuple[str, Union[Fraction, int]]]:
+    """Parse an exact evaluation-endpoint or witness specification into
+    `{('rational', Fraction), ('exp', int), ('alg_4_5', int)}` (`>= 2`), rejecting floats/bools.
+    """
+    if spec is None or isinstance(spec, (bool, float)):
         return None
     try:
-        y_w = Fraction(str(witness_spec))
-        if not (Y_lo <= y_w <= Y_hi and y_w >= Fraction(2, 1)):
-            return False
-        t_w = _exact_ceil_rational_five_fourths(y_w)
-        d0_w = _exact_floor_log_rational(y_w)
-        deff_w = min(d0_w, t_w - 1)
-        return (t_w, d0_w, deff_w) == cutoff_triple
+        if isinstance(spec, (list, tuple)) and len(spec) == 2:
+            kind_raw, val_raw = spec
+            if not isinstance(kind_raw, str) or isinstance(val_raw, (bool, float)):
+                return None
+            if kind_raw == "rational":
+                if not isinstance(val_raw, (str, int)):
+                    return None
+                q_v = Fraction(str(val_raw).strip())
+                parsed: Tuple[str, Union[Fraction, int]] = ("rational", q_v)
+            elif kind_raw == "exp":
+                if not (isinstance(val_raw, int) and not isinstance(val_raw, bool) and val_raw >= 0):
+                    return None
+                parsed = ("exp", int(val_raw))
+            elif kind_raw == "alg_4_5":
+                if not (isinstance(val_raw, int) and not isinstance(val_raw, bool) and val_raw >= 0):
+                    return None
+                parsed = ("alg_4_5", int(val_raw))
+            else:
+                return None
+        elif isinstance(spec, int):
+            parsed = ("rational", Fraction(spec, 1))
+        elif isinstance(spec, str):
+            s_clean = spec.strip()
+            m_exp = re.fullmatch(r"exp\(([0-9]+)\)", s_clean)
+            m_alg = re.fullmatch(r"([0-9]+)\^\(4/5\)", s_clean)
+            if m_exp:
+                parsed = ("exp", int(m_exp.group(1)))
+            elif m_alg:
+                parsed = ("alg_4_5", int(m_alg.group(1)))
+            else:
+                if "nan" in s_clean.lower() or "inf" in s_clean.lower():
+                    return None
+                parsed = ("rational", Fraction(s_clean))
+        else:
+            return None
+
+        if _compare_symbolic_cutoff_bound(("rational", Fraction(2, 1)), parsed) > 0:
+            return None
+        return parsed
     except Exception:  # noqa: BLE001
-        return False
+        return None
+
+
+def _symbolic_closed_box_covers_closure(
+    box_lo: Tuple[str, Union[Fraction, int]],
+    box_hi: Tuple[str, Union[Fraction, int]],
+    subdomain_A: Dict[str, Any],
+) -> Tuple[bool, bool]:
+    """Return `(covers_lower, covers_upper)` checking whether closed symbolic box `[box_lo, box_hi]`
+    covers the closure of nonempty `subdomain_A`.
+    """
+    if not subdomain_A.get("is_nonempty", False):
+        return (False, False)
+    if _compare_symbolic_cutoff_bound(box_lo, box_hi) > 0:
+        return (False, False)
+    cov_lo = _compare_symbolic_cutoff_bound(box_lo, subdomain_A["lower_bound"]) <= 0
+    cov_hi = _compare_symbolic_cutoff_bound(subdomain_A["upper_bound"], box_hi) <= 0
+    return (cov_lo, cov_hi)
+
+
+def _symbolic_subdomain_vs_closed_box_relations(
+    subdomain_A: Dict[str, Any],
+    box_lo: Tuple[str, Union[Fraction, int]],
+    box_hi: Tuple[str, Union[Fraction, int]],
+) -> Dict[str, Any]:
+    """Compute exact relations between nonempty `subdomain_A` (with open/closed endpoints) and a
+    closed interval `B = [box_lo, box_hi]` (`box_lo <= box_hi`):
+      - `closure_intersects`: `closure(A) cap B != empty`
+      - `exact_intersects`: `A cap B != empty`
+      - `box_subset_of_A`: `B subseteq A`
+      - `intersection_bounds`: `(i_lo, i_lo_closed, i_hi, i_hi_closed)`
+    """
+    a_lo = subdomain_A["lower_bound"]
+    a_lo_cl = bool(subdomain_A["lower_closed"])
+    a_hi = subdomain_A["upper_bound"]
+    a_hi_cl = bool(subdomain_A["upper_closed"])
+
+    c_l = _compare_symbolic_cutoff_bound(a_lo, box_lo)
+    if c_l > 0:
+        i_lo, i_lo_cl = a_lo, a_lo_cl
+    elif c_l < 0:
+        i_lo, i_lo_cl = box_lo, True
+    else:
+        i_lo, i_lo_cl = a_lo, a_lo_cl
+
+    c_u = _compare_symbolic_cutoff_bound(a_hi, box_hi)
+    if c_u < 0:
+        i_hi, i_hi_cl = a_hi, a_hi_cl
+    elif c_u > 0:
+        i_hi, i_hi_cl = box_hi, True
+    else:
+        i_hi, i_hi_cl = a_hi, a_hi_cl
+
+    c_lu = _compare_symbolic_cutoff_bound(i_lo, i_hi)
+    closure_intersects = c_lu <= 0
+    exact_intersects = (c_lu < 0) or (c_lu == 0 and i_lo_cl and i_hi_cl)
+
+    sub_l_ok = (c_l < 0) or (c_l == 0 and a_lo_cl)
+    sub_u_ok = (c_u > 0) or (c_u == 0 and a_hi_cl)
+    box_subset_of_A = bool(sub_l_ok and sub_u_ok)
+
+    return {
+        "closure_intersects": closure_intersects,
+        "exact_intersects": exact_intersects,
+        "box_subset_of_A": box_subset_of_A,
+        "i_lo": i_lo,
+        "i_lo_closed": i_lo_cl,
+        "i_hi": i_hi,
+        "i_hi_closed": i_hi_cl,
+        "cmp_i_lo_hi": c_lu,
+    }
+
+
+def _certified_witness_from_nonempty_intersection(
+    rel: Dict[str, Any],
+    subdomain_A: Dict[str, Any],
+    box_lo: Tuple[str, Union[Fraction, int]],
+    box_hi: Tuple[str, Union[Fraction, int]],
+) -> Optional[str]:
+    """Given a certified nonempty intersection `I = A cap B_cert` where `B_cert = [box_lo, box_hi]`
+    is a verified subset of the actually evaluated domain `B_eval`, return an explicitly verified
+    symbolic or dyadic rational witness `Y_w in A cap B_cert`.
+    """
+    if not rel["exact_intersects"]:
+        return None
+    if rel["cmp_i_lo_hi"] == 0:
+        return _format_symbolic_cutoff_bound(rel["i_lo"])
+
+    def _bound_to_arb(b_sym: Tuple[str, Union[Fraction, int]]) -> arb:
+        k_s, v_s = b_sym
+        if k_s == "rational":
+            return _frac_to_arb(Fraction(v_s))
+        if k_s == "exp":
+            return arb(int(v_s)).exp()
+        if k_s == "alg_4_5":
+            return arb(int(v_s)) ** (arb(4) / arb(5))
+        raise ValueError(f"Unknown bound {b_sym}")
+
+    saved_p = flint_ctx.prec
+    try:
+        for prec in (256, 512, 1024, 2048):
+            flint_ctx.prec = prec
+            b1_a = _bound_to_arb(rel["i_lo"])
+            b2_a = _bound_to_arb(rel["i_hi"])
+            mid_a = ((b1_a + b2_a) / arb(2)).mid()
+            q_cand, _ = _exact_arb_endpoints_as_fractions(mid_a)
+            w_sym: Tuple[str, Union[Fraction, int]] = ("rational", q_cand)
+            in_A = _symbolic_subdomain_vs_closed_box_relations(subdomain_A, w_sym, w_sym)[
+                "exact_intersects"
+            ]
+            in_B = (
+                _compare_symbolic_cutoff_bound(box_lo, w_sym) <= 0
+                and _compare_symbolic_cutoff_bound(w_sym, box_hi) <= 0
+            )
+            if in_A and in_B:
+                return f"{q_cand.numerator}/{q_cand.denominator}"
+    finally:
+        flint_ctx.prec = saved_p
+    return None
+
+
+def _evaluate_branch_domain_admissibility_tc062(
+    br: Dict[str, Any],
+    *,
+    y_sub_parsed: Optional[Dict[str, Any]],
+    prescribed_Y_lo: Fraction,
+    prescribed_Y_hi: Fraction,
+    cutoff_triple: Tuple[int, int, int],
+) -> Dict[str, Any]:
+    """Single shared branch evaluation-domain admissibility and witness verifier (`TASK-TC-062R3` §2),
+    used identically on required and conservative/extra branches for BOTH `P0` and `TC062_P0_F`.
+
+    Distinguishes:
+      1. `CERTIFIED_NONEMPTY_INTERSECTION` (`A cap B != empty` certified or verified witness `Y_w in A cap B`),
+      2. `DISJOINT_EVALUATION_DOMAIN` (`A == empty` or `closure(A) cap B == empty`),
+      3. `EXCLUDED_BOUNDARY_ONLY_INTERSECTION` (`A cap B == empty` while `closure(A) cap B != empty`),
+      4. `UNCERTIFIED_INTERSECTION` (`A cap B_outer != empty` solely within outward serialization padding),
+      5. `INVALID_DOMAIN_OR_WITNESS_CONFLICT` (malformed domain, provenance mismatch, or invalid witness).
+    """
+    t_f, d0_f, deff_f = cutoff_triple
+    subdomain_A = _derive_exact_branch_admissible_subdomain(
+        prescribed_Y_lo, prescribed_Y_hi, t_f, d0_f, deff_f
+    )
+    conflicts: List[Dict[str, Any]] = []
+
+    if y_sub_parsed is None or y_sub_parsed["c_lo"] <= Fraction(1, 1) or y_sub_parsed["c_hi"] < Fraction(2, 1):
+        return {
+            "subdomain_A": subdomain_A,
+            "domain_evidence_source": "MALFORMED_Y_SUB_BALL",
+            "admissibility_status": "INVALID_DOMAIN_OR_WITNESS_CONFLICT",
+            "admissibility_reason": "MALFORMED_OR_SUBTHRESHOLD_Y_SUB_BALL",
+            "complete_subdomain_coverage": False,
+            "cov_lo": False,
+            "cov_hi": False,
+            "can_certify_refutation": False,
+            "certified_witness_Y": None,
+            "supplied_witness_check": None,
+            "conflicts": conflicts,
+        }
+
+    c_lo = y_sub_parsed["c_lo"]
+    c_hi = y_sub_parsed["c_hi"]
+    lo_dec = y_sub_parsed["lo_dec"]
+    hi_dec = y_sub_parsed["hi_dec"]
+    scale = max(abs(c_lo), abs(c_hi), Fraction(1, 10**70))
+    w_core = c_hi - c_lo
+    # Upper bound on outward rounding + serialization padding per endpoint when reconstructing an
+    # inner certified evaluation domain from `Y_sub_ball` alone (never manufacturing a witness from
+    # outward serialization padding or midpoint rounding):
+    d_pad = (
+        scale * (Fraction(1, 2**50) + Fraction(1, 10**38))
+        + w_core * Fraction(1, 2**28)
+        + Fraction(1, 2**1070)
+    )
+    b_inner_lo_q = lo_dec + d_pad
+    b_inner_hi_q = hi_dec - d_pad
+    has_nonempty_inner = b_inner_lo_q <= b_inner_hi_q
+
+    # Parse and cross-validate optional exact/symbolic evaluation-domain provenance if supplied:
+    exact_frac_raw = br.get("evaluated_Y_interval_exact_fractions")
+    sym_bounds_raw = br.get("evaluated_Y_symbolic_bounds")
+    exact_box: Optional[Tuple[Tuple[str, Union[Fraction, int]], Tuple[str, Union[Fraction, int]]]] = None
+    domain_evidence_source = (
+        "SERIALIZED_ARB_EXACT_POINT" if c_lo == c_hi else "SERIALIZED_ARB_OUTWARD_BALL"
+    )
+
+    if exact_frac_raw is not None:
+        if not (isinstance(exact_frac_raw, (list, tuple)) and len(exact_frac_raw) == 2):
+            conflicts.append(
+                {
+                    "conflict_type": "INTERVAL_SPLIT_EVALUATED_DOMAIN_PROVENANCE_CONFLICT",
+                    "reason": "MALFORMED_EVALUATED_Y_INTERVAL_EXACT_FRACTIONS",
+                    "cutoff_triple": list(cutoff_triple),
+                }
+            )
+        else:
+            ef0 = _parse_symbolic_cutoff_bound_spec_tc062(["rational", exact_frac_raw[0]])
+            ef1 = _parse_symbolic_cutoff_bound_spec_tc062(["rational", exact_frac_raw[1]])
+            if ef0 is None or ef1 is None or _compare_symbolic_cutoff_bound(ef0, ef1) > 0:
+                conflicts.append(
+                    {
+                        "conflict_type": "INTERVAL_SPLIT_EVALUATED_DOMAIN_PROVENANCE_CONFLICT",
+                        "reason": "INVALID_EVALUATED_Y_INTERVAL_EXACT_FRACTIONS",
+                        "cutoff_triple": list(cutoff_triple),
+                    }
+                )
+            else:
+                exact_box = (ef0, ef1)
+                domain_evidence_source = "EXACT_DYADIC_FRACTIONS"
+
+    if sym_bounds_raw is not None:
+        if not (isinstance(sym_bounds_raw, (list, tuple)) and len(sym_bounds_raw) == 2):
+            conflicts.append(
+                {
+                    "conflict_type": "INTERVAL_SPLIT_EVALUATED_DOMAIN_PROVENANCE_CONFLICT",
+                    "reason": "MALFORMED_EVALUATED_Y_SYMBOLIC_BOUNDS",
+                    "cutoff_triple": list(cutoff_triple),
+                }
+            )
+        else:
+            sb0 = _parse_symbolic_cutoff_bound_spec_tc062(sym_bounds_raw[0])
+            sb1 = _parse_symbolic_cutoff_bound_spec_tc062(sym_bounds_raw[1])
+            if sb0 is None or sb1 is None or _compare_symbolic_cutoff_bound(sb0, sb1) > 0:
+                conflicts.append(
+                    {
+                        "conflict_type": "INTERVAL_SPLIT_EVALUATED_DOMAIN_PROVENANCE_CONFLICT",
+                        "reason": "INVALID_EVALUATED_Y_SYMBOLIC_BOUNDS",
+                        "cutoff_triple": list(cutoff_triple),
+                    }
+                )
+            elif exact_box is not None and (
+                _compare_symbolic_cutoff_bound(exact_box[0], sb0) != 0
+                or _compare_symbolic_cutoff_bound(exact_box[1], sb1) != 0
+            ):
+                conflicts.append(
+                    {
+                        "conflict_type": "INTERVAL_SPLIT_EVALUATED_DOMAIN_PROVENANCE_CONFLICT",
+                        "reason": "CONTRADICTORY_EXACT_FRACTIONS_AND_SYMBOLIC_BOUNDS",
+                        "cutoff_triple": list(cutoff_triple),
+                    }
+                )
+            else:
+                exact_box = (sb0, sb1)
+                domain_evidence_source = "EXACT_SYMBOLIC_BOUNDS"
+
+    if exact_box is not None and not conflicts:
+        # Cross-validate exact evaluation box against `Y_sub_ball` outward enclosure:
+        max_prov_pad = (
+            scale * (Fraction(1, 2**48) + Fraction(1, 10**37))
+            + w_core * Fraction(1, 2**26)
+            + Fraction(1, 2**1000)
+        )
+        encloses_exact = (
+            _compare_symbolic_cutoff_bound(("rational", c_lo), exact_box[0]) <= 0
+            and _compare_symbolic_cutoff_bound(exact_box[1], ("rational", c_hi)) <= 0
+        )
+        tight_to_exact = (
+            _compare_symbolic_cutoff_bound(exact_box[0], ("rational", lo_dec + max_prov_pad)) <= 0
+            and _compare_symbolic_cutoff_bound(("rational", hi_dec - max_prov_pad), exact_box[1]) <= 0
+        )
+        if not (encloses_exact and tight_to_exact):
+            conflicts.append(
+                {
+                    "conflict_type": "INTERVAL_SPLIT_EVALUATED_DOMAIN_PROVENANCE_CONFLICT",
+                    "reason": "EXACT_DOMAIN_PROVENANCE_INCONSISTENT_WITH_Y_SUB_BALL",
+                    "cutoff_triple": list(cutoff_triple),
+                }
+            )
+            exact_box = None
+
+    if exact_box is None and c_lo == c_hi:
+        exact_box = (("rational", c_lo), ("rational", c_hi))
+
+    # Audit optional supplied `admissible_witness_Y` against BOTH `A` and certified `B`:
+    witness_raw = br.get("admissible_witness_Y")
+    supplied_witness_check: Optional[Dict[str, Any]] = None
+    verified_supplied_witness_str: Optional[str] = None
+    if witness_raw is not None:
+        w_sym = _parse_symbolic_cutoff_bound_spec_tc062(witness_raw)
+        if w_sym is None:
+            supplied_witness_check = {
+                "supplied": witness_raw,
+                "valid": False,
+                "in_admissible_subdomain_A": False,
+                "in_certified_evaluation_domain_B": False,
+                "reason": "MALFORMED_WITNESS_SPEC",
+            }
+            conflicts.append(
+                {
+                    "conflict_type": "INVALID_BRANCH_ADMISSIBLE_WITNESS",
+                    "reason": "MALFORMED_WITNESS_SPEC",
+                    "cutoff_triple": list(cutoff_triple),
+                    "admissible_witness_Y": witness_raw,
+                }
+            )
+        else:
+            in_A = (
+                subdomain_A["is_nonempty"]
+                and _symbolic_subdomain_vs_closed_box_relations(subdomain_A, w_sym, w_sym)[
+                    "exact_intersects"
+                ]
+            )
+            if exact_box is not None and not conflicts:
+                in_B = (
+                    _compare_symbolic_cutoff_bound(exact_box[0], w_sym) <= 0
+                    and _compare_symbolic_cutoff_bound(w_sym, exact_box[1]) <= 0
+                )
+            elif has_nonempty_inner:
+                in_B = (
+                    _compare_symbolic_cutoff_bound(("rational", b_inner_lo_q), w_sym) <= 0
+                    and _compare_symbolic_cutoff_bound(w_sym, ("rational", b_inner_hi_q)) <= 0
+                )
+            else:
+                in_B = False
+
+            if not in_A:
+                w_reason = "WITNESS_OUTSIDE_ADMISSIBLE_SUBDOMAIN_A"
+            elif not in_B:
+                w_reason = "WITNESS_NOT_CERTIFIED_IN_EVALUATION_DOMAIN_B"
+            else:
+                w_reason = "VERIFIED_IN_BOTH_A_AND_B"
+
+            supplied_witness_check = {
+                "supplied": witness_raw,
+                "formatted": _format_symbolic_cutoff_bound(w_sym),
+                "valid": bool(in_A and in_B),
+                "in_admissible_subdomain_A": bool(in_A),
+                "in_certified_evaluation_domain_B": bool(in_B),
+                "reason": w_reason,
+            }
+            if not (in_A and in_B):
+                conflicts.append(
+                    {
+                        "conflict_type": "INVALID_BRANCH_ADMISSIBLE_WITNESS",
+                        "reason": w_reason,
+                        "cutoff_triple": list(cutoff_triple),
+                        "admissible_witness_Y": witness_raw,
+                    }
+                )
+            else:
+                verified_supplied_witness_str = _format_symbolic_cutoff_bound(w_sym)
+
+    if conflicts:
+        return {
+            "subdomain_A": subdomain_A,
+            "domain_evidence_source": domain_evidence_source,
+            "admissibility_status": "INVALID_DOMAIN_OR_WITNESS_CONFLICT",
+            "admissibility_reason": conflicts[0]["reason"],
+            "complete_subdomain_coverage": False,
+            "cov_lo": False,
+            "cov_hi": False,
+            "can_certify_refutation": False,
+            "certified_witness_Y": None,
+            "supplied_witness_check": supplied_witness_check,
+            "conflicts": conflicts,
+        }
+
+    if not subdomain_A["is_nonempty"]:
+        return {
+            "subdomain_A": subdomain_A,
+            "domain_evidence_source": domain_evidence_source,
+            "admissibility_status": "DISJOINT_EVALUATION_DOMAIN",
+            "admissibility_reason": "EMPTY_OR_INFEASIBLE_ADMISSIBLE_SUBDOMAIN",
+            "complete_subdomain_coverage": False,
+            "cov_lo": False,
+            "cov_hi": False,
+            "can_certify_refutation": False,
+            "certified_witness_Y": None,
+            "supplied_witness_check": supplied_witness_check,
+            "conflicts": [],
+        }
+
+    outer_box = (("rational", c_lo), ("rational", c_hi))
+    if exact_box is not None:
+        cov_lo, cov_hi = _symbolic_closed_box_covers_closure(exact_box[0], exact_box[1], subdomain_A)
+        rel_ex = _symbolic_subdomain_vs_closed_box_relations(subdomain_A, exact_box[0], exact_box[1])
+        if rel_ex["exact_intersects"]:
+            wit_y = (
+                verified_supplied_witness_str
+                if verified_supplied_witness_str is not None
+                else _certified_witness_from_nonempty_intersection(
+                    rel_ex, subdomain_A, exact_box[0], exact_box[1]
+                )
+            )
+            return {
+                "subdomain_A": subdomain_A,
+                "domain_evidence_source": domain_evidence_source,
+                "admissibility_status": "CERTIFIED_NONEMPTY_INTERSECTION",
+                "admissibility_reason": "EXACT_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
+                "complete_subdomain_coverage": bool(cov_lo and cov_hi),
+                "cov_lo": cov_lo,
+                "cov_hi": cov_hi,
+                "can_certify_refutation": True,
+                "certified_witness_Y": wit_y,
+                "supplied_witness_check": supplied_witness_check,
+                "conflicts": [],
+            }
+        if rel_ex["closure_intersects"]:
+            return {
+                "subdomain_A": subdomain_A,
+                "domain_evidence_source": domain_evidence_source,
+                "admissibility_status": "EXCLUDED_BOUNDARY_ONLY_INTERSECTION",
+                "admissibility_reason": "TOUCHES_ONLY_EXCLUDED_OPEN_BOUNDARY_OF_SUBDOMAIN",
+                "complete_subdomain_coverage": False,
+                "cov_lo": cov_lo,
+                "cov_hi": cov_hi,
+                "can_certify_refutation": False,
+                "certified_witness_Y": None,
+                "supplied_witness_check": supplied_witness_check,
+                "conflicts": [],
+            }
+        return {
+            "subdomain_A": subdomain_A,
+            "domain_evidence_source": domain_evidence_source,
+            "admissibility_status": "DISJOINT_EVALUATION_DOMAIN",
+            "admissibility_reason": "DISJOINT_FROM_ADMISSIBLE_SUBDOMAIN_CLOSURE",
+            "complete_subdomain_coverage": False,
+            "cov_lo": cov_lo,
+            "cov_hi": cov_hi,
+            "can_certify_refutation": False,
+            "certified_witness_Y": None,
+            "supplied_witness_check": supplied_witness_check,
+            "conflicts": [],
+        }
+
+    # Outward serialized `Y_sub_ball` (`c_lo < c_hi`) with no exact provenance field:
+    cov_lo, cov_hi = _symbolic_closed_box_covers_closure(outer_box[0], outer_box[1], subdomain_A)
+    rel_out = _symbolic_subdomain_vs_closed_box_relations(subdomain_A, outer_box[0], outer_box[1])
+    if not rel_out["closure_intersects"]:
+        return {
+            "subdomain_A": subdomain_A,
+            "domain_evidence_source": domain_evidence_source,
+            "admissibility_status": "DISJOINT_EVALUATION_DOMAIN",
+            "admissibility_reason": "OUTWARD_EVALUATION_BOX_DISJOINT_FROM_SUBDOMAIN_CLOSURE",
+            "complete_subdomain_coverage": False,
+            "cov_lo": cov_lo,
+            "cov_hi": cov_hi,
+            "can_certify_refutation": False,
+            "certified_witness_Y": None,
+            "supplied_witness_check": supplied_witness_check,
+            "conflicts": [],
+        }
+    if not rel_out["exact_intersects"]:
+        return {
+            "subdomain_A": subdomain_A,
+            "domain_evidence_source": domain_evidence_source,
+            "admissibility_status": "EXCLUDED_BOUNDARY_ONLY_INTERSECTION",
+            "admissibility_reason": "OUTWARD_EVALUATION_BOX_TOUCHES_ONLY_EXCLUDED_OPEN_BOUNDARY",
+            "complete_subdomain_coverage": False,
+            "cov_lo": cov_lo,
+            "cov_hi": cov_hi,
+            "can_certify_refutation": False,
+            "certified_witness_Y": None,
+            "supplied_witness_check": supplied_witness_check,
+            "conflicts": [],
+        }
+
+    inner_box = (("rational", b_inner_lo_q), ("rational", b_inner_hi_q))
+    rel_in = (
+        _symbolic_subdomain_vs_closed_box_relations(subdomain_A, inner_box[0], inner_box[1])
+        if has_nonempty_inner
+        else None
+    )
+    if rel_in is not None and rel_in["exact_intersects"]:
+        wit_y = (
+            verified_supplied_witness_str
+            if verified_supplied_witness_str is not None
+            else _certified_witness_from_nonempty_intersection(
+                rel_in, subdomain_A, inner_box[0], inner_box[1]
+            )
+        )
+        return {
+            "subdomain_A": subdomain_A,
+            "domain_evidence_source": domain_evidence_source,
+            "admissibility_status": "CERTIFIED_NONEMPTY_INTERSECTION",
+            "admissibility_reason": "CERTIFIED_INTERIOR_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
+            "complete_subdomain_coverage": bool(cov_lo and cov_hi),
+            "cov_lo": cov_lo,
+            "cov_hi": cov_hi,
+            "can_certify_refutation": True,
+            "certified_witness_Y": wit_y,
+            "supplied_witness_check": supplied_witness_check,
+            "conflicts": [],
+        }
+
+    if rel_out["box_subset_of_A"]:
+        # Every point of outward enclosure `B_outer` lies in `A`, and `emptyset != B_eval subseteq B_outer`,
+        # so `A cap B_eval = B_eval != emptyset` without manufacturing any midpoint witness:
+        return {
+            "subdomain_A": subdomain_A,
+            "domain_evidence_source": domain_evidence_source,
+            "admissibility_status": "CERTIFIED_NONEMPTY_INTERSECTION",
+            "admissibility_reason": "ENTIRE_OUTWARD_EVALUATION_ENCLOSURE_SUBSET_OF_ADMISSIBLE_SUBDOMAIN",
+            "complete_subdomain_coverage": bool(cov_lo and cov_hi),
+            "cov_lo": cov_lo,
+            "cov_hi": cov_hi,
+            "can_certify_refutation": True,
+            "certified_witness_Y": verified_supplied_witness_str,
+            "supplied_witness_check": supplied_witness_check,
+            "conflicts": [],
+        }
+
+    # `A cap B_outer != empty`, yet overlap lies entirely inside the outward serialization padding
+    # margin (neither `B_outer subseteq A` nor `A cap B_inner != empty` nor verified witness):
+    return {
+        "subdomain_A": subdomain_A,
+        "domain_evidence_source": domain_evidence_source,
+        "admissibility_status": "UNCERTIFIED_INTERSECTION",
+        "admissibility_reason": "UNCERTIFIED_OUTWARD_SERIALIZATION_PADDING_OVERLAP",
+        "complete_subdomain_coverage": False,
+        "cov_lo": False,
+        "cov_hi": False,
+        "can_certify_refutation": False,
+        "certified_witness_Y": None,
+        "supplied_witness_check": supplied_witness_check,
+        "conflicts": [],
+    }
 
 
 def audit_continuous_interval_split_certificate_tc062(
@@ -4014,6 +4676,7 @@ def audit_continuous_interval_split_certificate_tc062(
             "coverage_issues": coverage_issues,
             "coverage_complete": False,
             "integrity_ok": True,
+            "branch_domain_admissibility": [],
             "probe_effective_verdicts": {
                 "P0": "INCOMPLETE_OR_INVALID_COVERAGE",
                 "TC062_P0_F": "INCOMPLETE_OR_INVALID_COVERAGE",
@@ -4168,7 +4831,11 @@ def audit_continuous_interval_split_certificate_tc062(
             seen_triples[triple] = b_idx
 
         y_sub_parsed = _parse_serialized_arb_enclosure_tc062(br.get("Y_sub_ball"))
-        if y_sub_parsed is None or y_sub_parsed["c_lo"] < Fraction(2, 1):
+        if (
+            y_sub_parsed is None
+            or y_sub_parsed["c_lo"] <= Fraction(1, 1)
+            or y_sub_parsed["c_hi"] < Fraction(2, 1)
+        ):
             integrity_conflicts.append(
                 {
                     "conflict_type": "INTERVAL_SPLIT_MALFORMED_Y_SUB_BALL",
@@ -4180,7 +4847,26 @@ def audit_continuous_interval_split_certificate_tc062(
 
         role_raw = br.get("branch_role")
         is_feasible_required = triple in feasible_by_triple and (not is_duplicate)
-        can_certify_refutation = False
+
+        # Single shared evaluation-domain admissibility & witness verifier (`TASK-TC-062R3` §2):
+        adm = _evaluate_branch_domain_admissibility_tc062(
+            br,
+            y_sub_parsed=y_sub_parsed,
+            prescribed_Y_lo=prescribed_Y_lo,
+            prescribed_Y_hi=prescribed_Y_hi,
+            cutoff_triple=triple,
+        )
+        for c_adm in adm["conflicts"]:
+            integrity_conflicts.append(
+                {
+                    "interval_key": split_key,
+                    "branch_index": b_idx,
+                    **c_adm,
+                }
+            )
+        can_certify_refutation = bool(adm["can_certify_refutation"]) and (
+            len(adm["conflicts"]) == 0
+        )
 
         if is_feasible_required:
             if role_raw is not None and str(role_raw) in allowed_extra_roles:
@@ -4193,12 +4879,10 @@ def audit_continuous_interval_split_certificate_tc062(
                         "branch_role": role_raw,
                     }
                 )
-            can_certify_refutation = True
             cell_info = feasible_by_triple[triple]
-            if y_sub_parsed is not None:
-                cov_lo, cov_hi = _rational_box_covers_exact_subdomain(
-                    y_sub_parsed["c_lo"], y_sub_parsed["c_hi"], cell_info
-                )
+            if y_sub_parsed is not None and len(adm["conflicts"]) == 0:
+                cov_lo = bool(adm["cov_lo"])
+                cov_hi = bool(adm["cov_hi"])
                 if not cov_lo:
                     is_left_end = cell_info["cutoff_triple"] == expected_triples[0]
                     coverage_issues.append(
@@ -4231,28 +4915,19 @@ def audit_continuous_interval_split_certificate_tc062(
                             "y_sub_c_hi": str(y_sub_parsed["c_hi"]),
                         }
                     )
+                if not can_certify_refutation:
+                    coverage_issues.append(
+                        {
+                            "issue_type": "BRANCH_EVALUATION_DOMAIN_NOT_ADMISSIBLE_ON_SUBDOMAIN",
+                            "interval_key": split_key,
+                            "branch_index": b_idx,
+                            "cutoff_triple": list(triple),
+                            "subdomain_notation": cell_info["subdomain_notation"],
+                            "admissibility_status": adm["admissibility_status"],
+                            "admissibility_reason": adm["admissibility_reason"],
+                        }
+                    )
         elif not is_duplicate:
-            # Extra / infeasible branch: allowed ONLY with explicit conservative role semantics,
-            # and cannot certify refutation unless an admissible rational witness is verified:
-            wit_chk = _verify_admissible_witness_on_branch_tc062(
-                br.get("admissible_witness_Y"),
-                Y_lo=prescribed_Y_lo,
-                Y_hi=prescribed_Y_hi,
-                cutoff_triple=triple,
-            )
-            if wit_chk is False:
-                integrity_conflicts.append(
-                    {
-                        "conflict_type": "INVALID_EXTRA_BRANCH_ADMISSIBLE_WITNESS",
-                        "interval_key": split_key,
-                        "branch_index": b_idx,
-                        "cutoff_triple": list(triple),
-                        "admissible_witness_Y": br.get("admissible_witness_Y"),
-                    }
-                )
-            elif wit_chk is True:
-                can_certify_refutation = True
-
             if role_raw is None or str(role_raw) not in allowed_extra_roles:
                 coverage_issues.append(
                     {
@@ -4295,6 +4970,31 @@ def audit_continuous_interval_split_certificate_tc062(
                         }
                     )
 
+        effective_role = (
+            str(role_raw)
+            if role_raw is not None
+            else (
+                "REQUIRED_FEASIBLE_SUBDOMAIN"
+                if is_feasible_required
+                else ("DUPLICATE_BRANCH" if is_duplicate else "UNANNOTATED_EXTRA_BRANCH")
+            )
+        )
+        adm_summary = {
+            "branch_index": b_idx,
+            "cutoff_triple": list(triple),
+            "branch_role": effective_role,
+            "is_feasible_required": is_feasible_required,
+            "subdomain_notation": adm["subdomain_A"]["subdomain_notation"],
+            "subdomain_is_nonempty": bool(adm["subdomain_A"]["is_nonempty"]),
+            "domain_evidence_source": adm["domain_evidence_source"],
+            "admissibility_status": adm["admissibility_status"],
+            "admissibility_reason": adm["admissibility_reason"],
+            "complete_subdomain_coverage": bool(adm["complete_subdomain_coverage"]),
+            "has_certified_admissible_evaluated_witness": bool(can_certify_refutation),
+            "can_certify_refutation": bool(can_certify_refutation),
+            "certified_witness_Y": adm["certified_witness_Y"],
+            "supplied_witness_check": adm["supplied_witness_check"],
+        }
         branch_records.append(
             {
                 "branch_index": b_idx,
@@ -4302,6 +5002,10 @@ def audit_continuous_interval_split_certificate_tc062(
                 "cutoff_triple": triple,
                 "is_feasible_required": is_feasible_required,
                 "can_certify_refutation": can_certify_refutation,
+                "complete_subdomain_coverage": bool(adm["complete_subdomain_coverage"]),
+                "admissibility_status": adm["admissibility_status"],
+                "admissibility_reason": adm["admissibility_reason"],
+                "admissibility_summary": adm_summary,
             }
         )
 
@@ -4469,6 +5173,27 @@ def audit_continuous_interval_split_certificate_tc062(
                             "branch_index": b_idx,
                             "cutoff_triple": list(rec["cutoff_triple"]),
                             "margin_key": br_key,
+                            "reason": "UNRESOLVED_ZERO_STRADDLING_MARGIN",
+                        }
+                    )
+                elif bv == "FAIL" and not rec["can_certify_refutation"]:
+                    unresolved_required_branch_margins.append(
+                        {
+                            "interval_key": split_key,
+                            "branch_index": b_idx,
+                            "cutoff_triple": list(rec["cutoff_triple"]),
+                            "margin_key": br_key,
+                            "reason": f"INADMISSIBLE_FAIL_MARGIN_{rec['admissibility_status']}",
+                        }
+                    )
+                elif bv == "PASS" and not rec["complete_subdomain_coverage"]:
+                    unresolved_required_branch_margins.append(
+                        {
+                            "interval_key": split_key,
+                            "branch_index": b_idx,
+                            "cutoff_triple": list(rec["cutoff_triple"]),
+                            "margin_key": br_key,
+                            "reason": f"INCOMPLETE_SUBDOMAIN_COVERAGE_{rec['admissibility_status']}",
                         }
                     )
             else:
@@ -4480,6 +5205,7 @@ def audit_continuous_interval_split_certificate_tc062(
                             "cutoff_triple": list(rec["cutoff_triple"]),
                             "margin_key": br_key,
                             "branch_verdict": bv,
+                            "admissibility_status": rec["admissibility_status"],
                         }
                     )
             if bv == "FAIL" and rec["can_certify_refutation"]:
@@ -4505,9 +5231,9 @@ def audit_continuous_interval_split_certificate_tc062(
         if not integrity_ok:
             probe_effective_verdicts[probe_tag] = CERTIFICATION_INTEGRITY_CONFLICT_VERDICT
         elif any_certifying_fail:
-            # Valid feasible (or witness-certified) FAIL branch refutes on a nonempty admissible
-            # subdomain even when mixed signs make the containing union UNRESOLVED (or even when
-            # another branch is missing/unresolved — completeness is tracked separately!):
+            # Valid feasible or witness-certified FAIL branch with certified nonempty admissible
+            # evaluation domain intersection `A cap B != empty` refutes even when mixed signs make
+            # the containing union UNRESOLVED (or while remaining coverage is incomplete):
             probe_effective_verdicts[probe_tag] = "FAIL"
         elif not coverage_complete:
             probe_effective_verdicts[probe_tag] = "INCOMPLETE_OR_INVALID_COVERAGE"
@@ -4530,6 +5256,7 @@ def audit_continuous_interval_split_certificate_tc062(
         "coverage_issues": coverage_issues,
         "coverage_complete": coverage_complete,
         "integrity_ok": integrity_ok,
+        "branch_domain_admissibility": [rec["admissibility_summary"] for rec in branch_records],
         "probe_effective_verdicts": probe_effective_verdicts,
         "unresolved_required_branch_margins": unresolved_required_branch_margins,
         "unresolved_conservative_extra_margins": unresolved_conservative_extra_margins,
@@ -4890,8 +5617,12 @@ def aggregate_tc062_section5_and_derive_outcomes(
                     tuple(item["cutoff_triple"]): item["subdomain_notation"]
                     for item in aud["partition_summary"]["required_feasible_subdomains"]
                 }
+                adm_by_idx = {
+                    int(item["branch_index"]): item
+                    for item in aud.get("branch_domain_admissibility", [])
+                }
                 new_br_list: List[Any] = []
-                for br_orig in sp_obj["branches"]:
+                for b_idx_c, br_orig in enumerate(sp_obj["branches"]):
                     if not isinstance(br_orig, dict):
                         new_br_list.append(br_orig)
                         continue
@@ -4904,6 +5635,8 @@ def aggregate_tc062_section5_and_derive_outcomes(
                     if tr_c in feasible_notations:
                         br_c.setdefault("branch_role", "REQUIRED_FEASIBLE_SUBDOMAIN")
                         br_c["exact_subdomain_notation"] = feasible_notations[tr_c]
+                    if b_idx_c in adm_by_idx:
+                        br_c["domain_admissibility_audit"] = adm_by_idx[b_idx_c]
                     p0_m = _parse_serialized_arb_enclosure_tc062(br_c.get("M_P0"))
                     if p0_m is not None and "P0_branch_classification" not in br_c:
                         br_c["P0_branch_classification"] = {"verdict": str(p0_m["verdict"])}
@@ -6162,26 +6895,32 @@ def _extract_tc062_stable_key_maps(
                     else:
                         _put_v(k_ib, pv, "continuous_interval_classifications")
 
-    # Execution / integrity / coverage / resource status classifications:
+    # Execution / integrity / coverage / resource status classifications (as supplied — never
+    # recreating deleted fields):
+    non_status_root_scalars = {
+        "task_id",
+        "repair_task_id",
+        "prior_repair_task_id",
+        "epic_id",
+        "parent_subgate",
+        "generated_at_utc",
+        "total_generation_wall_seconds",
+        "circle_constant_convention",
+        "grade_variable_convention",
+        "sampled_zeta_zeros_used",
+    }
+    non_status_sec5_scalars = {"section_epistemic_scope_note"}
     status_classifications: Dict[str, Any] = {}
-    for top_k in (
-        "execution_and_certification_status",
-        "holdout_hypothesis_outcome",
-        "resource_compliance_status",
-        "completion_outcome_code",
-        "research_outcome_class",
-        "all_mathematical_and_numerical_checks_pass",
-    ):
-        if top_k in art:
-            status_classifications[f"top.{top_k}"] = art[top_k]
-    for s5_k in (
-        "coverage_complete",
-        "certification_integrity_ok",
-        "all_required_applicable_evaluations_resolved",
-        "all_section_5_checks_pass",
-    ):
-        if s5_k in sec5:
-            status_classifications[f"sec5.{s5_k}"] = sec5[s5_k]
+    for top_k, top_v in art.items():
+        if top_k in non_status_root_scalars:
+            continue
+        if top_v is None or isinstance(top_v, (bool, str, int, float)):
+            status_classifications[f"top.{top_k}"] = top_v
+    for s5_k, s5_v in sec5.items():
+        if s5_k in non_status_sec5_scalars:
+            continue
+        if s5_v is None or isinstance(s5_v, (bool, str, int, float)):
+            status_classifications[f"sec5.{s5_k}"] = s5_v
 
     # Stable-keyed numerical enclosures:
     def _stable_balls(node: Any, prefix: str = "") -> Dict[str, Dict[str, Any]]:
@@ -6265,16 +7004,20 @@ def compare_tc062_artifacts_by_stable_key(
     comparison_id: str = "TC062_STABLE_KEY_COMPARISON",
     probes: Optional[Sequence[Dict[str, Any]]] = None,
     holdout_entries: Optional[Sequence[Dict[str, Any]]] = None,
+    explicitly_retired_optional_keys: Optional[Dict[str, str]] = None,
 ) -> Dict[str, Any]:
-    """Compare two `TC-062` family artifacts across stable keys (`TASK-TC-062R2` §5), separating:
+    """Compare two `TC-062` family artifacts across stable keys (`TASK-TC-062R2` §5 &
+    `TASK-TC-062R3` §3), separating:
     1. `changed_numerical_enclosures`,
     2. `changed_mathematical_verdicts` (across registered probes, applicable point-level results,
        `KL1` diagnostics, in-scope controls, Section 4 candidates, and continuous intervals),
-    3. `corrected_integrity_coverage_or_execution_classifications`,
-    4. `schema_only_additions`,
-    and returning `comparison_status = 'NOT_COMPARED'` / `'INCOMPLETE_COMPARISON'` with
-    `any_probe_kl1_control_or_candidate_verdict_changed = None` (never `False` by default!) when
-    unavailable or when required entries are missing, renamed, or blocked by integrity conflicts.
+    3. `corrected_integrity_coverage_or_execution_classifications` (changed values on comparable
+       status fields),
+    4. `schema_only_additions`, `removed_status_or_schema_fields`, and `retired_optional_fields`,
+    and returning `comparison_status = 'NOT_COMPARED'` / `'INCOMPLETE_COMPARISON'` with `None`
+    (never defaulting an unperformed or incomplete comparison to `False` / "unchanged"!) when
+    unavailable or when required status/verdict/enclosure entries are deleted, renamed, or blocked
+    by integrity conflicts.
     """
     if prior_artifact is None or not isinstance(prior_artifact, dict):
         return {
@@ -6290,11 +7033,15 @@ def compare_tc062_artifacts_by_stable_key(
             "changed_mathematical_verdicts_count": 0,
             "corrected_integrity_coverage_or_execution_classifications_count": 0,
             "schema_only_additions_count": 0,
+            "removed_status_or_schema_fields_count": 0,
+            "retired_optional_fields_count": 0,
             "missing_or_incomparable_entries_count": 0,
             "changed_numerical_enclosures": [],
             "changed_mathematical_verdicts": [],
             "corrected_integrity_coverage_or_execution_classifications": [],
             "schema_only_additions": [],
+            "removed_status_or_schema_fields": [],
+            "retired_optional_fields": [],
             "missing_or_incomparable_entries": [],
         }
 
@@ -6312,11 +7059,15 @@ def compare_tc062_artifacts_by_stable_key(
             "changed_mathematical_verdicts_count": 0,
             "corrected_integrity_coverage_or_execution_classifications_count": 0,
             "schema_only_additions_count": 0,
+            "removed_status_or_schema_fields_count": 0,
+            "retired_optional_fields_count": 0,
             "missing_or_incomparable_entries_count": 0,
             "changed_numerical_enclosures": [],
             "changed_mathematical_verdicts": [],
             "corrected_integrity_coverage_or_execution_classifications": [],
             "schema_only_additions": [],
+            "removed_status_or_schema_fields": [],
+            "retired_optional_fields": [],
             "missing_or_incomparable_entries": [],
         }
 
@@ -6427,17 +7178,66 @@ def compare_tc062_artifacts_by_stable_key(
                 }
             )
 
-    # Compare execution / integrity / coverage / resource status classifications:
+    # Compare execution / integrity / coverage / resource status classifications over the FULL
+    # union `old_st | cur_st` plus `REQUIRED_CURRENT_TC062_STATUS_KEYS` (`TASK-TC-062R3` §3):
     old_st = old_ext["status_classifications"]
     cur_st = cur_ext["status_classifications"]
+    required_status_set = set(REQUIRED_CURRENT_TC062_STATUS_KEYS)
+    retired_rules: Dict[str, str] = (
+        {str(k): str(v) for k, v in explicitly_retired_optional_keys.items() if v}
+        if isinstance(explicitly_retired_optional_keys, dict)
+        else {}
+    )
     schema_only_additions: List[Dict[str, Any]] = []
+    removed_status_or_schema_fields: List[Dict[str, Any]] = []
+    retired_optional_fields: List[Dict[str, Any]] = []
+    corresponding_removed_schema_keys: set[str] = set()
+
+    def _status_key_to_schema_key(st_key: str) -> Optional[str]:
+        if st_key.startswith("top."):
+            return "root." + st_key[len("top.") :]
+        if st_key.startswith("sec5."):
+            return "section_5_unseen_validation_and_interval_splits." + st_key[len("sec5.") :]
+        return None
 
     for sk in sorted(set(old_st.keys()) | set(cur_st.keys())):
         if sk not in old_st:
             schema_only_additions.append(
                 {"kind": "status_field", "key": sk, "added_value": cur_st[sk]}
             )
-        elif sk in cur_st and old_st[sk] != cur_st[sk]:
+        elif sk not in cur_st:
+            is_req_st = sk in required_status_set
+            sch_equiv = _status_key_to_schema_key(sk)
+            if sch_equiv is not None:
+                corresponding_removed_schema_keys.add(sch_equiv)
+            if (not is_req_st) and (sk in retired_rules):
+                retired_optional_fields.append(
+                    {
+                        "kind": "retired_optional_status_field",
+                        "key": sk,
+                        "prior_value": old_st[sk],
+                        "retirement_rule": retired_rules[sk],
+                    }
+                )
+            else:
+                reason_rem = (
+                    "REMOVED_REQUIRED_STATUS_FIELD"
+                    if is_req_st
+                    else "UNDECLARED_REMOVED_STATUS_FIELD"
+                )
+                removed_status_or_schema_fields.append(
+                    {
+                        "kind": "removed_status_field",
+                        "key": sk,
+                        "prior_value": old_st[sk],
+                        "required": is_req_st,
+                        "reason": reason_rem,
+                    }
+                )
+                missing_or_incomparable.append(
+                    {"side": "current", "key": sk, "reason": reason_rem}
+                )
+        elif old_st[sk] != cur_st[sk]:
             corrected_classifications.append(
                 {
                     "key": sk,
@@ -6447,8 +7247,73 @@ def compare_tc062_artifacts_by_stable_key(
                 }
             )
 
+    # Even if a prior historical baseline predated a now-required status field, deleting that
+    # required status field from `current_artifact` still makes `current_artifact` incomplete:
+    for req_sk in sorted(required_status_set):
+        if req_sk not in cur_st and req_sk not in old_st:
+            removed_status_or_schema_fields.append(
+                {
+                    "kind": "missing_required_current_status_field",
+                    "key": req_sk,
+                    "prior_value": None,
+                    "required": True,
+                    "reason": "MISSING_REQUIRED_CURRENT_STATUS_FIELD",
+                }
+            )
+            missing_or_incomparable.append(
+                {
+                    "side": "current",
+                    "key": req_sk,
+                    "reason": "MISSING_REQUIRED_CURRENT_STATUS_FIELD",
+                }
+            )
+
     for sch_k in sorted(cur_ext["schema_keys"] - old_ext["schema_keys"]):
         schema_only_additions.append({"kind": "section_schema_key", "key": sch_k})
+
+    required_schema_keys = {
+        _status_key_to_schema_key(rk)
+        for rk in required_status_set
+        if _status_key_to_schema_key(rk) is not None
+    } | {
+        "root.section_1_protocols_reassembly_and_complete_kernel",
+        "root.section_2_disjoint_prime_decompositions_and_controls",
+        "root.section_3_whole_line_contraction_obstruction",
+        "root.section_4_quantitative_proof_attempt",
+        "root.section_5_unseen_validation_and_interval_splits",
+        "root.section_6_lean_formalization_and_gate_accounting",
+        "root.provenance",
+        "root.serialized_arb_self_check",
+    }
+    for sch_rem in sorted(old_ext["schema_keys"] - cur_ext["schema_keys"]):
+        if sch_rem in corresponding_removed_schema_keys:
+            continue
+        is_req_sch = sch_rem in required_schema_keys
+        if (not is_req_sch) and (sch_rem in retired_rules):
+            retired_optional_fields.append(
+                {
+                    "kind": "retired_optional_section_schema_key",
+                    "key": sch_rem,
+                    "retirement_rule": retired_rules[sch_rem],
+                }
+            )
+        else:
+            reason_sch = (
+                "REMOVED_REQUIRED_SCHEMA_KEY"
+                if is_req_sch
+                else "UNDECLARED_REMOVED_SCHEMA_KEY"
+            )
+            removed_status_or_schema_fields.append(
+                {
+                    "kind": "removed_section_schema_key",
+                    "key": sch_rem,
+                    "required": is_req_sch,
+                    "reason": reason_sch,
+                }
+            )
+            missing_or_incomparable.append(
+                {"side": "current", "key": sch_rem, "reason": reason_sch}
+            )
 
     # Compare numerical Arb enclosures by stable key:
     old_b = old_ext["balls"]
@@ -6487,6 +7352,16 @@ def compare_tc062_artifacts_by_stable_key(
         if is_complete_comp
         else (True if len(changed_math_verdicts) > 0 else None)
     )
+    any_enclosure_changed: Optional[bool] = (
+        bool(len(changed_balls) > 0)
+        if is_complete_comp
+        else (True if len(changed_balls) > 0 else None)
+    )
+    any_classification_changed: Optional[bool] = (
+        bool(len(corrected_classifications) > 0)
+        if is_complete_comp
+        else (True if len(corrected_classifications) > 0 else None)
+    )
 
     return {
         "comparison_id": comparison_id,
@@ -6494,10 +7369,8 @@ def compare_tc062_artifacts_by_stable_key(
         "comparison_status": comp_status,
         "incomparable_reason": None if is_complete_comp else "MISSING_OR_BLOCKED_COMPARISON_KEYS",
         "any_probe_kl1_control_or_candidate_verdict_changed": any_verdict_changed,
-        "any_numerical_enclosure_changed": bool(len(changed_balls) > 0),
-        "any_integrity_coverage_or_execution_classification_changed": bool(
-            len(corrected_classifications) > 0
-        ),
+        "any_numerical_enclosure_changed": any_enclosure_changed,
+        "any_integrity_coverage_or_execution_classification_changed": any_classification_changed,
         "scope_key_counts": scope_counts,
         "changed_numerical_enclosures_count": len(changed_balls),
         "changed_mathematical_verdicts_count": len(changed_math_verdicts),
@@ -6505,11 +7378,15 @@ def compare_tc062_artifacts_by_stable_key(
             corrected_classifications
         ),
         "schema_only_additions_count": len(schema_only_additions),
+        "removed_status_or_schema_fields_count": len(removed_status_or_schema_fields),
+        "retired_optional_fields_count": len(retired_optional_fields),
         "missing_or_incomparable_entries_count": len(missing_or_incomparable),
         "changed_numerical_enclosures": changed_balls,
         "changed_mathematical_verdicts": changed_math_verdicts,
         "corrected_integrity_coverage_or_execution_classifications": corrected_classifications,
         "schema_only_additions": schema_only_additions,
+        "removed_status_or_schema_fields": removed_status_or_schema_fields,
+        "retired_optional_fields": retired_optional_fields,
         "missing_or_incomparable_entries": missing_or_incomparable,
     }
 
@@ -6629,8 +7506,8 @@ def generate_task_tc062_artifact(
 
     artifact: Dict[str, Any] = {
         "task_id": TASK_TC_062_ID,
-        "repair_task_id": TASK_TC_062R2_ID,
-        "prior_repair_task_id": TASK_TC_062R_ID,
+        "repair_task_id": TASK_TC_062R3_ID,
+        "prior_repair_task_id": TASK_TC_062R2_ID,
         "epic_id": EPIC_TC_042_ID,
         "parent_subgate": PARENT_SUBGATE_ID,
         "parent_subgate_status": "OPEN",
@@ -6658,6 +7535,8 @@ def generate_task_tc062_artifact(
             "prior_tc062_producing_commit": REVIEWED_TC062_PRODUCING_COMMIT,
             "reviewed_tc062r_delivered_tip": REVIEWED_TC062R_DELIVERED_TIP,
             "reviewed_tc062r_producing_commit": REVIEWED_TC062R_PRODUCING_COMMIT,
+            "reviewed_tc062r2_delivered_tip": REVIEWED_TC062R2_DELIVERED_TIP,
+            "reviewed_tc062r2_validation_commit": REVIEWED_TC062R2_VALIDATION_COMMIT,
             "preserved_tc061_protocol_registration_commit": TC061_FROZEN_PROTOCOL_REGISTRATION_COMMIT,
             "preserved_tc061_protocol_sha256": TC061_FROZEN_PROTOCOL_SHA256,
             "frozen_tc062_protocol_registration_commit": FROZEN_TC062_PROTOCOL_REGISTRATION_COMMIT,
@@ -6901,6 +7780,21 @@ def generate_task_tc062_artifact(
             holdout_entries=eff_entries,
         )
     )
+    prior_tc062r2_art: Optional[Dict[str, Any]] = prior_artifact_for_comparison
+    if prior_tc062r2_art is None and (not has_test_override):
+        prior_tc062r2_art = _load_git_json_artifact_or_none(
+            REVIEWED_TC062R2_DELIVERED_TIP, "data/tc_joint_prime_dilation_signed_remainder.json"
+        )
+    clean_obj["provenance"]["tc062r3_validation_and_verdict_comparison"] = (
+        compare_tc062_artifacts_by_stable_key(
+            clean_obj,
+            prior_tc062r2_art,
+            baseline_commit=REVIEWED_TC062R2_DELIVERED_TIP,
+            comparison_id="TC062R3_VS_TC062R2_STABLE_KEY_V1",
+            probes=eff_probes,
+            holdout_entries=eff_entries,
+        )
+    )
 
     if write_output:
         out_txt = json.dumps(clean_obj, indent=2, ensure_ascii=True) + "\n"
@@ -7049,16 +7943,21 @@ def reprocess_task_tc062_metadata_and_stage_b(
     prov = dict(existing["provenance"])
     prov["reviewed_tc062r_delivered_tip"] = REVIEWED_TC062R_DELIVERED_TIP
     prov["reviewed_tc062r_producing_commit"] = REVIEWED_TC062R_PRODUCING_COMMIT
+    prov["reviewed_tc062r2_delivered_tip"] = REVIEWED_TC062R2_DELIVERED_TIP
+    prov["reviewed_tc062r2_validation_commit"] = REVIEWED_TC062R2_VALIDATION_COMMIT
+    prov.setdefault(
+        "tc062r2_validation_and_metadata_producing_git_commit", REVIEWED_TC062R2_VALIDATION_COMMIT
+    )
     prov["metadata_and_stage_b_reprocessed_from_source"] = True
-    prov["tc062r2_validation_and_metadata_producing_git_commit"] = head_sha
-    prov["tc062r2_reprocessed_at_utc"] = datetime.now(timezone.utc).isoformat()
+    prov["tc062r3_validation_and_metadata_producing_git_commit"] = head_sha
+    prov["tc062r3_reprocessed_at_utc"] = datetime.now(timezone.utc).isoformat()
     prov["hand_edited_enclosures"] = False
     prov["quadrature_timestamps_reset"] = False
 
     updated: Dict[str, Any] = {
         "task_id": existing["task_id"],
-        "repair_task_id": TASK_TC_062R2_ID,
-        "prior_repair_task_id": TASK_TC_062R_ID,
+        "repair_task_id": TASK_TC_062R3_ID,
+        "prior_repair_task_id": TASK_TC_062R2_ID,
         "epic_id": existing["epic_id"],
         "parent_subgate": existing["parent_subgate"],
         "parent_subgate_status": "OPEN",
@@ -7139,6 +8038,13 @@ def reprocess_task_tc062_metadata_and_stage_b(
                 REVIEWED_TC062R_DELIVERED_TIP, "data/tc_joint_prime_dilation_signed_remainder.json"
             )
         )
+        prior_tc062r2 = (
+            prior_artifact_for_comparison
+            if prior_artifact_for_comparison is not None
+            else _load_git_json_artifact_or_none(
+                REVIEWED_TC062R2_DELIVERED_TIP, "data/tc_joint_prime_dilation_signed_remainder.json"
+            )
+        )
         if isinstance(clean_obj["provenance"].get("tc062r_certificate_impact_inventory"), dict):
             inv_r = dict(clean_obj["provenance"]["tc062r_certificate_impact_inventory"])
             comp_vs_062 = compare_tc062_artifacts_by_stable_key(
@@ -7157,6 +8063,7 @@ def reprocess_task_tc062_metadata_and_stage_b(
             clean_obj["provenance"]["tc062r_certificate_impact_inventory"] = inv_r
     else:
         prior_tc062r = prior_artifact_for_comparison
+        prior_tc062r2 = prior_artifact_for_comparison
 
     clean_obj["provenance"]["tc062r2_validation_and_verdict_comparison"] = (
         compare_tc062_artifacts_by_stable_key(
@@ -7164,6 +8071,16 @@ def reprocess_task_tc062_metadata_and_stage_b(
             prior_tc062r,
             baseline_commit=REVIEWED_TC062R_DELIVERED_TIP,
             comparison_id="TC062R2_VS_TC062R_STABLE_KEY_V1",
+            probes=probes,
+            holdout_entries=eff_entries if "eff_entries" in locals() else holdout_entries,
+        )
+    )
+    clean_obj["provenance"]["tc062r3_validation_and_verdict_comparison"] = (
+        compare_tc062_artifacts_by_stable_key(
+            clean_obj,
+            prior_tc062r2,
+            baseline_commit=REVIEWED_TC062R2_DELIVERED_TIP,
+            comparison_id="TC062R3_VS_TC062R2_STABLE_KEY_V1",
             probes=probes,
             holdout_entries=holdout_entries,
         )

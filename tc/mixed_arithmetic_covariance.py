@@ -1700,6 +1700,7 @@ def evaluate_fixed_cutoff_on_Y_ball_arb(
         flint_ctx.prec = work_prec
         if not bool(Y_ball >= arb(2)):
             raise ValueError(f"Y_ball {Y_ball} must satisfy Y >= 2")
+        eval_lo_q, eval_hi_q = _exact_arb_endpoints_as_fractions(Y_ball)
         D0_eff = min(D0_raw_fixed, max(0, T_fixed - 1))
         tau = _tau_arb()
         log_tau = tau.log()
@@ -1847,6 +1848,10 @@ def evaluate_fixed_cutoff_on_Y_ball_arb(
             "D0_raw_fixed": D0_raw_fixed,
             "D0_eff_fixed": D0_eff,
             "Y_sub_ball": +Y_ball,
+            "evaluated_Y_interval_exact_fractions": [
+                f"{eval_lo_q.numerator}/{eval_lo_q.denominator}",
+                f"{eval_hi_q.numerator}/{eval_hi_q.denominator}",
+            ],
             "E_Y": +E_acc,
             "D_tilde_Y": +D_acc,
             "X_tilde_Y": +(P2_acc - D_acc),
