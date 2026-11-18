@@ -36,7 +36,7 @@ import json
 import re
 from typing import Any, Dict, Tuple
 
-from flint import arb, ctx as flint_ctx
+from flint import arb, arf, ctx as flint_ctx
 import pytest
 
 from certification import REQUIRED_FORMAL_SOURCES
@@ -46,11 +46,14 @@ from tc.joint_prime_dilation_signed_remainder import (
     ACCEPTED_TC061R3_IMPLEMENTATION,
     ACCEPTED_TC061R3_TIP,
     BRANCH_ADMISSIBILITY_STATUSES,
+    BRANCH_COVERAGE_STATUSES,
     EXPECTED_TC062_THEOREMS,
     FROZEN_TC062_PROTOCOL_ID,
     FROZEN_TC062_PROTOCOL_REGISTRATION_COMMIT,
     FROZEN_TC062_PROTOCOL_SHA256,
     GLOBAL_CONSEQUENCE_CLASSES,
+    HISTORICAL_TC062R_BRANCH_OBSERVABLE_SHA256,
+    HISTORICAL_TC062R_GENERATED_AT_UTC,
     JOINT_PRIME_DILATION_ARTIFACT_PATH,
     JOINT_PRIME_DILATION_PROTOCOL_PATH,
     REQUIRED_CURRENT_TC062_STATUS_KEYS,
@@ -61,12 +64,17 @@ from tc.joint_prime_dilation_signed_remainder import (
     REVIEWED_TC062R_PRODUCING_COMMIT,
     REVIEWED_TC062R2_DELIVERED_TIP,
     REVIEWED_TC062R2_VALIDATION_COMMIT,
+    REVIEWED_TC062R3_DELIVERED_TIP,
+    REVIEWED_TC062R3_VALIDATION_COMMIT,
     TASK_TC_062_ID,
     TASK_TC_062R_ID,
     TASK_TC_062R2_ID,
     TASK_TC_062R3_ID,
+    TASK_TC_062R4_ID,
     TC_062_LEAN_MODULE_PATH,
     TC_062_REVIEW_DOC_PATH,
+    _load_git_json_artifact_or_none,
+    _replay_historical_tc062r_sub_ball,
     aggregate_tc062_section5_and_derive_outcomes,
     audit_continuous_interval_split_certificate_tc062,
     build_complete_signed_kernel_evaluator_small_T,
@@ -81,6 +89,7 @@ from tc.joint_prime_dilation_signed_remainder import (
     generate_task_tc062_artifact,
     prime_even_valuation_anchors,
     prime_valuation_v_p,
+    reconstruct_tc062r_legacy_interval_domains,
     reprocess_task_tc062_metadata_and_stage_b,
     verify_anchor_diagonal_identities_and_self_collision_bounds_arb,
     verify_beta_four_piece_endpoint_and_summed_strip_bound_arb,
@@ -422,8 +431,8 @@ def test_tc062_lean_formalization_registration_and_review_synchronization(
     assert spans["hygiene_ok"] is True, spans
     assert spans["public_theorem_count"] == len(EXPECTED_TC062_THEOREMS)
 
-    assert tc062_artifact["repair_task_id"] == TASK_TC_062R3_ID
-    assert tc062_artifact["prior_repair_task_id"] == TASK_TC_062R2_ID
+    assert tc062_artifact["repair_task_id"] == TASK_TC_062R4_ID
+    assert tc062_artifact["prior_repair_task_id"] == TASK_TC_062R3_ID
     prov = tc062_artifact["provenance"]
     assert prov["reviewed_tc062_tip"] == REVIEWED_TC062_TIP
     assert prov["reviewed_tc062_implementation"] == REVIEWED_TC062_IMPLEMENTATION
@@ -432,7 +441,21 @@ def test_tc062_lean_formalization_registration_and_review_synchronization(
     assert prov["reviewed_tc062r_producing_commit"] == REVIEWED_TC062R_PRODUCING_COMMIT
     assert prov["reviewed_tc062r2_delivered_tip"] == REVIEWED_TC062R2_DELIVERED_TIP
     assert prov["reviewed_tc062r2_validation_commit"] == REVIEWED_TC062R2_VALIDATION_COMMIT
-    assert prov["tc062r3_validation_and_verdict_comparison"]["comparison_status"] == "COMPLETE_COMPARED"
+    assert prov["reviewed_tc062r3_delivered_tip"] == REVIEWED_TC062R3_DELIVERED_TIP
+    assert prov["reviewed_tc062r3_validation_commit"] == REVIEWED_TC062R3_VALIDATION_COMMIT
+    comp_r4_as_sup = prov["tc062r4_validation_and_verdict_comparison"]
+    assert comp_r4_as_sup["comparison_status"] == "INCOMPLETE_COMPARISON"
+    assert comp_r4_as_sup["enclosure_comparison_complete"] is True
+    assert comp_r4_as_sup["any_numerical_enclosure_changed_on_comparable_balls"] is False
+    assert comp_r4_as_sup["changed_numerical_enclosures_count"] == 0
+    assert comp_r4_as_sup["changed_mathematical_verdicts_count"] == 0
+    assert comp_r4_as_sup["raw_branch_margin_sign_verdicts_changed_count"] == 0
+    assert comp_r4_as_sup["branch_coverage_classifications_changed_count"] == 5
+    assert comp_r4_as_sup["any_integrity_coverage_or_execution_classification_changed"] is True
+    comp_r4_post = prov["tc062r4_post_domain_recovery_verdict_comparison"]
+    assert comp_r4_post["comparison_status"] == "COMPLETE_COMPARED"
+    assert comp_r4_post["any_probe_kl1_control_or_candidate_verdict_changed"] is False
+    assert comp_r4_post["any_numerical_enclosure_changed"] is False
     assert prov["formal_compiled_theorem_count"] == 830
     assert prov["formal_build_producing_git_commit"] == prov["numerical_producing_git_commit"]
     inv62 = prov["tc062r_certificate_impact_inventory"]
@@ -440,7 +463,8 @@ def test_tc062_lean_formalization_registration_and_review_synchronization(
     assert inv62["prior_tc062_baseline_commit"] == REVIEWED_TC062_TIP
     assert inv62["recomputed_producing_git_commit"] == prov["numerical_producing_git_commit"]
     assert inv62["candidate_a2_Y64_counterexample_unaffected"] is True
-    assert inv62["any_probe_kl1_control_or_candidate_verdict_changed"] is False
+    assert inv62["raw_branch_margin_sign_verdicts_changed_count"] == 0
+    assert inv62["stable_key_verdict_comparison_v2"]["changed_mathematical_verdicts_count"] == 0
     assert sum(inv62["overall_ball_status_counts"].values()) == inv62["total_artifact_arb_balls"]
 
     assert TC_062_REVIEW_DOC_PATH.exists()
@@ -777,6 +801,8 @@ def test_tc062r_shared_outcome_derivation_and_adversarial_scenarios(
     b1_m_arb = arb("0.24", arb("0.005"))
     b0_f_arb = arb("0.92", arb("0.005"))
     b1_f_arb = arb("0.95", arb("0.005"))
+    sp625_cf["branches"][0]["evaluated_Y_interval_exact_fractions"] = ["2559999/4096", "625"]
+    sp625_cf["branches"][1]["evaluated_Y_interval_exact_fractions"] = ["625", "2560001/4096"]
     sp625_cf["branches"][0]["F_Y"] = strip_enclosure_arb_for_json(serialize_arb_certified(b0_f_arb))
     sp625_cf["branches"][1]["F_Y"] = strip_enclosure_arb_for_json(serialize_arb_certified(b1_f_arb))
     sp625_cf["union_F_Y"] = strip_enclosure_arb_for_json(
@@ -1093,6 +1119,8 @@ def test_tc062r2_interval_containment_exact_cutoff_partition_and_extra_branch_se
     b1_pos = arb("0.150", arb("0.005"))
     f0_arb = arb("0.070", arb("0.001"))
     f1_arb = arb("0.870", arb("0.005"))
+    sp_mx["branches"][0]["evaluated_Y_interval_exact_fractions"] = ["2559999/4096", "625"]
+    sp_mx["branches"][1]["evaluated_Y_interval_exact_fractions"] = ["625", "2560001/4096"]
     sp_mx["branches"][0]["F_Y"] = _ser(f0_arb)
     sp_mx["branches"][1]["F_Y"] = _ser(f1_arb)
     sp_mx["union_F_Y"] = _ser(f0_arb.union(f1_arb))
@@ -1200,6 +1228,7 @@ def test_tc062r2_interval_containment_exact_cutoff_partition_and_extra_branch_se
         "interval_403_40_to_403_46_across_e6"
     ]
     extra_br = json.loads(json.dumps(sp_ex["branches"][0]))
+    extra_br.pop("historical_domain_reconstruction", None)
     extra_br["T_fixed"] = 1808
     extra_br["D0_raw_fixed"] = 6
     extra_br["D0_eff_fixed"] = 6
@@ -1662,6 +1691,11 @@ def test_tc062r2_stable_key_verdict_comparison_and_endpoint_strip_mathematics(
     mut_v["section_5_unseen_validation_and_interval_splits"]["global_candidate_outcomes"][
         "KL1_int2_offdiag"
     ] = "REFUTED_BY_CERTIFIED_WITNESS"
+    mut_v["section_5_unseen_validation_and_interval_splits"][
+        "continuous_straddling_interval_splits"
+    ]["interval_625_pm_2_neg12_across_T3125"]["branches"][1][
+        "evaluated_Y_interval_exact_fractions"
+    ] = ["625", "2560001/4096"]
     mut_v["section_5_unseen_validation_and_interval_splits"][
         "continuous_straddling_interval_splits"
     ]["interval_625_pm_2_neg12_across_T3125"]["branches"][1]["M_P0_F"] = pos_m
@@ -2156,8 +2190,8 @@ def test_tc062r3_refutation_domain_admissibility_and_boundary_ownership(
     r_idem_2 = reprocess_task_tc062_metadata_and_stage_b(p_idem, write_output=True)
     c1 = json.loads(json.dumps(r_idem_1))
     c2 = json.loads(json.dumps(r_idem_2))
-    ts1 = c1["provenance"].pop("tc062r3_reprocessed_at_utc")
-    ts2 = c2["provenance"].pop("tc062r3_reprocessed_at_utc")
+    ts1 = c1["provenance"].pop("tc062r4_reprocessed_at_utc")
+    ts2 = c2["provenance"].pop("tc062r4_reprocessed_at_utc")
     assert isinstance(ts1, str) and isinstance(ts2, str)
     assert c1 == c2
 
@@ -2392,14 +2426,26 @@ def test_tc062r3_deleted_renamed_and_retired_status_provenance_comparison(
     assert c_unch["any_integrity_coverage_or_execution_classification_changed"] is False
     assert c_unch["removed_status_or_schema_fields_count"] == 0
 
-    comp_r3 = tc062_artifact["provenance"]["tc062r3_validation_and_verdict_comparison"]
-    assert comp_r3["comparison_id"] == "TC062R3_VS_TC062R2_STABLE_KEY_V1"
-    assert comp_r3["baseline_commit"] == REVIEWED_TC062R2_DELIVERED_TIP
-    assert comp_r3["comparison_status"] == "COMPLETE_COMPARED"
-    assert comp_r3["any_probe_kl1_control_or_candidate_verdict_changed"] is False
-    assert comp_r3["any_numerical_enclosure_changed"] is False
-    assert comp_r3["any_integrity_coverage_or_execution_classification_changed"] is False
-    assert comp_r3["removed_status_or_schema_fields_count"] == 0
+    comp_r4 = tc062_artifact["provenance"]["tc062r4_validation_and_verdict_comparison"]
+    assert comp_r4["comparison_id"] == "TC062R4_VS_TC062R3_AS_SUPPLIED_STABLE_KEY_V1"
+    assert comp_r4["baseline_commit"] == REVIEWED_TC062R3_DELIVERED_TIP
+    assert comp_r4["comparison_status"] == "INCOMPLETE_COMPARISON"
+    assert comp_r4["enclosure_comparison_complete"] is True
+    assert comp_r4["any_numerical_enclosure_changed_on_comparable_balls"] is False
+    assert comp_r4["changed_numerical_enclosures_count"] == 0
+    assert comp_r4["changed_mathematical_verdicts_count"] == 0
+    assert comp_r4["raw_branch_margin_sign_verdicts_changed_count"] == 0
+    assert comp_r4["branch_coverage_classifications_changed_count"] == 5
+    assert comp_r4["any_integrity_coverage_or_execution_classification_changed"] is True
+    assert comp_r4["removed_status_or_schema_fields_count"] == 0
+
+    comp_r4_post = tc062_artifact["provenance"]["tc062r4_post_domain_recovery_verdict_comparison"]
+    assert comp_r4_post["comparison_id"] == "TC062R4_VS_TC062R3_POST_DOMAIN_RECOVERY_STABLE_KEY_V1"
+    assert comp_r4_post["baseline_commit"] == REVIEWED_TC062R3_DELIVERED_TIP
+    assert comp_r4_post["comparison_status"] == "COMPLETE_COMPARED"
+    assert comp_r4_post["any_probe_kl1_control_or_candidate_verdict_changed"] is False
+    assert comp_r4_post["any_numerical_enclosure_changed"] is False
+    assert comp_r4_post["removed_status_or_schema_fields_count"] == 0
 
     # 7. Overwriting required or optional status fields with `None` or wrong types is caught as
     #    `INCOMPLETE_COMPARISON` with `None` (never accepted as a valid present scalar):
@@ -2467,6 +2513,11 @@ def test_tc062r3_deleted_renamed_and_retired_status_provenance_comparison(
     art_p0_full = json.loads(json.dumps(base))
     art_p0_full["section_5_unseen_validation_and_interval_splits"][
         "continuous_straddling_interval_splits"
+    ]["interval_625_pm_2_neg12_across_T3125"]["branches"][0][
+        "evaluated_Y_interval_exact_fractions"
+    ] = ["2559999/4096", "625"]
+    art_p0_full["section_5_unseen_validation_and_interval_splits"][
+        "continuous_straddling_interval_splits"
     ]["interval_625_pm_2_neg12_across_T3125"]["branches"][0]["M_P0"] = pos_p0
     c_p0_full_vs_base = compare_tc062_artifacts_by_stable_key(
         art_p0_full, base, baseline_commit=REVIEWED_TC062R2_DELIVERED_TIP
@@ -2491,6 +2542,611 @@ def test_tc062r3_deleted_renamed_and_retired_status_provenance_comparison(
     )
     assert c_dup_iv["comparison_status"] == "INCOMPLETE_COMPARISON"
     assert c_dup_iv["any_probe_kl1_control_or_candidate_verdict_changed"] is None
+
+
+def test_tc062r4_exact_evaluation_domain_coverage_and_legacy_recovery(
+    tc062_artifact: Dict[str, Any], tmp_path
+) -> None:
+    """Focused regression matrix for `TASK-TC-062R4` §§2–5 across live FLINT/Arb + production
+    `serialize_arb_certified`, `audit_continuous_interval_split_certificate_tc062`,
+    `generate_task_tc062_artifact`, `reprocess_task_tc062_metadata_and_stage_b`,
+    `reconstruct_tc062r_legacy_interval_domains`, and `compare_tc062_artifacts_by_stable_key`:
+    1. Concrete `625` right-endpoint gap `B = [625 - 2^-12 - 2^-201, 625 - 2^-201]` (recording exact
+       binary endpoints vs outward serialized endpoints separately) cannot certify full coverage or
+       complete interval survival;
+    2. Corresponding left-end gap hidden by outward 40-digit rounding is rejected as complete coverage;
+    3. Coverage at `exp(6)` respects exact ownership and cannot be supplied solely by decimal padding
+       or by the neighboring `(1809, 5, 5)` wrong-cutoff branch;
+    4. Tiny interior gap (`2^-201`) cannot disappear through a rounded union (`evaluated_Y_subintervals_exact_fractions`
+       and adjacent cutoff branches);
+    5. Valid fully covering exact evaluation domains (`evaluated_Y_interval_exact_fractions`,
+       `evaluated_Y_symbolic_bounds`, `B_inner`-padded balls, and live producing path) pass;
+    6. Justified recovered legacy domains on all 5 branches pass with `0` numerical margin changes;
+    7. Deleting or invalidating domain evidence on any branch cannot silently preserve complete coverage;
+    8. `reconstruct_tc062r_legacy_interval_domains` refuses mismatched producer commit, mismatched
+       timestamp, mismatched cutoff identity, modified `Y_sub_ball`, pre-existing explicit domain
+       field, or `prec=53` serialization-collision impostor margins;
+    9. Partial evaluated domain with admissible positive margin (`P0` and `P0_F`) still refutes while
+       coverage stays incomplete;
+    10. Nonempty partial evaluated domain inside `A` with only `PASS` margins supplies an admissible
+        witness (`can_certify_refutation = True`) yet cannot establish survival on the uncovered region;
+    11. Disjoint and excluded-boundary-only boxes remain unable to refute;
+    12. Valid mixed-sign branch outcomes, earlier decisive witnesses, and separate `WITHIN` / `EXCEEDED`
+        / `UNKNOWN` resource statuses retain their semantics;
+    13. Repeated metadata processing is semantically idempotent modulo `provenance.tc062r4_reprocessed_at_utc`.
+    """
+    from tc.canonical_theta_correlation_bound import serialize_arb_certified
+    from tc.liouville_square_dilation import _exact_arb_endpoints_as_fractions
+    from tc.mixed_arithmetic_covariance import (
+        evaluate_interval_via_cutoff_case_split_arb,
+        strip_enclosure_arb_for_json,
+    )
+
+    assert len(BRANCH_COVERAGE_STATUSES) == 5
+    assert len(HISTORICAL_TC062R_BRANCH_OBSERVABLE_SHA256) == 5
+
+    pre_1_4 = (
+        tc062_artifact["section_1_protocols_reassembly_and_complete_kernel"],
+        tc062_artifact["section_2_disjoint_prime_decompositions_and_controls"],
+        tc062_artifact["section_3_whole_line_contraction_obstruction"],
+        tc062_artifact["section_4_quantitative_proof_attempt"],
+    )
+    s_base = json.loads(
+        json.dumps(tc062_artifact["section_5_unseen_validation_and_interval_splits"])
+    )
+
+    def _ser(ball: arb) -> Dict[str, Any]:
+        return strip_enclosure_arb_for_json(serialize_arb_certified(ball))
+
+    def _q_arb(q: Fraction) -> arb:
+        return arb(q.numerator) / arb(q.denominator)
+
+    def _both(sec5_mut: Dict[str, Any], tag: str) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+        g = generate_task_tc062_artifact(
+            write_output=False,
+            precomputed_sections_1_to_4=pre_1_4,
+            section_5_override=sec5_mut,
+        )
+        art_tmp = json.loads(json.dumps(tc062_artifact))
+        art_tmp["section_5_unseen_validation_and_interval_splits"] = json.loads(
+            json.dumps(sec5_mut)
+        )
+        p_f = tmp_path / f"tc062r4_{tag}.json"
+        p_f.write_text(json.dumps(art_tmp), encoding="utf-8")
+        r = reprocess_task_tc062_metadata_and_stage_b(p_f, write_output=False)
+        assert g["holdout_hypothesis_outcome"] == r["holdout_hypothesis_outcome"]
+        assert g["execution_and_certification_status"] == r["execution_and_certification_status"]
+        assert g["completion_outcome_code"] == r["completion_outcome_code"]
+        assert (
+            g["all_mathematical_and_numerical_checks_pass"]
+            == r["all_mathematical_and_numerical_checks_pass"]
+        )
+        return g, r
+
+    # 1. Section 2 & 5.1: Live Arb + production serializer reproduction on `[625 - 2^-12, 625 + 2^-12]`,
+    #    branch `(3125, 6, 6)`, `A = [625 - 2^-12, 625]`, `B = [625 - 2^-12 - 2^-201, 625 - 2^-201]`:
+    flint_ctx.prec = 256
+    a_lo_q = Fraction(2559999, 4096)
+    a_hi_q = Fraction(625, 1)
+    b_right_gap_mid = arf((625 * (1 << 201) - (1 << 188) - 1, -201))  # 625 - 2^-13 - 2^-201
+    B_right_gap = arb(b_right_gap_mid, arf(((1 << 31) - 1, -44)))  # exact rad = 2^-13
+    bin_lo_q, bin_hi_q = _exact_arb_endpoints_as_fractions(B_right_gap)
+    assert bin_lo_q == a_lo_q - Fraction(1, 1 << 201)
+    assert bin_hi_q == a_hi_q - Fraction(1, 1 << 201)
+    assert bin_hi_q < a_hi_q  # misses right endpoint 625 and interval (625 - 2^-201, 625]
+
+    ser_right_gap = _ser(B_right_gap)
+    ser_lo_dec_q = Fraction(ser_right_gap["lower_dec"])
+    ser_hi_dec_q = Fraction(ser_right_gap["upper_dec"])
+    ser_lo_fl_q = Fraction(ser_right_gap["mid_float"]) - Fraction(ser_right_gap["rad_float_outward"])
+    ser_hi_fl_q = Fraction(ser_right_gap["mid_float"]) + Fraction(ser_right_gap["rad_float_outward"])
+    # Record binary vs outward-serialized endpoints separately: outward 40-digit and float enclosures
+    # BOTH cover `A = [625 - 2^-12, 625]`, yet binary `B_right_gap` misses `[625 - 2^-201, 625]`:
+    assert ser_lo_dec_q < a_lo_q and ser_hi_dec_q > a_hi_q
+    assert ser_lo_fl_q < a_lo_q and ser_hi_fl_q > a_hi_q
+
+    s_repro_625 = json.loads(json.dumps(s_base))
+    sp_r625 = s_repro_625["continuous_straddling_interval_splits"][
+        "interval_625_pm_2_neg12_across_T3125"
+    ]
+    sp_r625["branches"][0].pop("historical_domain_reconstruction", None)
+    sp_r625["branches"][0]["Y_sub_ball"] = ser_right_gap
+    aud_r625 = audit_continuous_interval_split_certificate_tc062(
+        "interval_625_pm_2_neg12_across_T3125",
+        sp_r625,
+        prescribed_Y_lo=Fraction(2559999, 4096),
+        prescribed_Y_hi=Fraction(2560001, 4096),
+    )
+    assert aud_r625["integrity_ok"] is True
+    assert aud_r625["coverage_complete"] is False
+    assert aud_r625["probe_effective_verdicts"] == {
+        "P0": "INCOMPLETE_OR_INVALID_COVERAGE",
+        "TC062_P0_F": "INCOMPLETE_OR_INVALID_COVERAGE",
+    }
+    adm_r625 = aud_r625["branch_domain_admissibility"][0]
+    assert adm_r625["admissibility_status"] == "CERTIFIED_NONEMPTY_INTERSECTION"
+    assert adm_r625["can_certify_refutation"] is True
+    assert adm_r625["complete_subdomain_coverage"] is False
+    assert adm_r625["coverage_status"] == "UNCERTIFIED_COVERAGE"
+    assert any(
+        i["issue_type"] == "UNCERTIFIED_BRANCH_SUBDOMAIN_COVERAGE"
+        for i in aud_r625["coverage_issues"]
+    )
+    g_r625, _ = _both(s_repro_625, "repro_625_right_gap_no_exact")
+    assert g_r625["holdout_hypothesis_outcome"] == "INCOMPLETE_OR_INVALID_COVERAGE"
+    assert g_r625["execution_and_certification_status"] == "INCOMPLETE_HOLDOUT_COVERAGE"
+    assert "SURVIVAL" not in g_r625["completion_outcome_code"]
+    assert g_r625["all_mathematical_and_numerical_checks_pass"] is False
+
+    # Same `B_right_gap` with its exact binary endpoints explicitly supplied -> `PROVED_COVERAGE_GAP`:
+    s_repro_625_ex = json.loads(json.dumps(s_repro_625))
+    s_repro_625_ex["continuous_straddling_interval_splits"][
+        "interval_625_pm_2_neg12_across_T3125"
+    ]["branches"][0]["evaluated_Y_interval_exact_fractions"] = [
+        f"{bin_lo_q.numerator}/{bin_lo_q.denominator}",
+        f"{bin_hi_q.numerator}/{bin_hi_q.denominator}",
+    ]
+    aud_r625_ex = audit_continuous_interval_split_certificate_tc062(
+        "interval_625_pm_2_neg12_across_T3125",
+        s_repro_625_ex["continuous_straddling_interval_splits"][
+            "interval_625_pm_2_neg12_across_T3125"
+        ],
+        prescribed_Y_lo=Fraction(2559999, 4096),
+        prescribed_Y_hi=Fraction(2560001, 4096),
+    )
+    assert aud_r625_ex["integrity_ok"] is True
+    assert aud_r625_ex["coverage_complete"] is False
+    assert aud_r625_ex["branch_domain_admissibility"][0]["coverage_status"] == "PROVED_COVERAGE_GAP"
+    assert any(i["issue_type"] == "INTERIOR_SUBDOMAIN_GAP" for i in aud_r625_ex["coverage_issues"])
+    g_r625_ex, _ = _both(s_repro_625_ex, "repro_625_right_gap_exact")
+    assert g_r625_ex["holdout_hypothesis_outcome"] == "INCOMPLETE_OR_INVALID_COVERAGE"
+
+    # 2. Section 5.2: Corresponding left-end gap `B_left = [625 - 2^-12 + 2^-201, 625 + 2^-201]`
+    #    hidden by outward 40-digit rounding:
+    b_left_gap_mid = arf((625 * (1 << 201) - (1 << 188) + 1, -201))  # 625 - 2^-13 + 2^-201
+    B_left_gap = arb(b_left_gap_mid, arf(((1 << 31) - 1, -44)))
+    bl_lo_q, bl_hi_q = _exact_arb_endpoints_as_fractions(B_left_gap)
+    assert bl_lo_q == a_lo_q + Fraction(1, 1 << 201) > a_lo_q
+    assert bl_hi_q == a_hi_q + Fraction(1, 1 << 201) > a_hi_q
+    ser_left_gap = _ser(B_left_gap)
+    assert Fraction(ser_left_gap["lower_dec"]) < a_lo_q
+    assert Fraction(ser_left_gap["upper_dec"]) > a_hi_q
+
+    s_left_gap = json.loads(json.dumps(s_base))
+    sp_lg = s_left_gap["continuous_straddling_interval_splits"][
+        "interval_625_pm_2_neg12_across_T3125"
+    ]
+    sp_lg["branches"][0].pop("historical_domain_reconstruction", None)
+    sp_lg["branches"][0]["Y_sub_ball"] = ser_left_gap
+    g_lg, _ = _both(s_left_gap, "left_gap_hidden_by_rounding")
+    assert g_lg["holdout_hypothesis_outcome"] == "INCOMPLETE_OR_INVALID_COVERAGE"
+    assert (
+        g_lg["section_5_unseen_validation_and_interval_splits"][
+            "continuous_straddling_interval_splits"
+        ]["interval_split_audits"]["interval_625_pm_2_neg12_across_T3125"][
+            "branch_domain_admissibility"
+        ][0]["coverage_status"]
+        == "UNCERTIFIED_COVERAGE"
+    )
+
+    s_left_gap_ex = json.loads(json.dumps(s_left_gap))
+    s_left_gap_ex["continuous_straddling_interval_splits"][
+        "interval_625_pm_2_neg12_across_T3125"
+    ]["branches"][0]["evaluated_Y_interval_exact_fractions"] = [
+        f"{bl_lo_q.numerator}/{bl_lo_q.denominator}",
+        f"{bl_hi_q.numerator}/{bl_hi_q.denominator}",
+    ]
+    g_lg_ex, _ = _both(s_left_gap_ex, "left_gap_exact_proved")
+    aud_lg_ex = g_lg_ex["section_5_unseen_validation_and_interval_splits"][
+        "continuous_straddling_interval_splits"
+    ]["interval_split_audits"]["interval_625_pm_2_neg12_across_T3125"]
+    assert aud_lg_ex["branch_domain_admissibility"][0]["coverage_status"] == "PROVED_COVERAGE_GAP"
+    assert any(
+        i["issue_type"] == "UNCOVERED_LEFT_INTERVAL_ENDPOINT" for i in aud_lg_ex["coverage_issues"]
+    )
+
+    # 3. Section 5.3: Coverage at `exp(6)` on `(1809, 6, 6)` (`A = [exp(6), 20173/50]`) respects
+    #    exact ownership and cannot be supplied solely by decimal padding or neighboring `(1809, 5, 5)`:
+    flint_ctx.prec = 220
+    q_gt_e6 = _exact_arb_endpoints_as_fractions(arb(6).exp())[1]
+    flint_ctx.prec = 512
+    assert _q_arb(q_gt_e6) > arb(6).exp()
+    flint_ctx.prec = 256
+    mid_e6_q = q_gt_e6 + Fraction(1, 32)
+    sh_e6 = mid_e6_q.denominator.bit_length() - 1
+    B_e6_gap = arb(arf((mid_e6_q.numerator, -sh_e6)), arf(((1 << 31) - 1, -36)))  # rad = 2^-5
+    e6_bin_lo, e6_bin_hi = _exact_arb_endpoints_as_fractions(B_e6_gap)
+    assert e6_bin_lo == q_gt_e6 and e6_bin_hi > Fraction(20173, 50)
+    ser_e6_gap = _ser(B_e6_gap)
+    flint_ctx.prec = 512
+    assert _q_arb(Fraction(ser_e6_gap["lower_dec"])) < arb(6).exp()
+    flint_ctx.prec = 256
+
+    s_e6_pad = json.loads(json.dumps(s_base))
+    sp_e6p = s_e6_pad["continuous_straddling_interval_splits"][
+        "interval_403_40_to_403_46_across_e6"
+    ]
+    # Widen neighboring `(1809, 5, 5)` well past `exp(6)` (`[403.42, 403.44]`, wrong cutoff `D0 = 5`):
+    sp_e6p["branches"][1].pop("historical_domain_reconstruction", None)
+    sp_e6p["branches"][1]["Y_sub_ball"] = _ser(
+        _q_arb(Fraction(40342, 100)).union(_q_arb(Fraction(40344, 100)))
+    )
+    sp_e6p["branches"][1]["evaluated_Y_interval_exact_fractions"] = ["40342/100", "40344/100"]
+    sp_e6p["branches"][2].pop("historical_domain_reconstruction", None)
+    sp_e6p["branches"][2]["Y_sub_ball"] = ser_e6_gap
+    g_e6p, _ = _both(s_e6_pad, "exp6_decimal_padding_and_neighbor_rejected")
+    assert g_e6p["holdout_hypothesis_outcome"] == "INCOMPLETE_OR_INVALID_COVERAGE"
+    aud_e6p = g_e6p["section_5_unseen_validation_and_interval_splits"][
+        "continuous_straddling_interval_splits"
+    ]["interval_split_audits"]["interval_403_40_to_403_46_across_e6"]
+    assert aud_e6p["branch_domain_admissibility"][2]["complete_subdomain_coverage"] is False
+    assert aud_e6p["branch_domain_admissibility"][2]["coverage_status"] == "UNCERTIFIED_COVERAGE"
+
+    s_e6_pad_ex = json.loads(json.dumps(s_e6_pad))
+    s_e6_pad_ex["continuous_straddling_interval_splits"][
+        "interval_403_40_to_403_46_across_e6"
+    ]["branches"][2]["evaluated_Y_interval_exact_fractions"] = [
+        f"{e6_bin_lo.numerator}/{e6_bin_lo.denominator}",
+        f"{e6_bin_hi.numerator}/{e6_bin_hi.denominator}",
+    ]
+    g_e6p_ex, _ = _both(s_e6_pad_ex, "exp6_exact_gap_rejected")
+    aud_e6p_ex = g_e6p_ex["section_5_unseen_validation_and_interval_splits"][
+        "continuous_straddling_interval_splits"
+    ]["interval_split_audits"]["interval_403_40_to_403_46_across_e6"]
+    assert aud_e6p_ex["branch_domain_admissibility"][2]["coverage_status"] == "PROVED_COVERAGE_GAP"
+
+    # 4. Section 5.4: Tiny interior gap (`2^-201`) cannot disappear through a rounded union
+    #    (`evaluated_Y_subintervals_exact_fractions` inside one branch AND across adjacent branches):
+    p1_hi = Fraction(625, 1) - Fraction(1, 8192) - Fraction(1, 1 << 201)
+    p2_lo = Fraction(625, 1) - Fraction(1, 8192)
+    b_hull = _q_arb(a_lo_q).union(_q_arb(a_hi_q))
+    s_multi_gap = json.loads(json.dumps(s_base))
+    sp_mg = s_multi_gap["continuous_straddling_interval_splits"][
+        "interval_625_pm_2_neg12_across_T3125"
+    ]
+    sp_mg["branches"][0].pop("historical_domain_reconstruction", None)
+    sp_mg["branches"][0]["Y_sub_ball"] = _ser(b_hull)
+    sp_mg["branches"][0]["evaluated_Y_subintervals_exact_fractions"] = [
+        [f"{a_lo_q.numerator}/{a_lo_q.denominator}", f"{p1_hi.numerator}/{p1_hi.denominator}"],
+        [f"{p2_lo.numerator}/{p2_lo.denominator}", "625"],
+    ]
+    g_mg, _ = _both(s_multi_gap, "multi_piece_tiny_interior_gap")
+    assert g_mg["holdout_hypothesis_outcome"] == "INCOMPLETE_OR_INVALID_COVERAGE"
+    aud_mg = g_mg["section_5_unseen_validation_and_interval_splits"][
+        "continuous_straddling_interval_splits"
+    ]["interval_split_audits"]["interval_625_pm_2_neg12_across_T3125"]
+    assert aud_mg["branch_domain_admissibility"][0]["complete_subdomain_coverage"] is False
+    assert aud_mg["branch_domain_admissibility"][0]["coverage_status"] == "PROVED_COVERAGE_GAP"
+    assert (
+        aud_mg["branch_domain_admissibility"][0]["coverage_reason"]
+        == "UNBRIDGED_INTERIOR_GAP_IN_EVALUATED_PIECES"
+    )
+    assert any(i["issue_type"] == "INTERIOR_SUBDOMAIN_GAP" for i in aud_mg["coverage_issues"])
+
+    # Touching multi-piece union WITHOUT gap (`hi_1 == lo_2`) passes cleanly:
+    s_multi_ok = json.loads(json.dumps(s_multi_gap))
+    s_multi_ok["continuous_straddling_interval_splits"][
+        "interval_625_pm_2_neg12_across_T3125"
+    ]["branches"][0]["evaluated_Y_subintervals_exact_fractions"] = [
+        [f"{a_lo_q.numerator}/{a_lo_q.denominator}", f"{p2_lo.numerator}/{p2_lo.denominator}"],
+        [f"{p2_lo.numerator}/{p2_lo.denominator}", "625"],
+    ]
+    g_mok, _ = _both(s_multi_ok, "multi_piece_touching_valid")
+    assert g_mok["holdout_hypothesis_outcome"] == "SURVIVED_TESTED_POINTS"
+    assert g_mok["execution_and_certification_status"] == "CERTIFIED_EVALUATION_COMPLETE"
+
+    # 5. Section 5.5: Valid fully covering exact evaluation domain (`evaluated_Y_symbolic_bounds`
+    #    on `exp(6)` + live `evaluate_interval_via_cutoff_case_split_arb` output) passes:
+    s_sym_ok = json.loads(json.dumps(s_base))
+    sp_sok = s_sym_ok["continuous_straddling_interval_splits"][
+        "interval_403_40_to_403_46_across_e6"
+    ]
+    sp_sok["branches"][2].pop("historical_domain_reconstruction", None)
+    e6_cov_ball = arb(6).exp().lower().union(_q_arb(Fraction(20173, 50)).upper())
+    e6_cov_lo, e6_cov_hi = _exact_arb_endpoints_as_fractions(e6_cov_ball)
+    sp_sok["branches"][2]["Y_sub_ball"] = _ser(e6_cov_ball)
+    sp_sok["branches"][2]["evaluated_Y_interval_exact_fractions"] = [
+        f"{e6_cov_lo.numerator}/{e6_cov_lo.denominator}",
+        f"{e6_cov_hi.numerator}/{e6_cov_hi.denominator}",
+    ]
+    g_sok, _ = _both(s_sym_ok, "valid_exact_covering_exp6")
+    assert g_sok["holdout_hypothesis_outcome"] == "SURVIVED_TESTED_POINTS"
+    assert g_sok["execution_and_certification_status"] == "CERTIFIED_EVALUATION_COMPLETE"
+    assert g_sok["all_mathematical_and_numerical_checks_pass"] is True
+
+    live_sp = evaluate_interval_via_cutoff_case_split_arb(
+        Fraction(159, 10), Fraction(161, 10), prec_bits=128, quad_tol_bits=40
+    )
+    for br_live in live_sp["branches"]:
+        ef_live = br_live["evaluated_Y_interval_exact_fractions"]
+        ys_live_lo, ys_live_hi = _exact_arb_endpoints_as_fractions(br_live["Y_sub_ball"])
+        assert ys_live_lo <= Fraction(ef_live[0]) <= Fraction(ef_live[1]) <= ys_live_hi
+
+    # 6. Section 4 & 5.6: Justified recovered legacy domains on all 5 branches pass with `0`
+    #    numerical margin changes:
+    raw_tc062r3 = _load_git_json_artifact_or_none(
+        REVIEWED_TC062R3_DELIVERED_TIP, "data/tc_joint_prime_dilation_signed_remainder.json"
+    )
+    assert raw_tc062r3 is not None
+    p_unmig = tmp_path / "raw_tc062r3.json"
+    p_unmig.write_text(json.dumps(raw_tc062r3), encoding="utf-8")
+    r_unmig = reprocess_task_tc062_metadata_and_stage_b(p_unmig, write_output=False)
+    assert r_unmig["holdout_hypothesis_outcome"] == "INCOMPLETE_OR_INVALID_COVERAGE"
+    assert r_unmig["execution_and_certification_status"] == "INCOMPLETE_HOLDOUT_COVERAGE"
+
+    r_rec = reprocess_task_tc062_metadata_and_stage_b(
+        p_unmig, write_output=False, reconstruct_legacy_interval_domains=True
+    )
+    assert r_rec["holdout_hypothesis_outcome"] == "SURVIVED_TESTED_POINTS"
+    assert r_rec["execution_and_certification_status"] == "CERTIFIED_EVALUATION_COMPLETE"
+    assert r_rec["all_mathematical_and_numerical_checks_pass"] is True
+    rec_tbl = r_rec["provenance"]["tc062r4_legacy_domain_reconstruction_summary"][
+        "five_branch_domain_evidence_table"
+    ]
+    assert len(rec_tbl) == 5
+    assert all(
+        row["pre_reconstruction_coverage_status"] == "UNCERTIFIED_COVERAGE"
+        and row["margin_status"] == "PRESERVED_WITHOUT_RECOMPUTATION"
+        and row["stored_Y_sub_ball_5field_exact_match"] is True
+        for row in rec_tbl
+    )
+    comp_rec = compare_tc062_artifacts_by_stable_key(
+        r_rec, raw_tc062r3, baseline_commit=REVIEWED_TC062R3_DELIVERED_TIP
+    )
+    assert comp_rec["changed_numerical_enclosures_count"] == 0
+    assert comp_rec["enclosure_comparison_complete"] is True
+    assert comp_rec["any_numerical_enclosure_changed_on_comparable_balls"] is False
+
+    # 7. Section 5.7: Deleting or invalidating domain evidence on ANY of the 5 branches cannot
+    #    silently preserve complete coverage across generator or `--reprocess-metadata`:
+    branch_locs = [
+        ("interval_625_pm_2_neg12_across_T3125", 0),
+        ("interval_625_pm_2_neg12_across_T3125", 1),
+        ("interval_403_40_to_403_46_across_e6", 0),
+        ("interval_403_40_to_403_46_across_e6", 1),
+        ("interval_403_40_to_403_46_across_e6", 2),
+    ]
+    for sk_loc, b_i in branch_locs:
+        s_del_hdr = json.loads(json.dumps(s_base))
+        s_del_hdr["continuous_straddling_interval_splits"][sk_loc]["branches"][b_i].pop(
+            "historical_domain_reconstruction", None
+        )
+        g_dh, r_dh = _both(s_del_hdr, f"del_hdr_{sk_loc}_{b_i}")
+        assert g_dh["holdout_hypothesis_outcome"] == "INCOMPLETE_OR_INVALID_COVERAGE"
+        assert (
+            "historical_domain_reconstruction"
+            not in r_dh["section_5_unseen_validation_and_interval_splits"][
+                "continuous_straddling_interval_splits"
+            ][sk_loc]["branches"][b_i]
+        )
+
+        s_bad_hdr = json.loads(json.dumps(s_base))
+        s_bad_hdr["continuous_straddling_interval_splits"][sk_loc]["branches"][b_i][
+            "historical_domain_reconstruction"
+        ]["reconstructed_sub_ball_exact_dyadic_fractions"] = ["2", "3"]
+        g_bh, _ = _both(s_bad_hdr, f"bad_hdr_{sk_loc}_{b_i}")
+        assert g_bh["holdout_hypothesis_outcome"] == "CERTIFICATION_INTEGRITY_CONFLICT"
+
+    # Also verify artifact-level producer commit mismatch invalidates `historical_domain_reconstruction`:
+    art_wrong_prod = json.loads(json.dumps(tc062_artifact))
+    art_wrong_prod["provenance"]["numerical_producing_git_commit"] = "0" * 40
+    p_wp = tmp_path / "wrong_prod_hdr.json"
+    p_wp.write_text(json.dumps(art_wrong_prod), encoding="utf-8")
+    r_wp = reprocess_task_tc062_metadata_and_stage_b(p_wp, write_output=False)
+    assert r_wp["holdout_hypothesis_outcome"] == "CERTIFICATION_INTEGRITY_CONFLICT"
+
+    # 8. Section 4 & 5.8: `reconstruct_tc062r_legacy_interval_domains` refuses mismatched producer,
+    #    mismatched timestamp, mismatched cutoff identity, modified `Y_sub_ball`, explicit domain
+    #    field, or `prec=53` serialization-collision impostor margins:
+    bad_p1 = json.loads(json.dumps(raw_tc062r3))
+    bad_p1["provenance"]["numerical_producing_git_commit"] = "1" * 40
+    with pytest.raises(ValueError, match="REFUSED_MISMATCHED_NUMERICAL_PRODUCER"):
+        reconstruct_tc062r_legacy_interval_domains(bad_p1)
+
+    bad_ts = json.loads(json.dumps(raw_tc062r3))
+    bad_ts["generated_at_utc"] = "2026-11-18T00:00:00+00:00"
+    with pytest.raises(ValueError, match="REFUSED_MISMATCHED_GENERATED_AT_UTC"):
+        reconstruct_tc062r_legacy_interval_domains(bad_ts)
+
+    bad_cut = json.loads(json.dumps(raw_tc062r3))
+    bad_cut["section_5_unseen_validation_and_interval_splits"][
+        "continuous_straddling_interval_splits"
+    ]["interval_625_pm_2_neg12_across_T3125"]["branches"][0]["T_fixed"] = 3124
+    bad_cut["section_5_unseen_validation_and_interval_splits"][
+        "continuous_straddling_interval_splits"
+    ]["interval_625_pm_2_neg12_across_T3125"]["T_range"] = [3124, 3126]
+    with pytest.raises(ValueError, match="REFUSED"):
+        reconstruct_tc062r_legacy_interval_domains(bad_cut)
+
+    bad_ys = json.loads(json.dumps(raw_tc062r3))
+    bad_ys["section_5_unseen_validation_and_interval_splits"][
+        "continuous_straddling_interval_splits"
+    ]["interval_625_pm_2_neg12_across_T3125"]["branches"][0]["Y_sub_ball"] = ser_right_gap
+    with pytest.raises(ValueError, match="REFUSED_MODIFIED_Y_SUB_BALL_RECORD"):
+        reconstruct_tc062r_legacy_interval_domains(bad_ys)
+
+    bad_exp = json.loads(json.dumps(raw_tc062r3))
+    bad_exp["section_5_unseen_validation_and_interval_splits"][
+        "continuous_straddling_interval_splits"
+    ]["interval_625_pm_2_neg12_across_T3125"]["branches"][0][
+        "evaluated_Y_interval_exact_fractions"
+    ] = ["2559999/4096", "625"]
+    with pytest.raises(ValueError, match="REFUSED_MODIFIED_EXPLICIT_DOMAIN_FIELD"):
+        reconstruct_tc062r_legacy_interval_domains(bad_exp)
+
+    # Construct a genuine 256-bit Arb impostor interval `b_impostor != yr0` on `(1808, 5, 5)` whose
+    # 53-bit `serialize_arb_certified(b_impostor)` matches `ser_53` across ALL 5 serialized fields,
+    # and verify that observable SHA-256 linkage defeats the serialization collision:
+    rep_1808 = _replay_historical_tc062r_sub_ball(
+        Fraction(2017, 5), Fraction(20173, 50), 1808, 5
+    )
+    saved_pr = flint_ctx.prec
+    try:
+        flint_ctx.prec = 320
+        sub_1808 = (arb(2017) / arb(5)).lower().union((arb(1808) ** (arb(4) / arb(5))).upper())
+        flint_ctx.prec = 256
+        yr_1808 = +sub_1808
+        ym_18, ye_18 = yr_1808.mid().man_exp()
+        flint_ctx.prec = 512
+        b_impostor = (yr_1808 - arb(yr_1808.mid())) + arb(arf((ym_18 + 2, ye_18)))
+        assert _exact_arb_endpoints_as_fractions(b_impostor) != _exact_arb_endpoints_as_fractions(
+            yr_1808
+        )
+        flint_ctx.prec = 53
+        ser_impostor = _ser(b_impostor)
+    finally:
+        flint_ctx.prec = saved_pr
+    assert ser_impostor == rep_1808["ser_53"]  # identical 5-field rounded serialization!
+
+    bad_imp = json.loads(json.dumps(raw_tc062r3))
+    sp_imp = bad_imp["section_5_unseen_validation_and_interval_splits"][
+        "continuous_straddling_interval_splits"
+    ]["interval_403_40_to_403_46_across_e6"]
+    br_imp = sp_imp["branches"][0]
+    br_imp["Y_sub_ball"] = ser_impostor
+    br_imp["M_P0_F"] = _ser(arb("-0.641", arb("0.001")))
+    sp_imp["union_M_P0_F"] = _ser(arb("-1.0").union(arb("-0.10")))
+    with pytest.raises(ValueError, match="REFUSED_MODIFIED_OR_UNLINKED_BRANCH_OBSERVABLES"):
+        reconstruct_tc062r_legacy_interval_domains(bad_imp)
+
+    # 9 & 10. Sections 5.9 & 5.10: Nonempty partial evaluated domain inside `A` (`B_outer subseteq A`
+    #         with NO exact-domain field, AND exact partial domain):
+    #   - With `PASS` margins: supplies an admissible witness (`can_certify_refutation = True`) yet
+    #     CANNOT establish complete coverage or survival (`INCOMPLETE_OR_INVALID_COVERAGE`);
+    #   - With positive `FAIL` margin (`P0` and `P0_F`): refutes (`REFUTED_BY_CERTIFIED_WITNESS`)
+    #     while coverage stays incomplete (`CERTIFIED_REFUTATION_WITH_INCOMPLETE_REMAINING_GRID`):
+    flint_ctx.prec = 256
+    B_sub_A = _q_arb(Fraction(625, 1) - Fraction(3, 16384)).union(
+        _q_arb(Fraction(625, 1) - Fraction(1, 16384))
+    )
+    s_part_pass = json.loads(json.dumps(s_base))
+    sp_pp = s_part_pass["continuous_straddling_interval_splits"][
+        "interval_625_pm_2_neg12_across_T3125"
+    ]
+    sp_pp["branches"][0].pop("historical_domain_reconstruction", None)
+    sp_pp["branches"][0]["Y_sub_ball"] = _ser(B_sub_A)
+    g_pp, _ = _both(s_part_pass, "partial_domain_only_pass_margins")
+    aud_pp = g_pp["section_5_unseen_validation_and_interval_splits"][
+        "continuous_straddling_interval_splits"
+    ]["interval_split_audits"]["interval_625_pm_2_neg12_across_T3125"]
+    assert aud_pp["branch_domain_admissibility"][0]["can_certify_refutation"] is True
+    assert aud_pp["branch_domain_admissibility"][0]["complete_subdomain_coverage"] is False
+    assert g_pp["holdout_hypothesis_outcome"] == "INCOMPLETE_OR_INVALID_COVERAGE"
+    assert g_pp["execution_and_certification_status"] == "INCOMPLETE_HOLDOUT_COVERAGE"
+    assert "SURVIVAL" not in g_pp["completion_outcome_code"]
+
+    # Tiny `B_tiny_in_A` (`403.41 +/- 2^-201` on `(1808, 5, 5)`, where `has_nonempty_inner = False`,
+    # testing the pure `B_outer subseteq A` branch!):
+    B_tiny_in_A = (arb(40341) / arb(100)) + arb(0, arf(((1 << 31) - 1, -232)))
+    s_tiny_pass = json.loads(json.dumps(s_base))
+    sp_tp = s_tiny_pass["continuous_straddling_interval_splits"][
+        "interval_403_40_to_403_46_across_e6"
+    ]
+    sp_tp["branches"][0].pop("historical_domain_reconstruction", None)
+    sp_tp["branches"][0]["Y_sub_ball"] = _ser(B_tiny_in_A)
+    aud_tp = audit_continuous_interval_split_certificate_tc062(
+        "interval_403_40_to_403_46_across_e6",
+        sp_tp,
+        prescribed_Y_lo=Fraction(2017, 5),
+        prescribed_Y_hi=Fraction(20173, 50),
+    )
+    adm_tp = aud_tp["branch_domain_admissibility"][0]
+    assert (
+        adm_tp["admissibility_reason"]
+        == "ENTIRE_OUTWARD_EVALUATION_ENCLOSURE_SUBSET_OF_ADMISSIBLE_SUBDOMAIN"
+    )
+    assert adm_tp["can_certify_refutation"] is True
+    assert adm_tp["complete_subdomain_coverage"] is False
+    assert adm_tp["coverage_status"] == "PROVED_COVERAGE_GAP"
+    g_tp, _ = _both(s_tiny_pass, "tiny_subset_of_A_pass_margins")
+    assert g_tp["holdout_hypothesis_outcome"] == "INCOMPLETE_OR_INVALID_COVERAGE"
+
+    # Same `B_tiny_in_A` with positive `M_P0_F` refutes while coverage stays incomplete:
+    pos_m = arb("0.20", arb("0.005"))
+    pos_f = arb("0.92", arb("0.005"))
+    neg_m_wide = arb("-1.0").union(arb("-0.05"))
+    s_tiny_fail = json.loads(json.dumps(s_tiny_pass))
+    sp_tf = s_tiny_fail["continuous_straddling_interval_splits"][
+        "interval_403_40_to_403_46_across_e6"
+    ]
+    sp_tf["branches"][0]["F_Y"] = _ser(pos_f)
+    sp_tf["union_F_Y"] = _ser(arb("-1.0").union(pos_f))
+    sp_tf["branches"][0]["M_P0_F"] = _ser(pos_m)
+    sp_tf["branches"][0]["TC062_P0_F_branch_classification"] = {"verdict": "FAIL"}
+    sp_tf["union_M_P0_F"] = _ser(neg_m_wide.union(pos_m))
+    sp_tf["TC062_P0_F_interval_classification"] = {"verdict": "UNRESOLVED"}
+    g_tf, _ = _both(s_tiny_fail, "tiny_subset_of_A_fail_refutes")
+    assert g_tf["holdout_hypothesis_outcome"] == "REFUTED_BY_CERTIFIED_WITNESS"
+    assert (
+        g_tf["execution_and_certification_status"]
+        == "CERTIFIED_REFUTATION_WITH_INCOMPLETE_REMAINING_GRID"
+    )
+    assert g_tf["section_5_unseen_validation_and_interval_splits"]["coverage_complete"] is False
+
+    # 11. Section 5.11: Disjoint `[2, 2]` and excluded-boundary-only `[625, 625]` on `(3126, 6, 6)`
+    #     remain unable to refute:
+    s_disj = json.loads(json.dumps(s_tiny_fail))
+    s_disj["continuous_straddling_interval_splits"][
+        "interval_403_40_to_403_46_across_e6"
+    ]["branches"][0]["Y_sub_ball"] = _ser(arb(2))
+    g_disj, _ = _both(s_disj, "disjoint_box_cannot_refute")
+    assert g_disj["holdout_hypothesis_outcome"] == "INCOMPLETE_OR_INVALID_COVERAGE"
+
+    s_excl = json.loads(json.dumps(s_base))
+    sp_ex = s_excl["continuous_straddling_interval_splits"][
+        "interval_625_pm_2_neg12_across_T3125"
+    ]
+    sp_ex["branches"][1].pop("historical_domain_reconstruction", None)
+    sp_ex["branches"][1]["Y_sub_ball"] = _ser(arb(625))
+    sp_ex["branches"][1]["F_Y"] = _ser(pos_f)
+    sp_ex["union_F_Y"] = _ser(arb("-0.40").union(pos_f))
+    sp_ex["branches"][1]["M_P0_F"] = _ser(pos_m)
+    sp_ex["branches"][1]["TC062_P0_F_branch_classification"] = {"verdict": "FAIL"}
+    sp_ex["union_M_P0_F"] = _ser(neg_m_wide.union(pos_m))
+    sp_ex["TC062_P0_F_interval_classification"] = {"verdict": "UNRESOLVED"}
+    g_excl, _ = _both(s_excl, "excluded_625_on_3126_cannot_refute")
+    assert g_excl["holdout_hypothesis_outcome"] == "INCOMPLETE_OR_INVALID_COVERAGE"
+
+    # 12. Section 5.12: Separate `WITHIN` / `EXCEEDED` / `UNKNOWN` resource statuses retain semantics:
+    s_res_exc = json.loads(json.dumps(s_base))
+    s_res_exc["holdout_point_evaluations"][0]["tier_escalation_history"][0][
+        "peak_rss_mb"
+    ] = 99999.0
+    g_rexc, _ = _both(s_res_exc, "resource_exceeded")
+    assert g_rexc["holdout_hypothesis_outcome"] == "SURVIVED_TESTED_POINTS"
+    assert g_rexc["resource_compliance_status"] == "EXCEEDED"
+    assert (
+        g_rexc["execution_and_certification_status"]
+        == "CERTIFIED_EVALUATION_COMPLETE_RESOURCE_BUDGET_EXCEEDED"
+    )
+    assert g_rexc["all_mathematical_and_numerical_checks_pass"] is False
+
+    s_res_unk = json.loads(json.dumps(s_base))
+    s_res_unk["holdout_point_evaluations"][0]["tier_escalation_history"][0][
+        "peak_rss_measurement_semantics"
+    ] = "TIER_LOCAL_SNAPSHOT"
+    g_runk, _ = _both(s_res_unk, "resource_unknown")
+    assert g_runk["holdout_hypothesis_outcome"] == "SURVIVED_TESTED_POINTS"
+    assert g_runk["resource_compliance_status"] == "UNKNOWN"
+    assert (
+        g_runk["execution_and_certification_status"]
+        == "CERTIFIED_EVALUATION_COMPLETE_RESOURCE_TELEMETRY_UNKNOWN"
+    )
+    assert g_runk["all_mathematical_and_numerical_checks_pass"] is False
+
+    # 13. Section 5.13: Repeated metadata reprocessing is semantically idempotent modulo
+    #     `provenance.tc062r4_reprocessed_at_utc`:
+    p_id = tmp_path / "tc062r4_idem.json"
+    p_id.write_bytes(JOINT_PRIME_DILATION_ARTIFACT_PATH.read_bytes())
+    out_1 = reprocess_task_tc062_metadata_and_stage_b(p_id, write_output=True)
+    out_2 = reprocess_task_tc062_metadata_and_stage_b(p_id, write_output=True)
+    d_1 = json.loads(json.dumps(out_1))
+    d_2 = json.loads(json.dumps(out_2))
+    t_1 = d_1["provenance"].pop("tc062r4_reprocessed_at_utc")
+    t_2 = d_2["provenance"].pop("tc062r4_reprocessed_at_utc")
+    assert isinstance(t_1, str) and isinstance(t_2, str)
+    assert d_1 == d_2
+
 
 
 

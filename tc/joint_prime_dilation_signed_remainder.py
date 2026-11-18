@@ -164,10 +164,12 @@ TASK_TC_062_ID = "TASK-TC-062"
 TASK_TC_062R_ID = "TASK-TC-062R"
 TASK_TC_062R2_ID = "TASK-TC-062R2"
 TASK_TC_062R3_ID = "TASK-TC-062R3"
+TASK_TC_062R4_ID = "TASK-TC-062R4"
 PROPOSED_TC062_BRANCH = "task/tc-062-joint-prime-dilation-signed-remainder"
 PROPOSED_TC062R_BRANCH = "task/tc-062r-prime-power-certification-and-diagonal-equivalence-repair"
 PROPOSED_TC062R2_BRANCH = "task/tc-062r2-interval-integrity-coverage-and-report-closeout"
 PROPOSED_TC062R3_BRANCH = "task/tc-062r3-witness-domain-and-provenance-closeout"
+PROPOSED_TC062R4_BRANCH = "task/tc-062r4-exact-evaluation-domain-coverage-closeout"
 ACCEPTED_TC061R3_TIP = "6a2f5f519b3f2f4642ea2ce00626832e556953be"
 ACCEPTED_TC061R3_IMPLEMENTATION = "c2691d0d9e9aee2e148af2c7ec4908f0ebd52521"
 REVIEWED_TC062_TIP = "0943eb639dd20191f7563ba23f3e2d5d9f999217"
@@ -177,6 +179,9 @@ REVIEWED_TC062R_DELIVERED_TIP = "a8f5887735e59c95af783e61297b7264a4caea5e"
 REVIEWED_TC062R_PRODUCING_COMMIT = "4b3df05665e186c85eb54c3822ae1d8c34199a3c"
 REVIEWED_TC062R2_DELIVERED_TIP = "a742aecea3fe737074231ecb2f501a959bbc2693"
 REVIEWED_TC062R2_VALIDATION_COMMIT = "2ba4f3348ddc7b8b9d731bf189ae20c2af877434"
+REVIEWED_TC062R3_DELIVERED_TIP = "c87d464f4d9c030259a69142306cf4bef90fc581"
+REVIEWED_TC062R3_VALIDATION_COMMIT = "8c08a56d11ee5524904bcc23ed56d6b5583794fc"
+HISTORICAL_TC062R_GENERATED_AT_UTC = "2026-11-17T13:21:54.466739+00:00"
 
 BRANCH_ADMISSIBILITY_STATUSES: Tuple[str, ...] = (
     "CERTIFIED_NONEMPTY_INTERSECTION",
@@ -185,6 +190,53 @@ BRANCH_ADMISSIBILITY_STATUSES: Tuple[str, ...] = (
     "UNCERTIFIED_INTERSECTION",
     "INVALID_DOMAIN_OR_WITNESS_CONFLICT",
 )
+
+BRANCH_COVERAGE_STATUSES: Tuple[str, ...] = (
+    "CERTIFIED_COMPLETE_COVERAGE",
+    "PROVED_COVERAGE_GAP",
+    "UNCERTIFIED_COVERAGE",
+    "EMPTY_OR_INFEASIBLE_SUBDOMAIN",
+    "INVALID_DOMAIN_CONFLICT",
+)
+
+BRANCH_12_OBSERVABLE_KEYS: Tuple[str, ...] = (
+    "E_Y",
+    "D_tilde_Y",
+    "X_tilde_Y",
+    "A_norm_sq",
+    "B_norm_sq",
+    "pair_P_B",
+    "J_Y",
+    "log_Y_times_D_tilde",
+    "M_P0",
+    "X_self_Y",
+    "F_Y",
+    "M_P0_F",
+)
+
+# Deterministic SHA-256 digests of the 12 256-bit Arb quadrature enclosures produced by
+# `REVIEWED_TC062R_PRODUCING_COMMIT = 4b3df05665e186c85eb54c3822ae1d8c34199a3c` at
+# `HISTORICAL_TC062R_GENERATED_AT_UTC = 2026-11-17T13:21:54.466739+00:00` across the five
+# canonical interval branches (`TASK-TC-062R4` §4):
+HISTORICAL_TC062R_BRANCH_OBSERVABLE_SHA256: Dict[
+    Tuple[str, Tuple[int, int, int]], str
+] = {
+    ("interval_625_pm_2_neg12_across_T3125", (3125, 6, 6)): (
+        "cb28836b6b38544c52b63ebff39339452975f99fb525823f7e0e8a36b3a5b4ac"
+    ),
+    ("interval_625_pm_2_neg12_across_T3125", (3126, 6, 6)): (
+        "0a9b492de943ef45d168c76fd51be855e44526e6e037fce532ee243f34f413ac"
+    ),
+    ("interval_403_40_to_403_46_across_e6", (1808, 5, 5)): (
+        "ad956f647773eaccd57d483585ad6966f1dc3493b48432b04ce75f94e8569e64"
+    ),
+    ("interval_403_40_to_403_46_across_e6", (1809, 5, 5)): (
+        "c1d203d9e1f6e26d3577c47fbe9268430c511cdfffef71fbbd08353c69495ec5"
+    ),
+    ("interval_403_40_to_403_46_across_e6", (1809, 6, 6)): (
+        "56de79e6b91fb41546e5d2eccba870df84e163d8c6950f111361ecfebf919e68"
+    ),
+}
 
 REQUIRED_CURRENT_TC062_STATUS_KEYS: Tuple[str, ...] = (
     "top.execution_and_certification_status",
@@ -4256,6 +4308,137 @@ def _certified_witness_from_nonempty_intersection(
     return None
 
 
+_HISTORICAL_TC062R_REPLAY_CACHE: Dict[
+    Tuple[str, str, int, int], Dict[str, Any]
+] = {}
+
+
+def _branch_12_observables_sha256(br: Dict[str, Any]) -> Optional[str]:
+    """Compute canonical SHA-256 digest over all 12 branch observable Arb enclosures (`E_Y`..`M_P0_F`),
+    binding a branch's preserved quadrature margins to its exact historical evaluation domain.
+    """
+    if not isinstance(br, dict):
+        return None
+    obs_payload: Dict[str, Any] = {}
+    for k in BRANCH_12_OBSERVABLE_KEYS:
+        val = br.get(k)
+        if not isinstance(val, dict):
+            return None
+        obs_payload[k] = val
+    raw = json.dumps(obs_payload, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+
+def _replay_historical_tc062r_sub_ball(
+    prescribed_Y_lo: Fraction,
+    prescribed_Y_hi: Fraction,
+    t_c: int,
+    d0_c: int,
+) -> Dict[str, Any]:
+    """Deterministically replay the exact `sub_ball` (`flint_ctx.prec = 320`), outward return
+    `y_ret = +sub_ball` (`flint_ctx.prec = 256`), and serialized `Y_sub_ball` (`flint_ctx.prec = 53`)
+    executed by `REVIEWED_TC062R_PRODUCING_COMMIT = 4b3df05665e186c85eb54c3822ae1d8c34199a3c`
+    without repeating numerical quadrature (`TASK-TC-062R4` §4).
+    """
+    cache_key = (str(prescribed_Y_lo), str(prescribed_Y_hi), int(t_c), int(d0_c))
+    if cache_key in _HISTORICAL_TC062R_REPLAY_CACHE:
+        return _HISTORICAL_TC062R_REPLAY_CACHE[cache_key]
+
+    saved_p = flint_ctx.prec
+    try:
+        flint_ctx.prec = 320
+        y_lo_b = _frac_to_arb(prescribed_Y_lo)
+        y_hi_b = _frac_to_arb(prescribed_Y_hi)
+        t_lo_b = (arb(t_c - 1) ** (arb(4) / arb(5))) if t_c > 1 else arb(0)
+        t_hi_b = arb(t_c) ** (arb(4) / arb(5))
+        d_lo_b = arb(d0_c).exp()
+        d_hi_b = arb(d0_c + 1).exp()
+        lo_cand = max(
+            [y_lo_b.lower(), t_lo_b.lower(), d_lo_b.lower()],
+            key=lambda b: _exact_arb_endpoints_as_fractions(b)[0],
+        )
+        hi_cand = min(
+            [y_hi_b.upper(), t_hi_b.upper(), d_hi_b.upper()],
+            key=lambda b: _exact_arb_endpoints_as_fractions(b)[1],
+        )
+        sub_ball = lo_cand.union(hi_cand)
+        eval_lo_q, eval_hi_q = _exact_arb_endpoints_as_fractions(sub_ball)
+        lo_cand_q = _exact_arb_endpoints_as_fractions(lo_cand)[0]
+        hi_cand_q = _exact_arb_endpoints_as_fractions(hi_cand)[1]
+        mid_me = sub_ball.mid().man_exp()
+        rad_me = sub_ball.rad().man_exp()
+
+        flint_ctx.prec = 256
+        y_ret = +sub_ball
+        ret_lo_q, ret_hi_q = _exact_arb_endpoints_as_fractions(y_ret)
+
+        flint_ctx.prec = 53
+        ser_53 = strip_enclosure_arb_for_json(serialize_arb_certified(y_ret))
+    finally:
+        flint_ctx.prec = saved_p
+
+    deff_c = min(int(d0_c), max(0, int(t_c) - 1))
+    subdomain_A = _derive_exact_branch_admissible_subdomain(
+        prescribed_Y_lo, prescribed_Y_hi, int(t_c), int(d0_c), deff_c
+    )
+    cov_lo, cov_hi = _symbolic_closed_box_covers_closure(
+        ("rational", eval_lo_q), ("rational", eval_hi_q), subdomain_A
+    )
+    constructor_chain_ok = bool(
+        eval_lo_q <= lo_cand_q
+        and hi_cand_q <= eval_hi_q
+        and ret_lo_q <= eval_lo_q
+        and eval_hi_q <= ret_hi_q
+        and cov_lo
+        and cov_hi
+    )
+    res = {
+        "eval_lo_q": eval_lo_q,
+        "eval_hi_q": eval_hi_q,
+        "ret_lo_q": ret_lo_q,
+        "ret_hi_q": ret_hi_q,
+        "mid_man_exp": [int(mid_me[0]), int(mid_me[1])],
+        "rad_man_exp": [int(rad_me[0]), int(rad_me[1])],
+        "ser_53": ser_53,
+        "cov_lo": cov_lo,
+        "cov_hi": cov_hi,
+        "constructor_chain_ok": constructor_chain_ok,
+    }
+    _HISTORICAL_TC062R_REPLAY_CACHE[cache_key] = res
+    return res
+
+
+def _merge_touching_symbolic_closed_intervals(
+    pieces: Sequence[Tuple[Tuple[str, Union[Fraction, int]], Tuple[str, Union[Fraction, int]]]],
+) -> List[Tuple[Tuple[str, Union[Fraction, int]], Tuple[str, Union[Fraction, int]]]]:
+    """Merge sorted closed intervals `[lo_i, hi_i]` ONLY when `next_lo <= cur_hi` (touching or
+    overlapping). Never bridges any positive interior gap `cur_hi < next_lo` (`TASK-TC-062R4` §3).
+    """
+    if not pieces:
+        return []
+    from functools import cmp_to_key
+
+    def _cmp_piece(
+        a: Tuple[Tuple[str, Union[Fraction, int]], Tuple[str, Union[Fraction, int]]],
+        b: Tuple[Tuple[str, Union[Fraction, int]], Tuple[str, Union[Fraction, int]]],
+    ) -> int:
+        c0 = _compare_symbolic_cutoff_bound(a[0], b[0])
+        return c0 if c0 != 0 else _compare_symbolic_cutoff_bound(a[1], b[1])
+
+    sorted_p = sorted(pieces, key=cmp_to_key(_cmp_piece))
+    merged: List[Tuple[Tuple[str, Union[Fraction, int]], Tuple[str, Union[Fraction, int]]]] = [
+        sorted_p[0]
+    ]
+    for nxt_lo, nxt_hi in sorted_p[1:]:
+        cur_lo, cur_hi = merged[-1]
+        if _compare_symbolic_cutoff_bound(nxt_lo, cur_hi) <= 0:
+            new_hi = cur_hi if _compare_symbolic_cutoff_bound(cur_hi, nxt_hi) >= 0 else nxt_hi
+            merged[-1] = (cur_lo, new_hi)
+        else:
+            merged.append((nxt_lo, nxt_hi))
+    return merged
+
+
 def _evaluate_branch_domain_admissibility_tc062(
     br: Dict[str, Any],
     *,
@@ -4263,16 +4446,34 @@ def _evaluate_branch_domain_admissibility_tc062(
     prescribed_Y_lo: Fraction,
     prescribed_Y_hi: Fraction,
     cutoff_triple: Tuple[int, int, int],
+    split_key: Optional[str] = None,
+    artifact_provenance: Optional[Dict[str, Any]] = None,
+    artifact_generated_at_utc: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """Single shared branch evaluation-domain admissibility and witness verifier (`TASK-TC-062R3` §2),
-    used identically on required and conservative/extra branches for BOTH `P0` and `TC062_P0_F`.
+    """Single shared branch evaluation-domain admissibility, witness, and full-coverage verifier
+    (`TASK-TC-062R3` §2 & `TASK-TC-062R4` §3), used identically on required and conservative/extra
+    branches across BOTH `P0` and `TC062_P0_F`, aggregator, generator, metadata reprocessor, and
+    stable-key comparisons.
 
-    Distinguishes:
-      1. `CERTIFIED_NONEMPTY_INTERSECTION` (`A cap B != empty` certified or verified witness `Y_w in A cap B`),
-      2. `DISJOINT_EVALUATION_DOMAIN` (`A == empty` or `closure(A) cap B == empty`),
-      3. `EXCLUDED_BOUNDARY_ONLY_INTERSECTION` (`A cap B == empty` while `closure(A) cap B != empty`),
-      4. `UNCERTIFIED_INTERSECTION` (`A cap B_outer != empty` solely within outward serialization padding),
-      5. `INVALID_DOMAIN_OR_WITNESS_CONFLICT` (malformed domain, provenance mismatch, or invalid witness).
+    Enforces two independent proof obligations (`A` = exact cutoff cell, `B_eval` = actual evaluated
+    domain, `B_inner subseteq B_eval subseteq B_outer`):
+      - Refutation admissibility requires `A intersect B_eval != empty`:
+        1. `CERTIFIED_NONEMPTY_INTERSECTION`,
+        2. `DISJOINT_EVALUATION_DOMAIN`,
+        3. `EXCLUDED_BOUNDARY_ONLY_INTERSECTION`,
+        4. `UNCERTIFIED_INTERSECTION`,
+        5. `INVALID_DOMAIN_OR_WITNESS_CONFLICT`.
+      - Complete subdomain coverage requires `A subseteq B_eval` (NEVER derived from `A subseteq B_outer`
+        or from an interior witness!):
+        1. `CERTIFIED_COMPLETE_COVERAGE` (proved from exact recorded endpoints, gapless union of exact
+           pieces, verified historical producer reconstruction linked to stored `Y_sub_ball` + 12-observable
+           SHA-256, or proved inclusion `A subseteq B_inner`),
+        2. `PROVED_COVERAGE_GAP` (exact/multi-piece `B_eval` omits required points of `A`, or `closure(A)
+           not subseteq B_outer`),
+        3. `UNCERTIFIED_COVERAGE` (`closure(A) subseteq B_outer` only within outward serialization
+           rounding band without exact/reconstructed proof or `A subseteq B_inner`),
+        4. `EMPTY_OR_INFEASIBLE_SUBDOMAIN`,
+        5. `INVALID_DOMAIN_CONFLICT`.
     """
     t_f, d0_f, deff_f = cutoff_triple
     subdomain_A = _derive_exact_branch_admissible_subdomain(
@@ -4284,8 +4485,12 @@ def _evaluate_branch_domain_admissibility_tc062(
         return {
             "subdomain_A": subdomain_A,
             "domain_evidence_source": "MALFORMED_Y_SUB_BALL",
+            "coverage_evidence_source": "MALFORMED_Y_SUB_BALL",
+            "historical_reconstruction_status": "NOT_SUPPLIED",
             "admissibility_status": "INVALID_DOMAIN_OR_WITNESS_CONFLICT",
             "admissibility_reason": "MALFORMED_OR_SUBTHRESHOLD_Y_SUB_BALL",
+            "coverage_status": "INVALID_DOMAIN_CONFLICT",
+            "coverage_reason": "MALFORMED_OR_SUBTHRESHOLD_Y_SUB_BALL",
             "complete_subdomain_coverage": False,
             "cov_lo": False,
             "cov_hi": False,
@@ -4299,11 +4504,12 @@ def _evaluate_branch_domain_admissibility_tc062(
     c_hi = y_sub_parsed["c_hi"]
     lo_dec = y_sub_parsed["lo_dec"]
     hi_dec = y_sub_parsed["hi_dec"]
+    lo_bs = y_sub_parsed["lo_bs"]
+    hi_bs = y_sub_parsed["hi_bs"]
     scale = max(abs(c_lo), abs(c_hi), Fraction(1, 10**70))
     w_core = c_hi - c_lo
     # Upper bound on outward rounding + serialization padding per endpoint when reconstructing an
-    # inner certified evaluation domain from `Y_sub_ball` alone (never manufacturing a witness from
-    # outward serialization padding or midpoint rounding):
+    # inner certified evaluation domain `B_inner subseteq B_eval` from `Y_sub_ball` alone:
     d_pad = (
         scale * (Fraction(1, 2**50) + Fraction(1, 10**38))
         + w_core * Fraction(1, 2**28)
@@ -4313,18 +4519,24 @@ def _evaluate_branch_domain_admissibility_tc062(
     b_inner_hi_q = hi_dec - d_pad
     has_nonempty_inner = b_inner_lo_q <= b_inner_hi_q
 
-    # Parse and cross-validate optional exact/symbolic evaluation-domain provenance if supplied:
     is_exact_serialized_point = bool(
-        y_sub_parsed["lo_bs"] == y_sub_parsed["hi_bs"]
+        lo_bs == hi_bs
         and c_lo == c_hi
-        and c_lo == y_sub_parsed["lo_bs"]
+        and c_lo == lo_bs
     )
     exact_frac_raw = br.get("evaluated_Y_interval_exact_fractions")
     sym_bounds_raw = br.get("evaluated_Y_symbolic_bounds")
+    multi_pieces_raw = br.get("evaluated_Y_subintervals_exact_fractions")
+    hdr_raw = br.get("historical_domain_reconstruction")
+
     exact_box: Optional[Tuple[Tuple[str, Union[Fraction, int]], Tuple[str, Union[Fraction, int]]]] = None
+    exact_components: Optional[
+        List[Tuple[Tuple[str, Union[Fraction, int]], Tuple[str, Union[Fraction, int]]]]
+    ] = None
     domain_evidence_source = (
         "SERIALIZED_ARB_EXACT_POINT" if is_exact_serialized_point else "SERIALIZED_ARB_OUTWARD_BALL"
     )
+    historical_reconstruction_status = "NOT_SUPPLIED"
 
     if exact_frac_raw is not None:
         if not (isinstance(exact_frac_raw, (list, tuple)) and len(exact_frac_raw) == 2):
@@ -4348,6 +4560,7 @@ def _evaluate_branch_domain_admissibility_tc062(
                 )
             else:
                 exact_box = (ef0, ef1)
+                exact_components = [exact_box]
                 domain_evidence_source = "EXACT_DYADIC_FRACTIONS"
 
     if sym_bounds_raw is not None:
@@ -4383,22 +4596,76 @@ def _evaluate_branch_domain_admissibility_tc062(
                 )
             else:
                 exact_box = (sb0, sb1)
+                exact_components = [exact_box]
                 domain_evidence_source = "EXACT_SYMBOLIC_BOUNDS"
 
-    if exact_box is not None and not conflicts:
-        # Cross-validate exact evaluation box against `Y_sub_ball` outward enclosure:
-        max_prov_pad = (
-            scale * (Fraction(1, 2**48) + Fraction(1, 10**37))
-            + w_core * Fraction(1, 2**26)
-            + Fraction(1, 2**1000)
-        )
+    if multi_pieces_raw is not None:
+        if not (isinstance(multi_pieces_raw, (list, tuple)) and len(multi_pieces_raw) >= 1):
+            conflicts.append(
+                {
+                    "conflict_type": "INTERVAL_SPLIT_EVALUATED_DOMAIN_PROVENANCE_CONFLICT",
+                    "reason": "MALFORMED_EVALUATED_Y_SUBINTERVALS_EXACT_FRACTIONS",
+                    "cutoff_triple": list(cutoff_triple),
+                }
+            )
+        else:
+            parsed_pieces: List[
+                Tuple[Tuple[str, Union[Fraction, int]], Tuple[str, Union[Fraction, int]]]
+            ] = []
+            pieces_valid = True
+            for pc in multi_pieces_raw:
+                if not (isinstance(pc, (list, tuple)) and len(pc) == 2):
+                    pieces_valid = False
+                    break
+                p0 = _parse_symbolic_cutoff_bound_spec_tc062(["rational", pc[0]])
+                p1 = _parse_symbolic_cutoff_bound_spec_tc062(["rational", pc[1]])
+                if p0 is None or p1 is None or _compare_symbolic_cutoff_bound(p0, p1) > 0:
+                    pieces_valid = False
+                    break
+                parsed_pieces.append((p0, p1))
+            if not pieces_valid:
+                conflicts.append(
+                    {
+                        "conflict_type": "INTERVAL_SPLIT_EVALUATED_DOMAIN_PROVENANCE_CONFLICT",
+                        "reason": "INVALID_EVALUATED_Y_SUBINTERVALS_EXACT_FRACTIONS",
+                        "cutoff_triple": list(cutoff_triple),
+                    }
+                )
+            else:
+                merged_pieces = _merge_touching_symbolic_closed_intervals(parsed_pieces)
+                if exact_box is not None and (
+                    len(merged_pieces) != 1
+                    or _compare_symbolic_cutoff_bound(exact_box[0], merged_pieces[0][0]) != 0
+                    or _compare_symbolic_cutoff_bound(exact_box[1], merged_pieces[0][1]) != 0
+                ):
+                    conflicts.append(
+                        {
+                            "conflict_type": "INTERVAL_SPLIT_EVALUATED_DOMAIN_PROVENANCE_CONFLICT",
+                            "reason": "CONTRADICTORY_SINGLE_AND_MULTI_PIECE_EXACT_DOMAINS",
+                            "cutoff_triple": list(cutoff_triple),
+                        }
+                    )
+                else:
+                    exact_components = merged_pieces
+                    domain_evidence_source = "EXACT_MULTI_PIECE_DYADIC_FRACTIONS"
+
+    max_prov_pad = (
+        scale * (Fraction(1, 2**48) + Fraction(1, 10**37))
+        + w_core * Fraction(1, 2**26)
+        + Fraction(1, 2**1000)
+    )
+    if exact_components is not None and not conflicts:
+        hull_lo = exact_components[0][0]
+        hull_hi = exact_components[-1][1]
         encloses_exact = (
-            _compare_symbolic_cutoff_bound(("rational", c_lo), exact_box[0]) <= 0
-            and _compare_symbolic_cutoff_bound(exact_box[1], ("rational", c_hi)) <= 0
+            _compare_symbolic_cutoff_bound(("rational", c_lo), hull_lo) <= 0
+            and _compare_symbolic_cutoff_bound(hull_hi, ("rational", c_hi)) <= 0
+            and _compare_symbolic_cutoff_bound(("rational", lo_bs), hull_lo) <= 0
+            and _compare_symbolic_cutoff_bound(hull_hi, ("rational", hi_bs)) <= 0
         )
         tight_to_exact = (
-            _compare_symbolic_cutoff_bound(exact_box[0], ("rational", lo_dec + max_prov_pad)) <= 0
-            and _compare_symbolic_cutoff_bound(("rational", hi_dec - max_prov_pad), exact_box[1]) <= 0
+            _compare_symbolic_cutoff_bound(hull_lo, ("rational", lo_dec + max_prov_pad)) <= 0
+            and _compare_symbolic_cutoff_bound(("rational", hi_dec - max_prov_pad), hull_hi) <= 0
         )
         if not (encloses_exact and tight_to_exact):
             conflicts.append(
@@ -4408,12 +4675,136 @@ def _evaluate_branch_domain_admissibility_tc062(
                     "cutoff_triple": list(cutoff_triple),
                 }
             )
+            exact_components = None
             exact_box = None
 
-    if exact_box is None and is_exact_serialized_point and not conflicts:
-        exact_box = (("rational", c_lo), ("rational", c_hi))
+    # Audit optional `historical_domain_reconstruction` (`TASK-TC-062R4` §4):
+    if "historical_domain_reconstruction" in br:
+        eff_split_key = split_key
+        if eff_split_key is None:
+            for sk_cand, (ylo_cand, yhi_cand) in PRESCRIBED_TC062_INTERVAL_SPLITS.items():
+                if ylo_cand == prescribed_Y_lo and yhi_cand == prescribed_Y_hi:
+                    eff_split_key = sk_cand
+                    break
+        canon_key = (eff_split_key, cutoff_triple) if eff_split_key is not None else None
+        expected_obs_sha = (
+            HISTORICAL_TC062R_BRANCH_OBSERVABLE_SHA256.get(canon_key)
+            if canon_key is not None
+            else None
+        )
+        if not isinstance(hdr_raw, dict):
+            historical_reconstruction_status = "INVALID_NON_DICT_HISTORICAL_RECONSTRUCTION"
+            conflicts.append(
+                {
+                    "conflict_type": "INTERVAL_SPLIT_HISTORICAL_RECONSTRUCTION_PROVENANCE_CONFLICT",
+                    "reason": "MALFORMED_HISTORICAL_DOMAIN_RECONSTRUCTION",
+                    "cutoff_triple": list(cutoff_triple),
+                }
+            )
+        elif expected_obs_sha is None:
+            historical_reconstruction_status = "UNRECOGNIZED_HISTORICAL_BRANCH_IDENTITY"
+            conflicts.append(
+                {
+                    "conflict_type": "INTERVAL_SPLIT_HISTORICAL_RECONSTRUCTION_PROVENANCE_CONFLICT",
+                    "reason": "HISTORICAL_RECONSTRUCTION_CUTOFF_OR_INTERVAL_MISMATCH",
+                    "cutoff_triple": list(cutoff_triple),
+                }
+            )
+        else:
+            replay = _replay_historical_tc062r_sub_ball(
+                prescribed_Y_lo, prescribed_Y_hi, t_f, d0_f
+            )
+            exp_dyadic = [
+                f"{replay['eval_lo_q'].numerator}/{replay['eval_lo_q'].denominator}",
+                f"{replay['eval_hi_q'].numerator}/{replay['eval_hi_q'].denominator}",
+            ]
+            hdr_struct_ok = (
+                hdr_raw.get("evidence_origin") == "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER"
+                and hdr_raw.get("historical_numerical_producer_commit")
+                == REVIEWED_TC062R_PRODUCING_COMMIT
+                and hdr_raw.get("historical_generated_at_utc") == HISTORICAL_TC062R_GENERATED_AT_UTC
+                and hdr_raw.get("cutoff_triple") == list(cutoff_triple)
+                and hdr_raw.get("reconstructed_sub_ball_exact_dyadic_fractions") == exp_dyadic
+                and hdr_raw.get("preserved_12_observable_enclosures_sha256") == expected_obs_sha
+                and hdr_raw.get("inclusion_A_subseteq_B_eval_verified") is True
+                and hdr_raw.get("stored_Y_sub_ball_5field_exact_match") is True
+                and replay["constructor_chain_ok"]
+            )
+            prov_mismatch = False
+            if isinstance(artifact_provenance, dict):
+                num_c = artifact_provenance.get("numerical_producing_git_commit")
+                if num_c is not None and num_c != REVIEWED_TC062R_PRODUCING_COMMIT:
+                    prov_mismatch = True
+            if (
+                artifact_generated_at_utc is not None
+                and artifact_generated_at_utc != HISTORICAL_TC062R_GENERATED_AT_UTC
+            ):
+                prov_mismatch = True
 
-    # Audit optional supplied `admissible_witness_Y` against BOTH `A` and certified `B`:
+            if (not hdr_struct_ok) or prov_mismatch:
+                historical_reconstruction_status = "INVALID_OR_MISMATCHED_HISTORICAL_RECONSTRUCTION"
+                conflicts.append(
+                    {
+                        "conflict_type": "INTERVAL_SPLIT_HISTORICAL_RECONSTRUCTION_PROVENANCE_CONFLICT",
+                        "reason": (
+                            "ARTIFACT_PRODUCER_MISMATCH_FOR_HISTORICAL_RECONSTRUCTION"
+                            if prov_mismatch
+                            else "TAMPERED_OR_INVALID_HISTORICAL_RECONSTRUCTION_METADATA"
+                        ),
+                        "cutoff_triple": list(cutoff_triple),
+                    }
+                )
+            else:
+                raw_ys = br.get("Y_sub_ball")
+                ys_5field = (
+                    {
+                        k_s: raw_ys.get(k_s)
+                        for k_s in (
+                            "mid_float",
+                            "rad_float_outward",
+                            "lower_dec",
+                            "upper_dec",
+                            "arb_ball_str",
+                        )
+                    }
+                    if isinstance(raw_ys, dict)
+                    else None
+                )
+                obs_sha_cur = _branch_12_observables_sha256(br)
+                if ys_5field == replay["ser_53"] and obs_sha_cur == expected_obs_sha:
+                    hist_comp = (
+                        ("rational", replay["eval_lo_q"]),
+                        ("rational", replay["eval_hi_q"]),
+                    )
+                    if exact_components is not None and (
+                        len(exact_components) != 1
+                        or _compare_symbolic_cutoff_bound(exact_components[0][0], hist_comp[0]) != 0
+                        or _compare_symbolic_cutoff_bound(exact_components[0][1], hist_comp[1]) != 0
+                    ):
+                        historical_reconstruction_status = "CONTRADICTS_EXPLICIT_EXACT_DOMAIN"
+                        conflicts.append(
+                            {
+                                "conflict_type": "INTERVAL_SPLIT_HISTORICAL_RECONSTRUCTION_PROVENANCE_CONFLICT",
+                                "reason": "CONTRADICTORY_EXACT_DOMAIN_AND_HISTORICAL_RECONSTRUCTION",
+                                "cutoff_triple": list(cutoff_triple),
+                            }
+                        )
+                    else:
+                        historical_reconstruction_status = "VERIFIED_LINKED_TO_4B3DF056"
+                        if exact_components is None:
+                            exact_box = hist_comp
+                            exact_components = [hist_comp]
+                            domain_evidence_source = "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER"
+                else:
+                    # Branch `Y_sub_ball` or quadrature margins were modified relative to `4b3df056...`,
+                    # so historical reconstruction no longer applies to this modified branch record:
+                    historical_reconstruction_status = "SUPERSEDED_BY_MODIFIED_BRANCH_RECORD"
+
+    if exact_components is None and is_exact_serialized_point and not conflicts:
+        exact_box = (("rational", c_lo), ("rational", c_hi))
+        exact_components = [exact_box]
+
+    # Audit optional supplied `admissible_witness_Y` against BOTH `A` and certified `B_eval`:
     witness_raw = br.get("admissible_witness_Y")
     supplied_witness_check: Optional[Dict[str, Any]] = None
     verified_supplied_witness_str: Optional[str] = None
@@ -4442,10 +4833,11 @@ def _evaluate_branch_domain_admissibility_tc062(
                     "exact_intersects"
                 ]
             )
-            if exact_box is not None and not conflicts:
-                in_B = (
-                    _compare_symbolic_cutoff_bound(exact_box[0], w_sym) <= 0
-                    and _compare_symbolic_cutoff_bound(w_sym, exact_box[1]) <= 0
+            if exact_components is not None and not conflicts:
+                in_B = any(
+                    _compare_symbolic_cutoff_bound(comp_lo, w_sym) <= 0
+                    and _compare_symbolic_cutoff_bound(w_sym, comp_hi) <= 0
+                    for comp_lo, comp_hi in exact_components
                 )
             elif has_nonempty_inner:
                 in_B = (
@@ -4486,8 +4878,12 @@ def _evaluate_branch_domain_admissibility_tc062(
         return {
             "subdomain_A": subdomain_A,
             "domain_evidence_source": domain_evidence_source,
+            "coverage_evidence_source": domain_evidence_source,
+            "historical_reconstruction_status": historical_reconstruction_status,
             "admissibility_status": "INVALID_DOMAIN_OR_WITNESS_CONFLICT",
             "admissibility_reason": conflicts[0]["reason"],
+            "coverage_status": "INVALID_DOMAIN_CONFLICT",
+            "coverage_reason": conflicts[0]["reason"],
             "complete_subdomain_coverage": False,
             "cov_lo": False,
             "cov_hi": False,
@@ -4501,8 +4897,12 @@ def _evaluate_branch_domain_admissibility_tc062(
         return {
             "subdomain_A": subdomain_A,
             "domain_evidence_source": domain_evidence_source,
+            "coverage_evidence_source": domain_evidence_source,
+            "historical_reconstruction_status": historical_reconstruction_status,
             "admissibility_status": "DISJOINT_EVALUATION_DOMAIN",
             "admissibility_reason": "EMPTY_OR_INFEASIBLE_ADMISSIBLE_SUBDOMAIN",
+            "coverage_status": "EMPTY_OR_INFEASIBLE_SUBDOMAIN",
+            "coverage_reason": "EMPTY_OR_INFEASIBLE_ADMISSIBLE_SUBDOMAIN",
             "complete_subdomain_coverage": False,
             "cov_lo": False,
             "cov_hi": False,
@@ -4512,24 +4912,67 @@ def _evaluate_branch_domain_admissibility_tc062(
             "conflicts": [],
         }
 
-    outer_box = (("rational", c_lo), ("rational", c_hi))
-    if exact_box is not None:
-        cov_lo, cov_hi = _symbolic_closed_box_covers_closure(exact_box[0], exact_box[1], subdomain_A)
-        rel_ex = _symbolic_subdomain_vs_closed_box_relations(subdomain_A, exact_box[0], exact_box[1])
-        if rel_ex["exact_intersects"]:
+    # Case 1: Exact / verified-reconstructed / multi-piece closed evaluation components `B_eval`:
+    if exact_components is not None:
+        comp_covs = [
+            _symbolic_closed_box_covers_closure(c0, c1, subdomain_A)
+            for c0, c1 in exact_components
+        ]
+        # Connected `A` is contained in a disjoint union of closed intervals iff ONE merged connected
+        # component contains `closure(A)` (`TASK-TC-062R4` §3):
+        full_cov = any(clo and chi for clo, chi in comp_covs)
+        any_cov_lo = any(clo for clo, _ in comp_covs)
+        any_cov_hi = any(chi for _, chi in comp_covs)
+        cov_lo = True if full_cov else any_cov_lo
+        cov_hi = True if full_cov else any_cov_hi
+        if full_cov:
+            cov_status = "CERTIFIED_COMPLETE_COVERAGE"
+            cov_reason = (
+                "HISTORICAL_PRODUCER_RECONSTRUCTED_DOMAIN_CONTAINS_SUBDOMAIN"
+                if domain_evidence_source == "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER"
+                else "EXACT_EVALUATION_DOMAIN_CONTAINS_SUBDOMAIN"
+            )
+        elif any_cov_lo and any_cov_hi and len(exact_components) > 1:
+            cov_status = "PROVED_COVERAGE_GAP"
+            cov_reason = "UNBRIDGED_INTERIOR_GAP_IN_EVALUATED_PIECES"
+        else:
+            cov_status = "PROVED_COVERAGE_GAP"
+            cov_reason = "EXACT_EVALUATION_DOMAIN_OMITS_REQUIRED_SUBDOMAIN_POINTS"
+
+        any_exact_hit: Optional[
+            Tuple[
+                Dict[str, Any],
+                Tuple[str, Union[Fraction, int]],
+                Tuple[str, Union[Fraction, int]],
+            ]
+        ] = None
+        any_closure_hit = False
+        for c0, c1 in exact_components:
+            rel_c = _symbolic_subdomain_vs_closed_box_relations(subdomain_A, c0, c1)
+            if rel_c["exact_intersects"] and any_exact_hit is None:
+                any_exact_hit = (rel_c, c0, c1)
+            if rel_c["closure_intersects"]:
+                any_closure_hit = True
+
+        if any_exact_hit is not None:
+            rel_ex, hit_lo, hit_hi = any_exact_hit
             wit_y = (
                 verified_supplied_witness_str
                 if verified_supplied_witness_str is not None
                 else _certified_witness_from_nonempty_intersection(
-                    rel_ex, subdomain_A, exact_box[0], exact_box[1]
+                    rel_ex, subdomain_A, hit_lo, hit_hi
                 )
             )
             return {
                 "subdomain_A": subdomain_A,
                 "domain_evidence_source": domain_evidence_source,
+                "coverage_evidence_source": domain_evidence_source,
+                "historical_reconstruction_status": historical_reconstruction_status,
                 "admissibility_status": "CERTIFIED_NONEMPTY_INTERSECTION",
                 "admissibility_reason": "EXACT_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
-                "complete_subdomain_coverage": bool(cov_lo and cov_hi),
+                "coverage_status": cov_status,
+                "coverage_reason": cov_reason,
+                "complete_subdomain_coverage": full_cov,
                 "cov_lo": cov_lo,
                 "cov_hi": cov_hi,
                 "can_certify_refutation": True,
@@ -4537,12 +4980,16 @@ def _evaluate_branch_domain_admissibility_tc062(
                 "supplied_witness_check": supplied_witness_check,
                 "conflicts": [],
             }
-        if rel_ex["closure_intersects"]:
+        if any_closure_hit:
             return {
                 "subdomain_A": subdomain_A,
                 "domain_evidence_source": domain_evidence_source,
+                "coverage_evidence_source": domain_evidence_source,
+                "historical_reconstruction_status": historical_reconstruction_status,
                 "admissibility_status": "EXCLUDED_BOUNDARY_ONLY_INTERSECTION",
                 "admissibility_reason": "TOUCHES_ONLY_EXCLUDED_OPEN_BOUNDARY_OF_SUBDOMAIN",
+                "coverage_status": "PROVED_COVERAGE_GAP",
+                "coverage_reason": cov_reason,
                 "complete_subdomain_coverage": False,
                 "cov_lo": cov_lo,
                 "cov_hi": cov_hi,
@@ -4554,8 +5001,12 @@ def _evaluate_branch_domain_admissibility_tc062(
         return {
             "subdomain_A": subdomain_A,
             "domain_evidence_source": domain_evidence_source,
+            "coverage_evidence_source": domain_evidence_source,
+            "historical_reconstruction_status": historical_reconstruction_status,
             "admissibility_status": "DISJOINT_EVALUATION_DOMAIN",
             "admissibility_reason": "DISJOINT_FROM_ADMISSIBLE_SUBDOMAIN_CLOSURE",
+            "coverage_status": "PROVED_COVERAGE_GAP",
+            "coverage_reason": cov_reason,
             "complete_subdomain_coverage": False,
             "cov_lo": cov_lo,
             "cov_hi": cov_hi,
@@ -4565,18 +5016,55 @@ def _evaluate_branch_domain_admissibility_tc062(
             "conflicts": [],
         }
 
-    # Outward serialized `Y_sub_ball` (`c_lo < c_hi`) with no exact provenance field:
-    cov_lo, cov_hi = _symbolic_closed_box_covers_closure(outer_box[0], outer_box[1], subdomain_A)
+    # Case 2: Outward serialized `Y_sub_ball` (`c_lo < c_hi`) with NO exact/reconstructed endpoints:
+    # NEVER derive `complete_subdomain_coverage` or `cov_lo`/`cov_hi` from `outer_box` or an
+    # interior witness (`TASK-TC-062R4` §3)!
+    outer_box = (("rational", c_lo), ("rational", c_hi))
+    cov_out_lo, cov_out_hi = _symbolic_closed_box_covers_closure(
+        outer_box[0], outer_box[1], subdomain_A
+    )
+    inner_box = (("rational", b_inner_lo_q), ("rational", b_inner_hi_q))
+    if has_nonempty_inner:
+        cov_in_lo, cov_in_hi = _symbolic_closed_box_covers_closure(
+            inner_box[0], inner_box[1], subdomain_A
+        )
+        rel_in = _symbolic_subdomain_vs_closed_box_relations(
+            subdomain_A, inner_box[0], inner_box[1]
+        )
+    else:
+        cov_in_lo, cov_in_hi = False, False
+        rel_in = None
+
+    cov_lo = bool(cov_in_lo)
+    cov_hi = bool(cov_in_hi)
+    full_cov_inner = bool(cov_in_lo and cov_in_hi)
+    if full_cov_inner:
+        cov_status = "CERTIFIED_COMPLETE_COVERAGE"
+        cov_reason = "PROVED_INNER_ENCLOSURE_CONTAINS_SUBDOMAIN"
+        cov_source = "CERTIFIED_INNER_SERIALIZATION_ENCLOSURE"
+    elif (not cov_out_lo) or (not cov_out_hi):
+        cov_status = "PROVED_COVERAGE_GAP"
+        cov_reason = "OUTWARD_EVALUATION_ENCLOSURE_OMITS_SUBDOMAIN_POINTS"
+        cov_source = domain_evidence_source
+    else:
+        cov_status = "UNCERTIFIED_COVERAGE"
+        cov_reason = "OUTWARD_ENCLOSURE_COVERS_ONLY_WITHIN_SERIALIZATION_ROUNDING_BAND"
+        cov_source = domain_evidence_source
+
     rel_out = _symbolic_subdomain_vs_closed_box_relations(subdomain_A, outer_box[0], outer_box[1])
     if not rel_out["closure_intersects"]:
         return {
             "subdomain_A": subdomain_A,
             "domain_evidence_source": domain_evidence_source,
+            "coverage_evidence_source": cov_source,
+            "historical_reconstruction_status": historical_reconstruction_status,
             "admissibility_status": "DISJOINT_EVALUATION_DOMAIN",
             "admissibility_reason": "OUTWARD_EVALUATION_BOX_DISJOINT_FROM_SUBDOMAIN_CLOSURE",
+            "coverage_status": "PROVED_COVERAGE_GAP",
+            "coverage_reason": "OUTWARD_EVALUATION_ENCLOSURE_OMITS_SUBDOMAIN_POINTS",
             "complete_subdomain_coverage": False,
-            "cov_lo": cov_lo,
-            "cov_hi": cov_hi,
+            "cov_lo": False,
+            "cov_hi": False,
             "can_certify_refutation": False,
             "certified_witness_Y": None,
             "supplied_witness_check": supplied_witness_check,
@@ -4586,23 +5074,21 @@ def _evaluate_branch_domain_admissibility_tc062(
         return {
             "subdomain_A": subdomain_A,
             "domain_evidence_source": domain_evidence_source,
+            "coverage_evidence_source": cov_source,
+            "historical_reconstruction_status": historical_reconstruction_status,
             "admissibility_status": "EXCLUDED_BOUNDARY_ONLY_INTERSECTION",
             "admissibility_reason": "OUTWARD_EVALUATION_BOX_TOUCHES_ONLY_EXCLUDED_OPEN_BOUNDARY",
+            "coverage_status": "PROVED_COVERAGE_GAP",
+            "coverage_reason": "OUTWARD_EVALUATION_ENCLOSURE_OMITS_SUBDOMAIN_POINTS",
             "complete_subdomain_coverage": False,
-            "cov_lo": cov_lo,
-            "cov_hi": cov_hi,
+            "cov_lo": False,
+            "cov_hi": False,
             "can_certify_refutation": False,
             "certified_witness_Y": None,
             "supplied_witness_check": supplied_witness_check,
             "conflicts": [],
         }
 
-    inner_box = (("rational", b_inner_lo_q), ("rational", b_inner_hi_q))
-    rel_in = (
-        _symbolic_subdomain_vs_closed_box_relations(subdomain_A, inner_box[0], inner_box[1])
-        if has_nonempty_inner
-        else None
-    )
     if rel_in is not None and rel_in["exact_intersects"]:
         wit_y = (
             verified_supplied_witness_str
@@ -4614,9 +5100,13 @@ def _evaluate_branch_domain_admissibility_tc062(
         return {
             "subdomain_A": subdomain_A,
             "domain_evidence_source": domain_evidence_source,
+            "coverage_evidence_source": cov_source,
+            "historical_reconstruction_status": historical_reconstruction_status,
             "admissibility_status": "CERTIFIED_NONEMPTY_INTERSECTION",
             "admissibility_reason": "CERTIFIED_INTERIOR_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
-            "complete_subdomain_coverage": bool(cov_lo and cov_hi),
+            "coverage_status": cov_status,
+            "coverage_reason": cov_reason,
+            "complete_subdomain_coverage": full_cov_inner,
             "cov_lo": cov_lo,
             "cov_hi": cov_hi,
             "can_certify_refutation": True,
@@ -4626,21 +5116,26 @@ def _evaluate_branch_domain_admissibility_tc062(
         }
 
     full_dec_bs_outer_box = (
-        ("rational", min(lo_dec, y_sub_parsed["lo_bs"])),
-        ("rational", max(hi_dec, y_sub_parsed["hi_bs"])),
+        ("rational", min(lo_dec, lo_bs)),
+        ("rational", max(hi_dec, hi_bs)),
     )
     rel_full_outer = _symbolic_subdomain_vs_closed_box_relations(
         subdomain_A, full_dec_bs_outer_box[0], full_dec_bs_outer_box[1]
     )
     if rel_out["box_subset_of_A"] and rel_full_outer["box_subset_of_A"]:
         # Every point of outward enclosure `B_outer` lies in `A`, and `emptyset != B_eval subseteq B_outer`,
-        # so `A cap B_eval = B_eval != emptyset` without manufacturing any midpoint witness:
+        # so `A cap B_eval = B_eval != emptyset` supplies an admissible refutation witness, while NEVER
+        # establishing coverage of `A` unless `A subseteq B_inner` (`full_cov_inner`):
         return {
             "subdomain_A": subdomain_A,
             "domain_evidence_source": domain_evidence_source,
+            "coverage_evidence_source": cov_source,
+            "historical_reconstruction_status": historical_reconstruction_status,
             "admissibility_status": "CERTIFIED_NONEMPTY_INTERSECTION",
             "admissibility_reason": "ENTIRE_OUTWARD_EVALUATION_ENCLOSURE_SUBSET_OF_ADMISSIBLE_SUBDOMAIN",
-            "complete_subdomain_coverage": bool(cov_lo and cov_hi),
+            "coverage_status": cov_status,
+            "coverage_reason": cov_reason,
+            "complete_subdomain_coverage": full_cov_inner,
             "cov_lo": cov_lo,
             "cov_hi": cov_hi,
             "can_certify_refutation": True,
@@ -4654,8 +5149,12 @@ def _evaluate_branch_domain_admissibility_tc062(
     return {
         "subdomain_A": subdomain_A,
         "domain_evidence_source": domain_evidence_source,
+        "coverage_evidence_source": cov_source,
+        "historical_reconstruction_status": historical_reconstruction_status,
         "admissibility_status": "UNCERTIFIED_INTERSECTION",
         "admissibility_reason": "UNCERTIFIED_OUTWARD_SERIALIZATION_PADDING_OVERLAP",
+        "coverage_status": cov_status,
+        "coverage_reason": cov_reason,
         "complete_subdomain_coverage": False,
         "cov_lo": False,
         "cov_hi": False,
@@ -4672,6 +5171,8 @@ def audit_continuous_interval_split_certificate_tc062(
     *,
     prescribed_Y_lo: Fraction,
     prescribed_Y_hi: Fraction,
+    artifact_provenance: Optional[Dict[str, Any]] = None,
+    artifact_generated_at_utc: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Audit a serialized continuous interval cutoff-split certificate for:
     1. Exact cutoff-branch partition coverage (`derive_exact_interval_cutoff_partition`),
@@ -4889,13 +5390,17 @@ def audit_continuous_interval_split_certificate_tc062(
         role_raw = br.get("branch_role")
         is_feasible_required = triple in feasible_by_triple and (not is_duplicate)
 
-        # Single shared evaluation-domain admissibility & witness verifier (`TASK-TC-062R3` §2):
+        # Single shared evaluation-domain admissibility, witness, & full-coverage verifier
+        # (`TASK-TC-062R3` §2 & `TASK-TC-062R4` §3):
         adm = _evaluate_branch_domain_admissibility_tc062(
             br,
             y_sub_parsed=y_sub_parsed,
             prescribed_Y_lo=prescribed_Y_lo,
             prescribed_Y_hi=prescribed_Y_hi,
             cutoff_triple=triple,
+            split_key=split_key,
+            artifact_provenance=artifact_provenance,
+            artifact_generated_at_utc=artifact_generated_at_utc,
         )
         for c_adm in adm["conflicts"]:
             integrity_conflicts.append(
@@ -4926,38 +5431,70 @@ def audit_continuous_interval_split_certificate_tc062(
             if y_sub_parsed is not None and len(adm["conflicts"]) == 0:
                 cov_lo = bool(adm["cov_lo"])
                 cov_hi = bool(adm["cov_hi"])
-                if not cov_lo:
-                    is_left_end = cell_info["cutoff_triple"] == expected_triples[0]
+                cov_status_b = str(adm["coverage_status"])
+                if cov_status_b == "UNCERTIFIED_COVERAGE":
                     coverage_issues.append(
                         {
-                            "issue_type": (
-                                "UNCOVERED_LEFT_INTERVAL_ENDPOINT"
-                                if is_left_end
-                                else "INTERIOR_SUBDOMAIN_GAP"
-                            ),
+                            "issue_type": "UNCERTIFIED_BRANCH_SUBDOMAIN_COVERAGE",
                             "interval_key": split_key,
                             "branch_index": b_idx,
                             "cutoff_triple": list(triple),
                             "subdomain_notation": cell_info["subdomain_notation"],
-                            "y_sub_c_lo": str(y_sub_parsed["c_lo"]),
+                            "coverage_status": cov_status_b,
+                            "coverage_reason": adm["coverage_reason"],
+                            "uncertified_left_endpoint": not cov_lo,
+                            "uncertified_right_endpoint": not cov_hi,
                         }
                     )
-                if not cov_hi:
-                    is_right_end = cell_info["cutoff_triple"] == expected_triples[-1]
-                    coverage_issues.append(
-                        {
-                            "issue_type": (
-                                "UNCOVERED_RIGHT_INTERVAL_ENDPOINT"
-                                if is_right_end
-                                else "INTERIOR_SUBDOMAIN_GAP"
-                            ),
-                            "interval_key": split_key,
-                            "branch_index": b_idx,
-                            "cutoff_triple": list(triple),
-                            "subdomain_notation": cell_info["subdomain_notation"],
-                            "y_sub_c_hi": str(y_sub_parsed["c_hi"]),
-                        }
-                    )
+                elif not bool(adm["complete_subdomain_coverage"]):
+                    if not cov_lo:
+                        is_left_end = cell_info["cutoff_triple"] == expected_triples[0]
+                        coverage_issues.append(
+                            {
+                                "issue_type": (
+                                    "UNCOVERED_LEFT_INTERVAL_ENDPOINT"
+                                    if is_left_end
+                                    else "INTERIOR_SUBDOMAIN_GAP"
+                                ),
+                                "interval_key": split_key,
+                                "branch_index": b_idx,
+                                "cutoff_triple": list(triple),
+                                "subdomain_notation": cell_info["subdomain_notation"],
+                                "coverage_status": cov_status_b,
+                                "coverage_reason": adm["coverage_reason"],
+                                "y_sub_c_lo": str(y_sub_parsed["c_lo"]),
+                            }
+                        )
+                    if not cov_hi:
+                        is_right_end = cell_info["cutoff_triple"] == expected_triples[-1]
+                        coverage_issues.append(
+                            {
+                                "issue_type": (
+                                    "UNCOVERED_RIGHT_INTERVAL_ENDPOINT"
+                                    if is_right_end
+                                    else "INTERIOR_SUBDOMAIN_GAP"
+                                ),
+                                "interval_key": split_key,
+                                "branch_index": b_idx,
+                                "cutoff_triple": list(triple),
+                                "subdomain_notation": cell_info["subdomain_notation"],
+                                "coverage_status": cov_status_b,
+                                "coverage_reason": adm["coverage_reason"],
+                                "y_sub_c_hi": str(y_sub_parsed["c_hi"]),
+                            }
+                        )
+                    if cov_lo and cov_hi:
+                        coverage_issues.append(
+                            {
+                                "issue_type": "INTERIOR_SUBDOMAIN_GAP",
+                                "interval_key": split_key,
+                                "branch_index": b_idx,
+                                "cutoff_triple": list(triple),
+                                "subdomain_notation": cell_info["subdomain_notation"],
+                                "coverage_status": cov_status_b,
+                                "coverage_reason": adm["coverage_reason"],
+                            }
+                        )
                 if not can_certify_refutation:
                     coverage_issues.append(
                         {
@@ -5030,8 +5567,12 @@ def audit_continuous_interval_split_certificate_tc062(
             "subdomain_notation": adm["subdomain_A"]["subdomain_notation"],
             "subdomain_is_nonempty": bool(adm["subdomain_A"]["is_nonempty"]),
             "domain_evidence_source": adm["domain_evidence_source"],
+            "coverage_evidence_source": adm["coverage_evidence_source"],
+            "historical_reconstruction_status": adm["historical_reconstruction_status"],
             "admissibility_status": adm["admissibility_status"],
             "admissibility_reason": adm["admissibility_reason"],
+            "coverage_status": adm["coverage_status"],
+            "coverage_reason": adm["coverage_reason"],
             "complete_subdomain_coverage": bool(adm["complete_subdomain_coverage"]),
             "has_certified_admissible_evaluated_witness": bool(can_certify_refutation),
             "can_certify_refutation": bool(can_certify_refutation),
@@ -5047,6 +5588,7 @@ def audit_continuous_interval_split_certificate_tc062(
                 "is_feasible_required": is_feasible_required,
                 "can_certify_refutation": can_certify_refutation,
                 "complete_subdomain_coverage": bool(adm["complete_subdomain_coverage"]),
+                "coverage_status": adm["coverage_status"],
                 "admissibility_status": adm["admissibility_status"],
                 "admissibility_reason": adm["admissibility_reason"],
                 "admissibility_summary": adm_summary,
@@ -5272,7 +5814,10 @@ def audit_continuous_interval_split_certificate_tc062(
                             "branch_index": b_idx,
                             "cutoff_triple": list(rec["cutoff_triple"]),
                             "margin_key": br_key,
-                            "reason": f"INCOMPLETE_SUBDOMAIN_COVERAGE_{rec['admissibility_status']}",
+                            "reason": (
+                                f"INCOMPLETE_SUBDOMAIN_COVERAGE_{rec['coverage_status']}_"
+                                f"{rec['admissibility_status']}"
+                            ),
                         }
                     )
             else:
@@ -5358,12 +5903,246 @@ def audit_continuous_interval_split_certificate_tc062(
     }
 
 
+def reconstruct_tc062r_legacy_interval_domains(
+    artifact: Dict[str, Any],
+    *,
+    reconstruction_commit: Optional[str] = None,
+    reconstructed_at_utc: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Explicit, one-time deterministic domain recovery for the five legacy continuous-interval
+    branches produced by `REVIEWED_TC062R_PRODUCING_COMMIT = 4b3df05665e186c85eb54c3822ae1d8c34199a3c`
+    at `HISTORICAL_TC062R_GENERATED_AT_UTC = 2026-11-17T13:21:54.466739+00:00` (`TASK-TC-062R4` §4).
+
+    Guarantees:
+    - Audits the supplied `artifact` BEFORE any reconstruction (`pre_reconstruction_audit`) so
+      malformed or narrowed inputs are never silently overwritten with canonical data.
+    - Refuses (`ValueError`) on any mismatched `numerical_producing_git_commit`, mismatched
+      `generated_at_utc`, missing/altered interval or cutoff identity, modified `Y_sub_ball`,
+      modified 12-observable quadrature enclosures (`SHA-256` linkage), or pre-existing conflicting
+      explicit domain fields.
+    - Labels recovered metadata explicitly as `RECONSTRUCTED_FROM_HISTORICAL_PRODUCER`, never
+      fabricating `evaluated_Y_interval_exact_fractions`, never marking rounded decimal endpoints
+      "exact", and never enlarging `B_eval` beyond the exact `prec=320` `sub_ball` integrated by
+      `4b3df05665e186c85eb54c3822ae1d8c34199a3c`.
+    """
+    if not isinstance(artifact, dict):
+        raise ValueError("REFUSED_NON_DICT_ARTIFACT")
+
+    prov_in = artifact.get("provenance")
+    if not isinstance(prov_in, dict):
+        raise ValueError("REFUSED_MISSING_PROVENANCE_DICT")
+    num_prod = prov_in.get("numerical_producing_git_commit")
+    if num_prod != REVIEWED_TC062R_PRODUCING_COMMIT:
+        raise ValueError(
+            f"REFUSED_MISMATCHED_NUMERICAL_PRODUCER: expected {REVIEWED_TC062R_PRODUCING_COMMIT}, got {num_prod!r}"
+        )
+    gen_ts = artifact.get("generated_at_utc")
+    if gen_ts != HISTORICAL_TC062R_GENERATED_AT_UTC:
+        raise ValueError(
+            f"REFUSED_MISMATCHED_GENERATED_AT_UTC: expected {HISTORICAL_TC062R_GENERATED_AT_UTC}, got {gen_ts!r}"
+        )
+
+    sec5_in = artifact.get("section_5_unseen_validation_and_interval_splits")
+    if not isinstance(sec5_in, dict):
+        raise ValueError("REFUSED_MISSING_SECTION_5")
+    splits_in = sec5_in.get("continuous_straddling_interval_splits")
+    if not isinstance(splits_in, dict):
+        raise ValueError("REFUSED_MISSING_INTERVAL_SPLITS")
+
+    # 1. Audit supplied evidence BEFORE any reconstruction (`TASK-TC-062R4` §3):
+    pre_audits: Dict[str, Any] = {}
+    for split_key, (ylo_p, yhi_p) in PRESCRIBED_TC062_INTERVAL_SPLITS.items():
+        sp_in = splits_in.get(split_key)
+        aud_pre = audit_continuous_interval_split_certificate_tc062(
+            split_key,
+            sp_in,
+            prescribed_Y_lo=ylo_p,
+            prescribed_Y_hi=yhi_p,
+            artifact_provenance=prov_in,
+            artifact_generated_at_utc=gen_ts,
+        )
+        if not aud_pre["integrity_ok"]:
+            raise ValueError(
+                f"REFUSED_PRE_RECONSTRUCTION_INTEGRITY_CONFLICT on {split_key}: {aud_pre['integrity_conflicts']}"
+            )
+        pre_audits[split_key] = aud_pre
+
+    if reconstruction_commit is None:
+        hp = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=str(REPO_ROOT),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        eff_commit = hp.stdout.strip() if hp.returncode == 0 else "UNKNOWN"
+    else:
+        eff_commit = str(reconstruction_commit)
+    eff_ts = (
+        str(reconstructed_at_utc)
+        if reconstructed_at_utc is not None
+        else datetime.now(timezone.utc).isoformat()
+    )
+
+    out_art = json.loads(json.dumps(artifact))
+    out_splits = out_art["section_5_unseen_validation_and_interval_splits"][
+        "continuous_straddling_interval_splits"
+    ]
+    evidence_table: List[Dict[str, Any]] = []
+
+    for split_key, (ylo_p, yhi_p) in PRESCRIBED_TC062_INTERVAL_SPLITS.items():
+        sp_out = out_splits.get(split_key)
+        if not isinstance(sp_out, dict) or not isinstance(sp_out.get("branches"), list):
+            raise ValueError(f"REFUSED_MISSING_SPLIT_BRANCHES: {split_key}")
+        if sp_out.get("Y_lo_fraction") != str(ylo_p) or sp_out.get("Y_hi_fraction") != str(yhi_p):
+            raise ValueError(f"REFUSED_ALTERED_PRESCRIBED_ENDPOINTS: {split_key}")
+        expected_triples = derive_exact_interval_cutoff_partition(ylo_p, yhi_p)["feasible_triples"]
+        branches_out = sp_out["branches"]
+        if len(branches_out) != len(expected_triples):
+            raise ValueError(f"REFUSED_BRANCH_COUNT_MISMATCH on {split_key}")
+
+        for b_idx, (br_o, exp_tr) in enumerate(zip(branches_out, expected_triples)):
+            obs_tr = (
+                int(br_o.get("T_fixed", -1)),
+                int(br_o.get("D0_raw_fixed", -1)),
+                int(br_o.get("D0_eff_fixed", -1)),
+            )
+            if obs_tr != exp_tr:
+                raise ValueError(
+                    f"REFUSED_MISMATCHED_CUTOFF_IDENTITY on {split_key}[{b_idx}]: expected {exp_tr}, got {obs_tr}"
+                )
+            for explicit_k in (
+                "evaluated_Y_interval_exact_fractions",
+                "evaluated_Y_symbolic_bounds",
+                "evaluated_Y_subintervals_exact_fractions",
+            ):
+                if explicit_k in br_o:
+                    raise ValueError(
+                        f"REFUSED_MODIFIED_EXPLICIT_DOMAIN_FIELD on {split_key}[{b_idx}]: {explicit_k}"
+                    )
+
+            replay = _replay_historical_tc062r_sub_ball(ylo_p, yhi_p, exp_tr[0], exp_tr[1])
+            if not replay["constructor_chain_ok"]:
+                raise RuntimeError(
+                    f"Historical constructor coverage chain failed on {split_key} {exp_tr}"
+                )
+            raw_ys = br_o.get("Y_sub_ball")
+            ys_5field = (
+                {
+                    k_s: raw_ys.get(k_s)
+                    for k_s in (
+                        "mid_float",
+                        "rad_float_outward",
+                        "lower_dec",
+                        "upper_dec",
+                        "arb_ball_str",
+                    )
+                }
+                if isinstance(raw_ys, dict)
+                else None
+            )
+            if ys_5field != replay["ser_53"]:
+                raise ValueError(
+                    f"REFUSED_MODIFIED_Y_SUB_BALL_RECORD on {split_key} {exp_tr}"
+                )
+            expected_obs_sha = HISTORICAL_TC062R_BRANCH_OBSERVABLE_SHA256[(split_key, exp_tr)]
+            obs_sha_cur = _branch_12_observables_sha256(br_o)
+            if obs_sha_cur != expected_obs_sha:
+                raise ValueError(
+                    f"REFUSED_MODIFIED_OR_UNLINKED_BRANCH_OBSERVABLES on {split_key} {exp_tr}"
+                )
+
+            eval_lo_q = replay["eval_lo_q"]
+            eval_hi_q = replay["eval_hi_q"]
+            exact_dyadic_pair = [
+                f"{eval_lo_q.numerator}/{eval_lo_q.denominator}",
+                f"{eval_hi_q.numerator}/{eval_hi_q.denominator}",
+            ]
+            subdomain_A = _derive_exact_branch_admissible_subdomain(
+                ylo_p, yhi_p, exp_tr[0], exp_tr[1], exp_tr[2]
+            )
+            prev_hdr = br_o.get("historical_domain_reconstruction")
+            keep_ts = (
+                str(prev_hdr["reconstructed_at_utc"])
+                if (isinstance(prev_hdr, dict) and isinstance(prev_hdr.get("reconstructed_at_utc"), str))
+                else eff_ts
+            )
+            hdr_new = {
+                "evidence_origin": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+                "reconstruction_task_id": TASK_TC_062R4_ID,
+                "historical_numerical_producer_commit": REVIEWED_TC062R_PRODUCING_COMMIT,
+                "historical_generated_at_utc": HISTORICAL_TC062R_GENERATED_AT_UTC,
+                "reconstruction_validation_commit": eff_commit,
+                "reconstructed_at_utc": keep_ts,
+                "historical_constructor": (
+                    "tc.mixed_arithmetic_covariance.evaluate_interval_via_cutoff_case_split_arb "
+                    "(flint_ctx.prec=320 sub_ball=lo_cand.union(hi_cand)) -> "
+                    "evaluate_fixed_cutoff_on_Y_ball_arb (flint_ctx.prec=256 Y_sub_ball=+sub_ball) -> "
+                    "_enrich_and_serialize_interval_split (ambient flint_ctx.prec=53 serialize_arb_certified)"
+                ),
+                "cutoff_triple": list(exp_tr),
+                "required_subdomain_notation": subdomain_A["subdomain_notation"],
+                "reconstructed_sub_ball_mid_man_exp": replay["mid_man_exp"],
+                "reconstructed_sub_ball_rad_man_exp": replay["rad_man_exp"],
+                "reconstructed_sub_ball_exact_dyadic_fractions": exact_dyadic_pair,
+                "constructor_coverage_proof": (
+                    "lo_cand = max(y_lo_b.lower(), t_lo_b.lower(), d_lo_b.lower()) <= inf(A), "
+                    "hi_cand = min(y_hi_b.upper(), t_hi_b.upper(), d_hi_b.upper()) >= sup(A), "
+                    "and outward Arb union satisfies lo(sub_ball) <= lo_cand and hi(sub_ball) >= hi_cand, "
+                    "hence closure(A) subseteq sub_ball = B_eval subseteq y_ret (X_self_Y input)."
+                ),
+                "stored_Y_sub_ball_5field_exact_match": True,
+                "preserved_12_observable_enclosures_sha256": expected_obs_sha,
+                "inclusion_A_subseteq_B_eval_verified": True,
+                "margin_recomputation_status": "PRESERVED_WITHOUT_RECOMPUTATION",
+            }
+            br_o["historical_domain_reconstruction"] = hdr_new
+            pre_br_adm = pre_audits[split_key]["branch_domain_admissibility"][b_idx]
+            evidence_table.append(
+                {
+                    "interval_key": split_key,
+                    "cutoff_triple": list(exp_tr),
+                    "required_cell_A": subdomain_A["subdomain_notation"],
+                    "pre_reconstruction_coverage_status": pre_br_adm["coverage_status"],
+                    "evaluation_domain_evidence": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+                    "reconstructed_sub_ball_mid_man_exp": replay["mid_man_exp"],
+                    "reconstructed_sub_ball_rad_man_exp": replay["rad_man_exp"],
+                    "reconstructed_B_eval_exact_dyadic_fractions": exact_dyadic_pair,
+                    "stored_Y_sub_ball_5field_exact_match": True,
+                    "preserved_12_observable_enclosures_sha256": expected_obs_sha,
+                    "inclusion_result": "CERTIFIED_COMPLETE_COVERAGE (closure(A) subseteq B_eval)",
+                    "margin_status": "PRESERVED_WITHOUT_RECOMPUTATION",
+                    "historical_numerical_producer_commit": REVIEWED_TC062R_PRODUCING_COMMIT,
+                    "reconstruction_validation_commit": eff_commit,
+                }
+            )
+
+    out_prov = out_art["provenance"]
+    out_prov.setdefault("tc062r4_domain_reconstructed_at_utc", eff_ts)
+    out_prov["tc062r4_legacy_domain_reconstruction_summary"] = {
+        "evidence_origin": "RECONSTRUCTED_FROM_HISTORICAL_PRODUCER",
+        "historical_numerical_producer_commit": REVIEWED_TC062R_PRODUCING_COMMIT,
+        "historical_generated_at_utc": HISTORICAL_TC062R_GENERATED_AT_UTC,
+        "reconstruction_validation_commit": eff_commit,
+        "reconstructed_branch_count": len(evidence_table),
+        "recomputed_branch_count": 0,
+        "pre_reconstruction_branch_coverage_statuses": [
+            row["pre_reconstruction_coverage_status"] for row in evidence_table
+        ],
+        "five_branch_domain_evidence_table": evidence_table,
+    }
+    return out_art
+
+
 def aggregate_tc062_section5_and_derive_outcomes(
     holdout_rows: Sequence[Dict[str, Any]],
     holdout_entries: Sequence[Dict[str, Any]],
     probes: Sequence[Dict[str, Any]],
     protocol_rules: Dict[str, Any],
     continuous_straddling_interval_splits: Dict[str, Any],
+    *,
+    artifact_provenance: Optional[Dict[str, Any]] = None,
+    artifact_generated_at_utc: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Single shared Section 5 coverage, integrity, resource, and outcome-derivation aggregator
     used identically by `verify_section_5_unseen_validation_and_interval_splits`,
@@ -5671,7 +6450,12 @@ def aggregate_tc062_section5_and_derive_outcomes(
         for split_key, (ylo_p, yhi_p) in PRESCRIBED_TC062_INTERVAL_SPLITS.items():
             sp_obj = continuous_straddling_interval_splits.get(split_key)
             aud = audit_continuous_interval_split_certificate_tc062(
-                split_key, sp_obj, prescribed_Y_lo=ylo_p, prescribed_Y_hi=yhi_p
+                split_key,
+                sp_obj,
+                prescribed_Y_lo=ylo_p,
+                prescribed_Y_hi=yhi_p,
+                artifact_provenance=artifact_provenance,
+                artifact_generated_at_utc=artifact_generated_at_utc,
             )
             interval_split_audits[split_key] = aud
             if aud["integrity_conflicts"]:
@@ -6264,19 +7048,19 @@ def verify_section_5_unseen_validation_and_interval_splits(
             raw_split["union_F_Y"] = u_f
             raw_split["union_M_P0_F"] = u_mf
             raw_split["TC062_P0_F_interval_classification"] = classify_probe_margin_arb(u_mf)
+
+            def _ser_leaves(node: Any) -> Any:
+                if isinstance(node, arb):
+                    return serialize_arb_certified(node)
+                if isinstance(node, dict):
+                    return {k: _ser_leaves(v) for k, v in node.items()}
+                if isinstance(node, list):
+                    return [_ser_leaves(v) for v in node]
+                return node
+
+            return _ser_leaves(raw_split)
         finally:
             flint_ctx.prec = saved_p
-
-        def _ser_leaves(node: Any) -> Any:
-            if isinstance(node, arb):
-                return serialize_arb_certified(node)
-            if isinstance(node, dict):
-                return {k: _ser_leaves(v) for k, v in node.items()}
-            if isinstance(node, list):
-                return [_ser_leaves(v) for v in node]
-            return node
-
-        return _ser_leaves(raw_split)
 
     split_625 = _enrich_and_serialize_interval_split(
         evaluate_interval_via_cutoff_case_split_arb(
@@ -6616,6 +7400,8 @@ def _extract_tc062_stable_key_maps(
     verdicts: Dict[str, Any] = {}
     scope_of_key: Dict[str, str] = {}
     incomparable: List[Dict[str, Any]] = []
+    branch_raw_margin_verdicts: Dict[str, str] = {}
+    branch_coverage_statuses: Dict[str, str] = {}
 
     def _put_v(k: str, v: Any, scope_name: str) -> None:
         verdicts[k] = v
@@ -7013,12 +7799,17 @@ def _extract_tc062_stable_key_maps(
             else:
                 br_by_tr[tr_b] = br_o
 
+        art_prov_o = art.get("provenance") if isinstance(art.get("provenance"), dict) else None
+        art_gen_ts_o = (
+            art.get("generated_at_utc") if isinstance(art.get("generated_at_utc"), str) else None
+        )
+
         def _audited_branch_margin_verdict(
             br_dict: Dict[str, Any], tr_tuple: Tuple[int, int, int], m_k: str
-        ) -> Optional[str]:
+        ) -> Tuple[Optional[str], Optional[str], Optional[str]]:
             pv_raw = _audit_serialized_margin_verdict_tc062(br_dict.get(m_k))
             if pv_raw == "CONFLICT":
-                return None
+                return None, None, None
             ys_p = _parse_serialized_arb_enclosure_tc062(br_dict.get("Y_sub_ball"))
             adm_b = _evaluate_branch_domain_admissibility_tc062(
                 br_dict,
@@ -7026,18 +7817,22 @@ def _extract_tc062_stable_key_maps(
                 prescribed_Y_lo=ylo_p,
                 prescribed_Y_hi=yhi_p,
                 cutoff_triple=tr_tuple,
+                split_key=split_key,
+                artifact_provenance=art_prov_o,
+                artifact_generated_at_utc=art_gen_ts_o,
             )
+            cov_st_b = str(adm_b["coverage_status"])
             if adm_b["conflicts"]:
-                return CERTIFICATION_INTEGRITY_CONFLICT_VERDICT
+                return CERTIFICATION_INTEGRITY_CONFLICT_VERDICT, pv_raw, cov_st_b
             if pv_raw == "FAIL" and not adm_b["can_certify_refutation"]:
-                return "INCOMPLETE_OR_INVALID_COVERAGE"
+                return "INCOMPLETE_OR_INVALID_COVERAGE", pv_raw, cov_st_b
             if (
                 tr_tuple in part_req_set
                 and pv_raw == "PASS"
                 and not adm_b["complete_subdomain_coverage"]
             ):
-                return "INCOMPLETE_OR_INVALID_COVERAGE"
-            return pv_raw
+                return "INCOMPLETE_OR_INVALID_COVERAGE", pv_raw, cov_st_b
+            return pv_raw, pv_raw, cov_st_b
 
         for tr_req in part_req:
             br_m = br_by_tr.get(tr_req)
@@ -7051,21 +7846,26 @@ def _extract_tc062_stable_key_maps(
                     )
                     incomparable.append({"key": k_ib, "reason": reason_ib})
                 else:
-                    eff_pv = _audited_branch_margin_verdict(br_m, tr_req, m_key)
+                    eff_pv, raw_pv, cov_st_b = _audited_branch_margin_verdict(br_m, tr_req, m_key)
                     if eff_pv is None:
                         incomparable.append({"key": k_ib, "reason": "MALFORMED_BRANCH_MARGIN"})
                     else:
                         _put_v(k_ib, eff_pv, "continuous_interval_classifications")
+                        branch_raw_margin_verdicts[k_ib] = str(raw_pv)
+                        branch_coverage_statuses[
+                            f"sec5.interval_branch_coverage::{split_key}::{tr_req}"
+                        ] = str(cov_st_b)
 
         for tr_extra in sorted(set(br_by_tr.keys()) - part_req_set):
             br_ex = br_by_tr[tr_extra]
             for m_key in ("M_P0", "M_P0_F"):
                 k_ex = f"sec5.interval_extra_branch::{split_key}::{tr_extra}::{m_key}"
-                eff_pv_ex = _audited_branch_margin_verdict(br_ex, tr_extra, m_key)
+                eff_pv_ex, raw_pv_ex, _ = _audited_branch_margin_verdict(br_ex, tr_extra, m_key)
                 if eff_pv_ex is None:
                     incomparable.append({"key": k_ex, "reason": "MALFORMED_EXTRA_BRANCH_MARGIN"})
                 else:
                     _put_v(k_ex, eff_pv_ex, "continuous_interval_classifications")
+                    branch_raw_margin_verdicts[k_ex] = str(raw_pv_ex)
 
     # Execution / integrity / coverage / resource status classifications (as supplied — never
     # recreating deleted fields, and rejecting `None` / wrong-typed status values):
@@ -7236,9 +8036,19 @@ def _extract_tc062_stable_key_maps(
             for sub_k in s_d.keys():
                 schema_keys.add(f"{sec_k}.{sub_k}")
 
+    provenance_scalars: Dict[str, Any] = {}
+    prov_art = art.get("provenance")
+    if isinstance(prov_art, dict):
+        for pk, pv in prov_art.items():
+            if isinstance(pv, (str, int, float, bool)):
+                provenance_scalars[str(pk)] = pv
+
     return {
         "verdicts": verdicts,
         "scope_of_key": scope_of_key,
+        "branch_raw_margin_verdicts": branch_raw_margin_verdicts,
+        "branch_coverage_statuses": branch_coverage_statuses,
+        "provenance_scalars": provenance_scalars,
         "status_classifications": status_classifications,
         "invalid_status_fields": invalid_status_fields,
         "balls": _stable_balls(art),
@@ -7278,10 +8088,15 @@ def compare_tc062_artifacts_by_stable_key(
             "incomparable_reason": "PRIOR_ARTIFACT_UNAVAILABLE",
             "any_probe_kl1_control_or_candidate_verdict_changed": None,
             "any_numerical_enclosure_changed": None,
+            "enclosure_comparison_complete": False,
+            "any_numerical_enclosure_changed_on_comparable_balls": None,
             "any_integrity_coverage_or_execution_classification_changed": None,
             "scope_key_counts": {},
             "changed_numerical_enclosures_count": 0,
             "changed_mathematical_verdicts_count": 0,
+            "raw_branch_margin_sign_verdicts_changed_count": 0,
+            "branch_coverage_classifications_changed_count": 0,
+            "provenance_changes_count": 0,
             "corrected_integrity_coverage_or_execution_classifications_count": 0,
             "schema_only_additions_count": 0,
             "removed_status_or_schema_fields_count": 0,
@@ -7289,6 +8104,9 @@ def compare_tc062_artifacts_by_stable_key(
             "missing_or_incomparable_entries_count": 0,
             "changed_numerical_enclosures": [],
             "changed_mathematical_verdicts": [],
+            "raw_branch_margin_sign_verdicts_changed": [],
+            "branch_coverage_classifications_changed": [],
+            "provenance_changes": [],
             "corrected_integrity_coverage_or_execution_classifications": [],
             "schema_only_additions": [],
             "removed_status_or_schema_fields": [],
@@ -7304,10 +8122,15 @@ def compare_tc062_artifacts_by_stable_key(
             "incomparable_reason": "CURRENT_ARTIFACT_UNAVAILABLE",
             "any_probe_kl1_control_or_candidate_verdict_changed": None,
             "any_numerical_enclosure_changed": None,
+            "enclosure_comparison_complete": False,
+            "any_numerical_enclosure_changed_on_comparable_balls": None,
             "any_integrity_coverage_or_execution_classification_changed": None,
             "scope_key_counts": {},
             "changed_numerical_enclosures_count": 0,
             "changed_mathematical_verdicts_count": 0,
+            "raw_branch_margin_sign_verdicts_changed_count": 0,
+            "branch_coverage_classifications_changed_count": 0,
+            "provenance_changes_count": 0,
             "corrected_integrity_coverage_or_execution_classifications_count": 0,
             "schema_only_additions_count": 0,
             "removed_status_or_schema_fields_count": 0,
@@ -7315,6 +8138,9 @@ def compare_tc062_artifacts_by_stable_key(
             "missing_or_incomparable_entries_count": 0,
             "changed_numerical_enclosures": [],
             "changed_mathematical_verdicts": [],
+            "raw_branch_margin_sign_verdicts_changed": [],
+            "branch_coverage_classifications_changed": [],
+            "provenance_changes": [],
             "corrected_integrity_coverage_or_execution_classifications": [],
             "schema_only_additions": [],
             "removed_status_or_schema_fields": [],
@@ -7606,10 +8432,12 @@ def compare_tc062_artifacts_by_stable_key(
     old_b = old_ext["balls"]
     cur_b = cur_ext["balls"]
     changed_balls: List[Dict[str, Any]] = []
+    missing_ball_count = 0
     for bk in sorted(set(old_b.keys()) | set(cur_b.keys())):
         if bk not in old_b:
             schema_only_additions.append({"kind": "added_arb_enclosure", "key": bk})
         elif bk not in cur_b:
+            missing_ball_count += 1
             missing_or_incomparable.append(
                 {"side": "current", "key": bk, "reason": "MISSING_PRIOR_ARB_ENCLOSURE"}
             )
@@ -7632,6 +8460,48 @@ def compare_tc062_artifacts_by_stable_key(
                     }
                 )
 
+    # Separate raw branch margin-sign verdicts, per-branch coverage statuses, and provenance scalars
+    # (`TASK-TC-062R4` §6):
+    old_raw_bv = old_ext.get("branch_raw_margin_verdicts", {})
+    cur_raw_bv = cur_ext.get("branch_raw_margin_verdicts", {})
+    changed_raw_bv: List[Dict[str, Any]] = []
+    for rbk in sorted(set(old_raw_bv.keys()) & set(cur_raw_bv.keys())):
+        if old_raw_bv[rbk] != cur_raw_bv[rbk]:
+            changed_raw_bv.append(
+                {
+                    "key": rbk,
+                    "prior_raw_margin_verdict": old_raw_bv[rbk],
+                    "current_raw_margin_verdict": cur_raw_bv[rbk],
+                }
+            )
+
+    old_bcov = old_ext.get("branch_coverage_statuses", {})
+    cur_bcov = cur_ext.get("branch_coverage_statuses", {})
+    changed_bcov: List[Dict[str, Any]] = []
+    for bck in sorted(set(old_bcov.keys()) | set(cur_bcov.keys())):
+        if old_bcov.get(bck) != cur_bcov.get(bck):
+            changed_bcov.append(
+                {
+                    "key": bck,
+                    "prior_coverage_status": old_bcov.get(bck),
+                    "current_coverage_status": cur_bcov.get(bck),
+                }
+            )
+
+    old_prov = old_ext.get("provenance_scalars", {})
+    cur_prov = cur_ext.get("provenance_scalars", {})
+    prov_changes: List[Dict[str, Any]] = []
+    for p_k in sorted(set(old_prov.keys()) | set(cur_prov.keys())):
+        if old_prov.get(p_k) != cur_prov.get(p_k):
+            prov_changes.append(
+                {
+                    "key": p_k,
+                    "prior_value": old_prov.get(p_k),
+                    "current_value": cur_prov.get(p_k),
+                }
+            )
+
+    enclosure_comp_complete = missing_ball_count == 0 and len(cur_b) > 0
     is_complete_comp = len(missing_or_incomparable) == 0
     comp_status = "COMPLETE_COMPARED" if is_complete_comp else "INCOMPLETE_COMPARISON"
     any_verdict_changed: Optional[bool] = (
@@ -7642,6 +8512,11 @@ def compare_tc062_artifacts_by_stable_key(
     any_enclosure_changed: Optional[bool] = (
         bool(len(changed_balls) > 0)
         if is_complete_comp
+        else (True if len(changed_balls) > 0 else None)
+    )
+    any_enclosure_changed_balls: Optional[bool] = (
+        bool(len(changed_balls) > 0)
+        if enclosure_comp_complete
         else (True if len(changed_balls) > 0 else None)
     )
     any_classification_changed: Optional[bool] = (
@@ -7657,10 +8532,15 @@ def compare_tc062_artifacts_by_stable_key(
         "incomparable_reason": None if is_complete_comp else "MISSING_OR_BLOCKED_COMPARISON_KEYS",
         "any_probe_kl1_control_or_candidate_verdict_changed": any_verdict_changed,
         "any_numerical_enclosure_changed": any_enclosure_changed,
+        "enclosure_comparison_complete": enclosure_comp_complete,
+        "any_numerical_enclosure_changed_on_comparable_balls": any_enclosure_changed_balls,
         "any_integrity_coverage_or_execution_classification_changed": any_classification_changed,
         "scope_key_counts": scope_counts,
         "changed_numerical_enclosures_count": len(changed_balls),
         "changed_mathematical_verdicts_count": len(changed_math_verdicts),
+        "raw_branch_margin_sign_verdicts_changed_count": len(changed_raw_bv),
+        "branch_coverage_classifications_changed_count": len(changed_bcov),
+        "provenance_changes_count": len(prov_changes),
         "corrected_integrity_coverage_or_execution_classifications_count": len(
             corrected_classifications
         ),
@@ -7670,6 +8550,9 @@ def compare_tc062_artifacts_by_stable_key(
         "missing_or_incomparable_entries_count": len(missing_or_incomparable),
         "changed_numerical_enclosures": changed_balls,
         "changed_mathematical_verdicts": changed_math_verdicts,
+        "raw_branch_margin_sign_verdicts_changed": changed_raw_bv,
+        "branch_coverage_classifications_changed": changed_bcov,
+        "provenance_changes": prov_changes,
         "corrected_integrity_coverage_or_execution_classifications": corrected_classifications,
         "schema_only_additions": schema_only_additions,
         "removed_status_or_schema_fields": removed_status_or_schema_fields,
@@ -7678,18 +8561,27 @@ def compare_tc062_artifacts_by_stable_key(
     }
 
 
+_GIT_JSON_RAW_CACHE: Dict[Tuple[str, str], Optional[str]] = {}
+
+
 def _load_git_json_artifact_or_none(commit_sha: str, rel_path: str) -> Optional[Dict[str, Any]]:
-    proc = subprocess.run(
-        ["git", "show", f"{commit_sha}:{rel_path}"],
-        cwd=str(REPO_ROOT),
-        capture_output=True,
-        text=True,
-        encoding="utf-8",
-        check=False,
-    )
-    if proc.returncode == 0 and proc.stdout.strip():
+    cache_k = (str(commit_sha), str(rel_path))
+    if cache_k not in _GIT_JSON_RAW_CACHE:
+        proc = subprocess.run(
+            ["git", "show", f"{commit_sha}:{rel_path}"],
+            cwd=str(REPO_ROOT),
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            check=False,
+        )
+        _GIT_JSON_RAW_CACHE[cache_k] = (
+            proc.stdout if (proc.returncode == 0 and proc.stdout.strip()) else None
+        )
+    raw_txt = _GIT_JSON_RAW_CACHE[cache_k]
+    if raw_txt is not None:
         try:
-            return json.loads(proc.stdout)
+            return json.loads(raw_txt)
         except Exception:  # noqa: BLE001
             return None
     return None
@@ -7793,8 +8685,8 @@ def generate_task_tc062_artifact(
 
     artifact: Dict[str, Any] = {
         "task_id": TASK_TC_062_ID,
-        "repair_task_id": TASK_TC_062R3_ID,
-        "prior_repair_task_id": TASK_TC_062R2_ID,
+        "repair_task_id": TASK_TC_062R4_ID,
+        "prior_repair_task_id": TASK_TC_062R3_ID,
         "epic_id": EPIC_TC_042_ID,
         "parent_subgate": PARENT_SUBGATE_ID,
         "parent_subgate_status": "OPEN",
@@ -7824,6 +8716,8 @@ def generate_task_tc062_artifact(
             "reviewed_tc062r_producing_commit": REVIEWED_TC062R_PRODUCING_COMMIT,
             "reviewed_tc062r2_delivered_tip": REVIEWED_TC062R2_DELIVERED_TIP,
             "reviewed_tc062r2_validation_commit": REVIEWED_TC062R2_VALIDATION_COMMIT,
+            "reviewed_tc062r3_delivered_tip": REVIEWED_TC062R3_DELIVERED_TIP,
+            "reviewed_tc062r3_validation_commit": REVIEWED_TC062R3_VALIDATION_COMMIT,
             "preserved_tc061_protocol_registration_commit": TC061_FROZEN_PROTOCOL_REGISTRATION_COMMIT,
             "preserved_tc061_protocol_sha256": TC061_FROZEN_PROTOCOL_SHA256,
             "frozen_tc062_protocol_registration_commit": FROZEN_TC062_PROTOCOL_REGISTRATION_COMMIT,
@@ -8082,6 +8976,21 @@ def generate_task_tc062_artifact(
             holdout_entries=eff_entries,
         )
     )
+    prior_tc062r3_art: Optional[Dict[str, Any]] = prior_artifact_for_comparison
+    if prior_tc062r3_art is None and (not has_test_override):
+        prior_tc062r3_art = _load_git_json_artifact_or_none(
+            REVIEWED_TC062R3_DELIVERED_TIP, "data/tc_joint_prime_dilation_signed_remainder.json"
+        )
+    clean_obj["provenance"]["tc062r4_validation_and_verdict_comparison"] = (
+        compare_tc062_artifacts_by_stable_key(
+            clean_obj,
+            prior_tc062r3_art,
+            baseline_commit=REVIEWED_TC062R3_DELIVERED_TIP,
+            comparison_id="TC062R4_VS_TC062R3_AS_SUPPLIED_STABLE_KEY_V1",
+            probes=eff_probes,
+            holdout_entries=eff_entries,
+        )
+    )
 
     if write_output:
         out_txt = json.dumps(clean_obj, indent=2, ensure_ascii=True) + "\n"
@@ -8097,6 +9006,7 @@ def reprocess_task_tc062_metadata_and_stage_b(
     *,
     write_output: bool = True,
     prec_bits: int = 256,
+    reconstruct_legacy_interval_domains: bool = False,
     holdout_entries_override: Optional[Sequence[Dict[str, Any]]] = None,
     probes_override: Optional[Sequence[Dict[str, Any]]] = None,
     prior_artifact_for_comparison: Optional[Dict[str, Any]] = None,
@@ -8106,8 +9016,19 @@ def reprocess_task_tc062_metadata_and_stage_b(
     divisor-jump + endpoint/summed-strip audits, and stable-key verdict-change provenance on an
     existing `TC-062` certificate, preserving all existing certified Arb quadrature enclosures,
     original execution timestamps, telemetry, and numerical/formal producing commits untouched.
+
+    By default (`reconstruct_legacy_interval_domains = False`), audits the supplied artifact strictly
+    as supplied without injecting or recreating deleted/missing domain evidence (`TASK-TC-062R4` §3).
     """
     existing = json.loads(artifact_path.read_text(encoding="utf-8"))
+    head_proc = subprocess.run(
+        ["git", "rev-parse", "HEAD"], cwd=str(REPO_ROOT), capture_output=True, text=True, check=False
+    )
+    head_sha = head_proc.stdout.strip() if head_proc.returncode == 0 else "UNKNOWN"
+    if reconstruct_legacy_interval_domains:
+        existing = reconstruct_tc062r_legacy_interval_domains(
+            existing, reconstruction_commit=head_sha
+        )
     proto_chk = verify_frozen_tc062_protocol_immutability()
     if not proto_chk["verified"]:
         raise RuntimeError(f"Frozen TC-062 protocol verification failed: {proto_chk}")
@@ -8211,6 +9132,14 @@ def reprocess_task_tc062_metadata_and_stage_b(
         probes,
         rules,
         old_sec5.get("continuous_straddling_interval_splits", {}),
+        artifact_provenance=(
+            existing.get("provenance") if isinstance(existing.get("provenance"), dict) else None
+        ),
+        artifact_generated_at_utc=(
+            existing.get("generated_at_utc")
+            if isinstance(existing.get("generated_at_utc"), str)
+            else None
+        ),
     )
     ep5_ok, ep5_msg = verify_section_epistemic_scope_metadata(sec5)
     if not ep5_ok:
@@ -8222,29 +9151,40 @@ def reprocess_task_tc062_metadata_and_stage_b(
         + ["KL1_int2_diag", "KL1_int2_offdiag"],
     )
 
-    head_proc = subprocess.run(
-        ["git", "rev-parse", "HEAD"], cwd=str(REPO_ROOT), capture_output=True, text=True, check=False
-    )
-    head_sha = head_proc.stdout.strip() if head_proc.returncode == 0 else "UNKNOWN"
-
     prov = dict(existing["provenance"])
     prov["reviewed_tc062r_delivered_tip"] = REVIEWED_TC062R_DELIVERED_TIP
     prov["reviewed_tc062r_producing_commit"] = REVIEWED_TC062R_PRODUCING_COMMIT
     prov["reviewed_tc062r2_delivered_tip"] = REVIEWED_TC062R2_DELIVERED_TIP
     prov["reviewed_tc062r2_validation_commit"] = REVIEWED_TC062R2_VALIDATION_COMMIT
+    prov["reviewed_tc062r3_delivered_tip"] = REVIEWED_TC062R3_DELIVERED_TIP
+    prov["reviewed_tc062r3_validation_commit"] = REVIEWED_TC062R3_VALIDATION_COMMIT
     prov.setdefault(
         "tc062r2_validation_and_metadata_producing_git_commit", REVIEWED_TC062R2_VALIDATION_COMMIT
     )
+    prov.setdefault(
+        "tc062r3_validation_and_metadata_producing_git_commit", REVIEWED_TC062R3_VALIDATION_COMMIT
+    )
     prov["metadata_and_stage_b_reprocessed_from_source"] = True
-    prov["tc062r3_validation_and_metadata_producing_git_commit"] = head_sha
-    prov["tc062r3_reprocessed_at_utc"] = datetime.now(timezone.utc).isoformat()
+    prov["tc062r4_validation_and_reconstruction_producing_git_commit"] = head_sha
+    prov["tc062r4_reprocessed_at_utc"] = datetime.now(timezone.utc).isoformat()
+    if isinstance(prov.get("tc062r4_legacy_domain_reconstruction_summary"), dict):
+        rec_sum = dict(prov["tc062r4_legacy_domain_reconstruction_summary"])
+        rec_sum["reconstruction_validation_commit"] = head_sha
+        if isinstance(rec_sum.get("five_branch_domain_evidence_table"), list):
+            rec_sum["five_branch_domain_evidence_table"] = [
+                {**row_e, "reconstruction_validation_commit": head_sha}
+                if isinstance(row_e, dict)
+                else row_e
+                for row_e in rec_sum["five_branch_domain_evidence_table"]
+            ]
+        prov["tc062r4_legacy_domain_reconstruction_summary"] = rec_sum
     prov["hand_edited_enclosures"] = False
     prov["quadrature_timestamps_reset"] = False
 
     updated: Dict[str, Any] = {
         "task_id": existing["task_id"],
-        "repair_task_id": TASK_TC_062R3_ID,
-        "prior_repair_task_id": TASK_TC_062R2_ID,
+        "repair_task_id": TASK_TC_062R4_ID,
+        "prior_repair_task_id": TASK_TC_062R3_ID,
         "epic_id": existing["epic_id"],
         "parent_subgate": existing["parent_subgate"],
         "parent_subgate_status": "OPEN",
@@ -8332,6 +9272,13 @@ def reprocess_task_tc062_metadata_and_stage_b(
                 REVIEWED_TC062R2_DELIVERED_TIP, "data/tc_joint_prime_dilation_signed_remainder.json"
             )
         )
+        prior_tc062r3 = (
+            prior_artifact_for_comparison
+            if prior_artifact_for_comparison is not None
+            else _load_git_json_artifact_or_none(
+                REVIEWED_TC062R3_DELIVERED_TIP, "data/tc_joint_prime_dilation_signed_remainder.json"
+            )
+        )
         if isinstance(clean_obj["provenance"].get("tc062r_certificate_impact_inventory"), dict):
             inv_r = dict(clean_obj["provenance"]["tc062r_certificate_impact_inventory"])
             comp_vs_062 = compare_tc062_artifacts_by_stable_key(
@@ -8346,11 +9293,15 @@ def reprocess_task_tc062_metadata_and_stage_b(
             inv_r["any_probe_kl1_control_or_candidate_verdict_changed"] = comp_vs_062[
                 "any_probe_kl1_control_or_candidate_verdict_changed"
             ]
+            inv_r["raw_branch_margin_sign_verdicts_changed_count"] = comp_vs_062[
+                "raw_branch_margin_sign_verdicts_changed_count"
+            ]
             inv_r["stable_key_verdict_comparison_v2"] = comp_vs_062
             clean_obj["provenance"]["tc062r_certificate_impact_inventory"] = inv_r
     else:
         prior_tc062r = prior_artifact_for_comparison
         prior_tc062r2 = prior_artifact_for_comparison
+        prior_tc062r3 = prior_artifact_for_comparison
 
     clean_obj["provenance"]["tc062r2_validation_and_verdict_comparison"] = (
         compare_tc062_artifacts_by_stable_key(
@@ -8372,6 +9323,39 @@ def reprocess_task_tc062_metadata_and_stage_b(
             holdout_entries=holdout_entries,
         )
     )
+    clean_obj["provenance"]["tc062r4_validation_and_verdict_comparison"] = (
+        compare_tc062_artifacts_by_stable_key(
+            clean_obj,
+            prior_tc062r3,
+            baseline_commit=REVIEWED_TC062R3_DELIVERED_TIP,
+            comparison_id="TC062R4_VS_TC062R3_AS_SUPPLIED_STABLE_KEY_V1",
+            probes=probes,
+            holdout_entries=holdout_entries,
+        )
+    )
+    if isinstance(prior_tc062r3, dict):
+        try:
+            prior_tc062r3_recovered = reconstruct_tc062r_legacy_interval_domains(
+                prior_tc062r3,
+                reconstruction_commit=head_sha,
+                reconstructed_at_utc=HISTORICAL_TC062R_GENERATED_AT_UTC,
+            )
+            post_rec_comp = compare_tc062_artifacts_by_stable_key(
+                clean_obj,
+                prior_tc062r3_recovered,
+                baseline_commit=REVIEWED_TC062R3_DELIVERED_TIP,
+                comparison_id="TC062R4_VS_TC062R3_POST_DOMAIN_RECOVERY_STABLE_KEY_V1",
+                probes=probes,
+                holdout_entries=holdout_entries,
+            )
+            post_rec_comp["comparison_basis"] = (
+                "POST_HISTORICAL_DOMAIN_RECOVERY_ON_PRIOR_TC062R3"
+            )
+            clean_obj["provenance"]["tc062r4_post_domain_recovery_verdict_comparison"] = (
+                post_rec_comp
+            )
+        except ValueError:
+            pass
 
     if write_output:
         out_txt = json.dumps(clean_obj, indent=2, ensure_ascii=True) + "\n"
@@ -8382,7 +9366,17 @@ def reprocess_task_tc062_metadata_and_stage_b(
 
 
 if __name__ == "__main__":
-    if "--reprocess-metadata" in sys.argv[1:]:
+    if "--reconstruct-legacy-domains" in sys.argv[1:]:
+        out = reprocess_task_tc062_metadata_and_stage_b(
+            write_output=True, reconstruct_legacy_interval_domains=True
+        )
+        print(
+            f"Reconstructed legacy interval domains & reprocessed {JOINT_PRIME_DILATION_ARTIFACT_PATH.name}: "
+            f"outcome={out['completion_outcome_code']}, "
+            f"hyp={out['holdout_hypothesis_outcome']}, "
+            f"res={out['resource_compliance_status']}"
+        )
+    elif "--reprocess-metadata" in sys.argv[1:]:
         out = reprocess_task_tc062_metadata_and_stage_b(write_output=True)
         print(
             f"Reprocessed {JOINT_PRIME_DILATION_ARTIFACT_PATH.name}: "

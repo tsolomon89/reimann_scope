@@ -1841,13 +1841,19 @@ def evaluate_fixed_cutoff_on_Y_ball_arb(
             PB_acc += _int_f(lambda b: b[1] * b[3])
 
         flint_ctx.prec = prec_bits
+        y_sub_out = +Y_ball
+        y_out_lo_q, y_out_hi_q = _exact_arb_endpoints_as_fractions(y_sub_out)
+        if not (y_out_lo_q <= eval_lo_q and eval_hi_q <= y_out_hi_q):
+            raise CertificationIntegrityError(
+                f"Outward Y_sub_ball {y_sub_out} failed to enclose evaluated Y_ball [{eval_lo_q}, {eval_hi_q}]"
+            )
         J_b = +(arb(4) * (P2_acc - D_acc) + B2_acc - arb(4) * PB_acc)
         lgD_b = +(log_Y * D_acc)
         return {
             "T_fixed": T_fixed,
             "D0_raw_fixed": D0_raw_fixed,
             "D0_eff_fixed": D0_eff,
-            "Y_sub_ball": +Y_ball,
+            "Y_sub_ball": y_sub_out,
             "evaluated_Y_interval_exact_fractions": [
                 f"{eval_lo_q.numerator}/{eval_lo_q.denominator}",
                 f"{eval_hi_q.numerator}/{eval_hi_q.denominator}",
@@ -1945,6 +1951,13 @@ def evaluate_interval_via_cutoff_case_split_arb(
                 if bool(lo_cand > hi_cand):
                     continue
                 sub_ball = lo_cand.union(hi_cand)
+                sub_lo_q, sub_hi_q = _exact_arb_endpoints_as_fractions(sub_ball)
+                lo_cand_q = _exact_arb_endpoints_as_fractions(lo_cand)[0]
+                hi_cand_q = _exact_arb_endpoints_as_fractions(hi_cand)[1]
+                if not (sub_lo_q <= lo_cand_q and hi_cand_q <= sub_hi_q):
+                    raise CertificationIntegrityError(
+                        f"Constructed sub_ball {sub_ball} failed to enclose [lo_cand, hi_cand] = [{lo_cand_q}, {hi_cand_q}]"
+                    )
                 br_res = evaluate_fixed_cutoff_on_Y_ball_arb(
                     sub_ball,
                     T_c,
