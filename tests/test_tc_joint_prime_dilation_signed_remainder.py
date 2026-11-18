@@ -1094,16 +1094,22 @@ def test_tc062r2_interval_containment_exact_cutoff_partition_and_extra_branch_se
         "interval_625_pm_2_neg12_across_T3125"
     ]
     sp_w["union_M_P0_F"] = _ser(arb("-0.50", arb("0.30")))  # [-0.80, -0.20] strictly wider than ~[-0.652, -0.648]
-    sp_w["branches"][0]["Y_sub_ball"] = _ser(
-        _q_arb(Fraction(2559999, 4096) - Fraction(1, 10**6)).union(
-            _q_arb(Fraction(625, 1) + Fraction(1, 10**6))
-        )
-    )
-    sp_w["branches"][1]["Y_sub_ball"] = _ser(
-        _q_arb(Fraction(625, 1) - Fraction(1, 10**6)).union(
-            _q_arb(Fraction(2560001, 4096) + Fraction(1, 10**6))
-        )
-    )
+    w0_lo = Fraction(2559999, 4096) - Fraction(1, 10**6)
+    w0_hi = Fraction(625, 1) + Fraction(1, 10**6)
+    w1_lo = Fraction(625, 1) - Fraction(1, 10**6)
+    w1_hi = Fraction(2560001, 4096) + Fraction(1, 10**6)
+    sp_w["branches"][0].pop("historical_domain_reconstruction", None)
+    sp_w["branches"][1].pop("historical_domain_reconstruction", None)
+    sp_w["branches"][0]["Y_sub_ball"] = _ser(_q_arb(w0_lo).union(_q_arb(w0_hi)))
+    sp_w["branches"][0]["evaluated_Y_interval_exact_fractions"] = [
+        f"{w0_lo.numerator}/{w0_lo.denominator}",
+        f"{w0_hi.numerator}/{w0_hi.denominator}",
+    ]
+    sp_w["branches"][1]["Y_sub_ball"] = _ser(_q_arb(w1_lo).union(_q_arb(w1_hi)))
+    sp_w["branches"][1]["evaluated_Y_interval_exact_fractions"] = [
+        f"{w1_lo.numerator}/{w1_lo.denominator}",
+        f"{w1_hi.numerator}/{w1_hi.denominator}",
+    ]
     g_w, _ = _both(s_wide, "valid_conservative_wide")
     assert g_w["holdout_hypothesis_outcome"] == "SURVIVED_TESTED_POINTS"
     assert g_w["execution_and_certification_status"] == "CERTIFIED_EVALUATION_COMPLETE"
@@ -3150,6 +3156,182 @@ def test_tc062r4_exact_evaluation_domain_coverage_and_legacy_recovery(
     t_2 = d_2["provenance"].pop("tc062r4_reprocessed_at_utc")
     assert isinstance(t_1, str) and isinstance(t_2, str)
     assert d_1 == d_2
+
+    # 14. Independent review edge-case regressions (`B_inner subseteq B_eval subseteq B_outer`,
+    #     explicit inner-enclosure fields, sub-53-bit precision guard, null/missing parent
+    #     provenance & auxiliary reconstruction fields, explicit JSON `null` domain/witness keys,
+    #     and repeat-invocation idempotence of `reconstruct_tc062r_legacy_interval_domains`):
+    from tc.mixed_arithmetic_covariance import evaluate_fixed_cutoff_on_Y_ball_arb
+
+    with pytest.raises(ValueError, match="prec_bits"):
+        evaluate_fixed_cutoff_on_Y_ball_arb(
+            arb(64), 181, 4, prec_bits=50, quad_tol_bits=40, selberg_table={}
+        )
+
+    # (14a) Narrow `arb_ball_str` inside wider `lower_dec`/`upper_dec` (`B_outer` vs `dec` mismatch)
+    #       is rejected at `_parse_serialized_arb_enclosure_tc062` -> `CERTIFICATION_INTEGRITY_CONFLICT`:
+    s_inv_bs = json.loads(json.dumps(s_base))
+    sp_ibs = s_inv_bs["continuous_straddling_interval_splits"][
+        "interval_625_pm_2_neg12_across_T3125"
+    ]
+    sp_ibs["branches"][0].pop("historical_domain_reconstruction", None)
+    sp_ibs["branches"][0]["Y_sub_ball"] = {
+        "mid_float": 624.99986,
+        "rad_float_outward": 0.0003,
+        "lower_dec": "6.249996000000000000000000000000000000000e+2",
+        "upper_dec": "6.250001000000000000000000000000000000000e+2",
+        "arb_ball_str": "[624.99986 +/- 1.1e-4]",
+    }
+    g_ibs, r_ibs = _both(s_inv_bs, "narrow_bs_vs_wide_dec_rejected")
+    assert g_ibs["holdout_hypothesis_outcome"] == "CERTIFICATION_INTEGRITY_CONFLICT"
+    assert g_ibs["serialized_arb_self_check"]["all_enclose_original_256bit_arb_ball"] is False
+    assert r_ibs["serialized_arb_self_check"]["all_enclose_original_256bit_arb_ball"] is False
+
+    # (14b) Wide unlinked outward `Y_sub_ball` (`[625 - 2^-11, 625 + 2^-11]`) and `prec = 50`
+    #       untampered `serialize_arb_certified(B_eval)` WITHOUT exact/reconstructed/inner domain
+    #       NEVER synthesize `CERTIFIED_COMPLETE_COVERAGE`:
+    s_unlinked_wide = json.loads(json.dumps(s_base))
+    sp_uw = s_unlinked_wide["continuous_straddling_interval_splits"][
+        "interval_625_pm_2_neg12_across_T3125"
+    ]
+    sp_uw["branches"][0].pop("historical_domain_reconstruction", None)
+    sp_uw["branches"][0]["Y_sub_ball"] = _ser(
+        _q_arb(Fraction(625, 1) - Fraction(1, 2048)).union(
+            _q_arb(Fraction(625, 1) + Fraction(1, 2048))
+        )
+    )
+    g_uw, _ = _both(s_unlinked_wide, "unlinked_wide_outward_ball_uncertified")
+    assert g_uw["holdout_hypothesis_outcome"] == "INCOMPLETE_OR_INVALID_COVERAGE"
+    adm_uw = g_uw["section_5_unseen_validation_and_interval_splits"][
+        "continuous_straddling_interval_splits"
+    ]["interval_split_audits"]["interval_625_pm_2_neg12_across_T3125"]["branch_domain_admissibility"][0]
+    assert adm_uw["complete_subdomain_coverage"] is False
+    assert adm_uw["coverage_status"] == "UNCERTIFIED_COVERAGE"
+
+    saved_pr50 = flint_ctx.prec
+    try:
+        flint_ctx.prec = 50
+        ser_p50 = _ser(
+            _q_arb(Fraction(2559999, 4096) + Fraction(1, 1 << 53)).union(
+                _q_arb(Fraction(625, 1))
+            )
+        )
+    finally:
+        flint_ctx.prec = saved_pr50
+    s_p50 = json.loads(json.dumps(s_base))
+    s_p50["continuous_straddling_interval_splits"]["interval_625_pm_2_neg12_across_T3125"][
+        "branches"
+    ][0].pop("historical_domain_reconstruction", None)
+    s_p50["continuous_straddling_interval_splits"]["interval_625_pm_2_neg12_across_T3125"][
+        "branches"
+    ][0]["Y_sub_ball"] = ser_p50
+    g_p50, _ = _both(s_p50, "prec50_unlinked_never_certifies_coverage")
+    assert g_p50["holdout_hypothesis_outcome"] in (
+        "INCOMPLETE_OR_INVALID_COVERAGE",
+        "CERTIFICATION_INTEGRITY_CONFLICT",
+    )
+
+    # (14c) Explicit certified inner enclosure (`evaluated_Y_inner_interval_exact_fractions`):
+    #       - valid `closure(A) subseteq B_inner subseteq B_outer` -> `CERTIFIED_COMPLETE_COVERAGE`;
+    #       - partial `B_inner subsetneq A subseteq B_outer` -> `UNCERTIFIED_COVERAGE`;
+    #       - invalid `B_inner not subseteq B_outer` -> `CERTIFICATION_INTEGRITY_CONFLICT`:
+    s_in_ok = json.loads(json.dumps(s_unlinked_wide))
+    s_in_ok["continuous_straddling_interval_splits"]["interval_625_pm_2_neg12_across_T3125"][
+        "branches"
+    ][0]["evaluated_Y_inner_interval_exact_fractions"] = ["2559999/4096", "625"]
+    g_in_ok, _ = _both(s_in_ok, "explicit_inner_enclosure_covers_A")
+    assert g_in_ok["holdout_hypothesis_outcome"] == "SURVIVED_TESTED_POINTS"
+    assert g_in_ok["execution_and_certification_status"] == "CERTIFIED_EVALUATION_COMPLETE"
+
+    s_in_part = json.loads(json.dumps(s_unlinked_wide))
+    s_in_part["continuous_straddling_interval_splits"]["interval_625_pm_2_neg12_across_T3125"][
+        "branches"
+    ][0]["evaluated_Y_inner_interval_exact_fractions"] = ["6249998/10000", "6249999/10000"]
+    g_in_part, _ = _both(s_in_part, "explicit_inner_enclosure_partial")
+    assert g_in_part["holdout_hypothesis_outcome"] == "INCOMPLETE_OR_INVALID_COVERAGE"
+
+    s_in_bad = json.loads(json.dumps(s_unlinked_wide))
+    s_in_bad["continuous_straddling_interval_splits"]["interval_625_pm_2_neg12_across_T3125"][
+        "branches"
+    ][0]["evaluated_Y_inner_interval_exact_fractions"] = ["620", "630"]
+    g_in_bad, _ = _both(s_in_bad, "explicit_inner_outside_outer_rejected")
+    assert g_in_bad["holdout_hypothesis_outcome"] == "CERTIFICATION_INTEGRITY_CONFLICT"
+
+    # (14d) Missing / `None` / non-string `provenance["numerical_producing_git_commit"]` or
+    #       `generated_at_utc` AND tampered `mid_man_exp` / `rad_man_exp` / `required_subdomain_notation`
+    #       fail closed in BOTH `reprocess_task_tc062_metadata_and_stage_b` and `compare_tc062_artifacts_by_stable_key`:
+    for bad_prov_tag, mut_art_fn in (
+        ("null_num_commit", lambda a: a["provenance"].update({"numerical_producing_git_commit": None})),
+        ("del_num_commit", lambda a: a["provenance"].pop("numerical_producing_git_commit", None)),
+        ("null_gen_ts", lambda a: a.update({"generated_at_utc": None})),
+        ("int_gen_ts", lambda a: a.update({"generated_at_utc": 0})),
+        (
+            "corrupt_mid_man_exp",
+            lambda a: a["section_5_unseen_validation_and_interval_splits"][
+                "continuous_straddling_interval_splits"
+            ]["interval_625_pm_2_neg12_across_T3125"]["branches"][0][
+                "historical_domain_reconstruction"
+            ].update({"reconstructed_sub_ball_mid_man_exp": [0, 0]}),
+        ),
+        (
+            "corrupt_margin_status",
+            lambda a: a["section_5_unseen_validation_and_interval_splits"][
+                "continuous_straddling_interval_splits"
+            ]["interval_625_pm_2_neg12_across_T3125"]["branches"][0][
+                "historical_domain_reconstruction"
+            ].update({"margin_recomputation_status": "RECOMPUTED"}),
+        ),
+    ):
+        art_bp = json.loads(json.dumps(tc062_artifact))
+        mut_art_fn(art_bp)
+        p_bp = tmp_path / f"bad_prov_{bad_prov_tag}.json"
+        p_bp.write_text(json.dumps(art_bp), encoding="utf-8")
+        r_bp = reprocess_task_tc062_metadata_and_stage_b(p_bp, write_output=False)
+        assert r_bp["holdout_hypothesis_outcome"] == "CERTIFICATION_INTEGRITY_CONFLICT"
+        assert r_bp["all_mathematical_and_numerical_checks_pass"] is False
+        cmp_bp = compare_tc062_artifacts_by_stable_key(
+            art_bp, tc062_artifact, baseline_commit=REVIEWED_TC062R3_DELIVERED_TIP
+        )
+        assert cmp_bp["comparison_status"] == "INCOMPLETE_COMPARISON"
+        assert cmp_bp["any_probe_kl1_control_or_candidate_verdict_changed"] is None
+
+    # (14e) Explicit JSON `null` (`None`) on domain or witness keys is rejected even when
+    #       `historical_domain_reconstruction` is present:
+    for null_k in (
+        "evaluated_Y_interval_exact_fractions",
+        "evaluated_Y_symbolic_bounds",
+        "evaluated_Y_subintervals_exact_fractions",
+        "evaluated_Y_inner_interval_exact_fractions",
+        "evaluated_Y_inner_symbolic_bounds",
+        "admissible_witness_Y",
+    ):
+        s_null_k = json.loads(json.dumps(s_base))
+        s_null_k["continuous_straddling_interval_splits"][
+            "interval_625_pm_2_neg12_across_T3125"
+        ]["branches"][0][null_k] = None
+        g_nk, _ = _both(s_null_k, f"null_key_{null_k}")
+        assert g_nk["holdout_hypothesis_outcome"] == "CERTIFICATION_INTEGRITY_CONFLICT"
+
+    # (14f) Repeat invocation of `reconstruct_tc062r_legacy_interval_domains` on an already
+    #       reconstructed artifact idempotently preserves `pre_reconstruction_branch_coverage_statuses`:
+    rec_once = reconstruct_tc062r_legacy_interval_domains(
+        raw_tc062r3,
+        reconstruction_commit="a" * 40,
+        reconstructed_at_utc="2026-11-18T20:00:00+00:00",
+    )
+    rec_twice = reconstruct_tc062r_legacy_interval_domains(
+        rec_once,
+        reconstruction_commit="a" * 40,
+        reconstructed_at_utc="2026-11-18T20:05:00+00:00",
+    )
+    assert rec_once == rec_twice
+    assert (
+        rec_twice["provenance"]["tc062r4_legacy_domain_reconstruction_summary"][
+            "pre_reconstruction_branch_coverage_statuses"
+        ]
+        == ["UNCERTIFIED_COVERAGE"] * 5
+    )
+
 
 
 

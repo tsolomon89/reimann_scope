@@ -1694,6 +1694,8 @@ def evaluate_fixed_cutoff_on_Y_ball_arb(
     selberg_table: Dict[str, Any],
 ) -> Dict[str, Any]:
     """Evaluate fixed-cutoff `(T_fixed, D0_eff_fixed)` window observables uniformly across ALL `Y` in `Y_ball`."""
+    if not (isinstance(prec_bits, int) and not isinstance(prec_bits, bool) and prec_bits >= 53):
+        raise ValueError(f"prec_bits must be an int >= 53, got {prec_bits!r}")
     work_prec = prec_bits + 32
     saved = flint_ctx.prec
     try:
