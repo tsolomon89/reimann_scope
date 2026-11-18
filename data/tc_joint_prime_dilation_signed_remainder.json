@@ -1,7 +1,7 @@
 {
   "task_id": "TASK-TC-062",
-  "repair_task_id": "TASK-TC-062R2",
-  "prior_repair_task_id": "TASK-TC-062R",
+  "repair_task_id": "TASK-TC-062R3",
+  "prior_repair_task_id": "TASK-TC-062R2",
   "epic_id": "EPIC-TC-042",
   "parent_subgate": "SUBGATE-TC-043A",
   "parent_subgate_status": "OPEN",
@@ -120,6 +120,8 @@
         "changed_mathematical_verdicts_count": 0,
         "corrected_integrity_coverage_or_execution_classifications_count": 1,
         "schema_only_additions_count": 77,
+        "removed_status_or_schema_fields_count": 0,
+        "retired_optional_fields_count": 0,
         "missing_or_incomparable_entries_count": 0,
         "changed_numerical_enclosures": [],
         "changed_mathematical_verdicts": [],
@@ -445,6 +447,8 @@
             "key": "section_4_quantitative_proof_attempt.candidate_a2_unsigned_paired_block_majorant_refutation.complete_kernel_linear_growth_proof.zero_locus_X_over_m_sqrt_4_3_log_8"
           }
         ],
+        "removed_status_or_schema_fields": [],
+        "retired_optional_fields": [],
         "missing_or_incomparable_entries": []
       }
     },
@@ -474,6 +478,8 @@
       "changed_mathematical_verdicts_count": 0,
       "corrected_integrity_coverage_or_execution_classifications_count": 0,
       "schema_only_additions_count": 6,
+      "removed_status_or_schema_fields_count": 0,
+      "retired_optional_fields_count": 0,
       "missing_or_incomparable_entries_count": 0,
       "changed_numerical_enclosures": [],
       "changed_mathematical_verdicts": [],
@@ -505,6 +511,42 @@
           "key": "section_5_unseen_validation_and_interval_splits.six_dimension_closeout_audit"
         }
       ],
+      "removed_status_or_schema_fields": [],
+      "retired_optional_fields": [],
+      "missing_or_incomparable_entries": []
+    },
+    "reviewed_tc062r2_delivered_tip": "a742aecea3fe737074231ecb2f501a959bbc2693",
+    "reviewed_tc062r2_validation_commit": "2ba4f3348ddc7b8b9d731bf189ae20c2af877434",
+    "tc062r3_validation_and_metadata_producing_git_commit": "8c08a56d11ee5524904bcc23ed56d6b5583794fc",
+    "tc062r3_reprocessed_at_utc": "2026-11-18T12:16:55.694420+00:00",
+    "tc062r3_validation_and_verdict_comparison": {
+      "comparison_id": "TC062R3_VS_TC062R2_STABLE_KEY_V1",
+      "baseline_commit": "a742aecea3fe737074231ecb2f501a959bbc2693",
+      "comparison_status": "COMPLETE_COMPARED",
+      "incomparable_reason": null,
+      "any_probe_kl1_control_or_candidate_verdict_changed": false,
+      "any_numerical_enclosure_changed": false,
+      "any_integrity_coverage_or_execution_classification_changed": false,
+      "scope_key_counts": {
+        "in_scope_controls": 37,
+        "candidate_and_section4_classifications": 6,
+        "kl1_diagnostics": 62,
+        "registered_probes_and_point_verdicts": 124,
+        "continuous_interval_classifications": 14
+      },
+      "changed_numerical_enclosures_count": 0,
+      "changed_mathematical_verdicts_count": 0,
+      "corrected_integrity_coverage_or_execution_classifications_count": 0,
+      "schema_only_additions_count": 0,
+      "removed_status_or_schema_fields_count": 0,
+      "retired_optional_fields_count": 0,
+      "missing_or_incomparable_entries_count": 0,
+      "changed_numerical_enclosures": [],
+      "changed_mathematical_verdicts": [],
+      "corrected_integrity_coverage_or_execution_classifications": [],
+      "schema_only_additions": [],
+      "removed_status_or_schema_fields": [],
+      "retired_optional_fields": [],
       "missing_or_incomparable_entries": []
     }
   },
@@ -4774,6 +4816,26 @@
             },
             "TC062_P0_F_branch_classification": {
               "verdict": "PASS"
+            },
+            "domain_admissibility_audit": {
+              "branch_index": 0,
+              "cutoff_triple": [
+                3125,
+                6,
+                6
+              ],
+              "branch_role": "REQUIRED_FEASIBLE_SUBDOMAIN",
+              "is_feasible_required": true,
+              "subdomain_notation": "[2559999/4096, 625]",
+              "subdomain_is_nonempty": true,
+              "domain_evidence_source": "SERIALIZED_ARB_OUTWARD_BALL",
+              "admissibility_status": "CERTIFIED_NONEMPTY_INTERSECTION",
+              "admissibility_reason": "CERTIFIED_INTERIOR_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
+              "complete_subdomain_coverage": true,
+              "has_certified_admissible_evaluated_witness": true,
+              "can_certify_refutation": true,
+              "certified_witness_Y": "5119999/8192",
+              "supplied_witness_check": null
             }
           },
           {
@@ -4878,6 +4940,26 @@
             },
             "TC062_P0_F_branch_classification": {
               "verdict": "PASS"
+            },
+            "domain_admissibility_audit": {
+              "branch_index": 1,
+              "cutoff_triple": [
+                3126,
+                6,
+                6
+              ],
+              "branch_role": "REQUIRED_FEASIBLE_SUBDOMAIN",
+              "is_feasible_required": true,
+              "subdomain_notation": "(625, 2560001/4096]",
+              "subdomain_is_nonempty": true,
+              "domain_evidence_source": "SERIALIZED_ARB_OUTWARD_BALL",
+              "admissibility_status": "CERTIFIED_NONEMPTY_INTERSECTION",
+              "admissibility_reason": "CERTIFIED_INTERIOR_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
+              "complete_subdomain_coverage": true,
+              "has_certified_admissible_evaluated_witness": true,
+              "can_certify_refutation": true,
+              "certified_witness_Y": "12500002441406248863131622783839702606201/20000000000000000000000000000000000000",
+              "supplied_witness_check": null
             }
           }
         ],
@@ -5087,6 +5169,26 @@
             },
             "TC062_P0_F_branch_classification": {
               "verdict": "PASS"
+            },
+            "domain_admissibility_audit": {
+              "branch_index": 0,
+              "cutoff_triple": [
+                1808,
+                5,
+                5
+              ],
+              "branch_role": "REQUIRED_FEASIBLE_SUBDOMAIN",
+              "is_feasible_required": true,
+              "subdomain_notation": "[2017/5, 1808^(4/5)]",
+              "subdomain_is_nonempty": true,
+              "domain_evidence_source": "SERIALIZED_ARB_OUTWARD_BALL",
+              "admissibility_status": "CERTIFIED_NONEMPTY_INTERSECTION",
+              "admissibility_reason": "CERTIFIED_INTERIOR_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
+              "complete_subdomain_coverage": true,
+              "has_certified_admissible_evaluated_witness": true,
+              "can_certify_refutation": true,
+              "certified_witness_Y": "4034106111597373853783210506662726402283/10000000000000000000000000000000000000",
+              "supplied_witness_check": null
             }
           },
           {
@@ -5191,6 +5293,26 @@
             },
             "TC062_P0_F_branch_classification": {
               "verdict": "PASS"
+            },
+            "domain_admissibility_audit": {
+              "branch_index": 1,
+              "cutoff_triple": [
+                1809,
+                5,
+                5
+              ],
+              "branch_role": "REQUIRED_FEASIBLE_SUBDOMAIN",
+              "is_feasible_required": true,
+              "subdomain_notation": "(1808^(4/5), exp(6))",
+              "subdomain_is_nonempty": true,
+              "domain_evidence_source": "SERIALIZED_ARB_OUTWARD_BALL",
+              "admissibility_status": "CERTIFIED_NONEMPTY_INTERSECTION",
+              "admissibility_reason": "CERTIFIED_INTERIOR_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
+              "complete_subdomain_coverage": true,
+              "has_certified_admissible_evaluated_witness": true,
+              "can_certify_refutation": true,
+              "certified_witness_Y": "4034250079061049234496749704703688621521/10000000000000000000000000000000000000",
+              "supplied_witness_check": null
             }
           },
           {
@@ -5295,6 +5417,26 @@
             },
             "TC062_P0_F_branch_classification": {
               "verdict": "PASS"
+            },
+            "domain_admissibility_audit": {
+              "branch_index": 2,
+              "cutoff_triple": [
+                1809,
+                6,
+                6
+              ],
+              "branch_role": "REQUIRED_FEASIBLE_SUBDOMAIN",
+              "is_feasible_required": true,
+              "subdomain_notation": "[exp(6), 20173/50]",
+              "subdomain_is_nonempty": true,
+              "domain_evidence_source": "SERIALIZED_ARB_OUTWARD_BALL",
+              "admissibility_status": "CERTIFIED_NONEMPTY_INTERSECTION",
+              "admissibility_reason": "CERTIFIED_INTERIOR_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
+              "complete_subdomain_coverage": true,
+              "has_certified_admissible_evaluated_witness": true,
+              "can_certify_refutation": true,
+              "certified_witness_Y": "1008610991865918933285684033762663602829/2500000000000000000000000000000000000",
+              "supplied_witness_check": null
             }
           }
         ],
@@ -5414,6 +5556,48 @@
           "coverage_issues": [],
           "coverage_complete": true,
           "integrity_ok": true,
+          "branch_domain_admissibility": [
+            {
+              "branch_index": 0,
+              "cutoff_triple": [
+                3125,
+                6,
+                6
+              ],
+              "branch_role": "REQUIRED_FEASIBLE_SUBDOMAIN",
+              "is_feasible_required": true,
+              "subdomain_notation": "[2559999/4096, 625]",
+              "subdomain_is_nonempty": true,
+              "domain_evidence_source": "SERIALIZED_ARB_OUTWARD_BALL",
+              "admissibility_status": "CERTIFIED_NONEMPTY_INTERSECTION",
+              "admissibility_reason": "CERTIFIED_INTERIOR_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
+              "complete_subdomain_coverage": true,
+              "has_certified_admissible_evaluated_witness": true,
+              "can_certify_refutation": true,
+              "certified_witness_Y": "5119999/8192",
+              "supplied_witness_check": null
+            },
+            {
+              "branch_index": 1,
+              "cutoff_triple": [
+                3126,
+                6,
+                6
+              ],
+              "branch_role": "REQUIRED_FEASIBLE_SUBDOMAIN",
+              "is_feasible_required": true,
+              "subdomain_notation": "(625, 2560001/4096]",
+              "subdomain_is_nonempty": true,
+              "domain_evidence_source": "SERIALIZED_ARB_OUTWARD_BALL",
+              "admissibility_status": "CERTIFIED_NONEMPTY_INTERSECTION",
+              "admissibility_reason": "CERTIFIED_INTERIOR_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
+              "complete_subdomain_coverage": true,
+              "has_certified_admissible_evaluated_witness": true,
+              "can_certify_refutation": true,
+              "certified_witness_Y": "12500002441406248863131622783839702606201/20000000000000000000000000000000000000",
+              "supplied_witness_check": null
+            }
+          ],
           "probe_effective_verdicts": {
             "P0": "PASS",
             "TC062_P0_F": "PASS"
@@ -5458,6 +5642,68 @@
           "coverage_issues": [],
           "coverage_complete": true,
           "integrity_ok": true,
+          "branch_domain_admissibility": [
+            {
+              "branch_index": 0,
+              "cutoff_triple": [
+                1808,
+                5,
+                5
+              ],
+              "branch_role": "REQUIRED_FEASIBLE_SUBDOMAIN",
+              "is_feasible_required": true,
+              "subdomain_notation": "[2017/5, 1808^(4/5)]",
+              "subdomain_is_nonempty": true,
+              "domain_evidence_source": "SERIALIZED_ARB_OUTWARD_BALL",
+              "admissibility_status": "CERTIFIED_NONEMPTY_INTERSECTION",
+              "admissibility_reason": "CERTIFIED_INTERIOR_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
+              "complete_subdomain_coverage": true,
+              "has_certified_admissible_evaluated_witness": true,
+              "can_certify_refutation": true,
+              "certified_witness_Y": "4034106111597373853783210506662726402283/10000000000000000000000000000000000000",
+              "supplied_witness_check": null
+            },
+            {
+              "branch_index": 1,
+              "cutoff_triple": [
+                1809,
+                5,
+                5
+              ],
+              "branch_role": "REQUIRED_FEASIBLE_SUBDOMAIN",
+              "is_feasible_required": true,
+              "subdomain_notation": "(1808^(4/5), exp(6))",
+              "subdomain_is_nonempty": true,
+              "domain_evidence_source": "SERIALIZED_ARB_OUTWARD_BALL",
+              "admissibility_status": "CERTIFIED_NONEMPTY_INTERSECTION",
+              "admissibility_reason": "CERTIFIED_INTERIOR_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
+              "complete_subdomain_coverage": true,
+              "has_certified_admissible_evaluated_witness": true,
+              "can_certify_refutation": true,
+              "certified_witness_Y": "4034250079061049234496749704703688621521/10000000000000000000000000000000000000",
+              "supplied_witness_check": null
+            },
+            {
+              "branch_index": 2,
+              "cutoff_triple": [
+                1809,
+                6,
+                6
+              ],
+              "branch_role": "REQUIRED_FEASIBLE_SUBDOMAIN",
+              "is_feasible_required": true,
+              "subdomain_notation": "[exp(6), 20173/50]",
+              "subdomain_is_nonempty": true,
+              "domain_evidence_source": "SERIALIZED_ARB_OUTWARD_BALL",
+              "admissibility_status": "CERTIFIED_NONEMPTY_INTERSECTION",
+              "admissibility_reason": "CERTIFIED_INTERIOR_EVALUATION_DOMAIN_INTERSECTS_ADMISSIBLE_SUBDOMAIN",
+              "complete_subdomain_coverage": true,
+              "has_certified_admissible_evaluated_witness": true,
+              "can_certify_refutation": true,
+              "certified_witness_Y": "1008610991865918933285684033762663602829/2500000000000000000000000000000000000",
+              "supplied_witness_check": null
+            }
+          ],
           "probe_effective_verdicts": {
             "P0": "PASS",
             "TC062_P0_F": "PASS"
