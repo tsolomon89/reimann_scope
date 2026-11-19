@@ -487,34 +487,90 @@ def test_tc063_section_5_adversarial_coverage_witness_and_provenance(
     extra_br = copy.deepcopy(sp81_d["branches"][0])
     extra_br["branch_role"] = "POSSIBLY_EMPTY_CONSERVATIVE_BRANCH"
     extra_br["T_fixed"] = 242
-    extra_br["Y_sub_ball"] = {
-        "mid_float": 80.5,
-        "rad_float_outward": 0.5,
-        "lower_dec": "80.0",
-        "upper_dec": "80.99",
-        "arb_ball_str": "[80.50 +/- 0.50]",
-    }
-    extra_br["evaluated_Y_interval_exact_fractions"] = ["80/1", "8099/100"]
+    y_disj_arb = arb.union(arb(80), arb(8099) / arb(100))
+    dj_lo, dj_hi = _exact_arb_endpoints_as_fractions(y_disj_arb)
+    dj_mid_me = y_disj_arb.mid().man_exp()
+    dj_rad_me = y_disj_arb.rad().man_exp()
+    extra_br["Y_sub_ball"] = strip_enclosure_arb_for_json(serialize_arb_certified(y_disj_arb))
+    extra_br["evaluated_Y_interval_exact_fractions"] = [
+        f"{dj_lo.numerator}/{dj_lo.denominator}",
+        f"{dj_hi.numerator}/{dj_hi.denominator}",
+    ]
+    extra_br["evaluated_Y_mid_man_exp"] = [int(dj_mid_me[0]), int(dj_mid_me[1])]
+    extra_br["evaluated_Y_rad_man_exp"] = [int(dj_rad_me[0]), int(dj_rad_me[1])]
     extra_br["M_P0_DIFF"] = pos_ball
     extra_br["TC063_P0_DIFF_branch_classification"] = {"verdict": "FAIL"}
     sp81_d["branches"].append(extra_br)
     sp81_d["active_branch_count"] = 3
-    sp81_d["union_M_P0_DIFF"] = {
-        "mid_float": 0.0,
-        "rad_float_outward": 1.0,
-        "lower_dec": "-1.0",
-        "upper_dec": "1.0",
-        "arb_ball_str": "[0.0 +/- 1.00]",
-    }
+    zero_rad1 = strip_enclosure_arb_for_json(serialize_arb_certified(arb(0, 1)))
+    sp81_d["union_M_P0_DIFF"] = zero_rad1
     sp81_d["TC063_P0_DIFF_interval_classification"] = {"verdict": "UNRESOLVED"}
     ia_disj = audit_continuous_interval_split_certificate_tc063(
         "interval_81_pm_2_neg12_across_T243", sp81_d
     )
     assert ia_disj["certification_integrity_ok"] is True
     assert ia_disj["derived_probe_outcomes"]["TC063-P0-DIFF"] == "SURVIVED_TESTED_POINTS"
+    assert ia_disj["derived_probe_outcomes"]["TC063-P-HALF-DIFF"] == "SURVIVED_TESTED_POINTS"
 
-    # 6. Union ball failing to contain branch OR forged point Y_enclosure / applicability / duplicate branch
-    #    -> CERTIFICATION_INTEGRITY_CONFLICT:
+    # 5b. `TC063-P-HALF-DIFF` tracks interval `M_P0_DIFF` AND candidate `domain_threshold_Y0`
+    #     is enforced on continuous intervals (`D3`):
+    s_int_p0_fail = copy.deepcopy(sec5_all_pass)
+    sp81_pf = s_int_p0_fail["continuous_interval_case_splits"]["interval_81_pm_2_neg12_across_T243"]
+    for br in sp81_pf["branches"]:
+        br["M_P0_DIFF"] = copy.deepcopy(pos_ball)
+        br["TC063_P0_DIFF_branch_classification"] = {"verdict": "FAIL"}
+    sp81_pf["union_M_P0_DIFF"] = copy.deepcopy(pos_ball)
+    sp81_pf["TC063_P0_DIFF_interval_classification"] = {"verdict": "FAIL"}
+    so_pf, _ = aggregate_tc063_section5_and_derive_outcomes(s_int_p0_fail, tc063_protocol)
+    assert so_pf["per_candidate_mathematical_outcomes"]["TC063-P0-DIFF"] == "REFUTED_BY_CERTIFIED_WITNESS"
+    assert so_pf["per_candidate_mathematical_outcomes"]["TC063-P-HALF-DIFF"] == "REFUTED_BY_CERTIFIED_WITNESS"
+
+    # Now raise `TC063-P0-DIFF` `domain_threshold_Y0` to `200` (above `[81-2^-12, 81+2^-12]`):
+    proto_y200 = copy.deepcopy(tc063_protocol)
+    for pr in proto_y200["frozen_candidate_probes"]:
+        if pr["probe_id"] == "TC063-P0-DIFF":
+            pr["domain_threshold_Y0"] = "200"
+    s_y200 = copy.deepcopy(s_int_p0_fail)
+    for row in s_y200["holdout_point_evaluations"]:
+        if row["cutoffs"]["T_Y"] < 1000:  # Y in {81-2^-12, 81+2^-12, 96, 144} < 200
+            row["probe_evaluations"]["TC063-P0-DIFF"]["applicable_in_domain"] = False
+            row["probe_evaluations"]["TC063-P0-DIFF"]["verdict"] = "OUT_OF_DOMAIN_NOT_APPLICABLE"
+    so_y200, _ = aggregate_tc063_section5_and_derive_outcomes(s_y200, proto_y200)
+    assert so_y200["per_candidate_mathematical_outcomes"]["TC063-P0-DIFF"] == "SURVIVED_TESTED_POINTS"
+    assert so_y200["per_candidate_mathematical_outcomes"]["TC063-P-HALF-DIFF"] == "REFUTED_BY_CERTIFIED_WITNESS"
+    art_y200 = copy.deepcopy(tc063_artifact)
+    art_y200["section_5_unseen_validation_and_interval_splits"] = s_y200
+    p_y200 = tmp_path / "proto_y200.json"
+    p_y200.write_text(json.dumps(art_y200), encoding="utf-8")
+    rep_y200 = reprocess_task_tc063_metadata_and_lean_audit(
+        p_y200, write_output=False, protocol_override=proto_y200
+    )
+    assert rep_y200["primary_log_saving_probe_outcome"] == "SURVIVED_TESTED_POINTS"
+
+    # Interior `domain_threshold_Y0 = 663553/8192` (> 81) excludes branch 0 `[331775/4096, 81]`:
+    sp81_b0_only = copy.deepcopy(sec5_all_pass["continuous_interval_case_splits"]["interval_81_pm_2_neg12_across_T243"])
+    sp81_b0_only["branches"][0]["M_P0_DIFF"] = copy.deepcopy(pos_ball)
+    sp81_b0_only["branches"][0]["TC063_P0_DIFF_branch_classification"] = {"verdict": "FAIL"}
+    sp81_b0_only["union_M_P0_DIFF"] = zero_rad1
+    sp81_b0_only["TC063_P0_DIFF_interval_classification"] = {"verdict": "UNRESOLVED"}
+    ia_int_y0 = audit_continuous_interval_split_certificate_tc063(
+        "interval_81_pm_2_neg12_across_T243",
+        sp81_b0_only,
+        cand_y0_by_id={"TC063-P0-DIFF": Fraction(663553, 8192)},
+    )
+    assert ia_int_y0["derived_probe_outcomes"]["TC063-P0-DIFF"] == "SURVIVED_TESTED_POINTS"
+    assert ia_int_y0["derived_probe_outcomes"]["TC063-P-HALF-DIFF"] == "REFUTED_BY_CERTIFIED_WITNESS"
+
+    # 6. Union ball failing to contain branch OR forged binary `man_exp` / point Y_enclosure /
+    #    applicability / duplicate branch -> CERTIFICATION_INTEGRITY_CONFLICT (`D4`):
+    s_bad_man_exp = copy.deepcopy(sec5)
+    s_bad_man_exp["continuous_interval_case_splits"]["interval_81_pm_2_neg12_across_T243"][
+        "branches"
+    ][0]["evaluated_Y_mid_man_exp"] = [1, -999]
+    g6m, r6m = _run_both(s_bad_man_exp, "bad_binary_man_exp")
+    assert g6m["holdout_hypothesis_outcome"] == CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
+    assert r6m["holdout_hypothesis_outcome"] == CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
+
     s_bad_u = copy.deepcopy(sec5)
     s_bad_u["continuous_interval_case_splits"]["interval_81_pm_2_neg12_across_T243"][
         "union_S_different_Y"
@@ -544,7 +600,13 @@ def test_tc063_section_5_adversarial_coverage_witness_and_provenance(
     assert g6d["holdout_hypothesis_outcome"] == CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
     assert r6d["holdout_hypothesis_outcome"] == CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
 
-    # 7. Deleted status field in `compare_tc063_artifacts_by_stable_key` -> INCOMPLETE_COMPARISON (None):
+    # 7. Deleted/wrong-typed/extra status fields & multi-scope verdict mutations in
+    #    `compare_tc063_artifacts_by_stable_key` (`D5`):
+    cmp_none = compare_tc063_artifacts_by_stable_key(None, tc063_artifact)
+    assert cmp_none["comparison_status"] == "NOT_COMPARED"
+    assert cmp_none["any_mathematical_verdict_changed"] is None
+    assert cmp_none["any_status_classification_changed"] is None
+
     for rk in REQUIRED_CURRENT_TC063_STATUS_KEYS:
         mut_prior = copy.deepcopy(tc063_artifact)
         scope_p, field_p = rk.split(".", 1)
@@ -558,7 +620,71 @@ def test_tc063_section_5_adversarial_coverage_witness_and_provenance(
         assert cmp_del["any_status_classification_changed"] is None
         assert rk in cmp_del["missing_status_keys"]
 
-    # 8. Resource EXCEEDED / UNKNOWN remain orthogonal to mathematical outcome:
+    # Wrong-typed `rh_proved = 0` (`int` instead of `bool`) -> INCOMPLETE_COMPARISON (`None`):
+    mut_type = copy.deepcopy(tc063_artifact)
+    mut_type["rh_proved"] = 0
+    cmp_type = compare_tc063_artifacts_by_stable_key(tc063_artifact, mut_type)
+    assert cmp_type["comparison_status"] == "INCOMPLETE_COMPARISON"
+    assert cmp_type["any_status_classification_changed"] is None
+
+    # Extra status key in `prior_art` deleted in `current_art` -> INCOMPLETE_COMPARISON (`None`):
+    mut_extra_st = copy.deepcopy(tc063_artifact)
+    mut_extra_st["prior_repair_status"] = "OPEN"
+    cmp_extra = compare_tc063_artifacts_by_stable_key(tc063_artifact, mut_extra_st)
+    assert cmp_extra["comparison_status"] == "INCOMPLETE_COMPARISON"
+    assert cmp_extra["any_status_classification_changed"] is None
+    assert "top.prior_repair_status" in cmp_extra["removed_status_or_schema_fields"]
+
+    # Multi-scope verdict changes (point, interval, control, Section 4) are detected:
+    mut_v = copy.deepcopy(tc063_artifact)
+    mut_v["section_5_unseen_validation_and_interval_splits"]["holdout_point_evaluations"][9][
+        "probe_evaluations"
+    ]["TC063-P-NEG-DIFF"]["verdict"] = "PASS"
+    mut_v["section_3_same_chain_bound_and_matched_controls"][
+        "matched_control_and_hybrid_chain_rows"
+    ][0]["TC063_P0_DIFF_verdict"] = "FAIL"
+    mut_v["section_4_distinct_chain_attempts_and_obstructions"][
+        "attempt_A_common_factor_primitive_regrouping"
+    ]["candidate_A1_prim_nonpos"]["outcome"] = "UNRESOLVED/INCOMPLETE_COVERAGE"
+    cmp_v = compare_tc063_artifacts_by_stable_key(tc063_artifact, mut_v)
+    assert cmp_v["comparison_status"] == "COMPLETE_COMPARED"
+    assert cmp_v["any_mathematical_verdict_changed"] is True
+    assert len(cmp_v["changed_mathematical_verdict_keys"]) == 3
+
+    # Conflict sentinel in `per_candidate_mathematical_outcomes` -> INCOMPLETE_COMPARISON:
+    mut_conf_v = copy.deepcopy(tc063_artifact)
+    mut_conf_v["section_5_unseen_validation_and_interval_splits"][
+        "per_candidate_mathematical_outcomes"
+    ]["TC063-P0-DIFF"] = CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
+    cmp_cv = compare_tc063_artifacts_by_stable_key(tc063_artifact, mut_conf_v)
+    assert cmp_cv["comparison_status"] == "INCOMPLETE_COMPARISON"
+    assert cmp_cv["any_mathematical_verdict_changed"] is None
+
+    # 8. Corrupted Section 1 ball & corrupted CAND-A1 witnesses in `reprocess_task_tc063...` (`D6`):
+    art_corrupt = copy.deepcopy(tc063_artifact)
+    art_corrupt["section_1_protocols_endpoint_and_premise_chain"][
+        "dirichlet_ratio_nonvanishing_checks"
+    ][0]["abs_zeta_2z"]["lower_dec"] = "999.0"
+    art_corrupt["section_1_protocols_endpoint_and_premise_chain"][
+        "dirichlet_ratio_nonvanishing_checks"
+    ][0]["abs_zeta_2z"]["upper_dec"] = "-999.0"
+    art_corrupt["section_4_distinct_chain_attempts_and_obstructions"][
+        "attempt_A_common_factor_primitive_regrouping"
+    ]["candidate_A1_prim_nonpos"]["witness_Y16_g5"] = copy.deepcopy(neg_ball)
+    p_corrupt = tmp_path / "corrupt_s1_s4.json"
+    p_corrupt.write_text(json.dumps(art_corrupt), encoding="utf-8")
+    rep_corrupt = reprocess_task_tc063_metadata_and_lean_audit(p_corrupt, write_output=False)
+    assert rep_corrupt["all_mathematical_and_numerical_checks_pass"] is False
+    assert (
+        rep_corrupt["section_4_distinct_chain_attempts_and_obstructions"][
+            "all_section_4_checks_pass"
+        ]
+        is False
+    )
+    assert rep_corrupt["holdout_hypothesis_outcome"] == CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
+    assert rep_corrupt["serialized_arb_self_check"]["all_enclose_original_256bit_arb_ball"] is False
+
+    # 9. Resource EXCEEDED / UNKNOWN remain orthogonal to mathematical outcome:
     s_exc = copy.deepcopy(sec5)
     s_exc["holdout_point_evaluations"][0]["tier_escalation_history"][0]["peak_rss_mb"] = 99999.0
     g8, _ = _run_both(s_exc, "res_exceeded")
@@ -584,21 +710,57 @@ def test_tc063_section_5_adversarial_coverage_witness_and_provenance(
 
 def test_tc063_section_6_lean_audit_and_review_verification(
     tc063_artifact: Dict[str, Any],
+    tmp_path: Path,
 ) -> None:
     """Verify live Lean 4 declaration audit (`0` sorry/admit/custom axioms, all 5 expected public
-    theorems), registration in `build_formal.py` & `certification.py`, and review enclosure/anchor
-    alignment.
+    theorems, `formal_build_report_pass = True`), registration in `build_formal.py` &
+    `certification.py`, prior-exposure audit disclosure (`D1`), and review enclosure/anchor/cutoff
+    alignment (`D2`).
     """
     rel_lean = "formal/RiemannScope/DyadicChainCorrelationRegularity.lean"
     assert rel_lean in FORMAL_SOURCE_FILES
     assert rel_lean in REQUIRED_FORMAL_SOURCES
     lean_chk = extract_lean_declaration_spans_tc063()
     assert lean_chk["verified"] is True, lean_chk
+    assert lean_chk["formal_build_report_pass"] is True, lean_chk
     assert lean_chk["sorry_count"] == 0
     assert lean_chk["admit_count"] == 0
     assert lean_chk["custom_axiom_count"] == 0
     assert lean_chk["expected_theorems_all_present"] is True
     assert set(EXPECTED_TC063_THEOREMS).issubset(set(lean_chk["public_theorems"]))
 
+    sec1 = tc063_artifact["section_1_protocols_endpoint_and_premise_chain"]
+    assert sec1["preserved_tc061_artifact_integrity"]["verified"] is True
+    assert sec1["preserved_tc062_artifact_integrity"]["verified"] is True
+
+    sec5 = tc063_artifact["section_5_unseen_validation_and_interval_splits"]
+    assert (
+        sec5["prior_exposure_audit_disclosure"]["strictly_zero_prior_occurrences_count"]
+        == 9
+    )
+    assert "TC063-HO-UNSEEN-96" in sec5["prior_exposure_audit_disclosure"][
+        "single_observable_prior_occurrence_points"
+    ]
+
+    sec6 = tc063_artifact["section_6_lean_audit_and_gate_accounting"]
+    assert sec6["imported_in_root_RiemannScope_lean"] is True
+    assert sec6["lean_module_audit"]["formal_build_report_pass"] is True
+    assert sec6["all_section_6_checks_pass"] is True
+
     rev_chk = verify_tc063_review_enclosures_and_lean_anchors(tc063_artifact, TC_063_REVIEW_DOC_PATH)
     assert rev_chk["verified"] is True, rev_chk
+    assert rev_chk["holdout_cutoffs_checked"] == 10
+    assert rev_chk["holdout_cutoff_failures"] == []
+
+    # Unknown Lean declaration name OR wrong holdout cutoff in review table must fail closed:
+    rev_txt = TC_063_REVIEW_DOC_PATH.read_text(encoding="utf-8")
+    bad_anchor_p = tmp_path / "bad_anchor.md"
+    bad_anchor_p.write_text(
+        rev_txt + "\n[`nonexistent_decl_xyz`](../../formal/RiemannScope/DyadicChainCorrelationRegularity.lean#L1-L2)\n",
+        encoding="utf-8",
+    )
+    assert verify_tc063_review_enclosures_and_lean_anchors(tc063_artifact, bad_anchor_p)["verified"] is False
+
+    bad_cut_p = tmp_path / "bad_cut.md"
+    bad_cut_p.write_text(rev_txt.replace("$(5344, 6, 6)$", "$(5351, 6, 6)$"), encoding="utf-8")
+    assert verify_tc063_review_enclosures_and_lean_anchors(tc063_artifact, bad_cut_p)["verified"] is False

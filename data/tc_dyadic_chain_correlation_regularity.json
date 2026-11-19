@@ -28,18 +28,20 @@
     "frozen_tc063_protocol_registration_commit": "767ff30dcd605e82f7d855fb0b86ee59919eceb8",
     "frozen_tc063_protocol_sha256": "a5ced83b7aede12e5bcfc4c146a0edb57f7a668ad773098bff44c71e2471edff",
     "numerical_producing_git_commit": "767ff30dcd605e82f7d855fb0b86ee59919eceb8",
-    "validation_git_commit": "767ff30dcd605e82f7d855fb0b86ee59919eceb8",
-    "formal_producing_git_commit": "4b3df05665e186c85eb54c3822ae1d8c34199a3c",
+    "validation_git_commit": "ba34faa4df3fc1ef3067b9203a6bdcaf1d7a9e81",
+    "formal_producing_git_commit": "ba34faa4df3fc1ef3067b9203a6bdcaf1d7a9e81",
     "self_verdict_comparison": {
       "comparison_id": "TC063_SELF_CONSISTENCY_V1",
       "comparison_status": "COMPLETE_COMPARED",
+      "comparable_verdict_key_count": 128,
       "any_mathematical_verdict_changed": false,
       "changed_mathematical_verdict_keys": [],
       "any_status_classification_changed": false,
       "changed_status_keys": [],
-      "missing_status_keys": []
+      "missing_status_keys": [],
+      "removed_status_or_schema_fields": []
     },
-    "reprocessed_at_utc": "2026-11-18T23:39:47.702764+00:00"
+    "reprocessed_at_utc": "2026-11-19T00:38:30.008472+00:00"
   },
   "section_1_protocols_endpoint_and_premise_chain": {
     "epistemic_statuses": [
@@ -409,7 +411,13 @@
         "verified": true
       }
     ],
-    "all_section_1_checks_pass": true
+    "all_section_1_checks_pass": true,
+    "preserved_tc061_artifact_integrity": {
+      "artifact_path": "data/tc_mixed_arithmetic_covariance.json",
+      "sha256_lf": "1dd8e539645f933c1fc6055f32a5dba4d4bef51a1a67d8ee35a9cdf81bfd49bc",
+      "total_certified_arb_balls": 3208,
+      "verified": true
+    }
   },
   "section_2_odd_part_decomposition_and_cross_checks": {
     "epistemic_statuses": [
@@ -4151,7 +4159,7 @@
         "refutation_certified": true
       },
       "first_uncontrolled_term_and_size": {
-        "term": "Coupled distinct-chain Selberg remainder 4*X_diff(Y) - 4*C_{P,B}^diff(Y) + E_B^diff(Y) (equivalently off-diagonal odd-divisor cross-sum sum_{d_1 != d_2 in O(T)} <Gcal_Y^(d_1), Gcal_Y^(d_2)>_Y)",
+        "term": "Negative off-diagonal odd-divisor dilation cross-sum -sum_{d_1 != d_2 in O(T)} <Gcal_Y^(d_1), Gcal_Y^(d_2)>_Y in ||Gcal_Y^(1)||_Y^2 = ||S_{sq,Y}||_Y^2 - sum_{d > 1 in O(T)} ||Gcal_Y^(d)||_Y^2 - sum_{d_1 != d_2 in O(T)} <Gcal_Y^(d_1), Gcal_Y^(d_2)>_Y (blocking a one-way upper bound on ||Gcal_Y^(1)||_Y^2 toward S_different(Y))",
         "unsigned_majorant_size": "Theta(Y) under odd-Mobius triangle inequality or unsigned prime-power majorization."
       }
     },
@@ -4870,7 +4878,8 @@
           "within_resource_budget": true,
           "resource_compliance_verified": true,
           "enforcement_mode": "POST_EVALUATION_BUDGET_AUDIT_NO_OS_PREEMPTIVE_KILL"
-        }
+        },
+        "prior_exposure_audit_note": "Y = 96 had a prior E(96) evaluation in TC-059 (data/tc_dyadic_power_lift_primitive_correlation.json), with 0 prior evaluations for D_tilde, J, F, Sigma_off, S_same, or S_different and 0 calibration usage."
       },
       {
         "point_id": "TC063-HO-UNSEEN-144",
@@ -7178,6 +7187,7 @@
         "coverage_gaps": [],
         "derived_probe_outcomes": {
           "TC063-P0-DIFF": "SURVIVED_TESTED_POINTS",
+          "TC063-P-HALF-DIFF": "SURVIVED_TESTED_POINTS",
           "TC063-P-NEG-DIFF": "SURVIVED_TESTED_POINTS",
           "TC063-SAME-LOCAL-HILBERT": "SURVIVED_TESTED_POINTS"
         }
@@ -7190,6 +7200,7 @@
         "coverage_gaps": [],
         "derived_probe_outcomes": {
           "TC063-P0-DIFF": "SURVIVED_TESTED_POINTS",
+          "TC063-P-HALF-DIFF": "SURVIVED_TESTED_POINTS",
           "TC063-P-NEG-DIFF": "REFUTED_BY_CERTIFIED_WITNESS",
           "TC063-SAME-LOCAL-HILBERT": "SURVIVED_TESTED_POINTS"
         }
@@ -7233,7 +7244,13 @@
       "TC063-P-HALF-DIFF",
       "KL1_same_chain",
       "KL1_different_chain"
-    ]
+    ],
+    "prior_exposure_audit_disclosure": {
+      "strictly_zero_prior_occurrences_count": 9,
+      "single_observable_prior_occurrence_points": {
+        "TC063-HO-UNSEEN-96": "Y = 96 appeared in TC-059 grid_Y for E(96) only (data/tc_dyadic_power_lift_primitive_correlation.json); 0 prior evaluations for D_tilde, J, F, Sigma_off, S_same, or S_different and 0 calibration usage."
+      }
+    }
   },
   "section_6_lean_audit_and_gate_accounting": {
     "epistemic_statuses": [
@@ -7599,9 +7616,9 @@
       "custom_axiom_count": 0,
       "forbidden_pi_tokens": [],
       "forbidden_K_underscore_tokens": [],
-      "formal_build_report_pass": false,
-      "formal_producing_git_commit": null,
-      "total_project_public_theorems": null,
+      "formal_build_report_pass": true,
+      "formal_producing_git_commit": "ba34faa4df3fc1ef3067b9203a6bdcaf1d7a9e81",
+      "total_project_public_theorems": 835,
       "verified": true
     },
     "imported_in_root_RiemannScope_lean": true,

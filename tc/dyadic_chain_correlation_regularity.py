@@ -50,8 +50,8 @@ Sections:
    - Attempt B (Quantitative Square-Projection & Selberg Compatibility):
      verifies exact odd-divisor square-projection `sum_{d in O(T)} Gcal_Y^(d)(X) = sum_{w=m^2 in O(T)} Ucal_w(X)`
      and odd-Mobius recovery, refutes `TC063-CAND-B1-SQPROJ-DIAG-DOM` via certified negative `d_1 != d_2`
-     dilation cross-terms, and verifies the exact distinct-chain Selberg split `S_different(Y) =
-     4*X_diff(Y) - 4*C_{P,B}^diff(Y) + E_B^diff(Y)`.
+     dilation cross-terms, and verifies the exact station-level Selberg decomposition of `psi_{Y, n}(X)`
+     across `1 <= n <= T`.
    - Attempt C (Arithmetic-Restricted vs Arbitrary-Sign Quadratic Comparison):
      implements the constructive greedy `+-1` sign-extension witness from `A_odd(Y)` (matching Lean
      Theorem 5(3)), refutes `TC063-CAND-C1-ARB-SIGN` at `Y = 64`, and certifies the
@@ -186,6 +186,7 @@ FROZEN_TC063_PROTOCOL_ID = "TC063-DYADIC-CHAIN-CORRELATION-REGULARITY-PROTOCOL-V
 FROZEN_TC063_PROTOCOL_REGISTRATION_COMMIT = "767ff30dcd605e82f7d855fb0b86ee59919eceb8"
 FROZEN_TC063_PROTOCOL_SHA256 = "a5ced83b7aede12e5bcfc4c146a0edb57f7a668ad773098bff44c71e2471edff"
 
+EXPECTED_TC061_ARTIFACT_SHA256 = "1dd8e539645f933c1fc6055f32a5dba4d4bef51a1a67d8ee35a9cdf81bfd49bc"
 EXPECTED_TC062_ARTIFACT_SHA256 = "88e1e3afb1d8ef91fbc2fab6aa5e9e0e0d05f357c214c210fdbe669c163a2a14"
 
 DYADIC_CHAIN_PROTOCOL_PATH = (
@@ -839,9 +840,18 @@ def verify_section_1_protocols_endpoint_and_premise_chain(
     tc062_obj = json.loads(tc062_bytes.decode("utf-8"))
     tc062_balls = tc062_obj["serialized_arb_self_check"]["total_certified_arb_balls_checked"]
     tc062_preserved_ok = bool(
-        tc062_balls == 885
+        tc062_sha == EXPECTED_TC062_ARTIFACT_SHA256
+        and tc062_balls == 885
         and tc062_obj["provenance"]["numerical_producing_git_commit"]
         == PRESERVED_TC062R_PRODUCING_COMMIT
+    )
+
+    tc061_bytes = MIXED_ARITHMETIC_COVARIANCE_ARTIFACT_PATH.read_bytes().replace(b"\r\n", b"\n")
+    tc061_sha = hashlib.sha256(tc061_bytes).hexdigest()
+    tc061_obj = json.loads(tc061_bytes.decode("utf-8"))
+    tc061_balls = tc061_obj["serialized_arb_self_check"]["total_certified_arb_balls_checked"]
+    tc061_preserved_ok = bool(
+        tc061_sha == EXPECTED_TC061_ARTIFACT_SHA256 and tc061_balls == 3208
     )
 
     saved = flint_ctx.prec
@@ -1077,6 +1087,12 @@ def verify_section_1_protocols_endpoint_and_premise_chain(
                 ],
                 "verified": tc062_preserved_ok,
             },
+            "preserved_tc061_artifact_integrity": {
+                "artifact_path": "data/tc_mixed_arithmetic_covariance.json",
+                "sha256_lf": tc061_sha,
+                "total_certified_arb_balls": tc061_balls,
+                "verified": tc061_preserved_ok,
+            },
             "tc_compatibility_principle_and_window_base_scope": {
                 "common_arithmetic_object": (
                     "Single Liouville-Gaussian observable Q_{lambda, infty}(X) = sum_{n>=1} lambda(n)*phi_n(X) "
@@ -1110,6 +1126,7 @@ def verify_section_1_protocols_endpoint_and_premise_chain(
                 and chk_62["verified"]
                 and chk_63["verified"]
                 and tc062_preserved_ok
+                and tc061_preserved_ok
                 and dirichlet_ok
                 and triv_ok
                 and refl_ok
@@ -2478,8 +2495,11 @@ def verify_section_4_distinct_chain_attempts_and_obstructions(
                 },
                 "first_uncontrolled_term_and_size": {
                     "term": (
-                        "Coupled distinct-chain Selberg remainder 4*X_diff(Y) - 4*C_{P,B}^diff(Y) + E_B^diff(Y) "
-                        "(equivalently off-diagonal odd-divisor cross-sum sum_{d_1 != d_2 in O(T)} <Gcal_Y^(d_1), Gcal_Y^(d_2)>_Y)"
+                        "Negative off-diagonal odd-divisor dilation cross-sum "
+                        "-sum_{d_1 != d_2 in O(T)} <Gcal_Y^(d_1), Gcal_Y^(d_2)>_Y in "
+                        "||Gcal_Y^(1)||_Y^2 = ||S_{sq,Y}||_Y^2 - sum_{d > 1 in O(T)} ||Gcal_Y^(d)||_Y^2 "
+                        "- sum_{d_1 != d_2 in O(T)} <Gcal_Y^(d_1), Gcal_Y^(d_2)>_Y "
+                        "(blocking a one-way upper bound on ||Gcal_Y^(1)||_Y^2 toward S_different(Y))"
                     ),
                     "unsigned_majorant_size": "Theta(Y) under odd-Mobius triangle inequality or unsigned prime-power majorization.",
                 },
@@ -3111,13 +3131,118 @@ def evaluate_tc063_interval_via_cutoff_case_split_arb(
         flint_ctx.prec = saved
 
 
+def _dyadic_man_exp_to_fraction(man: int, exp: int) -> Fraction:
+    return Fraction(man) * (1 << exp) if exp >= 0 else Fraction(man, 1 << (-exp))
+
+
+def _verify_tc063_branch_binary_man_exp_consistency(
+    br: Dict[str, Any],
+    y_sub_parsed: Optional[Dict[str, Any]],
+    triple: Tuple[int, int, int],
+) -> List[Dict[str, Any]]:
+    """Verify exact dyadic equality between `(evaluated_Y_mid_man_exp, evaluated_Y_rad_man_exp)`
+    and `evaluated_Y_interval_exact_fractions`, plus outward enclosure by `Y_sub_ball`.
+    """
+    errs: List[Dict[str, Any]] = []
+    has_ef = "evaluated_Y_interval_exact_fractions" in br
+    has_mid = "evaluated_Y_mid_man_exp" in br
+    has_rad = "evaluated_Y_rad_man_exp" in br
+    if not (has_ef or has_mid or has_rad):
+        return errs
+    if not has_ef:
+        # Unlinked outward ball (missing exact fractions) is handled as an uncertified coverage gap
+        # unless `mid_man_exp`/`rad_man_exp` itself is malformed:
+        for k_me in ("evaluated_Y_mid_man_exp", "evaluated_Y_rad_man_exp"):
+            v_me = br.get(k_me)
+            if v_me is not None and (
+                not isinstance(v_me, list)
+                or len(v_me) != 2
+                or not all(isinstance(x, int) and not isinstance(x, bool) for x in v_me)
+            ):
+                errs.append({"conflict_type": "MALFORMED_BINARY_MAN_EXP", "triple": list(triple)})
+        return errs
+    ef = br.get("evaluated_Y_interval_exact_fractions")
+    mid_me = br.get("evaluated_Y_mid_man_exp")
+    rad_me = br.get("evaluated_Y_rad_man_exp")
+    if (
+        not isinstance(ef, list)
+        or len(ef) != 2
+        or not all(isinstance(s, str) and s.strip() for s in ef)
+        or not isinstance(mid_me, list)
+        or len(mid_me) != 2
+        or not all(isinstance(x, int) and not isinstance(x, bool) for x in mid_me)
+        or not isinstance(rad_me, list)
+        or len(rad_me) != 2
+        or not all(isinstance(x, int) and not isinstance(x, bool) for x in rad_me)
+        or rad_me[0] < 0
+    ):
+        errs.append(
+            {
+                "conflict_type": "MALFORMED_OR_INCOMPLETE_BINARY_DOMAIN_METADATA",
+                "triple": list(triple),
+            }
+        )
+        return errs
+    try:
+        ef_lo = Fraction(ef[0])
+        ef_hi = Fraction(ef[1])
+        mid_q = _dyadic_man_exp_to_fraction(mid_me[0], mid_me[1])
+        rad_q = _dyadic_man_exp_to_fraction(rad_me[0], rad_me[1])
+        lo_bin = mid_q - rad_q
+        hi_bin = mid_q + rad_q
+    except Exception:  # noqa: BLE001
+        errs.append({"conflict_type": "UNPARSEABLE_BINARY_DOMAIN_FRACTIONS", "triple": list(triple)})
+        return errs
+    if lo_bin > hi_bin or lo_bin != ef_lo or hi_bin != ef_hi:
+        errs.append(
+            {
+                "conflict_type": "BINARY_MAN_EXP_EXACT_FRACTION_MISMATCH",
+                "triple": list(triple),
+                "man_exp_bounds": [str(lo_bin), str(hi_bin)],
+                "recorded_exact_fractions": [str(ef_lo), str(ef_hi)],
+            }
+        )
+        return errs
+    if y_sub_parsed is None or not (
+        y_sub_parsed["c_lo"] <= lo_bin and hi_bin <= y_sub_parsed["c_hi"]
+    ):
+        errs.append(
+            {
+                "conflict_type": "Y_SUB_BALL_DOES_NOT_ENCLOSE_BINARY_EVALUATED_DOMAIN",
+                "triple": list(triple),
+            }
+        )
+    return errs
+
+
 def audit_continuous_interval_split_certificate_tc063(
     split_key: str,
     split_obj: Dict[str, Any],
+    *,
+    cand_y0_by_id: Optional[Dict[str, Fraction]] = None,
 ) -> Dict[str, Any]:
     """Audit a serialized `TC-063` continuous interval split certificate under all `TC-062R4`
-    integrity, union-containment, witness-admissibility, and exact-coverage rules.
+    integrity, binary `man_exp` consistency, union-containment, domain-threshold `Y0`
+    witness-admissibility, and exact-coverage rules.
     """
+    eff_y0: Dict[str, Fraction] = {
+        "TC063-P0-DIFF": Fraction(64, 1),
+        "TC063-P-HALF-DIFF": Fraction(16, 1),
+        "TC063-P-NEG-DIFF": Fraction(64, 1),
+        "TC063-SAME-LOCAL-HILBERT": Fraction(2, 1),
+    }
+    if cand_y0_by_id is not None:
+        for k_id, v_q in cand_y0_by_id.items():
+            if k_id in eff_y0:
+                eff_y0[k_id] = Fraction(v_q)
+
+    probe_map = (
+        ("TC063-P0-DIFF", "M_P0_DIFF", "TC063_P0_DIFF_branch_classification"),
+        ("TC063-P-HALF-DIFF", "M_P0_DIFF", "TC063_P0_DIFF_branch_classification"),
+        ("TC063-P-NEG-DIFF", "M_P_NEG_DIFF", "TC063_P_NEG_DIFF_branch_classification"),
+        ("TC063-SAME-LOCAL-HILBERT", "M_SAME_LOC", "TC063_SAME_LOC_branch_classification"),
+    )
+
     conflicts: List[Dict[str, Any]] = []
     coverage_gaps: List[Dict[str, Any]] = []
 
@@ -3129,9 +3254,7 @@ def audit_continuous_interval_split_certificate_tc063(
             "conflicts": [{"conflict_type": "UNKNOWN_INTERVAL_SPLIT_KEY", "split_key": split_key}],
             "coverage_gaps": [],
             "derived_probe_outcomes": {
-                "TC063-P0-DIFF": CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME,
-                "TC063-P-NEG-DIFF": CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME,
-                "TC063-SAME-LOCAL-HILBERT": CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME,
+                pid: CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME for pid, _, _ in probe_map
             },
         }
 
@@ -3153,6 +3276,23 @@ def audit_continuous_interval_split_certificate_tc063(
 
     part = derive_exact_interval_cutoff_partition(exp_lo, exp_hi)
     req_triples = [tuple(c["cutoff_triple"]) for c in part["feasible_cells"]]
+
+    # Per-probe effective domain `[max(exp_lo, Y0), exp_hi]` and required feasible cells:
+    probe_eff_lo: Dict[str, Optional[Fraction]] = {}
+    probe_req_triples: Dict[str, List[Tuple[int, int, int]]] = {}
+    part_cache_by_lo: Dict[Fraction, List[Tuple[int, int, int]]] = {exp_lo: req_triples}
+    for pid, _, _ in probe_map:
+        lo_p = max(exp_lo, eff_y0[pid])
+        if lo_p > exp_hi:
+            probe_eff_lo[pid] = None
+            probe_req_triples[pid] = []
+        else:
+            probe_eff_lo[pid] = lo_p
+            if lo_p not in part_cache_by_lo:
+                p_sub = derive_exact_interval_cutoff_partition(lo_p, exp_hi)
+                part_cache_by_lo[lo_p] = [tuple(c["cutoff_triple"]) for c in p_sub["feasible_cells"]]
+            probe_req_triples[pid] = part_cache_by_lo[lo_p]
+
     branches = split_obj.get("branches")
     if not isinstance(branches, list) or len(branches) == 0:
         coverage_gaps.append({"gap_type": "EMPTY_OR_MISSING_BRANCH_LIST"})
@@ -3176,17 +3316,16 @@ def audit_continuous_interval_split_certificate_tc063(
 
     seen_req: set[Tuple[int, int, int]] = set()
     req_branch_verdicts: Dict[str, Dict[Tuple[int, int, int], str]] = {
-        "TC063-P0-DIFF": {},
-        "TC063-P-NEG-DIFF": {},
-        "TC063-SAME-LOCAL-HILBERT": {},
+        pid: {} for pid, _, _ in probe_map
+    }
+    probe_covered_triples: Dict[str, set[Tuple[int, int, int]]] = {
+        pid: set() for pid, _, _ in probe_map
     }
     admissible_fail_witnesses: Dict[str, List[Tuple[int, int, int]]] = {
-        "TC063-P0-DIFF": [],
-        "TC063-P-NEG-DIFF": [],
-        "TC063-SAME-LOCAL-HILBERT": [],
+        pid: [] for pid, _, _ in probe_map
     }
 
-    probe_map = (
+    checked_cls_fields_per_branch = (
         ("TC063-P0-DIFF", "M_P0_DIFF", "TC063_P0_DIFF_branch_classification"),
         ("TC063-P-NEG-DIFF", "M_P_NEG_DIFF", "TC063_P_NEG_DIFF_branch_classification"),
         ("TC063-SAME-LOCAL-HILBERT", "M_SAME_LOC", "TC063_SAME_LOC_branch_classification"),
@@ -3243,6 +3382,11 @@ def audit_continuous_interval_split_certificate_tc063(
                 )
 
         y_sub_p = _parse_serialized_arb_enclosure_tc062(br.get("Y_sub_ball"))
+        bin_errs = _verify_tc063_branch_binary_man_exp_consistency(br, y_sub_p, triple)
+        if bin_errs:
+            conflicts.extend(bin_errs)
+
+        dom_by_lo: Dict[Fraction, Dict[str, Any]] = {}
         dom_res = _evaluate_branch_domain_admissibility_tc062(
             br,
             y_sub_parsed=y_sub_p,
@@ -3251,6 +3395,7 @@ def audit_continuous_interval_split_certificate_tc063(
             cutoff_triple=triple,
             split_key=split_key,
         )
+        dom_by_lo[exp_lo] = dom_res
         if dom_res["conflicts"]:
             conflicts.extend(dom_res["conflicts"])
         if triple in req_triples and not dom_res["complete_subdomain_coverage"]:
@@ -3263,13 +3408,15 @@ def audit_continuous_interval_split_certificate_tc063(
                 }
             )
 
-        for pid, m_field, cls_field in probe_map:
+        branch_exp_verdict_by_field: Dict[str, Optional[str]] = {}
+        for rep_pid, m_field, cls_field in checked_cls_fields_per_branch:
             cls_rec = br.get(cls_field)
             m_p = _parse_serialized_arb_enclosure_tc062(br.get(m_field))
             if not isinstance(cls_rec, dict) or m_p is None:
                 conflicts.append(
-                    {"conflict_type": "MALFORMED_BRANCH_MARGIN_CLASSIFICATION", "probe_id": pid}
+                    {"conflict_type": "MALFORMED_BRANCH_MARGIN_CLASSIFICATION", "probe_id": rep_pid}
                 )
+                branch_exp_verdict_by_field[m_field] = None
                 continue
             exp_v = (
                 "PASS"
@@ -3280,14 +3427,33 @@ def audit_continuous_interval_split_certificate_tc063(
                 conflicts.append(
                     {
                         "conflict_type": "BRANCH_VERDICT_DISAGREES_WITH_MARGIN",
-                        "probe_id": pid,
+                        "probe_id": rep_pid,
                         "claimed": cls_rec.get("verdict"),
                         "expected": exp_v,
                     }
                 )
-            if triple in req_triples:
-                req_branch_verdicts[pid][triple] = exp_v
-            if exp_v == "FAIL" and dom_res["can_certify_refutation"]:
+            branch_exp_verdict_by_field[m_field] = exp_v
+
+        for pid, m_field, _ in probe_map:
+            exp_v_p = branch_exp_verdict_by_field.get(m_field)
+            lo_p = probe_eff_lo[pid]
+            if exp_v_p is None or lo_p is None:
+                continue
+            if lo_p not in dom_by_lo:
+                dom_by_lo[lo_p] = _evaluate_branch_domain_admissibility_tc062(
+                    br,
+                    y_sub_parsed=y_sub_p,
+                    prescribed_Y_lo=lo_p,
+                    prescribed_Y_hi=exp_hi,
+                    cutoff_triple=triple,
+                    split_key=split_key,
+                )
+            dom_p = dom_by_lo[lo_p]
+            if triple in probe_req_triples[pid]:
+                req_branch_verdicts[pid][triple] = exp_v_p
+                if dom_p["complete_subdomain_coverage"]:
+                    probe_covered_triples[pid].add(triple)
+            if exp_v_p == "FAIL" and dom_p["can_certify_refutation"] and not bin_errs:
                 admissible_fail_witnesses[pid].append(triple)
 
     for req_t in req_triples:
@@ -3329,17 +3495,26 @@ def audit_continuous_interval_split_certificate_tc063(
         req_t in req_branch_verdicts[pid]
         and req_branch_verdicts[pid][req_t] in ("PASS", "FAIL")
         for pid, _, _ in probe_map
-        for req_t in req_triples
+        for req_t in probe_req_triples[pid]
     )
 
     derived_outcomes: Dict[str, str] = {}
     for pid, _, _ in probe_map:
         if not integrity_ok:
             derived_outcomes[pid] = CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
+        elif probe_eff_lo[pid] is None:
+            derived_outcomes[pid] = "OUT_OF_DOMAIN_NOT_APPLICABLE"
         elif len(admissible_fail_witnesses[pid]) > 0:
             derived_outcomes[pid] = "REFUTED_BY_CERTIFIED_WITNESS"
-        elif coverage_ok and all(
-            req_branch_verdicts[pid].get(rt) == "PASS" for rt in req_triples
+        elif (
+            rec_lo == exp_lo
+            and rec_hi == exp_hi
+            and len(probe_req_triples[pid]) > 0
+            and all(
+                rt in probe_covered_triples[pid]
+                and req_branch_verdicts[pid].get(rt) == "PASS"
+                for rt in probe_req_triples[pid]
+            )
         ):
             derived_outcomes[pid] = "SURVIVED_TESTED_POINTS"
         else:
@@ -3508,7 +3683,9 @@ def aggregate_tc063_section5_and_derive_outcomes(
         if req_ik not in splits_raw or not isinstance(splits_raw[req_ik], dict):
             coverage_gaps.append({"gap_type": "MISSING_PRESCRIBED_INTERVAL_SPLIT", "interval_id": req_ik})
             continue
-        ia = audit_continuous_interval_split_certificate_tc063(req_ik, splits_raw[req_ik])
+        ia = audit_continuous_interval_split_certificate_tc063(
+            req_ik, splits_raw[req_ik], cand_y0_by_id=cand_y0_by_id
+        )
         interval_audits[req_ik] = ia
         conflicts.extend(ia["conflicts"])
         coverage_gaps.extend(ia["coverage_gaps"])
@@ -3519,10 +3696,30 @@ def aggregate_tc063_section5_and_derive_outcomes(
     integrity_ok = len(conflicts) == 0
     coverage_complete = integrity_ok and len(coverage_gaps) == 0
 
+    saved_prec3 = flint_ctx.prec
+    try:
+        flint_ctx.prec = 256
+        expected_applicable_points_by_cand: Dict[str, int] = {}
+        for cid in all_cand_ids:
+            y0_b = _frac_to_arb(cand_y0_by_id[cid])
+            cnt_app = 0
+            for p_entry in reg_points:
+                sp_r = _parse_tc063_scale_spec(p_entry)
+                if bool(sp_r.evaluate_arb(256) >= y0_b):
+                    cnt_app += 1
+            expected_applicable_points_by_cand[cid] = cnt_app
+    finally:
+        flint_ctx.prec = saved_prec3
+
     all_points_resolved = integrity_ok and all(
-        point_applicable_counts[cid] > 0
-        and len(point_verdicts_by_cand[cid]) == point_applicable_counts[cid]
-        and all(v in ("PASS", "FAIL") for v in point_verdicts_by_cand[cid])
+        (
+            expected_applicable_points_by_cand[cid] == 0
+            or (
+                point_applicable_counts[cid] == expected_applicable_points_by_cand[cid]
+                and len(point_verdicts_by_cand[cid]) == point_applicable_counts[cid]
+                and all(v in ("PASS", "FAIL") for v in point_verdicts_by_cand[cid])
+            )
+        )
         for cid in all_cand_ids
     )
     all_intervals_resolved = integrity_ok and (
@@ -3545,12 +3742,25 @@ def aggregate_tc063_section5_and_derive_outcomes(
             per_cand_outcomes[cid] = "REFUTED_BY_CERTIFIED_WITNESS"
         elif (
             coverage_complete
-            and point_applicable_counts[cid] > 0
+            and point_applicable_counts[cid] == expected_applicable_points_by_cand[cid]
+            and len(point_verdicts_by_cand[cid]) == expected_applicable_points_by_cand[cid]
             and all(v == "PASS" for v in point_verdicts_by_cand[cid])
+            and len(interval_audits) == len(PRESCRIBED_TC063_INTERVAL_SPLITS)
             and all(
-                (cid not in ia["derived_probe_outcomes"])
-                or ia["derived_probe_outcomes"][cid] == "SURVIVED_TESTED_POINTS"
+                (
+                    ia["derived_probe_outcomes"].get(cid)
+                    in ("SURVIVED_TESTED_POINTS", "OUT_OF_DOMAIN_NOT_APPLICABLE")
+                    if cid in probe_ids
+                    else True
+                )
                 for ia in interval_audits.values()
+            )
+            and (
+                expected_applicable_points_by_cand[cid] > 0
+                or any(
+                    ia["derived_probe_outcomes"].get(cid) == "SURVIVED_TESTED_POINTS"
+                    for ia in interval_audits.values()
+                )
             )
         ):
             per_cand_outcomes[cid] = (
@@ -3562,16 +3772,27 @@ def aggregate_tc063_section5_and_derive_outcomes(
             per_cand_outcomes[cid] = "UNRESOLVED/INCOMPLETE_COVERAGE"
 
     # Resource compliance summary across evaluated rows:
+    res_limits = protocol_obj.get("numerical_settings_and_escalation_rules", {}).get(
+        "resource_limits", {}
+    )
+    max_wall_sec = float(res_limits.get("max_wall_seconds_per_point", 300.0))
+    max_rss_mb = float(res_limits.get("max_rss_megabytes", 4096.0))
     res_checks: List[Dict[str, Any]] = []
     for row in eval_rows:
         if not isinstance(row, dict):
             continue
+        if row.get("point_id") == "TC063-HO-UNSEEN-96":
+            row["prior_exposure_audit_note"] = (
+                "Y = 96 had a prior E(96) evaluation in TC-059 "
+                "(data/tc_dyadic_power_lift_primitive_correlation.json), with 0 prior evaluations "
+                "for D_tilde, J, F, Sigma_off, S_same, or S_different and 0 calibration usage."
+            )
         hist = row.get("tier_escalation_history")
         if isinstance(hist, list) and len(hist) > 0:
             rc_p = evaluate_point_resource_compliance(
                 hist,
-                max_wall_sec=300.0,
-                max_rss_mb=4096.0,
+                max_wall_sec=max_wall_sec,
+                max_rss_mb=max_rss_mb,
             )
             row["resource_budget_check"] = rc_p
             res_checks.append(rc_p)
@@ -3656,6 +3877,16 @@ def aggregate_tc063_section5_and_derive_outcomes(
             "interval_split_audits": interval_audits,
             "integrity_conflicts": conflicts,
             "coverage_gaps": coverage_gaps,
+            "prior_exposure_audit_disclosure": {
+                "strictly_zero_prior_occurrences_count": 9,
+                "single_observable_prior_occurrence_points": {
+                    "TC063-HO-UNSEEN-96": (
+                        "Y = 96 appeared in TC-059 grid_Y for E(96) only "
+                        "(data/tc_dyadic_power_lift_primitive_correlation.json); 0 prior evaluations "
+                        "for D_tilde, J, F, Sigma_off, S_same, or S_different and 0 calibration usage."
+                    )
+                },
+            },
             "resource_compliance_summary": res_summary,
             "all_section_5_checks_pass": bool(sec5_pass),
         }
@@ -3784,11 +4015,17 @@ def extract_lean_declaration_spans_tc063(
     total_project_public_theorems: Optional[int] = None
     if FORMAL_BUILD_REPORT_PATH.exists():
         brep = json.loads(FORMAL_BUILD_REPORT_PATH.read_text(encoding="utf-8"))
-        build_rep_ok = bool(
-            brep.get("overall_status") == "PASS" and brep.get("sorry_count") == 0
+        live_mod_sha = hashlib.sha256(lean_path.read_bytes()).hexdigest()
+        rec_mod_sha = brep.get("formal_source_hashes", {}).get(
+            "formal/RiemannScope/DyadicChainCorrelationRegularity.lean"
         )
-        formal_producing_commit = brep.get("git_commit")
-        total_project_public_theorems = brep.get("theorem_count")
+        build_rep_ok = bool(
+            brep.get("status") == "passed"
+            and brep.get("exit_code") == 0
+            and rec_mod_sha == live_mod_sha
+        )
+        formal_producing_commit = brep.get("producing_git_commit")
+        total_project_public_theorems = brep.get("total_theorems")
 
     expected_present = all(t in pub_theorems for t in EXPECTED_TC063_THEOREMS)
     return {
@@ -3812,6 +4049,7 @@ def extract_lean_declaration_spans_tc063(
         "total_project_public_theorems": total_project_public_theorems,
         "verified": bool(
             expected_present
+            and build_rep_ok
             and len(sorry_hits) == 0
             and len(admit_hits) == 0
             and len(axiom_hits) == 0
@@ -3874,97 +4112,325 @@ def verify_section_6_lean_audit_and_gate_accounting() -> Dict[str, Any]:
                 "TC063-PREM-09 (Mellin holomorphy continuation M_Q(w) to 0 < Re(w) < 5/2)",
             ],
         },
-        "all_section_6_checks_pass": bool(lean_audit["verified"] and imported_in_root),
+        "all_section_6_checks_pass": bool(
+            lean_audit["verified"]
+            and lean_audit["formal_build_report_pass"]
+            and imported_in_root
+        ),
     }
+
+
+_STATUS_LIKE_KEY_SUFFIXES: Tuple[str, ...] = (
+    "_status",
+    "_outcome",
+    "_code",
+    "_class",
+    "_pass",
+    "_complete",
+    "_ok",
+    "_resolved",
+    "_proved",
+    "_claimed",
+    "_count",
+)
+
+_EXPECTED_STATUS_KEY_TYPES_TC063: Dict[str, str] = {
+    "top.execution_and_certification_status": "str",
+    "top.holdout_hypothesis_outcome": "str",
+    "top.primary_log_saving_probe_outcome": "str",
+    "top.resource_compliance_status": "str",
+    "top.completion_outcome_code": "str",
+    "top.research_outcome_class": "str",
+    "top.all_mathematical_and_numerical_checks_pass": "bool",
+    "top.parent_subgate_status": "str",
+    "top.rh_proved": "bool",
+    "top.global_energy_improvement_claimed": "bool",
+    "sec5.registered_unseen_point_count": "int",
+    "sec5.evaluated_unseen_point_count": "int",
+    "sec5.coverage_complete": "bool",
+    "sec5.certification_integrity_ok": "bool",
+    "sec5.all_required_applicable_evaluations_resolved": "bool",
+    "sec5.all_section_5_checks_pass": "bool",
+}
+
+
+def _check_strict_scalar_type(val: Any, kind: str) -> bool:
+    if kind == "bool":
+        return isinstance(val, bool)
+    if kind == "int":
+        return isinstance(val, int) and not isinstance(val, bool)
+    if kind == "str":
+        return isinstance(val, str) and len(val.strip()) > 0
+    return False
 
 
 def _collect_status_map_tc063(art: Dict[str, Any]) -> Dict[str, Any]:
     s5 = art.get("section_5_unseen_validation_and_interval_splits", {})
-    return {
-        "top.execution_and_certification_status": art.get("execution_and_certification_status"),
-        "top.holdout_hypothesis_outcome": art.get("holdout_hypothesis_outcome"),
-        "top.primary_log_saving_probe_outcome": art.get("primary_log_saving_probe_outcome"),
-        "top.resource_compliance_status": art.get("resource_compliance_status"),
-        "top.completion_outcome_code": art.get("completion_outcome_code"),
-        "top.research_outcome_class": art.get("research_outcome_class"),
-        "top.all_mathematical_and_numerical_checks_pass": art.get(
-            "all_mathematical_and_numerical_checks_pass"
+    if not isinstance(s5, dict):
+        s5 = {}
+    out: Dict[str, Any] = {}
+    for k, v in art.items():
+        if isinstance(k, str) and any(k.endswith(suf) for suf in _STATUS_LIKE_KEY_SUFFIXES):
+            if not isinstance(v, (dict, list)):
+                out[f"top.{k}"] = v
+    for k, v in s5.items():
+        if isinstance(k, str) and any(k.endswith(suf) for suf in _STATUS_LIKE_KEY_SUFFIXES):
+            if not isinstance(v, (dict, list)):
+                out[f"sec5.{k}"] = v
+    for rk in REQUIRED_CURRENT_TC063_STATUS_KEYS:
+        sc, fk = rk.split(".", 1)
+        src = art if sc == "top" else s5
+        if fk in src:
+            out[rk] = src[fk]
+    return out
+
+
+def _collect_verdict_map_tc063(art: Dict[str, Any]) -> Tuple[Dict[str, str], List[str]]:
+    """Collect all mathematical verdict keys across all 5 scopes (`sec5` global outcomes, `sec5`
+    point verdicts, `sec5` interval outcomes & branch/union classifications, `sec3` matched-control
+    verdicts, and `sec4` sub-candidate outcomes), flagging missing, malformed, or conflict sentinels.
+    """
+    verdicts: Dict[str, str] = {}
+    issues: List[str] = []
+
+    s3 = art.get("section_3_same_chain_bound_and_matched_controls")
+    s4 = art.get("section_4_distinct_chain_attempts_and_obstructions")
+    s5 = art.get("section_5_unseen_validation_and_interval_splits")
+    if not isinstance(s3, dict) or not isinstance(s4, dict) or not isinstance(s5, dict):
+        return {}, ["missing_section_dict"]
+
+    # 1. Section 5 per-candidate outcomes:
+    pco = s5.get("per_candidate_mathematical_outcomes")
+    if not isinstance(pco, dict) or len(pco) == 0:
+        issues.append("sec5.per_candidate_mathematical_outcomes")
+    else:
+        for cid, v in pco.items():
+            if not isinstance(v, str) or v == CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME:
+                issues.append(f"sec5.per_candidate_mathematical_outcomes.{cid}")
+            else:
+                verdicts[f"sec5.outcome.{cid}"] = v
+
+    # 2. Section 5 holdout point verdicts:
+    pts = s5.get("holdout_point_evaluations")
+    if not isinstance(pts, list) or len(pts) == 0:
+        issues.append("sec5.holdout_point_evaluations")
+    else:
+        seen_p = set()
+        for row in pts:
+            if not isinstance(row, dict) or not isinstance(row.get("point_id"), str):
+                issues.append("sec5.malformed_point_row")
+                continue
+            pid = row["point_id"]
+            if pid in seen_p:
+                issues.append(f"sec5.duplicate_point.{pid}")
+                continue
+            seen_p.add(pid)
+            for grp_k in ("probe_evaluations", "kl1_sub_budget_evaluations"):
+                grp = row.get(grp_k)
+                if not isinstance(grp, dict):
+                    issues.append(f"sec5.point.{pid}.{grp_k}")
+                    continue
+                for cid, rec in grp.items():
+                    v = rec.get("verdict") if isinstance(rec, dict) else None
+                    if not isinstance(v, str) or v == CERTIFICATION_INTEGRITY_CONFLICT_VERDICT:
+                        issues.append(f"sec5.point.{pid}.{cid}")
+                    else:
+                        verdicts[f"sec5.point.{pid}.{cid}"] = v
+
+    # 3. Section 5 interval outcomes + branch/union classifications:
+    ia_map = s5.get("interval_split_audits")
+    sp_map = s5.get("continuous_interval_case_splits")
+    if not isinstance(ia_map, dict) or not isinstance(sp_map, dict):
+        issues.append("sec5.interval_maps")
+    else:
+        for ik in PRESCRIBED_TC063_INTERVAL_SPLITS:
+            ia = ia_map.get(ik)
+            sp = sp_map.get(ik)
+            if not isinstance(ia, dict) or not isinstance(sp, dict):
+                issues.append(f"sec5.interval.{ik}")
+                continue
+            dpo = ia.get("derived_probe_outcomes")
+            if not isinstance(dpo, dict):
+                issues.append(f"sec5.interval.{ik}.derived_probe_outcomes")
+            else:
+                for cid, v in dpo.items():
+                    if not isinstance(v, str) or v == CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME:
+                        issues.append(f"sec5.interval.{ik}.outcome.{cid}")
+                    else:
+                        verdicts[f"sec5.interval.{ik}.outcome.{cid}"] = v
+            for u_cls_k in (
+                "TC063_P0_DIFF_interval_classification",
+                "TC063_P_NEG_DIFF_interval_classification",
+                "TC063_SAME_LOC_interval_classification",
+            ):
+                uc = sp.get(u_cls_k)
+                uv = uc.get("verdict") if isinstance(uc, dict) else None
+                if not isinstance(uv, str) or uv == CERTIFICATION_INTEGRITY_CONFLICT_VERDICT:
+                    issues.append(f"sec5.interval.{ik}.{u_cls_k}")
+                else:
+                    verdicts[f"sec5.interval.{ik}.{u_cls_k}"] = uv
+            brs = sp.get("branches")
+            if not isinstance(brs, list) or len(brs) == 0:
+                issues.append(f"sec5.interval.{ik}.branches")
+            else:
+                seen_tr = set()
+                for br in brs:
+                    if not isinstance(br, dict):
+                        issues.append(f"sec5.interval.{ik}.malformed_branch")
+                        continue
+                    tr = (br.get("T_fixed"), br.get("D0_raw_fixed"), br.get("D0_eff_fixed"))
+                    if tr in seen_tr:
+                        issues.append(f"sec5.interval.{ik}.duplicate_branch.{tr}")
+                        continue
+                    seen_tr.add(tr)
+                    for b_cls_k in (
+                        "TC063_P0_DIFF_branch_classification",
+                        "TC063_P_NEG_DIFF_branch_classification",
+                        "TC063_SAME_LOC_branch_classification",
+                    ):
+                        bc = br.get(b_cls_k)
+                        bv = bc.get("verdict") if isinstance(bc, dict) else None
+                        if not isinstance(bv, str) or bv == CERTIFICATION_INTEGRITY_CONFLICT_VERDICT:
+                            issues.append(f"sec5.interval.{ik}.branch.{tr}.{b_cls_k}")
+                        else:
+                            verdicts[f"sec5.interval.{ik}.branch.{tr}.{b_cls_k}"] = bv
+
+    # 4. Section 3 matched-control and hybrid verdicts:
+    c_rows = s3.get("matched_control_and_hybrid_chain_rows")
+    if not isinstance(c_rows, list) or len(c_rows) == 0:
+        issues.append("sec3.matched_control_and_hybrid_chain_rows")
+    else:
+        for cr in c_rows:
+            if not isinstance(cr, dict):
+                issues.append("sec3.malformed_control_row")
+                continue
+            yk, mk, cv = cr.get("Y"), cr.get("mode"), cr.get("TC063_P0_DIFF_verdict")
+            if not isinstance(cv, str) or cv == CERTIFICATION_INTEGRITY_CONFLICT_VERDICT:
+                issues.append(f"sec3.control.{yk}.{mk}")
+            else:
+                verdicts[f"sec3.control.{yk}.{mk}"] = cv
+
+    # 5. Section 4 sub-candidate outcomes:
+    s4_paths = (
+        (
+            "TC063-CAND-A1-PRIM-NONPOS",
+            s4.get("attempt_A_common_factor_primitive_regrouping", {}).get("candidate_A1_prim_nonpos"),
         ),
-        "top.parent_subgate_status": art.get("parent_subgate_status"),
-        "top.rh_proved": art.get("rh_proved"),
-        "top.global_energy_improvement_claimed": art.get("global_energy_improvement_claimed"),
-        "sec5.registered_unseen_point_count": s5.get("registered_unseen_point_count"),
-        "sec5.evaluated_unseen_point_count": s5.get("evaluated_unseen_point_count"),
-        "sec5.coverage_complete": s5.get("coverage_complete"),
-        "sec5.certification_integrity_ok": s5.get("certification_integrity_ok"),
-        "sec5.all_required_applicable_evaluations_resolved": s5.get(
-            "all_required_applicable_evaluations_resolved"
+        (
+            "TC063-CAND-B1-SQPROJ-DIAG-DOM",
+            s4.get("attempt_B_square_projection_and_selberg_compatibility", {}).get(
+                "candidate_B1_sqproj_diag_dom"
+            ),
         ),
-        "sec5.all_section_5_checks_pass": s5.get("all_section_5_checks_pass"),
-    }
+        (
+            "TC063-CAND-C1-ARB-SIGN",
+            s4.get("attempt_C_arithmetic_restricted_vs_arbitrary_sign_comparison", {}).get(
+                "candidate_C1_arbitrary_sign"
+            ),
+        ),
+    )
+    for cid4, rec4 in s4_paths:
+        ov4 = rec4.get("outcome") if isinstance(rec4, dict) else None
+        if not isinstance(ov4, str) or ov4 == CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME:
+            issues.append(f"sec4.{cid4}")
+        else:
+            verdicts[f"sec4.{cid4}"] = ov4
+
+    return verdicts, issues
 
 
 def compare_tc063_artifacts_by_stable_key(
-    current_art: Dict[str, Any],
+    current_art: Optional[Dict[str, Any]],
     prior_art: Optional[Dict[str, Any]],
     *,
     comparison_id: str = "TC063_SELF_CONSISTENCY_V1",
+    retired_optional_fields: Optional[Sequence[str]] = None,
 ) -> Dict[str, Any]:
-    """Compare two `TC-063` artifacts across mathematical verdict keys AND required status keys,
-    detecting deleted status keys (`INCOMPLETE_COMPARISON`, `None` — never `False`, `TC-062R3` §3).
+    """Compare two `TC-063` artifacts across all 5 mathematical verdict scopes AND the full union
+    of status keys, enforcing strict runtime scalar types and detecting deleted/renamed/conflicted
+    keys (`INCOMPLETE_COMPARISON` with `None` — never `False`).
     """
-    if prior_art is None or not isinstance(prior_art, dict):
+    if (
+        current_art is None
+        or not isinstance(current_art, dict)
+        or prior_art is None
+        or not isinstance(prior_art, dict)
+    ):
         return {
             "comparison_id": comparison_id,
             "comparison_status": "NOT_COMPARED",
             "any_mathematical_verdict_changed": None,
             "any_status_classification_changed": None,
             "missing_status_keys": [],
+            "removed_status_or_schema_fields": [],
         }
 
-    cur_s5 = current_art.get("section_5_unseen_validation_and_interval_splits", {})
-    pri_s5 = prior_art.get("section_5_unseen_validation_and_interval_splits", {})
-
-    missing_status: List[str] = []
+    retired_set = set(retired_optional_fields or ())
     cur_stat = _collect_status_map_tc063(current_art)
     pri_stat = _collect_status_map_tc063(prior_art)
+
+    missing_or_bad_status: List[str] = []
     for rk in REQUIRED_CURRENT_TC063_STATUS_KEYS:
-        val_c = cur_stat.get(rk)
-        val_p = pri_stat.get(rk)
-        if val_c is None or val_p is None:
-            missing_status.append(rk)
-    if missing_status:
+        exp_t = _EXPECTED_STATUS_KEY_TYPES_TC063[rk]
+        if rk not in cur_stat or not _check_strict_scalar_type(cur_stat[rk], exp_t):
+            missing_or_bad_status.append(rk)
+        elif rk not in pri_stat or not _check_strict_scalar_type(pri_stat[rk], exp_t):
+            missing_or_bad_status.append(rk)
+
+    removed_extra = sorted(
+        k
+        for k in (set(pri_stat.keys()) - set(cur_stat.keys()))
+        if k not in retired_set
+    )
+    added_extra = sorted(set(cur_stat.keys()) - set(pri_stat.keys()))
+    for k_common in sorted(set(cur_stat.keys()) & set(pri_stat.keys())):
+        vc, vp = cur_stat[k_common], pri_stat[k_common]
+        if vc is None or vp is None or (type(vc) is not type(vp)):
+            if k_common not in missing_or_bad_status:
+                missing_or_bad_status.append(k_common)
+
+    if missing_or_bad_status or removed_extra or added_extra:
         return {
             "comparison_id": comparison_id,
             "comparison_status": "INCOMPLETE_COMPARISON",
             "any_mathematical_verdict_changed": None,
             "any_status_classification_changed": None,
-            "missing_status_keys": missing_status,
+            "missing_status_keys": sorted(set(missing_or_bad_status + removed_extra + added_extra)),
+            "removed_status_or_schema_fields": removed_extra,
         }
 
-    cur_outcomes = cur_s5.get("per_candidate_mathematical_outcomes", {})
-    pri_outcomes = pri_s5.get("per_candidate_mathematical_outcomes", {})
-    if not isinstance(cur_outcomes, dict) or not isinstance(pri_outcomes, dict) or (
-        set(cur_outcomes.keys()) != set(pri_outcomes.keys())
-    ):
+    cur_verdicts, cur_v_issues = _collect_verdict_map_tc063(current_art)
+    pri_verdicts, pri_v_issues = _collect_verdict_map_tc063(prior_art)
+    if cur_v_issues or pri_v_issues or set(cur_verdicts.keys()) != set(pri_verdicts.keys()):
         return {
             "comparison_id": comparison_id,
             "comparison_status": "INCOMPLETE_COMPARISON",
             "any_mathematical_verdict_changed": None,
             "any_status_classification_changed": None,
-            "missing_status_keys": ["sec5.per_candidate_mathematical_outcomes"],
+            "missing_status_keys": sorted(
+                set(
+                    cur_v_issues
+                    + pri_v_issues
+                    + list(set(cur_verdicts.keys()) ^ set(pri_verdicts.keys()))
+                )
+            ),
+            "removed_status_or_schema_fields": [],
         }
 
-    changed_math = [k for k in sorted(cur_outcomes) if cur_outcomes[k] != pri_outcomes[k]]
-    changed_stat = [k for k in REQUIRED_CURRENT_TC063_STATUS_KEYS if cur_stat[k] != pri_stat[k]]
+    changed_math = [k for k in sorted(cur_verdicts) if cur_verdicts[k] != pri_verdicts[k]]
+    changed_stat = [
+        k for k in sorted(cur_stat) if cur_stat[k] != pri_stat[k]
+    ]
     return {
         "comparison_id": comparison_id,
         "comparison_status": "COMPLETE_COMPARED",
+        "comparable_verdict_key_count": len(cur_verdicts),
         "any_mathematical_verdict_changed": len(changed_math) > 0,
         "changed_mathematical_verdict_keys": changed_math,
         "any_status_classification_changed": len(changed_stat) > 0,
         "changed_status_keys": changed_stat,
         "missing_status_keys": [],
+        "removed_status_or_schema_fields": [],
     }
 
 
@@ -3972,9 +4438,10 @@ def verify_tc063_review_enclosures_and_lean_anchors(
     artifact_dict: Dict[str, Any],
     review_path: Path = TC_063_REVIEW_DOC_PATH,
 ) -> Dict[str, Any]:
-    """Verify every `<!-- tc-enclosure: ... -->` tag in `TC_063_...md` against `artifact_dict`
-    and every `DyadicChainCorrelationRegularity.lean#L<a>-L<b>` line anchor against live Lean
-    declaration spans.
+    """Verify every `<!-- tc-enclosure: ... -->` tag in `TC_063_...md` against `artifact_dict`,
+    every `DyadicChainCorrelationRegularity.lean#L<a>-L<b>` line anchor against live Lean
+    declaration spans (rejecting unknown declaration names), and all 10 holdout cutoff triples in
+    the Section 7.2 review table.
     """
     if not review_path.exists():
         return {"review_exists": False, "verified": False}
@@ -4026,12 +4493,44 @@ def verify_tc063_review_enclosures_and_lean_anchors(
     for am in anchor_re.finditer(txt):
         anchor_count += 1
         d_name, l_s, l_e = am.group(1), int(am.group(2)), int(am.group(3))
-        if d_name in span_map:
+        if d_name not in span_map:
+            anchor_failures.append(
+                f"{d_name}: declaration not found in DyadicChainCorrelationRegularity.lean"
+            )
+        else:
             exp_s, exp_e = span_map[d_name]
             if (l_s, l_e) != (exp_s, exp_e):
                 anchor_failures.append(
                     f"{d_name}: review #L{l_s}-L{l_e} != live #L{exp_s}-L{exp_e}"
                 )
+
+    # Cross-check all 10 holdout cutoff triples `(T, D_eff, L)` in the review table:
+    pt_cut_map = {
+        r["point_id"]: (
+            r["cutoffs"]["T_Y"],
+            r["cutoffs"]["D0_eff"],
+            r["cutoffs"]["max_chain_length_L_T"],
+        )
+        for r in artifact_dict.get("section_5_unseen_validation_and_interval_splits", {}).get(
+            "holdout_point_evaluations", []
+        )
+        if isinstance(r, dict) and "point_id" in r and "cutoffs" in r
+    }
+    row_re = re.compile(
+        r"\|\s*`(TC063-HO-[A-Z0-9-]+)`\s*\|[^|]+\|\s*`?\$\((\d+),\s*(\d+),\s*(\d+)\)\$`?\s*\|"
+    )
+    cutoff_failures: List[str] = []
+    cutoff_checked = 0
+    for rm in row_re.finditer(txt):
+        cutoff_checked += 1
+        pid_r = rm.group(1)
+        got_tr = (int(rm.group(2)), int(rm.group(3)), int(rm.group(4)))
+        if pid_r not in pt_cut_map:
+            cutoff_failures.append(f"{pid_r}: unknown holdout point_id in review table")
+        elif got_tr != pt_cut_map[pid_r]:
+            cutoff_failures.append(
+                f"{pid_r}: review table {got_tr} != certified {pt_cut_map[pid_r]}"
+            )
 
     return {
         "review_exists": True,
@@ -4039,12 +4538,17 @@ def verify_tc063_review_enclosures_and_lean_anchors(
         "enclosure_failures": enclosure_failures,
         "lean_anchors_checked": anchor_count,
         "lean_anchor_failures": anchor_failures,
+        "holdout_cutoffs_checked": cutoff_checked,
+        "holdout_cutoff_failures": cutoff_failures,
         "forbidden_pi_tokens": pi_hits,
         "forbidden_K_underscore_tokens": k_hits,
         "verified": bool(
             enclosure_count >= 6
             and len(enclosure_failures) == 0
+            and anchor_count >= 5
             and len(anchor_failures) == 0
+            and cutoff_checked == 10
+            and len(cutoff_failures) == 0
             and len(pi_hits) == 0
             and len(k_hits) == 0
         ),
@@ -4167,9 +4671,166 @@ def generate_task_tc063_artifact(
     return clean_art
 
 
+def _audit_all_serialized_arb_balls_in_artifact(
+    tree: Dict[str, Any],
+    existing_self_chk: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """Walk the entire serialized artifact and validate EVERY Arb ball via the 3-representation
+    exact `Fraction` validator `_parse_serialized_arb_enclosure_tc062`.
+    """
+    req_keys = {"mid_float", "rad_float_outward", "lower_dec", "upper_dec", "arb_ball_str"}
+    checked_paths: List[str] = []
+    failed_paths: List[str] = []
+
+    def _walk(node: Any, cur_path: str) -> None:
+        if isinstance(node, dict):
+            if any(k in node for k in req_keys):
+                if not req_keys.issubset(node.keys()):
+                    checked_paths.append(cur_path)
+                    failed_paths.append(cur_path)
+                    return
+                checked_paths.append(cur_path)
+                if _parse_serialized_arb_enclosure_tc062(node) is None:
+                    failed_paths.append(cur_path)
+                return
+            for k, v in node.items():
+                if k in ("enclosure_arb", "serialized_arb_self_check"):
+                    continue
+                _walk(v, f"{cur_path}.{k}" if cur_path else str(k))
+        elif isinstance(node, (list, tuple)):
+            for idx, item in enumerate(node):
+                _walk(item, f"{cur_path}[{idx}]")
+
+    _walk(tree, "")
+    prev_live_cnt = (
+        int(existing_self_chk["compared_against_live_original_arb_count"])
+        if isinstance(existing_self_chk, dict)
+        and isinstance(existing_self_chk.get("compared_against_live_original_arb_count"), int)
+        else 0
+    )
+    live_matches = bool(prev_live_cnt == len(checked_paths) and len(failed_paths) == 0)
+    return {
+        "total_certified_arb_balls_checked": len(checked_paths),
+        "compared_against_live_original_arb_count": prev_live_cnt if live_matches else 0,
+        "live_original_count_matches_enumerated_total": live_matches,
+        "all_enclose_original_256bit_arb_ball": bool(
+            len(checked_paths) > 0 and len(failed_paths) == 0
+        ),
+        "failed_paths": failed_paths,
+        "checked_paths": checked_paths,
+    }
+
+
+def _audit_section_1_serialized_checks(sec1_raw: Dict[str, Any]) -> Dict[str, Any]:
+    """Re-verify Section 1 protocol/historical SHA-256 invariants and serialized Arb checks."""
+    s1 = json.loads(json.dumps(sec1_raw))
+    chk_61 = verify_frozen_protocol_immutability()
+    chk_62 = verify_frozen_tc062_protocol_immutability()
+    chk_63 = verify_frozen_tc063_protocol_immutability()
+
+    tc062_bytes = JOINT_PRIME_DILATION_ARTIFACT_PATH.read_bytes().replace(b"\r\n", b"\n")
+    tc062_sha = hashlib.sha256(tc062_bytes).hexdigest()
+    tc062_obj = json.loads(tc062_bytes.decode("utf-8"))
+    tc062_balls = tc062_obj["serialized_arb_self_check"]["total_certified_arb_balls_checked"]
+    tc062_ok = bool(
+        tc062_sha == EXPECTED_TC062_ARTIFACT_SHA256
+        and tc062_balls == 885
+        and tc062_obj["provenance"]["numerical_producing_git_commit"]
+        == PRESERVED_TC062R_PRODUCING_COMMIT
+    )
+    tc061_bytes = MIXED_ARITHMETIC_COVARIANCE_ARTIFACT_PATH.read_bytes().replace(b"\r\n", b"\n")
+    tc061_sha = hashlib.sha256(tc061_bytes).hexdigest()
+    tc061_obj = json.loads(tc061_bytes.decode("utf-8"))
+    tc061_balls = tc061_obj["serialized_arb_self_check"]["total_certified_arb_balls_checked"]
+    tc061_ok = bool(tc061_sha == EXPECTED_TC061_ARTIFACT_SHA256 and tc061_balls == 3208)
+
+    s1["preserved_tc062_artifact_integrity"] = {
+        "artifact_path": "data/tc_joint_prime_dilation_signed_remainder.json",
+        "sha256_lf": tc062_sha,
+        "total_certified_arb_balls": tc062_balls,
+        "numerical_producing_git_commit": tc062_obj["provenance"][
+            "numerical_producing_git_commit"
+        ],
+        "verified": tc062_ok,
+    }
+    s1["preserved_tc061_artifact_integrity"] = {
+        "artifact_path": "data/tc_mixed_arithmetic_covariance.json",
+        "sha256_lf": tc061_sha,
+        "total_certified_arb_balls": tc061_balls,
+        "verified": tc061_ok,
+    }
+
+    dir_rows = s1.get("dirichlet_ratio_nonvanishing_checks", [])
+    dir_ok = len(dir_rows) >= 2
+    for dr in dir_rows:
+        p_z2 = _parse_serialized_arb_enclosure_tc062(dr.get("abs_zeta_2z")) if isinstance(dr, dict) else None
+        p_res = _parse_serialized_arb_enclosure_tc062(dr.get("product_residual_abs")) if isinstance(dr, dict) else None
+        rok = bool(
+            p_z2 is not None
+            and p_res is not None
+            and p_z2["c_lo"] > Fraction(1, 10)
+            and p_res["c_lo"] <= 0 <= p_res["c_hi"]
+        )
+        if isinstance(dr, dict):
+            dr["zeta_2z_certified_nonzero"] = bool(p_z2 is not None and p_z2["c_lo"] > 0)
+            dr["verified"] = rok
+        dir_ok = dir_ok and rok
+
+    triv_rows = s1.get("trivial_zero_double_vanishing_checks", [])
+    triv_ok = len(triv_rows) >= 3
+    for tr in triv_rows:
+        v1 = _parse_serialized_arb_enclosure_tc062(tr.get("abs_zeta_z")) if isinstance(tr, dict) else None
+        v2 = _parse_serialized_arb_enclosure_tc062(tr.get("abs_zeta_2z")) if isinstance(tr, dict) else None
+        tok = bool(
+            v1 is not None
+            and v2 is not None
+            and v1["c_hi"] < Fraction(1, 10 ** 70)
+            and v2["c_hi"] < Fraction(1, 10 ** 70)
+        )
+        if isinstance(tr, dict):
+            tr["both_numerator_and_denominator_vanish"] = tok
+        triv_ok = triv_ok and tok
+
+    refl_rows = s1.get("functional_equation_reflection_checks", [])
+    refl_ok = len(refl_rows) >= 2
+    for rr in refl_rows:
+         d_xi = _parse_serialized_arb_enclosure_tc062(
+             rr.get("completed_xi_reflection_abs_diff")
+         ) if isinstance(rr, dict) else None
+         rok = bool(d_xi is not None and d_xi["c_hi"] < Fraction(1, 10 ** 65))
+         if isinstance(rr, dict):
+             rr["verified"] = rok
+         refl_ok = refl_ok and rok
+
+    base_rows = s1.get("generic_window_base_hilbert_checks", [])
+    base_ok = len(base_rows) == 3
+    for br in base_rows:
+        mb = _parse_serialized_arb_enclosure_tc062(
+            br.get("abs_S_same_minus_hilbert_bound")
+        ) if isinstance(br, dict) else None
+        bok = bool(mb is not None and mb["c_hi"] < 0)
+        if isinstance(br, dict):
+            br["verified"] = bok
+        base_ok = base_ok and bok
+
+    s1["all_section_1_checks_pass"] = bool(
+        chk_61["verified"]
+        and chk_62["verified"]
+        and chk_63["verified"]
+        and tc062_ok
+        and tc061_ok
+        and dir_ok
+        and triv_ok
+        and refl_ok
+        and base_ok
+    )
+    return s1
+
+
 def _audit_section_4_serialized_checks(sec4_raw: Dict[str, Any]) -> Dict[str, Any]:
-    """Re-verify Section 4 booleans directly from serialized 256-bit Arb enclosures without
-    modifying any numerical Arb ball.
+    """Re-verify ALL Section 4 witness balls (`CAND-A1`, `CAND-B1`, `CAND-C1`, `p = 2` jump
+    witnesses, primitive regrouping residuals, and square-projection residuals) directly from
+    serialized 256-bit Arb enclosures without modifying any numerical Arb ball.
     """
     s4 = json.loads(json.dumps(sec4_raw))
     att_a = s4.get("attempt_A_common_factor_primitive_regrouping", {})
@@ -4179,9 +4840,62 @@ def _audit_section_4_serialized_checks(sec4_raw: Dict[str, Any]) -> Dict[str, An
     cand_b1 = att_b.get("candidate_B1_sqproj_diag_dom", {})
     cand_c1 = att_c.get("candidate_C1_arbitrary_sign", {})
 
+    if isinstance(att_b, dict) and isinstance(att_b.get("first_uncontrolled_term_and_size"), dict):
+        att_b["first_uncontrolled_term_and_size"]["term"] = (
+            "Negative off-diagonal odd-divisor dilation cross-sum "
+            "-sum_{d_1 != d_2 in O(T)} <Gcal_Y^(d_1), Gcal_Y^(d_2)>_Y in "
+            "||Gcal_Y^(1)||_Y^2 = ||S_{sq,Y}||_Y^2 - sum_{d > 1 in O(T)} ||Gcal_Y^(d)||_Y^2 "
+            "- sum_{d_1 != d_2 in O(T)} <Gcal_Y^(d_1), Gcal_Y^(d_2)>_Y "
+            "(blocking a one-way upper bound on ||Gcal_Y^(1)||_Y^2 toward S_different(Y))"
+        )
+
     saved_p = flint_ctx.prec
     try:
         flint_ctx.prec = 256
+        # Audit CAND-A1 witnesses:
+        w16_p = _parse_serialized_arb_enclosure_tc062(cand_a1.get("witness_Y16_g5"))
+        w64_p = _parse_serialized_arb_enclosure_tc062(cand_a1.get("witness_Y64_g7"))
+        a1_ok = bool(
+            w16_p is not None
+            and w64_p is not None
+            and w16_p["c_lo"] > Fraction(7, 10000)
+            and w64_p["c_lo"] > Fraction(1, 1000)
+        )
+        if isinstance(cand_a1, dict):
+            cand_a1["refutation_certified"] = a1_ok
+            cand_a1["outcome"] = (
+                "REFUTED_BY_CERTIFIED_WITNESS" if a1_ok else "UNRESOLVED/INCOMPLETE_COVERAGE"
+            )
+
+        # Audit CAND-B1 margins on Y >= 16:
+        rows_b = att_b.get("square_projection_and_moebius_rows", [])
+        b1_ok = isinstance(rows_b, list) and len(rows_b) >= 3
+        b_rows_ok = isinstance(rows_b, list) and len(rows_b) > 0
+        for rb in rows_b if isinstance(rows_b, list) else []:
+            if not isinstance(rb, dict):
+                b1_ok = False
+                b_rows_ok = False
+                continue
+            m_b1 = _parse_serialized_arb_enclosure_tc062(rb.get("TC063_CAND_B1_margin_sum_d_minus_S_sq"))
+            r_sq = _parse_serialized_arb_enclosure_tc062(rb.get("pointwise_sq_proj_residual"))
+            r_mb = _parse_serialized_arb_enclosure_tc062(rb.get("pointwise_odd_moebius_recovery_residual"))
+            if rb.get("Y", 0) >= 16 and (m_b1 is None or m_b1["c_lo"] <= 0):
+                b1_ok = False
+            rok_b = bool(
+                r_sq is not None
+                and r_mb is not None
+                and r_sq["c_lo"] <= 0 <= r_sq["c_hi"]
+                and r_mb["c_lo"] <= 0 <= r_mb["c_hi"]
+            )
+            rb["verified"] = rok_b
+            b_rows_ok = b_rows_ok and rok_b
+        if isinstance(cand_b1, dict):
+            cand_b1["refutation_certified"] = b1_ok
+            cand_b1["outcome"] = (
+                "REFUTED_BY_CERTIFIED_WITNESS" if b1_ok else "UNRESOLVED/INCOMPLETE_COVERAGE"
+            )
+
+        # Audit CAND-C1 witnesses:
         seed_p = _parse_serialized_arb_enclosure_tc062(cand_c1.get("seed_band_A_odd_64_sum"))
         greedy_p = _parse_serialized_arb_enclosure_tc062(cand_c1.get("greedy_pm1_witness_sum_Y64"))
         margin_c1_p = _parse_serialized_arb_enclosure_tc062(cand_c1.get("candidate_C1_margin_Y64"))
@@ -4202,18 +4916,33 @@ def _audit_section_4_serialized_checks(sec4_raw: Dict[str, Any]) -> Dict[str, An
 
     if isinstance(cand_c1, dict):
         cand_c1["refutation_and_omega_Y_obstruction_certified"] = c1_ok
+        cand_c1["outcome"] = (
+            "REFUTED_BY_CERTIFIED_WITNESS" if c1_ok else "UNRESOLVED/INCOMPLETE_COVERAGE"
+        )
     rows_a = att_a.get("primitive_regrouping_rows", [])
-    rows_b = att_b.get("square_projection_and_moebius_rows", [])
+    a_rows_ok = isinstance(rows_a, list) and len(rows_a) > 0
+    for ra in rows_a if isinstance(rows_a, list) else []:
+        r_pi = _parse_serialized_arb_enclosure_tc062(ra.get("primitive_minus_direct_residual")) if isinstance(ra, dict) else None
+        rok_a = bool(r_pi is not None and r_pi["c_lo"] <= 0 <= r_pi["c_hi"])
+        if isinstance(ra, dict):
+            ra["verified"] = rok_a
+        a_rows_ok = a_rows_ok and rok_a
+
+    selb_err = _parse_serialized_arb_enclosure_tc062(
+        att_b.get("station_selberg_decomposition_max_abs_error_Y16")
+    )
+    selb_ok = bool(selb_err is not None and selb_err["c_hi"] < Fraction(1, 10 ** 65))
+    if isinstance(att_b, dict):
+        att_b["station_selberg_decomposition_verified"] = selb_ok
+
     s4["all_section_4_checks_pass"] = bool(
         att_a.get("coprime_feature_decoupling_verified", False)
         and att_a.get("p2_smallop_jump_obstruction_certified", False)
-        and len(rows_a) > 0
-        and all(r.get("verified", False) for r in rows_a)
-        and cand_a1.get("refutation_certified", False)
-        and len(rows_b) > 0
-        and all(r.get("verified", False) for r in rows_b)
-        and cand_b1.get("refutation_certified", False)
-        and att_b.get("station_selberg_decomposition_verified", False)
+        and a_rows_ok
+        and a1_ok
+        and b_rows_ok
+        and b1_ok
+        and selb_ok
         and c1_ok
     )
     return s4
@@ -4224,10 +4953,11 @@ def reprocess_task_tc063_metadata_and_lean_audit(
     *,
     write_output: bool = True,
     validation_commit_override: Optional[str] = None,
+    protocol_override: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
-    """Re-run Section 4/5 validation, Section 6 live Lean declaration audit, and provenance
-    synchronization on an existing `TC-063` artifact WITHOUT altering any numerical Arb ball or
-    `numerical_producing_git_commit`.
+    """Re-run full 674-ball serialized Arb validation, Section 1/4/5 validation, Section 6 live
+    Lean declaration audit, and provenance synchronization on an existing `TC-063` artifact
+    WITHOUT altering any numerical Arb ball or `numerical_producing_git_commit`.
     """
     existing = json.loads(Path(artifact_path).read_text(encoding="utf-8"))
     prov = existing.get("provenance")
@@ -4244,8 +4974,21 @@ def reprocess_task_tc063_metadata_and_lean_audit(
         bad_out["all_mathematical_and_numerical_checks_pass"] = False
         return bad_out
 
-    proto_chk = verify_frozen_tc063_protocol_immutability()
-    proto_obj = proto_chk["protocol_object"]
+    if protocol_override is not None:
+        proto_obj = protocol_override
+    else:
+        proto_chk = verify_frozen_tc063_protocol_immutability()
+        if not proto_chk["verified"]:
+            bad_p = dict(existing)
+            bad_p["execution_and_certification_status"] = "CERTIFICATION_INTEGRITY_CONFLICT_BLOCKED"
+            bad_p["holdout_hypothesis_outcome"] = CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
+            bad_p["all_mathematical_and_numerical_checks_pass"] = False
+            return bad_p
+        proto_obj = proto_chk["protocol_object"]
+
+    sec1_upd = _audit_section_1_serialized_checks(
+        existing["section_1_protocols_endpoint_and_premise_chain"]
+    )
     sec4_upd = _audit_section_4_serialized_checks(
         existing["section_4_distinct_chain_attempts_and_obstructions"]
     )
@@ -4267,17 +5010,29 @@ def reprocess_task_tc063_metadata_and_lean_audit(
     new_prov["formal_producing_git_commit"] = formal_commit
     new_prov["reprocessed_at_utc"] = datetime.now(timezone.utc).isoformat()
     updated["provenance"] = new_prov
+    updated["section_1_protocols_endpoint_and_premise_chain"] = sec1_upd
     updated["section_4_distinct_chain_attempts_and_obstructions"] = sec4_upd
     updated["section_5_unseen_validation_and_interval_splits"] = sec5_upd
     updated["section_6_lean_audit_and_gate_accounting"] = sec6_upd
+
+    arb_rechk = _audit_all_serialized_arb_balls_in_artifact(
+        updated, existing.get("serialized_arb_self_check")
+    )
+    updated["serialized_arb_self_check"] = arb_rechk
+    if not arb_rechk["all_enclose_original_256bit_arb_ball"]:
+        updated["execution_and_certification_status"] = "CERTIFICATION_INTEGRITY_CONFLICT_BLOCKED"
+        updated["holdout_hypothesis_outcome"] = CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
+        updated["primary_log_saving_probe_outcome"] = CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
+
     updated["all_mathematical_and_numerical_checks_pass"] = bool(
-        updated["section_1_protocols_endpoint_and_premise_chain"]["all_section_1_checks_pass"]
+        sec1_upd["all_section_1_checks_pass"]
         and updated["section_2_odd_part_decomposition_and_cross_checks"]["all_section_2_checks_pass"]
         and updated["section_3_same_chain_bound_and_matched_controls"]["all_section_3_checks_pass"]
         and sec4_upd["all_section_4_checks_pass"]
         and sec5_upd["all_section_5_checks_pass"]
         and sec6_upd["all_section_6_checks_pass"]
-        and updated["serialized_arb_self_check"]["all_enclose_original_256bit_arb_ball"]
+        and arb_rechk["all_enclose_original_256bit_arb_ball"]
+        and updated["holdout_hypothesis_outcome"] != CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
     )
     updated["provenance"]["self_verdict_comparison"] = compare_tc063_artifacts_by_stable_key(
         updated, existing
