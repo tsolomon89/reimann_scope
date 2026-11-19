@@ -684,6 +684,86 @@ def test_tc063_section_5_adversarial_coverage_witness_and_provenance(
     assert rep_corrupt["holdout_hypothesis_outcome"] == CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
     assert rep_corrupt["serialized_arb_self_check"]["all_enclose_original_256bit_arb_ball"] is False
 
+    # 8b. Round 2 edge-case `R2-1`: popping `evaluated_Y_interval_exact_fractions` and injecting
+    #     alternate `evaluated_Y_symbolic_bounds` (either with forged `[1, 0]` `man_exp`, with
+    #     `Y_sub_ball`-enclosed `[81, 0]` `man_exp`, or with `man_exp` removed) MUST fail closed:
+    for r2_mode in ("forged_outside_man_exp", "forged_inside_man_exp", "removed_man_exp"):
+        s_r2_1 = copy.deepcopy(sec5_all_pass)
+        br_r2 = s_r2_1["continuous_interval_case_splits"]["interval_81_pm_2_neg12_across_T243"][
+            "branches"
+        ][0]
+        br_r2.pop("evaluated_Y_interval_exact_fractions", None)
+        br_r2["evaluated_Y_symbolic_bounds"] = [["rational", "331775/4096"], ["rational", "81/1"]]
+        if r2_mode == "forged_outside_man_exp":
+            br_r2["evaluated_Y_mid_man_exp"] = [1, 0]
+            br_r2["evaluated_Y_rad_man_exp"] = [0, 0]
+        elif r2_mode == "forged_inside_man_exp":
+            br_r2["evaluated_Y_mid_man_exp"] = [81, 0]
+            br_r2["evaluated_Y_rad_man_exp"] = [0, 0]
+        else:
+            br_r2.pop("evaluated_Y_mid_man_exp", None)
+            br_r2.pop("evaluated_Y_rad_man_exp", None)
+        g_r21, r_r21 = _run_both(s_r2_1, f"r2_1_{r2_mode}")
+        assert g_r21["holdout_hypothesis_outcome"] == CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
+        assert r_r21["holdout_hypothesis_outcome"] == CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
+        assert r_r21["all_mathematical_and_numerical_checks_pass"] is False
+
+    # Also popping `evaluated_Y_interval_exact_fractions` WITHOUT alternate keys while forging
+    # `evaluated_Y_mid_man_exp = [1, 0]` outside `Y_sub_ball` MUST fail closed:
+    s_r2_1_noalt = copy.deepcopy(sec5_all_pass)
+    br_noalt = s_r2_1_noalt["continuous_interval_case_splits"][
+        "interval_81_pm_2_neg12_across_T243"
+    ]["branches"][0]
+    br_noalt.pop("evaluated_Y_interval_exact_fractions", None)
+    br_noalt["evaluated_Y_mid_man_exp"] = [1, 0]
+    br_noalt["evaluated_Y_rad_man_exp"] = [0, 0]
+    g_r21_na, r_r21_na = _run_both(s_r2_1_noalt, "r2_1_noalt_outside")
+    assert g_r21_na["holdout_hypothesis_outcome"] == CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
+    assert r_r21_na["holdout_hypothesis_outcome"] == CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
+
+    # 8c. Round 2 edge-case `R2-2`: replacing ANY serialized Arb ball with `{}` / `None` / scalar
+    #     in Sections 2, 3, 4, or 5 MUST fail closed (never silently drop `total_certified_arb_balls_checked`):
+    s_r2_2_s5 = copy.deepcopy(sec5)
+    s_r2_2_s5["holdout_point_evaluations"][0]["S_different_Y"] = {}
+    g_r22_s5, r_r22_s5 = _run_both(s_r2_2_s5, "r2_2_sec5_empty_ball")
+    assert g_r22_s5["holdout_hypothesis_outcome"] == CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
+    assert r_r22_s5["holdout_hypothesis_outcome"] == CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
+    assert r_r22_s5["all_mathematical_and_numerical_checks_pass"] is False
+    assert (
+        r_r22_s5["serialized_arb_self_check"]["all_enclose_original_256bit_arb_ball"] is False
+    )
+
+    for sec_tag, mut_fn in (
+        (
+            "sec2_empty_dict",
+            lambda a: a["section_2_odd_part_decomposition_and_cross_checks"][
+                "complete_kernel_cross_validation_rows"
+            ][0].__setitem__("Sigma_off_2d_kernel", {}),
+        ),
+        (
+            "sec3_none_const",
+            lambda a: a["section_3_same_chain_bound_and_matched_controls"][
+                "uniform_constants"
+            ].__setitem__("C_psi", None),
+        ),
+        (
+            "sec4_scalar_ball",
+            lambda a: a["section_4_distinct_chain_attempts_and_obstructions"][
+                "attempt_A_common_factor_primitive_regrouping"
+            ]["p2_smallop_jump_obstruction_witnesses_Y16"][0].__setitem__(
+                "b_2m_minus_b_m_actual", 0.0
+            ),
+        ),
+    ):
+        art_drop_ball = copy.deepcopy(tc063_artifact)
+        mut_fn(art_drop_ball)
+        p_db = tmp_path / f"r2_2_{sec_tag}.json"
+        p_db.write_text(json.dumps(art_drop_ball), encoding="utf-8")
+        rep_db = reprocess_task_tc063_metadata_and_lean_audit(p_db, write_output=False)
+        assert rep_db["all_mathematical_and_numerical_checks_pass"] is False, sec_tag
+        assert rep_db["holdout_hypothesis_outcome"] == CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME, sec_tag
+        assert rep_db["serialized_arb_self_check"]["all_enclose_original_256bit_arb_ball"] is False, sec_tag
+
     # 9. Resource EXCEEDED / UNKNOWN remain orthogonal to mathematical outcome:
     s_exc = copy.deepcopy(sec5)
     s_exc["holdout_point_evaluations"][0]["tier_escalation_history"][0]["peak_rss_mb"] = 99999.0

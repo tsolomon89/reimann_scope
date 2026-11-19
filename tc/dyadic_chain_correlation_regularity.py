@@ -3135,39 +3135,44 @@ def _dyadic_man_exp_to_fraction(man: int, exp: int) -> Fraction:
     return Fraction(man) * (1 << exp) if exp >= 0 else Fraction(man, 1 << (-exp))
 
 
+_TC063_ALT_DOMAIN_KEYS = (
+    "evaluated_Y_symbolic_bounds",
+    "evaluated_Y_subintervals_exact_fractions",
+    "evaluated_Y_inner_interval_exact_fractions",
+    "evaluated_Y_inner_symbolic_bounds",
+    "historical_domain_reconstruction",
+)
+
+
 def _verify_tc063_branch_binary_man_exp_consistency(
     br: Dict[str, Any],
     y_sub_parsed: Optional[Dict[str, Any]],
     triple: Tuple[int, int, int],
 ) -> List[Dict[str, Any]]:
     """Verify exact dyadic equality between `(evaluated_Y_mid_man_exp, evaluated_Y_rad_man_exp)`
-    and `evaluated_Y_interval_exact_fractions`, plus outward enclosure by `Y_sub_ball`.
+    and `evaluated_Y_interval_exact_fractions`, outward enclosure by `Y_sub_ball` even when
+    `evaluated_Y_interval_exact_fractions` is omitted, and absence of unlinked alternate domain
+    provenance claims without full binary provenance (`R2-1`).
     """
     errs: List[Dict[str, Any]] = []
     has_ef = "evaluated_Y_interval_exact_fractions" in br
     has_mid = "evaluated_Y_mid_man_exp" in br
     has_rad = "evaluated_Y_rad_man_exp" in br
+    has_alt = any(k_alt in br for k_alt in _TC063_ALT_DOMAIN_KEYS)
+    if has_alt and not (has_ef and has_mid and has_rad):
+        errs.append(
+            {
+                "conflict_type": "UNLINKED_ALTERNATE_DOMAIN_METADATA_WITHOUT_BINARY_PROVENANCE",
+                "triple": list(triple),
+            }
+        )
+        return errs
     if not (has_ef or has_mid or has_rad):
         return errs
-    if not has_ef:
-        # Unlinked outward ball (missing exact fractions) is handled as an uncertified coverage gap
-        # unless `mid_man_exp`/`rad_man_exp` itself is malformed:
-        for k_me in ("evaluated_Y_mid_man_exp", "evaluated_Y_rad_man_exp"):
-            v_me = br.get(k_me)
-            if v_me is not None and (
-                not isinstance(v_me, list)
-                or len(v_me) != 2
-                or not all(isinstance(x, int) and not isinstance(x, bool) for x in v_me)
-            ):
-                errs.append({"conflict_type": "MALFORMED_BINARY_MAN_EXP", "triple": list(triple)})
-        return errs
-    ef = br.get("evaluated_Y_interval_exact_fractions")
     mid_me = br.get("evaluated_Y_mid_man_exp")
     rad_me = br.get("evaluated_Y_rad_man_exp")
     if (
-        not isinstance(ef, list)
-        or len(ef) != 2
-        or not all(isinstance(s, str) and s.strip() for s in ef)
+        not (has_mid and has_rad)
         or not isinstance(mid_me, list)
         or len(mid_me) != 2
         or not all(isinstance(x, int) and not isinstance(x, bool) for x in mid_me)
@@ -3184,8 +3189,6 @@ def _verify_tc063_branch_binary_man_exp_consistency(
         )
         return errs
     try:
-        ef_lo = Fraction(ef[0])
-        ef_hi = Fraction(ef[1])
         mid_q = _dyadic_man_exp_to_fraction(mid_me[0], mid_me[1])
         rad_q = _dyadic_man_exp_to_fraction(rad_me[0], rad_me[1])
         lo_bin = mid_q - rad_q
@@ -3193,23 +3196,46 @@ def _verify_tc063_branch_binary_man_exp_consistency(
     except Exception:  # noqa: BLE001
         errs.append({"conflict_type": "UNPARSEABLE_BINARY_DOMAIN_FRACTIONS", "triple": list(triple)})
         return errs
-    if lo_bin > hi_bin or lo_bin != ef_lo or hi_bin != ef_hi:
-        errs.append(
-            {
-                "conflict_type": "BINARY_MAN_EXP_EXACT_FRACTION_MISMATCH",
-                "triple": list(triple),
-                "man_exp_bounds": [str(lo_bin), str(hi_bin)],
-                "recorded_exact_fractions": [str(ef_lo), str(ef_hi)],
-            }
-        )
-        return errs
-    if y_sub_parsed is None or not (
+    if lo_bin > hi_bin or y_sub_parsed is None or not (
         y_sub_parsed["c_lo"] <= lo_bin and hi_bin <= y_sub_parsed["c_hi"]
     ):
         errs.append(
             {
                 "conflict_type": "Y_SUB_BALL_DOES_NOT_ENCLOSE_BINARY_EVALUATED_DOMAIN",
                 "triple": list(triple),
+            }
+        )
+        return errs
+    if not has_ef:
+        # Unlinked outward ball with valid enclosed binary `man_exp` and zero alternate domain
+        # claims is handled downstream as an uncertified coverage gap (`TC-062R4`).
+        return errs
+    ef = br.get("evaluated_Y_interval_exact_fractions")
+    if (
+        not isinstance(ef, list)
+        or len(ef) != 2
+        or not all(isinstance(s, str) and s.strip() for s in ef)
+    ):
+        errs.append(
+            {
+                "conflict_type": "MALFORMED_OR_INCOMPLETE_BINARY_DOMAIN_METADATA",
+                "triple": list(triple),
+            }
+        )
+        return errs
+    try:
+        ef_lo = Fraction(ef[0])
+        ef_hi = Fraction(ef[1])
+    except Exception:  # noqa: BLE001
+        errs.append({"conflict_type": "UNPARSEABLE_BINARY_DOMAIN_FRACTIONS", "triple": list(triple)})
+        return errs
+    if lo_bin != ef_lo or hi_bin != ef_hi:
+        errs.append(
+            {
+                "conflict_type": "BINARY_MAN_EXP_EXACT_FRACTION_MISMATCH",
+                "triple": list(triple),
+                "man_exp_bounds": [str(lo_bin), str(hi_bin)],
+                "recorded_exact_fractions": [str(ef_lo), str(ef_hi)],
             }
         )
     return errs
@@ -3382,6 +3408,8 @@ def audit_continuous_interval_split_certificate_tc063(
                 )
 
         y_sub_p = _parse_serialized_arb_enclosure_tc062(br.get("Y_sub_ball"))
+        if y_sub_p is None:
+            conflicts.append({"conflict_type": "MALFORMED_Y_SUB_BALL", "triple": list(triple)})
         bin_errs = _verify_tc063_branch_binary_man_exp_consistency(br, y_sub_p, triple)
         if bin_errs:
             conflicts.extend(bin_errs)
@@ -3599,6 +3627,35 @@ def aggregate_tc063_section5_and_derive_outcomes(
             ):
                 conflicts.append({"conflict_type": "HOLDOUT_CUTOFF_MISMATCH", "point_id": pid})
                 continue
+            obs_ball_ok = True
+            for obs_f in (
+                "E_Y",
+                "D_tilde_Y",
+                "log_Y_times_D_tilde",
+                "F_int_T_p2",
+                "Sigma_diag_p2",
+                "Sigma_off_p2",
+                "S_same_Y",
+                "S_different_Y",
+                "reconstructed_Sigma_off_algebraic_check",
+                "same_input_reconstruction_residual",
+                "local_same_chain_hilbert_bound",
+            ):
+                obs_p = _parse_serialized_arb_enclosure_tc062(row.get(obs_f))
+                if obs_p is None or (
+                    obs_f == "same_input_reconstruction_residual"
+                    and not (obs_p["c_lo"] <= 0 <= obs_p["c_hi"])
+                ):
+                    conflicts.append(
+                        {
+                            "conflict_type": "MALFORMED_HOLDOUT_OBSERVABLE_BALL",
+                            "point_id": pid,
+                            "field": obs_f,
+                        }
+                    )
+                    obs_ball_ok = False
+            if not obs_ball_ok:
+                continue
             admissible_spec_y_by_pid[pid] = spec_y
     finally:
         flint_ctx.prec = saved_prec
@@ -3620,13 +3677,24 @@ def aggregate_tc063_section5_and_derive_outcomes(
             if pid not in admissible_spec_y_by_pid:
                 continue
             spec_y = admissible_spec_y_by_pid[pid]
-            pe = row.get("probe_evaluations", {})
-            ke = row.get("kl1_sub_budget_evaluations", {})
+            pe = row.get("probe_evaluations")
+            ke = row.get("kl1_sub_budget_evaluations")
+            if not isinstance(pe, dict) or not isinstance(ke, dict):
+                conflicts.append(
+                    {"conflict_type": "MALFORMED_CANDIDATE_EVALUATION_CONTAINER", "point_id": pid}
+                )
+                continue
             for cid in all_cand_ids:
-                rec_c = pe.get(cid) if cid in probe_ids else ke.get(cid)
-                if not isinstance(rec_c, dict):
+                container_c = pe if cid in probe_ids else ke
+                if cid not in container_c:
                     coverage_gaps.append(
                         {"gap_type": "MISSING_CANDIDATE_EVALUATION", "point_id": pid, "candidate_id": cid}
+                    )
+                    continue
+                rec_c = container_c.get(cid)
+                if not isinstance(rec_c, dict):
+                    conflicts.append(
+                        {"conflict_type": "MALFORMED_CANDIDATE_EVALUATION_RECORD", "point_id": pid, "candidate_id": cid}
                     )
                     continue
                 m_chk = _audit_serialized_margin_verdict_tc062(rec_c.get("margin_M_Y"))
@@ -4671,15 +4739,60 @@ def generate_task_tc063_artifact(
     return clean_art
 
 
+EXPECTED_TC063_FIXED_SECTION_BALL_COUNTS: Dict[str, int] = {
+    "section_1_protocols_endpoint_and_premise_chain": 21,
+    "section_2_odd_part_decomposition_and_cross_checks": 66,
+    "section_3_same_chain_bound_and_matched_controls": 260,
+    "section_4_distinct_chain_attempts_and_obstructions": 79,
+}
+
+
+def _expected_tc063_section_5_ball_count(sec5_obj: Any) -> Optional[int]:
+    """Compute exact expected serialized Arb ball count for all present Section 5 rows,
+    candidate evaluation records, and continuous interval splits/branches (`R2-2`).
+    """
+    if not isinstance(sec5_obj, dict):
+        return None
+    exp_cnt = 0
+    rows = sec5_obj.get("holdout_point_evaluations")
+    if isinstance(rows, list):
+        for row in rows:
+            if not isinstance(row, dict):
+                return None
+            # 1 `Y_enclosure` + 11 observable balls = 12 mandatory balls per present point row:
+            exp_cnt += 12
+            pe = row.get("probe_evaluations")
+            ke = row.get("kl1_sub_budget_evaluations")
+            if not isinstance(pe, dict) or not isinstance(ke, dict):
+                return None
+            exp_cnt += len(pe) + len(ke)
+    splits = sec5_obj.get("continuous_interval_case_splits")
+    if isinstance(splits, dict):
+        for sp_obj in splits.values():
+            if not isinstance(sp_obj, dict):
+                return None
+            # 9 union balls per present split + 10 balls (`Y_sub_ball` + 9 observables) per branch:
+            exp_cnt += 9
+            brs = sp_obj.get("branches")
+            if isinstance(brs, list):
+                for br in brs:
+                    if not isinstance(br, dict):
+                        return None
+                    exp_cnt += 10
+    return exp_cnt
+
+
 def _audit_all_serialized_arb_balls_in_artifact(
     tree: Dict[str, Any],
     existing_self_chk: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """Walk the entire serialized artifact and validate EVERY Arb ball via the 3-representation
-    exact `Fraction` validator `_parse_serialized_arb_enclosure_tc062`.
+    exact `Fraction` validator `_parse_serialized_arb_enclosure_tc062`, plus enforce exact
+    per-section ball counts so silent `{}`/`None`/scalar ball replacement fails closed (`R2-2`).
     """
     req_keys = {"mid_float", "rad_float_outward", "lower_dec", "upper_dec", "arb_ball_str"}
     checked_paths: List[str] = []
+    valid_paths_by_root: Dict[str, int] = {}
     failed_paths: List[str] = []
 
     def _walk(node: Any, cur_path: str) -> None:
@@ -4692,6 +4805,9 @@ def _audit_all_serialized_arb_balls_in_artifact(
                 checked_paths.append(cur_path)
                 if _parse_serialized_arb_enclosure_tc062(node) is None:
                     failed_paths.append(cur_path)
+                else:
+                    root_sec = cur_path.split(".", 1)[0].split("[", 1)[0]
+                    valid_paths_by_root[root_sec] = valid_paths_by_root.get(root_sec, 0) + 1
                 return
             for k, v in node.items():
                 if k in ("enclosure_arb", "serialized_arb_self_check"):
@@ -4702,6 +4818,19 @@ def _audit_all_serialized_arb_balls_in_artifact(
                 _walk(item, f"{cur_path}[{idx}]")
 
     _walk(tree, "")
+    for sec_k, exp_n in EXPECTED_TC063_FIXED_SECTION_BALL_COUNTS.items():
+        got_n = valid_paths_by_root.get(sec_k, 0)
+        if got_n != exp_n:
+            failed_paths.append(f"{sec_k}:expected_{exp_n}_certified_balls_got_{got_n}")
+    exp_s5 = _expected_tc063_section_5_ball_count(
+        tree.get("section_5_unseen_validation_and_interval_splits") if isinstance(tree, dict) else None
+    )
+    got_s5 = valid_paths_by_root.get("section_5_unseen_validation_and_interval_splits", 0)
+    if exp_s5 is None or got_s5 != exp_s5:
+        failed_paths.append(
+            f"section_5_unseen_validation_and_interval_splits:expected_{exp_s5}_certified_balls_got_{got_s5}"
+        )
+
     prev_live_cnt = (
         int(existing_self_chk["compared_against_live_original_arb_count"])
         if isinstance(existing_self_chk, dict)
@@ -4948,6 +5077,157 @@ def _audit_section_4_serialized_checks(sec4_raw: Dict[str, Any]) -> Dict[str, An
     return s4
 
 
+def _audit_section_2_serialized_checks(sec2_raw: Dict[str, Any]) -> Dict[str, Any]:
+    """Re-verify all 66 serialized Arb balls and sign-change flags in Section 2 (`R2-2`)."""
+    s2 = json.loads(json.dumps(sec2_raw)) if isinstance(sec2_raw, dict) else {}
+    rows = s2.get("complete_kernel_cross_validation_rows")
+    rows_ok = isinstance(rows, list) and len(rows) == 6
+    y16_pos = False
+    y64_neg = False
+    req_ball_fields = (
+        "Sigma_off_2d_kernel",
+        "S_same_2d_kernel",
+        "S_different_2d_kernel",
+        "S_same_1d_quadrature",
+        "S_different_1d_quadrature",
+        "Sigma_off_1d_quadrature",
+        "algebraic_consistency_check_2d_residual",
+        "algebraic_consistency_check_1d_residual",
+        "independent_validation_S_same_1d_minus_2d",
+        "independent_validation_S_different_1d_minus_2d",
+        "independent_validation_Sigma_off_1d_minus_2d",
+    )
+    zero_fields = req_ball_fields[6:]
+    for r in rows if isinstance(rows, list) else []:
+        if not isinstance(r, dict):
+            rows_ok = False
+            continue
+        parsed_r = {f: _parse_serialized_arb_enclosure_tc062(r.get(f)) for f in req_ball_fields}
+        rok = all(v is not None for v in parsed_r.values()) and all(
+            parsed_r[zf] is not None and parsed_r[zf]["c_lo"] <= 0 <= parsed_r[zf]["c_hi"]
+            for zf in zero_fields
+        )
+        r["verified"] = rok
+        rows_ok = rows_ok and rok
+        if r.get("Y") == 16 and parsed_r["S_same_1d_quadrature"] is not None:
+            y16_pos = bool(parsed_r["S_same_1d_quadrature"]["c_lo"] > 0)
+        if r.get("Y") == 64 and parsed_r["S_same_1d_quadrature"] is not None:
+            y64_neg = bool(parsed_r["S_same_1d_quadrature"]["c_hi"] < 0)
+    if isinstance(s2.get("S_same_sign_change_certified"), dict):
+        s2["S_same_sign_change_certified"]["Y_16_positive"] = y16_pos
+        s2["S_same_sign_change_certified"]["Y_64_negative"] = y64_neg
+    ex_ok = bool(
+        isinstance(s2.get("exhaustive_exact_reindexing"), dict)
+        and s2["exhaustive_exact_reindexing"].get("verified", False)
+    )
+    s2["all_section_2_checks_pass"] = bool(ex_ok and rows_ok and y16_pos and y64_neg)
+    return s2
+
+
+def _audit_section_3_serialized_checks(sec3_raw: Dict[str, Any]) -> Dict[str, Any]:
+    """Re-verify all 260 serialized Arb balls, Hilbert margins, and matched-control verdicts in Section 3 (`R2-2`)."""
+    s3 = json.loads(json.dumps(sec3_raw)) if isinstance(sec3_raw, dict) else {}
+    uc = s3.get("uniform_constants")
+    uc_ok = isinstance(uc, dict) and all(
+        _parse_serialized_arb_enclosure_tc062(uc.get(k)) is not None
+        for k in ("c_lambda", "c_half", "C_phi", "C_beta", "C_psi", "C_g", "C_same")
+    )
+    fchk = s3.get("shifted_station_disjointness_and_feature_checks")
+    feat_rows = fchk.get("distinct_anchor_feature_rows") if isinstance(fchk, dict) else None
+    feat_ok = (
+        isinstance(fchk, dict)
+        and bool(fchk.get("disjointness_verified_on_I2_180", False))
+        and bool(fchk.get("m_eq_n_self_collision_indispensability_certified_at_Y16_m3", False))
+        and isinstance(feat_rows, list)
+        and len(feat_rows) == 3
+    )
+    for fr in feat_rows if isinstance(feat_rows, list) else []:
+        fp = (
+            _parse_serialized_arb_enclosure_tc062(fr.get("max_distinct_anchor_feature_abs_error"))
+            if isinstance(fr, dict)
+            else None
+        )
+        feat_ok = feat_ok and bool(
+            fp is not None and fp["c_lo"] <= 0 <= fp["c_hi"] and fp["c_hi"] < Fraction(1, 10 ** 50)
+        )
+    if isinstance(fchk, dict):
+        fchk["verified"] = feat_ok
+
+    same_rows = s3.get("same_chain_hilbert_bound_rows")
+    same_ok = isinstance(same_rows, list) and len(same_rows) == 10
+    for sr in same_rows if isinstance(same_rows, list) else []:
+        if not isinstance(sr, dict):
+            same_ok = False
+            continue
+        sp = {
+            f: _parse_serialized_arb_enclosure_tc062(sr.get(f))
+            for f in (
+                "S_same_Y",
+                "sum_psi_sq_le_T",
+                "sum_log2_G2_le_T",
+                "local_hilbert_bound",
+                "uniform_log_bound_C_same_1_plus_log_Y",
+                "local_margin_abs_S_same_minus_bound",
+                "uniform_margin_abs_S_same_minus_bound",
+            )
+        }
+        sok = (
+            all(v is not None for v in sp.values())
+            and sp["local_margin_abs_S_same_minus_bound"]["c_hi"] <= 0
+            and sp["uniform_margin_abs_S_same_minus_bound"]["c_hi"] <= 0
+        )
+        sr["verified"] = sok
+        same_ok = same_ok and sok
+
+    ctrl_rows = s3.get("matched_control_and_hybrid_chain_rows")
+    ctrl_ok = isinstance(ctrl_rows, list) and len(ctrl_rows) == 30
+    neg_refuted_ok = True
+    for cr in ctrl_rows if isinstance(ctrl_rows, list) else []:
+        if not isinstance(cr, dict):
+            ctrl_ok = False
+            neg_refuted_ok = False
+            continue
+        rat_obj = cr.get("S_different_over_log_Y_D_tilde")
+        cp = {
+            f: _parse_serialized_arb_enclosure_tc062(cr.get(f))
+            for f in (
+                "S_same_Y",
+                "S_different_Y",
+                "D_tilde_Y",
+                "log_Y_times_D_tilde",
+                "TC063_P0_DIFF_margin",
+            )
+        }
+        rp = (
+            _parse_serialized_arb_enclosure_tc062(rat_obj.get("ratio"))
+            if isinstance(rat_obj, dict)
+            else None
+        )
+        if not all(v is not None for v in cp.values()) or rp is None:
+            ctrl_ok = False
+            neg_refuted_ok = False
+            continue
+        mp = cp["TC063_P0_DIFF_margin"]
+        exp_cv = "PASS" if mp["c_hi"] <= 0 else ("FAIL" if mp["c_lo"] > 0 else "UNRESOLVED")
+        if cr.get("TC063_P0_DIFF_verdict") != exp_cv:
+            ctrl_ok = False
+        if cr.get("Y", 0) >= 64:
+            if cr.get("mode") == "liouville" and exp_cv != "PASS":
+                ctrl_ok = False
+            elif cr.get("mode") != "liouville" and exp_cv != "FAIL":
+                neg_refuted_ok = False
+    s3["all_negative_controls_refuted_on_S_different_for_Y_ge_64"] = neg_refuted_ok
+    s3["all_section_3_checks_pass"] = bool(
+        uc_ok
+        and feat_ok
+        and same_ok
+        and bool(s3.get("control_2d_vs_1d_cross_check_Y16_verified", False))
+        and ctrl_ok
+        and neg_refuted_ok
+    )
+    return s3
+
+
 def reprocess_task_tc063_metadata_and_lean_audit(
     artifact_path: Path = DYADIC_CHAIN_ARTIFACT_PATH,
     *,
@@ -4955,7 +5235,7 @@ def reprocess_task_tc063_metadata_and_lean_audit(
     validation_commit_override: Optional[str] = None,
     protocol_override: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
-    """Re-run full 674-ball serialized Arb validation, Section 1/4/5 validation, Section 6 live
+    """Re-run full 674-ball serialized Arb validation, Section 1/2/3/4/5 validation, Section 6 live
     Lean declaration audit, and provenance synchronization on an existing `TC-063` artifact
     WITHOUT altering any numerical Arb ball or `numerical_producing_git_commit`.
     """
@@ -4987,13 +5267,19 @@ def reprocess_task_tc063_metadata_and_lean_audit(
         proto_obj = proto_chk["protocol_object"]
 
     sec1_upd = _audit_section_1_serialized_checks(
-        existing["section_1_protocols_endpoint_and_premise_chain"]
+        existing.get("section_1_protocols_endpoint_and_premise_chain", {})
+    )
+    sec2_upd = _audit_section_2_serialized_checks(
+        existing.get("section_2_odd_part_decomposition_and_cross_checks", {})
+    )
+    sec3_upd = _audit_section_3_serialized_checks(
+        existing.get("section_3_same_chain_bound_and_matched_controls", {})
     )
     sec4_upd = _audit_section_4_serialized_checks(
-        existing["section_4_distinct_chain_attempts_and_obstructions"]
+        existing.get("section_4_distinct_chain_attempts_and_obstructions", {})
     )
     sec5_upd, top_fields = aggregate_tc063_section5_and_derive_outcomes(
-        existing["section_5_unseen_validation_and_interval_splits"], proto_obj
+        existing.get("section_5_unseen_validation_and_interval_splits", {}), proto_obj
     )
     sec6_upd = verify_section_6_lean_audit_and_gate_accounting()
 
@@ -5011,6 +5297,8 @@ def reprocess_task_tc063_metadata_and_lean_audit(
     new_prov["reprocessed_at_utc"] = datetime.now(timezone.utc).isoformat()
     updated["provenance"] = new_prov
     updated["section_1_protocols_endpoint_and_premise_chain"] = sec1_upd
+    updated["section_2_odd_part_decomposition_and_cross_checks"] = sec2_upd
+    updated["section_3_same_chain_bound_and_matched_controls"] = sec3_upd
     updated["section_4_distinct_chain_attempts_and_obstructions"] = sec4_upd
     updated["section_5_unseen_validation_and_interval_splits"] = sec5_upd
     updated["section_6_lean_audit_and_gate_accounting"] = sec6_upd
@@ -5026,8 +5314,8 @@ def reprocess_task_tc063_metadata_and_lean_audit(
 
     updated["all_mathematical_and_numerical_checks_pass"] = bool(
         sec1_upd["all_section_1_checks_pass"]
-        and updated["section_2_odd_part_decomposition_and_cross_checks"]["all_section_2_checks_pass"]
-        and updated["section_3_same_chain_bound_and_matched_controls"]["all_section_3_checks_pass"]
+        and sec2_upd["all_section_2_checks_pass"]
+        and sec3_upd["all_section_3_checks_pass"]
         and sec4_upd["all_section_4_checks_pass"]
         and sec5_upd["all_section_5_checks_pass"]
         and sec6_upd["all_section_6_checks_pass"]
