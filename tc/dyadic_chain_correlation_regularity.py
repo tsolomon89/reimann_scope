@@ -2077,10 +2077,10 @@ def _build_tc063r_section_4_analytic_metadata() -> Dict[str, Any]:
                 "P-rough odd chains (and by monotonicity Omega_c(Y / log log Y) across all 2 <= P <= c*log Y); "
                 "and at polynomial smoothness P = T^(1/u) for fixed u > 1, Hildebrand-Tenenbaum gives "
                 "Psi(T, T^(1/u)) ~ T * rho_dB(u), hence Psi(T, T^(1/u)) = T^(1 + o(1)) (at u = 2, main term "
-                "(1 - log 2)*T, and on odd anchors Psi_odd(T/2, T^(1/u)) = Psi(T/2, T^(1/u)) - Psi(T/4, T^(1/u)) "
-                "~ (1/4)*rho_dB(u)*T). Polynomially large smooth fibers Theta_u(T) obstruct naive unweighted / "
-                "Cauchy-Schwarz fiber grouping, whereas cardinality alone does not rule out future weighted or "
-                "signed bilinear cancellation arguments."
+                "(1 - log 2)*T, and on odd anchors for T >= 2^u, Psi_odd(T/2, T^(1/u)) = Psi(T/2, T^(1/u)) - "
+                "Psi(T/4, T^(1/u)) ~ (1/4)*rho_dB(u)*T). Polynomially large smooth fibers Theta_u(T) obstruct "
+                "naive unweighted / Cauchy-Schwarz fiber grouping, whereas cardinality alone does not rule out "
+                "future weighted or signed bilinear cancellation arguments."
             ),
         },
         "attempt_B_cand_b1_premise": (
@@ -3010,26 +3010,38 @@ def execute_tc063_holdout_point_with_escalation(
     }
 
 
+TC063R_KL1_DERIVATION_KIND = (
+    "DERIVED_FROM_PRESERVED_TC063_BRANCH_ENCLOSURES_NO_NEW_QUADRATURE"
+)
+TC063R_KL1_FORMULAS: Dict[str, str] = {
+    "M_KL1_SAME": "S_same_Y - (1/4) * log_Y_times_D_tilde (signed S_same_Y, not |S_same_Y|)",
+    "M_KL1_DIFF": "S_different_Y - (3/4) * log_Y_times_D_tilde",
+}
+
+
 def reconstruct_outward_arb_from_serialized_ball_tc063r(
     ball_dict: Any,
     *,
     prec_bits: int = 256,
 ) -> arb:
-    """Reconstruct a conservative outward-rounded `prec_bits` FLINT `arb` ball enclosing all three
-    serialized representations (`lower_dec/upper_dec`, `arb_ball_str`, `mid_float/rad_float_outward`)
-    of a preserved `TC-063` serialized ball without repeating numerical quadrature (`TASK-TC-063R` §6).
+    """Reconstruct a tight outward-rounded `prec_bits` FLINT `arb` ball from the validated
+    intersection `[c_lo, c_hi]` of a preserved `TC-063` serialized ball without repeating numerical
+    quadrature (`TASK-TC-063R` §6). Because each serialized representation (`[lo_dec, hi_dec]`,
+    `[lo_bs, hi_bs]`, `[lo_fl, hi_fl]`) individually encloses the exact 256-bit `arb` ball, their
+    validated intersection `[c_lo, c_hi]` (`= [lo_dec, hi_dec]` at 40-digit outward rounding)
+    rigorously encloses the original 256-bit ball while preserving exact endpoint signs even when
+    `arb_ball_str` formats small-midpoint negative intervals as `[+/- ...]`.
     """
     parsed = _parse_serialized_arb_enclosure_tc062(ball_dict)
     if parsed is None:
         raise CertificationIntegrityError(
-            "Cannot reconstruct outward Arb enclosure from malformed serialized ball."
+            "Cannot reconstruct outward Arb enclosure from malformed serialized ball.",
+            [{"conflict_type": "MALFORMED_SERIALIZED_ARB_BALL"}],
         )
-    outer_lo = min(parsed["lo_dec"], parsed["lo_bs"], parsed["lo_fl"])
-    outer_hi = max(parsed["hi_dec"], parsed["hi_bs"], parsed["hi_fl"])
     saved = flint_ctx.prec
     try:
         flint_ctx.prec = prec_bits
-        return +(_frac_to_arb(outer_lo).union(_frac_to_arb(outer_hi)))
+        return +(_frac_to_arb(parsed["c_lo"]).union(_frac_to_arb(parsed["c_hi"])))
     finally:
         flint_ctx.prec = saved
 
@@ -3064,7 +3076,10 @@ def derive_kl1_branch_margins_from_serialized_branch_tc063r(
     """
     src_sha = compute_tc063r_kl1_source_observables_sha256(br)
     if src_sha is None:
-        raise CertificationIntegrityError("Missing source branch observables for KL1 derivation.")
+        raise CertificationIntegrityError(
+            "Missing source branch observables for KL1 derivation.",
+            [{"conflict_type": "MISSING_KL1_SOURCE_OBSERVABLES"}],
+        )
     ef_raw = br.get("evaluated_Y_interval_exact_fractions")
     if not (
         isinstance(ef_raw, list)
@@ -3072,7 +3087,8 @@ def derive_kl1_branch_margins_from_serialized_branch_tc063r(
         and all(isinstance(s, str) and s.strip() for s in ef_raw)
     ):
         raise CertificationIntegrityError(
-            "Missing exact evaluated_Y_interval_exact_fractions on branch for KL1 derivation."
+            "Missing exact evaluated_Y_interval_exact_fractions on branch for KL1 derivation.",
+            [{"conflict_type": "MISSING_EVALUATED_Y_INTERVAL_EXACT_FRACTIONS"}],
         )
 
     saved = flint_ctx.prec
@@ -3098,15 +3114,13 @@ def derive_kl1_branch_margins_from_serialized_branch_tc063r(
 
     prov_rec = {
         "derivation_task_id": TASK_TC_063R_ID,
-        "derivation_kind": "DERIVED_FROM_PRESERVED_TC063_BRANCH_ENCLOSURES_NO_NEW_QUADRATURE",
+        "derivation_kind": TC063R_KL1_DERIVATION_KIND,
+        "quadrature_recomputation_performed": False,
         "retroactively_audited_in_original_tc063": False,
         "source_numerical_producing_git_commit": source_numerical_commit,
         "tc063r_derivation_git_commit": derivation_commit,
         "candidate_domain_threshold_Y0": "64",
-        "formulas": {
-            "M_KL1_SAME": "S_same_Y - (1/4) * log_Y_times_D_tilde (signed S_same_Y, not |S_same_Y|)",
-            "M_KL1_DIFF": "S_different_Y - (3/4) * log_Y_times_D_tilde",
-        },
+        "formulas": dict(TC063R_KL1_FORMULAS),
         "source_observable_fields": ["S_same_Y", "S_different_Y", "log_Y_times_D_tilde"],
         "source_observables_sha256": src_sha,
         "evaluated_Y_interval_exact_fractions": list(ef_raw),
@@ -3145,7 +3159,10 @@ def attach_tc063r_kl1_certificates_to_split_dict(
     )
     branches = sp_copy.get("branches")
     if not isinstance(branches, list) or len(branches) == 0:
-        raise CertificationIntegrityError("Cannot derive KL1 interval balls on empty branch list.")
+        raise CertificationIntegrityError(
+            "Cannot derive KL1 interval balls on empty branch list.",
+            [{"conflict_type": "EMPTY_KL1_BRANCH_LIST"}],
+        )
 
     saved = flint_ctx.prec
     try:
@@ -3184,7 +3201,8 @@ def attach_tc063r_kl1_certificates_to_split_dict(
         live_chk = verify_all_serialized_arb_in_tree({"derived_kl1": live_tree_for_check})
         if not live_chk["all_enclose_original_256bit_arb_ball"]:
             raise CertificationIntegrityError(
-                f"Live 256-bit Arb roundtrip failed on derived KL1 balls: {live_chk}"
+                f"Live 256-bit Arb roundtrip failed on derived KL1 balls: {live_chk}",
+                [{"conflict_type": "DERIVED_KL1_ARB_ROUNDTRIP_FAILURE", "details": live_chk}],
             )
         sp_copy["union_M_KL1_SAME"] = ser_u_same
         sp_copy["union_M_KL1_DIFF"] = ser_u_diff
@@ -3192,7 +3210,8 @@ def attach_tc063r_kl1_certificates_to_split_dict(
         sp_copy["KL1_different_chain_interval_classification"] = classify_probe_margin_arb(u_diff)
         sp_copy["tc063r_derived_kl1_interval_provenance"] = {
             "derivation_task_id": TASK_TC_063R_ID,
-            "derivation_kind": "DERIVED_FROM_PRESERVED_TC063_BRANCH_ENCLOSURES_NO_NEW_QUADRATURE",
+            "derivation_kind": TC063R_KL1_DERIVATION_KIND,
+            "quadrature_recomputation_performed": False,
             "retroactively_audited_in_original_tc063": False,
             "source_numerical_producing_git_commit": source_numerical_commit,
             "tc063r_derivation_git_commit": derivation_commit,
@@ -3670,6 +3689,13 @@ def audit_continuous_interval_split_certificate_tc063(
         and artifact_provenance["numerical_producing_git_commit"].strip()
         else None
     )
+    exp_deriv_commit = (
+        artifact_provenance.get("tc063r_kl1_derivation_git_commit")
+        if isinstance(artifact_provenance, dict)
+        and isinstance(artifact_provenance.get("tc063r_kl1_derivation_git_commit"), str)
+        and artifact_provenance["tc063r_kl1_derivation_git_commit"].strip()
+        else None
+    )
 
     kl1_union_specs = (
         ("KL1_same_chain", "union_M_KL1_SAME", "KL1_same_chain_interval_classification"),
@@ -3729,14 +3755,20 @@ def audit_continuous_interval_split_certificate_tc063(
                 else:
                     kl1_union_present[kid_u] = True
 
-    if any_kl1_union_key:
-        sp_kl1_prov = split_obj.get("tc063r_derived_kl1_interval_provenance")
+    sp_kl1_prov_raw = split_obj.get("tc063r_derived_kl1_interval_provenance")
+    has_sp_kl1_prov_key = "tc063r_derived_kl1_interval_provenance" in split_obj
+    if has_sp_kl1_prov_key and not any_kl1_union_key:
+        conflicts.append({"conflict_type": "KL1_ORPHAN_INTERVAL_PROVENANCE_WITHOUT_UNIONS"})
+    if any_kl1_union_key or has_sp_kl1_prov_key:
+        sp_kl1_prov = sp_kl1_prov_raw
         if (
             not isinstance(sp_kl1_prov, dict)
             or sp_kl1_prov.get("derivation_task_id") != TASK_TC_063R_ID
-            or sp_kl1_prov.get("derivation_kind")
-            != "DERIVED_FROM_PRESERVED_TC063_BRANCH_ENCLOSURES_NO_NEW_QUADRATURE"
+            or sp_kl1_prov.get("derivation_kind") != TC063R_KL1_DERIVATION_KIND
+            or sp_kl1_prov.get("quadrature_recomputation_performed") is not False
             or sp_kl1_prov.get("retroactively_audited_in_original_tc063") is not False
+            or sp_kl1_prov.get("derived_branch_ball_count") != 2 * len(branches)
+            or sp_kl1_prov.get("derived_union_ball_count") != 2
             or not isinstance(sp_kl1_prov.get("source_numerical_producing_git_commit"), str)
             or not sp_kl1_prov["source_numerical_producing_git_commit"].strip()
             or (
@@ -3745,8 +3777,19 @@ def audit_continuous_interval_split_certificate_tc063(
             )
             or not isinstance(sp_kl1_prov.get("tc063r_derivation_git_commit"), str)
             or not sp_kl1_prov["tc063r_derivation_git_commit"].strip()
+            or (
+                exp_deriv_commit is not None
+                and sp_kl1_prov["tc063r_derivation_git_commit"] != exp_deriv_commit
+            )
         ):
             conflicts.append({"conflict_type": "INVALID_KL1_INTERVAL_PROVENANCE"})
+
+    seen_kl1_src_commits: set[str] = set()
+    seen_kl1_deriv_commits: set[str] = set()
+    branch_kl1_bounds: Dict[str, List[Tuple[Fraction, Fraction]]] = {
+        "union_M_KL1_SAME": [],
+        "union_M_KL1_DIFF": [],
+    }
 
     seen_req: set[Tuple[int, int, int]] = set()
     req_branch_verdicts: Dict[str, Dict[Tuple[int, int, int], str]] = {
@@ -3874,7 +3917,15 @@ def audit_continuous_interval_split_certificate_tc063(
 
         # Audit TC-063R derived KL1 branch margins, exact formulas, union containment, & provenance:
         any_kl1_on_br = ("M_KL1_SAME" in br) or ("M_KL1_DIFF" in br)
-        if any_kl1_on_br:
+        has_br_kl1_prov_key = "tc063r_derived_kl1_provenance" in br
+        if has_br_kl1_prov_key and not any_kl1_on_br:
+            conflicts.append(
+                {
+                    "conflict_type": "KL1_ORPHAN_DERIVED_PROVENANCE_WITHOUT_MARGINS",
+                    "triple": list(triple),
+                }
+            )
+        if any_kl1_on_br or has_br_kl1_prov_key:
             prov_kl1 = br.get("tc063r_derived_kl1_provenance")
             exp_obs_sha = compute_tc063r_kl1_source_observables_sha256(br)
             prov_ef = (
@@ -3896,20 +3947,46 @@ def audit_continuous_interval_split_certificate_tc063(
                     prov_ef_ok = False
                 if prov_ef_ok and "evaluated_Y_interval_exact_fractions" in br:
                     prov_ef_ok = prov_ef == br.get("evaluated_Y_interval_exact_fractions")
+            sp_src_c = (
+                sp_kl1_prov_raw.get("source_numerical_producing_git_commit")
+                if isinstance(sp_kl1_prov_raw, dict)
+                else None
+            )
+            sp_der_c = (
+                sp_kl1_prov_raw.get("tc063r_derivation_git_commit")
+                if isinstance(sp_kl1_prov_raw, dict)
+                else None
+            )
             if (
                 not isinstance(prov_kl1, dict)
                 or prov_kl1.get("derivation_task_id") != TASK_TC_063R_ID
-                or prov_kl1.get("derivation_kind")
-                != "DERIVED_FROM_PRESERVED_TC063_BRANCH_ENCLOSURES_NO_NEW_QUADRATURE"
+                or prov_kl1.get("derivation_kind") != TC063R_KL1_DERIVATION_KIND
+                or prov_kl1.get("quadrature_recomputation_performed") is not False
                 or prov_kl1.get("retroactively_audited_in_original_tc063") is not False
+                or prov_kl1.get("candidate_domain_threshold_Y0") != "64"
+                or prov_kl1.get("formulas") != TC063R_KL1_FORMULAS
                 or not isinstance(prov_kl1.get("source_numerical_producing_git_commit"), str)
                 or not prov_kl1["source_numerical_producing_git_commit"].strip()
                 or (
                     exp_src_num_commit is not None
                     and prov_kl1["source_numerical_producing_git_commit"] != exp_src_num_commit
                 )
+                or (
+                    isinstance(sp_src_c, str)
+                    and sp_src_c.strip()
+                    and prov_kl1["source_numerical_producing_git_commit"] != sp_src_c
+                )
                 or not isinstance(prov_kl1.get("tc063r_derivation_git_commit"), str)
                 or not prov_kl1["tc063r_derivation_git_commit"].strip()
+                or (
+                    exp_deriv_commit is not None
+                    and prov_kl1["tc063r_derivation_git_commit"] != exp_deriv_commit
+                )
+                or (
+                    isinstance(sp_der_c, str)
+                    and sp_der_c.strip()
+                    and prov_kl1["tc063r_derivation_git_commit"] != sp_der_c
+                )
                 or prov_kl1.get("source_observable_fields")
                 != ["S_same_Y", "S_different_Y", "log_Y_times_D_tilde"]
                 or exp_obs_sha is None
@@ -3919,6 +3996,9 @@ def audit_continuous_interval_split_certificate_tc063(
                 conflicts.append(
                     {"conflict_type": "INVALID_KL1_DERIVED_PROVENANCE", "triple": list(triple)}
                 )
+            else:
+                seen_kl1_src_commits.add(prov_kl1["source_numerical_producing_git_commit"])
+                seen_kl1_deriv_commits.add(prov_kl1["tc063r_derivation_git_commit"])
 
         ss_p = parsed_br_obs.get("S_same_Y")
         sd_p = parsed_br_obs.get("S_different_Y")
@@ -3971,6 +4051,7 @@ def audit_continuous_interval_split_certificate_tc063(
                 branch_exp_verdict_by_field[m_f_k] = None
                 continue
 
+            branch_kl1_bounds[u_f_k].append((m_pk["c_lo"], m_pk["c_hi"]))
             u_pk = parsed_kl1_unions.get(u_f_k)
             if u_pk is not None and not _serialized_union_contains_branch_tc062(u_pk, m_pk):
                 conflicts.append(
@@ -3985,21 +4066,27 @@ def audit_continuous_interval_split_certificate_tc063(
             if src_p_k is not None and lgd_p is not None:
                 exp_c_lo = src_p_k["c_lo"] - coeff_q * lgd_p["c_hi"]
                 exp_c_hi = src_p_k["c_hi"] - coeff_q * lgd_p["c_lo"]
-                src_out_lo = min(src_p_k["lo_dec"], src_p_k["lo_bs"], src_p_k["lo_fl"])
-                src_out_hi = max(src_p_k["hi_dec"], src_p_k["hi_bs"], src_p_k["hi_fl"])
-                lgd_out_lo = min(lgd_p["lo_dec"], lgd_p["lo_bs"], lgd_p["lo_fl"])
-                lgd_out_hi = max(lgd_p["hi_dec"], lgd_p["hi_bs"], lgd_p["hi_fl"])
-                exp_out_lo = src_out_lo - coeff_q * lgd_out_hi
-                exp_out_hi = src_out_hi - coeff_q * lgd_out_lo
+                saved_aud_p = flint_ctx.prec
+                try:
+                    flint_ctx.prec = 256
+                    out_src_b = +(_frac_to_arb(src_p_k["c_lo"]).union(_frac_to_arb(src_p_k["c_hi"])))
+                    out_lgd_b = +(_frac_to_arb(lgd_p["c_lo"]).union(_frac_to_arb(lgd_p["c_hi"])))
+                    exp_m_arb = +(out_src_b - _frac_to_arb(coeff_q) * out_lgd_b)
+                    exp_ser_p = _parse_serialized_arb_enclosure_tc062(
+                        serialize_arb_certified(exp_m_arb)
+                    )
+                finally:
+                    flint_ctx.prec = saved_aud_p
                 f_scale = max(abs(exp_c_lo), abs(exp_c_hi), Fraction(1, 10 ** 70))
-                pad_tol = Fraction(8, 1) * (exp_out_hi - exp_out_lo) + f_scale * Fraction(
-                    1, 2 ** 46
-                )
-                if not (
-                    m_pk["c_lo"] <= exp_c_lo
-                    and exp_c_hi <= m_pk["c_hi"]
-                    and m_pk["c_lo"] >= exp_out_lo - pad_tol
-                    and m_pk["c_hi"] <= exp_out_hi + pad_tol
+                dec_tol = f_scale * Fraction(1, 10 ** 35)
+                if (
+                    exp_ser_p is None
+                    or not (
+                        m_pk["c_lo"] <= exp_c_lo
+                        and exp_c_hi <= m_pk["c_hi"]
+                        and abs(m_pk["lo_dec"] - exp_ser_p["lo_dec"]) <= dec_tol
+                        and abs(m_pk["hi_dec"] - exp_ser_p["hi_dec"]) <= dec_tol
+                    )
                 ):
                     conflicts.append(
                         {
@@ -4052,6 +4139,28 @@ def audit_continuous_interval_split_certificate_tc063(
                     probe_covered_triples[pid].add(triple)
             if exp_v_p == "FAIL" and dom_p["can_certify_refutation"] and not bin_errs:
                 admissible_fail_witnesses[pid].append(triple)
+
+    if len(seen_kl1_src_commits) > 1 or len(seen_kl1_deriv_commits) > 1:
+        conflicts.append({"conflict_type": "INCONSISTENT_KL1_BRANCH_PROVENANCE_COMMITS"})
+
+    for kid_u, u_m_k, _ in kl1_union_specs:
+        u_pk = parsed_kl1_unions.get(u_f_k := u_m_k)
+        b_bounds = branch_kl1_bounds.get(u_f_k, [])
+        if u_pk is not None and len(b_bounds) == len(branches) and len(b_bounds) > 0:
+            min_b_lo = min(b_lo for b_lo, _ in b_bounds)
+            max_b_hi = max(b_hi for _, b_hi in b_bounds)
+            u_scale = max(abs(min_b_lo), abs(max_b_hi), Fraction(1, 10 ** 70))
+            u_pad_tol = Fraction(1, 2 ** 24) * (max_b_hi - min_b_lo) + u_scale * Fraction(
+                1, 10 ** 35
+            )
+            if u_pk["c_lo"] < min_b_lo - u_pad_tol or u_pk["c_hi"] > max_b_hi + u_pad_tol:
+                conflicts.append(
+                    {
+                        "conflict_type": "KL1_UNION_ARTIFICIAL_PADDING_OR_FORMULA_MISMATCH",
+                        "probe_id": kid_u,
+                        "union_field": u_f_k,
+                    }
+                )
 
     for req_t in req_triples:
         if req_t not in seen_req:
@@ -5264,7 +5373,14 @@ def compare_tc063r_against_tc063_baseline(
         "baseline_commit": REVIEWED_TC063_DELIVERED_TIP,
         "comparison_status": (
             "COMPLETE_COMPARED"
-            if (not cur_v_iss and not base_v_iss and not removed_v and not removed_st)
+            if (
+                not cur_v_iss
+                and not base_v_iss
+                and not removed_v
+                and not removed_st
+                and not missing_orig
+                and not removed_prov_keys
+            )
             else "INCOMPLETE_COMPARISON"
         ),
         "enclosure_preservation_report": {
@@ -5474,6 +5590,17 @@ def verify_tc063_review_enclosures_and_lean_anchors(
             "approx -3.05",
             "T^{\\rho_{\\mathrm{dB}}(u)",
             "genuinely needed",
+            "\\lambda * \\lambda",
+            "lambda * lambda",
+            "divisible by 4",
+            "divisible by $4$",
+            "= \\zeta''(1 +",
+            "O((\\log Y)^{-2})",
+            "O((log Y)^(-2))",
+            "0.02737041",
+            "0.02738314",
+            "on unseen Y >= 960",
+            "on unseen $Y \\ge 960$",
         )
         if bad_s in main_body_before_erratum
     ]
@@ -5533,7 +5660,10 @@ def generate_task_tc063_artifact(
     """
     proto_chk = verify_frozen_tc063_protocol_immutability()
     if not proto_chk["verified"]:
-        raise CertificationIntegrityError("Frozen TC-063 protocol immutability check failed!")
+        raise CertificationIntegrityError(
+            "Frozen TC-063 protocol immutability check failed!",
+            [{"conflict_type": "FROZEN_TC063_PROTOCOL_MUTATED", "details": proto_chk}],
+        )
     proto_obj = proto_chk["protocol_object"]
 
     tbl = compute_selberg_centered_remainder_table_fast_arb(18000, prec_bits=288)
@@ -6278,7 +6408,10 @@ def apply_tc063r_repairs_and_derive_kl1_certificates(
     raw_art = json.loads(Path(artifact_path).read_text(encoding="utf-8"))
     prov = raw_art.get("provenance")
     if not isinstance(prov, dict) or not isinstance(prov.get("numerical_producing_git_commit"), str):
-        raise CertificationIntegrityError("Missing numerical_producing_git_commit in TC-063 artifact.")
+        raise CertificationIntegrityError(
+            "Missing numerical_producing_git_commit in TC-063 artifact.",
+            [{"conflict_type": "MISSING_NUMERICAL_PRODUCING_GIT_COMMIT"}],
+        )
 
     src_num_commit = prov["numerical_producing_git_commit"]
     deriv_commit = derivation_commit_override or _get_git_head_commit()
@@ -6288,12 +6421,18 @@ def apply_tc063r_repairs_and_derive_kl1_certificates(
     sec5_w = working.get("section_5_unseen_validation_and_interval_splits", {})
     splits_w = sec5_w.get("continuous_interval_case_splits", {})
     if not isinstance(splits_w, dict):
-        raise CertificationIntegrityError("Missing continuous_interval_case_splits in Section 5.")
+        raise CertificationIntegrityError(
+            "Missing continuous_interval_case_splits in Section 5.",
+            [{"conflict_type": "MISSING_CONTINUOUS_INTERVAL_CASE_SPLITS"}],
+        )
 
     total_derived_live = 0
     for ik in PRESCRIBED_TC063_INTERVAL_SPLITS:
         if ik not in splits_w or not isinstance(splits_w[ik], dict):
-            raise CertificationIntegrityError(f"Missing prescribed split {ik!r} for KL1 derivation.")
+            raise CertificationIntegrityError(
+                f"Missing prescribed split {ik!r} for KL1 derivation.",
+                [{"conflict_type": "MISSING_PRESCRIBED_INTERVAL_SPLIT", "interval_id": ik}],
+            )
         sp_clean = copy.deepcopy(splits_w[ik])
         for k_drop in (
             "union_M_KL1_SAME",
@@ -6325,7 +6464,8 @@ def apply_tc063r_repairs_and_derive_kl1_certificates(
 
     if total_derived_live != TC063R_DERIVED_KL1_ARB_BALL_COUNT:
         raise CertificationIntegrityError(
-            f"Expected {TC063R_DERIVED_KL1_ARB_BALL_COUNT} derived KL1 balls, got {total_derived_live}"
+            f"Expected {TC063R_DERIVED_KL1_ARB_BALL_COUNT} derived KL1 balls, got {total_derived_live}",
+            [{"conflict_type": "UNEXPECTED_DERIVED_KL1_BALL_COUNT", "count": total_derived_live}],
         )
 
     new_prov = dict(prov)
@@ -6376,11 +6516,12 @@ def apply_tc063r_repairs_and_derive_kl1_certificates(
         )
     )
     base_cmp = repaired["provenance"]["tc063r_vs_tc063_baseline_comparison"]
-    if base_cmp.get("comparison_status") == "COMPLETE_COMPARED":
+    if "enclosure_preservation_report" in base_cmp:
         enc_rep = base_cmp["enclosure_preservation_report"]
         if not enc_rep["all_674_original_enclosures_byte_identical"]:
             raise CertificationIntegrityError(
-                f"Original TC-063 enclosure byte-identity violated: {enc_rep}"
+                f"Original TC-063 enclosure byte-identity violated: {enc_rep}",
+                [{"conflict_type": "ORIGINAL_TC063_ENCLOSURE_MUTATED", "report": enc_rep}],
             )
 
     if write_output:
