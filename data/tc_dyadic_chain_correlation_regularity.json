@@ -28,7 +28,7 @@
     "frozen_tc063_protocol_registration_commit": "767ff30dcd605e82f7d855fb0b86ee59919eceb8",
     "frozen_tc063_protocol_sha256": "a5ced83b7aede12e5bcfc4c146a0edb57f7a668ad773098bff44c71e2471edff",
     "numerical_producing_git_commit": "767ff30dcd605e82f7d855fb0b86ee59919eceb8",
-    "validation_git_commit": "5a9b7ed25c777951d4069f8e87d3ea2ec086d371",
+    "validation_git_commit": "ed5e068faa666255c0746b7d2738f14d133bd2e3",
     "formal_producing_git_commit": "ba34faa4df3fc1ef3067b9203a6bdcaf1d7a9e81",
     "self_verdict_comparison": {
       "comparison_id": "TC063_SELF_CONSISTENCY_V1",
@@ -41,13 +41,13 @@
       "missing_status_keys": [],
       "removed_status_or_schema_fields": []
     },
-    "reprocessed_at_utc": "2026-11-19T21:29:08.653308+00:00",
+    "reprocessed_at_utc": "2026-11-19T22:05:41.481828+00:00",
     "reviewed_tc063_delivered_tip": "255594aab4b08af083a4b02faaa10750e072b370",
     "tc063_original_validation_git_commit": "3ac1c6fc8d0c7a9f61c0bdc136e1d7a7fb751a68",
     "tc063_original_provenance_sync_git_commit": "70b8fd96e6b32e7a589632fdd348d2eecae74757",
     "tc063r_repair_task_id": "TASK-TC-063R",
-    "tc063r_repair_implementation_git_commit": "5a9b7ed25c777951d4069f8e87d3ea2ec086d371",
-    "tc063r_kl1_derivation_git_commit": "5a9b7ed25c777951d4069f8e87d3ea2ec086d371",
+    "tc063r_repair_implementation_git_commit": "ed5e068faa666255c0746b7d2738f14d133bd2e3",
+    "tc063r_kl1_derivation_git_commit": "ed5e068faa666255c0746b7d2738f14d133bd2e3",
     "tc063r_vs_tc063_baseline_comparison": {
       "baseline_commit": "255594aab4b08af083a4b02faaa10750e072b370",
       "comparison_status": "COMPLETE_COMPARED",
@@ -4045,7 +4045,7 @@
         "resonant_shell_cauchy_schwarz_loss": "Loses resonant odd-chain count |O_res(Y)| = Theta(Y), yielding Theta(Y).",
         "smooth_and_rough_definitions": "Psi(x, y) := |{1 <= n <= x : P^+(n) <= y}| (with P^+(1) := 1); Dickman function rho_dB : [0, infty) -> (0, 1] continuous with rho_dB(u) = 1 on [0, 1] and u * rho_dB'(u) = -rho_dB(u - 1) for u > 1 (so rho_dB(2) = 1 - log 2).",
         "primary_smooth_number_reference": "Hildebrand & Tenenbaum, 'Integers without large prime factors' / 'On Integers Free of Large Prime Factors', J. Theor. Nombres Bordeaux 5(2):411-484 (1993), https://tenenb.perso.math.cnrs.fr/PPP/Psi+.pdf",
-        "iterated_prime_smooth_wall": "Grouping S-smooth chains for fixed finite prime set S gives O_S((log Y)^|S|) <<_eta Y^eta per fixed-core fiber while leaving a constant positive density Theta_S(Y) of S-rough resonant odd chains (never decaying like 1/log log Y for fixed P); at comparable growth P ~ c*log Y (c > 0 fixed), Mertens/sieve asymptotics leave Theta(Y / log log Y) resonant P-rough odd chains (and by monotonicity Omega_c(Y / log log Y) across all 2 <= P <= c*log Y); and at polynomial smoothness P = T^(1/u) for fixed u > 1, Hildebrand-Tenenbaum gives Psi(T, T^(1/u)) ~ T * rho_dB(u), hence Psi(T, T^(1/u)) = T^(1 + o(1)) (at u = 2, main term (1 - log 2)*T, and on odd anchors Psi_odd(T/2, T^(1/u)) = Psi(T/2, T^(1/u)) - Psi(T/4, T^(1/u)) ~ (1/4)*rho_dB(u)*T). Polynomially large smooth fibers Theta_u(T) obstruct naive unweighted / Cauchy-Schwarz fiber grouping, whereas cardinality alone does not rule out future weighted or signed bilinear cancellation arguments."
+        "iterated_prime_smooth_wall": "Grouping S-smooth chains for fixed finite prime set S gives O_S((log Y)^|S|) <<_eta Y^eta per fixed-core fiber while leaving a constant positive density Theta_S(Y) of S-rough resonant odd chains (never decaying like 1/log log Y for fixed P); at comparable growth P ~ c*log Y (c > 0 fixed), Mertens/sieve asymptotics leave Theta(Y / log log Y) resonant P-rough odd chains (and by monotonicity Omega_c(Y / log log Y) across all 2 <= P <= c*log Y); and at polynomial smoothness P = T^(1/u) for fixed u > 1, Hildebrand-Tenenbaum gives Psi(T, T^(1/u)) ~ T * rho_dB(u), hence Psi(T, T^(1/u)) = T^(1 + o(1)) (at u = 2, main term (1 - log 2)*T, and on odd anchors for T >= 2^u, Psi_odd(T/2, T^(1/u)) = Psi(T/2, T^(1/u)) - Psi(T/4, T^(1/u)) ~ (1/4)*rho_dB(u)*T). Polynomially large smooth fibers Theta_u(T) obstruct naive unweighted / Cauchy-Schwarz fiber grouping, whereas cardinality alone does not rule out future weighted or signed bilinear cancellation arguments."
       }
     },
     "attempt_B_square_projection_and_selberg_compatibility": {
@@ -6644,18 +6644,18 @@
               "domain_evidence_source": "EXACT_DYADIC_FRACTIONS"
             },
             "M_KL1_SAME": {
-              "mid_float": -0.04259,
-              "rad_float_outward": 7.42000004550222e-06,
-              "lower_dec": "-4.259742000004549936420517042279243469240e-2",
-              "upper_dec": "-4.258257999995450063579482957720756530760e-2",
-              "arb_ball_str": "[-0.04259 +/- 7.43e-6]"
+              "mid_float": -0.04259433252336335,
+              "rad_float_outward": 3.0543951865553826e-06,
+              "lower_dec": "-4.259738691854990087902555541785696189629e-2",
+              "upper_dec": "-4.259127812817679591260534079464414756521e-2",
+              "arb_ball_str": "[-0.04259 +/- 7.39e-6]"
             },
             "M_KL1_DIFF": {
-              "mid_float": -0.13275,
-              "rad_float_outward": 3.125000017690361e-05,
-              "lower_dec": "-1.327812500001768967194948345422744750978e-1",
-              "upper_dec": "-1.327187499998231032805051654577255249022e-1",
-              "arb_ball_str": "[-0.1327 +/- 8.13e-5]"
+              "mid_float": -0.13276079492825518,
+              "rad_float_outward": 1.7013812026802348e-05,
+              "lower_dec": "-1.327778087402819848124319948833417762097e-1",
+              "upper_dec": "-1.327437811162284061923539527337980140024e-1",
+              "arb_ball_str": "[-0.1328 +/- 5.63e-5]"
             },
             "KL1_same_chain_branch_classification": {
               "verdict": "PASS",
@@ -6670,9 +6670,10 @@
             "tc063r_derived_kl1_provenance": {
               "derivation_task_id": "TASK-TC-063R",
               "derivation_kind": "DERIVED_FROM_PRESERVED_TC063_BRANCH_ENCLOSURES_NO_NEW_QUADRATURE",
+              "quadrature_recomputation_performed": false,
               "retroactively_audited_in_original_tc063": false,
               "source_numerical_producing_git_commit": "767ff30dcd605e82f7d855fb0b86ee59919eceb8",
-              "tc063r_derivation_git_commit": "5a9b7ed25c777951d4069f8e87d3ea2ec086d371",
+              "tc063r_derivation_git_commit": "ed5e068faa666255c0746b7d2738f14d133bd2e3",
               "candidate_domain_threshold_Y0": "64",
               "formulas": {
                 "M_KL1_SAME": "S_same_Y - (1/4) * log_Y_times_D_tilde (signed S_same_Y, not |S_same_Y|)",
@@ -6802,18 +6803,18 @@
               "domain_evidence_source": "EXACT_DYADIC_FRACTIONS"
             },
             "M_KL1_SAME": {
-              "mid_float": -0.041765,
-              "rad_float_outward": 4.795000030814e-06,
-              "lower_dec": "-4.176979500003081057002418674528598785402e-2",
-              "upper_dec": "-4.176020499996918942997581325471401214598e-2",
-              "arb_ball_str": "[-0.04176 +/- 9.80e-6]"
+              "mid_float": -0.04176674885344707,
+              "rad_float_outward": 3.0373585886445472e-06,
+              "lower_dec": "-4.176978621203570937046579195354876987514e-2",
+              "upper_dec": "-4.176371149485842478730746654962001316124e-2",
+              "arb_ball_str": "[-0.04177 +/- 6.29e-6]"
             },
             "M_KL1_DIFF": {
-              "mid_float": -0.130275,
-              "rad_float_outward": 2.3375000125726824e-05,
-              "lower_dec": "-1.302983750001257249095942825078964233400e-1",
-              "upper_dec": "-1.302516249998742750904057174921035766600e-1",
-              "arb_ball_str": "[-0.1303 +/- 4.84e-5]"
+              "mid_float": -0.13027803072599325,
+              "rad_float_outward": 1.6962638653701407e-05,
+              "lower_dec": "-1.302949933646469560263048365618395071282e-1",
+              "upper_dec": "-1.302610680873395665476399913336443166982e-1",
+              "arb_ball_str": "[-0.1303 +/- 3.90e-5]"
             },
             "KL1_same_chain_branch_classification": {
               "verdict": "PASS",
@@ -6828,9 +6829,10 @@
             "tc063r_derived_kl1_provenance": {
               "derivation_task_id": "TASK-TC-063R",
               "derivation_kind": "DERIVED_FROM_PRESERVED_TC063_BRANCH_ENCLOSURES_NO_NEW_QUADRATURE",
+              "quadrature_recomputation_performed": false,
               "retroactively_audited_in_original_tc063": false,
               "source_numerical_producing_git_commit": "767ff30dcd605e82f7d855fb0b86ee59919eceb8",
-              "tc063r_derivation_git_commit": "5a9b7ed25c777951d4069f8e87d3ea2ec086d371",
+              "tc063r_derivation_git_commit": "ed5e068faa666255c0746b7d2738f14d133bd2e3",
               "candidate_domain_threshold_Y0": "64",
               "formulas": {
                 "M_KL1_SAME": "S_same_Y - (1/4) * log_Y_times_D_tilde (signed S_same_Y, not |S_same_Y|)",
@@ -6928,18 +6930,18 @@
           "certified_definite": true
         },
         "union_M_KL1_SAME": {
-          "mid_float": -0.042178812500007344,
-          "rad_float_outward": 0.00041860750116029554,
-          "lower_dec": "-4.259742000116763961159449536353349685670e-2",
-          "upper_dec": "-4.176020499884704918258648831397294998167e-2",
+          "mid_float": -0.042180549206704165,
+          "rad_float_outward": 0.0004168377126916338,
+          "lower_dec": "-4.259738691939579400129357092026192502878e-2",
+          "upper_dec": "-4.176371149401253166503945104721505002875e-2",
           "arb_ball_str": "[-0.042 +/- 5.98e-4]"
         },
         "union_M_KL1_DIFF": {
-          "mid_float": -0.1315164375000256,
-          "rad_float_outward": 0.0012648125029954872,
-          "lower_dec": "-1.327812500030210685508791357278823852541e-1",
-          "upper_dec": "-1.302516249970301032590214163064956665038e-1",
-          "arb_ball_str": "[-0.13 +/- 2.79e-3]"
+          "mid_float": -0.13151943841381078,
+          "rad_float_outward": 0.001258370330106122,
+          "lower_dec": "-1.327778087439168934426612105462371870791e-1",
+          "upper_dec": "-1.302610680837046579174107756707489058288e-1",
+          "arb_ball_str": "[-0.13 +/- 2.78e-3]"
         },
         "KL1_same_chain_interval_classification": {
           "verdict": "PASS",
@@ -6954,9 +6956,10 @@
         "tc063r_derived_kl1_interval_provenance": {
           "derivation_task_id": "TASK-TC-063R",
           "derivation_kind": "DERIVED_FROM_PRESERVED_TC063_BRANCH_ENCLOSURES_NO_NEW_QUADRATURE",
+          "quadrature_recomputation_performed": false,
           "retroactively_audited_in_original_tc063": false,
           "source_numerical_producing_git_commit": "767ff30dcd605e82f7d855fb0b86ee59919eceb8",
-          "tc063r_derivation_git_commit": "5a9b7ed25c777951d4069f8e87d3ea2ec086d371",
+          "tc063r_derivation_git_commit": "ed5e068faa666255c0746b7d2738f14d133bd2e3",
           "derived_branch_ball_count": 4,
           "derived_union_ball_count": 2
         }
@@ -7087,18 +7090,18 @@
               "domain_evidence_source": "EXACT_DYADIC_FRACTIONS"
             },
             "M_KL1_SAME": {
-              "mid_float": -0.0608,
-              "rad_float_outward": 0.000248500001816865,
-              "lower_dec": "-6.104850000181686482392251491546630859376e-2",
-              "upper_dec": "-6.055149999818313517607748508453369140623e-2",
-              "arb_ball_str": "[-0.061 +/- 4.49e-4]"
+              "mid_float": -0.060749533463138695,
+              "rad_float_outward": 0.00011444409688010714,
+              "lower_dec": "-6.086397756001880259148464046181478575307e-2",
+              "upper_dec": "-6.063508936625858984782979331673421934679e-2",
+              "arb_ball_str": "[-0.061 +/- 3.65e-4]"
             },
             "M_KL1_DIFF": {
-              "mid_float": -0.191,
-              "rad_float_outward": 0.0014415000059671034,
-              "lower_dec": "-1.924415000059671001508831977844238281251e-1",
-              "upper_dec": "-1.895584999940328998491168022155761718748e-1",
-              "arb_ball_str": "[-0.19 +/- 2.45e-3]"
+              "mid_float": -0.19081917501441772,
+              "rad_float_outward": 0.001068871719326135,
+              "lower_dec": "-1.918880467337438406178817198453215014525e-1",
+              "upper_dec": "-1.897503032950915897021159575162199389522e-1",
+              "arb_ball_str": "[-0.19 +/- 1.89e-3]"
             },
             "KL1_same_chain_branch_classification": {
               "verdict": "PASS",
@@ -7113,9 +7116,10 @@
             "tc063r_derived_kl1_provenance": {
               "derivation_task_id": "TASK-TC-063R",
               "derivation_kind": "DERIVED_FROM_PRESERVED_TC063_BRANCH_ENCLOSURES_NO_NEW_QUADRATURE",
+              "quadrature_recomputation_performed": false,
               "retroactively_audited_in_original_tc063": false,
               "source_numerical_producing_git_commit": "767ff30dcd605e82f7d855fb0b86ee59919eceb8",
-              "tc063r_derivation_git_commit": "5a9b7ed25c777951d4069f8e87d3ea2ec086d371",
+              "tc063r_derivation_git_commit": "ed5e068faa666255c0746b7d2738f14d133bd2e3",
               "candidate_domain_threshold_Y0": "64",
               "formulas": {
                 "M_KL1_SAME": "S_same_Y - (1/4) * log_Y_times_D_tilde (signed S_same_Y, not |S_same_Y|)",
@@ -7245,18 +7249,18 @@
               "domain_evidence_source": "EXACT_DYADIC_FRACTIONS"
             },
             "M_KL1_SAME": {
-              "mid_float": -0.062,
-              "rad_float_outward": 0.0015260000145644887,
-              "lower_dec": "-6.352600001456448808312416076660156250001e-2",
-              "upper_dec": "-6.047399998543551191687583923339843749998e-2",
-              "arb_ball_str": "[-0.06 +/- 3.53e-3]"
+              "mid_float": -0.060769009641295786,
+              "rad_float_outward": 0.0002924305981650845,
+              "lower_dec": "-6.106144023946087060995647706723891226213e-2",
+              "upper_dec": "-6.047657904313070418812582292295180288710e-2",
+              "arb_ball_str": "[-0.061 +/- 5.24e-4]"
             },
             "M_KL1_DIFF": {
-              "mid_float": -0.19,
-              "rad_float_outward": 0.008815000066533688,
-              "lower_dec": "-1.988150000665336847305297851562500000001e-1",
-              "upper_dec": "-1.811849999334663152694702148437499999998e-1",
-              "arb_ball_str": "[-0.19 +/- 8.82e-3]"
+              "mid_float": -0.1896066210071722,
+              "rad_float_outward": 0.0027606933945207904,
+              "lower_dec": "-1.923673144016929916803444994096316496523e-1",
+              "upper_dec": "-1.868459276126514203612412584428347746520e-1",
+              "arb_ball_str": "[-0.19 +/- 3.16e-3]"
             },
             "KL1_same_chain_branch_classification": {
               "verdict": "PASS",
@@ -7271,9 +7275,10 @@
             "tc063r_derived_kl1_provenance": {
               "derivation_task_id": "TASK-TC-063R",
               "derivation_kind": "DERIVED_FROM_PRESERVED_TC063_BRANCH_ENCLOSURES_NO_NEW_QUADRATURE",
+              "quadrature_recomputation_performed": false,
               "retroactively_audited_in_original_tc063": false,
               "source_numerical_producing_git_commit": "767ff30dcd605e82f7d855fb0b86ee59919eceb8",
-              "tc063r_derivation_git_commit": "5a9b7ed25c777951d4069f8e87d3ea2ec086d371",
+              "tc063r_derivation_git_commit": "ed5e068faa666255c0746b7d2738f14d133bd2e3",
               "candidate_domain_threshold_Y0": "64",
               "formulas": {
                 "M_KL1_SAME": "S_same_Y - (1/4) * log_Y_times_D_tilde (signed S_same_Y, not |S_same_Y|)",
@@ -7403,18 +7408,18 @@
               "domain_evidence_source": "EXACT_DYADIC_FRACTIONS"
             },
             "M_KL1_SAME": {
-              "mid_float": -0.0609,
-              "rad_float_outward": 0.00018095000109497327,
-              "lower_dec": "-6.108095000109497050289064645767211914064e-2",
-              "upper_dec": "-6.071904999890502949710935354232788085936e-2",
-              "arb_ball_str": "[-0.061 +/- 2.81e-4]"
+              "mid_float": -0.06080141608630061,
+              "rad_float_outward": 8.2166120478181e-05,
+              "lower_dec": "-6.088358220677879049699502152021797831430e-2",
+              "upper_dec": "-6.071924996582243526145564478453072245489e-2",
+              "arb_ball_str": "[-0.0608 +/- 8.36e-5]"
             },
             "M_KL1_DIFF": {
-              "mid_float": -0.187,
-              "rad_float_outward": 0.002469250015565195,
-              "lower_dec": "-1.894692500155651941895484924316406250001e-1",
-              "upper_dec": "-1.845307499844348058104515075683593749998e-1",
-              "arb_ball_str": "[-0.19 +/- 5.47e-3]"
+              "mid_float": -0.18824406560630302,
+              "rad_float_outward": 0.0007748628022454867,
+              "lower_dec": "-1.890189284085484962237427534671341793129e-1",
+              "upper_dec": "-1.874692028040575371382186712832962886876e-1",
+              "arb_ball_str": "[-0.19 +/- 2.54e-3]"
             },
             "KL1_same_chain_branch_classification": {
               "verdict": "PASS",
@@ -7429,9 +7434,10 @@
             "tc063r_derived_kl1_provenance": {
               "derivation_task_id": "TASK-TC-063R",
               "derivation_kind": "DERIVED_FROM_PRESERVED_TC063_BRANCH_ENCLOSURES_NO_NEW_QUADRATURE",
+              "quadrature_recomputation_performed": false,
               "retroactively_audited_in_original_tc063": false,
               "source_numerical_producing_git_commit": "767ff30dcd605e82f7d855fb0b86ee59919eceb8",
-              "tc063r_derivation_git_commit": "5a9b7ed25c777951d4069f8e87d3ea2ec086d371",
+              "tc063r_derivation_git_commit": "ed5e068faa666255c0746b7d2738f14d133bd2e3",
               "candidate_domain_threshold_Y0": "64",
               "formulas": {
                 "M_KL1_SAME": "S_same_Y - (1/4) * log_Y_times_D_tilde (signed S_same_Y, not |S_same_Y|)",
@@ -7529,18 +7535,18 @@
           "certified_definite": true
         },
         "union_M_KL1_SAME": {
-          "mid_float": -0.062,
-          "rad_float_outward": 0.0015260000182024675,
-          "lower_dec": "-6.352600001820246689021587371826171875001e-2",
-          "upper_dec": "-6.047399998179753310978412628173828124998e-2",
-          "arb_ball_str": "[-0.06 +/- 3.53e-3]"
+          "mid_float": -0.060769009641295786,
+          "rad_float_outward": 0.0002924305990745792,
+          "lower_dec": "-6.106144024037036531172940530515395132463e-2",
+          "upper_dec": "-6.047657904222120948635289468503676382460e-2",
+          "arb_ball_str": "[-0.061 +/- 5.24e-4]"
         },
         "union_M_KL1_DIFF": {
-          "mid_float": -0.19,
-          "rad_float_outward": 0.008815000095637519,
-          "lower_dec": "-1.988150000956375151872634887695312500001e-1",
-          "upper_dec": "-1.811849999043624848127365112304687499998e-1",
-          "arb_ball_str": "[-0.19 +/- 8.82e-3]"
+          "mid_float": -0.1896066210071722,
+          "rad_float_outward": 0.002760693401796748,
+          "lower_dec": "-1.923673144089689492945279253129519621523e-1",
+          "upper_dec": "-1.868459276053754627470578325395144621520e-1",
+          "arb_ball_str": "[-0.19 +/- 3.16e-3]"
         },
         "KL1_same_chain_interval_classification": {
           "verdict": "PASS",
@@ -7555,9 +7561,10 @@
         "tc063r_derived_kl1_interval_provenance": {
           "derivation_task_id": "TASK-TC-063R",
           "derivation_kind": "DERIVED_FROM_PRESERVED_TC063_BRANCH_ENCLOSURES_NO_NEW_QUADRATURE",
+          "quadrature_recomputation_performed": false,
           "retroactively_audited_in_original_tc063": false,
           "source_numerical_producing_git_commit": "767ff30dcd605e82f7d855fb0b86ee59919eceb8",
-          "tc063r_derivation_git_commit": "5a9b7ed25c777951d4069f8e87d3ea2ec086d371",
+          "tc063r_derivation_git_commit": "ed5e068faa666255c0746b7d2738f14d133bd2e3",
           "derived_branch_ball_count": 6,
           "derived_union_ball_count": 2
         }
