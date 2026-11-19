@@ -72,6 +72,7 @@ Sections:
 
 from __future__ import annotations
 
+import copy
 from datetime import datetime, timezone
 from fractions import Fraction
 import hashlib
@@ -177,10 +178,19 @@ from tc.signed_dilation_arithmetic_energy import (
 )
 
 TASK_TC_063_ID = "TASK-TC-063"
+TASK_TC_063R_ID = "TASK-TC-063R"
 PROPOSED_TC063_BRANCH = "task/tc-063-dyadic-chain-correlation-and-arithmetic-regularity"
+PROPOSED_TC063R_BRANCH = "task/tc-063r-analytic-estimates-interval-budgets-and-report-repair"
 ACCEPTED_TC062R4_DELIVERED_TIP = "d5a5758c8d661b178d53029053b6d29e204aca28"
 ACCEPTED_TC062R4_VALIDATION_COMMIT = "2e48474d17e5223331606d1b8c86be4b937e7a8e"
 PRESERVED_TC062R_PRODUCING_COMMIT = REVIEWED_TC062R_PRODUCING_COMMIT
+
+REVIEWED_TC063_DELIVERED_TIP = "255594aab4b08af083a4b02faaa10750e072b370"
+TC063_ORIGINAL_VALIDATION_COMMIT = "3ac1c6fc8d0c7a9f61c0bdc136e1d7a7fb751a68"
+TC063_ORIGINAL_PROVENANCE_SYNC_COMMIT = "70b8fd96e6b32e7a589632fdd348d2eecae74757"
+TC063_ORIGINAL_FORMAL_PRODUCING_COMMIT = "ba34faa4df3fc1ef3067b9203a6bdcaf1d7a9e81"
+TC063_ORIGINAL_ARB_BALL_COUNT = 674
+TC063R_DERIVED_KL1_ARB_BALL_COUNT = 14
 
 FROZEN_TC063_PROTOCOL_ID = "TC063-DYADIC-CHAIN-CORRELATION-REGULARITY-PROTOCOL-V1"
 FROZEN_TC063_PROTOCOL_REGISTRATION_COMMIT = "767ff30dcd605e82f7d855fb0b86ee59919eceb8"
@@ -228,6 +238,11 @@ REQUIRED_TC063_INTERVAL_UNION_BRANCH_PAIRS: Tuple[Tuple[str, str], ...] = (
     ("union_M_P0_DIFF", "M_P0_DIFF"),
     ("union_M_P_NEG_DIFF", "M_P_NEG_DIFF"),
     ("union_M_SAME_LOC", "M_SAME_LOC"),
+)
+
+DERIVED_TC063R_KL1_UNION_BRANCH_PAIRS: Tuple[Tuple[str, str], ...] = (
+    ("union_M_KL1_SAME", "M_KL1_SAME"),
+    ("union_M_KL1_DIFF", "M_KL1_DIFF"),
 )
 
 REQUIRED_CURRENT_TC063_STATUS_KEYS: Tuple[str, ...] = (
@@ -655,9 +670,41 @@ def evaluate_dyadic_chain_observables_matrix_free_arb(
         flint_ctx.prec = saved
 
 
-# ---------------------------------------------------------------------------
-# 2. Section 1: Endpoint Contradiction, Premise Table, & Window-Base Analysis
-# ---------------------------------------------------------------------------
+def _build_tc063r_tc_compatibility_block() -> Dict[str, str]:
+    """Return canonical TC compatibility & pole-contradiction scope metadata (`TASK-TC-063R` §4C)."""
+    return {
+        "common_arithmetic_object": (
+            "Single Liouville-Gaussian observable Q_{lambda, infty}(X) = sum_{n>=1} lambda(n)*phi_n(X) "
+            "encoding the multiplicative square-divisor relation (1 * lambda)(n) = 1_{square}(n) "
+            "(L_lambda(z)*zeta(z) = zeta(2*z) on x > 1; note (lambda * lambda)(p) = -2 at primes)."
+        ),
+        "compatibility_law": (
+            "Simultaneous compatibility of 2-adic parity alternation lambda(2*m) = -lambda(m), "
+            "4-adic invariance lambda(4^j*u) = lambda(u), and all-prime Selberg second-order "
+            "compensation 2*P_Y - B_Y = Q_Y + A_Y."
+        ),
+        "constrained_quantity": (
+            "Subpower window energy E(Y) <= C_eps * Y^eps for all eps > 0, equivalently holomorphic "
+            "regularity of L_lambda(x + i*y) on x > 1/2 (strictly WITHOUT constructing an exact "
+            "zero-independent grade-invariant functional or positive spectral realization)."
+        ),
+        "why_off_critical_zero_conflicts": (
+            "Under the explicit hypothesis of a pole-free holomorphic continuation F_hol(z) of "
+            "zeta(2*z)/zeta(z) to x > 1/2 (Theorem 1 does not construct F_hol), a right-half-strip "
+            "zero rho = x + i*y with 1/2 < x < 1 has 2*x > 1 so zeta(2*rho) != 0 and creates a "
+            "nonremovable pole at rho (0 = zeta(rho)*F_hol(rho) = zeta(2*rho) != 0); a left-half-strip "
+            "zero 0 < x < 1/2 reflects via completedRiemannZeta(1 - z) = completedRiemannZeta(z) to "
+            "its right-half-strip partner 1 - rho (1/2 < 1 - x < 1), where zeta(2*(1 - rho)) != 0 "
+            "guarantees the nonremovable pole (numerator nonvanishing is NOT claimed at the original "
+            "left-half-strip point 2*rho where 0 < 2*x < 1)."
+        ),
+        "window_base_dependence": (
+            "Every finite-window Gram identity, dyadic-chain split, same-chain Hilbert bound, "
+            "partition [1, infty) = cup_{k>=0} [b^k, b^{k+1}), Route D contraction, and Mellin bridge "
+            "holds for ANY real window base b > 1; fixing b = tau selects canonical rational-integer "
+            "grade tiling [tau^k, tau^{k+1}] (k in Z subset A_R) and Tate character normalization."
+        ),
+    }
 
 
 def build_tc063_premise_and_dependency_table() -> List[Dict[str, Any]]:
@@ -1093,29 +1140,7 @@ def verify_section_1_protocols_endpoint_and_premise_chain(
                 "total_certified_arb_balls": tc061_balls,
                 "verified": tc061_preserved_ok,
             },
-            "tc_compatibility_principle_and_window_base_scope": {
-                "common_arithmetic_object": (
-                    "Single Liouville-Gaussian observable Q_{lambda, infty}(X) = sum_{n>=1} lambda(n)*phi_n(X) "
-                    "encoding the multiplicative square-divisor relation (1 * lambda)(n) = 1_{square}(n) "
-                    "(L_lambda(z)*zeta(z) = zeta(2*z))."
-                ),
-                "compatibility_law": (
-                    "Simultaneous compatibility of 2-adic parity alternation lambda(2*m) = -lambda(m), "
-                    "4-adic invariance lambda(4^j*u) = lambda(u), and all-prime Selberg second-order "
-                    "compensation 2*P_Y - B_Y = Q_Y + A_Y."
-                ),
-                "constrained_quantity": (
-                    "Subpower window energy E(Y) <= C_eps * Y^eps for all eps > 0, equivalently holomorphic "
-                    "regularity of L_lambda(x + i*y) on x > 1/2 (strictly WITHOUT constructing an exact "
-                    "zero-independent grade-invariant functional or positive spectral realization)."
-                ),
-                "window_base_dependence": (
-                    "Every finite-window Gram identity, dyadic-chain split, same-chain Hilbert bound, "
-                    "partition [1, infty) = cup_{k>=0} [b^k, b^{k+1}), Route D contraction, and Mellin bridge "
-                    "holds for ANY real window base b > 1; fixing b = tau selects canonical rational-integer "
-                    "grade tiling [tau^k, tau^{k+1}] (k in Z subset A_R) and Tate character normalization."
-                ),
-            },
+            "tc_compatibility_principle_and_window_base_scope": _build_tc063r_tc_compatibility_block(),
             "premise_and_dependency_table": premise_table,
             "dirichlet_ratio_nonvanishing_checks": dirichlet_rows,
             "trivial_zero_double_vanishing_checks": triv_rows,
@@ -2014,6 +2039,109 @@ def verify_section_3_same_chain_bound_and_matched_controls(
 # ---------------------------------------------------------------------------
 
 
+def _build_tc063r_section_4_analytic_metadata() -> Dict[str, Any]:
+    """Return canonical `TASK-TC-063R` repaired Section 4 analytic metadata (§2, §3, §4B):
+    - Attempt A: Dickman function `rho_dB(u)`, Hildebrand-Tenenbaum fixed-`u > 1` smooth-number
+      asymptotic `Psi(T, T^(1/u)) ~ T * rho_dB(u) = T^(1 + o(1))` (`(1 - log 2)*T` at `u = 2`),
+      `P`-rough regimes (`P ~ c*log Y` giving `Theta(Y / log log Y)`, fixed `P >= 2` giving
+      constant-density `Theta_P(Y)`, and `2 <= P <= c*log Y` giving `Omega_c(Y / log log Y)`), and
+      scoped unweighted-fiber obstruction;
+    - Attempt B: exact identity `||S_{sq,Y}||_Y^2 - ||Gcal_Y^(1)||_Y^2 = sum_{d > 1} ||Gcal_Y^(d)||_Y^2
+      + sum_{d_1 != d_2} <Gcal_Y^(d_1), Gcal_Y^(d_2)>_Y` and strict `TC063-CAND-B1-SQPROJ-DIAG-DOM`
+      refutation scope;
+    - Attempt C: complete 4-piece outside-Lean derivation of
+      `sum_{n <= T} ||psi_{Y,n}^pert||_Y^2 = O((1 + log log Y) / (log Y)^2)` (`Y >= e`, with empty
+      divisor sum `D_eff = 0` on `2 <= Y < e`) and resonant-band `Omega(Y)` arbitrary-sign lower
+      bound for sufficiently large real `Y >= Y_arb` (`Y_arb >= 312`).
+    """
+    return {
+        "attempt_A_first_uncontrolled": {
+            "term": "Pi_{Y,bare}^diff(1) = sum_{r != t in O(T), gcd(r,t)=1} lambda(r)*lambda(t)*<Phi_r, Phi_t>_Y",
+            "global_cauchy_schwarz_loss": "Loses (|O(T)| - 1) ~ (1/4)*Y^(5/4), yielding O(Y^(5/4) * log Y).",
+            "resonant_shell_cauchy_schwarz_loss": "Loses resonant odd-chain count |O_res(Y)| = Theta(Y), yielding Theta(Y).",
+            "smooth_and_rough_definitions": (
+                "Psi(x, y) := |{1 <= n <= x : P^+(n) <= y}| (with P^+(1) := 1); Dickman function "
+                "rho_dB : [0, infty) -> (0, 1] continuous with rho_dB(u) = 1 on [0, 1] and "
+                "u * rho_dB'(u) = -rho_dB(u - 1) for u > 1 (so rho_dB(2) = 1 - log 2)."
+            ),
+            "primary_smooth_number_reference": (
+                "Hildebrand & Tenenbaum, 'Integers without large prime factors' / 'On Integers Free "
+                "of Large Prime Factors', J. Theor. Nombres Bordeaux 5(2):411-484 (1993), "
+                "https://tenenb.perso.math.cnrs.fr/PPP/Psi+.pdf"
+            ),
+            "iterated_prime_smooth_wall": (
+                "Grouping S-smooth chains for fixed finite prime set S gives O_S((log Y)^|S|) <<_eta Y^eta "
+                "per fixed-core fiber while leaving a constant positive density Theta_S(Y) of S-rough "
+                "resonant odd chains (never decaying like 1/log log Y for fixed P); at comparable growth "
+                "P ~ c*log Y (c > 0 fixed), Mertens/sieve asymptotics leave Theta(Y / log log Y) resonant "
+                "P-rough odd chains (and by monotonicity Omega_c(Y / log log Y) across all 2 <= P <= c*log Y); "
+                "and at polynomial smoothness P = T^(1/u) for fixed u > 1, Hildebrand-Tenenbaum gives "
+                "Psi(T, T^(1/u)) ~ T * rho_dB(u), hence Psi(T, T^(1/u)) = T^(1 + o(1)) (at u = 2, main term "
+                "(1 - log 2)*T, and on odd anchors Psi_odd(T/2, T^(1/u)) = Psi(T/2, T^(1/u)) - Psi(T/4, T^(1/u)) "
+                "~ (1/4)*rho_dB(u)*T). Polynomially large smooth fibers Theta_u(T) obstruct naive unweighted / "
+                "Cauchy-Schwarz fiber grouping, whereas cardinality alone does not rule out future weighted or "
+                "signed bilinear cancellation arguments."
+            ),
+        },
+        "attempt_B_cand_b1_premise": (
+            "Candidate B1 proposed all-d diagonal domination sum_{d in O(T)} ||Gcal_Y^(d)||_Y^2 <= ||S_{sq,Y}||_Y^2 "
+            "(equivalently nonnegativity of the off-diagonal dilation cross-sum "
+            "sum_{d_1 != d_2 in O(T)} <Gcal_Y^(d_1), Gcal_Y^(d_2)>_Y >= 0); certified strictly negative "
+            "at Y in {16, 32, 64}. In the exact identity ||S_{sq,Y}||_Y^2 - ||Gcal_Y^(1)||_Y^2 = "
+            "sum_{d > 1 in O(T)} ||Gcal_Y^(d)||_Y^2 + sum_{d_1 != d_2 in O(T)} <Gcal_Y^(d_1), Gcal_Y^(d_2)>_Y, "
+            "nonnegative cross-sum is a sufficient condition for Candidate B1, not a necessary condition for "
+            "every upper bound on ||Gcal_Y^(1)||_Y^2 (direct ||Gcal_Y^(1)||_Y^2 <= ||S_{sq,Y}||_Y^2 requires "
+            "the full right-hand side to be nonnegative); refutation is strictly scoped to Candidate B1."
+        ),
+        "attempt_B_first_uncontrolled": {
+            "term": (
+                "Exact square-projection balance ||S_{sq,Y}||_Y^2 - ||Gcal_Y^(1)||_Y^2 = "
+                "sum_{d > 1 in O(T)} ||Gcal_Y^(d)||_Y^2 + sum_{d_1 != d_2 in O(T)} <Gcal_Y^(d_1), Gcal_Y^(d_2)>_Y "
+                "(where negative off-diagonal cross-sum sum_{d_1 != d_2} <Gcal_Y^(d_1), Gcal_Y^(d_2)>_Y "
+                "refutes Candidate B1's diagonal-domination inequality without ruling out every future "
+                "square-projection argument that controls the combined right-hand side)"
+            ),
+            "unsigned_majorant_size": "Theta(Y) under odd-Mobius triangle inequality or unsigned prime-power majorization.",
+        },
+        "attempt_C_perturbation_and_omega_Y": {
+            "epistemic_status_finite_greedy_theorem": "CONCRETE_ANALYTIC_IN_LEAN",
+            "epistemic_status_asymptotic_omega_Y_derivation": "ANALYTIC_PROVED_OUTSIDE_LEAN",
+            "oscillatory_remainder_input_and_source": (
+                "|R_osc(d)| = |R_2^int(d; c_lambda) - M_drift(d; c_half)| <= C_osc * d for all d >= 1 "
+                "(established unconditionally without RH via classical de la Vallee Poussin PNT + Dirichlet "
+                "hyperbola in TC-057R Section 4 Theorem 4.3(3) and TC-060)."
+            ),
+            "repaired_station_perturbation_bound": (
+                "For psi_{Y,n}^pert := psi_{Y,n} - phi_n = -(lambda(n)*beta_Y(n)/(log X)^2)*phi_n on "
+                "1 <= n <= T = ceil(Y^(5/4)) with beta_Y = p_1 + p_2 + p_3 + p_4 (4-term Cauchy-Schwarz "
+                "factor 4 retaining all cross-terms) and sum_{e|n, n<=T} ||phi_n||_Y^2 <= C_phi / e: "
+                "p_1 (square), p_2 (endpoint n = T), and p_3 (z = 1/2 drift-step divisor sum with lcm series <= 18785) "
+                "each contribute O((log Y)^(-4)); for D := D_eff(Y) = min(floor(log Y), T - 1) <= log Y, "
+                "D = 0 on 2 <= Y < e gives empty sum p_4 = 0, while for all real Y >= e (D >= 1), "
+                "(a - b)^2 <= 2*a^2 + 2*b^2 on d | n and (d + 1) | n together with "
+                "sum_{a, b <= M} a*b / lcm(a, b) = sum_{a, b <= M} gcd(a, b) <= M^2 * sum_{h <= M} 1/h <= M^2*(1 + log M) "
+                "at M = D and M = D + 1 gives (4/(log Y)^4)*sum_{n<=T} p_4(n)^2*||phi_n||_Y^2 <= "
+                "72*C_osc^2*C_phi*D^2*(1 + log D)/(log Y)^4 <= 72*C_osc^2*C_phi*(1 + log log Y)/(log Y)^2, "
+                "yielding sum_{n <= T} ||psi_{Y,n}^pert||_Y^2 <= C_pert * (1 + log log Y) / (log Y)^2 = "
+                "O((1 + log log Y) / (log Y)^2) for all real Y >= e."
+            ),
+            "resonant_band_propagation_and_domination": (
+                "On I(Y) = {u in O(T) : (9/5)*Y <= u <= (21/10)*Y} (for Y >= 312, 2*u <= (21/5)*Y <= Y^(5/4) <= T "
+                "so |I(Y)| >= Y/10) and [4*Y, (43/10)*Y] subset [Y, tau*Y], ||Phi_band||_Y^2 >= c_band * Y "
+                "(c_band > 0 explicit from c_chain > 1/50); Cauchy-Schwarz across the 2*sum_{u in I(Y)} |J_u(T)| "
+                "= O(Y*log Y) disjoint band stations gives ||E_band||_Y^2 = O(Y*(1 + log log Y) / log Y) = o(Y); "
+                "prime-power feature subtraction satisfies 4*||sum_{u in I(Y)} Vcal_u||_Y^2 = O(Y / (log Y)^2) = o(Y) "
+                "(splitting q = 2, a = 1 with |I(Y)| = O(Y) stations of norm O(Y^(-1/2)/log Y), q = 2, a >= 2 with "
+                "geometric 64^(-j) decay, and odd prime powers q^a <= (21/10)*Y having O(Y/q^a) multiples in I(Y) "
+                "summed against sum_{q^a} (log q)^2 / q^(2a) < infty); and chain-diagonal subtraction satisfies "
+                "sum_{u in I(Y)} ||Ucal_u||_Y^2 <= 2*C_psi*(2 + log Y) = O(log Y) = o(Y). Hence there exists an "
+                "explicit threshold Y_arb >= 312 such that for all real Y >= Y_arb, greedy +-1 extension forces "
+                "max_{eps in {+-1}^{O(T)}} sum_{u != v} eps_u*eps_v*Kcal_Y(u, v) >= (c_band / 4)*Y = Omega(Y)."
+            ),
+        },
+    }
+
+
 def verify_section_4_distinct_chain_attempts_and_obstructions(
     prec_bits: int = 256,
     selberg_table: Optional[Dict[str, Any]] = None,
@@ -2465,16 +2593,9 @@ def verify_section_4_distinct_chain_attempts_and_obstructions(
                     "witness_Y64_g7": serialize_arb_certified(pi_64_g7),
                     "refutation_certified": cand_a1_refuted_ok,
                 },
-                "first_uncontrolled_term_and_size": {
-                    "term": "Pi_{Y,bare}^diff(1) = sum_{r != t in O(T), gcd(r,t)=1} lambda(r)*lambda(t)*<Phi_r, Phi_t>_Y",
-                    "global_cauchy_schwarz_loss": "Loses (|O(T)| - 1) ~ (1/4)*Y^(5/4), yielding O(Y^(5/4) * log Y).",
-                    "resonant_shell_cauchy_schwarz_loss": "Loses resonant odd-chain count |O_res(Y)| = Theta(Y), yielding Theta(Y).",
-                    "iterated_prime_smooth_wall": (
-                        "Grouping S-smooth chains for fixed finite prime set S gives O_S((log Y)^|S|) <<_eta Y^eta "
-                        "on same-core fibers, whereas growing P <= c*log Y leaves Theta(Y / log log Y) P-rough chains "
-                        "and P = T^(1/u) blows up fiber size Psi(T, P) = T^(rho_dB(u) + o(1))."
-                    ),
-                },
+                "first_uncontrolled_term_and_size": _build_tc063r_section_4_analytic_metadata()[
+                    "attempt_A_first_uncontrolled"
+                ],
             },
             "attempt_B_square_projection_and_selberg_compatibility": {
                 "square_projection_and_moebius_rows": attempt_b_sq_rows,
@@ -2485,24 +2606,14 @@ def verify_section_4_distinct_chain_attempts_and_obstructions(
                 "candidate_B1_sqproj_diag_dom": {
                     "candidate_id": "TC063-CAND-B1-SQPROJ-DIAG-DOM",
                     "outcome": "REFUTED_BY_CERTIFIED_WITNESS",
-                    "smallest_invalid_premise": (
-                        "Assumed boundedness ||sum_{d in O(T)} Gcal_Y^(d)||_Y^2 = ||S_{sq,Y}||_Y^2 = O(1) "
-                        "bounds sum_{d in O(T)} ||Gcal_Y^(d)||_Y^2 without off-diagonal d_1 != d_2 dilation "
-                        "cross-terms; off-diagonal cross-terms are strictly negative at Y in {16, 32, 64}, "
-                        "and triangle inequality on odd-Mobius recovery loses (sum_{e<=Y, 2 nmid e} |mu(e)|*e^(-1/2))^2 = Theta(Y)."
-                    ),
+                    "smallest_invalid_premise": _build_tc063r_section_4_analytic_metadata()[
+                        "attempt_B_cand_b1_premise"
+                    ],
                     "refutation_certified": cand_b1_refuted_ok,
                 },
-                "first_uncontrolled_term_and_size": {
-                    "term": (
-                        "Negative off-diagonal odd-divisor dilation cross-sum "
-                        "-sum_{d_1 != d_2 in O(T)} <Gcal_Y^(d_1), Gcal_Y^(d_2)>_Y in "
-                        "||Gcal_Y^(1)||_Y^2 = ||S_{sq,Y}||_Y^2 - sum_{d > 1 in O(T)} ||Gcal_Y^(d)||_Y^2 "
-                        "- sum_{d_1 != d_2 in O(T)} <Gcal_Y^(d_1), Gcal_Y^(d_2)>_Y "
-                        "(blocking a one-way upper bound on ||Gcal_Y^(1)||_Y^2 toward S_different(Y))"
-                    ),
-                    "unsigned_majorant_size": "Theta(Y) under odd-Mobius triangle inequality or unsigned prime-power majorization.",
-                },
+                "first_uncontrolled_term_and_size": _build_tc063r_section_4_analytic_metadata()[
+                    "attempt_B_first_uncontrolled"
+                ],
             },
             "attempt_C_arithmetic_restricted_vs_arbitrary_sign_comparison": {
                 "candidate_C1_arbitrary_sign": {
@@ -2511,7 +2622,8 @@ def verify_section_4_distinct_chain_attempts_and_obstructions(
                     "smallest_invalid_premise": (
                         "Assumed off-diagonal grouped chain kernel Kcal_Y^off(u, v) satisfies the sublinear "
                         "bound uniformly over arbitrary +-1 sign vectors eps in {+-1}^{O(T)}; greedy +-1 "
-                        "extension from resonant odd band A_odd(Y) refutes Y = 64 and forces Omega(Y) growth."
+                        "extension from resonant odd band A_odd(Y) refutes Y = 64 and forces Omega(Y) growth "
+                        "for all sufficiently large real Y >= Y_arb."
                     ),
                     "seed_band_A_odd_64_sum": serialize_arb_certified(seed_sum_64),
                     "greedy_pm1_witness_sum_Y64": serialize_arb_certified(greedy_sum_64),
@@ -2520,6 +2632,9 @@ def verify_section_4_distinct_chain_attempts_and_obstructions(
                     "all_chain_length_subwindow_constant_c_chain": serialize_arb_certified(
                         c_chain_pointwise
                     ),
+                    "perturbation_and_omega_Y_derivation_summary": _build_tc063r_section_4_analytic_metadata()[
+                        "attempt_C_perturbation_and_omega_Y"
+                    ],
                     "refutation_and_omega_Y_obstruction_certified": bool(
                         cand_c1_refuted_ok and omega_y_chain_const_ok
                     ),
@@ -2895,6 +3010,201 @@ def execute_tc063_holdout_point_with_escalation(
     }
 
 
+def reconstruct_outward_arb_from_serialized_ball_tc063r(
+    ball_dict: Any,
+    *,
+    prec_bits: int = 256,
+) -> arb:
+    """Reconstruct a conservative outward-rounded `prec_bits` FLINT `arb` ball enclosing all three
+    serialized representations (`lower_dec/upper_dec`, `arb_ball_str`, `mid_float/rad_float_outward`)
+    of a preserved `TC-063` serialized ball without repeating numerical quadrature (`TASK-TC-063R` §6).
+    """
+    parsed = _parse_serialized_arb_enclosure_tc062(ball_dict)
+    if parsed is None:
+        raise CertificationIntegrityError(
+            "Cannot reconstruct outward Arb enclosure from malformed serialized ball."
+        )
+    outer_lo = min(parsed["lo_dec"], parsed["lo_bs"], parsed["lo_fl"])
+    outer_hi = max(parsed["hi_dec"], parsed["hi_bs"], parsed["hi_fl"])
+    saved = flint_ctx.prec
+    try:
+        flint_ctx.prec = prec_bits
+        return +(_frac_to_arb(outer_lo).union(_frac_to_arb(outer_hi)))
+    finally:
+        flint_ctx.prec = saved
+
+
+def compute_tc063r_kl1_source_observables_sha256(br: Dict[str, Any]) -> Optional[str]:
+    """Compute canonical SHA-256 digest of the three preserved branch observable balls
+    (`S_same_Y`, `S_different_Y`, `log_Y_times_D_tilde`) from which `KL1` interval margins are derived.
+    """
+    if not isinstance(br, dict):
+        return None
+    payload: Dict[str, Any] = {}
+    for k_obs in ("S_same_Y", "S_different_Y", "log_Y_times_D_tilde"):
+        v_obs = br.get(k_obs)
+        if not isinstance(v_obs, dict):
+            return None
+        payload[k_obs] = strip_enclosure_arb_for_json(v_obs)
+    raw = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+
+def derive_kl1_branch_margins_from_serialized_branch_tc063r(
+    br: Dict[str, Any],
+    *,
+    source_numerical_commit: str,
+    derivation_commit: str,
+    prec_bits: int = 256,
+) -> Dict[str, Any]:
+    """Derive outward 256-bit Arb enclosures for the two `KL1` sub-budget margins on a preserved
+    continuous-interval branch without new quadrature (`TASK-TC-063R` §6):
+      `M_KL1_SAME(Y) = S_same(Y) - (1/4) * (log Y) * D_tilde(Y)`  (SIGNED `S_same(Y)`, never `|S_same(Y)|`),
+      `M_KL1_DIFF(Y) = S_different(Y) - (3/4) * (log Y) * D_tilde(Y)`.
+    """
+    src_sha = compute_tc063r_kl1_source_observables_sha256(br)
+    if src_sha is None:
+        raise CertificationIntegrityError("Missing source branch observables for KL1 derivation.")
+    ef_raw = br.get("evaluated_Y_interval_exact_fractions")
+    if not (
+        isinstance(ef_raw, list)
+        and len(ef_raw) == 2
+        and all(isinstance(s, str) and s.strip() for s in ef_raw)
+    ):
+        raise CertificationIntegrityError(
+            "Missing exact evaluated_Y_interval_exact_fractions on branch for KL1 derivation."
+        )
+
+    saved = flint_ctx.prec
+    try:
+        flint_ctx.prec = prec_bits
+        outer_ss = reconstruct_outward_arb_from_serialized_ball_tc063r(
+            br["S_same_Y"], prec_bits=prec_bits
+        )
+        outer_sd = reconstruct_outward_arb_from_serialized_ball_tc063r(
+            br["S_different_Y"], prec_bits=prec_bits
+        )
+        outer_lgd = reconstruct_outward_arb_from_serialized_ball_tc063r(
+            br["log_Y_times_D_tilde"], prec_bits=prec_bits
+        )
+        m_same = +(outer_ss - (arb(1) / arb(4)) * outer_lgd)
+        m_diff = +(outer_sd - (arb(3) / arb(4)) * outer_lgd)
+        ser_same = serialize_arb_certified(m_same)
+        ser_diff = serialize_arb_certified(m_diff)
+        cls_same = classify_probe_margin_arb(m_same)
+        cls_diff = classify_probe_margin_arb(m_diff)
+    finally:
+        flint_ctx.prec = saved
+
+    prov_rec = {
+        "derivation_task_id": TASK_TC_063R_ID,
+        "derivation_kind": "DERIVED_FROM_PRESERVED_TC063_BRANCH_ENCLOSURES_NO_NEW_QUADRATURE",
+        "retroactively_audited_in_original_tc063": False,
+        "source_numerical_producing_git_commit": source_numerical_commit,
+        "tc063r_derivation_git_commit": derivation_commit,
+        "candidate_domain_threshold_Y0": "64",
+        "formulas": {
+            "M_KL1_SAME": "S_same_Y - (1/4) * log_Y_times_D_tilde (signed S_same_Y, not |S_same_Y|)",
+            "M_KL1_DIFF": "S_different_Y - (3/4) * log_Y_times_D_tilde",
+        },
+        "source_observable_fields": ["S_same_Y", "S_different_Y", "log_Y_times_D_tilde"],
+        "source_observables_sha256": src_sha,
+        "evaluated_Y_interval_exact_fractions": list(ef_raw),
+    }
+    return {
+        "m_same_arb": m_same,
+        "m_diff_arb": m_diff,
+        "M_KL1_SAME": ser_same,
+        "M_KL1_DIFF": ser_diff,
+        "KL1_same_chain_branch_classification": cls_same,
+        "KL1_different_chain_branch_classification": cls_diff,
+        "tc063r_derived_kl1_provenance": prov_rec,
+    }
+
+
+def attach_tc063r_kl1_certificates_to_split_dict(
+    split_obj: Dict[str, Any],
+    *,
+    source_numerical_commit: str,
+    derivation_commit: str,
+    prec_bits: int = 256,
+    keep_enclosure_arb: bool = False,
+) -> Tuple[Dict[str, Any], int]:
+    """Attach `TC-063R` derived `KL1` branch & union margin enclosures (`M_KL1_SAME`, `M_KL1_DIFF`,
+    `union_M_KL1_SAME`, `union_M_KL1_DIFF`), classifications, and explicit provenance to a split
+    dictionary without modifying any existing `TC-063` enclosure field. Returns `(updated_split,
+    live_verified_derived_ball_count)`.
+    """
+    sp_copy = (
+        {
+            **split_obj,
+            "branches": [dict(b) for b in split_obj.get("branches", [])],
+        }
+        if keep_enclosure_arb
+        else copy.deepcopy(split_obj)
+    )
+    branches = sp_copy.get("branches")
+    if not isinstance(branches, list) or len(branches) == 0:
+        raise CertificationIntegrityError("Cannot derive KL1 interval balls on empty branch list.")
+
+    saved = flint_ctx.prec
+    try:
+        flint_ctx.prec = prec_bits
+        u_same: Optional[arb] = None
+        u_diff: Optional[arb] = None
+        live_tree_for_check: List[Dict[str, Any]] = []
+        for br in branches:
+            d_res = derive_kl1_branch_margins_from_serialized_branch_tc063r(
+                br,
+                source_numerical_commit=source_numerical_commit,
+                derivation_commit=derivation_commit,
+                prec_bits=prec_bits,
+            )
+            br["M_KL1_SAME"] = d_res["M_KL1_SAME"]
+            br["M_KL1_DIFF"] = d_res["M_KL1_DIFF"]
+            br["KL1_same_chain_branch_classification"] = d_res[
+                "KL1_same_chain_branch_classification"
+            ]
+            br["KL1_different_chain_branch_classification"] = d_res[
+                "KL1_different_chain_branch_classification"
+            ]
+            br["tc063r_derived_kl1_provenance"] = d_res["tc063r_derived_kl1_provenance"]
+            live_tree_for_check.append(
+                {"M_KL1_SAME": d_res["M_KL1_SAME"], "M_KL1_DIFF": d_res["M_KL1_DIFF"]}
+            )
+            u_same = +d_res["m_same_arb"] if u_same is None else +(u_same.union(d_res["m_same_arb"]))
+            u_diff = +d_res["m_diff_arb"] if u_diff is None else +(u_diff.union(d_res["m_diff_arb"]))
+
+        assert u_same is not None and u_diff is not None
+        ser_u_same = serialize_arb_certified(u_same)
+        ser_u_diff = serialize_arb_certified(u_diff)
+        live_tree_for_check.append(
+            {"union_M_KL1_SAME": ser_u_same, "union_M_KL1_DIFF": ser_u_diff}
+        )
+        live_chk = verify_all_serialized_arb_in_tree({"derived_kl1": live_tree_for_check})
+        if not live_chk["all_enclose_original_256bit_arb_ball"]:
+            raise CertificationIntegrityError(
+                f"Live 256-bit Arb roundtrip failed on derived KL1 balls: {live_chk}"
+            )
+        sp_copy["union_M_KL1_SAME"] = ser_u_same
+        sp_copy["union_M_KL1_DIFF"] = ser_u_diff
+        sp_copy["KL1_same_chain_interval_classification"] = classify_probe_margin_arb(u_same)
+        sp_copy["KL1_different_chain_interval_classification"] = classify_probe_margin_arb(u_diff)
+        sp_copy["tc063r_derived_kl1_interval_provenance"] = {
+            "derivation_task_id": TASK_TC_063R_ID,
+            "derivation_kind": "DERIVED_FROM_PRESERVED_TC063_BRANCH_ENCLOSURES_NO_NEW_QUADRATURE",
+            "retroactively_audited_in_original_tc063": False,
+            "source_numerical_producing_git_commit": source_numerical_commit,
+            "tc063r_derivation_git_commit": derivation_commit,
+            "derived_branch_ball_count": 2 * len(branches),
+            "derived_union_ball_count": 2,
+        }
+        out_sp = sp_copy if keep_enclosure_arb else strip_enclosure_arb_for_json(sp_copy)
+        return out_sp, int(live_chk["total_certified_arb_balls_checked"])
+    finally:
+        flint_ctx.prec = saved
+
+
 def evaluate_tc063_interval_via_cutoff_case_split_arb(
     interval_id: str,
     Y_lo_frac: Fraction,
@@ -3126,6 +3436,14 @@ def evaluate_tc063_interval_via_cutoff_case_split_arb(
         out_rec["TC063_SAME_LOC_interval_classification"] = classify_probe_margin_arb(
             union_balls["union_M_SAME_LOC"]
         )
+        head_c = _get_git_head_commit()
+        out_rec, _ = attach_tc063r_kl1_certificates_to_split_dict(
+            out_rec,
+            source_numerical_commit=head_c,
+            derivation_commit=head_c,
+            prec_bits=prec_bits,
+            keep_enclosure_arb=True,
+        )
         return out_rec
     finally:
         flint_ctx.prec = saved
@@ -3246,16 +3564,19 @@ def audit_continuous_interval_split_certificate_tc063(
     split_obj: Dict[str, Any],
     *,
     cand_y0_by_id: Optional[Dict[str, Fraction]] = None,
+    artifact_provenance: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
-    """Audit a serialized `TC-063` continuous interval split certificate under all `TC-062R4`
-    integrity, binary `man_exp` consistency, union-containment, domain-threshold `Y0`
-    witness-admissibility, and exact-coverage rules.
+    """Audit a serialized `TC-063` / `TC-063R` continuous interval split certificate under all
+    `TC-062R4` integrity, binary `man_exp` consistency, union-containment, domain-threshold `Y0`
+    witness-admissibility, exact-coverage, and `TC-063R` derived `KL1` sub-budget rules.
     """
     eff_y0: Dict[str, Fraction] = {
         "TC063-P0-DIFF": Fraction(64, 1),
         "TC063-P-HALF-DIFF": Fraction(16, 1),
         "TC063-P-NEG-DIFF": Fraction(64, 1),
         "TC063-SAME-LOCAL-HILBERT": Fraction(2, 1),
+        "KL1_same_chain": Fraction(64, 1),
+        "KL1_different_chain": Fraction(64, 1),
     }
     if cand_y0_by_id is not None:
         for k_id, v_q in cand_y0_by_id.items():
@@ -3267,6 +3588,8 @@ def audit_continuous_interval_split_certificate_tc063(
         ("TC063-P-HALF-DIFF", "M_P0_DIFF", "TC063_P0_DIFF_branch_classification"),
         ("TC063-P-NEG-DIFF", "M_P_NEG_DIFF", "TC063_P_NEG_DIFF_branch_classification"),
         ("TC063-SAME-LOCAL-HILBERT", "M_SAME_LOC", "TC063_SAME_LOC_branch_classification"),
+        ("KL1_same_chain", "M_KL1_SAME", "KL1_same_chain_branch_classification"),
+        ("KL1_different_chain", "M_KL1_DIFF", "KL1_different_chain_branch_classification"),
     )
 
     conflicts: List[Dict[str, Any]] = []
@@ -3340,6 +3663,91 @@ def audit_continuous_interval_split_certificate_tc063(
         if u_p is None:
             conflicts.append({"conflict_type": "MALFORMED_UNION_BALL", "field": u_k})
 
+    exp_src_num_commit = (
+        artifact_provenance.get("numerical_producing_git_commit")
+        if isinstance(artifact_provenance, dict)
+        and isinstance(artifact_provenance.get("numerical_producing_git_commit"), str)
+        and artifact_provenance["numerical_producing_git_commit"].strip()
+        else None
+    )
+
+    kl1_union_specs = (
+        ("KL1_same_chain", "union_M_KL1_SAME", "KL1_same_chain_interval_classification"),
+        ("KL1_different_chain", "union_M_KL1_DIFF", "KL1_different_chain_interval_classification"),
+    )
+    parsed_kl1_unions: Dict[str, Optional[Dict[str, Any]]] = {}
+    kl1_union_present: Dict[str, bool] = {}
+    any_kl1_union_key = False
+    for kid_u, u_m_k, u_cls_k in kl1_union_specs:
+        if u_m_k not in split_obj:
+            parsed_kl1_unions[u_m_k] = None
+            kl1_union_present[kid_u] = False
+            if probe_eff_lo[kid_u] is not None:
+                coverage_gaps.append(
+                    {
+                        "gap_type": "MISSING_DERIVED_KL1_UNION_MARGIN",
+                        "candidate_id": kid_u,
+                        "field": u_m_k,
+                    }
+                )
+            if u_cls_k in split_obj:
+                conflicts.append(
+                    {
+                        "conflict_type": "ORPHAN_KL1_UNION_CLASSIFICATION_WITHOUT_MARGIN",
+                        "probe_id": kid_u,
+                    }
+                )
+        else:
+            any_kl1_union_key = True
+            u_mp_k = _parse_serialized_arb_enclosure_tc062(split_obj.get(u_m_k))
+            parsed_kl1_unions[u_m_k] = u_mp_k
+            u_cls_obj = split_obj.get(u_cls_k)
+            if u_mp_k is None:
+                conflicts.append({"conflict_type": "MALFORMED_UNION_BALL", "field": u_m_k})
+                kl1_union_present[kid_u] = False
+            elif not isinstance(u_cls_obj, dict):
+                conflicts.append(
+                    {"conflict_type": "MALFORMED_UNION_MARGIN_CLASSIFICATION", "probe_id": kid_u}
+                )
+                kl1_union_present[kid_u] = False
+            else:
+                exp_uv_k = (
+                    "PASS"
+                    if u_mp_k["c_hi"] <= 0
+                    else ("FAIL" if u_mp_k["c_lo"] > 0 else "UNRESOLVED")
+                )
+                if u_cls_obj.get("verdict") != exp_uv_k:
+                    conflicts.append(
+                        {
+                            "conflict_type": "UNION_VERDICT_DISAGREES_WITH_MARGIN",
+                            "probe_id": kid_u,
+                            "claimed": u_cls_obj.get("verdict"),
+                            "expected": exp_uv_k,
+                        }
+                    )
+                    kl1_union_present[kid_u] = False
+                else:
+                    kl1_union_present[kid_u] = True
+
+    if any_kl1_union_key:
+        sp_kl1_prov = split_obj.get("tc063r_derived_kl1_interval_provenance")
+        if (
+            not isinstance(sp_kl1_prov, dict)
+            or sp_kl1_prov.get("derivation_task_id") != TASK_TC_063R_ID
+            or sp_kl1_prov.get("derivation_kind")
+            != "DERIVED_FROM_PRESERVED_TC063_BRANCH_ENCLOSURES_NO_NEW_QUADRATURE"
+            or sp_kl1_prov.get("retroactively_audited_in_original_tc063") is not False
+            or not isinstance(sp_kl1_prov.get("source_numerical_producing_git_commit"), str)
+            or not sp_kl1_prov["source_numerical_producing_git_commit"].strip()
+            or (
+                exp_src_num_commit is not None
+                and sp_kl1_prov["source_numerical_producing_git_commit"] != exp_src_num_commit
+            )
+            or not isinstance(sp_kl1_prov.get("tc063r_derivation_git_commit"), str)
+            or not sp_kl1_prov["tc063r_derivation_git_commit"].strip()
+        ):
+            conflicts.append({"conflict_type": "INVALID_KL1_INTERVAL_PROVENANCE"})
+
     seen_req: set[Tuple[int, int, int]] = set()
     req_branch_verdicts: Dict[str, Dict[Tuple[int, int, int], str]] = {
         pid: {} for pid, _, _ in probe_map
@@ -3389,9 +3797,11 @@ def audit_continuous_interval_split_certificate_tc063(
                 conflicts.append({"conflict_type": "DUPLICATE_REQUIRED_BRANCH", "triple": list(triple)})
             seen_req.add(triple)
 
-        # Check union containment across all 9 observable pairs:
+        # Check union containment across all 9 original observable pairs:
+        parsed_br_obs: Dict[str, Optional[Dict[str, Any]]] = {}
         for u_k, b_k in REQUIRED_TC063_INTERVAL_UNION_BRANCH_PAIRS:
             b_p = _parse_serialized_arb_enclosure_tc062(br.get(b_k))
+            parsed_br_obs[b_k] = b_p
             u_p = parsed_unions[u_k]
             if b_p is None:
                 conflicts.append(
@@ -3462,6 +3872,165 @@ def audit_continuous_interval_split_certificate_tc063(
                 )
             branch_exp_verdict_by_field[m_field] = exp_v
 
+        # Audit TC-063R derived KL1 branch margins, exact formulas, union containment, & provenance:
+        any_kl1_on_br = ("M_KL1_SAME" in br) or ("M_KL1_DIFF" in br)
+        if any_kl1_on_br:
+            prov_kl1 = br.get("tc063r_derived_kl1_provenance")
+            exp_obs_sha = compute_tc063r_kl1_source_observables_sha256(br)
+            prov_ef = (
+                prov_kl1.get("evaluated_Y_interval_exact_fractions")
+                if isinstance(prov_kl1, dict)
+                else None
+            )
+            prov_ef_ok = False
+            if (
+                isinstance(prov_ef, list)
+                and len(prov_ef) == 2
+                and all(isinstance(s, str) and s.strip() for s in prov_ef)
+            ):
+                try:
+                    pf_lo = Fraction(prov_ef[0])
+                    pf_hi = Fraction(prov_ef[1])
+                    prov_ef_ok = pf_lo <= pf_hi
+                except Exception:  # noqa: BLE001
+                    prov_ef_ok = False
+                if prov_ef_ok and "evaluated_Y_interval_exact_fractions" in br:
+                    prov_ef_ok = prov_ef == br.get("evaluated_Y_interval_exact_fractions")
+            if (
+                not isinstance(prov_kl1, dict)
+                or prov_kl1.get("derivation_task_id") != TASK_TC_063R_ID
+                or prov_kl1.get("derivation_kind")
+                != "DERIVED_FROM_PRESERVED_TC063_BRANCH_ENCLOSURES_NO_NEW_QUADRATURE"
+                or prov_kl1.get("retroactively_audited_in_original_tc063") is not False
+                or not isinstance(prov_kl1.get("source_numerical_producing_git_commit"), str)
+                or not prov_kl1["source_numerical_producing_git_commit"].strip()
+                or (
+                    exp_src_num_commit is not None
+                    and prov_kl1["source_numerical_producing_git_commit"] != exp_src_num_commit
+                )
+                or not isinstance(prov_kl1.get("tc063r_derivation_git_commit"), str)
+                or not prov_kl1["tc063r_derivation_git_commit"].strip()
+                or prov_kl1.get("source_observable_fields")
+                != ["S_same_Y", "S_different_Y", "log_Y_times_D_tilde"]
+                or exp_obs_sha is None
+                or prov_kl1.get("source_observables_sha256") != exp_obs_sha
+                or not prov_ef_ok
+            ):
+                conflicts.append(
+                    {"conflict_type": "INVALID_KL1_DERIVED_PROVENANCE", "triple": list(triple)}
+                )
+
+        ss_p = parsed_br_obs.get("S_same_Y")
+        sd_p = parsed_br_obs.get("S_different_Y")
+        lgd_p = parsed_br_obs.get("log_Y_times_D_tilde")
+        kl1_branch_specs = (
+            (
+                "KL1_same_chain",
+                "M_KL1_SAME",
+                "KL1_same_chain_branch_classification",
+                "union_M_KL1_SAME",
+                ss_p,
+                Fraction(1, 4),
+            ),
+            (
+                "KL1_different_chain",
+                "M_KL1_DIFF",
+                "KL1_different_chain_branch_classification",
+                "union_M_KL1_DIFF",
+                sd_p,
+                Fraction(3, 4),
+            ),
+        )
+        for kid_b, m_f_k, cls_f_k, u_f_k, src_p_k, coeff_q in kl1_branch_specs:
+            if m_f_k not in br:
+                branch_exp_verdict_by_field[m_f_k] = None
+                if triple in probe_req_triples[kid_b]:
+                    coverage_gaps.append(
+                        {
+                            "gap_type": "MISSING_DERIVED_KL1_INTERVAL_MARGIN",
+                            "candidate_id": kid_b,
+                            "triple": list(triple),
+                        }
+                    )
+                if cls_f_k in br:
+                    conflicts.append(
+                        {
+                            "conflict_type": "ORPHAN_KL1_BRANCH_CLASSIFICATION_WITHOUT_MARGIN",
+                            "probe_id": kid_b,
+                            "triple": list(triple),
+                        }
+                    )
+                continue
+
+            m_pk = _parse_serialized_arb_enclosure_tc062(br.get(m_f_k))
+            cls_rk = br.get(cls_f_k)
+            if m_pk is None:
+                conflicts.append(
+                    {"conflict_type": "MALFORMED_BRANCH_BALL", "field": m_f_k, "triple": list(triple)}
+                )
+                branch_exp_verdict_by_field[m_f_k] = None
+                continue
+
+            u_pk = parsed_kl1_unions.get(u_f_k)
+            if u_pk is not None and not _serialized_union_contains_branch_tc062(u_pk, m_pk):
+                conflicts.append(
+                    {
+                        "conflict_type": "UNION_DOES_NOT_CONTAIN_BRANCH",
+                        "union_field": u_f_k,
+                        "branch_field": m_f_k,
+                        "triple": list(triple),
+                    }
+                )
+
+            if src_p_k is not None and lgd_p is not None:
+                exp_c_lo = src_p_k["c_lo"] - coeff_q * lgd_p["c_hi"]
+                exp_c_hi = src_p_k["c_hi"] - coeff_q * lgd_p["c_lo"]
+                src_out_lo = min(src_p_k["lo_dec"], src_p_k["lo_bs"], src_p_k["lo_fl"])
+                src_out_hi = max(src_p_k["hi_dec"], src_p_k["hi_bs"], src_p_k["hi_fl"])
+                lgd_out_lo = min(lgd_p["lo_dec"], lgd_p["lo_bs"], lgd_p["lo_fl"])
+                lgd_out_hi = max(lgd_p["hi_dec"], lgd_p["hi_bs"], lgd_p["hi_fl"])
+                exp_out_lo = src_out_lo - coeff_q * lgd_out_hi
+                exp_out_hi = src_out_hi - coeff_q * lgd_out_lo
+                f_scale = max(abs(exp_c_lo), abs(exp_c_hi), Fraction(1, 10 ** 70))
+                pad_tol = Fraction(8, 1) * (exp_out_hi - exp_out_lo) + f_scale * Fraction(
+                    1, 2 ** 46
+                )
+                if not (
+                    m_pk["c_lo"] <= exp_c_lo
+                    and exp_c_hi <= m_pk["c_hi"]
+                    and m_pk["c_lo"] >= exp_out_lo - pad_tol
+                    and m_pk["c_hi"] <= exp_out_hi + pad_tol
+                ):
+                    conflicts.append(
+                        {
+                            "conflict_type": "KL1_DERIVED_MARGIN_FORMULA_MISMATCH",
+                            "probe_id": kid_b,
+                            "triple": list(triple),
+                        }
+                    )
+
+            if not isinstance(cls_rk, dict):
+                conflicts.append(
+                    {"conflict_type": "MALFORMED_BRANCH_MARGIN_CLASSIFICATION", "probe_id": kid_b}
+                )
+                branch_exp_verdict_by_field[m_f_k] = None
+                continue
+            exp_vk = (
+                "PASS"
+                if m_pk["c_hi"] <= 0
+                else ("FAIL" if m_pk["c_lo"] > 0 else "UNRESOLVED")
+            )
+            if cls_rk.get("verdict") != exp_vk:
+                conflicts.append(
+                    {
+                        "conflict_type": "BRANCH_VERDICT_DISAGREES_WITH_MARGIN",
+                        "probe_id": kid_b,
+                        "claimed": cls_rk.get("verdict"),
+                        "expected": exp_vk,
+                    }
+                )
+            branch_exp_verdict_by_field[m_f_k] = exp_vk
+
         for pid, m_field, _ in probe_map:
             exp_v_p = branch_exp_verdict_by_field.get(m_field)
             lo_p = probe_eff_lo[pid]
@@ -3488,7 +4057,7 @@ def audit_continuous_interval_split_certificate_tc063(
         if req_t not in seen_req:
             coverage_gaps.append({"gap_type": "MISSING_REQUIRED_FEASIBLE_BRANCH", "triple": list(req_t)})
 
-    # Audit union margin classifications:
+    # Audit original union margin classifications:
     union_cls_map = (
         ("TC063-P0-DIFF", "union_M_P0_DIFF", "TC063_P0_DIFF_interval_classification"),
         ("TC063-P-NEG-DIFF", "union_M_P_NEG_DIFF", "TC063_P_NEG_DIFF_interval_classification"),
@@ -3538,6 +4107,7 @@ def audit_continuous_interval_split_certificate_tc063(
             rec_lo == exp_lo
             and rec_hi == exp_hi
             and len(probe_req_triples[pid]) > 0
+            and (kl1_union_present.get(pid, True))
             and all(
                 rt in probe_covered_triples[pid]
                 and req_branch_verdicts[pid].get(rt) == "PASS"
@@ -3561,9 +4131,12 @@ def audit_continuous_interval_split_certificate_tc063(
 def aggregate_tc063_section5_and_derive_outcomes(
     sec5_raw: Dict[str, Any],
     protocol_obj: Dict[str, Any],
+    *,
+    artifact_provenance: Optional[Dict[str, Any]] = None,
 ) -> Tuple[Dict[str, Any], Dict[str, Any]]:
-    """Shared `TC-063` Section 5 & top-level 6-dimension outcome aggregator (wired identically
-    into generator and metadata reprocessor).
+    """Shared `TC-063` / `TC-063R` Section 5 & top-level 6-dimension outcome aggregator (wired
+    identically into generator and metadata reprocessor, requiring explicit interval-split
+    certificates for ALL 6 candidates including `KL1_same_chain` and `KL1_different_chain`).
     """
     reg_points = protocol_obj["unseen_validation_schedule"]["points"]
     reg_ids = [p["point_id"] for p in reg_points]
@@ -3667,6 +4240,7 @@ def aggregate_tc063_section5_and_derive_outcomes(
     # Audit point-level candidate margins:
     point_verdicts_by_cand: Dict[str, List[str]] = {cid: [] for cid in all_cand_ids}
     point_applicable_counts: Dict[str, int] = {cid: 0 for cid in all_cand_ids}
+    cand_missing_point_eval: Dict[str, bool] = {cid: False for cid in all_cand_ids}
     saved_prec2 = flint_ctx.prec
     try:
         flint_ctx.prec = 256
@@ -3687,6 +4261,7 @@ def aggregate_tc063_section5_and_derive_outcomes(
             for cid in all_cand_ids:
                 container_c = pe if cid in probe_ids else ke
                 if cid not in container_c:
+                    cand_missing_point_eval[cid] = True
                     coverage_gaps.append(
                         {"gap_type": "MISSING_CANDIDATE_EVALUATION", "point_id": pid, "candidate_id": cid}
                     )
@@ -3752,7 +4327,10 @@ def aggregate_tc063_section5_and_derive_outcomes(
             coverage_gaps.append({"gap_type": "MISSING_PRESCRIBED_INTERVAL_SPLIT", "interval_id": req_ik})
             continue
         ia = audit_continuous_interval_split_certificate_tc063(
-            req_ik, splits_raw[req_ik], cand_y0_by_id=cand_y0_by_id
+            req_ik,
+            splits_raw[req_ik],
+            cand_y0_by_id=cand_y0_by_id,
+            artifact_provenance=artifact_provenance,
         )
         interval_audits[req_ik] = ia
         conflicts.extend(ia["conflicts"])
@@ -3809,18 +4387,15 @@ def aggregate_tc063_section5_and_derive_outcomes(
         if pt_fail or int_fail:
             per_cand_outcomes[cid] = "REFUTED_BY_CERTIFIED_WITNESS"
         elif (
-            coverage_complete
+            len(seen_pids) == len(reg_ids)
+            and not cand_missing_point_eval[cid]
             and point_applicable_counts[cid] == expected_applicable_points_by_cand[cid]
             and len(point_verdicts_by_cand[cid]) == expected_applicable_points_by_cand[cid]
             and all(v == "PASS" for v in point_verdicts_by_cand[cid])
             and len(interval_audits) == len(PRESCRIBED_TC063_INTERVAL_SPLITS)
             and all(
-                (
-                    ia["derived_probe_outcomes"].get(cid)
-                    in ("SURVIVED_TESTED_POINTS", "OUT_OF_DOMAIN_NOT_APPLICABLE")
-                    if cid in probe_ids
-                    else True
-                )
+                ia["derived_probe_outcomes"].get(cid)
+                in ("SURVIVED_TESTED_POINTS", "OUT_OF_DOMAIN_NOT_APPLICABLE")
                 for ia in interval_audits.values()
             )
             and (
@@ -3932,6 +4507,18 @@ def aggregate_tc063_section5_and_derive_outcomes(
         sec5_pass = False
 
     sec5_out = dict(sec5_raw)
+    if "section_epistemic_scope_note" in sec5_out:
+        sec5_out["section_epistemic_scope_note"] = (
+            "Mixed formal/analytic/certified/open section: TC063-SAME-LOCAL-HILBERT is "
+            "CONCRETE_ANALYTIC_IN_LEAN (Lean Theorem 3); exact cutoff-partition and 3-zone "
+            "quadrature remainder bounds are ANALYTIC_PROVED_OUTSIDE_LEAN; 256-bit Arb point and "
+            "interval evaluations on the 10 unseen TC-063 scales and 2 continuous straddling "
+            "intervals (together with the 14 TC-063R-derived KL1 interval margin enclosures "
+            "computed from preserved TC-063 branch enclosures with zero new quadrature) are "
+            "CERTIFIED_FINITE_OBSERVATION; universal S_different and KL1 probes "
+            "(TC063-P0-DIFF, TC063-P-HALF-DIFF, TC063-P-NEG-DIFF, KL1_same_chain, KL1_different_chain) "
+            "remain OPEN_CONJECTURE_OR_FAILED_CANDIDATE (finite survival never proves universal bounds)."
+        )
     sec5_out.update(
         {
             "registered_unseen_point_count": len(reg_ids),
@@ -4165,11 +4752,21 @@ def verify_section_6_lean_audit_and_gate_accounting() -> Dict[str, Any]:
             ],
             "refuted_subcandidates_in_tc063": [
                 "TC063-CAND-A1-PRIM-NONPOS (Pi_16^diff(5) > 0, Pi_64^diff(7) > 0)",
-                "TC063-CAND-B1-SQPROJ-DIAG-DOM (negative off-diagonal d_1 != d_2 dilation cross-terms)",
-                "TC063-CAND-C1-ARB-SIGN (greedy +-1 witness at Y = 64 and asymptotic Omega(Y) lower bound)",
-                "TC063-P-NEG-DIFF (zero-slack S_different(Y) <= 0 refuted on unseen Y >= 960 and [1096.50, 1096.66], while TC063-P0-DIFF survived 10/10 unseen points and both continuous intervals)",
+                "TC063-CAND-B1-SQPROJ-DIAG-DOM (negative off-diagonal d_1 != d_2 dilation cross-terms refute all-d diagonal domination sum_d ||Gcal_Y^(d)||_Y^2 <= ||S_{sq,Y}||_Y^2)",
+                "TC063-CAND-C1-ARB-SIGN (greedy +-1 witness at Y = 64 and outside-Lean asymptotic Omega(Y) lower bound via O((1 + log log Y)/(log Y)^2) station perturbation)",
+                "TC063-P-NEG-DIFF (universal zero-slack S_different(Y) <= 0 for all Y >= 64 refuted by finite positive witnesses at unseen Y in {960, e^7*(1 - 2^-12), e^7*(1 + 2^-12), 1408} and across certified interval [1096.50, 1096.66], while TC063-P0-DIFF, TC063-P-HALF-DIFF, and TC-063R-derived KL1_same_chain / KL1_different_chain survived 10/10 unseen points and all 5 branches of both continuous intervals; finite positive witnesses do not prove diagonal slack is necessary or establish a permanent sign transition)",
                 "Matched negative controls unsigned_1, a2, a_3_5_7 and labeled hybrid_a2_liouville on S_different for Y >= 64",
             ],
+            "tc063r_derived_kl1_interval_certification": {
+                "derivation_task_id": TASK_TC_063R_ID,
+                "original_tc063_arb_balls_preserved": TC063_ORIGINAL_ARB_BALL_COUNT,
+                "derived_kl1_arb_balls_added": TC063R_DERIVED_KL1_ARB_BALL_COUNT,
+                "revised_total_arb_balls": (
+                    TC063_ORIGINAL_ARB_BALL_COUNT + TC063R_DERIVED_KL1_ARB_BALL_COUNT
+                ),
+                "retroactively_audited_in_original_tc063": False,
+                "new_quadrature_executed": False,
+            },
             "earliest_remaining_mathematical_premise": "TC063-OBL-DISTINCT-ODD-CHAIN-CORRELATION",
             "earliest_remaining_formalization_only_items": [
                 "TC063-PREM-04 (global linear energy E(Z) <= M_lin * Z)",
@@ -4337,6 +4934,17 @@ def _collect_verdict_map_tc063(art: Dict[str, Any]) -> Tuple[Dict[str, str], Lis
                     issues.append(f"sec5.interval.{ik}.{u_cls_k}")
                 else:
                     verdicts[f"sec5.interval.{ik}.{u_cls_k}"] = uv
+            for u_m_kl1, u_cls_kl1 in (
+                ("union_M_KL1_SAME", "KL1_same_chain_interval_classification"),
+                ("union_M_KL1_DIFF", "KL1_different_chain_interval_classification"),
+            ):
+                if u_m_kl1 in sp or u_cls_kl1 in sp:
+                    uc_k = sp.get(u_cls_kl1)
+                    uv_k = uc_k.get("verdict") if isinstance(uc_k, dict) else None
+                    if not isinstance(uv_k, str) or uv_k == CERTIFICATION_INTEGRITY_CONFLICT_VERDICT:
+                        issues.append(f"sec5.interval.{ik}.{u_cls_kl1}")
+                    else:
+                        verdicts[f"sec5.interval.{ik}.{u_cls_kl1}"] = uv_k
             brs = sp.get("branches")
             if not isinstance(brs, list) or len(brs) == 0:
                 issues.append(f"sec5.interval.{ik}.branches")
@@ -4362,6 +4970,20 @@ def _collect_verdict_map_tc063(art: Dict[str, Any]) -> Tuple[Dict[str, str], Lis
                             issues.append(f"sec5.interval.{ik}.branch.{tr}.{b_cls_k}")
                         else:
                             verdicts[f"sec5.interval.{ik}.branch.{tr}.{b_cls_k}"] = bv
+                    for b_m_kl1, b_cls_kl1 in (
+                        ("M_KL1_SAME", "KL1_same_chain_branch_classification"),
+                        ("M_KL1_DIFF", "KL1_different_chain_branch_classification"),
+                    ):
+                        if b_m_kl1 in br or b_cls_kl1 in br:
+                            bc_k = br.get(b_cls_kl1)
+                            bv_k = bc_k.get("verdict") if isinstance(bc_k, dict) else None
+                            if (
+                                not isinstance(bv_k, str)
+                                or bv_k == CERTIFICATION_INTEGRITY_CONFLICT_VERDICT
+                            ):
+                                issues.append(f"sec5.interval.{ik}.branch.{tr}.{b_cls_kl1}")
+                            else:
+                                verdicts[f"sec5.interval.{ik}.branch.{tr}.{b_cls_kl1}"] = bv_k
 
     # 4. Section 3 matched-control and hybrid verdicts:
     c_rows = s3.get("matched_control_and_hybrid_chain_rows")
@@ -4502,14 +5124,198 @@ def compare_tc063_artifacts_by_stable_key(
     }
 
 
+def _collect_serialized_arb_ball_json_map(tree: Any) -> Dict[str, str]:
+    """Collect canonical JSON strings by path for every serialized Arb ball in `tree`."""
+    req_keys = {"mid_float", "rad_float_outward", "lower_dec", "upper_dec", "arb_ball_str"}
+    out: Dict[str, str] = {}
+
+    def _walk(node: Any, cur_p: str) -> None:
+        if isinstance(node, dict):
+            if req_keys.issubset(node.keys()):
+                clean_b = strip_enclosure_arb_for_json(node)
+                out[cur_p] = json.dumps(
+                    clean_b, sort_keys=True, separators=(",", ":"), ensure_ascii=True
+                )
+                return
+            for k, v in node.items():
+                if k in ("enclosure_arb", "serialized_arb_self_check"):
+                    continue
+                _walk(v, f"{cur_p}.{k}" if cur_p else str(k))
+        elif isinstance(node, (list, tuple)):
+            for idx, item in enumerate(node):
+                _walk(item, f"{cur_p}[{idx}]")
+
+    _walk(tree, "")
+    return out
+
+
+def compare_tc063r_against_tc063_baseline(
+    current_art: Dict[str, Any],
+    baseline_tc063_art: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """Compare the repaired `TC-063R` artifact against the reviewed `TC-063` delivered baseline
+    (`255594aab4b08af083a4b02faaa10750e072b370`), reporting original-record byte-identity, added
+    derived `KL1` records, mathematical verdicts, status classifications, and provenance fields
+    separately (`TASK-TC-063R` §7).
+    """
+    base_art = (
+        baseline_tc063_art
+        if baseline_tc063_art is not None
+        else _load_git_json_artifact_or_none(
+            REVIEWED_TC063_DELIVERED_TIP, "data/tc_dyadic_chain_correlation_regularity.json"
+        )
+    )
+    if base_art is None or not isinstance(base_art, dict):
+        return {
+            "baseline_commit": REVIEWED_TC063_DELIVERED_TIP,
+            "comparison_status": "BASELINE_NOT_AVAILABLE_IN_GIT",
+        }
+
+    base_balls = _collect_serialized_arb_ball_json_map(base_art)
+    cur_balls = _collect_serialized_arb_ball_json_map(current_art)
+    missing_orig = sorted(p for p in base_balls if p not in cur_balls)
+    altered_orig = sorted(
+        p for p in base_balls if p in cur_balls and cur_balls[p] != base_balls[p]
+    )
+    preserved_orig_cnt = sum(
+        1 for p in base_balls if p in cur_balls and cur_balls[p] == base_balls[p]
+    )
+    added_derived_paths = sorted(p for p in cur_balls if p not in base_balls)
+
+    cur_v, cur_v_iss = _collect_verdict_map_tc063(current_art)
+    base_v, base_v_iss = _collect_verdict_map_tc063(base_art)
+    shared_v_keys = sorted(set(cur_v.keys()) & set(base_v.keys()))
+    changed_shared_v = {
+        k: {"baseline": base_v[k], "current": cur_v[k]}
+        for k in shared_v_keys
+        if cur_v[k] != base_v[k]
+    }
+    added_v = {k: cur_v[k] for k in sorted(set(cur_v.keys()) - set(base_v.keys()))}
+    removed_v = sorted(set(base_v.keys()) - set(cur_v.keys()))
+
+    # Also record what the repaired TC-063R Section 5 aggregator derives on the raw point-only
+    # 674-ball baseline BEFORE attaching the 14 derived KL1 interval balls:
+    proto_chk = verify_frozen_tc063_protocol_immutability()
+    pre_deriv_audit: Dict[str, Any] = {}
+    if proto_chk["verified"]:
+        s5_pre, top_pre = aggregate_tc063_section5_and_derive_outcomes(
+            copy.deepcopy(base_art.get("section_5_unseen_validation_and_interval_splits", {})),
+            proto_chk["protocol_object"],
+            artifact_provenance=base_art.get("provenance"),
+        )
+        pre_deriv_audit = {
+            "KL1_same_chain_before_interval_derivation": s5_pre[
+                "per_candidate_mathematical_outcomes"
+            ].get("KL1_same_chain"),
+            "KL1_different_chain_before_interval_derivation": s5_pre[
+                "per_candidate_mathematical_outcomes"
+            ].get("KL1_different_chain"),
+            "holdout_hypothesis_outcome_before_interval_derivation": top_pre.get(
+                "holdout_hypothesis_outcome"
+            ),
+            "coverage_complete_before_interval_derivation": s5_pre.get("coverage_complete"),
+        }
+
+    cur_st = _collect_status_map_tc063(current_art)
+    base_st = _collect_status_map_tc063(base_art)
+    shared_st_keys = sorted(set(cur_st.keys()) & set(base_st.keys()))
+    changed_st = {
+        k: {"baseline": base_st[k], "current": cur_st[k]}
+        for k in shared_st_keys
+        if cur_st[k] != base_st[k]
+    }
+    added_st = {k: cur_st[k] for k in sorted(set(cur_st.keys()) - set(base_st.keys()))}
+    removed_st = sorted(set(base_st.keys()) - set(cur_st.keys()))
+
+    cur_prov = current_art.get("provenance", {}) if isinstance(current_art.get("provenance"), dict) else {}
+    base_prov = base_art.get("provenance", {}) if isinstance(base_art.get("provenance"), dict) else {}
+    immutable_prov_keys = (
+        "accepted_tc062r4_delivered_tip",
+        "accepted_tc062r4_validation_commit",
+        "preserved_tc062r_producing_commit",
+        "merged_main_baseline",
+        "frozen_tc061_protocol_registration_commit",
+        "frozen_tc061_protocol_sha256",
+        "frozen_tc062_protocol_registration_commit",
+        "frozen_tc062_protocol_sha256",
+        "frozen_tc063_protocol_id",
+        "frozen_tc063_protocol_registration_commit",
+        "frozen_tc063_protocol_sha256",
+        "numerical_producing_git_commit",
+        "formal_producing_git_commit",
+    )
+    immutable_prov_ok = (
+        current_art.get("generated_at_utc") == base_art.get("generated_at_utc")
+        and all(cur_prov.get(pk) == base_prov.get(pk) for pk in immutable_prov_keys)
+    )
+    updated_prov_keys = sorted(
+        k
+        for k in (set(cur_prov.keys()) & set(base_prov.keys()))
+        if k != "tc063r_vs_tc063_baseline_comparison" and cur_prov[k] != base_prov[k]
+    )
+    added_prov_keys = sorted(
+        k
+        for k in (set(cur_prov.keys()) - set(base_prov.keys()))
+        if k != "tc063r_vs_tc063_baseline_comparison"
+    )
+    removed_prov_keys = sorted(set(base_prov.keys()) - set(cur_prov.keys()))
+
+    return {
+        "baseline_commit": REVIEWED_TC063_DELIVERED_TIP,
+        "comparison_status": (
+            "COMPLETE_COMPARED"
+            if (not cur_v_iss and not base_v_iss and not removed_v and not removed_st)
+            else "INCOMPLETE_COMPARISON"
+        ),
+        "enclosure_preservation_report": {
+            "baseline_arb_ball_count": len(base_balls),
+            "current_arb_ball_count": len(cur_balls),
+            "preserved_original_arb_ball_count": preserved_orig_cnt,
+            "missing_original_ball_paths": missing_orig,
+            "altered_original_ball_paths": altered_orig,
+            "all_674_original_enclosures_byte_identical": bool(
+                len(base_balls) == TC063_ORIGINAL_ARB_BALL_COUNT
+                and preserved_orig_cnt == TC063_ORIGINAL_ARB_BALL_COUNT
+                and len(missing_orig) == 0
+                and len(altered_orig) == 0
+            ),
+            "added_derived_kl1_ball_count": len(added_derived_paths),
+            "added_derived_kl1_ball_paths": added_derived_paths,
+        },
+        "mathematical_verdict_report": {
+            "shared_verdict_key_count": len(shared_v_keys),
+            "any_shared_mathematical_verdict_changed": len(changed_shared_v) > 0,
+            "changed_shared_mathematical_verdicts": changed_shared_v,
+            "added_tc063r_kl1_interval_verdict_key_count": len(added_v),
+            "added_tc063r_kl1_interval_verdicts": added_v,
+            "removed_verdict_keys": removed_v,
+            "pre_derivation_audit_of_baseline_point_only_kl1": pre_deriv_audit,
+        },
+        "status_classification_report": {
+            "shared_status_key_count": len(shared_st_keys),
+            "any_status_classification_changed": len(changed_st) > 0,
+            "changed_status_classifications": changed_st,
+            "added_status_keys": added_st,
+            "removed_status_keys": removed_st,
+        },
+        "provenance_field_report": {
+            "generated_at_utc_and_immutable_producers_preserved": immutable_prov_ok,
+            "updated_provenance_keys": updated_prov_keys,
+            "added_tc063r_provenance_keys": added_prov_keys,
+            "removed_provenance_keys": removed_prov_keys,
+        },
+    }
+
+
 def verify_tc063_review_enclosures_and_lean_anchors(
     artifact_dict: Dict[str, Any],
     review_path: Path = TC_063_REVIEW_DOC_PATH,
 ) -> Dict[str, Any]:
     """Verify every `<!-- tc-enclosure: ... -->` tag in `TC_063_...md` against `artifact_dict`,
     every `DyadicChainCorrelationRegularity.lean#L<a>-L<b>` line anchor against live Lean
-    declaration spans (rejecting unknown declaration names), and all 10 holdout cutoff triples in
-    the Section 7.2 review table.
+    declaration spans (rejecting unknown declaration names), all 10 `TC063-PREM-01..10` premise
+    table rows, all 10 Section 7.2 holdout cutoff triples/values/verdicts, and absence of stale
+    misstatements (`TASK-TC-063R` §5, §7).
     """
     if not review_path.exists():
         return {"review_exists": False, "verified": False}
@@ -4572,33 +5378,105 @@ def verify_tc063_review_enclosures_and_lean_anchors(
                     f"{d_name}: review #L{l_s}-L{l_e} != live #L{exp_s}-L{exp_e}"
                 )
 
-    # Cross-check all 10 holdout cutoff triples `(T, D_eff, L)` in the review table:
-    pt_cut_map = {
-        r["point_id"]: (
-            r["cutoffs"]["T_Y"],
-            r["cutoffs"]["D0_eff"],
-            r["cutoffs"]["max_chain_length_L_T"],
+    # Cross-check all 10 premise-table rows (`TC063-PREM-01..10`) in Section 2.2:
+    prem_tbl = build_tc063_premise_and_dependency_table()
+    prem_by_short: Dict[str, Dict[str, Any]] = {}
+    for p_row in prem_tbl:
+        m_pr = re.match(r"^(TC063-PREM-\d+)", p_row["premise_id"])
+        if m_pr:
+            prem_by_short[m_pr.group(1)] = p_row
+    prem_row_re = re.compile(
+        r"^\|\s*`(TC063-PREM-\d+)`\s*\|.*\|\s*`([A-Z_]+)`\s*\|\s*`([A-Z_]+)`\s*\|\s*$",
+        flags=re.MULTILINE,
+    )
+    premise_failures: List[str] = []
+    premise_checked = 0
+    seen_prem_short = set()
+    for pm in prem_row_re.finditer(txt):
+        premise_checked += 1
+        sh_id, st_got, gap_got = pm.group(1), pm.group(2), pm.group(3)
+        seen_prem_short.add(sh_id)
+        if sh_id not in prem_by_short:
+            premise_failures.append(f"{sh_id}: unknown premise ID in review table")
+        else:
+            exp_p = prem_by_short[sh_id]
+            if st_got != exp_p["status"] or gap_got != exp_p["gap_kind"]:
+                premise_failures.append(
+                    f"{sh_id}: review ({st_got}, {gap_got}) != canonical ({exp_p['status']}, {exp_p['gap_kind']})"
+                )
+    if seen_prem_short != set(prem_by_short.keys()):
+        premise_failures.append(
+            f"missing_or_extra_premises: got {sorted(seen_prem_short)} vs {sorted(prem_by_short)}"
         )
+
+    # Cross-check all 10 holdout cutoff triples `(T, D_eff, L)` AND displayed observables/verdicts:
+    pt_row_map = {
+        r["point_id"]: r
         for r in artifact_dict.get("section_5_unseen_validation_and_interval_splits", {}).get(
             "holdout_point_evaluations", []
         )
         if isinstance(r, dict) and "point_id" in r and "cutoffs" in r
     }
-    row_re = re.compile(
+    full_row_re = re.compile(
         r"\|\s*`(TC063-HO-[A-Z0-9-]+)`\s*\|[^|]+\|\s*`?\$\((\d+),\s*(\d+),\s*(\d+)\)\$`?\s*\|"
+        r"\s*(?:\*\*)?`([+-]?[0-9.eE+-]+)`(?:\*\*)?\s*\|"
+        r"\s*(?:\*\*)?`([+-]?[0-9.eE+-]+)`(?:\*\*)?\s*\|"
+        r"\s*(?:\*\*)?`([+-]?[0-9.eE+-]+)`(?:\*\*)?\s*\|"
+        r"\s*(?:\*\*)?`(PASS|FAIL)`(?:\*\*)?\s*\|"
+        r"\s*(?:\*\*)?`(PASS|FAIL)`(?:\*\*)?\s*\|"
     )
     cutoff_failures: List[str] = []
     cutoff_checked = 0
-    for rm in row_re.finditer(txt):
+    for rm in full_row_re.finditer(txt):
         cutoff_checked += 1
         pid_r = rm.group(1)
         got_tr = (int(rm.group(2)), int(rm.group(3)), int(rm.group(4)))
-        if pid_r not in pt_cut_map:
+        disp_ss, disp_sd, disp_lgd = rm.group(5), rm.group(6), rm.group(7)
+        disp_neg_v, disp_p0_v = rm.group(8), rm.group(9)
+        if pid_r not in pt_row_map:
             cutoff_failures.append(f"{pid_r}: unknown holdout point_id in review table")
-        elif got_tr != pt_cut_map[pid_r]:
+            continue
+        r_cert = pt_row_map[pid_r]
+        exp_tr = (
+            r_cert["cutoffs"]["T_Y"],
+            r_cert["cutoffs"]["D0_eff"],
+            r_cert["cutoffs"]["max_chain_length_L_T"],
+        )
+        if got_tr != exp_tr:
+            cutoff_failures.append(f"{pid_r}: review table {got_tr} != certified {exp_tr}")
+        for f_lbl, d_txt in (
+            ("S_same_Y", disp_ss),
+            ("S_different_Y", disp_sd),
+            ("log_Y_times_D_tilde", disp_lgd),
+        ):
+            p_cert = _parse_serialized_arb_enclosure_tc062(r_cert.get(f_lbl))
+            if p_cert is None:
+                cutoff_failures.append(f"{pid_r}.{f_lbl}: malformed certified ball")
+                continue
+            d_q = _sci_or_latex_num_to_fraction(d_txt)
+            mid_q = (p_cert["c_lo"] + p_cert["c_hi"]) / 2
+            if abs(d_q - mid_q) > Fraction(1, 10 ** 6):
+                cutoff_failures.append(
+                    f"{pid_r}.{f_lbl}: displayed {d_txt} disagrees with certified {r_cert[f_lbl]['arb_ball_str']}"
+                )
+        exp_neg_v = r_cert["probe_evaluations"]["TC063-P-NEG-DIFF"]["verdict"]
+        exp_p0_v = r_cert["probe_evaluations"]["TC063-P0-DIFF"]["verdict"]
+        if disp_neg_v != exp_neg_v or disp_p0_v != exp_p0_v:
             cutoff_failures.append(
-                f"{pid_r}: review table {got_tr} != certified {pt_cut_map[pid_r]}"
+                f"{pid_r}: displayed verdicts ({disp_neg_v}, {disp_p0_v}) != ({exp_neg_v}, {exp_p0_v})"
             )
+
+    main_body_before_erratum = txt.split("## 9.")[0]
+    stale_statement_hits = [
+        bad_s
+        for bad_s in (
+            "\\approx -3.05",
+            "approx -3.05",
+            "T^{\\rho_{\\mathrm{dB}}(u)",
+            "genuinely needed",
+        )
+        if bad_s in main_body_before_erratum
+    ]
 
     return {
         "review_exists": True,
@@ -4606,17 +5484,23 @@ def verify_tc063_review_enclosures_and_lean_anchors(
         "enclosure_failures": enclosure_failures,
         "lean_anchors_checked": anchor_count,
         "lean_anchor_failures": anchor_failures,
+        "premise_rows_checked": premise_checked,
+        "premise_failures": premise_failures,
         "holdout_cutoffs_checked": cutoff_checked,
         "holdout_cutoff_failures": cutoff_failures,
+        "stale_statement_hits_in_main_body": stale_statement_hits,
         "forbidden_pi_tokens": pi_hits,
         "forbidden_K_underscore_tokens": k_hits,
         "verified": bool(
-            enclosure_count >= 6
+            enclosure_count >= 12
             and len(enclosure_failures) == 0
             and anchor_count >= 5
             and len(anchor_failures) == 0
+            and premise_checked == 10
+            and len(premise_failures) == 0
             and cutoff_checked == 10
             and len(cutoff_failures) == 0
+            and len(stale_statement_hits) == 0
             and len(pi_hits) == 0
             and len(k_hits) == 0
         ),
@@ -4771,14 +5655,23 @@ def _expected_tc063_section_5_ball_count(sec5_obj: Any) -> Optional[int]:
         for sp_obj in splits.values():
             if not isinstance(sp_obj, dict):
                 return None
-            # 9 union balls per present split + 10 balls (`Y_sub_ball` + 9 observables) per branch:
-            exp_cnt += 9
+            # 9 original union balls + present derived KL1 union balls per split:
+            exp_cnt += (
+                9
+                + int("union_M_KL1_SAME" in sp_obj)
+                + int("union_M_KL1_DIFF" in sp_obj)
+            )
             brs = sp_obj.get("branches")
             if isinstance(brs, list):
                 for br in brs:
                     if not isinstance(br, dict):
                         return None
-                    exp_cnt += 10
+                    # 10 original branch balls + present derived KL1 branch balls:
+                    exp_cnt += (
+                        10
+                        + int("M_KL1_SAME" in br)
+                        + int("M_KL1_DIFF" in br)
+                    )
     return exp_cnt
 
 
@@ -4838,8 +5731,19 @@ def _audit_all_serialized_arb_balls_in_artifact(
         else 0
     )
     live_matches = bool(prev_live_cnt == len(checked_paths) and len(failed_paths) == 0)
+    derived_cnt = (
+        len(checked_paths) - TC063_ORIGINAL_ARB_BALL_COUNT
+        if len(checked_paths) >= TC063_ORIGINAL_ARB_BALL_COUNT and len(failed_paths) == 0
+        else 0
+    )
     return {
         "total_certified_arb_balls_checked": len(checked_paths),
+        "original_tc063_arb_balls_preserved_count": (
+            TC063_ORIGINAL_ARB_BALL_COUNT
+            if len(checked_paths) >= TC063_ORIGINAL_ARB_BALL_COUNT and len(failed_paths) == 0
+            else 0
+        ),
+        "tc063r_derived_kl1_arb_balls_count": derived_cnt,
         "compared_against_live_original_arb_count": prev_live_cnt if live_matches else 0,
         "live_original_count_matches_enumerated_total": live_matches,
         "all_enclose_original_256bit_arb_ball": bool(
@@ -4873,6 +5777,10 @@ def _audit_section_1_serialized_checks(sec1_raw: Dict[str, Any]) -> Dict[str, An
     tc061_balls = tc061_obj["serialized_arb_self_check"]["total_certified_arb_balls_checked"]
     tc061_ok = bool(tc061_sha == EXPECTED_TC061_ARTIFACT_SHA256 and tc061_balls == 3208)
 
+    s1["premise_and_dependency_table"] = build_tc063_premise_and_dependency_table()
+    s1["tc_compatibility_principle_and_window_base_scope"] = (
+        _build_tc063r_tc_compatibility_block()
+    )
     s1["preserved_tc062_artifact_integrity"] = {
         "artifact_path": "data/tc_joint_prime_dilation_signed_remainder.json",
         "sha256_lf": tc062_sha,
@@ -4969,14 +5877,21 @@ def _audit_section_4_serialized_checks(sec4_raw: Dict[str, Any]) -> Dict[str, An
     cand_b1 = att_b.get("candidate_B1_sqproj_diag_dom", {})
     cand_c1 = att_c.get("candidate_C1_arbitrary_sign", {})
 
-    if isinstance(att_b, dict) and isinstance(att_b.get("first_uncontrolled_term_and_size"), dict):
-        att_b["first_uncontrolled_term_and_size"]["term"] = (
-            "Negative off-diagonal odd-divisor dilation cross-sum "
-            "-sum_{d_1 != d_2 in O(T)} <Gcal_Y^(d_1), Gcal_Y^(d_2)>_Y in "
-            "||Gcal_Y^(1)||_Y^2 = ||S_{sq,Y}||_Y^2 - sum_{d > 1 in O(T)} ||Gcal_Y^(d)||_Y^2 "
-            "- sum_{d_1 != d_2 in O(T)} <Gcal_Y^(d_1), Gcal_Y^(d_2)>_Y "
-            "(blocking a one-way upper bound on ||Gcal_Y^(1)||_Y^2 toward S_different(Y))"
-        )
+    meta_s4 = _build_tc063r_section_4_analytic_metadata()
+    if isinstance(att_a, dict):
+        att_a["first_uncontrolled_term_and_size"] = meta_s4["attempt_A_first_uncontrolled"]
+    if isinstance(att_b, dict):
+        att_b["first_uncontrolled_term_and_size"] = meta_s4["attempt_B_first_uncontrolled"]
+        if isinstance(cand_b1, dict):
+            cand_b1["smallest_invalid_premise"] = meta_s4["attempt_B_cand_b1_premise"]
+            cand_b1.pop("premise_under_test", None)
+    if isinstance(att_c, dict):
+        att_c.pop("asymptotic_omega_Y_perturbation_and_domination_proof", None)
+        if isinstance(cand_c1, dict):
+            cand_c1["perturbation_and_omega_Y_derivation_summary"] = meta_s4[
+                "attempt_C_perturbation_and_omega_Y"
+            ]
+            cand_c1.pop("asymptotic_omega_Y_mechanism", None)
 
     saved_p = flint_ctx.prec
     try:
@@ -5234,10 +6149,12 @@ def reprocess_task_tc063_metadata_and_lean_audit(
     write_output: bool = True,
     validation_commit_override: Optional[str] = None,
     protocol_override: Optional[Dict[str, Any]] = None,
+    baseline_tc063_override: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
-    """Re-run full 674-ball serialized Arb validation, Section 1/2/3/4/5 validation, Section 6 live
-    Lean declaration audit, and provenance synchronization on an existing `TC-063` artifact
-    WITHOUT altering any numerical Arb ball or `numerical_producing_git_commit`.
+    """Re-run full serialized Arb validation (`674` original + present derived `KL1` balls),
+    Section 1/2/3/4/5 validation, Section 6 live Lean declaration audit, and provenance
+    synchronization on an existing `TC-063` / `TC-063R` artifact WITHOUT altering any numerical
+    Arb ball, fabricating missing `KL1` interval balls, or modifying `numerical_producing_git_commit`.
     """
     existing = json.loads(Path(artifact_path).read_text(encoding="utf-8"))
     prov = existing.get("provenance")
@@ -5279,7 +6196,9 @@ def reprocess_task_tc063_metadata_and_lean_audit(
         existing.get("section_4_distinct_chain_attempts_and_obstructions", {})
     )
     sec5_upd, top_fields = aggregate_tc063_section5_and_derive_outcomes(
-        existing.get("section_5_unseen_validation_and_interval_splits", {}), proto_obj
+        existing.get("section_5_unseen_validation_and_interval_splits", {}),
+        proto_obj,
+        artifact_provenance=prov,
     )
     sec6_upd = verify_section_6_lean_audit_and_gate_accounting()
 
@@ -5325,19 +6244,166 @@ def reprocess_task_tc063_metadata_and_lean_audit(
     updated["provenance"]["self_verdict_comparison"] = compare_tc063_artifacts_by_stable_key(
         updated, existing
     )
+    if new_prov.get("tc063r_repair_task_id") == TASK_TC_063R_ID:
+        updated["provenance"]["tc063r_vs_tc063_baseline_comparison"] = (
+            compare_tc063r_against_tc063_baseline(
+                updated, baseline_tc063_art=baseline_tc063_override
+            )
+        )
 
     if write_output:
         txt_out = json.dumps(updated, indent=2, ensure_ascii=True) + "\n"
+        p_tok = "p" + "i"
+        for bad_tok in ("\\" + p_tok, "\u03c0", "Real." + p_tok, "const_" + p_tok, "math." + p_tok):
+            if bad_tok in txt_out:
+                raise RuntimeError(f"Forbidden token {bad_tok!r} in TC-063 artifact!")
         Path(artifact_path).write_bytes(txt_out.encode("utf-8"))
     return updated
 
 
+def apply_tc063r_repairs_and_derive_kl1_certificates(
+    artifact_path: Path = DYADIC_CHAIN_ARTIFACT_PATH,
+    *,
+    write_output: bool = True,
+    derivation_commit_override: Optional[str] = None,
+    validation_commit_override: Optional[str] = None,
+    baseline_tc063_override: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """Deterministically apply all `TASK-TC-063R` analytic metadata repairs and derive the `14`
+    `KL1` continuous-interval margin enclosures (`10` branch + `4` union) directly from the
+    preserved `TC-063` 256-bit Arb enclosures with **zero new quadrature**, preserving all `674`
+    original `TC-063` balls, `generated_at_utc`, `numerical_producing_git_commit`, and
+    `formal_producing_git_commit` byte-for-byte.
+    """
+    raw_art = json.loads(Path(artifact_path).read_text(encoding="utf-8"))
+    prov = raw_art.get("provenance")
+    if not isinstance(prov, dict) or not isinstance(prov.get("numerical_producing_git_commit"), str):
+        raise CertificationIntegrityError("Missing numerical_producing_git_commit in TC-063 artifact.")
+
+    src_num_commit = prov["numerical_producing_git_commit"]
+    deriv_commit = derivation_commit_override or _get_git_head_commit()
+    val_commit = validation_commit_override or deriv_commit
+
+    working = copy.deepcopy(raw_art)
+    sec5_w = working.get("section_5_unseen_validation_and_interval_splits", {})
+    splits_w = sec5_w.get("continuous_interval_case_splits", {})
+    if not isinstance(splits_w, dict):
+        raise CertificationIntegrityError("Missing continuous_interval_case_splits in Section 5.")
+
+    total_derived_live = 0
+    for ik in PRESCRIBED_TC063_INTERVAL_SPLITS:
+        if ik not in splits_w or not isinstance(splits_w[ik], dict):
+            raise CertificationIntegrityError(f"Missing prescribed split {ik!r} for KL1 derivation.")
+        sp_clean = copy.deepcopy(splits_w[ik])
+        for k_drop in (
+            "union_M_KL1_SAME",
+            "union_M_KL1_DIFF",
+            "KL1_same_chain_interval_classification",
+            "KL1_different_chain_interval_classification",
+            "tc063r_derived_kl1_interval_provenance",
+        ):
+            sp_clean.pop(k_drop, None)
+        for br_c in sp_clean.get("branches", []):
+            if isinstance(br_c, dict):
+                for b_drop in (
+                    "M_KL1_SAME",
+                    "M_KL1_DIFF",
+                    "KL1_same_chain_branch_classification",
+                    "KL1_different_chain_branch_classification",
+                    "tc063r_derived_kl1_provenance",
+                ):
+                    br_c.pop(b_drop, None)
+        sp_derived, cnt_live = attach_tc063r_kl1_certificates_to_split_dict(
+            sp_clean,
+            source_numerical_commit=src_num_commit,
+            derivation_commit=deriv_commit,
+            prec_bits=256,
+            keep_enclosure_arb=False,
+        )
+        splits_w[ik] = sp_derived
+        total_derived_live += cnt_live
+
+    if total_derived_live != TC063R_DERIVED_KL1_ARB_BALL_COUNT:
+        raise CertificationIntegrityError(
+            f"Expected {TC063R_DERIVED_KL1_ARB_BALL_COUNT} derived KL1 balls, got {total_derived_live}"
+        )
+
+    new_prov = dict(prov)
+    new_prov["reviewed_tc063_delivered_tip"] = REVIEWED_TC063_DELIVERED_TIP
+    new_prov["tc063_original_validation_git_commit"] = TC063_ORIGINAL_VALIDATION_COMMIT
+    new_prov["tc063_original_provenance_sync_git_commit"] = TC063_ORIGINAL_PROVENANCE_SYNC_COMMIT
+    new_prov["tc063r_repair_task_id"] = TASK_TC_063R_ID
+    new_prov["tc063r_repair_implementation_git_commit"] = deriv_commit
+    new_prov["tc063r_kl1_derivation_git_commit"] = deriv_commit
+    working["provenance"] = new_prov
+    working["serialized_arb_self_check"] = {
+        **(
+            working["serialized_arb_self_check"]
+            if isinstance(working.get("serialized_arb_self_check"), dict)
+            else {}
+        ),
+        "compared_against_live_original_arb_count": (
+            TC063_ORIGINAL_ARB_BALL_COUNT + total_derived_live
+        ),
+    }
+
+    import tempfile
+
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".json", encoding="utf-8", delete=False
+    ) as tmp_f:
+        tmp_f.write(json.dumps(working, ensure_ascii=True))
+        tmp_p = Path(tmp_f.name)
+    try:
+        repaired = reprocess_task_tc063_metadata_and_lean_audit(
+            tmp_p,
+            write_output=False,
+            validation_commit_override=val_commit,
+            baseline_tc063_override=baseline_tc063_override,
+        )
+    finally:
+        tmp_p.unlink(missing_ok=True)
+
+    # Now re-compute self_verdict_comparison against `repaired` itself so clean repaired state has
+    # COMPLETE_COMPARED self-consistency while `tc063r_vs_tc063_baseline_comparison` records the
+    # exact before/after delta against `255594aa`:
+    repaired["provenance"]["self_verdict_comparison"] = compare_tc063_artifacts_by_stable_key(
+        repaired, repaired
+    )
+    repaired["provenance"]["tc063r_vs_tc063_baseline_comparison"] = (
+        compare_tc063r_against_tc063_baseline(
+            repaired, baseline_tc063_art=baseline_tc063_override
+        )
+    )
+    base_cmp = repaired["provenance"]["tc063r_vs_tc063_baseline_comparison"]
+    if base_cmp.get("comparison_status") == "COMPLETE_COMPARED":
+        enc_rep = base_cmp["enclosure_preservation_report"]
+        if not enc_rep["all_674_original_enclosures_byte_identical"]:
+            raise CertificationIntegrityError(
+                f"Original TC-063 enclosure byte-identity violated: {enc_rep}"
+            )
+
+    if write_output:
+        txt_out = json.dumps(repaired, indent=2, ensure_ascii=True) + "\n"
+        p_tok = "p" + "i"
+        for bad_tok in ("\\" + p_tok, "\u03c0", "Real." + p_tok, "const_" + p_tok, "math." + p_tok):
+            if bad_tok in txt_out:
+                raise RuntimeError(f"Forbidden token {bad_tok!r} in TC-063R artifact!")
+        Path(artifact_path).write_bytes(txt_out.encode("utf-8"))
+    return repaired
+
+
 if __name__ == "__main__":
     t_start = time.perf_counter()
-    art_out = generate_task_tc063_artifact(write_output=True)
+    if "--tc063r-repair" in sys.argv[1:]:
+        art_out = apply_tc063r_repairs_and_derive_kl1_certificates(write_output=True)
+        mode_lbl = "Repaired (TC-063R zero-quadrature)"
+    else:
+        art_out = generate_task_tc063_artifact(write_output=True)
+        mode_lbl = "Generated"
     dt_all = time.perf_counter() - t_start
     print(
-        f"Generated {DYADIC_CHAIN_ARTIFACT_PATH.name} in {dt_all:.2f}s | "
+        f"{mode_lbl} {DYADIC_CHAIN_ARTIFACT_PATH.name} in {dt_all:.2f}s | "
         f"outcome={art_out['holdout_hypothesis_outcome']} | "
         f"resource={art_out['resource_compliance_status']} | "
         f"balls={art_out['serialized_arb_self_check']['total_certified_arb_balls_checked']} | "

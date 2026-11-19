@@ -30,13 +30,21 @@ from tc.dyadic_chain_correlation_regularity import (
     FROZEN_TC063_PROTOCOL_SHA256,
     PRESERVED_TC062R_PRODUCING_COMMIT,
     REQUIRED_CURRENT_TC063_STATUS_KEYS,
+    REVIEWED_TC063_DELIVERED_TIP,
     TASK_TC_063_ID,
+    TASK_TC_063R_ID,
+    TC063_ORIGINAL_ARB_BALL_COUNT,
+    TC063R_DERIVED_KL1_ARB_BALL_COUNT,
     TC_063_LEAN_MODULE_PATH,
     TC_063_REVIEW_DOC_PATH,
     aggregate_tc063_section5_and_derive_outcomes,
+    apply_tc063r_repairs_and_derive_kl1_certificates,
+    attach_tc063r_kl1_certificates_to_split_dict,
     audit_continuous_interval_split_certificate_tc063,
     build_tc063_premise_and_dependency_table,
     compare_tc063_artifacts_by_stable_key,
+    compare_tc063r_against_tc063_baseline,
+    derive_kl1_branch_margins_from_serialized_branch_tc063r,
     dyadic_chain_exponents_J_u,
     extract_lean_declaration_spans_tc063,
     greedy_sign_extension_witness,
@@ -142,10 +150,15 @@ def test_tc063_protocols_immutability_hygiene_and_open_gate(
     arb_self = tc063_artifact["serialized_arb_self_check"]
     assert arb_self["all_enclose_original_256bit_arb_ball"] is True
     assert arb_self["live_original_count_matches_enumerated_total"] is True
-    assert arb_self["total_certified_arb_balls_checked"] == 674
+    assert (
+        arb_self["total_certified_arb_balls_checked"]
+        == TC063_ORIGINAL_ARB_BALL_COUNT + TC063R_DERIVED_KL1_ARB_BALL_COUNT
+    )
+    assert arb_self["original_tc063_arb_balls_preserved_count"] == TC063_ORIGINAL_ARB_BALL_COUNT
+    assert arb_self["tc063r_derived_kl1_arb_balls_count"] == TC063R_DERIVED_KL1_ARB_BALL_COUNT
     assert arb_self["failed_paths"] == []
 
-    # Independently audit all 674 serialized Arb balls via 3-representation validator:
+    # Independently audit all 688 serialized Arb balls via 3-representation validator:
     req_k = {"mid_float", "rad_float_outward", "lower_dec", "upper_dec", "arb_ball_str"}
     checked_count = 0
 
@@ -164,7 +177,7 @@ def test_tc063_protocols_immutability_hygiene_and_open_gate(
                 _walk_check(item, f"{pth}[{idx}]")
 
     _walk_check(tc063_artifact, "")
-    assert checked_count == 674
+    assert checked_count == 688
 
     p_tok = "p" + "i"
     for fpath in (
@@ -446,6 +459,9 @@ def test_tc063_section_5_adversarial_coverage_witness_and_provenance(
         f"{sh_lo.numerator}/{sh_lo.denominator}",
         f"{sh_hi.numerator}/{sh_hi.denominator}",
     ]
+    br0_sh["tc063r_derived_kl1_provenance"]["evaluated_Y_interval_exact_fractions"] = list(
+        br0_sh["evaluated_Y_interval_exact_fractions"]
+    )
     br0_sh["evaluated_Y_mid_man_exp"] = [int(sh_mid_me[0]), int(sh_mid_me[1])]
     br0_sh["evaluated_Y_rad_man_exp"] = [int(sh_rad_me[0]), int(sh_rad_me[1])]
     g3, r3 = _run_both(s_shrunk, "shrunk_exact_domain")
@@ -496,6 +512,9 @@ def test_tc063_section_5_adversarial_coverage_witness_and_provenance(
         f"{dj_lo.numerator}/{dj_lo.denominator}",
         f"{dj_hi.numerator}/{dj_hi.denominator}",
     ]
+    extra_br["tc063r_derived_kl1_provenance"]["evaluated_Y_interval_exact_fractions"] = list(
+        extra_br["evaluated_Y_interval_exact_fractions"]
+    )
     extra_br["evaluated_Y_mid_man_exp"] = [int(dj_mid_me[0]), int(dj_mid_me[1])]
     extra_br["evaluated_Y_rad_man_exp"] = [int(dj_rad_me[0]), int(dj_rad_me[1])]
     extra_br["M_P0_DIFF"] = pos_ball
@@ -844,3 +863,375 @@ def test_tc063_section_6_lean_audit_and_review_verification(
     bad_cut_p = tmp_path / "bad_cut.md"
     bad_cut_p.write_text(rev_txt.replace("$(5344, 6, 6)$", "$(5351, 6, 6)$"), encoding="utf-8")
     assert verify_tc063_review_enclosures_and_lean_anchors(tc063_artifact, bad_cut_p)["verified"] is False
+
+
+def test_tc063r_repairs_kl1_intervals_and_report_reconciliation(
+    tc063_artifact: Dict[str, Any],
+    tc063_protocol: Dict[str, Any],
+    tmp_path: Path,
+) -> None:
+    """Verify all 6 `TASK-TC-063R` repair, `KL1` interval certification, adversarial governance,
+    point-only non-inference, byte-for-byte preservation, and idempotence requirements (§2-§7).
+    """
+    flint_ctx.prec = 256
+
+    # 1. Agreement between corrected generated metadata, review, premise table, and report values:
+    sec1 = tc063_artifact["section_1_protocols_endpoint_and_premise_chain"]
+    sec4 = tc063_artifact["section_4_distinct_chain_attempts_and_obstructions"]
+    sec5 = tc063_artifact["section_5_unseen_validation_and_interval_splits"]
+    sec6 = tc063_artifact["section_6_lean_audit_and_gate_accounting"]
+
+    tc_comp = sec1["tc_compatibility_principle_and_window_base_scope"]["why_off_critical_zero_conflicts"]
+    assert "right-half-strip partner 1 - rho" in tc_comp
+    assert "1/2 < x < 1" in tc_comp
+
+    att_a_meta = sec4["attempt_A_common_factor_primitive_regrouping"]["first_uncontrolled_term_and_size"]
+    assert "Psi(T, T^(1/u)) ~ T * rho_dB(u)" in att_a_meta["iterated_prime_smooth_wall"]
+    assert "T^(1 + o(1))" in att_a_meta["iterated_prime_smooth_wall"]
+    assert "Hildebrand & Tenenbaum" in att_a_meta["primary_smooth_number_reference"]
+    assert "Theta(Y / log log Y)" in att_a_meta["iterated_prime_smooth_wall"]
+    assert "Theta_S(Y)" in att_a_meta["iterated_prime_smooth_wall"]
+
+    att_b_meta = sec4["attempt_B_square_projection_and_selberg_compatibility"]
+    assert (
+        "||S_{sq,Y}||_Y^2 - ||Gcal_Y^(1)||_Y^2"
+        in att_b_meta["candidate_B1_sqproj_diag_dom"]["smallest_invalid_premise"]
+    )
+    assert "strictly scoped to Candidate B1" in att_b_meta["candidate_B1_sqproj_diag_dom"]["smallest_invalid_premise"]
+
+    att_c_proof = sec4["attempt_C_arithmetic_restricted_vs_arbitrary_sign_comparison"][
+        "candidate_C1_arbitrary_sign"
+    ]["perturbation_and_omega_Y_derivation_summary"]
+    assert att_c_proof["epistemic_status_finite_greedy_theorem"] == "CONCRETE_ANALYTIC_IN_LEAN"
+    assert att_c_proof["epistemic_status_asymptotic_omega_Y_derivation"] == "ANALYTIC_PROVED_OUTSIDE_LEAN"
+    assert "O((1 + log log Y) / (log Y)^2)" in att_c_proof["repaired_station_perturbation_bound"]
+    assert "O(Y*(1 + log log Y) / log Y)" in att_c_proof["resonant_band_propagation_and_domination"]
+
+    gate_refuted = "\n".join(sec6["gate_accounting"]["refuted_subcandidates_in_tc063"])
+    assert "on unseen Y >= 960" not in gate_refuted
+    assert "do not prove diagonal slack is necessary" in gate_refuted
+
+    pts = sec5["holdout_point_evaluations"]
+    assert (
+        pts[8]["cutoffs"]["T_Y"],
+        pts[8]["cutoffs"]["D0_eff"],
+        pts[8]["cutoffs"]["max_chain_length_L_T"],
+    ) == (6313, 7, 6)
+    s_diff_7l = _parse_serialized_arb_enclosure_tc062(pts[7]["S_different_Y"])
+    s_diff_7r = _parse_serialized_arb_enclosure_tc062(pts[8]["S_different_Y"])
+    sig_diag_960 = _parse_serialized_arb_enclosure_tc062(pts[6]["Sigma_diag_p2"])
+    assert s_diff_7l is not None and abs((s_diff_7l["c_lo"] + s_diff_7l["c_hi"]) / 2 - Fraction(1760131, 100000000)) < Fraction(1, 10**6)
+    assert s_diff_7r is not None and abs((s_diff_7r["c_lo"] + s_diff_7r["c_hi"]) / 2 - Fraction(1805857, 100000000)) < Fraction(1, 10**6)
+    assert sig_diag_960 is not None and Fraction(-33, 100) < sig_diag_960["c_lo"] < Fraction(-32, 100)
+
+    rev_chk = verify_tc063_review_enclosures_and_lean_anchors(tc063_artifact, TC_063_REVIEW_DOC_PATH)
+    assert rev_chk["verified"] is True, rev_chk
+    assert rev_chk["premise_rows_checked"] == 10
+    assert rev_chk["premise_failures"] == []
+    assert rev_chk["enclosure_tags_checked"] >= 20
+    assert rev_chk["stale_statement_hits_in_main_body"] == []
+
+    # Mutating a premise status, holdout value (`0.02737041`), or re-injecting `-3.05` in main body must fail review check:
+    rev_txt = TC_063_REVIEW_DOC_PATH.read_text(encoding="utf-8")
+    for tag_r, mut_txt in (
+        ("bad_prem", rev_txt.replace("| `TC063-PREM-04` | Stage 1B Input 1 |", "| `TC063-PREM-99` | Stage 1B Input 1 |")),
+        ("bad_exp7_val", rev_txt.replace("`+0.01760131`", "`+0.02737041`")),
+        ("stale_305", rev_txt.replace("## 2.", "\\approx -3.05\n\n## 2.")),
+    ):
+        p_rev = tmp_path / f"{tag_r}.md"
+        p_rev.write_text(mut_txt, encoding="utf-8")
+        assert verify_tc063_review_enclosures_and_lean_anchors(tc063_artifact, p_rev)["verified"] is False, tag_r
+
+    # 2. Both KL1 interval formulas, including signed `S_same(Y)` when `S_same(Y) < 0`, & 5-branch PASS:
+    splits = sec5["continuous_interval_case_splits"]
+    total_branches = 0
+    for ik, sp in splits.items():
+        assert sp["KL1_same_chain_interval_classification"]["verdict"] == "PASS", ik
+        assert sp["KL1_different_chain_interval_classification"]["verdict"] == "PASS", ik
+        assert sp["tc063r_derived_kl1_interval_provenance"]["derivation_task_id"] == TASK_TC_063R_ID
+        assert sp["tc063r_derived_kl1_interval_provenance"]["retroactively_audited_in_original_tc063"] is False
+        for br in sp["branches"]:
+            total_branches += 1
+            assert br["KL1_same_chain_branch_classification"]["verdict"] == "PASS"
+            assert br["KL1_different_chain_branch_classification"]["verdict"] == "PASS"
+            assert br["tc063r_derived_kl1_provenance"]["derivation_task_id"] == TASK_TC_063R_ID
+            assert br["tc063r_derived_kl1_provenance"]["retroactively_audited_in_original_tc063"] is False
+    assert total_branches == 5
+
+    # Explicit negative-`S_same` check (`S_same = -3/100`, `S_different = -1/50`, `lg_D = 12/100`):
+    # Signed `M_KL1_SAME = -0.03 - 0.03 = -0.06` (`PASS`), whereas buggy `|S_same| - 0.03 = 0.0`!
+    sp81_neg_ss = copy.deepcopy(splits["interval_81_pm_2_neg12_across_T243"])
+    br0_neg = sp81_neg_ss["branches"][0]
+    br0_neg["S_same_Y"] = strip_enclosure_arb_for_json(serialize_arb_certified(arb(-3) / arb(100)))
+    br0_neg["S_different_Y"] = strip_enclosure_arb_for_json(serialize_arb_certified(arb(-1) / arb(50)))
+    br0_neg["log_Y_times_D_tilde"] = strip_enclosure_arb_for_json(serialize_arb_certified(arb(12) / arb(100)))
+    # Keep union balls enclosing mutated branch observables:
+    sp81_neg_ss["union_S_same_Y"] = strip_enclosure_arb_for_json(serialize_arb_certified(arb(0, 1)))
+    sp81_neg_ss["union_S_different_Y"] = strip_enclosure_arb_for_json(serialize_arb_certified(arb(0, 1)))
+    sp81_neg_ss["union_log_Y_times_D_tilde"] = strip_enclosure_arb_for_json(serialize_arb_certified(arb(0, 1)))
+    sp81_signed_ok, _ = attach_tc063r_kl1_certificates_to_split_dict(
+        sp81_neg_ss,
+        source_numerical_commit=tc063_artifact["provenance"]["numerical_producing_git_commit"],
+        derivation_commit="deadbeef",
+    )
+    m_same_signed_p = _parse_serialized_arb_enclosure_tc062(sp81_signed_ok["branches"][0]["M_KL1_SAME"])
+    m_diff_signed_p = _parse_serialized_arb_enclosure_tc062(sp81_signed_ok["branches"][0]["M_KL1_DIFF"])
+    assert m_same_signed_p is not None and m_same_signed_p["c_lo"] <= Fraction(-6, 100) <= m_same_signed_p["c_hi"]
+    assert m_diff_signed_p is not None and m_diff_signed_p["c_lo"] <= Fraction(-11, 100) <= m_diff_signed_p["c_hi"]
+    ia_signed = audit_continuous_interval_split_certificate_tc063(
+        "interval_81_pm_2_neg12_across_T243",
+        sp81_signed_ok,
+        artifact_provenance=tc063_artifact["provenance"],
+    )
+    assert ia_signed["certification_integrity_ok"] is True
+    assert ia_signed["derived_probe_outcomes"]["KL1_same_chain"] == "SURVIVED_TESTED_POINTS"
+    assert ia_signed["derived_probe_outcomes"]["KL1_different_chain"] == "SURVIVED_TESTED_POINTS"
+
+    # Substituting `|S_same| - (1/4)*lg_D = 0.0` (`-0.02` if `S_same = -0.01`) MUST fail formula audit:
+    sp81_buggy_abs = copy.deepcopy(sp81_signed_ok)
+    buggy_m = strip_enclosure_arb_for_json(serialize_arb_certified(arb(-2) / arb(100)))
+    sp81_buggy_abs["branches"][0]["M_KL1_SAME"] = buggy_m
+    sp81_buggy_abs["union_M_KL1_SAME"] = strip_enclosure_arb_for_json(serialize_arb_certified(arb(0, 1)))
+    sp81_buggy_abs["KL1_same_chain_interval_classification"] = {"verdict": "UNRESOLVED"}
+    ia_buggy_abs = audit_continuous_interval_split_certificate_tc063(
+        "interval_81_pm_2_neg12_across_T243",
+        sp81_buggy_abs,
+        artifact_provenance=tc063_artifact["provenance"],
+    )
+    assert ia_buggy_abs["certification_integrity_ok"] is False
+    assert any(c["conflict_type"] == "KL1_DERIVED_MARGIN_FORMULA_MISMATCH" for c in ia_buggy_abs["conflicts"])
+    assert (
+        ia_buggy_abs["derived_probe_outcomes"]["KL1_same_chain"]
+        == CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
+    )
+
+    def _run_both_tc063r(mut_sec5: Dict[str, Any], tag: str) -> tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any]]:
+        s5_g, top_g = aggregate_tc063_section5_and_derive_outcomes(
+            copy.deepcopy(mut_sec5),
+            tc063_protocol,
+            artifact_provenance=tc063_artifact["provenance"],
+        )
+        art_m = copy.deepcopy(tc063_artifact)
+        art_m["section_5_unseen_validation_and_interval_splits"] = copy.deepcopy(mut_sec5)
+        p_t = tmp_path / f"tc063r_{tag}.json"
+        p_t.write_text(json.dumps(art_m), encoding="utf-8")
+        rep_m = reprocess_task_tc063_metadata_and_lean_audit(p_t, write_output=False)
+        return s5_g, top_g, rep_m
+
+    # 3. Removal or corruption of a required KL1 branch, domain, or margin causing exact status:
+    # 3a. Pop `M_KL1_SAME` + `KL1_same_chain_branch_classification` on one branch -> `KL1_same_chain`
+    #     specifically degrades to `UNRESOLVED/INCOMPLETE_COVERAGE` (no point-only survival!):
+    s_miss_kl1 = copy.deepcopy(sec5)
+    s_miss_kl1["continuous_interval_case_splits"][
+        "interval_1096_50_to_1096_66_across_T6310_and_e7"
+    ]["branches"][1].pop("M_KL1_SAME", None)
+    s_miss_kl1["continuous_interval_case_splits"][
+        "interval_1096_50_to_1096_66_across_T6310_and_e7"
+    ]["branches"][1].pop("KL1_same_chain_branch_classification", None)
+    s5_mk, top_mk, rep_mk = _run_both_tc063r(s_miss_kl1, "missing_m_kl1_same")
+    assert s5_mk["per_candidate_mathematical_outcomes"]["KL1_same_chain"] == "UNRESOLVED/INCOMPLETE_COVERAGE"
+    assert s5_mk["per_candidate_mathematical_outcomes"]["KL1_different_chain"] == "SURVIVED_TESTED_POINTS"
+    assert top_mk["holdout_hypothesis_outcome"] == "PARTIAL_REFUTATION_WITH_UNRESOLVED_OR_INCOMPLETE_SIBLINGS"
+    assert (
+        rep_mk["section_5_unseen_validation_and_interval_splits"][
+            "per_candidate_mathematical_outcomes"
+        ]["KL1_same_chain"]
+        == "UNRESOLVED/INCOMPLETE_COVERAGE"
+    )
+    assert rep_mk["all_mathematical_and_numerical_checks_pass"] is False
+
+    # 3b. Replace `M_KL1_DIFF` with `{}` -> `CERTIFICATION_INTEGRITY_CONFLICT` + Arb self-check failure:
+    s_empty_kl1 = copy.deepcopy(sec5)
+    s_empty_kl1["continuous_interval_case_splits"]["interval_81_pm_2_neg12_across_T243"][
+        "branches"
+    ][0]["M_KL1_DIFF"] = {}
+    _, top_ek, rep_ek = _run_both_tc063r(s_empty_kl1, "empty_m_kl1_diff")
+    assert top_ek["holdout_hypothesis_outcome"] == CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
+    assert rep_ek["holdout_hypothesis_outcome"] == CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
+    assert rep_ek["serialized_arb_self_check"]["all_enclose_original_256bit_arb_ball"] is False
+
+    # 3c. Tamper `tc063r_derived_kl1_provenance` (`retroactively_audited_in_original_tc063 = True`
+    #     or wrong `source_observables_sha256` or wrong `evaluated_Y_interval_exact_fractions`) -> CONFLICT:
+    for p_tag, p_mut in (
+        ("retro_true", ("retroactively_audited_in_original_tc063", True)),
+        ("bad_sha", ("source_observables_sha256", "0" * 64)),
+        ("bad_dom", ("evaluated_Y_interval_exact_fractions", ["80/1", "81/1"])),
+    ):
+        s_bad_p = copy.deepcopy(sec5)
+        s_bad_p["continuous_interval_case_splits"]["interval_81_pm_2_neg12_across_T243"][
+            "branches"
+        ][0]["tc063r_derived_kl1_provenance"][p_mut[0]] = p_mut[1]
+        _, top_bp, rep_bp = _run_both_tc063r(s_bad_p, f"bad_prov_{p_tag}")
+        assert top_bp["holdout_hypothesis_outcome"] == CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME, p_tag
+        assert rep_bp["holdout_hypothesis_outcome"] == CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME, p_tag
+
+    # 3d. Valid zero-straddling `M_KL1_SAME` (`S_same = [0.03 +/- 0.02]`, `lg_D = 0.12` -> `[-0.02, +0.02]`)
+    #     causes `UNRESOLVED/INCOMPLETE_COVERAGE` (`all_required_branches_resolved = False`):
+    s_strad = copy.deepcopy(sec5)
+    sp81_st = s_strad["continuous_interval_case_splits"]["interval_81_pm_2_neg12_across_T243"]
+    sp81_st["branches"][0]["S_same_Y"] = strip_enclosure_arb_for_json(
+        serialize_arb_certified(arb("0.03") + arb(0, "0.02"))
+    )
+    sp81_st["branches"][0]["log_Y_times_D_tilde"] = strip_enclosure_arb_for_json(
+        serialize_arb_certified(arb("0.12"))
+    )
+    sp81_st["union_S_same_Y"] = strip_enclosure_arb_for_json(serialize_arb_certified(arb(0, 1)))
+    sp81_st["union_log_Y_times_D_tilde"] = strip_enclosure_arb_for_json(serialize_arb_certified(arb(0, 1)))
+    sp81_st_upd, _ = attach_tc063r_kl1_certificates_to_split_dict(
+        sp81_st,
+        source_numerical_commit=tc063_artifact["provenance"]["numerical_producing_git_commit"],
+        derivation_commit="deadbeef",
+    )
+    s_strad["continuous_interval_case_splits"]["interval_81_pm_2_neg12_across_T243"] = sp81_st_upd
+    s5_st, _, rep_st = _run_both_tc063r(s_strad, "straddling_kl1")
+    assert s5_st["certification_integrity_ok"] is True
+    assert s5_st["per_candidate_mathematical_outcomes"]["KL1_same_chain"] == "UNRESOLVED/INCOMPLETE_COVERAGE"
+    assert rep_st["all_mathematical_and_numerical_checks_pass"] is False
+
+    # 4. Valid positive-margin KL1 witness on an admissible branch certifies `REFUTED_BY_CERTIFIED_WITNESS`
+    #    (even when branch 1 is missing), whereas a disjoint extra branch refuses refutation:
+    s_kl1_fail = copy.deepcopy(sec5)
+    sp81_kf = copy.deepcopy(splits["interval_81_pm_2_neg12_across_T243"])
+    sp81_kf["branches"] = [sp81_kf["branches"][0]]
+    sp81_kf["active_branch_count"] = 1
+    sp81_kf["branches"][0]["S_same_Y"] = strip_enclosure_arb_for_json(serialize_arb_certified(arb(1)))
+    sp81_kf["branches"][0]["S_different_Y"] = strip_enclosure_arb_for_json(serialize_arb_certified(arb(1)))
+    sp81_kf["union_S_same_Y"] = strip_enclosure_arb_for_json(serialize_arb_certified(arb(0, 2)))
+    sp81_kf["union_S_different_Y"] = strip_enclosure_arb_for_json(serialize_arb_certified(arb(0, 2)))
+    sp81_kf_upd, _ = attach_tc063r_kl1_certificates_to_split_dict(
+        sp81_kf,
+        source_numerical_commit=tc063_artifact["provenance"]["numerical_producing_git_commit"],
+        derivation_commit="deadbeef",
+    )
+    s_kl1_fail["continuous_interval_case_splits"]["interval_81_pm_2_neg12_across_T243"] = sp81_kf_upd
+    s5_kf, _, rep_kf = _run_both_tc063r(s_kl1_fail, "admissible_kl1_fail")
+    assert s5_kf["per_candidate_mathematical_outcomes"]["KL1_same_chain"] == "REFUTED_BY_CERTIFIED_WITNESS"
+    assert s5_kf["per_candidate_mathematical_outcomes"]["KL1_different_chain"] == "REFUTED_BY_CERTIFIED_WITNESS"
+    assert (
+        rep_kf["section_5_unseen_validation_and_interval_splits"][
+            "per_candidate_mathematical_outcomes"
+        ]["KL1_same_chain"]
+        == "REFUTED_BY_CERTIFIED_WITNESS"
+    )
+
+    # Disjoint conservative extra branch (`[80, 80.99]`) with positive KL1 margins CANNOT refute:
+    sp81_disj_kl1 = copy.deepcopy(splits["interval_81_pm_2_neg12_across_T243"])
+    ex_kl1 = copy.deepcopy(sp81_disj_kl1["branches"][0])
+    ex_kl1["branch_role"] = "POSSIBLY_EMPTY_CONSERVATIVE_BRANCH"
+    ex_kl1["T_fixed"] = 242
+    y_dj = arb.union(arb(80), arb(8099) / arb(100))
+    dj_lo_q, dj_hi_q = _exact_arb_endpoints_as_fractions(y_dj)
+    dj_m, dj_r = y_dj.mid().man_exp(), y_dj.rad().man_exp()
+    ex_kl1["Y_sub_ball"] = strip_enclosure_arb_for_json(serialize_arb_certified(y_dj))
+    ex_kl1["evaluated_Y_interval_exact_fractions"] = [
+        f"{dj_lo_q.numerator}/{dj_lo_q.denominator}",
+        f"{dj_hi_q.numerator}/{dj_hi_q.denominator}",
+    ]
+    ex_kl1["evaluated_Y_mid_man_exp"] = [int(dj_m[0]), int(dj_m[1])]
+    ex_kl1["evaluated_Y_rad_man_exp"] = [int(dj_r[0]), int(dj_r[1])]
+    ex_kl1["S_same_Y"] = strip_enclosure_arb_for_json(serialize_arb_certified(arb(1)))
+    ex_kl1["S_different_Y"] = strip_enclosure_arb_for_json(serialize_arb_certified(arb(1)))
+    d_ex = derive_kl1_branch_margins_from_serialized_branch_tc063r(
+        ex_kl1,
+        source_numerical_commit=tc063_artifact["provenance"]["numerical_producing_git_commit"],
+        derivation_commit="deadbeef",
+    )
+    ex_kl1["M_KL1_SAME"] = strip_enclosure_arb_for_json(d_ex["M_KL1_SAME"])
+    ex_kl1["M_KL1_DIFF"] = strip_enclosure_arb_for_json(d_ex["M_KL1_DIFF"])
+    ex_kl1["KL1_same_chain_branch_classification"] = d_ex["KL1_same_chain_branch_classification"]
+    ex_kl1["KL1_different_chain_branch_classification"] = d_ex["KL1_different_chain_branch_classification"]
+    ex_kl1["tc063r_derived_kl1_provenance"] = d_ex["tc063r_derived_kl1_provenance"]
+    sp81_disj_kl1["branches"].append(ex_kl1)
+    sp81_disj_kl1["active_branch_count"] = 3
+    for u_f_w in ("union_S_same_Y", "union_S_different_Y", "union_M_KL1_SAME", "union_M_KL1_DIFF"):
+        sp81_disj_kl1[u_f_w] = strip_enclosure_arb_for_json(serialize_arb_certified(arb(0, 2)))
+    sp81_disj_kl1["KL1_same_chain_interval_classification"] = {"verdict": "UNRESOLVED"}
+    sp81_disj_kl1["KL1_different_chain_interval_classification"] = {"verdict": "UNRESOLVED"}
+    ia_dj_kl1 = audit_continuous_interval_split_certificate_tc063(
+        "interval_81_pm_2_neg12_across_T243",
+        sp81_disj_kl1,
+        artifact_provenance=tc063_artifact["provenance"],
+    )
+    assert ia_dj_kl1["certification_integrity_ok"] is True
+    assert ia_dj_kl1["derived_probe_outcomes"]["KL1_same_chain"] == "SURVIVED_TESTED_POINTS"
+    assert ia_dj_kl1["derived_probe_outcomes"]["KL1_different_chain"] == "SURVIVED_TESTED_POINTS"
+
+    # 5. No interval-survival inference from point-only results:
+    s_point_only = copy.deepcopy(sec5)
+    for sp_po in s_point_only["continuous_interval_case_splits"].values():
+        for k_po in (
+            "union_M_KL1_SAME",
+            "union_M_KL1_DIFF",
+            "KL1_same_chain_interval_classification",
+            "KL1_different_chain_interval_classification",
+            "tc063r_derived_kl1_interval_provenance",
+        ):
+            sp_po.pop(k_po, None)
+        for br_po in sp_po["branches"]:
+            for bk_po in (
+                "M_KL1_SAME",
+                "M_KL1_DIFF",
+                "KL1_same_chain_branch_classification",
+                "KL1_different_chain_branch_classification",
+                "tc063r_derived_kl1_provenance",
+            ):
+                br_po.pop(bk_po, None)
+    s5_po, top_po, rep_po = _run_both_tc063r(s_point_only, "point_only_kl1")
+    assert all(
+        r["kl1_sub_budget_evaluations"]["KL1_same_chain"]["verdict"] == "PASS"
+        and r["kl1_sub_budget_evaluations"]["KL1_different_chain"]["verdict"] == "PASS"
+        for r in s_point_only["holdout_point_evaluations"]
+    )
+    assert s5_po["per_candidate_mathematical_outcomes"]["KL1_same_chain"] == "UNRESOLVED/INCOMPLETE_COVERAGE"
+    assert s5_po["per_candidate_mathematical_outcomes"]["KL1_different_chain"] == "UNRESOLVED/INCOMPLETE_COVERAGE"
+    assert top_po["holdout_hypothesis_outcome"] == "PARTIAL_REFUTATION_WITH_UNRESOLVED_OR_INCOMPLETE_SIBLINGS"
+    assert rep_po["all_mathematical_and_numerical_checks_pass"] is False
+
+    # 6. Byte-for-byte preservation of all 674 original TC-063 enclosures & semantic idempotence:
+    base_cmp = compare_tc063r_against_tc063_baseline(tc063_artifact)
+    assert base_cmp["baseline_commit"] == REVIEWED_TC063_DELIVERED_TIP
+    assert base_cmp["comparison_status"] == "COMPLETE_COMPARED"
+    enc_rep = base_cmp["enclosure_preservation_report"]
+    assert enc_rep["baseline_arb_ball_count"] == 674
+    assert enc_rep["current_arb_ball_count"] == 688
+    assert enc_rep["preserved_original_arb_ball_count"] == 674
+    assert enc_rep["all_674_original_enclosures_byte_identical"] is True
+    assert enc_rep["added_derived_kl1_ball_count"] == 14
+    assert base_cmp["mathematical_verdict_report"]["any_shared_mathematical_verdict_changed"] is False
+    assert base_cmp["mathematical_verdict_report"]["added_tc063r_kl1_interval_verdict_key_count"] == 18
+    assert (
+        base_cmp["mathematical_verdict_report"]["pre_derivation_audit_of_baseline_point_only_kl1"][
+            "KL1_same_chain_before_interval_derivation"
+        ]
+        == "UNRESOLVED/INCOMPLETE_COVERAGE"
+    )
+    assert base_cmp["provenance_field_report"]["generated_at_utc_and_immutable_producers_preserved"] is True
+
+    # Semantic idempotence of repeated `reprocess_task_tc063_metadata_and_lean_audit` AND
+    # repeated `apply_tc063r_repairs_and_derive_kl1_certificates`:
+    p_idem = tmp_path / "idem_tc063r.json"
+    p_idem.write_text(json.dumps(tc063_artifact), encoding="utf-8")
+    r_idem_1 = apply_tc063r_repairs_and_derive_kl1_certificates(
+        p_idem,
+        write_output=True,
+        derivation_commit_override="abc1234",
+        validation_commit_override="def5678",
+    )
+    r_idem_2 = apply_tc063r_repairs_and_derive_kl1_certificates(
+        p_idem,
+        write_output=True,
+        derivation_commit_override="abc1234",
+        validation_commit_override="def5678",
+    )
+    r_rep_1 = reprocess_task_tc063_metadata_and_lean_audit(
+        p_idem, write_output=True, validation_commit_override="def5678"
+    )
+    r_rep_2 = reprocess_task_tc063_metadata_and_lean_audit(
+        p_idem, write_output=False, validation_commit_override="def5678"
+    )
+    for a_lhs, a_rhs in ((r_idem_1, r_idem_2), (r_rep_1, r_rep_2)):
+        c1, c2 = copy.deepcopy(a_lhs), copy.deepcopy(a_rhs)
+        c1["provenance"].pop("reprocessed_at_utc", None)
+        c2["provenance"].pop("reprocessed_at_utc", None)
+        assert c1 == c2
+

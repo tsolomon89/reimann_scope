@@ -839,6 +839,7 @@ def test_tc054_review_and_state_synchronization() -> None:
         "TASK-TC-062R3",
         "TASK-TC-062R4",
         "TASK-TC-063",
+        "TASK-TC-063R",
     )
     tc055_entries = [t for t in queue["tasks"] if t["task_id"] == "TASK-TC-055"]
     assert len(tc055_entries) == 1
