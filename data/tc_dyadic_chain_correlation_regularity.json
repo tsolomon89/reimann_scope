@@ -28,7 +28,7 @@
     "frozen_tc063_protocol_registration_commit": "767ff30dcd605e82f7d855fb0b86ee59919eceb8",
     "frozen_tc063_protocol_sha256": "a5ced83b7aede12e5bcfc4c146a0edb57f7a668ad773098bff44c71e2471edff",
     "numerical_producing_git_commit": "767ff30dcd605e82f7d855fb0b86ee59919eceb8",
-    "validation_git_commit": "49ed579cc1d165cbadfb494ba3b98983b18fa22f",
+    "validation_git_commit": "3ac1c6fc8d0c7a9f61c0bdc136e1d7a7fb751a68",
     "formal_producing_git_commit": "ba34faa4df3fc1ef3067b9203a6bdcaf1d7a9e81",
     "self_verdict_comparison": {
       "comparison_id": "TC063_SELF_CONSISTENCY_V1",
@@ -36,14 +36,12 @@
       "comparable_verdict_key_count": 128,
       "any_mathematical_verdict_changed": false,
       "changed_mathematical_verdict_keys": [],
-      "any_status_classification_changed": true,
-      "changed_status_keys": [
-        "top.all_mathematical_and_numerical_checks_pass"
-      ],
+      "any_status_classification_changed": false,
+      "changed_status_keys": [],
       "missing_status_keys": [],
       "removed_status_or_schema_fields": []
     },
-    "reprocessed_at_utc": "2026-11-19T01:04:08.096006+00:00"
+    "reprocessed_at_utc": "2026-11-19T01:05:01.965840+00:00"
   },
   "section_1_protocols_endpoint_and_premise_chain": {
     "epistemic_statuses": [
