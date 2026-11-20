@@ -1,0 +1,1034 @@
+{
+  "protocol_id": "TC064-SQUAREFREE-CORE-CORRELATION-PROTOCOL-V1",
+  "schema_version": "1.0.0",
+  "task_id": "TASK-TC-064",
+  "epic_id": "EPIC-TC-042",
+  "parent_subgate": "SUBGATE-TC-043A",
+  "preregistration_stage": "FROZEN_BEFORE_ANY_TC064_UNSEEN_VALIDATION_EVALUATION",
+  "circle_constant_convention": "tau_exclusively",
+  "grade_variable_convention": "K reserved strictly for real-algebraic geometric grades in A_R; Hcal_Y, Kcal_Y, and Mcal_Y for kernels; z = x + i*y complex coordinates; Y real analytic scale",
+  "baseline_provenance": {
+    "reviewed_main_baseline": "bf3babfb7857e41c0ea53235d82a48181cefee84",
+    "accepted_tc063r_delivered_tip": "8172c74b4218961e3c0e04af6b4fef936f14a1d2",
+    "preserved_tc061_protocol_id": "TC061-MIXED-ARITHMETIC-COVARIANCE-PROTOCOL-V1",
+    "preserved_tc061_protocol_registration_commit": "bc2f9f709f868ef02981600873dfa0c05da0ba0c",
+    "preserved_tc061_protocol_sha256": "c892c4c5a1ff2a60a11fa499b2d2bc017e01f0426e4aa8feef5880aaff8a70eb",
+    "preserved_tc062_protocol_id": "TC062-JOINT-PRIME-DILATION-SIGNED-REMAINDER-PROTOCOL-V1",
+    "preserved_tc062_protocol_registration_commit": "4961b03130bf1f353570a0e9c62ede4e1a2bf27d",
+    "preserved_tc062_protocol_sha256": "d56fbd30df9d8adf01ff41d0f207d06092a941fa79f593ef6c61382b72fc32df",
+    "preserved_tc063_protocol_id": "TC063-DYADIC-CHAIN-CORRELATION-REGULARITY-PROTOCOL-V1",
+    "preserved_tc063_protocol_registration_commit": "767ff30dcd605e82f7d855fb0b86ee59919eceb8",
+    "preserved_tc063_protocol_sha256": "a5ced83b7aede12e5bcfc4c146a0edb57f7a668ad773098bff44c71e2471edff",
+    "upstream_source_hashes_sha256": {
+      "tc/mixed_arithmetic_covariance.py": "93cc722afdbb6529c4dac9e3fb3b1bbfe316422df1e355e1b26cad761172ca85",
+      "tc/joint_prime_dilation_signed_remainder.py": "89f60643c07b03f7bb790c2b86db06797bb2829ab0f7a116c668b30f161953c8",
+      "tc/dyadic_chain_correlation_regularity.py": "e0aaf738a787a2d493b011f1f47101eac55d10001bb41c0a3626ab27e6919294",
+      "formal/RiemannScope/DyadicChainCorrelationRegularity.lean": "da5e2914e547f3588c419a5ae74e61314e63a7c387a48c13f8f378ed6690bf20",
+      "data/tc_mixed_arithmetic_covariance_protocol.json": "96bbe2c95e29debd904bfb0358216ac60206602c357c5394f2f72330a5ece549",
+      "data/tc_joint_prime_dilation_signed_remainder_protocol.json": "23c5d952c18a02958927ed1e80f01c864414e539e3158b48467af34e82d94a4c",
+      "data/tc_dyadic_chain_correlation_regularity_protocol.json": "3f8ec2d8565ae77041bf762b9ec8cddb14cdd58e1cf1ca0fceb6dcdb5c53ac81",
+      "data/tc_dyadic_chain_correlation_regularity.json": "637aad7dfcf723d6d9b0b7ac2659467422218a1fca9a892aa5a2fe73f17f83eb"
+    }
+  },
+  "exact_mathematical_object": {
+    "domain": "Y in R, Y >= 2",
+    "window_inner_product": "<f, g>_Y = int_Y^{tau*Y} f(X)*g(X) dX/X",
+    "canonical_cutoffs": {
+      "T_Y": "ceil(Y^(5/4))",
+      "D0_Y": "floor(log Y)",
+      "effective_small_divisor_cutoff": "min(D0(Y), T(Y) - 1)"
+    },
+    "squarefree_core_definitions": {
+      "O_T": "{u >= 1 : u odd and 2*u <= T}",
+      "J_u_T": "{j >= 0 : 2 * 4^j * u <= T}",
+      "C_T": "{a >= 1 : a odd squarefree and 2*a <= T}",
+      "B_a_T": "{b >= 1 : b odd and 2 * a * b^2 <= T}",
+      "Ucal_u": "sum_{j in J_u(T)} (psi_{Y, 4^j * u} - psi_{Y, 2 * 4^j * u})",
+      "Vcal_u": "sum_{j in J_u(T)} (G_{4^j * u} - G_{2 * 4^j * u})",
+      "A_a": "sum_{b in B_a(T)} Ucal_{a * b^2}",
+      "Bfeature_a": "sum_{b in B_a(T)} Vcal_{a * b^2}",
+      "S_core_Y": "sum_{a != c in C(T)} mu(a)*mu(c)*(<A_a, A_c>_Y - 4*<Bfeature_a, Bfeature_c>_Y)",
+      "R_square_Y": "sum_{a in C(T)} (||A_a||_Y^2 - 4*||Bfeature_a||_Y^2) - sum_{u in O(T)} (||Ucal_u||_Y^2 - 4*||Vcal_u||_Y^2) (using displayed Gram diagonals, NEVER literal full-kernel diagonal values)",
+      "complete_kernel_split": "S_different(Y) = R_square(Y) + S_core(Y)",
+      "D_tilde_Y": "inherited grouped prime-power diagonal (sum over multiples q^a | n BEFORE squaring)"
+    }
+  },
+  "full_closure_target_and_same_core_reduction": {
+    "inherited_target_id": "TC063-OBL-DISTINCT-ODD-CHAIN-CORRELATION",
+    "proved_same_core_bound": "sum_{a in C(T(Y))} (||A_a||_Y^2 + ||Bfeature_a||_Y^2) <= C_core*(1 + log Y) and |R_square(Y)| <= C_square*(1 + log Y) for all real Y >= 2",
+    "reduced_distinct_core_target_id": "TC064-OBL-DISTINCT-SQUAREFREE-CORE-CORRELATION",
+    "reduced_target_statement": "forall eta > 0, exists a_eta, b_eta >= 0, 0 < kappa_eta <= 2, Y_eta >= 2: forall real Y >= Y_eta, S_core(Y) <= a_eta * Y^eta + b_eta * (log Y)^(2 - kappa_eta) * D_tilde(Y)",
+    "epistemic_role": "RH_LEVEL_QUANTITATIVE_CLOSURE_TARGET_OPEN"
+  },
+  "frozen_candidate_probes": [
+    {
+      "probe_id": "TC064-P0-CORE",
+      "tier": "PRIMARY",
+      "observable_key": "S_core_Y",
+      "formula": "S_core(Y) <= (log Y) * D_tilde(Y) for every real Y >= 54",
+      "margin_formula": "M_{P0-CORE}(Y) = S_core(Y) - (log Y) * D_tilde(Y)",
+      "a_fraction": "0/1",
+      "a_numerator": 0,
+      "a_denominator": 1,
+      "eta_fraction": null,
+      "b_fraction": "1/1",
+      "b_numerator": 1,
+      "b_denominator": 1,
+      "kappa_fraction": "1/1",
+      "domain_threshold_Y0": "54",
+      "calibration_dependency": "NONE_FIXED_A_PRIORI"
+    },
+    {
+      "probe_id": "TC064-P-HALF-CORE",
+      "tier": "SECONDARY",
+      "observable_key": "S_core_Y",
+      "formula": "S_core(Y) <= (log Y) * D_tilde(Y) for every real Y >= 16 (calibrated U_{1/2} = 0 on C = {16, 32, 64})",
+      "margin_formula": "M_{P-HALF-CORE}(Y) = S_core(Y) - (log Y) * D_tilde(Y)",
+      "a_fraction": "0/1",
+      "a_numerator": 0,
+      "a_denominator": 1,
+      "eta_fraction": "1/2",
+      "b_fraction": "1/1",
+      "b_numerator": 1,
+      "b_denominator": 1,
+      "kappa_fraction": "1/1",
+      "domain_threshold_Y0": "16",
+      "calibration_dependency": "CALIBRATED_STRICTLY_ON_PREVIOUSLY_OBSERVED_C_16_32_64"
+    },
+    {
+      "probe_id": "TC064-P-NEG-CORE",
+      "tier": "SECONDARY",
+      "observable_key": "S_core_Y",
+      "formula": "S_core(Y) <= 0 for every real Y >= 54 (zero-slack distinct-core sign probe; calibrated on C = {16, 32, 64})",
+      "margin_formula": "M_{P-NEG-CORE}(Y) = S_core(Y)",
+      "a_fraction": "0/1",
+      "a_numerator": 0,
+      "a_denominator": 1,
+      "eta_fraction": null,
+      "b_fraction": "0/1",
+      "b_numerator": 0,
+      "b_denominator": 1,
+      "kappa_fraction": "2/1",
+      "domain_threshold_Y0": "54",
+      "calibration_dependency": "CALIBRATED_STRICTLY_ON_PREVIOUSLY_OBSERVED_C_16_32_64"
+    },
+    {
+      "probe_id": "TC064-RSQUARE-LOCAL-HILBERT",
+      "tier": "THEOREM_BOUND_CHECK",
+      "observable_key": "R_square_Y",
+      "formula": "|R_square(Y)| <= sum_{a in C(T)} (||A_a||_Y^2 + 4*||Bfeature_a||_Y^2) + sum_{u in O(T)} (||Ucal_u||_Y^2 + 4*||Vcal_u||_Y^2) for every real Y >= 2",
+      "margin_formula": "M_{RSQ-LOC}(Y) = |R_square(Y)| - (sum_a (||A_a||_Y^2 + 4*||Bfeature_a||_Y^2) + sum_u (||Ucal_u||_Y^2 + 4*||Vcal_u||_Y^2))",
+      "a_fraction": "0/1",
+      "a_numerator": 0,
+      "a_denominator": 1,
+      "eta_fraction": null,
+      "b_fraction": "0/1",
+      "b_numerator": 0,
+      "b_denominator": 1,
+      "kappa_fraction": null,
+      "domain_threshold_Y0": "2",
+      "calibration_dependency": "PROVED_UNIFORMLY_IN_LEAN"
+    }
+  ],
+  "preregistered_mechanism_decomposition": {
+    "lemma_candidate_id": "TC064-KL1-SQUARE-AND-CORE-SPLIT",
+    "decomposition": "S_different(Y) = R_square(Y) + S_core(Y)",
+    "sub_budgets_for_S_different": {
+      "KL1_same_core_square": "R_square(Y) <= (1/4) * (log Y) * D_tilde(Y) for Y >= 54",
+      "KL1_distinct_core": "S_core(Y) <= (3/4) * (log Y) * D_tilde(Y) for Y >= 54"
+    }
+  },
+  "registered_deliverable_c_analytic_subcandidates": [
+    {
+      "candidate_id": "TC064-CAND-C1A-CORE-SECTOR-NONPOS",
+      "attempt": "Attempt 1 (Complete-difference common-factor/coprime squarefree core decomposition a = g*r, c = g*t)",
+      "statement": "For all Y >= 16 and all odd squarefree g in G_core(T(Y)), Pi_Y^core(g) := sum_{(r, t) in P_core(T; g)} mu(r)*mu(t)*(<A_{g*r}, A_{g*t}>_Y - 4*<Bfeature_{g*r}, Bfeature_{g*t}>_Y) <= 0",
+      "domain_threshold_Y0": "16"
+    },
+    {
+      "candidate_id": "TC064-CAND-C2A-TOGGLE-PAIR-NONPOS",
+      "attempt": "Attempt 2 (Exact squarefree prime-toggle involution mu(a star p) = -mu(a))",
+      "statement": "For all Y >= 16, all odd primes p >= 3, and all a in C(floor(T(Y)/p)) with p nmid a, 2*mu(a)*mu(p*a)*(<A_a, A_{p*a}>_Y - 4*<Bfeature_a, Bfeature_{p*a}>_Y) <= 0",
+      "domain_threshold_Y0": "16"
+    }
+  ],
+  "calibration_and_prior_exposure_separation": {
+    "diagnostic_set_outside_domain": [
+      2,
+      4,
+      8
+    ],
+    "previously_observed_calibration_set_C": [
+      16,
+      32,
+      64
+    ],
+    "seen_mechanism_diagnostic_scales_tc064_section_6": [
+      512,
+      576,
+      960,
+      1408
+    ],
+    "seen_scales_non_holdout_rule": "Scales 512, 576, 960, and 1408 were explored previously in TC-061..TC-063 and reused in TC-064 Section 6 strictly as SEEN mechanism diagnostics; they are NEVER labeled unseen holdouts.",
+    "previously_exposed_scales_excluded_from_tc064_unseen_validation": [
+      "2",
+      "9/4",
+      "5/2",
+      "e",
+      "11/4",
+      "299/100",
+      "3",
+      "7/2",
+      "15/4",
+      "4",
+      "5",
+      "6",
+      "7",
+      "e^2",
+      "8",
+      "10",
+      "12",
+      "16 - 2^(-10)",
+      "16 - 2^(-100)",
+      "16",
+      "16 + 2^(-100)",
+      "16 + 2^(-10)",
+      "20",
+      "24",
+      "32",
+      "65/2",
+      "33",
+      "48",
+      "64",
+      "81 - 2^(-12)",
+      "81 - 2^(-100)",
+      "81",
+      "81 + 2^(-100)",
+      "81 + 2^(-12)",
+      "96",
+      "112",
+      "128",
+      "144",
+      "e^5*(1 - 2^(-12))",
+      "e^5*(1 + 2^(-12))",
+      "160",
+      "192",
+      "224",
+      "256 - 2^(-12)",
+      "256",
+      "256 + 2^(-12)",
+      "288",
+      "320",
+      "384",
+      "e^6*(1 - 2^(-12))",
+      "e^6*(1 + 2^(-12))",
+      "448",
+      "512",
+      "576",
+      "625 - 2^(-12)",
+      "625 + 2^(-12)",
+      "768",
+      "960",
+      "1024",
+      "e^7*(1 - 2^(-12))",
+      "e^7*(1 + 2^(-12))",
+      "1280",
+      "1408",
+      "1536",
+      "2048",
+      "4096"
+    ],
+    "calibrated_S_core_secondary_constants": {
+      "1/2": {
+        "eta_fraction": "1/2",
+        "calibration_set_C": [
+          16,
+          32,
+          64
+        ],
+        "maximizer_Y_in_C": null,
+        "U_eta_exact_numerator": "0",
+        "U_eta_exact_denominator": "1",
+        "ceil_64_U_eta_int": 0,
+        "a_eta_fraction": "0/1",
+        "a_eta_numerator": 0,
+        "a_eta_denominator": 1,
+        "per_calibration_point_quotients": [
+          {
+            "Y": 16,
+            "quotient_ball": {
+              "mid_float": -0.029344505454874062,
+              "rad_float_outward": 9.973214445676536e-19,
+              "lower_dec": "-2.934450545487406092536620014244154621910e-2",
+              "upper_dec": "-2.934450545487406092536620014244154621907e-2",
+              "arb_ball_str": "[-0.02934450545487406092536620014244154621908 +/- 3.84e-42]"
+            }
+          },
+          {
+            "Y": 32,
+            "quotient_ball": {
+              "mid_float": -0.02192039454735825,
+              "rad_float_outward": 1.5477043324783041e-18,
+              "lower_dec": "-2.192039454735824984715556574354873831690e-2",
+              "upper_dec": "-2.192039454735824984715556574354873831687e-2",
+              "arb_ball_str": "[-0.02192039454735824984715556574354873831689 +/- 2.86e-42]"
+            }
+          },
+          {
+            "Y": 64,
+            "quotient_ball": {
+              "mid_float": -0.02079833733751302,
+              "rad_float_outward": 7.217000554758603e-19,
+              "lower_dec": "-2.079833733751302179976152582393531155418e-2",
+              "upper_dec": "-2.079833733751302179976152582393531155415e-2",
+              "arb_ball_str": "[-0.02079833733751302179976152582393531155416 +/- 3.52e-42]"
+            }
+          }
+        ]
+      },
+      "1/4": {
+        "eta_fraction": "1/4",
+        "calibration_set_C": [
+          16,
+          32,
+          64
+        ],
+        "maximizer_Y_in_C": null,
+        "U_eta_exact_numerator": "0",
+        "U_eta_exact_denominator": "1",
+        "ceil_64_U_eta_int": 0,
+        "a_eta_fraction": "0/1",
+        "a_eta_numerator": 0,
+        "a_eta_denominator": 1,
+        "per_calibration_point_quotients": [
+          {
+            "Y": 16,
+            "quotient_ball": {
+              "mid_float": -0.058689010909748124,
+              "rad_float_outward": 1.9946428891353072e-18,
+              "lower_dec": "-5.868901090974812185073240028488309243818e-2",
+              "upper_dec": "-5.868901090974812185073240028488309243815e-2",
+              "arb_ball_str": "[-0.05868901090974812185073240028488309243817 +/- 2.33e-42]"
+            }
+          },
+          {
+            "Y": 32,
+            "quotient_ball": {
+              "mid_float": -0.052135778318770566,
+              "rad_float_outward": 2.1189327764236804e-18,
+              "lower_dec": "-5.213577831877056405644469131992117240896e-2",
+              "upper_dec": "-5.213577831877056405644469131992117240893e-2",
+              "arb_ball_str": "[-0.05213577831877056405644469131992117240894 +/- 2.34e-42]"
+            }
+          },
+          {
+            "Y": 64,
+            "quotient_ball": {
+              "mid_float": -0.058826581475043285,
+              "rad_float_outward": 1.655297699607494e-18,
+              "lower_dec": "-5.882658147504328692951560756164671566718e-2",
+              "upper_dec": "-5.882658147504328692951560756164671566715e-2",
+              "arb_ball_str": "[-0.05882658147504328692951560756164671566717 +/- 3.87e-42]"
+            }
+          }
+        ]
+      }
+    },
+    "diagnostic_set_evaluations": [
+      {
+        "Y": 2,
+        "T_Y": 3,
+        "D0_eff": 0,
+        "odd_chain_count_O_T": 1,
+        "squarefree_core_count_C_T": 1,
+        "max_chain_length_L_T": 1,
+        "E_Y": {
+          "mid_float": 0.11237427864768398,
+          "rad_float_outward": 3.679929483816847e-18,
+          "lower_dec": "1.123742786476839875693232278102696112238e-1",
+          "upper_dec": "1.123742786476839875693232278102696112241e-1",
+          "arb_ball_str": "[0.1123742786476839875693232278102696112239 +/- 3.04e-41]"
+        },
+        "D_tilde_Y": {
+          "mid_float": 0.0528119280098526,
+          "rad_float_outward": 1.8573512681455732e-18,
+          "lower_dec": "5.281192800985260079932681145742792781768e-2",
+          "upper_dec": "5.281192800985260079932681145742792781771e-2",
+          "arb_ball_str": "[0.05281192800985260079932681145742792781769 +/- 4.30e-42]"
+        },
+        "log_Y_times_D_tilde": {
+          "mid_float": 0.03660643899996413,
+          "rad_float_outward": 3.409366575112905e-18,
+          "lower_dec": "3.660643899996413383011662762098785411145e-2",
+          "upper_dec": "3.660643899996413383011662762098785411148e-2",
+          "arb_ball_str": "[0.03660643899996413383011662762098785411147 +/- 3.37e-42]"
+        },
+        "S_different_Y": {
+          "mid_float": -8.636168555094445e-78,
+          "rad_float_outward": 1.1828784950827278e-73,
+          "lower_dec": "-1.182964856768278575982531432141327817343e-73",
+          "upper_dec": "1.182792133397176687090023705104071809351e-73",
+          "arb_ball_str": "[+/- 1.19e-73]"
+        },
+        "R_square_Y": {
+          "mid_float": 0.0,
+          "rad_float_outward": 1.8351858919537102e-77,
+          "lower_dec": "-1.835185891953709831497515469092522402519e-77",
+          "upper_dec": "1.835185891953709831497515469092522402519e-77",
+          "arb_ball_str": "[+/- 1.84e-77]"
+        },
+        "S_core_Y": {
+          "mid_float": -8.636168555094445e-78,
+          "rad_float_outward": 1.1830620149822983e-73,
+          "lower_dec": "-1.183148376667849075834636295161984082242e-73",
+          "upper_dec": "1.182975653296747186942128568124728074251e-73",
+          "arb_ball_str": "[+/- 1.19e-73]"
+        },
+        "sum_A_norm_sq": {
+          "mid_float": 0.6335326138627175,
+          "rad_float_outward": 2.695902882247307e-17,
+          "lower_dec": "6.335326138627175577095301049280008496337e-1",
+          "upper_dec": "6.335326138627175577095301049280008496340e-1",
+          "arb_ball_str": "[0.6335326138627175577095301049280008496339 +/- 1.80e-41]"
+        },
+        "sum_Bfeat_norm_sq": {
+          "mid_float": 0.018908348281058907,
+          "rad_float_outward": 1.1412774206057084e-18,
+          "lower_dec": "1.890834828105890836110893142101928520857e-2",
+          "upper_dec": "1.890834828105890836110893142101928520860e-2",
+          "arb_ball_str": "[0.01890834828105890836110893142101928520859 +/- 2.78e-42]"
+        }
+      },
+      {
+        "Y": 4,
+        "T_Y": 6,
+        "D0_eff": 1,
+        "odd_chain_count_O_T": 2,
+        "squarefree_core_count_C_T": 2,
+        "max_chain_length_L_T": 1,
+        "E_Y": {
+          "mid_float": 0.004608633312722756,
+          "rad_float_outward": 2.869350901878105e-19,
+          "lower_dec": "4.608633312722755964394753036415613296615e-3",
+          "upper_dec": "4.608633312722755964394753036415613296618e-3",
+          "arb_ball_str": "[0.004608633312722755964394753036415613296616 +/- 3.52e-43]"
+        },
+        "D_tilde_Y": {
+          "mid_float": 0.030921682373364054,
+          "rad_float_outward": 1.6525769743946025e-18,
+          "lower_dec": "3.092168237336405554994579382923466558876e-2",
+          "upper_dec": "3.092168237336405554994579382923466558879e-2",
+          "arb_ball_str": "[0.03092168237336405554994579382923466558877 +/- 5.66e-43]"
+        },
+        "log_Y_times_D_tilde": {
+          "mid_float": 0.042866553910534906,
+          "rad_float_outward": 3.419227463719724e-19,
+          "lower_dec": "4.286655391053490644412596947139512316253e-2",
+          "upper_dec": "4.286655391053490644412596947139512316256e-2",
+          "arb_ball_str": "[0.04286655391053490644412596947139512316255 +/- 4.23e-43]"
+        },
+        "S_different_Y": {
+          "mid_float": -0.031524223727915225,
+          "rad_float_outward": 1.7032246660339913e-18,
+          "lower_dec": "-3.152422372791522684934805626586932088835e-2",
+          "upper_dec": "-3.152422372791522684934805626586932088832e-2",
+          "arb_ball_str": "[-0.03152422372791522684934805626586932088833 +/- 4.79e-42]"
+        },
+        "R_square_Y": {
+          "mid_float": 0.0,
+          "rad_float_outward": 8.906835626618698e-78,
+          "lower_dec": "-8.906835626618696208149812897352627205374e-78",
+          "upper_dec": "8.906835626618696208149812897352627205374e-78",
+          "arb_ball_str": "[+/- 8.91e-78]"
+        },
+        "S_core_Y": {
+          "mid_float": -0.031524223727915225,
+          "rad_float_outward": 1.7032246660339913e-18,
+          "lower_dec": "-3.152422372791522684934805626586932088835e-2",
+          "upper_dec": "-3.152422372791522684934805626586932088832e-2",
+          "arb_ball_str": "[-0.03152422372791522684934805626586932088833 +/- 4.79e-42]"
+        },
+        "sum_A_norm_sq": {
+          "mid_float": 0.2753105032413804,
+          "rad_float_outward": 2.664837533544962e-17,
+          "lower_dec": "2.753105032413803732152827772861039318633e-1",
+          "upper_dec": "2.753105032413803732152827772861039318636e-1",
+          "arb_ball_str": "[0.2753105032413803732152827772861039318635 +/- 4.80e-41]"
+        },
+        "sum_Bfeat_norm_sq": {
+          "mid_float": 0.0057423487267309415,
+          "rad_float_outward": 1.661885493142846e-19,
+          "lower_dec": "5.742348726730941633688385109536365959611e-3",
+          "upper_dec": "5.742348726730941633688385109536365959614e-3",
+          "arb_ball_str": "[0.005742348726730941633688385109536365959612 +/- 4.24e-43]"
+        }
+      },
+      {
+        "Y": 8,
+        "T_Y": 14,
+        "D0_eff": 2,
+        "odd_chain_count_O_T": 4,
+        "squarefree_core_count_C_T": 4,
+        "max_chain_length_L_T": 2,
+        "E_Y": {
+          "mid_float": 0.016280644236178577,
+          "rad_float_outward": 1.14638474407536e-18,
+          "lower_dec": "1.628064423617857591478454843047804761283e-2",
+          "upper_dec": "1.628064423617857591478454843047804761286e-2",
+          "arb_ball_str": "[0.01628064423617857591478454843047804761284 +/- 2.05e-42]"
+        },
+        "D_tilde_Y": {
+          "mid_float": 0.02865016127083831,
+          "rad_float_outward": 1.390133139484707e-18,
+          "lower_dec": "2.865016127083830909980586532566004414666e-2",
+          "upper_dec": "2.865016127083830909980586532566004414669e-2",
+          "arb_ball_str": "[0.02865016127083830909980586532566004414668 +/- 3.79e-42]"
+        },
+        "log_Y_times_D_tilde": {
+          "mid_float": 0.05957633552240794,
+          "rad_float_outward": 3.3678716795708088e-18,
+          "lower_dec": "5.957633552240794081845579402906031217513e-2",
+          "upper_dec": "5.957633552240794081845579402906031217516e-2",
+          "arb_ball_str": "[0.05957633552240794081845579402906031217514 +/- 3.40e-42]"
+        },
+        "S_different_Y": {
+          "mid_float": -0.021989947596049178,
+          "rad_float_outward": 1.6354202098793811e-18,
+          "lower_dec": "-2.198994759604917640032842922460473151926e-2",
+          "upper_dec": "-2.198994759604917640032842922460473151923e-2",
+          "arb_ball_str": "[-0.02198994759604917640032842922460473151925 +/- 2.48e-42]"
+        },
+        "R_square_Y": {
+          "mid_float": 3.0361530076503907e-79,
+          "rad_float_outward": 1.2913710029946268e-73,
+          "lower_dec": "-1.291367966841618993006290880685676681847e-73",
+          "upper_dec": "1.291374039147634293787668105464330213378e-73",
+          "arb_ball_str": "[+/- 1.30e-73]"
+        },
+        "S_core_Y": {
+          "mid_float": -0.021989947596049178,
+          "rad_float_outward": 1.6354202098793811e-18,
+          "lower_dec": "-2.198994759604917640032842922460473151926e-2",
+          "upper_dec": "-2.198994759604917640032842922460473151923e-2",
+          "arb_ball_str": "[-0.02198994759604917640032842922460473151925 +/- 2.48e-42]"
+        },
+        "sum_A_norm_sq": {
+          "mid_float": 0.04058649812958514,
+          "rad_float_outward": 2.4882734653968185e-18,
+          "lower_dec": "4.058649812958514234843830949128816983863e-2",
+          "upper_dec": "4.058649812958514234843830949128816983866e-2",
+          "arb_ball_str": "[0.04058649812958514234843830949128816983865 +/- 3.29e-42]"
+        },
+        "sum_Bfeat_norm_sq": {
+          "mid_float": 0.009665530007244794,
+          "rad_float_outward": 5.005798919639011e-19,
+          "lower_dec": "9.665530007244793108253896348139273297708e-3",
+          "upper_dec": "9.665530007244793108253896348139273297711e-3",
+          "arb_ball_str": "[0.009665530007244793108253896348139273297710 +/- 2.52e-43]"
+        }
+      }
+    ],
+    "calibration_set_evaluations": [
+      {
+        "Y": 16,
+        "T_Y": 32,
+        "D0_eff": 2,
+        "odd_chain_count_O_T": 8,
+        "squarefree_core_count_C_T": 7,
+        "max_chain_length_L_T": 3,
+        "E_Y": {
+          "mid_float": 0.07304028417222569,
+          "rad_float_outward": 2.409422764444495e-18,
+          "lower_dec": "7.304028417222568662057747520983290617878e-2",
+          "upper_dec": "7.304028417222568662057747520983290617881e-2",
+          "arb_ball_str": "[0.07304028417222568662057747520983290617880 +/- 4.14e-42]"
+        },
+        "D_tilde_Y": {
+          "mid_float": 0.02969300014219565,
+          "rad_float_outward": 1.1627723977565932e-18,
+          "lower_dec": "2.969300014219565289323140283645826032687e-2",
+          "upper_dec": "2.969300014219565289323140283645826032690e-2",
+          "arb_ball_str": "[0.02969300014219565289323140283645826032689 +/- 1.24e-42]"
+        },
+        "log_Y_times_D_tilde": {
+          "mid_float": 0.08232647732371588,
+          "rad_float_outward": 5.292004792993076e-18,
+          "lower_dec": "8.232647732371588785339940081231390783075e-2",
+          "upper_dec": "8.232647732371588785339940081231390783078e-2",
+          "arb_ball_str": "[0.08232647732371588785339940081231390783077 +/- 1.25e-42]"
+        },
+        "S_different_Y": {
+          "mid_float": -0.027939313129595335,
+          "rad_float_outward": 2.6264307317196317e-19,
+          "lower_dec": "-2.793931312959533506853110262217909717744e-2",
+          "upper_dec": "-2.793931312959533506853110262217909717741e-2",
+          "arb_ball_str": "[-0.02793931312959533506853110262217909717743 +/- 3.27e-42]"
+        },
+        "R_square_Y": {
+          "mid_float": 0.007112231366185021,
+          "rad_float_outward": 2.954526563212978e-21,
+          "lower_dec": "7.112231366185020779534297135273179868138e-3",
+          "upper_dec": "7.112231366185020779534297135273179868141e-3",
+          "arb_ball_str": "[0.007112231366185020779534297135273179868140 +/- 1.52e-43]"
+        },
+        "S_core_Y": {
+          "mid_float": -0.03505154449578036,
+          "rad_float_outward": 2.342396667356461e-18,
+          "lower_dec": "-3.505154449578035584806539975745227704558e-2",
+          "upper_dec": "-3.505154449578035584806539975745227704555e-2",
+          "arb_ball_str": "[-0.03505154449578035584806539975745227704557 +/- 3.42e-42]"
+        },
+        "sum_A_norm_sq": {
+          "mid_float": 0.04240129450616175,
+          "rad_float_outward": 2.8418045267308094e-18,
+          "lower_dec": "4.240129450616175333895747804217279969718e-2",
+          "upper_dec": "4.240129450616175333895747804217279969721e-2",
+          "arb_ball_str": "[0.04240129450616175333895747804217279969720 +/- 1.89e-42]"
+        },
+        "sum_Bfeat_norm_sq": {
+          "mid_float": 0.008196105524380243,
+          "rad_float_outward": 6.072736589195203e-19,
+          "lower_dec": "8.196105524380242149958281312056846831775e-3",
+          "upper_dec": "8.196105524380242149958281312056846831778e-3",
+          "arb_ball_str": "[0.008196105524380242149958281312056846831777 +/- 6.5e-45]"
+        }
+      },
+      {
+        "Y": 32,
+        "T_Y": 77,
+        "D0_eff": 3,
+        "odd_chain_count_O_T": 19,
+        "squarefree_core_count_C_T": 16,
+        "max_chain_length_L_T": 3,
+        "E_Y": {
+          "mid_float": 0.03136294235359265,
+          "rad_float_outward": 3.3313428500365492e-18,
+          "lower_dec": "3.136294235359265630892143096718869405403e-2",
+          "upper_dec": "3.136294235359265630892143096718869405406e-2",
+          "arb_ball_str": "[0.03136294235359265630892143096718869405404 +/- 2.81e-42]"
+        },
+        "D_tilde_Y": {
+          "mid_float": 0.03303081139052013,
+          "rad_float_outward": 3.049269696223223e-18,
+          "lower_dec": "3.303081139052012727248766762165856707765e-2",
+          "upper_dec": "3.303081139052012727248766762165856707768e-2",
+          "arb_ball_str": "[0.03303081139052012727248766762165856707767 +/- 3.46e-42]"
+        },
+        "log_Y_times_D_tilde": {
+          "mid_float": 0.11447606893473176,
+          "rad_float_outward": 1.988402363194499e-19,
+          "lower_dec": "1.144760689347317642826647312149699636827e-1",
+          "upper_dec": "1.144760689347317642826647312149699636830e-1",
+          "arb_ball_str": "[0.1144760689347317642826647312149699636829 +/- 4.04e-41]"
+        },
+        "S_different_Y": {
+          "mid_float": -0.009253629569585593,
+          "rad_float_outward": 2.0368728908207706e-19,
+          "lower_dec": "-9.253629569585593091546105346501290688824e-3",
+          "upper_dec": "-9.253629569585593091546105346501290688821e-3",
+          "arb_ball_str": "[-0.009253629569585593091546105346501290688822 +/- 1.89e-43]"
+        },
+        "R_square_Y": {
+          "mid_float": 0.00027077854145575816,
+          "rad_float_outward": 1.589789779286362e-20,
+          "lower_dec": "2.707785414557581451120667868271284651052e-4",
+          "upper_dec": "2.707785414557581451120667868271284651055e-4",
+          "arb_ball_str": "[0.0002707785414557581451120667868271284651054 +/- 3.92e-45]"
+        },
+        "S_core_Y": {
+          "mid_float": -0.009524408111041351,
+          "rad_float_outward": 5.695486100211499e-20,
+          "lower_dec": "-9.524408111041351236658172133328419153929e-3",
+          "upper_dec": "-9.524408111041351236658172133328419153926e-3",
+          "arb_ball_str": "[-0.009524408111041351236658172133328419153928 +/- 4.16e-43]"
+        },
+        "sum_A_norm_sq": {
+          "mid_float": 0.02481210924847831,
+          "rad_float_outward": 1.3577096652532474e-18,
+          "lower_dec": "2.481210924847830834548007172560952889757e-2",
+          "upper_dec": "2.481210924847830834548007172560952889760e-2",
+          "arb_ball_str": "[0.02481210924847830834548007172560952889759 +/- 4.13e-42]"
+        },
+        "sum_Bfeat_norm_sq": {
+          "mid_float": 0.011844860809226102,
+          "rad_float_outward": 3.6322127571148133e-19,
+          "lower_dec": "1.184486080922610115355659800079041490642e-2",
+          "upper_dec": "1.184486080922610115355659800079041490645e-2",
+          "arb_ball_str": "[0.01184486080922610115355659800079041490644 +/- 4.63e-42]"
+        }
+      },
+      {
+        "Y": 64,
+        "T_Y": 182,
+        "D0_eff": 4,
+        "odd_chain_count_O_T": 46,
+        "squarefree_core_count_C_T": 38,
+        "max_chain_length_L_T": 4,
+        "E_Y": {
+          "mid_float": 0.062151114898631475,
+          "rad_float_outward": 2.848224509376618e-18,
+          "lower_dec": "6.215111489863147799567474096528125023295e-2",
+          "upper_dec": "6.215111489863147799567474096528125023298e-2",
+          "arb_ball_str": "[0.06215111489863147799567474096528125023297 +/- 4.85e-42]"
+        },
+        "D_tilde_Y": {
+          "mid_float": 0.03437772170988294,
+          "rad_float_outward": 3.4181472425160616e-18,
+          "lower_dec": "3.437772170988294054704651429972756445225e-2",
+          "upper_dec": "3.437772170988294054704651429972756445228e-2",
+          "arb_ball_str": "[0.03437772170988294054704651429972756445226 +/- 2.89e-42]"
+        },
+        "log_Y_times_D_tilde": {
+          "mid_float": 0.1429729252636787,
+          "rad_float_outward": 3.641792207164239e-18,
+          "lower_dec": "1.429729252636786943411570998442621883163e-1",
+          "upper_dec": "1.429729252636786943411570998442621883166e-1",
+          "arb_ball_str": "[0.1429729252636786943411570998442621883164 +/- 2.82e-41]"
+        },
+        "S_different_Y": {
+          "mid_float": -0.023767702624261887,
+          "rad_float_outward": 1.2514631300835754e-18,
+          "lower_dec": "-2.376770262426188815265446192810477235301e-2",
+          "upper_dec": "-2.376770262426188815265446192810477235298e-2",
+          "arb_ball_str": "[-0.02376770262426188815265446192810477235300 +/- 4.80e-42]"
+        },
+        "R_square_Y": {
+          "mid_float": -0.0003539291878364081,
+          "rad_float_outward": 1.298336857066408e-20,
+          "lower_dec": "-3.539291878364080957193551808844682361154e-4",
+          "upper_dec": "-3.539291878364080957193551808844682361151e-4",
+          "arb_ball_str": "[-0.0003539291878364080957193551808844682361153 +/- 2.44e-44]"
+        },
+        "S_core_Y": {
+          "mid_float": -0.02341377343642548,
+          "rad_float_outward": 1.3376387153109715e-18,
+          "lower_dec": "-2.341377343642548005693510674722030411689e-2",
+          "upper_dec": "-2.341377343642548005693510674722030411686e-2",
+          "arb_ball_str": "[-0.02341377343642548005693510674722030411688 +/- 6.81e-44]"
+        },
+        "sum_A_norm_sq": {
+          "mid_float": 0.039431206824931404,
+          "rad_float_outward": 3.8137626671537275e-19,
+          "lower_dec": "3.943120682493140471249004900651323221542e-2",
+          "upper_dec": "3.943120682493140471249004900651323221545e-2",
+          "arb_ball_str": "[0.03943120682493140471249004900651323221544 +/- 3.41e-42]"
+        },
+        "sum_Bfeat_norm_sq": {
+          "mid_float": 0.015532812731144579,
+          "rad_float_outward": 4.457352693717641e-19,
+          "lower_dec": "1.553281273114457936177794495881430601693e-2",
+          "upper_dec": "1.553281273114457936177794495881430601696e-2",
+          "arb_ball_str": "[0.01553281273114457936177794495881430601695 +/- 4.21e-42]"
+        }
+      }
+    ]
+  },
+  "unseen_validation_schedule": {
+    "total_unseen_points": 8,
+    "points": [
+      {
+        "point_id": "TC064-HO-EXP4-LEFT",
+        "label": "e^4*(1 - 2^(-12))",
+        "kind": "exact_symbolic_exp_rational",
+        "rational_factor": "4095/4096",
+        "exp_power": "4/1",
+        "grid_tier": "D0_DISCONTINUITY_SIDED_GRID",
+        "prior_exposure_status": "UNSEEN_FOR_ALL_OBSERVABLES",
+        "prior_exposure_detail": "Zero prior occurrences across tc/*.py and data/*.json; tests left side of D0: 3 -> 4 jump at Y = e^4 (T = 149, D0 = 3)."
+      },
+      {
+        "point_id": "TC064-HO-EXP4-RIGHT",
+        "label": "e^4*(1 + 2^(-12))",
+        "kind": "exact_symbolic_exp_rational",
+        "rational_factor": "4097/4096",
+        "exp_power": "4/1",
+        "grid_tier": "D0_DISCONTINUITY_SIDED_GRID",
+        "prior_exposure_status": "UNSEEN_FOR_ALL_OBSERVABLES",
+        "prior_exposure_detail": "Zero prior occurrences across tc/*.py and data/*.json; tests right side of D0: 3 -> 4 jump at Y = e^4 (T = 149, D0 = 4)."
+      },
+      {
+        "point_id": "TC064-HO-UNSEEN-72",
+        "label": "72",
+        "kind": "exact_rational",
+        "rational_factor": "72/1",
+        "exp_power": "0/1",
+        "grid_tier": "SMALL_T_UNSPLIT_UNSEEN_GRID",
+        "prior_exposure_status": "UNSEEN_FOR_ALL_OBSERVABLES",
+        "prior_exposure_detail": "Zero prior occurrences across tc/*.py and data/*.json; tests unsplit quadrature regime (T = 210, D0 = 4)."
+      },
+      {
+        "point_id": "TC064-HO-UNSEEN-180",
+        "label": "180",
+        "kind": "exact_rational",
+        "rational_factor": "180/1",
+        "exp_power": "0/1",
+        "grid_tier": "THREE_ZONE_UNSEEN_GRID",
+        "prior_exposure_status": "UNSEEN_FOR_ALL_OBSERVABLES",
+        "prior_exposure_detail": "Zero prior occurrences across tc/*.py and data/*.json; tests early three-zone regime (T = 660, D0 = 5)."
+      },
+      {
+        "point_id": "TC064-HO-UNSEEN-360",
+        "label": "360",
+        "kind": "exact_rational",
+        "rational_factor": "360/1",
+        "exp_power": "0/1",
+        "grid_tier": "THREE_ZONE_UNSEEN_GRID",
+        "prior_exposure_status": "UNSEEN_FOR_ALL_OBSERVABLES",
+        "prior_exposure_detail": "Zero prior occurrences across tc/*.py and data/*.json; tests mid-scale three-zone regime (T = 1571, D0 = 5)."
+      },
+      {
+        "point_id": "TC064-HO-UNSEEN-720",
+        "label": "720",
+        "kind": "exact_rational",
+        "rational_factor": "720/1",
+        "exp_power": "0/1",
+        "grid_tier": "THREE_ZONE_UNSEEN_GRID",
+        "prior_exposure_status": "UNSEEN_FOR_ALL_OBSERVABLES",
+        "prior_exposure_detail": "Zero prior occurrences across tc/*.py and data/*.json; tests transition regime between 576 and 960 (T = 3732, D0 = 6)."
+      },
+      {
+        "point_id": "TC064-HO-1296-LEFT",
+        "label": "1296 - 2^(-12)",
+        "kind": "exact_rational",
+        "rational_factor": "5308415/4096",
+        "exp_power": "0/1",
+        "grid_tier": "FOURTH_POWER_T_SEAM_UNSEEN_GRID",
+        "prior_exposure_status": "UNSEEN_FOR_ALL_OBSERVABLES",
+        "prior_exposure_detail": "Zero prior occurrences across tc/*.py and data/*.json; tests left side of Y = 6^4 = 1296 seam (T = 7776, D0 = 7)."
+      },
+      {
+        "point_id": "TC064-HO-1296-RIGHT",
+        "label": "1296 + 2^(-12)",
+        "kind": "exact_rational",
+        "rational_factor": "5308417/4096",
+        "exp_power": "0/1",
+        "grid_tier": "FOURTH_POWER_T_SEAM_UNSEEN_GRID",
+        "prior_exposure_status": "UNSEEN_FOR_ALL_OBSERVABLES",
+        "prior_exposure_detail": "Zero prior occurrences across tc/*.py and data/*.json; tests right side of Y = 6^4 = 1296 seam (T = 7777, D0 = 7)."
+      }
+    ],
+    "prescribed_continuous_interval_splits": [
+      {
+        "interval_id": "interval_54_55_to_54_80_across_e4_and_B3_mult5",
+        "Y_lo_fraction": "1091/20",
+        "Y_hi_fraction": "274/5",
+        "changing_cutoffs_exercised": [
+          "D0: 3 -> 4 at Y = exp(4)",
+          "T: 149 -> 150 = 2 * 3 * 5^2 at Y = 149^(4/5)",
+          "B_3(T) square-multiplier class membership: {1, 3} -> {1, 3, 5}"
+        ],
+        "expected_feasible_cells": [
+          [
+            149,
+            3,
+            3
+          ],
+          [
+            149,
+            4,
+            4
+          ],
+          [
+            150,
+            4,
+            4
+          ]
+        ]
+      },
+      {
+        "interval_id": "interval_146_75_to_147_35_across_T512_L5_and_C257",
+        "Y_lo_fraction": "2935/20",
+        "Y_hi_fraction": "2947/20",
+        "changing_cutoffs_exercised": [
+          "T: 511 -> 512 -> 513 -> 514",
+          "max_chain_length L(T): 4 -> 5 at T = 512 = 2 * 4^4",
+          "C(T) squarefree-core class membership: gains prime core a = 257 at T = 514 = 2 * 257"
+        ],
+        "expected_feasible_cells": [
+          [
+            511,
+            4,
+            4
+          ],
+          [
+            512,
+            4,
+            4
+          ],
+          [
+            513,
+            4,
+            4
+          ],
+          [
+            514,
+            4,
+            4
+          ]
+        ]
+      },
+      {
+        "interval_id": "interval_1296_pm_2_neg12_across_T7776",
+        "Y_lo_fraction": "5308415/4096",
+        "Y_hi_fraction": "5308417/4096",
+        "changing_cutoffs_exercised": [
+          "T: 7776 -> 7777 across fourth-power seam Y = 6^4 = 1296"
+        ],
+        "expected_feasible_cells": [
+          [
+            7776,
+            7,
+            7
+          ],
+          [
+            7777,
+            7,
+            7
+          ]
+        ]
+      }
+    ]
+  },
+  "deliverable_d_finite_euler_factor_diagnostic_rules": {
+    "odd_primes_tested": [
+      3,
+      5,
+      7
+    ],
+    "finite_prime_sets_tested": [
+      [
+        3
+      ],
+      [
+        5
+      ],
+      [
+        3,
+        5,
+        7
+      ]
+    ],
+    "observable_restriction_rule": "Restrict numerical finite-flip checks to infinite/truncated Q and E unless a fully matched Selberg core and kernel are derived; changing outer signs while retaining Liouville's beta_Y must be explicitly labeled HYBRID_DIAGNOSTIC."
+  },
+  "numerical_settings_and_escalation_rules": {
+    "library": "python-flint (Arb/Acb outward-rounded ball arithmetic)",
+    "base_prec_bits": 256,
+    "quad_tol_bits_unsplit_small_T": 240,
+    "quad_tol_bits_three_zone_large_T": 160,
+    "three_zone_activation_threshold_T": 512,
+    "three_zone_parameters": {
+      "n_panels": 16,
+      "zone1_ratio_threshold_x_over_n": 12,
+      "zone3_cutoff_N1": "max(T(Y) + 1, ceil(tau * Y))",
+      "zone3_taylor_degree_M": 56
+    },
+    "escalation_ladder_on_zero_straddling_margin": [
+      {
+        "tier": 1,
+        "prec_bits": 512,
+        "quad_tol_bits": 240,
+        "n_panels": 32,
+        "zone1_ratio_threshold_x_over_n": 16,
+        "zone3_taylor_degree_M": 80
+      },
+      {
+        "tier": 2,
+        "prec_bits": 1024,
+        "quad_tol_bits": 440,
+        "n_panels": 64,
+        "zone1_ratio_threshold_x_over_n": 22,
+        "zone3_taylor_degree_M": 112
+      }
+    ],
+    "resource_limits": {
+      "max_wall_seconds_per_point": 300,
+      "max_rss_megabytes": 4096,
+      "budget_enforcement_mode": "POST_EVALUATION_BUDGET_AUDIT_NO_OS_PREEMPTIVE_KILL",
+      "recognized_peak_rss_covering_semantics": [
+        "PROCESS_LIFETIME_HIGH_WATER_MARK"
+      ]
+    },
+    "domain_coverage_and_witness_rules_tc062r4": {
+      "interval_survival_rule": "Requires actual binary-domain evidence (EVALUATED_AT_CREATION or HISTORICAL_DETERMINISTIC_RECONSTRUCTION linked to original producer) covering every required feasible cutoff cell.",
+      "refutation_witness_rule": "An admissible evaluated witness in the intersection of actual_domain and mathematical_domain can certify REFUTED_BY_CERTIFIED_WITNESS without full interval coverage.",
+      "serialization_non_sufficiency": "Outward decimal serialization or overlapping balls never establish binary domain inclusion or containment."
+    }
+  },
+  "decision_and_immutability_rules": {
+    "pointwise_margin_classification": {
+      "PASS": "upper(M(Y)) <= 0",
+      "FAIL": "lower(M(Y)) > 0",
+      "UNRESOLVED": "lower(M(Y)) <= 0 < upper(M(Y)) after precision/subdivision escalation"
+    },
+    "global_probe_outcomes": [
+      "REFUTED_BY_CERTIFIED_WITNESS",
+      "SURVIVED_TESTED_POINTS",
+      "UNRESOLVED/INCOMPLETE_COVERAGE",
+      "PROVED_UNIFORMLY"
+    ]
+  },
+  "serialized_arb_self_check": {
+    "total_certified_arb_balls_checked": 54,
+    "compared_against_live_original_arb_count": 54,
+    "live_original_count_matches_enumerated_total": true,
+    "all_enclose_original_256bit_arb_ball": true,
+    "failed_paths": [],
+    "checked_paths": [
+      "calibration_and_prior_exposure_separation.calibrated_S_core_secondary_constants.1/2.per_calibration_point_quotients[0].quotient_ball",
+      "calibration_and_prior_exposure_separation.calibrated_S_core_secondary_constants.1/2.per_calibration_point_quotients[1].quotient_ball",
+      "calibration_and_prior_exposure_separation.calibrated_S_core_secondary_constants.1/2.per_calibration_point_quotients[2].quotient_ball",
+      "calibration_and_prior_exposure_separation.calibrated_S_core_secondary_constants.1/4.per_calibration_point_quotients[0].quotient_ball",
+      "calibration_and_prior_exposure_separation.calibrated_S_core_secondary_constants.1/4.per_calibration_point_quotients[1].quotient_ball",
+      "calibration_and_prior_exposure_separation.calibrated_S_core_secondary_constants.1/4.per_calibration_point_quotients[2].quotient_ball",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[0].E_Y",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[0].D_tilde_Y",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[0].log_Y_times_D_tilde",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[0].S_different_Y",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[0].R_square_Y",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[0].S_core_Y",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[0].sum_A_norm_sq",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[0].sum_Bfeat_norm_sq",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[1].E_Y",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[1].D_tilde_Y",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[1].log_Y_times_D_tilde",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[1].S_different_Y",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[1].R_square_Y",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[1].S_core_Y",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[1].sum_A_norm_sq",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[1].sum_Bfeat_norm_sq",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[2].E_Y",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[2].D_tilde_Y",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[2].log_Y_times_D_tilde",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[2].S_different_Y",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[2].R_square_Y",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[2].S_core_Y",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[2].sum_A_norm_sq",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[2].sum_Bfeat_norm_sq",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[0].E_Y",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[0].D_tilde_Y",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[0].log_Y_times_D_tilde",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[0].S_different_Y",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[0].R_square_Y",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[0].S_core_Y",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[0].sum_A_norm_sq",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[0].sum_Bfeat_norm_sq",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[1].E_Y",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[1].D_tilde_Y",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[1].log_Y_times_D_tilde",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[1].S_different_Y",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[1].R_square_Y",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[1].S_core_Y",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[1].sum_A_norm_sq",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[1].sum_Bfeat_norm_sq",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[2].E_Y",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[2].D_tilde_Y",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[2].log_Y_times_D_tilde",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[2].S_different_Y",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[2].R_square_Y",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[2].S_core_Y",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[2].sum_A_norm_sq",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[2].sum_Bfeat_norm_sq"
+    ]
+  },
+  "protocol_sha256": "44fab01b3fa1f0982c0b56740bd459a3a6838cce862ed396321e909adb7fe967"
+}
