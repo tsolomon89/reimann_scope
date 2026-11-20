@@ -2801,17 +2801,24 @@ def evaluate_tc064_unseen_point_with_escalation(
 
     last_row: Optional[Dict[str, Any]] = None
     escalation_trace: List[Dict[str, Any]] = []
+    res_limits = protocol_rules["resource_limits"]
+    max_wall_s = float(res_limits["max_wall_seconds_per_point"])
+    max_rss_mb = float(res_limits["max_rss_megabytes"])
+    t0_wall = time.perf_counter()
 
     for tier in ladder:
         t0 = time.perf_counter()
         cut = certify_exact_scale_cutoffs(spec, base_prec_bits=256)
         T_y, D0_eff, ceil_tY = cut["T_Y"], cut["D0_eff"], cut["ceil_tau_Y"]
-        q_set = resolve_protocol_quadrature_settings(T_y, tier, protocol_rules)
+        q_res = resolve_protocol_quadrature_settings(
+            protocol_rules, T_y, ceil_tY, escalation_tier=tier
+        )
+        q_set = q_res["used_settings"]
         eff_prec = int(q_set["prec_bits"])
         eff_tol = int(q_set["quad_tol_bits"])
-        eff_3z = bool(q_set["use_three_zone"])
-        eff_pan = int(q_set["n_panels"])
-        eff_z1 = int(q_set["zone1_ratio_threshold_x_over_n"])
+        eff_3z = bool(q_set["quadrature_mode"] == "three_zone")
+        eff_pan = int(q_set["n_panels"] or 1)
+        eff_z1 = int(q_set["zone1_ratio_threshold_x_over_n"] or 12)
 
         mc = evaluate_mixed_covariance_point_arb(
             spec, escalation_tier=tier, protocol_rules=protocol_rules, selberg_table=selberg_table
@@ -2842,26 +2849,32 @@ def evaluate_tc064_unseen_point_with_escalation(
             m_kl1_rsq = +(obs["R_square_Y"] - (arb(1) / arb(4)) * lg_dt)
             m_kl1_core = +(obs["S_core_Y"] - (arb(3) / arb(4)) * lg_dt)
 
-            v_p0 = classify_probe_margin_arb(m_p0_core) if p0_applicable else "NOT_APPLICABLE"
-            v_half = classify_probe_margin_arb(m_p0_core)
-            v_neg = classify_probe_margin_arb(m_neg_core) if p0_applicable else "NOT_APPLICABLE"
-            v_rsq = classify_probe_margin_arb(m_rsq_loc)
-            v_kl1_rsq = classify_probe_margin_arb(m_kl1_rsq) if p0_applicable else "NOT_APPLICABLE"
-            v_kl1_core = classify_probe_margin_arb(m_kl1_core) if p0_applicable else "NOT_APPLICABLE"
-
-            elapsed = time.perf_counter() - t0
-            rss_info = _measure_process_rss_megabytes()
-            res_comp = evaluate_point_resource_compliance(
-                elapsed_sec=elapsed,
-                rss_info=rss_info,
-                resource_limits=protocol_rules["resource_limits"],
+            v_p0 = classify_probe_margin_arb(m_p0_core)["verdict"] if p0_applicable else "NOT_APPLICABLE"
+            v_half = classify_probe_margin_arb(m_p0_core)["verdict"]
+            v_neg = classify_probe_margin_arb(m_neg_core)["verdict"] if p0_applicable else "NOT_APPLICABLE"
+            v_rsq = classify_probe_margin_arb(m_rsq_loc)["verdict"]
+            v_kl1_rsq = (
+                classify_probe_margin_arb(m_kl1_rsq)["verdict"] if p0_applicable else "NOT_APPLICABLE"
             )
+            v_kl1_core = (
+                classify_probe_margin_arb(m_kl1_core)["verdict"] if p0_applicable else "NOT_APPLICABLE"
+            )
+
+            elapsed = round(time.perf_counter() - t0, 6)
+            cum_wall = round(time.perf_counter() - t0_wall, 6)
+            rss_info = _measure_process_rss_megabytes()
 
             escalation_trace.append(
                 {
                     "tier": tier,
                     "prec_bits": eff_prec,
                     "quad_tol_bits": eff_tol,
+                    "elapsed_sec": elapsed,
+                    "tier_wall_seconds": elapsed,
+                    "cumulative_wall_seconds": max(elapsed, cum_wall),
+                    "current_rss_mb": rss_info["current_rss_mb"],
+                    "peak_rss_mb": rss_info["peak_rss_mb"],
+                    "peak_rss_measurement_semantics": rss_info.get("peak_rss_measurement_semantics"),
                     "verdicts": {
                         "TC064-P0-CORE": v_p0,
                         "TC064-P-HALF-CORE": v_half,
@@ -2871,6 +2884,11 @@ def evaluate_tc064_unseen_point_with_escalation(
                         "KL1_distinct_core": v_kl1_core,
                     },
                 }
+            )
+            res_comp = evaluate_point_resource_compliance(
+                escalation_trace,
+                max_wall_sec=max_wall_s,
+                max_rss_mb=max_rss_mb,
             )
 
             last_row = {
@@ -3079,11 +3097,11 @@ def evaluate_tc064_continuous_interval_split_arb(
                 "M_RSQ_LOC": serialize_arb_certified(m_rsq_loc),
                 "M_KL1_RSQUARE": serialize_arb_certified(m_kl1_rsq),
                 "M_KL1_CORE": serialize_arb_certified(m_kl1_core),
-                "TC064_P0_CORE_branch_classification": classify_probe_margin_arb(m_p0_core),
-                "TC064_P_NEG_CORE_branch_classification": classify_probe_margin_arb(m_neg_core),
-                "TC064_RSQ_LOC_branch_classification": classify_probe_margin_arb(m_rsq_loc),
-                "KL1_same_core_square_branch_classification": classify_probe_margin_arb(m_kl1_rsq),
-                "KL1_distinct_core_branch_classification": classify_probe_margin_arb(m_kl1_core),
+                "TC064_P0_CORE_branch_classification": classify_probe_margin_arb(m_p0_core)["verdict"],
+                "TC064_P_NEG_CORE_branch_classification": classify_probe_margin_arb(m_neg_core)["verdict"],
+                "TC064_RSQ_LOC_branch_classification": classify_probe_margin_arb(m_rsq_loc)["verdict"],
+                "KL1_same_core_square_branch_classification": classify_probe_margin_arb(m_kl1_rsq)["verdict"],
+                "KL1_distinct_core_branch_classification": classify_probe_margin_arb(m_kl1_core)["verdict"],
             }
             y_parsed = _parse_serialized_arb_enclosure_tc062(
                 strip_enclosure_arb_for_json(br_entry["Y_sub_ball"])
@@ -3121,19 +3139,19 @@ def evaluate_tc064_continuous_interval_split_arb(
 
         out_rec["TC064_P0_CORE_interval_classification"] = classify_probe_margin_arb(
             union_balls["union_M_P0_CORE"]
-        )
+        )["verdict"]
         out_rec["TC064_P_NEG_CORE_interval_classification"] = classify_probe_margin_arb(
             union_balls["union_M_P_NEG_CORE"]
-        )
+        )["verdict"]
         out_rec["TC064_RSQ_LOC_interval_classification"] = classify_probe_margin_arb(
             union_balls["union_M_RSQ_LOC"]
-        )
+        )["verdict"]
         out_rec["KL1_same_core_square_interval_classification"] = classify_probe_margin_arb(
             union_balls["union_M_KL1_RSQUARE"]
-        )
+        )["verdict"]
         out_rec["KL1_distinct_core_interval_classification"] = classify_probe_margin_arb(
             union_balls["union_M_KL1_CORE"]
-        )
+        )["verdict"]
         return out_rec
     finally:
         flint_ctx.prec = saved
@@ -3312,8 +3330,23 @@ def aggregate_tc064_section5_and_derive_outcomes(
             if is_app:
                 probe_point_verdicts[pr_id].append((pid, exp_v))
 
-        rc = row.get("resource_compliance")
-        if not isinstance(rc, dict) or rc.get("status") not in RESOURCE_COMPLIANCE_STATUSES:
+        rc_trace = row.get("escalation_trace")
+        res_lim = protocol_obj.get("numerical_settings_and_escalation_rules", {}).get(
+            "resource_limits", {}
+        )
+        if isinstance(rc_trace, list) and len(rc_trace) > 0:
+            rc = evaluate_point_resource_compliance(
+                rc_trace,
+                max_wall_sec=float(res_lim.get("max_wall_seconds_per_point", 300.0)),
+                max_rss_mb=float(res_lim.get("max_rss_megabytes", 4096.0)),
+            )
+            row["resource_compliance"] = rc
+        else:
+            rc = row.get("resource_compliance")
+        if (
+            not isinstance(rc, dict)
+            or rc.get("overall_resource_status") not in RESOURCE_COMPLIANCE_STATUSES
+        ):
             conflicts.append({"conflict_type": "INVALID_POINT_RESOURCE_COMPLIANCE", "point_id": pid})
         else:
             point_res_rows.append(rc)
@@ -3429,6 +3462,49 @@ def aggregate_tc064_section5_and_derive_outcomes(
                 all_branches_covered = False
 
             yp = _parse_serialized_arb_enclosure_tc062(br.get("Y_sub_ball"))
+            mid_me_b = br.get("evaluated_Y_mid_man_exp")
+            rad_me_b = br.get("evaluated_Y_rad_man_exp")
+            ef_b = br.get("evaluated_Y_interval_exact_fractions")
+            bin_ok = False
+            if (
+                isinstance(mid_me_b, list)
+                and len(mid_me_b) == 2
+                and isinstance(rad_me_b, list)
+                and len(rad_me_b) == 2
+                and isinstance(ef_b, list)
+                and len(ef_b) == 2
+                and yp is not None
+            ):
+                try:
+                    m_q = (
+                        Fraction(int(mid_me_b[0])) * (1 << int(mid_me_b[1]))
+                        if int(mid_me_b[1]) >= 0
+                        else Fraction(int(mid_me_b[0]), 1 << (-int(mid_me_b[1])))
+                    )
+                    r_q = (
+                        Fraction(int(rad_me_b[0])) * (1 << int(rad_me_b[1]))
+                        if int(rad_me_b[1]) >= 0
+                        else Fraction(int(rad_me_b[0]), 1 << (-int(rad_me_b[1])))
+                    )
+                    bin_ok = bool(
+                        r_q >= 0
+                        and m_q - r_q == Fraction(ef_b[0])
+                        and m_q + r_q == Fraction(ef_b[1])
+                        and yp["c_lo"] <= m_q - r_q
+                        and m_q + r_q <= yp["c_hi"]
+                    )
+                except Exception:  # noqa: BLE001
+                    bin_ok = False
+            if not bin_ok:
+                all_branches_covered = False
+                conflicts.append(
+                    {
+                        "conflict_type": "BINARY_MAN_EXP_OR_ENCLOSURE_DOMAIN_MISMATCH",
+                        "interval_id": iid,
+                        "T_fixed": tc_exp,
+                    }
+                )
+
             dom = _evaluate_branch_domain_admissibility_tc062(
                 br,
                 y_sub_parsed=yp,
@@ -3562,8 +3638,12 @@ def aggregate_tc064_section5_and_derive_outcomes(
                 )
             interval_verdicts[pr_id].append((iid, eff_c))
 
-    res_agg = aggregate_section_resource_compliance(point_res_rows)
-    res_status = res_agg["resource_compliance_status"]
+    res_agg = aggregate_section_resource_compliance(
+        point_res_rows,
+        registered_count=reg_count,
+        distinct_evaluated_count=len(seen_pt_ids),
+    )
+    res_status = res_agg["overall_resource_budget_status"]
 
     def _derive_global(pr_id: str) -> str:
         if conflicts:

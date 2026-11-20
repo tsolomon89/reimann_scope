@@ -286,15 +286,25 @@ def test_tc064_section5_unseen_validation_and_adversarial_mutations(
     br0 = mut_shrunk["continuous_interval_case_splits"][
         "interval_54_55_to_54_80_across_e4_and_B3_mult5"
     ]["branches"][0]
-    br0["evaluated_Y_interval_exact_fractions"] = ["5456/100", "5457/100"]
-    br0["evaluated_Y_mid_man_exp"] = [54565, -3]
-    br0["evaluated_Y_rad_man_exp"] = [5, -3]
+    br0["evaluated_Y_interval_exact_fractions"] = ["873/16", "1747/32"]
+    br0["evaluated_Y_mid_man_exp"] = [3493, -6]
+    br0["evaluated_Y_rad_man_exp"] = [1, -6]
     s5_m4, top_m4 = aggregate_tc064_section5_and_derive_outcomes(mut_shrunk, tc064_protocol)
     assert s5_m4["certification_integrity_ok"] is False
     assert top_m4["holdout_hypothesis_outcome"] == CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
     assert any(
         c["conflict_type"] == "INCOMPLETE_BRANCH_BINARY_DOMAIN_COVERAGE"
         for c in s5_m4["certification_integrity_conflicts"]
+    )
+
+    mut_bad_manexp = copy.deepcopy(mut_shrunk)
+    mut_bad_manexp["continuous_interval_case_splits"][
+        "interval_54_55_to_54_80_across_e4_and_B3_mult5"
+    ]["branches"][0]["evaluated_Y_mid_man_exp"] = [3495, -6]
+    s5_m4b, _ = aggregate_tc064_section5_and_derive_outcomes(mut_bad_manexp, tc064_protocol)
+    assert any(
+        c["conflict_type"] == "BINARY_MAN_EXP_OR_ENCLOSURE_DOMAIN_MISMATCH"
+        for c in s5_m4b["certification_integrity_conflicts"]
     )
 
     # --- Mutation 5: Deleted status key in artifact provenance comparison ---
