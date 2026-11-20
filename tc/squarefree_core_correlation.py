@@ -1,5 +1,5 @@
 r"""
-TASK-TC-064: Squarefree-Core Correlations and the Arithmetic Regularity Constraint
+TASK-TC-064 / TASK-TC-064R: Squarefree-Core Correlations and the Arithmetic Regularity Constraint
 toward SUBGATE-TC-043A (EPIC-TC-042).
 
 Implements, verifies, and certifies in 256-bit FLINT/Arb outward-rounded ball arithmetic:
@@ -20,9 +20,12 @@ Sections:
      for `0 < x < 1/2`, trivial-zero double vanishing at `-2*(n+1)`, compensating-pole remark),
      separates the `5` remaining outside-Lean analytic bridges (`TC063-PREM-04..07` and
      `TC063-PREM-09`, after `TC063-PREM-08` is formalized in Lean Theorem 5) from the open
-     arithmetic premise, distinguishes square scaling (`n |-> b^2*n`, `z |-> 2*z`) from
-     transcendental-grade `tau^K` scaling, and certifies generic window-base `b > 1` square-support
-     bounds.
+     arithmetic premise, distinguishes fixed square dilation (`n |-> b^2*n`, `phi_{b^2*n}(X) =
+     b^(-1)*phi_n(X/b^2)`, Dirichlet multiplier `b^(-2*(x + i*y))`), running-index squaring
+     (`sum (n^2)^(-(x + i*y)) = zeta(2*x + 2*i*y)` on `x > 1/2`), Liouville convolution
+     (`1 * lambda = 1_square`, `zeta(x + i*y)*L_lambda(x + i*y) = zeta(2*x + 2*i*y)`), and
+     transcendental-grade `tau^K` transport, and certifies generic window-base `b > 1` square-support
+     Gaussian bounds (formalized in Lean for `b > 1`, distinct from canonical `tau`-window core bounds).
    - Maintains the complete declaration-level premise table (`PROVED_IN_LEAN`,
      `PROVED_ANALYTICALLY_OUTSIDE_LEAN`, `CERTIFIED_FINITE_OBSERVATION`, `REFUTED_CANDIDATE`, `OPEN`).
 
@@ -49,12 +52,18 @@ Sections:
 4. Section 4 — Deliverables C & D and Seen-Scale Mechanism Diagnostics (§4, §5, §6):
    - Attempt 1: Complete-difference common-factor/coprime squarefree core decomposition
      `S_core(Y) = sum_{g in G_core(T)} Pi_Y^core(g)`, exact Mobius sector diagonalization, exact
-     logarithmic GCD prime-divisibility identity, summable `1/g^2` tail budget, certified refutation
-     of `TC064-CAND-C1A-CORE-SECTOR-NONPOS`, and exact `g = 1` resonant core-count obstruction.
+     signed logarithmic GCD prime-divisibility identity (`Y >= 2`, positive `log p > 0` weights on
+     signed differences `||S_Y^core(p)||_Y^2 - 4*||F_Y^core(p)||_Y^2`, certified negative at
+     `Y in {16, 32, 64}`), aggregate large-common-factor tail bound
+     `sum_{g > G} |Pi_Y^core(g)| <= (T/(2*G))*max_{1<=a<=T} d_0(a)*(C_A + 4*C_B)*(1 + log Y)`
+     (`Y >= 2, G >= 1`, `d_0(a) = sum_{d|a} 1`), certified refutation of
+     `TC064-CAND-C1A-CORE-SECTOR-NONPOS`, and exact `g = 1` resonant core-count obstruction.
    - Attempt 2: Exact squarefree prime-toggle involution `mu(a star p) = -mu(a)`, finite-support
-     boundary partition `C_p^pair(T) sqcup C_p^bdry(T)`, weighted prime combinations, small-prime
-     exceptional jump witness (`p = 3`), certified refutation of `TC064-CAND-C2A-TOGGLE-PAIR-NONPOS`,
-     and exact scale-mismatch / sieve-sum `Theta(Y)` obstruction.
+     boundary partition `C_p^pair(T) sqcup C_p^bdry(T)` with exact resonant intersection
+     `C_p^bdry(T(Y)) cap C_res(Y) = {a in C_res(Y) : p nmid a}` under `2*p*Y > T(Y)` (`p`-divisible
+     resonant cores remain paired with `a/p`), weighted prime combinations, small-prime exceptional
+     jump witness (`p = 3`), certified refutation of `TC064-CAND-C2A-TOGGLE-PAIR-NONPOS`, and
+     withdrawal of the full-profile `p^(-3)` norm comparison as `UNPROVED`.
    - Seen-scale mechanism diagnostics at `{512, 576, 960, 1408}` (explicitly labeled SEEN, never
      unseen holdouts): `R_square`, `S_core`, scalar vs feature split, `g = 1` vs `g >= 3` sectors,
      and within-shell vs between-shell dyadic core cancellation.
@@ -195,8 +204,15 @@ from tc.signed_dilation_arithmetic_energy import (
 )
 
 TASK_TC_064_ID = "TASK-TC-064"
+TASK_TC_064R_ID = "TASK-TC-064R"
 PROPOSED_TC064_BRANCH = "task/tc-064-squarefree-core-correlation-and-arithmetic-regularity"
+PROPOSED_TC064R_REPAIR_BRANCH = (
+    "task/tc-064r-toggle-boundary-signed-identity-and-proof-scope-repair"
+)
 REVIEWED_MAIN_BASELINE_TC064 = "bf3babfb7857e41c0ea53235d82a48181cefee84"
+REVIEWED_TC064_TIP = "7e61dfff4cd6a2f78471182a990c495970fda2b5"
+PRESERVED_TC064_NUMERICAL_PRODUCER = "120512c27ce8230c90b09e429e96725152edea98"
+PRESERVED_TC064_FORMAL_PRODUCER = "dbbc462dcbd07b99449e74b6fe34633d07ef9ae7"
 ACCEPTED_TC063R_DELIVERED_TIP = "8172c74b4218961e3c0e04af6b4fef936f14a1d2"
 EXPECTED_TC063R_ARTIFACT_SHA256 = "637aad7dfcf723d6d9b0b7ac2659467422218a1fca9a892aa5a2fe73f17f83eb"
 EXPECTED_TC063R_ARB_BALL_COUNT = TC063_ORIGINAL_ARB_BALL_COUNT + TC063R_DERIVED_KL1_ARB_BALL_COUNT
@@ -347,6 +363,56 @@ def squarefree_core_star(a: int, c: int) -> int:
 def odd_squarefree_common_factor_set(T: int) -> List[int]:
     """Return `G_core(T) := {g in C(T) : 6 * g <= T}`."""
     return [g for g in odd_squarefree_cores_C_T(T) if 6 * g <= T]
+
+
+def canonical_cutoff_T_of_Y_exact(Y: Fraction | int) -> int:
+    """Return exact `T(Y) = ceil(Y^(5/4))` for positive rational/integer `Y` via
+    `(T - 1)^4 < Y^5 <= T^4` without floating-point rounding.
+    """
+    yf = Fraction(Y, 1) if isinstance(Y, int) else Fraction(Y)
+    if yf <= 0:
+        raise ValueError(f"Y must be positive, got {Y}")
+    y5_num = yf.numerator ** 5
+    y5_den = yf.denominator ** 5
+    # Initial integer estimate from float, then refine with exact integer arithmetic:
+    t_est = max(1, int(math.floor((float(yf)) ** 1.25)))
+    while (t_est ** 4) * y5_den < y5_num:
+        t_est += 1
+    while t_est > 1 and ((t_est - 1) ** 4) * y5_den >= y5_num:
+        t_est -= 1
+    return t_est
+
+
+def resonant_squarefree_cores_C_res(
+    Y: Fraction | int,
+    T: Optional[int] = None,
+) -> List[int]:
+    """Return `C_res(Y) := {a in C(T(Y)) : Y <= a <= 2 * Y}` using exact rational comparisons
+    and `T(Y) = ceil(Y^(5/4))` (or caller-supplied `T`).
+    """
+    yf = Fraction(Y, 1) if isinstance(Y, int) else Fraction(Y)
+    if yf <= 0:
+        raise ValueError(f"Y must be positive, got {Y}")
+    t_val = canonical_cutoff_T_of_Y_exact(yf) if T is None else int(T)
+    return [a for a in odd_squarefree_cores_C_T(t_val) if yf <= a <= 2 * yf]
+
+
+def prime_toggle_boundary_and_paired_partition(
+    p: int,
+    T: int,
+) -> Tuple[List[int], List[int]]:
+    """Return `(C_p^pair(T), C_p^bdry(T))` matching Lean `primeTogglePairedCores` and
+    `primeToggleBoundaryCores` for odd prime `p >= 3` and cutoff `T >= 0`:
+      - `C_p^pair(T) = {a in C(T) : a star p in C(T)}`
+      - `C_p^bdry(T) = {a in C(T) : p nmid a and T < 2 * p * a}`.
+    """
+    if p < 3 or p % 2 == 0 or any(p % d == 0 for d in range(3, int(math.isqrt(p)) + 1, 2)):
+        raise ValueError(f"p must be an odd prime >= 3, got {p}")
+    cores = odd_squarefree_cores_C_T(T)
+    core_set = set(cores)
+    paired = [a for a in cores if squarefree_core_star(a, p) in core_set]
+    bdry = [a for a in cores if (a % p != 0) and (T < 2 * p * a)]
+    return paired, bdry
 
 
 def verify_frozen_tc064_protocol_immutability(
@@ -716,6 +782,128 @@ def evaluate_squarefree_core_observables_matrix_free_arb(
 # ---------------------------------------------------------------------------
 
 
+def _build_tc064_scaling_and_window_base_distinction() -> Dict[str, str]:
+    """Single source of truth for Section 1 scaling, convolution, and window-base scope notes."""
+    return {
+        "common_arithmetic_referent": (
+            "Q_{lambda, infty}(X) = sum_{n >= 1} lambda(n)*phi_n(X), whose Mellin transform "
+            "represents L_lambda(x + i*y) = zeta(2*x + 2*i*y) / zeta(x + i*y)."
+        ),
+        "square_scaling_vs_transcendental_grade_scaling": (
+            "Distinguish four related but non-interchangeable operations on complex argument z = x + i*y: "
+            "(1) Fixed square dilation (fixed integer b >= 1): multiplying indices by b^2 gives "
+            "sum_n a(n)*(b^2*n)^(-(x + i*y)) = b^(-2*(x + i*y)) * sum_n a(n)*n^(-(x + i*y)) where the "
+            "series converge (a scalar prefactor, NOT argument doubling z |-> 2*z), and on the bare "
+            "Gaussian satisfies phi_{b^2*n}(X) = b^(-1)*phi_n(X/b^2) for X > 0; "
+            "(2) Running-index squaring (power lift): sum_{n >= 1} (n^2)^(-(x + i*y)) = zeta(2*x + 2*i*y) "
+            "initially for x > 1/2; "
+            "(3) Liouville convolution: 1 * lambda = 1_square and zeta(x + i*y)*L_lambda(x + i*y) = "
+            "zeta(2*x + 2*i*y), initially as absolutely convergent Dirichlet series for x > 1 and then "
+            "as a meromorphic identity where continued; "
+            "(4) Transcendental-grade transport X = tau^K (K in A_R), which parameterizes the canonical "
+            "logarithmic window [Y, tau*Y]. Summing fixed square dilations over odd b in B_a(T) collapses "
+            "lambda(a*b^2) = mu(a) onto odd squarefree cores, but neither fixed square dilation nor "
+            "running-index squaring alone proves pole-free continuation to x > 1/2 or the original "
+            "tau-grade compatibility principle, and no theorem assumes log_tau(b^2) in A_R (by Lindemann, "
+            "log_tau(m) notin Q for integer m >= 2; irrational algebraic membership remains "
+            "OPEN_TAU_ALGEBRAIC_EXPONENT_ARITHMETIC)."
+        ),
+        "window_base_b_gt_1_generality": (
+            "Formalized scope vs analytic extension: in Lean 4, the arithmetic/divisor-core bijections "
+            "(Theorems 1, 2, 4 finite-set parts) are window-independent and the Gaussian square-support "
+            "estimate sum_{r,l} ||phi_{2^r*M*l^2}||_{Y,b} <= C_b/sqrt(M) (Theorem 3, paramWindowNormSq) "
+            "is explicitly formalized for every real window base b > 1 (Y > 0, M >= 1). The complete "
+            "canonical 5-piece same-core bound, |R_square(Y)| <= C_square*(1 + log Y), closure transfer "
+            "(Theorem 3), and finite Euler-factor energy equivalence (Theorem 5) are formalized in Lean "
+            "on the canonical tau window [Y, tau*Y] (windowEnergyNormSq); extending those canonical "
+            "tau-window bounds to an arbitrary fixed base b > 1 is an analytically justified extension "
+            "outside Lean (no tau-specific arithmetic property is invoked)."
+        ),
+        "actual_zeta_pole_contradiction_summary": (
+            "Holomorphic (pole-free) continuation F_hol of zeta(2*z)/zeta(z) to x > 1/2 excludes "
+            "right-half-strip zeros rho = x + i*y (1/2 < x < 1) via 0 = zeta(rho)*F_hol(rho) = "
+            "zeta(2*rho) != 0 (2*x > 1), and left-half-strip zeros (0 < x < 1/2) via "
+            "completedRiemannZeta reflection to 1 - rho; at trivial zeros -2*(n+1) both numerator "
+            "and denominator vanish simultaneously, and meromorphic continuation alone proves nothing "
+            "due to compensating poles."
+        ),
+    }
+
+
+def _build_tc064_section3_epistemic_scope_note() -> str:
+    """Single source of truth for Section 3 scope note."""
+    return (
+        "Deliverable B divisor-core star involution and support bijection (with zero coprimality "
+        "assumed between c and f, Lean Theorem 2), the Gaussian square-support sum C_b / sqrt(M) "
+        "for every real window base b > 1 (paramWindowNormSq in Lean Theorem 3), and the complete "
+        "canonical tau-window (windowEnergyNormSq) 5-piece direct-sum Hilbert Minkowski bound "
+        "(retaining endpoint n = T, e = 1, d + 1, and all 25 cross-terms), uniform O(1 + log Y) "
+        "bounds on sum_a (||A_a||_Y^2 + ||Bfeature_a||_Y^2) and |R_square(Y)| for all real Y >= 2 "
+        "(unconditional with zero external premises; the optional stronger |R_osc(d)| <= C_osc*d "
+        "component estimate is kept separate), and two-way closure transfer S_different <-> S_core "
+        "are PROVED_IN_LEAN and certified in 256-bit Arb across Y = 2..1024."
+    )
+
+
+def _build_tc064_section4_explanatory_metadata() -> Dict[str, Any]:
+    """Single source of truth for repaired Section 4 explanatory descriptions (`TASK-TC-064R`)."""
+    return {
+        "section_epistemic_scope_note": (
+            "Deliverable C Attempt 1 & Attempt 2 intermediate identities (pairwise-coprime core "
+            "sector bijection, Mobius sector diagonalization, signed logarithmic GCD prime-sector "
+            "identity, and prime-toggle sign anti-invariance + finite-support boundary split) and "
+            "Deliverable D finite Euler-factor equivalence (for each fixed finite odd-prime set S, "
+            "without uniformity as |S| grows or local S_core transfer) are PROVED_IN_LEAN (Lean "
+            "Theorems 4 & 5; Theorem 4's three integral identities carry explicit Y >= 2 hypotheses "
+            "while its finite-set/pointwise identities hold under their separately proved domains); "
+            "sub-candidates TC064-CAND-C1A-CORE-SECTOR-NONPOS and TC064-CAND-C2A-TOGGLE-PAIR-NONPOS "
+            "are REFUTED_CANDIDATE by certified 256-bit Arb witnesses; the full-profile p^(-3) "
+            "comparison ||A_{p*a}||_Y << p^(-3)*||A_a||_Y is withdrawn as UNPROVED; seen scales "
+            "{512, 576, 960, 1408} are CERTIFIED_FINITE_OBSERVATION strictly labeled SEEN "
+            "diagnostics; uniform closure of S_core(Y) (equivalently D_core(Y) := S_core^scal(Y) - "
+            "4*||V_Y^int||_Y^2) remains OPEN."
+        ),
+        "attempt_1_exact_intermediate_lemmas": [
+            "S_core(Y) = sum_{g in G_core(T)} Pi_Y^core(g) for real Y >= 2 (finite-set pairwise-coprime factorization (g, r, t) and mu(g*r)*mu(g*t) = mu(r)*mu(t) hold independently of Y)",
+            "For real Y >= 2: Pi_Y^core(g) + Mcal_Y(g, g) = sum_{h in C(floor(T/g)), gcd(h,g)=1} mu(h)*(||S_Y^core(g*h)||_Y^2 - 4*||F_Y^core(g*h)||_Y^2)",
+            "Signed logarithmic-GCD identity (real Y >= 2): sum_{g in G_core(T)} (log g)*Pi_Y^core(g) + sum_{a in C(T)} (log a)*Mcal_Y(a, a) = sum_{3 <= p <= T, p prime} (log p)*(||S_Y^core(p)||_Y^2 - 4*||F_Y^core(p)||_Y^2), where weights log p > 0 are positive while the squared-norm differences are signed (certified strictly negative outward Arb enclosures at Y in {16, 32, 64}; no positive-semidefinite conclusion follows)",
+            "Aggregate large-common-factor tail bound (real Y >= 2, G >= 1, d_0(a) := sum_{d | a} 1): |Pi_Y^core(g)| <= (T/(2*g))*sum_{a in C(T), g | a} (||A_a||_Y^2 + 4*||Bfeature_a||_Y^2) and sum_{g in G_core(T), g > G} |Pi_Y^core(g)| <= (T/(2*G))*max_{1 <= a <= T} d_0(a)*(C_A + 4*C_B)*(1 + log Y) <<_eps T^(1+eps)*(1 + log Y)/G (no pointwise 1/g^2 or d_0(g)^2/g^2 bound is claimed)",
+        ],
+        "attempt_1_first_uncontrolled_term_and_exact_loss": (
+            "Coprime sector Pi_Y^core(1) (and between-shell cross-correlations S_core_between_shells): "
+            "log(1) = 0 gives zero weight to g = 1 in the signed logarithmic GCD identity (whose RHS "
+            "differences ||S_Y^core(p)||_Y^2 - 4*||F_Y^core(p)||_Y^2 are themselves signed and "
+            "certified strictly negative at Y in {16, 32, 64}), Mobius inversion f(d) = mu(d) "
+            "introduces alternating positive signs at even-omega(d) composites d = p_1*p_2, and "
+            "resonant squarefree core cardinality |C_res(Y)| ~ (16/tau^2)*Y = Theta(Y) causes a "
+            "Theta(Y) Cauchy-Schwarz loss on [Y, 2*Y] (globally O(Y^(5/4)*log Y))."
+        ),
+        "attempt_2_exact_intermediate_lemmas": [
+            "mu(a star p) = -mu(a), a star p != a, and (a star p) star p = a for every odd prime p >= 3 and odd squarefree a >= 1",
+            "C(T) = C_p^pair(T) sqcup C_p^bdry(T) with C_p^bdry(T) = {a in C(T) : p nmid a and T < 2*p*a}; under the exact strict inequality 2*p*Y > T(Y) (T(Y) = ceil(Y^(5/4)); asymptotic threshold p ~ Y^(1/4)/2), C_p^bdry(T(Y)) cap C_res(Y) = {a in C_res(Y) : p nmid a}, while p-divisible cores in C_res(Y) remain paired with a/p in C(T(Y)) (counterexample to full-shell absorption: Y = 256, T(256) = 1024, p = 7, a = 301 = 7*43, a star 7 = 43 in C(1024))",
+            "U_Y^{int} = (1/2)*sum_{a in C_p^pair(T)} mu(a)*(A_a - A_{a star p}) + sum_{a in C_p^bdry(T)} mu(a)*A_a (and matching feature identity + weighted prime combinations sum_{p in S} w_p = 1)",
+        ],
+        "attempt_2_first_uncontrolled_term_and_exact_loss": (
+            "Status separation: (i) the prime-toggle identity (Lean Theorem 4(3)) is PROVED_IN_LEAN; "
+            "(ii) pairwise toggle nonpositivity TC064-CAND-C2A-TOGGLE-PAIR-NONPOS is refuted by "
+            "certified witnesses (-2*Mcal_16(5, 15) > 0, -2*Mcal_32(5, 15) > 0) and small primes "
+            "p <= D_eff(Y) + 1 carry certified nonzero p_4 jump discrepancies (p = 3 at Y = 16, n = 1); "
+            "(iii) the previously claimed full-profile scale comparison ||A_{p*a}||_Y << p^(-3)*||A_a||_Y "
+            "and resulting contraction obstruction are withdrawn as UNPROVED (for bare Gaussians "
+            "phi_n(X) = X^(5/2)*n^(-3)*exp(-X^2/n^2), the exact ratio is phi_{p*n}(X)/phi_n(X) = "
+            "p^(-3)*exp((1 - p^(-2))*X^2/n^2) > p^(-3) on [Y, tau*Y], and p*a >= 3*Y does NOT place "
+            "p*a outside [Y, tau*Y] for p = 3); (iv) failure of one norm estimate does not rule out "
+            "collective cancellation. Under the exact strict inequality 2*p*Y > T(Y) (T(Y) = ceil(Y^(5/4)); "
+            "p ~ Y^(1/4)/2 asymptotic only), C_p^bdry(T(Y)) cap C_res(Y) = {a in C_res(Y) : p nmid a} "
+            "(p-divisible resonant cores remain paired with a/p in C(T(Y)), e.g. Y = 256, T = 1024, "
+            "p = 7, a = 301 = 7*43); and termwise Cauchy-Schwarz on full squarefree Mobius recovery "
+            "U_Y^{int} = A_1 - sum_{d in C(T), d > 1} mu(d)*S_Y^core(d) loses "
+            "(sum_{d <= Y} |mu(d)|*d^(-1/2))^2 = Theta(Y)."
+        ),
+        "full_profile_p_neg3_comparison_status": "UNPROVED",
+    }
+
+
 def _build_tc064_premise_and_dependency_table() -> List[Dict[str, str]]:
     """Return the complete declaration-level premise table using the 5 mandated categories:
     `PROVED_IN_LEAN`, `PROVED_ANALYTICALLY_OUTSIDE_LEAN`, `CERTIFIED_FINITE_OBSERVATION`,
@@ -1074,34 +1262,7 @@ def verify_section_1_protocols_endpoint_and_premise_chain(
                     "verified": tc063_ok,
                 },
             },
-            "tc_scaling_and_window_base_distinction": {
-                "common_arithmetic_referent": (
-                    "Q_{lambda, infty}(X) = sum_{n >= 1} lambda(n)*phi_n(X), whose Mellin transform "
-                    "represents L_lambda(x + i*y) = zeta(2*x + 2*i*y) / zeta(x + i*y)."
-                ),
-                "square_scaling_vs_transcendental_grade_scaling": (
-                    "Integer square scaling (u = a*b^2, n |-> b^2*n, X |-> X/b^2, z |-> 2*z) acts on "
-                    "continuum scale variables to collapse Liouville parity lambda(a*b^2) = mu(a) onto "
-                    "odd squarefree cores; transcendental-grade scaling X = tau^K (K in A_R) fixes the "
-                    "logarithmic window [Y, tau*Y] without claiming log_tau(b^2) in A_R (by Lindemann, "
-                    "log_tau(m) notin Q for m >= 2; irrational algebraic membership remains "
-                    "OPEN_TAU_ALGEBRAIC_EXPONENT_ARITHMETIC)."
-                ),
-                "window_base_b_gt_1_generality": (
-                    "All squarefree-core bijections, divisor-core support lemmas, square-support Gaussian "
-                    "sums C_b / sqrt(M), 5-piece Hilbert Minkowski bounds, and finite Euler-factor "
-                    "equivalences hold for EVERY real window base b > 1; tau enters solely as the "
-                    "canonical TC window convention [Y, tau*Y] (no tau-specific arithmetic property is used)."
-                ),
-                "actual_zeta_pole_contradiction_summary": (
-                    "Holomorphic (pole-free) continuation F_hol of zeta(2*z)/zeta(z) to x > 1/2 excludes "
-                    "right-half-strip zeros rho = x + i*y (1/2 < x < 1) via 0 = zeta(rho)*F_hol(rho) = "
-                    "zeta(2*rho) != 0 (2*x > 1), and left-half-strip zeros (0 < x < 1/2) via "
-                    "completedRiemannZeta reflection to 1 - rho; at trivial zeros -2*(n+1) both numerator "
-                    "and denominator vanish simultaneously, and meromorphic continuation alone proves nothing "
-                    "due to compensating poles."
-                ),
-            },
+            "tc_scaling_and_window_base_distinction": _build_tc064_scaling_and_window_base_distinction(),
             "premise_and_dependency_table": premise_table,
             "generic_window_base_square_support_checks": base_rows,
             "all_section_1_checks_pass": bool(
@@ -1837,14 +1998,7 @@ def verify_section_3_same_core_bound_and_divisor_support(
 
         return {
             "section_epistemic_classification": "CONCRETE_FORMAL_AND_CERTIFIED_OBSERVATION",
-            "section_epistemic_scope_note": (
-                "Deliverable B divisor-core star involution, support bijection (with zero coprimality "
-                "assumed between c and f), square-support Gaussian sum C_tau / sqrt(M), 5-piece "
-                "direct-sum Hilbert Minkowski bound (retaining endpoint n = T, e = 1, d + 1, and all "
-                "cross-terms), uniform O(1 + log Y) bounds on sum_a (||A_a||^2 + ||Bfeature_a||^2) and "
-                "|R_square(Y)| for all real Y >= 2, and two-way closure transfer S_different <-> S_core "
-                "are PROVED_IN_LEAN (Lean Theorems 2 & 3) and certified in 256-bit Arb across Y = 2..1024."
-            ),
+            "section_epistemic_scope_note": _build_tc064_section3_epistemic_scope_note(),
             "lean_theorems": [
                 "divisor_core_star_involution_and_support_bijection_tc064",
                 "uniform_same_core_hilbert_bound_and_closure_transfer_tc064",
@@ -2728,29 +2882,16 @@ def verify_section_4_attempts_seen_diagnostics_and_euler_robustness(
         and arb(wit_c2a_y32_a5["arb_ball_str"]).lower() > arb(0)
     )
 
+    s4_meta = _build_tc064_section4_explanatory_metadata()
     return {
         "section_epistemic_classification": "MIXED_CONCRETE_FORMAL_CERTIFIED_AND_REFUTATION",
-        "section_epistemic_scope_note": (
-            "Deliverable C Attempt 1 & Attempt 2 intermediate identities (pairwise-coprime core "
-            "sector bijection, Mobius sector diagonalization, logarithmic GCD prime-sector identity, "
-            "and prime-toggle sign anti-invariance + finite-support boundary split) and Deliverable D "
-            "finite Euler-factor equivalence are PROVED_IN_LEAN (Lean Theorems 4 & 5); sub-candidates "
-            "TC064-CAND-C1A-CORE-SECTOR-NONPOS and TC064-CAND-C2A-TOGGLE-PAIR-NONPOS are "
-            "REFUTED_CANDIDATE by certified 256-bit Arb witnesses; seen scales {512, 576, 960, 1408} "
-            "are CERTIFIED_FINITE_OBSERVATION strictly labeled SEEN diagnostics; uniform closure of "
-            "S_core(Y) remains OPEN."
-        ),
+        "section_epistemic_scope_note": s4_meta["section_epistemic_scope_note"],
         "lean_theorems": [
             "squarefree_core_gcd_prime_sector_and_prime_toggle_identities_tc064",
             "finite_euler_factor_dirichlet_multiplier_and_dilation_equivalence_tc064",
         ],
         "attempt_1_common_factor_coprime_and_scale_blocks": {
-            "exact_intermediate_lemmas": [
-                "S_core(Y) = sum_{g in G_core(T)} Pi_Y^core(g) with (g, r, t) pairwise coprime odd squarefree and mu(g*r)*mu(g*t) = mu(r)*mu(t)",
-                "Pi_Y^core(g) + Mcal_Y(g, g) = sum_{h in C(floor(T/g)), gcd(h,g)=1} mu(h)*(||S_Y^core(g*h)||_Y^2 - 4*||F_Y^core(g*h)||_Y^2)",
-                "sum_{g in G_core(T)} (log g)*Pi_Y^core(g) + sum_{a in C(T)} (log a)*Mcal_Y(a, a) = sum_{3 <= p <= T, p prime} (log p)*(||S_Y^core(p)||_Y^2 - 4*||F_Y^core(p)||_Y^2)",
-                "|Pi_Y^core(g)| <= (T/(2*g))*sum_{a in C(T), g | a} (||A_a||_Y^2 + 4*||Bfeature_a||_Y^2) and sum_{g > G} |Pi_Y^core(g)| <= (T/(2*G))*max_{a<=T} d_0(a)*(C_A + 4*C_B)*(1 + log Y) <<_eps T^(1+eps)*(1 + log Y)/G",
-            ],
+            "exact_intermediate_lemmas": s4_meta["attempt_1_exact_intermediate_lemmas"],
             "candidate_C1A_core_sector_nonpositivity": {
                 "candidate_id": "TC064-CAND-C1A-CORE-SECTOR-NONPOS",
                 "outcome": "REFUTED_BY_CERTIFIED_WITNESS" if c1a_refuted else "UNRESOLVED",
@@ -2758,35 +2899,25 @@ def verify_section_4_attempts_seen_diagnostics_and_euler_robustness(
                 "witness_Y32_g7": wit_c1a_y32_g7,
                 "witness_seen_Y512_coprime_g1": wit_c1a_y512_g1,
             },
-            "first_uncontrolled_term_and_exact_loss": (
-                "Coprime sector Pi_Y^core(1) (and between-shell cross-correlations S_core_between_shells): "
-                "log(1) = 0 gives zero weight to g = 1 in the logarithmic GCD identity, Mobius inversion "
-                "f(d) = mu(d) introduces alternating positive signs at even-omega(d) composites d = p_1*p_2, "
-                "and resonant squarefree core cardinality |C_res(Y)| ~ (16/tau^2)*Y = Theta(Y) causes a "
-                "Theta(Y) Cauchy-Schwarz loss on [Y, 2*Y] (globally O(Y^(5/4)*log Y))."
-            ),
+            "first_uncontrolled_term_and_exact_loss": s4_meta[
+                "attempt_1_first_uncontrolled_term_and_exact_loss"
+            ],
             "small_scale_sector_and_log_gcd_checks": small_rows,
         },
         "attempt_2_squarefree_prime_toggle_involution": {
-            "exact_intermediate_lemmas": [
-                "mu(a star p) = -mu(a), a star p != a, and (a star p) star p = a for every odd prime p and odd squarefree a >= 1",
-                "C(T) = C_p^pair(T) sqcup C_p^bdry(T) with C_p^bdry(T) = {a in C(T) : p nmid a and T < 2*p*a}",
-                "U_Y^{int} = (1/2)*sum_{a in C_p^pair(T)} mu(a)*(A_a - A_{a star p}) + sum_{a in C_p^bdry(T)} mu(a)*A_a (and matching feature identity + weighted prime combinations sum_{p in S} w_p = 1)",
-            ],
+            "exact_intermediate_lemmas": s4_meta["attempt_2_exact_intermediate_lemmas"],
             "candidate_C2A_toggle_pair_nonpositivity": {
                 "candidate_id": "TC064-CAND-C2A-TOGGLE-PAIR-NONPOS",
                 "outcome": "REFUTED_BY_CERTIFIED_WITNESS" if c2a_refuted else "UNRESOLVED",
                 "witness_Y16_p3_a5": wit_c2a_y16_a5,
                 "witness_Y32_p3_a5": wit_c2a_y32_a5,
             },
-            "first_uncontrolled_term_and_exact_loss": (
-                "At fixed window [Y, tau*Y], for resonant a in [Y, 2*Y] and p nmid a, A_{p*a} peaks near "
-                "p*a >= 3*Y with ||A_{p*a}||_Y << p^(-3)*||A_a||_Y, so (1/2)*(A_a - sum_{p <= P} w_p*A_{a star p}) "
-                "merely redistributes mass without norm contraction; across shifted scales Y/p, p <= D_eff + 1 "
-                "carries nonzero small-divisor jump discrepancies, C_p^bdry(T) swallows C_res(Y) once "
-                "p > T/(2*Y) ~ (1/2)*Y^(1/4), and full squarefree Mobius recovery U_Y^{int} = A_1 - "
-                "sum_{d in C(T), d > 1} mu(d)*S_Y^core(d) loses (sum_{d <= Y} |mu(d)|*d^(-1/2))^2 = Theta(Y)."
-            ),
+            "full_profile_p_neg3_comparison_status": s4_meta[
+                "full_profile_p_neg3_comparison_status"
+            ],
+            "first_uncontrolled_term_and_exact_loss": s4_meta[
+                "attempt_2_first_uncontrolled_term_and_exact_loss"
+            ],
         },
         "seen_scale_mechanism_diagnostics": seen_rows,
         "deliverable_d_finite_euler_factor_robustness": deliv_d,
@@ -3973,6 +4104,110 @@ def compare_tc064_artifacts_by_stable_key(
     }
 
 
+def compare_tc064_numerical_payloads_by_observable_key(
+    current_art: Dict[str, Any],
+    previous_art: Dict[str, Any],
+) -> Dict[str, Any]:
+    """Compare two `TC-064` artifacts key-by-key across EVERY serialized Arb enclosure (all 5
+    fields `mid_float`, `rad_float_outward`, `lower_dec`, `upper_dec`, `arb_ball_str`), every
+    discrete cutoff (`T_Y`, `D0_eff`, `squarefree_core_count_C_T`, `max_chain_length_L_T`,
+    `*_fixed`), every evaluated binary domain (`evaluated_Y_*`), and every holdout / interval /
+    candidate classification to verify zero unintended numerical or verdict mutation.
+    """
+    arb_keys = ("mid_float", "rad_float_outward", "lower_dec", "upper_dec", "arb_ball_str")
+    tracked_scalar_fields = {
+        "T_Y",
+        "D0_eff",
+        "squarefree_core_count_C_T",
+        "max_chain_length_L_T",
+        "T_fixed",
+        "D0_fixed",
+        "D0_eff_fixed",
+        "squarefree_core_count_C_fixed",
+        "max_chain_length_L_fixed",
+        "evaluated_Y_interval_exact_fractions",
+        "evaluated_Y_mid_man_exp",
+        "evaluated_Y_rad_man_exp",
+        "probe_verdicts",
+        "probe_global_outcomes",
+        "holdout_hypothesis_outcome",
+        "primary_log_saving_probe_outcome",
+        "outcome",
+        "TC064_P0_CORE_branch_classification",
+        "TC064_P_NEG_CORE_branch_classification",
+        "TC064_RSQ_LOC_branch_classification",
+        "KL1_same_core_square_branch_classification",
+        "KL1_distinct_core_branch_classification",
+        "TC064_P0_CORE_interval_classification",
+        "TC064_P_NEG_CORE_interval_classification",
+        "TC064_RSQ_LOC_interval_classification",
+        "KL1_same_core_square_interval_classification",
+        "KL1_distinct_core_interval_classification",
+    }
+
+    def _collect(tree: Dict[str, Any]) -> Tuple[Dict[str, Dict[str, Any]], Dict[str, Any]]:
+        arbs: Dict[str, Dict[str, Any]] = {}
+        metas: Dict[str, Any] = {}
+
+        def _walk(node: Any, path: str) -> None:
+            if isinstance(node, dict):
+                if all(k in node for k in arb_keys):
+                    arbs[path] = {k: node[k] for k in arb_keys}
+                    return
+                for k, v in node.items():
+                    if k in ("enclosure_arb", "serialized_arb_self_check", "provenance"):
+                        continue
+                    nxt = f"{path}.{k}" if path else str(k)
+                    if k in tracked_scalar_fields:
+                        metas[nxt] = v
+                    else:
+                        _walk(v, nxt)
+            elif isinstance(node, list):
+                for i, item in enumerate(node):
+                    _walk(item, f"{path}[{i}]")
+
+        _walk(tree, "")
+        return arbs, metas
+
+    cur_arbs, cur_metas = _collect(current_art)
+    prev_arbs, prev_metas = _collect(previous_art)
+
+    all_arb_paths = sorted(set(cur_arbs.keys()) | set(prev_arbs.keys()))
+    changed_arbs: List[str] = []
+    added_arbs: List[str] = []
+    removed_arbs: List[str] = []
+    for p in all_arb_paths:
+        if p not in prev_arbs:
+            added_arbs.append(p)
+        elif p not in cur_arbs:
+            removed_arbs.append(p)
+        elif cur_arbs[p] != prev_arbs[p]:
+            changed_arbs.append(p)
+
+    all_meta_paths = sorted(set(cur_metas.keys()) | set(prev_metas.keys()))
+    changed_metas: List[str] = []
+    for p in all_meta_paths:
+        if cur_metas.get(p) != prev_metas.get(p):
+            changed_metas.append(p)
+
+    identical = bool(
+        len(all_arb_paths) > 0
+        and not changed_arbs
+        and not added_arbs
+        and not removed_arbs
+        and not changed_metas
+    )
+    return {
+        "total_arb_keys_compared": len(all_arb_paths),
+        "changed_arb_keys": changed_arbs,
+        "added_arb_keys": added_arbs,
+        "removed_arb_keys": removed_arbs,
+        "total_domain_cutoff_and_classification_keys_compared": len(all_meta_paths),
+        "changed_domain_cutoff_or_classification_keys": changed_metas,
+        "numerical_payloads_identical": identical,
+    }
+
+
 def verify_tc064_review_document_consistency(
     artifact: Dict[str, Any],
     review_path: Path = TC_064_REVIEW_DOC_PATH,
@@ -4067,15 +4302,28 @@ def verify_tc064_review_document_consistency(
     if expected_thms != len(EXPECTED_TC064_THEOREMS):
         stale_errors.append("Unexpected public theorem count")
 
-    # Guard against discrete-tuple and surviving-lemma formula regressions:
+    # Guard against discrete-tuple, surviving-lemma, and repaired TC-064R overclaim regressions:
     for bad_snip in (
         "(7776, 7, 1578, 7)",
         "(7777, 7, 1578, 7)",
         "|C(513)| = 104",
         "\\Pi_Y^{\\mathrm{core}}(1) - 4\\|V_Y^{\\mathrm{int}}\\|_Y^2 =",
+        "swallows the entire resonant shell",
+        "swallows $C_{\\mathrm{res}}(Y)$",
+        "purely positive",
+        "d_0(g)^2",
+        "Mellin shift $z \\mapsto 2z$",
+        "for every $T \\ge 0, D_0 \\ge 0, Y > 0$",
     ):
         if bad_snip in txt:
             stale_errors.append(f"Stale or mathematically invalid snippet {bad_snip!r}")
+    for req_snip in (
+        "D_{\\mathrm{core}}(Y)",
+        "TC064-LEM-SURVIVING-SCALAR-CORE-DAMPED",
+        "MixedCovarianceClosureHypothesis",
+    ):
+        if req_snip not in txt:
+            stale_errors.append(f"Missing required surviving-target identifier {req_snip!r}")
 
     ok = bool(
         tagged_checked > 0
@@ -4269,10 +4517,13 @@ def reprocess_task_tc064_metadata_and_lean_audit(
     write_output: bool = True,
     validation_commit_override: Optional[str] = None,
     protocol_override: Optional[Dict[str, Any]] = None,
+    sync_tc064r_explanatory_metadata: bool = True,
 ) -> Dict[str, Any]:
     """Re-run full serialized Arb validation, Section 5 adversarial validation, Section 6 live
-    Lean declaration audit, and provenance synchronization on an existing `TC-064` artifact WITHOUT
-    altering any numerical Arb ball or modifying `numerical_producing_git_commit`.
+    Lean declaration audit, explanatory metadata synchronization (`TASK-TC-064R`), and provenance
+    synchronization on an existing `TC-064` artifact WITHOUT altering any numerical Arb ball,
+    cutoff, evaluated binary domain, holdout classification, `generated_at_utc`, or
+    `numerical_producing_git_commit`.
     """
     existing = json.loads(Path(artifact_path).read_text(encoding="utf-8"))
     prov = existing.get("provenance")
@@ -4320,6 +4571,48 @@ def reprocess_task_tc064_metadata_and_lean_audit(
     new_prov["validation_git_commit"] = val_commit
     new_prov["formal_producing_git_commit"] = formal_commit
     new_prov["reprocessed_at_utc"] = datetime.now(timezone.utc).isoformat()
+    if sync_tc064r_explanatory_metadata:
+        updated["repair_task_id"] = TASK_TC_064R_ID
+        new_prov["tc064r_repair_branch"] = PROPOSED_TC064R_REPAIR_BRANCH
+        new_prov["tc064r_reviewed_tc064_tip"] = REVIEWED_TC064_TIP
+        new_prov["tc064r_metadata_repair_git_commit"] = val_commit
+        new_prov["tc064r_repair_mode"] = (
+            "METADATA_AND_EXPLANATORY_REPAIR_ONLY_NO_NUMERICAL_OR_FORMAL_REBUILD"
+        )
+        sec1_u = updated.get("section_1_protocols_endpoint_and_premise_chain")
+        if isinstance(sec1_u, dict):
+            sec1_u["tc_scaling_and_window_base_distinction"] = (
+                _build_tc064_scaling_and_window_base_distinction()
+            )
+        sec3_u = updated.get("section_3_same_core_bound_and_divisor_support")
+        if isinstance(sec3_u, dict):
+            sec3_u["section_epistemic_scope_note"] = _build_tc064_section3_epistemic_scope_note()
+        sec4_u = updated.get(
+            "section_4_distinct_core_attempts_seen_diagnostics_and_euler_robustness"
+        )
+        if isinstance(sec4_u, dict):
+            s4_meta = _build_tc064_section4_explanatory_metadata()
+            sec4_u["section_epistemic_scope_note"] = s4_meta["section_epistemic_scope_note"]
+            att1_u = sec4_u.get("attempt_1_common_factor_coprime_and_scale_blocks")
+            if isinstance(att1_u, dict):
+                att1_u["exact_intermediate_lemmas"] = s4_meta[
+                    "attempt_1_exact_intermediate_lemmas"
+                ]
+                att1_u["first_uncontrolled_term_and_exact_loss"] = s4_meta[
+                    "attempt_1_first_uncontrolled_term_and_exact_loss"
+                ]
+            att2_u = sec4_u.get("attempt_2_squarefree_prime_toggle_involution")
+            if isinstance(att2_u, dict):
+                att2_u["exact_intermediate_lemmas"] = s4_meta[
+                    "attempt_2_exact_intermediate_lemmas"
+                ]
+                att2_u["full_profile_p_neg3_comparison_status"] = s4_meta[
+                    "full_profile_p_neg3_comparison_status"
+                ]
+                att2_u["first_uncontrolled_term_and_exact_loss"] = s4_meta[
+                    "attempt_2_first_uncontrolled_term_and_exact_loss"
+                ]
+
     updated["provenance"] = new_prov
     updated["section_5_unseen_validation_and_interval_splits"] = sec5_upd
     updated["section_6_lean_audit_and_gate_accounting"] = sec6_upd
@@ -4328,7 +4621,12 @@ def reprocess_task_tc064_metadata_and_lean_audit(
         updated, existing.get("serialized_arb_self_check")
     )
     updated["serialized_arb_self_check"] = arb_rechk
-    if not arb_rechk["all_enclose_original_256bit_arb_ball"]:
+    payload_cmp = compare_tc064_numerical_payloads_by_observable_key(updated, existing)
+    updated["provenance"]["numerical_payload_preservation_check"] = payload_cmp
+    if (
+        not arb_rechk["all_enclose_original_256bit_arb_ball"]
+        or not payload_cmp["numerical_payloads_identical"]
+    ):
         updated["execution_and_certification_status"] = "CERTIFICATION_INTEGRITY_CONFLICT_BLOCKED"
         updated["holdout_hypothesis_outcome"] = CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
         updated["primary_log_saving_probe_outcome"] = CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
@@ -4368,6 +4666,7 @@ def reprocess_task_tc064_metadata_and_lean_audit(
         and sec5_upd["all_section_5_checks_pass"]
         and sec6_upd["all_section_6_checks_pass"]
         and arb_rechk["all_enclose_original_256bit_arb_ball"]
+        and payload_cmp["numerical_payloads_identical"]
         and not cmp_rep["missing_required_status_keys"]
         and updated["holdout_hypothesis_outcome"] != CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
     )

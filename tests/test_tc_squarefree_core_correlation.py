@@ -10,12 +10,20 @@ import json
 from pathlib import Path
 import re
 
-from flint import arb, ctx as flint_ctx
+from flint import acb, arb, ctx as flint_ctx
 import pytest
 
 from certification import REQUIRED_FORMAL_SOURCES
 from scripts.build_formal import FORMAL_SOURCE_FILES
 from tc.canonical_theta_correlation_bound import REPO_ROOT, serialize_arb_certified
+from tc.coupled_scale_energy_bootstrap import _tau_arb
+from tc.dyadic_power_lift_primitive_correlation import is_perfect_square_int
+from tc.joint_prime_dilation_signed_remainder import _parse_serialized_arb_enclosure_tc062
+from tc.liouville_square_dilation import (
+    evaluate_energy_kernel_K_Y_certified_arb,
+    inflate_arb_with_nonneg_bound,
+    liouville_lambda_int,
+)
 from tc.mixed_arithmetic_covariance import (
     CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME,
     compute_selberg_centered_remainder_table_fast_arb,
@@ -27,21 +35,28 @@ from tc.squarefree_core_correlation import (
     FROZEN_TC064_PROTOCOL_REGISTRATION_COMMIT,
     FROZEN_TC064_PROTOCOL_SHA256,
     PRESCRIBED_TC064_INTERVAL_SPLITS,
+    PRESERVED_TC064_FORMAL_PRODUCER,
+    PRESERVED_TC064_NUMERICAL_PRODUCER,
     REQUIRED_CURRENT_TC064_STATUS_KEYS,
     SQUAREFREE_CORE_ARTIFACT_PATH,
     SQUAREFREE_CORE_LEAN_PATH,
     SQUAREFREE_CORE_LEAN_REL,
     SQUAREFREE_CORE_PROTOCOL_PATH,
     TASK_TC_064_ID,
+    TASK_TC_064R_ID,
     TC_064_REVIEW_DOC_PATH,
     aggregate_tc064_section5_and_derive_outcomes,
+    canonical_cutoff_T_of_Y_exact,
     compare_tc064_artifacts_by_stable_key,
+    compare_tc064_numerical_payloads_by_observable_key,
     compute_uniform_same_core_constants_arb,
     core_square_multipliers_B_a,
     odd_squarefree_common_factor_set,
     odd_squarefree_core_and_root,
     odd_squarefree_cores_C_T,
+    prime_toggle_boundary_and_paired_partition,
     reprocess_task_tc064_metadata_and_lean_audit,
+    resonant_squarefree_cores_C_res,
     squarefree_core_star,
     verify_divisor_core_support_exhaustive_exact,
     verify_five_piece_hilbert_and_feature_bound_at_Y16_arb,
@@ -419,6 +434,248 @@ def test_tc064_lean_formalization_review_consistency_and_registers(
 
     # Shared registers check:
     q_obj = json.loads((REPO_ROOT / ".agents" / "research" / "queue.json").read_text(encoding="utf-8"))
-    assert q_obj["active_task_id"] == TASK_TC_064_ID
+    q_ids = {t["task_id"] for t in q_obj["tasks"]}
+    assert TASK_TC_064_ID in q_ids
+    assert TASK_TC_064R_ID in q_ids
+    assert q_obj["active_task_id"] in {TASK_TC_064_ID, TASK_TC_064R_ID}
     s_obj = json.loads((REPO_ROOT / ".agents" / "research" / "state.json").read_text(encoding="utf-8"))
     assert s_obj.get("rh_proved", False) is False
+
+
+def test_tc064r_prime_toggle_boundary_partition_counterexample_and_strict_threshold() -> None:
+    """Verify the corrected prime-toggle resonant-shell boundary identity from the actual
+    core definitions `C(T)`, `C_p^pair(T)`, `C_p^bdry(T)`, `C_res(Y)`, and `T(Y) = ceil(Y^(5/4))`:
+      1. Exact counterexample `Y = 256, T(256) = 1024, p = 7, a = 301 = 7 * 43`;
+      2. Exact identity `C_p^bdry(T(Y)) cap C_res(Y) = {a in C_res(Y) : p nmid a}` and
+         `C_p^pair(T(Y)) cap C_res(Y) = {a in C_res(Y) : p | a}` whenever `2*p*Y > T(Y)`;
+      3. Strict-inequality and ceiling sensitivity (`Y = 1297, p = 3`; `Y = 1296 - 2^-12, p = 3`;
+         `Y = 2500, p = 3`).
+    """
+    # 1. Exact counterexample to full-shell absorption: Y = 256, T = 1024, p = 7, a = 301 = 7 * 43
+    T_256 = canonical_cutoff_T_of_Y_exact(256)
+    assert T_256 == 1024
+    assert 2 * 7 * 256 > T_256
+    c_1024 = set(odd_squarefree_cores_C_T(T_256))
+    c_res_256 = resonant_squarefree_cores_C_res(256, T_256)
+    paired_7, bdry_7 = prime_toggle_boundary_and_paired_partition(7, T_256)
+    assert set(paired_7).isdisjoint(bdry_7)
+    assert sorted(paired_7 + bdry_7) == sorted(c_1024)
+
+    assert 301 in c_res_256
+    assert 301 == 7 * 43
+    assert squarefree_core_star(301, 7) == 43
+    assert 43 in c_1024
+    assert 301 in paired_7
+    assert 301 not in bdry_7
+
+    # 2. Exact resonant-shell partition under strict inequality 2*p*Y > T(Y)
+    for y_val, p_val in ((256, 7), (256, 3), (1295, 3)):
+        t_y = canonical_cutoff_T_of_Y_exact(y_val)
+        assert 2 * p_val * y_val > t_y
+        c_res = resonant_squarefree_cores_C_res(y_val, t_y)
+        paired_p, bdry_p = prime_toggle_boundary_and_paired_partition(p_val, t_y)
+        bdry_res = [a for a in c_res if a in set(bdry_p)]
+        paired_res = [a for a in c_res if a in set(paired_p)]
+        copr_res = [a for a in c_res if a % p_val != 0]
+        pdiv_res = [a for a in c_res if a % p_val == 0]
+        assert len(copr_res) > 0 and len(pdiv_res) > 0
+        assert bdry_res == copr_res
+        assert paired_res == pdiv_res
+
+    # 3a. Strict inequality necessity: at Y = 1297, p = 3, 2*3*1297 = 7782 <= 7784 = T(1297),
+    #     so 3-coprime resonant core a = 1297 remains paired with 1297 star 3 = 3891 in C(7784).
+    T_1297 = canonical_cutoff_T_of_Y_exact(1297)
+    assert T_1297 == 7784
+    assert 2 * 3 * 1297 <= T_1297
+    c_res_1297 = resonant_squarefree_cores_C_res(1297, T_1297)
+    paired_1297, bdry_1297 = prime_toggle_boundary_and_paired_partition(3, T_1297)
+    assert 1297 in c_res_1297
+    assert 1297 % 3 != 0
+    assert squarefree_core_star(1297, 3) == 3891
+    assert 3891 in odd_squarefree_cores_C_T(T_1297)
+    assert 1297 in paired_1297 and 1297 not in bdry_1297
+    assert len([a for a in c_res_1297 if a in set(bdry_1297)]) < len(
+        [a for a in c_res_1297 if a % 3 != 0]
+    )
+
+    # 3b. Ceiling necessity vs asymptotic p ~ Y^(1/4)/2: at Y = 1296 - 2^-12, p = 3 satisfies
+    #     p > Y^(1/4)/2 (since 16*3^4 = 1296 > Y), yet 2*3*Y < 7776 = ceil(Y^(5/4)).
+    y_left = Fraction(5308415, 4096)
+    T_left = canonical_cutoff_T_of_Y_exact(y_left)
+    assert T_left == 7776
+    assert y_left < Fraction(16 * (3 ** 4), 1)
+    assert not (2 * 3 * y_left > T_left)
+
+    # 3c. Interior counterexample when 2*p*Y < T(Y): Y = 2500, T = 17678, p = 3, a = 2501 = 41 * 61.
+    T_2500 = canonical_cutoff_T_of_Y_exact(2500)
+    assert T_2500 == 17678
+    assert 2 * 3 * 2500 < T_2500
+    paired_2500, bdry_2500 = prime_toggle_boundary_and_paired_partition(3, T_2500)
+    assert 2501 in resonant_squarefree_cores_C_res(2500, T_2500)
+    assert 2501 % 3 != 0
+    assert 2501 in paired_2500 and 2501 not in bdry_2500
+
+
+def test_tc064r_signed_log_gcd_outward_enclosures_and_dilation_identities(
+    tc064_artifact: dict,
+) -> None:
+    """Verify:
+      1. Outward serialized Arb enclosures (not merely midpoints) of the signed logarithmic-GCD
+         identity RHS at Y in {16, 32, 64} are strictly negative (`c_hi < 0`), while the equality
+         residuals enclose 0;
+      2. Exact bare Gaussian ratio `phi_{p*n}(X)/phi_n(X) = p^(-3)*exp((1 - p^(-2))*X^2/n^2) > p^(-3)`
+         on `[Y, tau*Y]`, and `p*a <= 6*Y < tau*Y` for `p = 3` and `a in [Y, 2*Y]`;
+      3. Distinction between fixed square dilation (`b^(-2*(x+iy))` Dirichlet multiplier and
+         `phi_{b^2*n}(X) = b^(-1)*phi_n(X/b^2)`), running-index squaring (`sum (n^2)^(-z) = zeta(2z)`
+         on `x > 1/2`), and Liouville convolution (`1 * lambda = 1_square`, `zeta(z)*L_lambda(z) = zeta(2z)`).
+    """
+    sec4 = tc064_artifact[
+        "section_4_distinct_core_attempts_seen_diagnostics_and_euler_robustness"
+    ]
+    sm_checks = sec4["attempt_1_common_factor_coprime_and_scale_blocks"][
+        "small_scale_sector_and_log_gcd_checks"
+    ]
+    assert [r["Y"] for r in sm_checks] == [16, 32, 64]
+    for row in sm_checks:
+        p_rhs = _parse_serialized_arb_enclosure_tc062(row["log_gcd_identity_rhs"])
+        p_lhs = _parse_serialized_arb_enclosure_tc062(row["log_gcd_identity_lhs"])
+        p_res = _parse_serialized_arb_enclosure_tc062(row["log_gcd_identity_residual"])
+        assert p_rhs is not None and p_lhs is not None and p_res is not None
+        # Actual outward enclosure upper bound strictly negative (refutes "purely positive"):
+        assert p_rhs["c_hi"] < 0
+        assert p_lhs["c_hi"] < 0
+        # Equality residual encloses 0 tightly:
+        assert p_res["c_lo"] <= 0 <= p_res["c_hi"]
+        assert max(abs(p_res["c_lo"]), abs(p_res["c_hi"])) < Fraction(1, 10 ** 60)
+        if row["Y"] == 16:
+            ref_y16 = Fraction("-0.0232162511649197014")
+            assert abs(p_rhs["c_lo"] - ref_y16) < Fraction(1, 10 ** 18)
+            assert abs(p_rhs["c_hi"] - ref_y16) < Fraction(1, 10 ** 18)
+
+    saved = flint_ctx.prec
+    try:
+        flint_ctx.prec = 256
+        tau = _tau_arb()
+
+        def _phi(n_val: int, X_val: arb) -> arb:
+            na = arb(n_val)
+            return (X_val ** (arb(5) / arb(2))) * (na ** (-3)) * (-(X_val * X_val) / (na * na)).exp()
+
+        # Bare Gaussian ratio identity & strict > p^(-3) on [Y, tau*Y]:
+        Y_sample = arb(100)
+        assert bool((arb(6) * Y_sample < tau * Y_sample))  # p = 3, a <= 2Y stays inside [Y, tau*Y]
+        for p_val in (3, 5, 7):
+            for n_val in (100, 150, 200):
+                for X_val in (Y_sample, arb(3) * Y_sample, tau * Y_sample):
+                    lhs_ratio = _phi(p_val * n_val, X_val) / _phi(n_val, X_val)
+                    rhs_ratio = (arb(p_val) ** (-3)) * (
+                        (arb(1) - arb(p_val) ** (-2)) * (X_val * X_val) / (arb(n_val) ** 2)
+                    ).exp()
+                    assert lhs_ratio.overlaps(rhs_ratio)
+                    assert bool(abs(lhs_ratio - rhs_ratio).upper() < arb("1e-55"))
+                    assert bool(lhs_ratio.lower() > (arb(p_val) ** (-3)).upper())
+
+        # Bare window norm ratio at Y = 100, a = 100, p = 3 exceeds 20 * 3^(-3):
+        norm_100 = evaluate_energy_kernel_K_Y_certified_arb(100, 100, 100, prec_bits=256).sqrt()
+        norm_300 = evaluate_energy_kernel_K_Y_certified_arb(100, 300, 300, prec_bits=256).sqrt()
+        assert bool((norm_300 / norm_100).lower() > arb(20) * (arb(3) ** (-3)))
+
+        # Fixed square dilation on Gaussian: phi_{b^2 * n}(X) = b^(-1) * phi_n(X / b^2)
+        for b_val in (2, 3, 5):
+            for n_val in (1, 3, 7):
+                for X_val in (arb(5), arb(19)):
+                    lhs_d = _phi(b_val * b_val * n_val, X_val)
+                    rhs_d = (arb(b_val) ** (-1)) * _phi(n_val, X_val / arb(b_val * b_val))
+                    assert lhs_d.overlaps(rhs_d)
+                    assert bool(abs(lhs_d - rhs_d).upper() < arb("1e-60"))
+
+        # Fixed square dilation on Dirichlet series gives scalar factor b^(-2*(x+iy)), NOT zeta(2z):
+        z_dir = acb(arb(3), arb(2))
+        b_fix = 3
+        s_plain = sum((acb(liouville_lambda_int(n)) * (acb(n) ** (-z_dir)) for n in range(1, 121)), acb(0))
+        s_dil = sum(
+            (acb(liouville_lambda_int(n)) * (acb(b_fix * b_fix * n) ** (-z_dir)) for n in range(1, 121)),
+            acb(0),
+        )
+        expected_dil = (acb(b_fix) ** (-acb(2) * z_dir)) * s_plain
+        assert s_dil.real.overlaps(expected_dil.real) and s_dil.imag.overlaps(expected_dil.imag)
+        assert bool(abs(s_dil - expected_dil).upper() < arb("1e-60"))
+
+        # Running-index squaring sum (n^2)^(-z) = zeta(2z) converges on x = 3/4 in (1/2, 1):
+        z_half = acb(arb(3) / arb(4), arb(5) / arb(2))
+        N_sq = 800
+        part_sq = sum((acb(n * n) ** (-z_half) for n in range(1, N_sq + 1)), acb(0))
+        # Tail |sum_{n > N} n^(-2*x)| <= N^(1 - 2*x)/(2*x - 1) = 2 / sqrt(N)
+        tail_sq = arb(2) / arb(N_sq).sqrt()
+        encl_sq = acb(
+            inflate_arb_with_nonneg_bound(part_sq.real, tail_sq),
+            inflate_arb_with_nonneg_bound(part_sq.imag, tail_sq),
+        )
+        zeta_2z = (acb(2) * z_half).zeta()
+        assert encl_sq.real.overlaps(zeta_2z.real) and encl_sq.imag.overlaps(zeta_2z.imag)
+
+        # Liouville convolution 1 * lambda = 1_square (exact) & zeta(z)*L_lambda(z) = zeta(2z) (x > 1):
+        for n_i in range(1, 401):
+            conv_n = sum(liouville_lambda_int(d) for d in range(1, n_i + 1) if n_i % d == 0)
+            assert conv_n == (1 if is_perfect_square_int(n_i) else 0)
+        N_conv = 400
+        l_part = sum((acb(liouville_lambda_int(n)) * (acb(n) ** (-z_dir)) for n in range(1, N_conv + 1)), acb(0))
+        tail_l = (arb(N_conv) ** (-2)) / arb(2)
+        l_encl = acb(
+            inflate_arb_with_nonneg_bound(l_part.real, tail_l),
+            inflate_arb_with_nonneg_bound(l_part.imag, tail_l),
+        )
+        prod_encl = z_dir.zeta() * l_encl
+        z2_exact = (acb(2) * z_dir).zeta()
+        assert prod_encl.real.overlaps(z2_exact.real) and prod_encl.imag.overlaps(z2_exact.imag)
+    finally:
+        flint_ctx.prec = saved
+
+
+def test_tc064r_numerical_payload_preservation_and_reprocess_integrity(
+    tc064_artifact: dict, tmp_path: Path
+) -> None:
+    """Verify TC-064R metadata repair preserves all 686 Arb balls, domains, cutoffs, and holdout
+    classifications identically, keeps truthful numerical/formal producer commits, and catches
+    regression of repaired overclaims in the review document.
+    """
+    assert tc064_artifact.get("repair_task_id") == TASK_TC_064R_ID
+    prov = tc064_artifact["provenance"]
+    assert prov["numerical_producing_git_commit"] == PRESERVED_TC064_NUMERICAL_PRODUCER
+    assert prov["formal_producing_git_commit"] == PRESERVED_TC064_FORMAL_PRODUCER
+
+    att2 = tc064_artifact[
+        "section_4_distinct_core_attempts_seen_diagnostics_and_euler_robustness"
+    ]["attempt_2_squarefree_prime_toggle_involution"]
+    assert att2.get("full_profile_p_neg3_comparison_status") == "UNPROVED"
+
+    # Reprocess in memory and verify 686/686 numerical payload identity:
+    reproc = reprocess_task_tc064_metadata_and_lean_audit(
+        SQUAREFREE_CORE_ARTIFACT_PATH, write_output=False
+    )
+    assert reproc["all_mathematical_and_numerical_checks_pass"] is True
+    payload_cmp = compare_tc064_numerical_payloads_by_observable_key(reproc, tc064_artifact)
+    assert payload_cmp["total_arb_keys_compared"] == 686
+    assert payload_cmp["numerical_payloads_identical"] is True
+    assert payload_cmp["changed_arb_keys"] == []
+    assert payload_cmp["changed_domain_cutoff_or_classification_keys"] == []
+
+    # Mutating a single Arb ball must be detected immediately by observable-key comparison:
+    mut_art = copy.deepcopy(tc064_artifact)
+    mut_art["section_5_unseen_validation_and_interval_splits"]["holdout_point_evaluations"][0][
+        "S_core_Y"
+    ]["mid_float"] += 1.0
+    bad_cmp = compare_tc064_numerical_payloads_by_observable_key(mut_art, tc064_artifact)
+    assert bad_cmp["numerical_payloads_identical"] is False
+    assert len(bad_cmp["changed_arb_keys"]) == 1
+
+    # Report consistency checker must reject re-introduction of repaired overclaims:
+    orig_md = TC_064_REVIEW_DOC_PATH.read_text(encoding="utf-8")
+    bad_overclaim = tmp_path / "overclaim.md"
+    bad_overclaim.write_text(
+        orig_md + "\nRegression check: swallows the entire resonant shell and purely positive.\n",
+        encoding="utf-8",
+    )
+    res_oc = verify_tc064_review_document_consistency(tc064_artifact, bad_overclaim)
+    assert res_oc["verified"] is False
+    assert len(res_oc["stale_or_guardrail_errors"]) >= 2
