@@ -119,6 +119,7 @@ from tc.dyadic_chain_correlation_regularity import (
     compute_uniform_same_chain_constants_arb,
     dyadic_chain_exponents_J_u,
     evaluate_dyadic_chain_observables_matrix_free_arb,
+    evaluate_same_and_chain_diag_1d_arb,
     max_dyadic_chain_length_L,
     odd_chain_parts_O_T,
     verify_frozen_tc063_protocol_immutability,
@@ -519,13 +520,24 @@ def evaluate_core_and_chain_norms_1d_arb(
         for jp in range(n_panels):
             u_lo = log_tau * arb(jp) / arb(n_panels)
             u_hi = log_tau * arb(jp + 1) / arb(n_panels)
-            node_cache: Dict[Tuple[str, str, bool], Tuple[acb, acb, acb, acb]] = {}
+            node_cache: Dict[Any, Tuple[acb, acb, acb, acb]] = {}
 
             def _eval4(u_var: acb, _an: bool) -> Optional[Tuple[acb, acb, acb, acb]]:
                 lg = lgYc + u_var
                 if _an and not bool(lg.real > arb(1) / arb(2)):
                     return None
-                key = (repr(u_var.real), repr(u_var.imag), _an) if is_point_Y else None
+                key = (
+                    (
+                        flint_ctx.prec,
+                        u_var.real.mid().man_exp(),
+                        u_var.real.rad().man_exp(),
+                        u_var.imag.mid().man_exp(),
+                        u_var.imag.rad().man_exp(),
+                        _an,
+                    )
+                    if u_var.is_finite()
+                    else None
+                )
                 if key is not None:
                     hit = node_cache.get(key)
                     if hit is not None:
@@ -638,19 +650,16 @@ def evaluate_squarefree_core_observables_matrix_free_arb(
         n_panels_override=n_panels,
         zone1_ratio_threshold=zone1_ratio,
     )
-    ch_obs = evaluate_dyadic_chain_observables_matrix_free_arb(
+    eff_panels = n_panels if use_three_zone else max(1, n_panels if n_panels > 1 else 4)
+    ch_1d = evaluate_same_and_chain_diag_1d_arb(
         Y_arb,
         T_y,
         D0_eff,
-        ceil_tau_Y,
         selberg_table,
         prec_bits=prec_bits,
         quad_tol_bits=eff_tol,
-        use_three_zone=use_three_zone,
-        n_panels=n_panels,
-        zone1_ratio=zone1_ratio,
+        n_panels=eff_panels,
     )
-    eff_panels = n_panels if use_three_zone else max(1, n_panels if n_panels > 1 else 4)
     cn_1d = evaluate_core_and_chain_norms_1d_arb(
         Y_arb,
         T_y,
@@ -665,8 +674,11 @@ def evaluate_squarefree_core_observables_matrix_free_arb(
     try:
         flint_ctx.prec = prec_bits
         w_int = +(mf_int["V2_int_T"] - arb(4) * mf_int["D_tilde_omega_S"])
+        d_chain = +ch_1d["D_chain"]
+        s_same = +ch_1d["S_same"]
+        s_diff = +(w_int - d_chain)
         d_chain_from_norms = +(cn_1d["sum_Ucal_norm_sq"] - arb(4) * cn_1d["sum_Vcal_norm_sq"])
-        r_square = +(cn_1d["D_core_Y"] - ch_obs["D_chain_Y"])
+        r_square = +(cn_1d["D_core_Y"] - d_chain)
         s_core = +(w_int - cn_1d["D_core_Y"])
         s_core_scalar = +(mf_int["V2_int_T"] - cn_1d["sum_A_norm_sq"])
         s_core_feature = +(-arb(4) * (mf_int["D_tilde_omega_S"] - cn_1d["sum_Bfeat_norm_sq"]))
@@ -674,10 +686,10 @@ def evaluate_squarefree_core_observables_matrix_free_arb(
         return {
             "F_int_T_p2": mf_int["F_int_T"],
             "Sigma_diag_p2": mf_int["diag_int_T"],
-            "Sigma_off_p2": ch_obs["Sigma_off_p2"],
-            "S_same_Y": ch_obs["S_same_Y"],
-            "S_different_Y": ch_obs["S_different_Y"],
-            "D_chain_Y": ch_obs["D_chain_Y"],
+            "Sigma_off_p2": mf_int["offdiag_int_T"],
+            "S_same_Y": s_same,
+            "S_different_Y": s_diff,
+            "D_chain_Y": d_chain,
             "D_chain_from_Ucal_Vcal_Y": d_chain_from_norms,
             "D_core_Y": cn_1d["D_core_Y"],
             "R_square_Y": r_square,
@@ -690,7 +702,7 @@ def evaluate_squarefree_core_observables_matrix_free_arb(
             "sum_Vcal_norm_sq": cn_1d["sum_Vcal_norm_sq"],
             "local_rsquare_hilbert_bound": cn_1d["local_rsquare_hilbert_bound"],
             "reconstructed_S_different_Y": recon_s_diff,
-            "same_input_reconstruction_residual": +(recon_s_diff - ch_obs["S_different_Y"]),
+            "same_input_reconstruction_residual": +(recon_s_diff - s_diff),
         }
     finally:
         flint_ctx.prec = saved
@@ -1774,7 +1786,7 @@ def verify_section_3_same_core_bound_and_divisor_support(
             sp = ExactScaleSpec(str(y_v), "exact_rational", Fraction(y_v, 1))
             cut = certify_exact_scale_cutoffs(sp, base_prec_bits=prec_bits)
             T_y, D0_eff, ceil_tY = cut["T_Y"], cut["D0_eff"], cut["ceil_tau_Y"]
-            use_3z = T_y >= 512
+            use_3z = T_y >= 1024
             obs = evaluate_squarefree_core_observables_matrix_free_arb(
                 arb(y_v),
                 T_y,
@@ -1784,7 +1796,7 @@ def verify_section_3_same_core_bound_and_divisor_support(
                 prec_bits=prec_bits,
                 quad_tol_bits=160 if use_3z else 220,
                 use_three_zone=use_3z,
-                n_panels=16 if use_3z else 4,
+                n_panels=16 if use_3z else (8 if T_y >= 400 else 4),
             )
             flint_ctx.prec = prec_bits
             one_p_lg = arb(1) + arb(y_v).log()
@@ -1942,14 +1954,25 @@ def evaluate_small_scale_core_sectors_and_toggle_arb(
         for jp in range(n_panels):
             u_lo = log_tau * arb(jp) / arb(n_panels)
             u_hi = log_tau * arb(jp + 1) / arb(n_panels)
-            ncache: Dict[Tuple[str, str, bool], Any] = {}
+            ncache: Dict[Any, Any] = {}
 
             def _eval_all(uv: acb, _an: bool):
                 lg = lgYc + uv
                 if _an and not bool(lg.real > arb(1) / arb(2)):
                     return None
-                k = (repr(uv.real), repr(uv.imag), _an)
-                if k in ncache:
+                k = (
+                    (
+                        flint_ctx.prec,
+                        uv.real.mid().man_exp(),
+                        uv.real.rad().man_exp(),
+                        uv.imag.mid().man_exp(),
+                        uv.imag.rad().man_exp(),
+                        _an,
+                    )
+                    if uv.is_finite()
+                    else None
+                )
+                if k is not None and k in ncache:
                     return ncache[k]
                 inv_lg2 = acb(1) / (lg * lg)
                 x52 = Yc_52 * (acb(arb(5) / arb(2)) * uv).exp()
@@ -2039,7 +2062,8 @@ def evaluate_small_scale_core_sectors_and_toggle_arb(
 
                 tog_vals = [-acb(2) * _mcal(a_t, 3 * a_t) for a_t in tog_a_list]
                 res = (pi_vals, lhs_lg, rhs_lg, tog_vals, tog_diff_sq)
-                ncache[k] = res
+                if k is not None:
+                    ncache[k] = res
                 return res
 
             for gi in range(len(g_set)):
@@ -2722,7 +2746,7 @@ def verify_section_4_attempts_seen_diagnostics_and_euler_robustness(
                 "S_core(Y) = sum_{g in G_core(T)} Pi_Y^core(g) with (g, r, t) pairwise coprime odd squarefree and mu(g*r)*mu(g*t) = mu(r)*mu(t)",
                 "Pi_Y^core(g) + Mcal_Y(g, g) = sum_{h in C(floor(T/g)), gcd(h,g)=1} mu(h)*(||S_Y^core(g*h)||_Y^2 - 4*||F_Y^core(g*h)||_Y^2)",
                 "sum_{g in G_core(T)} (log g)*Pi_Y^core(g) + sum_{a in C(T)} (log a)*Mcal_Y(a, a) = sum_{3 <= p <= T, p prime} (log p)*(||S_Y^core(p)||_Y^2 - 4*||F_Y^core(p)||_Y^2)",
-                "|Pi_Y^core(g)| <= (|C(floor(T/g))| - 1)*sum_{r in C(floor(T/g))} (||A_{g*r}||_Y^2 + 4*||Bfeature_{g*r}||_Y^2) << T*(1 + log Y)/g^2 (summable 1/g^2 tail budget)",
+                "|Pi_Y^core(g)| <= (T/(2*g))*sum_{a in C(T), g | a} (||A_a||_Y^2 + 4*||Bfeature_a||_Y^2) and sum_{g > G} |Pi_Y^core(g)| <= (T/(2*G))*max_{a<=T} d_0(a)*(C_A + 4*C_B)*(1 + log Y) <<_eps T^(1+eps)*(1 + log Y)/G",
             ],
             "candidate_C1A_core_sector_nonpositivity": {
                 "candidate_id": "TC064-CAND-C1A-CORE-SECTOR-NONPOS",
@@ -3012,9 +3036,9 @@ def evaluate_tc064_continuous_interval_split_arb(
 
             tau = _tau_arb()
             ceil_tau_hi = int(math.ceil(float((tau * y_sub).upper()))) + 2
-            use_3z = t_c >= 512
+            use_3z = t_c >= 1024
             q_tol = 110
-            n_pan = 16 if use_3z else 4
+            n_pan = 16 if use_3z else (8 if t_c >= 400 else 4)
 
             base_br = evaluate_fixed_cutoff_on_Y_ball_arb(
                 y_sub,
