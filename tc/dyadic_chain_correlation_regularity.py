@@ -5582,7 +5582,8 @@ def verify_tc063_review_enclosures_and_lean_anchors(
                 f"{pid_r}: displayed verdicts ({disp_neg_v}, {disp_p0_v}) != ({exp_neg_v}, {exp_p0_v})"
             )
 
-    main_body_before_erratum = txt.split("## 9.")[0]
+    parts_sec9 = txt.split("## 9.", 1)
+    main_body_before_erratum = parts_sec9[0]
     stale_statement_hits = [
         bad_s
         for bad_s in (
@@ -5605,6 +5606,50 @@ def verify_tc063_review_enclosures_and_lean_anchors(
         if bad_s in main_body_before_erratum
     ]
 
+    erratum_failures: List[str] = []
+    erratum_prem05_checked = False
+    if len(parts_sec9) < 2:
+        erratum_failures.append("Missing Section 9 erratum in review")
+    else:
+        sec9_txt = parts_sec9[1]
+        m_prem05 = re.search(
+            r"^\|\s*\*\*Prime-Power Weight \(`PREM-05`\)\*\*\s*\|([^|\n]+)\|([^\n]+)\|\s*$",
+            sec9_txt,
+            flags=re.MULTILINE,
+        )
+        if m_prem05 is None:
+            erratum_failures.append(
+                "Missing Prime-Power Weight (`PREM-05`) row in Section 9 erratum"
+            )
+        else:
+            erratum_prem05_checked = True
+            prem05_canon_cell = m_prem05.group(2)
+            expected_prem05_cmp = re.sub(
+                r"\s+",
+                "",
+                r"\sum_{p^k \le \lfloor Y\rfloor} \frac{(\log p)^2}{(p^k)^{1+\delta}} "
+                r"\le \sum_{n \ge 2} \frac{(\log n)^2}{n^{1+\delta}} = \zeta''(1 + \delta) < \infty",
+            )
+            compact_cell = re.sub(r"\s+", "", prem05_canon_cell)
+            if expected_prem05_cmp not in compact_cell:
+                erratum_failures.append(
+                    "Section 9 PREM-05 canonical cell missing exact comparison "
+                    "sum_{p^k <= floor(Y)} (log p)^2 / (p^k)^(1+delta) <= "
+                    "sum_{n >= 2} (log n)^2 / n^(1+delta) = zeta''(1+delta) < infty"
+                )
+            if "\\Lambda" in prem05_canon_cell or "Lambda(" in prem05_canon_cell:
+                erratum_failures.append(
+                    "Section 9 PREM-05 canonical cell falsely invokes von Mangoldt Lambda for zeta''"
+                )
+
+    if re.search(
+        r"(\\zeta''[^$\n]*=\s*\\sum[^$\n]*\\Lambda|\\sum[^$\n]*\\Lambda[^$\n]*=\s*\\zeta'')",
+        txt,
+    ):
+        erratum_failures.append(
+            "Review conflates zeta'' with von Mangoldt Lambda(n) log(n) series"
+        )
+
     return {
         "review_exists": True,
         "enclosure_tags_checked": enclosure_count,
@@ -5616,6 +5661,8 @@ def verify_tc063_review_enclosures_and_lean_anchors(
         "holdout_cutoffs_checked": cutoff_checked,
         "holdout_cutoff_failures": cutoff_failures,
         "stale_statement_hits_in_main_body": stale_statement_hits,
+        "erratum_prem05_checked": erratum_prem05_checked,
+        "erratum_failures": erratum_failures,
         "forbidden_pi_tokens": pi_hits,
         "forbidden_K_underscore_tokens": k_hits,
         "verified": bool(
@@ -5628,6 +5675,8 @@ def verify_tc063_review_enclosures_and_lean_anchors(
             and cutoff_checked == 10
             and len(cutoff_failures) == 0
             and len(stale_statement_hits) == 0
+            and erratum_prem05_checked
+            and len(erratum_failures) == 0
             and len(pi_hits) == 0
             and len(k_hits) == 0
         ),

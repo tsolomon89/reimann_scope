@@ -953,8 +953,11 @@ def test_tc063r_repairs_kl1_intervals_and_report_reconciliation(
     assert rev_chk["premise_failures"] == []
     assert rev_chk["enclosure_tags_checked"] >= 20
     assert rev_chk["stale_statement_hits_in_main_body"] == []
+    assert rev_chk["erratum_prem05_checked"] is True
+    assert rev_chk["erratum_failures"] == []
 
-    # Mutating a premise status, holdout value (`0.02737041`), or re-injecting stale statements in main body must fail review check:
+    # Mutating a premise status, holdout value (`0.02737041`), re-injecting stale statements in main body,
+    # or corrupting the Section 9 PREM-05 erratum cell must fail review check:
     rev_txt = TC_063_REVIEW_DOC_PATH.read_text(encoding="utf-8")
     for tag_r, mut_txt in (
         ("bad_prem", rev_txt.replace("| `TC063-PREM-04` | Stage 1B Input 1 |", "| `TC063-PREM-99` | Stage 1B Input 1 |")),
@@ -964,10 +967,31 @@ def test_tc063r_repairs_kl1_intervals_and_report_reconciliation(
         ("stale_i2", rev_txt.replace("## 2.", "divisible by 4\n\n## 2.")),
         ("stale_zeta2", rev_txt.replace("## 2.", "= \\zeta''(1 + \\delta)\n\n## 2.")),
         ("stale_pert", rev_txt.replace("## 2.", "O((\\log Y)^{-2})\n\n## 2.")),
+        (
+            "erratum_prem05_lambda_conflation",
+            rev_txt.replace(
+                r"\le \sum_{n \ge 2} \frac{(\log n)^2}{n^{1+\delta}} = \zeta''(1 + \delta) < \infty",
+                r"\le \zeta''(1 + \delta) = \sum_{n \ge 2} \frac{\Lambda(n)\log n}{n^{1+\delta}} < \infty",
+            ),
+        ),
+        (
+            "erratum_prem05_missing_n_sum",
+            rev_txt.replace(
+                r"\le \sum_{n \ge 2} \frac{(\log n)^2}{n^{1+\delta}} = \zeta''(1 + \delta) < \infty",
+                r"\le \zeta''(1 + \delta) < \infty",
+            ),
+        ),
+        (
+            "erratum_prem05_row_deleted",
+            rev_txt.replace("**Prime-Power Weight (`PREM-05`)**", "**Removed Row**"),
+        ),
     ):
         p_rev = tmp_path / f"{tag_r}.md"
         p_rev.write_text(mut_txt, encoding="utf-8")
-        assert verify_tc063_review_enclosures_and_lean_anchors(tc063_artifact, p_rev)["verified"] is False, tag_r
+        res_mut = verify_tc063_review_enclosures_and_lean_anchors(tc063_artifact, p_rev)
+        assert res_mut["verified"] is False, (tag_r, res_mut)
+        if tag_r.startswith("erratum_prem05_"):
+            assert len(res_mut["erratum_failures"]) > 0, (tag_r, res_mut)
 
     # 2. Both KL1 interval formulas, including signed `S_same(Y)` on negative interval balls, & 5-branch PASS:
     splits = sec5["continuous_interval_case_splits"]
