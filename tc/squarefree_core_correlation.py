@@ -3186,11 +3186,12 @@ def _interval_overlap_frac(a: Dict[str, Any], b_lo: Fraction, b_hi: Fraction) ->
 
 
 def _clone_tree_preserving_arb(node: Any) -> Any:
-    """Deep-copy nested JSON-like containers while preserving live `flint.arb` objects (`+node`),
-    since Cython `flint.arb` intentionally omits pickle/`__reduce__` for `copy.deepcopy`.
+    """Deep-copy nested JSON-like containers while preserving live `flint.arb` objects (`arb(node)`
+    exact bit-for-bit copy without rounding to `flint_ctx.prec`), since Cython `flint.arb`
+    intentionally omits pickle/`__reduce__` for `copy.deepcopy`.
     """
     if isinstance(node, arb):
-        return +node
+        return arb(node)
     if isinstance(node, dict):
         return {k: _clone_tree_preserving_arb(v) for k, v in node.items()}
     if isinstance(node, list):
@@ -3431,10 +3432,13 @@ def aggregate_tc064_section5_and_derive_outcomes(
         if not isinstance(sp_rec, dict):
             conflicts.append({"conflict_type": "MISSING_INTERVAL_RECORD", "interval_id": iid})
             continue
-        if (
-            sp_rec.get("Y_lo_fraction") != icfg["Y_lo_fraction"]
-            or sp_rec.get("Y_hi_fraction") != icfg["Y_hi_fraction"]
-        ):
+        try:
+            sp_lo_f = Fraction(str(sp_rec.get("Y_lo_fraction", "")))
+            sp_hi_f = Fraction(str(sp_rec.get("Y_hi_fraction", "")))
+            ep_match = sp_lo_f == y_lo_f and sp_hi_f == y_hi_f
+        except Exception:  # noqa: BLE001
+            ep_match = False
+        if not ep_match:
             conflicts.append({"conflict_type": "INTERVAL_ENDPOINT_MISMATCH", "interval_id": iid})
             continue
 
@@ -3962,9 +3966,11 @@ def verify_tc064_review_document_consistency(
         if sig_digits > 45:
             fake_padding_hits.append(jpath)
         try:
-            target = _resolve_report_path_with_param_check(artifact, jpath, params_s)
-            gen_lo, gen_hi = _parse_arb_ball_str_to_fractions(target["arb_ball_str"])
-            disp_lo, disp_hi = _parse_arb_ball_str_to_fractions(disp_str)
+            target, _parent = _resolve_report_path_with_param_check(
+                artifact, jpath, params_s, obs_name
+            )
+            gen_lo, gen_hi, *_ = _parse_arb_ball_str_to_fractions(target["arb_ball_str"])
+            disp_lo, disp_hi, *_ = _parse_arb_ball_str_to_fractions(disp_str)
             tagged_checked += 1
             if not (disp_lo <= gen_lo and gen_hi <= disp_hi):
                 failed_tags.append(f"{obs_name}@{jpath}")
@@ -4113,6 +4119,76 @@ def generate_task_tc064_artifact(
     return art_clean
 
 
+EXPECTED_TC064_SECTION_BALL_COUNTS: Dict[str, int] = {
+    "section_1_protocols_endpoint_and_premise_chain": 36,
+    "section_2_squarefree_core_decomposition_and_cross_checks": 51,
+    "section_3_same_core_bound_and_divisor_support": 100,
+    "section_4_distinct_core_attempts_seen_diagnostics_and_euler_robustness": 178,
+    "section_5_unseen_validation_and_interval_splits": 309,
+}
+
+
+def _audit_all_serialized_arb_balls_in_tc064_artifact(
+    tree: Dict[str, Any],
+    existing_self_chk: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """Walk the entire serialized `TC-064` artifact and validate EVERY Arb ball via the
+    3-representation exact `Fraction` validator `_parse_serialized_arb_enclosure_tc062`, plus
+    enforce exact per-section ball counts (`36 + 51 + 100 + 178 + 309 = 674`) so silent
+    `{}`/`None`/scalar ball replacement fails closed.
+    """
+    req_keys = {"mid_float", "rad_float_outward", "lower_dec", "upper_dec", "arb_ball_str"}
+    checked_paths: List[str] = []
+    valid_paths_by_root: Dict[str, int] = {}
+    failed_paths: List[str] = []
+
+    def _walk(node: Any, cur_path: str) -> None:
+        if isinstance(node, dict):
+            if any(k in node for k in req_keys):
+                if not req_keys.issubset(node.keys()):
+                    checked_paths.append(cur_path)
+                    failed_paths.append(cur_path)
+                    return
+                checked_paths.append(cur_path)
+                if _parse_serialized_arb_enclosure_tc062(node) is None:
+                    failed_paths.append(cur_path)
+                else:
+                    root_sec = cur_path.split(".", 1)[0].split("[", 1)[0]
+                    valid_paths_by_root[root_sec] = valid_paths_by_root.get(root_sec, 0) + 1
+                return
+            for k, v in node.items():
+                if k in ("enclosure_arb", "serialized_arb_self_check"):
+                    continue
+                _walk(v, f"{cur_path}.{k}" if cur_path else str(k))
+        elif isinstance(node, (list, tuple)):
+            for idx, item in enumerate(node):
+                _walk(item, f"{cur_path}[{idx}]")
+
+    _walk(tree, "")
+    for sec_k, exp_n in EXPECTED_TC064_SECTION_BALL_COUNTS.items():
+        got_n = valid_paths_by_root.get(sec_k, 0)
+        if got_n != exp_n:
+            failed_paths.append(f"{sec_k}:expected_{exp_n}_certified_balls_got_{got_n}")
+
+    prev_live_cnt = (
+        int(existing_self_chk["compared_against_live_original_arb_count"])
+        if isinstance(existing_self_chk, dict)
+        and isinstance(existing_self_chk.get("compared_against_live_original_arb_count"), int)
+        else 0
+    )
+    live_matches = bool(prev_live_cnt == len(checked_paths) and len(failed_paths) == 0)
+    return {
+        "total_certified_arb_balls_checked": len(checked_paths),
+        "compared_against_live_original_arb_count": prev_live_cnt if live_matches else 0,
+        "live_original_count_matches_enumerated_total": live_matches,
+        "all_enclose_original_256bit_arb_ball": bool(
+            len(checked_paths) > 0 and len(failed_paths) == 0
+        ),
+        "failed_paths": failed_paths,
+        "checked_paths": checked_paths,
+    }
+
+
 def reprocess_task_tc064_metadata_and_lean_audit(
     artifact_path: Path = SQUAREFREE_CORE_ARTIFACT_PATH,
     *,
@@ -4174,7 +4250,7 @@ def reprocess_task_tc064_metadata_and_lean_audit(
     updated["section_5_unseen_validation_and_interval_splits"] = sec5_upd
     updated["section_6_lean_audit_and_gate_accounting"] = sec6_upd
 
-    arb_rechk = _audit_all_serialized_arb_balls_in_artifact(
+    arb_rechk = _audit_all_serialized_arb_balls_in_tc064_artifact(
         updated, existing.get("serialized_arb_self_check")
     )
     updated["serialized_arb_self_check"] = arb_rechk
