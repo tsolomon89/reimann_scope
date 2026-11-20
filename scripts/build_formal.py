@@ -69,6 +69,9 @@ FORMAL_SOURCE_FILES = [
     "formal/RiemannScope/LiouvilleSquareDilation.lean",
     "formal/RiemannScope/DyadicPowerLiftPrimitiveCorrelation.lean",
     "formal/RiemannScope/SignedDilationArithmeticEnergy.lean",
+    "formal/RiemannScope/MixedArithmeticCovariance.lean",
+    "formal/RiemannScope/JointPrimeDilationSignedRemainder.lean",
+    "formal/RiemannScope/DyadicChainCorrelationRegularity.lean",
 ]
 
 

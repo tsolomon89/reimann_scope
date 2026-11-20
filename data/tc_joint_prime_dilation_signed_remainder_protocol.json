@@ -1,0 +1,1328 @@
+{
+  "protocol_id": "TC062-JOINT-PRIME-DILATION-SIGNED-REMAINDER-PROTOCOL-V1",
+  "schema_version": "1.0.0",
+  "task_id": "TASK-TC-062",
+  "epic_id": "EPIC-TC-042",
+  "parent_subgate": "SUBGATE-TC-043A",
+  "preregistration_stage": "FROZEN_BEFORE_ANY_TC062_UNSEEN_VALIDATION_EVALUATION",
+  "circle_constant_convention": "tau_exclusively",
+  "grade_variable_convention": "K_reserved_for_real_algebraic_geometric_grades_A_R; Hcal_Y_for_complete_signed_kernel; A_Y_B_Y_functions; a_eta_b_eta_scalars",
+  "baseline_provenance": {
+    "accepted_tc061r3_tip": "6a2f5f519b3f2f4642ea2ce00626832e556953be",
+    "accepted_tc061r3_implementation": "c2691d0d9e9aee2e148af2c7ec4908f0ebd52521",
+    "inherited_tc061r_formal_producing_commit": "b65dba142658a8e4fd80c339d7029aa14e114c5a",
+    "accepted_tc061r2_numerical_producer": "3dbf2e0c999ec6b030b769b0bb3e55ff2783b50b",
+    "merged_main_baseline": "71a101005f1ee073e981187bb7d07d90daef9c65",
+    "preserved_tc061_protocol_id": "TC061-MIXED-ARITHMETIC-COVARIANCE-PROTOCOL-V1",
+    "preserved_tc061_protocol_registration_commit": "bc2f9f709f868ef02981600873dfa0c05da0ba0c",
+    "preserved_tc061_protocol_sha256": "c892c4c5a1ff2a60a11fa499b2d2bc017e01f0426e4aa8feef5880aaff8a70eb",
+    "upstream_source_hashes_sha256": {
+      "tc/mixed_arithmetic_covariance.py": "812396788ac817096ebf2f2dedf3a153cadb73d77ff03a4a1f76b3b00e0e1a07",
+      "formal/RiemannScope/MixedArithmeticCovariance.lean": "89d2b874d711bd70a57659bbde6e72422751406dfe5700ef9b19dff8d5d28bec",
+      "tc/signed_dilation_arithmetic_energy.py": "b7ea1e0e5dd5290801308c82cbe17859a7da1b6d6c91559b498efeebb3260c55",
+      "data/tc_mixed_arithmetic_covariance_protocol.json": "96bbe2c95e29debd904bfb0358216ac60206602c357c5394f2f72330a5ece549",
+      "data/tc_mixed_arithmetic_covariance.json": "90991e66c8b49516d5348c98ef21ebbff09611693701abdc0703489454e00602"
+    }
+  },
+  "exact_mathematical_object": {
+    "domain": "Y in R, Y >= 2",
+    "window_inner_product": "<f, g>_Y = int_Y^{tau*Y} f(X)*g(X) dX/X",
+    "canonical_cutoffs": {
+      "T_Y": "ceil(Y^(5/4))",
+      "D0_Y": "floor(log Y)",
+      "effective_small_divisor_cutoff": "min(D0(Y), T(Y) - 1)",
+      "outer_kernel_limit_N": "2 * T(Y)"
+    },
+    "complete_signed_kernel_Hcal_Y": "Hcal_Y(m, n) = t_m*t_n*G_Y^[0](m, n) - [t_m*b_n + b_m*t_n + 4*t_m*t_n*c(m, n) + 4*1_{m=n}*t_m*((log m)^2 - c(m, m))]*G_Y^[2](m, n) + b_m*b_n*G_Y^[4](m, n) on 1 <= m, n <= 2*T(Y) (zero outside [1, 2*T(Y)]^2)",
+    "observables": {
+      "F_Y": "4*X_off(Y) + ||B_Y||_Y^2 - 4*<P_Y, B_Y>_Y = sum_{m,n=1}^{2T} lambda(m)*lambda(n)*Hcal_Y(m, n)",
+      "F_int_T_p2": "sum_{m,n in I_2(T)} lambda(m)*lambda(n)*[Hcal_Y(m,n) - Hcal_Y(2m,n) - Hcal_Y(m,2n) + Hcal_Y(2m,2n)], I_2(T) = {1 <= m <= floor(T/2) : 2 | v_2(m)}",
+      "F_int_T_p23": "sum_{m,n in I_{2,3}(T)} lambda(m)*lambda(n)*Delta_{2,2}*Delta_{3,3} Hcal_Y(m, n), I_{2,3}(T) = {1 <= m <= floor(T/6) : 2 | v_2(m) and 2 | v_3(m)}",
+      "diag_int_T_p2": "sum_{m in I_2(T)} [Hcal_Y(m,m) - 2*Hcal_Y(2m,m) + Hcal_Y(2m,2m)]",
+      "offdiag_int_T_p2": "F_int_T_p2(Y) - diag_int_T_p2(Y) = sum_{m != n in I_2(T)} lambda(m)*lambda(n)*Delta_{2,2} Hcal_Y(m, n)",
+      "D_tilde_Y": "inheritedPrimePowerDiagDtilde(T(Y), Y) (never replaced by integer coefficient diagonal)"
+    }
+  },
+  "full_closure_target_and_reduced_equivalence": {
+    "target_obligation_id": "TC061R-OBL-SIGNED-REMAINDER-F",
+    "target_statement": "forall eta > 0, exists a_eta, b_eta >= 0, 0 < kappa_eta <= 2, Y_eta >= 2: forall real Y >= Y_eta, F(Y) <= a_eta * Y^eta + b_eta * (log Y)^(2 - kappa_eta) * D_tilde(Y)",
+    "proved_tc062_equivalent_interior_target": "TC062-OBL-INTERIOR-PRIME-PAIR-F-INT: MixedCovarianceClosureHypothesis(F, D_tilde) <-> MixedCovarianceClosureHypothesis(F_int_T(.; {p}), D_tilde) for every prime p (and since diag_int_T(Y; {p}) <= C_anc = O(1) unconditionally, equivalent to the distinct-anchor off-diagonal bound on offdiag_int_T(Y; {p}))",
+    "epistemic_role": "RH_LEVEL_QUANTITATIVE_CLOSURE_TARGET_OPEN"
+  },
+  "frozen_candidate_probes": [
+    {
+      "probe_id": "TC062-P0-F",
+      "tier": "PRIMARY",
+      "observable_key": "F_Y",
+      "formula": "F(Y) <= (log Y) * D_tilde(Y) for every real Y >= 64",
+      "margin_formula": "M_{P0-F}(Y) = F(Y) - (log Y) * D_tilde(Y)",
+      "a_fraction": "0/1",
+      "a_numerator": 0,
+      "a_denominator": 1,
+      "eta_fraction": null,
+      "b_fraction": "1/1",
+      "b_numerator": 1,
+      "b_denominator": 1,
+      "kappa_fraction": "1/1",
+      "domain_threshold_Y0": "64",
+      "calibration_dependency": "NONE_FIXED_A_PRIORI"
+    },
+    {
+      "probe_id": "TC062-P0-INT2",
+      "tier": "PRIMARY",
+      "observable_key": "F_int_T_p2",
+      "formula": "F_int_T(Y; {2}) <= (log Y) * D_tilde(Y) for every real Y >= 64",
+      "margin_formula": "M_{P0-INT2}(Y) = F_int_T(Y; {2}) - (log Y) * D_tilde(Y)",
+      "a_fraction": "0/1",
+      "a_numerator": 0,
+      "a_denominator": 1,
+      "eta_fraction": null,
+      "b_fraction": "1/1",
+      "b_numerator": 1,
+      "b_denominator": 1,
+      "kappa_fraction": "1/1",
+      "domain_threshold_Y0": "64",
+      "calibration_dependency": "NONE_FIXED_A_PRIORI"
+    },
+    {
+      "probe_id": "TC062-P0-INT23",
+      "tier": "PRIMARY",
+      "observable_key": "F_int_T_p23",
+      "formula": "F_int_T(Y; {2, 3}) <= (log Y) * D_tilde(Y) for every real Y >= 64",
+      "margin_formula": "M_{P0-INT23}(Y) = F_int_T(Y; {2, 3}) - (log Y) * D_tilde(Y)",
+      "a_fraction": "0/1",
+      "a_numerator": 0,
+      "a_denominator": 1,
+      "eta_fraction": null,
+      "b_fraction": "1/1",
+      "b_numerator": 1,
+      "b_denominator": 1,
+      "kappa_fraction": "1/1",
+      "domain_threshold_Y0": "64",
+      "calibration_dependency": "NONE_FIXED_A_PRIORI"
+    },
+    {
+      "probe_id": "TC062-P-NEG-INT2",
+      "tier": "SECONDARY",
+      "observable_key": "F_int_T_p2",
+      "formula": "F_int_T(Y; {2}) <= 0 for every real Y >= 64 (zero-slack interior sign probe; calibrated U_eta = 0 on C = {16, 32, 64})",
+      "margin_formula": "M_{P-NEG-INT2}(Y) = F_int_T(Y; {2})",
+      "a_fraction": "0/1",
+      "a_numerator": 0,
+      "a_denominator": 1,
+      "eta_fraction": null,
+      "b_fraction": "0/1",
+      "b_numerator": 0,
+      "b_denominator": 1,
+      "kappa_fraction": "2/1",
+      "domain_threshold_Y0": "64",
+      "calibration_dependency": "CALIBRATED_STRICTLY_ON_PREVIOUSLY_OBSERVED_C_16_32_64"
+    }
+  ],
+  "preregistered_mechanism_decomposition": {
+    "lemma_candidate_id": "TC062-KL1-INT2-DIAG-AND-OFFDIAG-SPLIT",
+    "decomposition": "F_int_T(Y; {2}) = diag_int_T(Y; {2}) + offdiag_int_T(Y; {2})",
+    "sub_budgets_for_P0_INT2": {
+      "KL1_int2_diag": "diag_int_T(Y; {2}) <= (1/4) * (log Y) * D_tilde(Y) for Y >= 64",
+      "KL1_int2_offdiag": "offdiag_int_T(Y; {2}) <= (3/4) * (log Y) * D_tilde(Y) for Y >= 64"
+    },
+    "revision_rule": "At most one versioned post-diagnosis mechanism revision (TC062-REV1-*) is permitted if a preregistered probe or sub-budget fails; all original probe definitions, constants, and outcomes remain immutable."
+  },
+  "calibration_and_prior_exposure_separation": {
+    "diagnostic_set_outside_domain": [
+      2,
+      4,
+      8
+    ],
+    "previously_observed_calibration_set_C": [
+      16,
+      32,
+      64
+    ],
+    "previously_observed_tc061_scales_excluded_from_unseen_validation": [
+      "128",
+      "192",
+      "e^5*(1 - 2^(-12))",
+      "e^5*(1 + 2^(-12))",
+      "256 - 2^(-12)",
+      "256",
+      "256 + 2^(-12)",
+      "384",
+      "512",
+      "768",
+      "1024",
+      "1536",
+      "2048",
+      "4096"
+    ],
+    "calibrated_F_secondary_constants": {
+      "1/2": {
+        "eta_fraction": "1/2",
+        "calibration_set_C": [
+          16,
+          32,
+          64
+        ],
+        "maximizer_Y_in_C": null,
+        "U_eta_exact_numerator": "0",
+        "U_eta_exact_denominator": "1",
+        "ceil_64_U_eta_int": 0,
+        "a_eta_fraction": "0/1",
+        "a_eta_numerator": 0,
+        "a_eta_denominator": 1,
+        "per_calibration_point_quotients": [
+          {
+            "Y": 16,
+            "quotient_ball": {
+              "mid_float": -0.008052470239525197,
+              "rad_float_outward": 3.864152007044843e-20,
+              "lower_dec": "-8.052470239525197321034181065990448439881e-3",
+              "upper_dec": "-8.052470239525197321034181065990448439878e-3",
+              "arb_ball_str": "[-0.008052470239525197321034181065990448439880 +/- 2.67e-43]"
+            },
+            "exact_dyadic_upper_numerator": "-29837195281789906142252884863876450414219696532880187441706369098538532356561",
+            "exact_dyadic_upper_denominator": "3705346855594118253554271520278013051304639509300498049262642688253220148477952",
+            "exact_dyadic_lower_numerator": "-29837195281789906142252884863876450414219696532880248741356052528381611098577",
+            "exact_dyadic_lower_denominator": "3705346855594118253554271520278013051304639509300498049262642688253220148477952"
+          },
+          {
+            "Y": 32,
+            "quotient_ball": {
+              "mid_float": -0.05094584494919932,
+              "rad_float_outward": 4.721381665524506e-19,
+              "lower_dec": "-5.094584494919931991178757103510995104908e-2",
+              "upper_dec": "-5.094584494919931991178757103510995104905e-2",
+              "arb_ball_str": "[-0.05094584494919931991178757103510995104906 +/- 3.15e-42]"
+            },
+            "exact_dyadic_upper_numerator": "-163733632891576225852578763122387986045227110769221847170237",
+            "exact_dyadic_upper_denominator": "3213876088517980551083924184682325205044405987565585670602752",
+            "exact_dyadic_lower_numerator": "-163733632891576225852578763122387986045227110769222784165649",
+            "exact_dyadic_lower_denominator": "3213876088517980551083924184682325205044405987565585670602752"
+          },
+          {
+            "Y": 64,
+            "quotient_ball": {
+              "mid_float": -0.028548981209087956,
+              "rad_float_outward": 9.394887696282113e-19,
+              "lower_dec": "-2.854898120908795539494711750086397266674e-2",
+              "upper_dec": "-2.854898120908795539494711750086397266671e-2",
+              "arb_ball_str": "[-0.02854898120908795539494711750086397266672 +/- 2.76e-42]"
+            },
+            "exact_dyadic_upper_numerator": "-105783877753509623797744635722879295608473067205296570357357950895384994189313",
+            "exact_dyadic_upper_denominator": "3705346855594118253554271520278013051304639509300498049262642688253220148477952",
+            "exact_dyadic_lower_numerator": "-105783877753509623797744635722879295608473067205297919965491132867342128058369",
+            "exact_dyadic_lower_denominator": "3705346855594118253554271520278013051304639509300498049262642688253220148477952"
+          }
+        ]
+      },
+      "1/4": {
+        "eta_fraction": "1/4",
+        "calibration_set_C": [
+          16,
+          32,
+          64
+        ],
+        "maximizer_Y_in_C": null,
+        "U_eta_exact_numerator": "0",
+        "U_eta_exact_denominator": "1",
+        "ceil_64_U_eta_int": 0,
+        "a_eta_fraction": "0/1",
+        "a_eta_numerator": 0,
+        "a_eta_denominator": 1,
+        "per_calibration_point_quotients": [
+          {
+            "Y": 16,
+            "quotient_ball": {
+              "mid_float": -0.016104940479050395,
+              "rad_float_outward": 7.728304014089686e-20,
+              "lower_dec": "-1.610494047905039464206836213198089687977e-2",
+              "upper_dec": "-1.610494047905039464206836213198089687974e-2",
+              "arb_ball_str": "[-0.01610494047905039464206836213198089687976 +/- 5.33e-43]"
+            },
+            "exact_dyadic_upper_numerator": "-414074264901002993852953194318606422650026706767658993841287",
+            "exact_dyadic_upper_denominator": "25711008708143844408671393477458601640355247900524685364822016",
+            "exact_dyadic_lower_numerator": "-414074264901002993852953194318606422650026706767659844557803",
+            "exact_dyadic_lower_denominator": "25711008708143844408671393477458601640355247900524685364822016"
+          },
+          {
+            "Y": 32,
+            "quotient_ball": {
+              "mid_float": -0.12117032258682654,
+              "rad_float_outward": 1.0050069158506747e-18,
+              "lower_dec": "-1.211703225868265436706902641827696787854e-1",
+              "upper_dec": "-1.211703225868265436706902641827696787851e-1",
+              "arb_ball_str": "[-0.1211703225868265436706902641827696787852 +/- 3.63e-41]"
+            },
+            "exact_dyadic_upper_numerator": "-194713201199906001487730232737084894941247328680156715405547",
+            "exact_dyadic_upper_denominator": "1606938044258990275541962092341162602522202993782792835301376",
+            "exact_dyadic_lower_numerator": "-194713201199906001487730232737084894941247328680157829687161",
+            "exact_dyadic_lower_denominator": "1606938044258990275541962092341162602522202993782792835301376"
+          },
+          {
+            "Y": 64,
+            "quotient_ball": {
+              "mid_float": -0.08074871283565366,
+              "rad_float_outward": 2.2333474545813147e-18,
+              "lower_dec": "-8.074871283565365541565688983965879458588e-2",
+              "upper_dec": "-8.074871283565365541565688983965879458585e-2",
+              "arb_ball_str": "[-0.08074871283565365541565688983965879458587 +/- 8.04e-43]"
+            },
+            "exact_dyadic_upper_numerator": "-32439544670139027470512600229296885625569633237198204445775",
+            "exact_dyadic_upper_denominator": "401734511064747568885490523085290650630550748445698208825344",
+            "exact_dyadic_lower_numerator": "-32439544670139027470512600229296885625569633237198618321147",
+            "exact_dyadic_lower_denominator": "401734511064747568885490523085290650630550748445698208825344"
+          }
+        ]
+      }
+    },
+    "calibrated_int2_secondary_constants": {
+      "1/2": {
+        "eta_fraction": "1/2",
+        "calibration_set_C": [
+          16,
+          32,
+          64
+        ],
+        "maximizer_Y_in_C": null,
+        "U_eta_exact_numerator": "0",
+        "U_eta_exact_denominator": "1",
+        "ceil_64_U_eta_int": 0,
+        "a_eta_fraction": "0/1",
+        "a_eta_numerator": 0,
+        "a_eta_denominator": 1,
+        "per_calibration_point_quotients": [
+          {
+            "Y": 16,
+            "quotient_ball": {
+              "mid_float": -0.04688435737787372,
+              "rad_float_outward": 2.9536900932491566e-18,
+              "lower_dec": "-4.688435737787371697610492231049204243835e-2",
+              "upper_dec": "-4.688435737787371697610492231049204243832e-2",
+              "arb_ball_str": "[-0.04688435737787371697610492231049204243833 +/- 4.66e-42]"
+            },
+            "exact_dyadic_upper_numerator": "-5559129797972968841885668533080085275798254307239134115612286620218033268038471",
+            "exact_dyadic_upper_denominator": "118571099379011784113736688648896417641748464297615937576404566024103044751294464",
+            "exact_dyadic_lower_numerator": "-5559129797972968841885668533080085275798254307239134115612286620218033590067769",
+            "exact_dyadic_lower_denominator": "118571099379011784113736688648896417641748464297615937576404566024103044751294464"
+          },
+          {
+            "Y": 32,
+            "quotient_ball": {
+              "mid_float": -0.04198102953815776,
+              "rad_float_outward": 7.093087595111496e-19,
+              "lower_dec": "-4.198102953815775679870133329506709710143e-2",
+              "upper_dec": "-4.198102953815775679870133329506709710140e-2",
+              "arb_ball_str": "[-0.04198102953815775679870133329506709710141 +/- 8.84e-43]"
+            },
+            "exact_dyadic_upper_numerator": "-9955473650804265126370779250033781506825496971872752637262977870146098097885513",
+            "exact_dyadic_upper_denominator": "237142198758023568227473377297792835283496928595231875152809132048206089502588928",
+            "exact_dyadic_lower_numerator": "-9955473650804265126370779250033781506825496971872752637262977870146098709182903",
+            "exact_dyadic_lower_denominator": "237142198758023568227473377297792835283496928595231875152809132048206089502588928"
+          },
+          {
+            "Y": 64,
+            "quotient_ball": {
+              "mid_float": -0.03936326340781071,
+              "rad_float_outward": 1.3418193985853955e-18,
+              "lower_dec": "-3.936326340781070997220828656278054189661e-2",
+              "upper_dec": "-3.936326340781070997220828656278054189658e-2",
+              "arb_ball_str": "[-0.03936326340781070997220828656278054189659 +/- 1.42e-42]"
+            },
+            "exact_dyadic_upper_numerator": "-583418177176217719763537493743467319177688119479088287763995223174370931961093",
+            "exact_dyadic_upper_denominator": "14821387422376473014217086081112052205218558037201992197050570753012880593911808",
+            "exact_dyadic_lower_numerator": "-583418177176217719763537493743467319177688119479088287763995223174370966356539",
+            "exact_dyadic_lower_denominator": "14821387422376473014217086081112052205218558037201992197050570753012880593911808"
+          }
+        ]
+      },
+      "1/4": {
+        "eta_fraction": "1/4",
+        "calibration_set_C": [
+          16,
+          32,
+          64
+        ],
+        "maximizer_Y_in_C": null,
+        "U_eta_exact_numerator": "0",
+        "U_eta_exact_denominator": "1",
+        "ceil_64_U_eta_int": 0,
+        "a_eta_fraction": "0/1",
+        "a_eta_numerator": 0,
+        "a_eta_denominator": 1,
+        "per_calibration_point_quotients": [
+          {
+            "Y": 16,
+            "quotient_ball": {
+              "mid_float": -0.09376871475574744,
+              "rad_float_outward": 5.907380186498313e-18,
+              "lower_dec": "-9.376871475574743395220984462098408487668e-2",
+              "upper_dec": "-9.376871475574743395220984462098408487665e-2",
+              "arb_ball_str": "[-0.09376871475574743395220984462098408487667 +/- 6.89e-43]"
+            },
+            "exact_dyadic_upper_numerator": "-11118259595945937683771337066160170551596508614478268231224573240436066536071823",
+            "exact_dyadic_upper_denominator": "118571099379011784113736688648896417641748464297615937576404566024103044751294464",
+            "exact_dyadic_lower_numerator": "-11118259595945937683771337066160170551596508614478268231224573240436067180140657",
+            "exact_dyadic_lower_denominator": "118571099379011784113736688648896417641748464297615937576404566024103044751294464"
+          },
+          {
+            "Y": 32,
+            "quotient_ball": {
+              "mid_float": -0.0998482780438332,
+              "rad_float_outward": 3.517376234891774e-18,
+              "lower_dec": "-9.984827804383320311939582509373612326252e-2",
+              "upper_dec": "-9.984827804383320311939582509373612326249e-2",
+              "arb_ball_str": "[-0.09984827804383320311939582509373612326251 +/- 3.32e-42]"
+            },
+            "exact_dyadic_upper_numerator": "-5919560049379273534317328111046272049867870867198661434430663494314077712425209",
+            "exact_dyadic_upper_denominator": "59285549689505892056868344324448208820874232148807968788202283012051522375647232",
+            "exact_dyadic_lower_numerator": "-5919560049379273534317328111046272049867870867198661434430663494314078075904903",
+            "exact_dyadic_lower_denominator": "59285549689505892056868344324448208820874232148807968788202283012051522375647232"
+          },
+          {
+            "Y": 64,
+            "quotient_ball": {
+              "mid_float": -0.11133612194118096,
+              "rad_float_outward": 1.829148586310875e-19,
+              "lower_dec": "-1.113361219411809629073529335599995930702e-1",
+              "upper_dec": "-1.113361219411809629073529335599995930699e-1",
+              "arb_ball_str": "[-0.1113361219411809629073529335599995930700 +/- 2.14e-41]"
+            },
+            "exact_dyadic_upper_numerator": "-3300311594790385585758653542009115116891124283435700553408918006271869612727473",
+            "exact_dyadic_upper_denominator": "29642774844752946028434172162224104410437116074403984394101141506025761187823616",
+            "exact_dyadic_lower_numerator": "-3300311594790385585758653542009115116891124283435700553408918006271869807300623",
+            "exact_dyadic_lower_denominator": "29642774844752946028434172162224104410437116074403984394101141506025761187823616"
+          }
+        ]
+      }
+    },
+    "calibration_set_evaluations": [
+      {
+        "Y": 16,
+        "T_Y": 32,
+        "D0_eff": 2,
+        "E_Y": {
+          "mid_float": 0.07304028417222569,
+          "rad_float_outward": 2.409422764444495e-18,
+          "lower_dec": "7.304028417222568662057747520983290617878e-2",
+          "upper_dec": "7.304028417222568662057747520983290617881e-2",
+          "arb_ball_str": "[0.07304028417222568662057747520983290617880 +/- 4.14e-42]"
+        },
+        "D_tilde_Y": {
+          "mid_float": 0.02969300014219565,
+          "rad_float_outward": 1.1627723977565932e-18,
+          "lower_dec": "2.969300014219565289323140283645826032687e-2",
+          "upper_dec": "2.969300014219565289323140283645826032690e-2",
+          "arb_ball_str": "[0.02969300014219565289323140283645826032689 +/- 1.24e-42]"
+        },
+        "X_self_Y": {
+          "mid_float": 0.03125504226064535,
+          "rad_float_outward": 2.7104824038214336e-18,
+          "lower_dec": "3.125504226064534658415193927438918897893e-2",
+          "upper_dec": "3.125504226064534658415193927438918897896e-2",
+          "arb_ball_str": "[0.03125504226064534658415193927438918897895 +/- 3.98e-42]"
+        },
+        "J_Y": {
+          "mid_float": 0.17513676540819648,
+          "rad_float_outward": 8.482429065803595e-18,
+          "lower_dec": "1.751367654081964849058704336459088699869e-1",
+          "upper_dec": "1.751367654081964849058704336459088699872e-1",
+          "arb_ball_str": "[0.1751367654081964849058704336459088699870 +/- 3.40e-41]"
+        },
+        "F_Y": {
+          "mid_float": 0.0501165963656151,
+          "rad_float_outward": 1.4923230306323594e-18,
+          "lower_dec": "5.011659636561509856926267654835211407123e-2",
+          "upper_dec": "5.011659636561509856926267654835211407126e-2",
+          "arb_ball_str": "[0.05011659636561509856926267654835211407125 +/- 1.78e-43]"
+        },
+        "F_int_T_p2": {
+          "mid_float": -0.10521095218777898,
+          "rad_float_outward": 3.2289773581752435e-18,
+          "lower_dec": "-1.052109521877789800510202884296542619227e-1",
+          "upper_dec": "-1.052109521877789800510202884296542619224e-1",
+          "arb_ball_str": "[-0.1052109521877789800510202884296542619226 +/- 3.02e-41]"
+        },
+        "diag_int_T_p2": {
+          "mid_float": -0.07745554433724483,
+          "rad_float_outward": 2.247948431902818e-18,
+          "lower_dec": "-7.745554433724483270303989185592719788207e-2",
+          "upper_dec": "-7.745554433724483270303989185592719788204e-2",
+          "arb_ball_str": "[-0.07745554433724483270303989185592719788206 +/- 3.62e-42]"
+        },
+        "offdiag_int_T_p2": {
+          "mid_float": -0.027755407850534146,
+          "rad_float_outward": 1.461968113829168e-18,
+          "lower_dec": "-2.775540785053414734798039657372706404053e-2",
+          "upper_dec": "-2.775540785053414734798039657372706404050e-2",
+          "arb_ball_str": "[-0.02775540785053414734798039657372706404051 +/- 3.49e-42]"
+        },
+        "F_bnd_T_p2": {
+          "mid_float": 0.1553275485533941,
+          "rad_float_outward": 1.1660194292714833e-17,
+          "lower_dec": "1.553275485533940786202829649780063759937e-1",
+          "upper_dec": "1.553275485533940786202829649780063759940e-1",
+          "arb_ball_str": "[0.1553275485533940786202829649780063759938 +/- 1.97e-41]"
+        },
+        "F_int_T_p23": {
+          "mid_float": -0.03577073583440259,
+          "rad_float_outward": 2.6329855816889256e-18,
+          "lower_dec": "-3.577073583440258927222130326620425660547e-2",
+          "upper_dec": "-3.577073583440258927222130326620425660544e-2",
+          "arb_ball_str": "[-0.03577073583440258927222130326620425660546 +/- 8.79e-43]"
+        },
+        "diag_int_T_p23": {
+          "mid_float": -0.02706490704068022,
+          "rad_float_outward": 1.552726054692627e-18,
+          "lower_dec": "-2.706490704068022032210560497360019706679e-2",
+          "upper_dec": "-2.706490704068022032210560497360019706676e-2",
+          "arb_ball_str": "[-0.02706490704068022032210560497360019706678 +/- 3.42e-42]"
+        },
+        "offdiag_int_T_p23": {
+          "mid_float": -0.00870582879372237,
+          "rad_float_outward": 6.544639489805087e-19,
+          "lower_dec": "-8.705828793722368950115698292604059538684e-3",
+          "upper_dec": "-8.705828793722368950115698292604059538681e-3",
+          "arb_ball_str": "[-0.008705828793722368950115698292604059538683 +/- 4.68e-43]"
+        },
+        "F_bnd_T_p23": {
+          "mid_float": 0.0858873322000177,
+          "rad_float_outward": 5.798231352850663e-18,
+          "lower_dec": "8.588733220001768784148397981455637067669e-2",
+          "upper_dec": "8.588733220001768784148397981455637067672e-2",
+          "arb_ball_str": "[0.08588733220001768784148397981455637067671 +/- 1.06e-42]"
+        },
+        "log_Y_times_D_tilde": {
+          "mid_float": 0.08232647732371588,
+          "rad_float_outward": 5.292004792993076e-18,
+          "lower_dec": "8.232647732371588785339940081231390783075e-2",
+          "upper_dec": "8.232647732371588785339940081231390783078e-2",
+          "arb_ball_str": "[0.08232647732371588785339940081231390783077 +/- 1.25e-42]"
+        }
+      },
+      {
+        "Y": 32,
+        "T_Y": 77,
+        "D0_eff": 3,
+        "E_Y": {
+          "mid_float": 0.03136294235359265,
+          "rad_float_outward": 3.3313428500365492e-18,
+          "lower_dec": "3.136294235359265630892143096718869405403e-2",
+          "upper_dec": "3.136294235359265630892143096718869405406e-2",
+          "arb_ball_str": "[0.03136294235359265630892143096718869405404 +/- 2.81e-42]"
+        },
+        "D_tilde_Y": {
+          "mid_float": 0.03303081139052013,
+          "rad_float_outward": 3.049269696223223e-18,
+          "lower_dec": "3.303081139052012727248766762165856707765e-2",
+          "upper_dec": "3.303081139052012727248766762165856707768e-2",
+          "arb_ball_str": "[0.03303081139052012727248766762165856707767 +/- 3.46e-42]"
+        },
+        "X_self_Y": {
+          "mid_float": 0.04105675579735706,
+          "rad_float_outward": 1.850849892144207e-18,
+          "lower_dec": "4.105675579735706450479046582632748284186e-2",
+          "upper_dec": "4.105675579735706450479046582632748284189e-2",
+          "arb_ball_str": "[0.04105675579735706450479046582632748284188 +/- 3.37e-42]"
+        },
+        "J_Y": {
+          "mid_float": -0.009490127370698065,
+          "rad_float_outward": 4.671253903308627e-19,
+          "lower_dec": "-9.490127370698064770139061023941320608008e-3",
+          "upper_dec": "-9.490127370698064770139061023941320608005e-3",
+          "arb_ball_str": "[-0.009490127370698064770139061023941320608007 +/- 9.11e-44]"
+        },
+        "F_Y": {
+          "mid_float": -0.17371715056012632,
+          "rad_float_outward": 1.7321037503155427e-18,
+          "lower_dec": "-1.737171505601263227893009243292512519757e-1",
+          "upper_dec": "-1.737171505601263227893009243292512519754e-1",
+          "arb_ball_str": "[-0.1737171505601263227893009243292512519755 +/- 1.35e-41]"
+        },
+        "F_int_T_p2": {
+          "mid_float": -0.12300449640626107,
+          "rad_float_outward": 6.131306668102515e-18,
+          "lower_dec": "-1.230044964062610774153562033818507534907e-1",
+          "upper_dec": "-1.230044964062610774153562033818507534904e-1",
+          "arb_ball_str": "[-0.1230044964062610774153562033818507534906 +/- 4.08e-41]"
+        },
+        "diag_int_T_p2": {
+          "mid_float": -0.11390788152383292,
+          "rad_float_outward": 2.49712449023994e-18,
+          "lower_dec": "-1.139078815238329264727499098835600374485e-1",
+          "upper_dec": "-1.139078815238329264727499098835600374482e-1",
+          "arb_ball_str": "[-0.1139078815238329264727499098835600374483 +/- 1.54e-41]"
+        },
+        "offdiag_int_T_p2": {
+          "mid_float": -0.00909661488242815,
+          "rad_float_outward": 1.6473522590895997e-19,
+          "lower_dec": "-9.096614882428150942606293498290716042245e-3",
+          "upper_dec": "-9.096614882428150942606293498290716042242e-3",
+          "arb_ball_str": "[-0.009096614882428150942606293498290716042244 +/- 1.31e-44]"
+        },
+        "F_bnd_T_p2": {
+          "mid_float": -0.05071265415386524,
+          "rad_float_outward": 2.5396909861202572e-18,
+          "lower_dec": "-5.071265415386524537394472094740049848497e-2",
+          "upper_dec": "-5.071265415386524537394472094740049848494e-2",
+          "arb_ball_str": "[-0.05071265415386524537394472094740049848495 +/- 4.16e-42]"
+        },
+        "F_int_T_p23": {
+          "mid_float": -0.03854781952309712,
+          "rad_float_outward": 2.1617696871972592e-18,
+          "lower_dec": "-3.854781952309712039456027937110091798663e-2",
+          "upper_dec": "-3.854781952309712039456027937110091798660e-2",
+          "arb_ball_str": "[-0.03854781952309712039456027937110091798662 +/- 2.80e-42]"
+        },
+        "diag_int_T_p23": {
+          "mid_float": -0.03256811825142539,
+          "rad_float_outward": 1.186078527560855e-18,
+          "lower_dec": "-3.256811825142538633545745368919899187720e-2",
+          "upper_dec": "-3.256811825142538633545745368919899187717e-2",
+          "arb_ball_str": "[-0.03256811825142538633545745368919899187718 +/- 2.69e-42]"
+        },
+        "offdiag_int_T_p23": {
+          "mid_float": -0.005979701271671734,
+          "rad_float_outward": 1.2159873719550055e-19,
+          "lower_dec": "-5.979701271671734059102825681901926109436e-3",
+          "upper_dec": "-5.979701271671734059102825681901926109433e-3",
+          "arb_ball_str": "[-0.005979701271671734059102825681901926109435 +/- 4.79e-43]"
+        },
+        "F_bnd_T_p23": {
+          "mid_float": -0.1351693310370292,
+          "rad_float_outward": 1.3448121870932742e-17,
+          "lower_dec": "-1.351693310370292023947406449581503339890e-1",
+          "upper_dec": "-1.351693310370292023947406449581503339887e-1",
+          "arb_ball_str": "[-0.1351693310370292023947406449581503339889 +/- 3.77e-42]"
+        },
+        "log_Y_times_D_tilde": {
+          "mid_float": 0.11447606893473176,
+          "rad_float_outward": 1.988402363194499e-19,
+          "lower_dec": "1.144760689347317642826647312149699636827e-1",
+          "upper_dec": "1.144760689347317642826647312149699636830e-1",
+          "arb_ball_str": "[0.1144760689347317642826647312149699636829 +/- 4.04e-41]"
+        }
+      },
+      {
+        "Y": 64,
+        "T_Y": 182,
+        "D0_eff": 4,
+        "E_Y": {
+          "mid_float": 0.062151114898631475,
+          "rad_float_outward": 2.848224509376618e-18,
+          "lower_dec": "6.215111489863147799567474096528125023295e-2",
+          "upper_dec": "6.215111489863147799567474096528125023298e-2",
+          "arb_ball_str": "[0.06215111489863147799567474096528125023297 +/- 4.85e-42]"
+        },
+        "D_tilde_Y": {
+          "mid_float": 0.03437772170988294,
+          "rad_float_outward": 3.4181472425160616e-18,
+          "lower_dec": "3.437772170988294054704651429972756445225e-2",
+          "upper_dec": "3.437772170988294054704651429972756445228e-2",
+          "arb_ball_str": "[0.03437772170988294054704651429972756445226 +/- 2.89e-42]"
+        },
+        "X_self_Y": {
+          "mid_float": 0.0506365107487719,
+          "rad_float_outward": 2.084218268992793e-18,
+          "lower_dec": "5.063651074877190336442569931090708582778e-2",
+          "upper_dec": "5.063651074877190336442569931090708582781e-2",
+          "arb_ball_str": "[0.05063651074877190336442569931090708582780 +/- 3.45e-42]"
+        },
+        "J_Y": {
+          "mid_float": 0.11712711858606266,
+          "rad_float_outward": 5.616787632346643e-18,
+          "lower_dec": "1.171271185860626646392829570809787502937e-1",
+          "upper_dec": "1.171271185860626646392829570809787502940e-1",
+          "arb_ball_str": "[0.1171271185860626646392829570809787502938 +/- 3.24e-41]"
+        },
+        "F_Y": {
+          "mid_float": -0.08541892440902495,
+          "rad_float_outward": 2.7200854436245292e-18,
+          "lower_dec": "-8.541892440902494881841984016264959301737e-2",
+          "upper_dec": "-8.541892440902494881841984016264959301734e-2",
+          "arb_ball_str": "[-0.08541892440902494881841984016264959301735 +/- 3.90e-42]"
+        },
+        "F_int_T_p2": {
+          "mid_float": -0.17193318199880697,
+          "rad_float_outward": 1.3379228219781514e-17,
+          "lower_dec": "-1.719331819988069854365091926579821468565e-1",
+          "upper_dec": "-1.719331819988069854365091926579821468562e-1",
+          "arb_ball_str": "[-0.1719331819988069854365091926579821468563 +/- 3.11e-42]"
+        },
+        "diag_int_T_p2": {
+          "mid_float": -0.14776291834110414,
+          "rad_float_outward": 4.239163265499004e-18,
+          "lower_dec": "-1.477629183411041422705465515328185801347e-1",
+          "upper_dec": "-1.477629183411041422705465515328185801344e-1",
+          "arb_ball_str": "[-0.1477629183411041422705465515328185801346 +/- 1.91e-41]"
+        },
+        "offdiag_int_T_p2": {
+          "mid_float": -0.024170263657702844,
+          "rad_float_outward": 1.2682759015783336e-18,
+          "lower_dec": "-2.417026365770284316596264112516356672174e-2",
+          "upper_dec": "-2.417026365770284316596264112516356672171e-2",
+          "arb_ball_str": "[-0.02417026365770284316596264112516356672172 +/- 2.13e-42]"
+        },
+        "F_bnd_T_p2": {
+          "mid_float": 0.08651425758978204,
+          "rad_float_outward": 3.2186450316574734e-18,
+          "lower_dec": "8.651425758978203661808935249533255383893e-2",
+          "upper_dec": "8.651425758978203661808935249533255383896e-2",
+          "arb_ball_str": "[0.08651425758978203661808935249533255383895 +/- 7.96e-43]"
+        },
+        "F_int_T_p23": {
+          "mid_float": -0.045347868787150636,
+          "rad_float_outward": 1.1248116344572666e-18,
+          "lower_dec": "-4.534786878715063472495810752344187720757e-2",
+          "upper_dec": "-4.534786878715063472495810752344187720754e-2",
+          "arb_ball_str": "[-0.04534786878715063472495810752344187720756 +/- 1.27e-42]"
+        },
+        "diag_int_T_p23": {
+          "mid_float": -0.0481757412938078,
+          "rad_float_outward": 1.307756308439688e-18,
+          "lower_dec": "-4.817574129380779993417034909439630587720e-2",
+          "upper_dec": "-4.817574129380779993417034909439630587717e-2",
+          "arb_ball_str": "[-0.04817574129380779993417034909439630587719 +/- 8.58e-43]"
+        },
+        "offdiag_int_T_p23": {
+          "mid_float": 0.0028278725066571654,
+          "rad_float_outward": 1.6951727106825654e-19,
+          "lower_dec": "2.827872506657165209212241570954428669629e-3",
+          "upper_dec": "2.827872506657165209212241570954428669632e-3",
+          "arb_ball_str": "[0.002827872506657165209212241570954428669630 +/- 4.11e-43]"
+        },
+        "F_bnd_T_p23": {
+          "mid_float": -0.04007105562187432,
+          "rad_float_outward": 3.0939968258254338e-18,
+          "lower_dec": "-4.007105562187431409346173263920771580981e-2",
+          "upper_dec": "-4.007105562187431409346173263920771580978e-2",
+          "arb_ball_str": "[-0.04007105562187431409346173263920771580980 +/- 4.84e-42]"
+        },
+        "log_Y_times_D_tilde": {
+          "mid_float": 0.1429729252636787,
+          "rad_float_outward": 3.641792207164239e-18,
+          "lower_dec": "1.429729252636786943411570998442621883163e-1",
+          "upper_dec": "1.429729252636786943411570998442621883166e-1",
+          "arb_ball_str": "[0.1429729252636786943411570998442621883164 +/- 2.82e-41]"
+        }
+      }
+    ],
+    "diagnostic_set_evaluations": [
+      {
+        "Y": 2,
+        "T_Y": 3,
+        "D0_eff": 0,
+        "E_Y": {
+          "mid_float": 0.11237427864768398,
+          "rad_float_outward": 3.679929483816847e-18,
+          "lower_dec": "1.123742786476839875693232278102696112238e-1",
+          "upper_dec": "1.123742786476839875693232278102696112241e-1",
+          "arb_ball_str": "[0.1123742786476839875693232278102696112239 +/- 3.04e-41]"
+        },
+        "D_tilde_Y": {
+          "mid_float": 0.0528119280098526,
+          "rad_float_outward": 1.8573512681455732e-18,
+          "lower_dec": "5.281192800985260079932681145742792781768e-2",
+          "upper_dec": "5.281192800985260079932681145742792781771e-2",
+          "arb_ball_str": "[0.05281192800985260079932681145742792781769 +/- 4.30e-42]"
+        },
+        "X_self_Y": {
+          "mid_float": 0.0,
+          "rad_float_outward": 5e-324,
+          "lower_dec": "0",
+          "upper_dec": "0",
+          "arb_ball_str": "0"
+        },
+        "J_Y": {
+          "mid_float": 1.9663126275869496,
+          "rad_float_outward": 6.621342274705574e-17,
+          "lower_dec": "1.966312627586949645807911315601504200604e+0",
+          "upper_dec": "1.966312627586949645807911315601504200607e+0",
+          "arb_ball_str": "[1.966312627586949645807911315601504200605 +/- 5.27e-41]"
+        },
+        "F_Y": {
+          "mid_float": 1.9663126275869496,
+          "rad_float_outward": 6.621342274705574e-17,
+          "lower_dec": "1.966312627586949645807911315601504200604e+0",
+          "upper_dec": "1.966312627586949645807911315601504200607e+0",
+          "arb_ball_str": "[1.966312627586949645807911315601504200605 +/- 5.27e-41]"
+        },
+        "F_int_T_p2": {
+          "mid_float": 0.557899220738482,
+          "rad_float_outward": 4.6995019899022053e-17,
+          "lower_dec": "5.578992207384819242650943792439237087994e-1",
+          "upper_dec": "5.578992207384819242650943792439237087997e-1",
+          "arb_ball_str": "[0.5578992207384819242650943792439237087995 +/- 3.33e-41]"
+        },
+        "diag_int_T_p2": {
+          "mid_float": 0.557899220738482,
+          "rad_float_outward": 4.6995019899022053e-17,
+          "lower_dec": "5.578992207384819242650943792439237087994e-1",
+          "upper_dec": "5.578992207384819242650943792439237087997e-1",
+          "arb_ball_str": "[0.5578992207384819242650943792439237087995 +/- 3.33e-41]"
+        },
+        "offdiag_int_T_p2": {
+          "mid_float": 0.0,
+          "rad_float_outward": 2.365400742941459e-73,
+          "lower_dec": "-2.365400742941458645616496338056772084575e-73",
+          "upper_dec": "2.365400742941458645616496338056772084575e-73",
+          "arb_ball_str": "[+/- 2.37e-73]"
+        },
+        "F_bnd_T_p2": {
+          "mid_float": 1.4084134068484677,
+          "rad_float_outward": 2.1861401835621156e-18,
+          "lower_dec": "1.408413406848467721542816936357580491804e+0",
+          "upper_dec": "1.408413406848467721542816936357580491807e+0",
+          "arb_ball_str": "[1.408413406848467721542816936357580491806 +/- 4.81e-40]"
+        },
+        "F_int_T_p23": {
+          "mid_float": 0.0,
+          "rad_float_outward": 5e-324,
+          "lower_dec": "0",
+          "upper_dec": "0",
+          "arb_ball_str": "0"
+        },
+        "diag_int_T_p23": {
+          "mid_float": 0.0,
+          "rad_float_outward": 5e-324,
+          "lower_dec": "0",
+          "upper_dec": "0",
+          "arb_ball_str": "0"
+        },
+        "offdiag_int_T_p23": {
+          "mid_float": 0.0,
+          "rad_float_outward": 5e-324,
+          "lower_dec": "0",
+          "upper_dec": "0",
+          "arb_ball_str": "0"
+        },
+        "F_bnd_T_p23": {
+          "mid_float": 1.9663126275869496,
+          "rad_float_outward": 6.621342274705574e-17,
+          "lower_dec": "1.966312627586949645807911315601504200604e+0",
+          "upper_dec": "1.966312627586949645807911315601504200607e+0",
+          "arb_ball_str": "[1.966312627586949645807911315601504200605 +/- 5.27e-41]"
+        },
+        "log_Y_times_D_tilde": {
+          "mid_float": 0.03660643899996413,
+          "rad_float_outward": 3.409366575112905e-18,
+          "lower_dec": "3.660643899996413383011662762098785411145e-2",
+          "upper_dec": "3.660643899996413383011662762098785411148e-2",
+          "arb_ball_str": "[0.03660643899996413383011662762098785411147 +/- 3.37e-42]"
+        }
+      },
+      {
+        "Y": 4,
+        "T_Y": 6,
+        "D0_eff": 1,
+        "E_Y": {
+          "mid_float": 0.004608633312722756,
+          "rad_float_outward": 2.869350901878105e-19,
+          "lower_dec": "4.608633312722755964394753036415613296615e-3",
+          "upper_dec": "4.608633312722755964394753036415613296618e-3",
+          "arb_ball_str": "[0.004608633312722755964394753036415613296616 +/- 3.52e-43]"
+        },
+        "D_tilde_Y": {
+          "mid_float": 0.030921682373364054,
+          "rad_float_outward": 1.6525769743946025e-18,
+          "lower_dec": "3.092168237336405554994579382923466558876e-2",
+          "upper_dec": "3.092168237336405554994579382923466558879e-2",
+          "arb_ball_str": "[0.03092168237336405554994579382923466558877 +/- 5.66e-43]"
+        },
+        "X_self_Y": {
+          "mid_float": 0.01373731552473553,
+          "rad_float_outward": 6.044764877864281e-19,
+          "lower_dec": "1.373731552473552867181359246080791158561e-2",
+          "upper_dec": "1.373731552473552867181359246080791158564e-2",
+          "arb_ball_str": "[0.01373731552473552867181359246080791158563 +/- 9.65e-43]"
+        },
+        "J_Y": {
+          "mid_float": 0.0712880536391955,
+          "rad_float_outward": 5.322593699648602e-18,
+          "lower_dec": "7.128805363919550076116515793645170071336e-2",
+          "upper_dec": "7.128805363919550076116515793645170071339e-2",
+          "arb_ball_str": "[0.07128805363919550076116515793645170071337 +/- 3.07e-42]"
+        },
+        "F_Y": {
+          "mid_float": 0.016338791540253386,
+          "rad_float_outward": 5.647592034507247e-19,
+          "lower_dec": "1.633879154025338607391078809322005437084e-2",
+          "upper_dec": "1.633879154025338607391078809322005437087e-2",
+          "arb_ball_str": "[0.01633879154025338607391078809322005437086 +/- 3.09e-42]"
+        },
+        "F_int_T_p2": {
+          "mid_float": 0.18962396300660603,
+          "rad_float_outward": 5.13454672648443e-18,
+          "lower_dec": "1.896239630066060226356710662650341048593e-1",
+          "upper_dec": "1.896239630066060226356710662650341048596e-1",
+          "arb_ball_str": "[0.1896239630066060226356710662650341048595 +/- 2.43e-41]"
+        },
+        "diag_int_T_p2": {
+          "mid_float": 0.22114818673452125,
+          "rad_float_outward": 3.507571843456791e-18,
+          "lower_dec": "2.211481867345212494850191225309034257477e-1",
+          "upper_dec": "2.211481867345212494850191225309034257480e-1",
+          "arb_ball_str": "[0.2211481867345212494850191225309034257478 +/- 1.06e-41]"
+        },
+        "offdiag_int_T_p2": {
+          "mid_float": -0.031524223727915225,
+          "rad_float_outward": 1.7032246660339913e-18,
+          "lower_dec": "-3.152422372791522684934805626586932088835e-2",
+          "upper_dec": "-3.152422372791522684934805626586932088832e-2",
+          "arb_ball_str": "[-0.03152422372791522684934805626586932088833 +/- 4.79e-42]"
+        },
+        "F_bnd_T_p2": {
+          "mid_float": -0.17328517146635264,
+          "rad_float_outward": 2.2298589779815397e-18,
+          "lower_dec": "-1.732851714663526365617602781718140504888e-1",
+          "upper_dec": "-1.732851714663526365617602781718140504885e-1",
+          "arb_ball_str": "[-0.1732851714663526365617602781718140504886 +/- 1.89e-41]"
+        },
+        "F_int_T_p23": {
+          "mid_float": 0.18962396300660603,
+          "rad_float_outward": 5.13454672648443e-18,
+          "lower_dec": "1.896239630066060226356710662650341048593e-1",
+          "upper_dec": "1.896239630066060226356710662650341048596e-1",
+          "arb_ball_str": "[0.1896239630066060226356710662650341048595 +/- 2.43e-41]"
+        },
+        "diag_int_T_p23": {
+          "mid_float": 0.18962396300660603,
+          "rad_float_outward": 5.13454672648443e-18,
+          "lower_dec": "1.896239630066060226356710662650341048593e-1",
+          "upper_dec": "1.896239630066060226356710662650341048596e-1",
+          "arb_ball_str": "[0.1896239630066060226356710662650341048595 +/- 2.43e-41]"
+        },
+        "offdiag_int_T_p23": {
+          "mid_float": 0.0,
+          "rad_float_outward": 4.272489413762423e-73,
+          "lower_dec": "-4.272489413762422533359931877334206645496e-73",
+          "upper_dec": "4.272489413762422533359931877334206645496e-73",
+          "arb_ball_str": "[+/- 4.28e-73]"
+        },
+        "F_bnd_T_p23": {
+          "mid_float": -0.17328517146635264,
+          "rad_float_outward": 2.2298589779815397e-18,
+          "lower_dec": "-1.732851714663526365617602781718140504888e-1",
+          "upper_dec": "-1.732851714663526365617602781718140504885e-1",
+          "arb_ball_str": "[-0.1732851714663526365617602781718140504886 +/- 1.89e-41]"
+        },
+        "log_Y_times_D_tilde": {
+          "mid_float": 0.042866553910534906,
+          "rad_float_outward": 3.419227463719724e-19,
+          "lower_dec": "4.286655391053490644412596947139512316253e-2",
+          "upper_dec": "4.286655391053490644412596947139512316256e-2",
+          "arb_ball_str": "[0.04286655391053490644412596947139512316255 +/- 4.23e-43]"
+        }
+      },
+      {
+        "Y": 8,
+        "T_Y": 14,
+        "D0_eff": 2,
+        "E_Y": {
+          "mid_float": 0.016280644236178577,
+          "rad_float_outward": 1.14638474407536e-18,
+          "lower_dec": "1.628064423617857591478454843047804761283e-2",
+          "upper_dec": "1.628064423617857591478454843047804761286e-2",
+          "arb_ball_str": "[0.01628064423617857591478454843047804761284 +/- 2.05e-42]"
+        },
+        "D_tilde_Y": {
+          "mid_float": 0.02865016127083831,
+          "rad_float_outward": 1.390133139484707e-18,
+          "lower_dec": "2.865016127083830909980586532566004414666e-2",
+          "upper_dec": "2.865016127083830909980586532566004414669e-2",
+          "arb_ball_str": "[0.02865016127083830909980586532566004414668 +/- 3.79e-42]"
+        },
+        "X_self_Y": {
+          "mid_float": 0.021213288433926846,
+          "rad_float_outward": 4.703806230168119e-19,
+          "lower_dec": "2.121328843392684659750058141299067303079e-2",
+          "upper_dec": "2.121328843392684659750058141299067303082e-2",
+          "arb_ball_str": "[0.02121328843392684659750058141299067303081 +/- 3.24e-42]"
+        },
+        "J_Y": {
+          "mid_float": -0.08180514027308593,
+          "rad_float_outward": 4.173222899572818e-18,
+          "lower_dec": "-8.180514027308593145593753513947982781822e-2",
+          "upper_dec": "-8.180514027308593145593753513947982781819e-2",
+          "arb_ball_str": "[-0.08180514027308593145593753513947982781821 +/- 4.65e-42]"
+        },
+        "F_Y": {
+          "mid_float": -0.1666582940087933,
+          "rad_float_outward": 6.054745391640065e-18,
+          "lower_dec": "-1.666582940087933178459398607914425199416e-1",
+          "upper_dec": "-1.666582940087933178459398607914425199413e-1",
+          "arb_ball_str": "[-0.1666582940087933178459398607914425199414 +/- 3.25e-41]"
+        },
+        "F_int_T_p2": {
+          "mid_float": -0.0684078949387367,
+          "rad_float_outward": 6.7046977626675825e-18,
+          "lower_dec": "-6.840789493873670305996145159655348195641e-2",
+          "upper_dec": "-6.840789493873670305996145159655348195638e-2",
+          "arb_ball_str": "[-0.06840789493873670305996145159655348195640 +/- 4.10e-43]"
+        },
+        "diag_int_T_p2": {
+          "mid_float": -0.04641796146448555,
+          "rad_float_outward": 9.126389734593098e-19,
+          "lower_dec": "-4.641796146448554697180087984628414872757e-2",
+          "upper_dec": "-4.641796146448554697180087984628414872754e-2",
+          "arb_ball_str": "[-0.04641796146448554697180087984628414872755 +/- 3.62e-42]"
+        },
+        "offdiag_int_T_p2": {
+          "mid_float": -0.021989933474251155,
+          "rad_float_outward": 6.784428322196632e-19,
+          "lower_dec": "-2.198993347425115608816057175026933322886e-2",
+          "upper_dec": "-2.198993347425115608816057175026933322883e-2",
+          "arb_ball_str": "[-0.02198993347425115608816057175026933322885 +/- 4.03e-42]"
+        },
+        "F_bnd_T_p2": {
+          "mid_float": -0.09825039907005662,
+          "rad_float_outward": 6.499523710275176e-19,
+          "lower_dec": "-9.825039907005661478597840919488903798505e-2",
+          "upper_dec": "-9.825039907005661478597840919488903798502e-2",
+          "arb_ball_str": "[-0.09825039907005661478597840919488903798503 +/- 2.84e-42]"
+        },
+        "F_int_T_p23": {
+          "mid_float": 0.006633241818847875,
+          "rad_float_outward": 3.3014356330034724e-19,
+          "lower_dec": "6.633241818847875043004697883255749157225e-3",
+          "upper_dec": "6.633241818847875043004697883255749157228e-3",
+          "arb_ball_str": "[0.006633241818847875043004697883255749157226 +/- 2.43e-43]"
+        },
+        "diag_int_T_p23": {
+          "mid_float": 0.006633241818847875,
+          "rad_float_outward": 3.3014356330034724e-19,
+          "lower_dec": "6.633241818847875043004697883255749157225e-3",
+          "upper_dec": "6.633241818847875043004697883255749157228e-3",
+          "arb_ball_str": "[0.006633241818847875043004697883255749157226 +/- 2.43e-43]"
+        },
+        "offdiag_int_T_p23": {
+          "mid_float": 0.0,
+          "rad_float_outward": 6.489278671444945e-73,
+          "lower_dec": "-6.489278671444943873923551107123549910999e-73",
+          "upper_dec": "6.489278671444943873923551107123549910999e-73",
+          "arb_ball_str": "[+/- 6.49e-73]"
+        },
+        "F_bnd_T_p23": {
+          "mid_float": -0.1732915358276412,
+          "rad_float_outward": 9.227622328850854e-18,
+          "lower_dec": "-1.732915358276411928889445586746982690988e-1",
+          "upper_dec": "-1.732915358276411928889445586746982690985e-1",
+          "arb_ball_str": "[-0.1732915358276411928889445586746982690987 +/- 4.14e-41]"
+        },
+        "log_Y_times_D_tilde": {
+          "mid_float": 0.05957633552240794,
+          "rad_float_outward": 3.3678716795708088e-18,
+          "lower_dec": "5.957633552240794081845579402906031217513e-2",
+          "upper_dec": "5.957633552240794081845579402906031217516e-2",
+          "arb_ball_str": "[0.05957633552240794081845579402906031217514 +/- 3.40e-42]"
+        }
+      }
+    ]
+  },
+  "holdout_validation_schedule": {
+    "total_unseen_holdout_points": 10,
+    "holdout_entries": [
+      {
+        "point_id": "TC062-HO-UNSEEN-112",
+        "label": "112",
+        "kind": "exact_rational",
+        "rational_factor": "112/1",
+        "exp_power": "0/1",
+        "grid_tier": "UNSPLIT_SMALL_T_UNSEEN_GRID",
+        "prior_exposure_status": "UNSEEN_FOR_ALL_OBSERVABLES",
+        "prior_exposure_detail": "Zero prior occurrences across all tc/*.py and data/*.json files; tests unsplit small-T (T = 365 < 512) mode."
+      },
+      {
+        "point_id": "TC062-HO-UNSEEN-160",
+        "label": "160",
+        "kind": "exact_rational",
+        "rational_factor": "160/1",
+        "exp_power": "0/1",
+        "grid_tier": "THREE_ZONE_UNSEEN_GRID",
+        "prior_exposure_status": "UNSEEN_FOR_ALL_OBSERVABLES",
+        "prior_exposure_detail": "Zero prior occurrences across all tc/*.py and data/*.json files; tests three-zone activation just above T = 512."
+      },
+      {
+        "point_id": "TC062-HO-UNSEEN-224",
+        "label": "224",
+        "kind": "exact_rational",
+        "rational_factor": "224/1",
+        "exp_power": "0/1",
+        "grid_tier": "THREE_ZONE_UNSEEN_GRID",
+        "prior_exposure_status": "UNSEEN_FOR_ALL_OBSERVABLES",
+        "prior_exposure_detail": "Zero prior occurrences across all tc/*.py and data/*.json files."
+      },
+      {
+        "point_id": "TC062-HO-UNSEEN-320",
+        "label": "320",
+        "kind": "exact_rational",
+        "rational_factor": "320/1",
+        "exp_power": "0/1",
+        "grid_tier": "THREE_ZONE_UNSEEN_GRID",
+        "prior_exposure_status": "UNSEEN_FOR_ALL_OBSERVABLES",
+        "prior_exposure_detail": "Zero prior occurrences across all tc/*.py and data/*.json files."
+      },
+      {
+        "point_id": "TC062-HO-EXP6-LEFT",
+        "label": "e^6*(1 - 2^(-12))",
+        "kind": "exact_symbolic_exp_rational",
+        "rational_factor": "4095/4096",
+        "exp_power": "6/1",
+        "grid_tier": "D0_DISCONTINUITY_SIDED_GRID",
+        "prior_exposure_status": "UNSEEN_FOR_ALL_OBSERVABLES",
+        "prior_exposure_detail": "Zero prior occurrences; tests left-sided limit below D0: 5 -> 6 jump at Y = e^6."
+      },
+      {
+        "point_id": "TC062-HO-EXP6-RIGHT",
+        "label": "e^6*(1 + 2^(-12))",
+        "kind": "exact_symbolic_exp_rational",
+        "rational_factor": "4097/4096",
+        "exp_power": "6/1",
+        "grid_tier": "D0_DISCONTINUITY_SIDED_GRID",
+        "prior_exposure_status": "UNSEEN_FOR_ALL_OBSERVABLES",
+        "prior_exposure_detail": "Zero prior occurrences; tests right-sided limit above D0: 5 -> 6 jump at Y = e^6."
+      },
+      {
+        "point_id": "TC062-HO-UNSEEN-448",
+        "label": "448",
+        "kind": "exact_rational",
+        "rational_factor": "448/1",
+        "exp_power": "0/1",
+        "grid_tier": "THREE_ZONE_UNSEEN_GRID",
+        "prior_exposure_status": "UNSEEN_FOR_ALL_OBSERVABLES",
+        "prior_exposure_detail": "Zero prior occurrences across all tc/*.py and data/*.json files."
+      },
+      {
+        "point_id": "TC062-HO-POW4-625-LEFT",
+        "label": "625 - 2^(-12)",
+        "kind": "exact_rational",
+        "rational_factor": "2559999/4096",
+        "exp_power": "0/1",
+        "grid_tier": "T_FOURTH_POWER_DISCONTINUITY_GRID",
+        "prior_exposure_status": "UNSEEN_FOR_ALL_OBSERVABLES",
+        "prior_exposure_detail": "Zero prior occurrences; tests left side of exact fourth-power cutoff boundary 625^(5/4) = 3125 (T = 3125)."
+      },
+      {
+        "point_id": "TC062-HO-POW4-625-RIGHT",
+        "label": "625 + 2^(-12)",
+        "kind": "exact_rational",
+        "rational_factor": "2560001/4096",
+        "exp_power": "0/1",
+        "grid_tier": "T_FOURTH_POWER_DISCONTINUITY_GRID",
+        "prior_exposure_status": "UNSEEN_FOR_ALL_OBSERVABLES",
+        "prior_exposure_detail": "Zero prior occurrences; tests right side of exact fourth-power cutoff boundary 625^(5/4) = 3125 (T = 3126)."
+      },
+      {
+        "point_id": "TC062-HO-UNSEEN-1280",
+        "label": "1280",
+        "kind": "exact_rational",
+        "rational_factor": "1280/1",
+        "exp_power": "0/1",
+        "grid_tier": "LARGE_SCALE_UNSEEN_GRID",
+        "prior_exposure_status": "UNSEEN_FOR_ALL_OBSERVABLES",
+        "prior_exposure_detail": "Zero prior occurrences across all tc/*.py and data/*.json files; tests large-scale matrix-free paired evaluation (T = 7529)."
+      }
+    ]
+  },
+  "preregistered_controls": {
+    "sequences": [
+      {
+        "mode": "liouville",
+        "prime_parity_set": "ALL_PRIMES_LAMBDA",
+        "prime_pair_sign_rule": "lambda(p*m) = -lambda(m) for ALL primes p",
+        "role": "AUTHENTIC_TC_ARITHMETIC"
+      },
+      {
+        "mode": "unsigned_1",
+        "prime_parity_set": "EMPTY_ALL_ONES",
+        "prime_pair_sign_rule": "1(p*m) = +1(m) for ALL primes p ([+, +, +] 4-term sum, NOT [-, -, +])",
+        "role": "UNSIGNED_NEGATIVE_CONTROL"
+      },
+      {
+        "mode": "a2",
+        "prime_parity_set": "{2}",
+        "prime_pair_sign_rule": "a_2(2*m) = -a_2(m) at p = 2; a_2(p*m) = +a_2(m) at every odd prime p >= 3",
+        "role": "FIXED_SINGLE_PRIME_PARITY_CONTROL"
+      },
+      {
+        "mode": "a_3_5_7",
+        "prime_parity_set": "{3, 5, 7}",
+        "prime_pair_sign_rule": "a_{3,5,7}(p*m) = -a_{3,5,7}(m) for p in {3,5,7}; +a_{3,5,7}(m) for p notin {3,5,7} (including p = 2)",
+        "role": "FIXED_THREE_PRIME_PARITY_CONTROL"
+      },
+      {
+        "mode": "hybrid_a2_liouville",
+        "prime_parity_set": "HYBRID_DIAGNOSTIC_ONLY",
+        "prime_pair_sign_rule": "inner observable uses a_2, outer Selberg compensation uses Liouville R_osc (explicitly labeled hybrid diagnostic)",
+        "role": "EXPLICITLY_LABELED_HYBRID_DIAGNOSTIC"
+      }
+    ],
+    "control_sample_scales": [
+      16,
+      32,
+      64,
+      128,
+      256,
+      512
+    ]
+  },
+  "numerical_settings_and_escalation_rules": {
+    "library": "python-flint (Arb/Acb outward-rounded ball arithmetic)",
+    "base_prec_bits": 256,
+    "quad_tol_bits_unsplit_small_T": 240,
+    "quad_tol_bits_three_zone_large_T": 160,
+    "three_zone_activation_threshold_T": 512,
+    "three_zone_parameters": {
+      "n_panels": 16,
+      "zone1_ratio_threshold_x_over_n": 12,
+      "zone3_cutoff_N1": "max(T(Y) + 1, ceil(tau * Y))",
+      "zone3_taylor_degree_M": 56
+    },
+    "escalation_ladder_on_zero_straddling_margin": [
+      {
+        "tier": 1,
+        "prec_bits": 512,
+        "quad_tol_bits": 240,
+        "n_panels": 32,
+        "zone1_ratio_threshold_x_over_n": 16,
+        "zone3_taylor_degree_M": 80
+      },
+      {
+        "tier": 2,
+        "prec_bits": 1024,
+        "quad_tol_bits": 440,
+        "n_panels": 64,
+        "zone1_ratio_threshold_x_over_n": 22,
+        "zone3_taylor_degree_M": 112
+      }
+    ],
+    "resource_limits": {
+      "max_wall_seconds_per_point": 300,
+      "max_rss_megabytes": 4096,
+      "budget_enforcement_mode": "POST_EVALUATION_BUDGET_AUDIT_NO_OS_PREEMPTIVE_KILL",
+      "recognized_peak_rss_covering_semantics": [
+        "PROCESS_LIFETIME_HIGH_WATER_MARK"
+      ],
+      "infeasible_or_timeout_reporting_rule": "Report NOT_EVALUATED or UNRESOLVED with explicit reason and mark coverage incomplete; never substitute a smaller cutoff T or silently truncate spillover."
+    }
+  },
+  "decision_and_immutability_rules": {
+    "pointwise_margin_classification": {
+      "PASS": "upper(M(Y)) <= 0",
+      "FAIL": "lower(M(Y)) > 0",
+      "UNRESOLVED": "lower(M(Y)) <= 0 < upper(M(Y)) after precision/subdivision escalation"
+    },
+    "global_probe_outcomes": [
+      "REFUTED_BY_CERTIFIED_WITNESS",
+      "SURVIVED_TESTED_POINTS",
+      "UNRESOLVED/INCOMPLETE_COVERAGE",
+      "PROVED_UNIFORMLY"
+    ],
+    "witness_preservation_and_conflict_rule": "Retain decisive PASS/FAIL witnesses across escalation tiers; block certification via CERTIFICATION_INTEGRITY_CONFLICT on contradictory certified PASS and FAIL verdicts for the same candidate, point, and parameters; keep mathematical verdicts strictly independent of 3-valued (WITHIN, EXCEEDED, UNKNOWN) resource compliance."
+  },
+  "serialized_arb_self_check": {
+    "total_certified_arb_balls_checked": 96,
+    "compared_against_live_original_arb_count": 96,
+    "live_original_count_matches_enumerated_total": true,
+    "all_enclose_original_256bit_arb_ball": true,
+    "failed_paths": [],
+    "checked_paths": [
+      "calibration_and_prior_exposure_separation.calibrated_F_secondary_constants.1/2.per_calibration_point_quotients[0].quotient_ball",
+      "calibration_and_prior_exposure_separation.calibrated_F_secondary_constants.1/2.per_calibration_point_quotients[1].quotient_ball",
+      "calibration_and_prior_exposure_separation.calibrated_F_secondary_constants.1/2.per_calibration_point_quotients[2].quotient_ball",
+      "calibration_and_prior_exposure_separation.calibrated_F_secondary_constants.1/4.per_calibration_point_quotients[0].quotient_ball",
+      "calibration_and_prior_exposure_separation.calibrated_F_secondary_constants.1/4.per_calibration_point_quotients[1].quotient_ball",
+      "calibration_and_prior_exposure_separation.calibrated_F_secondary_constants.1/4.per_calibration_point_quotients[2].quotient_ball",
+      "calibration_and_prior_exposure_separation.calibrated_int2_secondary_constants.1/2.per_calibration_point_quotients[0].quotient_ball",
+      "calibration_and_prior_exposure_separation.calibrated_int2_secondary_constants.1/2.per_calibration_point_quotients[1].quotient_ball",
+      "calibration_and_prior_exposure_separation.calibrated_int2_secondary_constants.1/2.per_calibration_point_quotients[2].quotient_ball",
+      "calibration_and_prior_exposure_separation.calibrated_int2_secondary_constants.1/4.per_calibration_point_quotients[0].quotient_ball",
+      "calibration_and_prior_exposure_separation.calibrated_int2_secondary_constants.1/4.per_calibration_point_quotients[1].quotient_ball",
+      "calibration_and_prior_exposure_separation.calibrated_int2_secondary_constants.1/4.per_calibration_point_quotients[2].quotient_ball",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[0].E_Y",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[0].D_tilde_Y",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[0].X_self_Y",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[0].J_Y",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[0].F_Y",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[0].F_int_T_p2",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[0].diag_int_T_p2",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[0].offdiag_int_T_p2",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[0].F_bnd_T_p2",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[0].F_int_T_p23",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[0].diag_int_T_p23",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[0].offdiag_int_T_p23",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[0].F_bnd_T_p23",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[0].log_Y_times_D_tilde",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[1].E_Y",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[1].D_tilde_Y",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[1].X_self_Y",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[1].J_Y",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[1].F_Y",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[1].F_int_T_p2",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[1].diag_int_T_p2",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[1].offdiag_int_T_p2",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[1].F_bnd_T_p2",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[1].F_int_T_p23",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[1].diag_int_T_p23",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[1].offdiag_int_T_p23",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[1].F_bnd_T_p23",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[1].log_Y_times_D_tilde",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[2].E_Y",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[2].D_tilde_Y",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[2].X_self_Y",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[2].J_Y",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[2].F_Y",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[2].F_int_T_p2",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[2].diag_int_T_p2",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[2].offdiag_int_T_p2",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[2].F_bnd_T_p2",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[2].F_int_T_p23",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[2].diag_int_T_p23",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[2].offdiag_int_T_p23",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[2].F_bnd_T_p23",
+      "calibration_and_prior_exposure_separation.calibration_set_evaluations[2].log_Y_times_D_tilde",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[0].E_Y",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[0].D_tilde_Y",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[0].X_self_Y",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[0].J_Y",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[0].F_Y",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[0].F_int_T_p2",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[0].diag_int_T_p2",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[0].offdiag_int_T_p2",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[0].F_bnd_T_p2",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[0].F_int_T_p23",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[0].diag_int_T_p23",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[0].offdiag_int_T_p23",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[0].F_bnd_T_p23",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[0].log_Y_times_D_tilde",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[1].E_Y",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[1].D_tilde_Y",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[1].X_self_Y",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[1].J_Y",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[1].F_Y",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[1].F_int_T_p2",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[1].diag_int_T_p2",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[1].offdiag_int_T_p2",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[1].F_bnd_T_p2",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[1].F_int_T_p23",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[1].diag_int_T_p23",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[1].offdiag_int_T_p23",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[1].F_bnd_T_p23",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[1].log_Y_times_D_tilde",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[2].E_Y",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[2].D_tilde_Y",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[2].X_self_Y",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[2].J_Y",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[2].F_Y",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[2].F_int_T_p2",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[2].diag_int_T_p2",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[2].offdiag_int_T_p2",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[2].F_bnd_T_p2",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[2].F_int_T_p23",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[2].diag_int_T_p23",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[2].offdiag_int_T_p23",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[2].F_bnd_T_p23",
+      "calibration_and_prior_exposure_separation.diagnostic_set_evaluations[2].log_Y_times_D_tilde"
+    ]
+  },
+  "protocol_sha256": "d56fbd30df9d8adf01ff41d0f207d06092a941fa79f593ef6c61382b72fc32df"
+}

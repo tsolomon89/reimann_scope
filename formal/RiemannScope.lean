@@ -43,3 +43,6 @@ import RiemannScope.CanonicalThetaCorrelationBound
 import RiemannScope.LiouvilleSquareDilation
 import RiemannScope.DyadicPowerLiftPrimitiveCorrelation
 import RiemannScope.SignedDilationArithmeticEnergy
+import RiemannScope.MixedArithmeticCovariance
+import RiemannScope.JointPrimeDilationSignedRemainder
+import RiemannScope.DyadicChainCorrelationRegularity
