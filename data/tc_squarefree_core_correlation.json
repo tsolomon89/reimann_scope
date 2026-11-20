@@ -23,11 +23,25 @@
     "frozen_protocol_sha256": "44fab01b3fa1f0982c0b56740bd459a3a6838cce862ed396321e909adb7fe967",
     "numerical_producing_git_commit": "120512c27ce8230c90b09e429e96725152edea98",
     "formal_producing_git_commit": "dbbc462dcbd07b99449e74b6fe34633d07ef9ae7",
-    "validation_git_commit": "120512c27ce8230c90b09e429e96725152edea98",
+    "validation_git_commit": "30da27e1d9cef528bf86c6b0d645b9cbf6f9a0eb",
     "self_verdict_comparison": {
       "comparison_status": "COMPLETE_IDENTICAL",
       "missing_required_status_keys": [],
       "status_deltas": []
+    },
+    "reprocessed_at_utc": "2026-11-20T18:36:55.514815+00:00",
+    "tc064r_repair_branch": "task/tc-064r-toggle-boundary-signed-identity-and-proof-scope-repair",
+    "tc064r_reviewed_tc064_tip": "7e61dfff4cd6a2f78471182a990c495970fda2b5",
+    "tc064r_metadata_repair_git_commit": "30da27e1d9cef528bf86c6b0d645b9cbf6f9a0eb",
+    "tc064r_repair_mode": "METADATA_AND_EXPLANATORY_REPAIR_ONLY_NO_NUMERICAL_OR_FORMAL_REBUILD",
+    "numerical_payload_preservation_check": {
+      "total_arb_keys_compared": 686,
+      "changed_arb_keys": [],
+      "added_arb_keys": [],
+      "removed_arb_keys": [],
+      "total_domain_cutoff_and_classification_keys_compared": 255,
+      "changed_domain_cutoff_or_classification_keys": [],
+      "numerical_payloads_identical": true
     }
   },
   "section_1_protocols_endpoint_and_premise_chain": {
@@ -103,8 +117,8 @@
     },
     "tc_scaling_and_window_base_distinction": {
       "common_arithmetic_referent": "Q_{lambda, infty}(X) = sum_{n >= 1} lambda(n)*phi_n(X), whose Mellin transform represents L_lambda(x + i*y) = zeta(2*x + 2*i*y) / zeta(x + i*y).",
-      "square_scaling_vs_transcendental_grade_scaling": "Integer square scaling (u = a*b^2, n |-> b^2*n, X |-> X/b^2, z |-> 2*z) acts on continuum scale variables to collapse Liouville parity lambda(a*b^2) = mu(a) onto odd squarefree cores; transcendental-grade scaling X = tau^K (K in A_R) fixes the logarithmic window [Y, tau*Y] without claiming log_tau(b^2) in A_R (by Lindemann, log_tau(m) notin Q for m >= 2; irrational algebraic membership remains OPEN_TAU_ALGEBRAIC_EXPONENT_ARITHMETIC).",
-      "window_base_b_gt_1_generality": "All squarefree-core bijections, divisor-core support lemmas, square-support Gaussian sums C_b / sqrt(M), 5-piece Hilbert Minkowski bounds, and finite Euler-factor equivalences hold for EVERY real window base b > 1; tau enters solely as the canonical TC window convention [Y, tau*Y] (no tau-specific arithmetic property is used).",
+      "square_scaling_vs_transcendental_grade_scaling": "Distinguish four related but non-interchangeable operations on complex argument z = x + i*y: (1) Fixed square dilation (fixed integer b >= 1): multiplying indices by b^2 gives sum_n a(n)*(b^2*n)^(-(x + i*y)) = b^(-2*(x + i*y)) * sum_n a(n)*n^(-(x + i*y)) where the series converge (a scalar prefactor, NOT argument doubling z |-> 2*z), and on the bare Gaussian satisfies phi_{b^2*n}(X) = b^(-1)*phi_n(X/b^2) for X > 0; (2) Running-index squaring (power lift): sum_{n >= 1} (n^2)^(-(x + i*y)) = zeta(2*x + 2*i*y) initially for x > 1/2; (3) Liouville convolution: 1 * lambda = 1_square and zeta(x + i*y)*L_lambda(x + i*y) = zeta(2*x + 2*i*y), initially as absolutely convergent Dirichlet series for x > 1 and then as a meromorphic identity where continued; (4) Transcendental-grade transport X = tau^K (K in A_R), which parameterizes the canonical logarithmic window [Y, tau*Y]. Summing fixed square dilations over odd b in B_a(T) collapses lambda(a*b^2) = mu(a) onto odd squarefree cores, but neither fixed square dilation nor running-index squaring alone proves pole-free continuation to x > 1/2 or the original tau-grade compatibility principle, and no theorem assumes log_tau(b^2) in A_R (by Lindemann, log_tau(m) notin Q for integer m >= 2; irrational algebraic membership remains OPEN_TAU_ALGEBRAIC_EXPONENT_ARITHMETIC).",
+      "window_base_b_gt_1_generality": "Formalized scope vs analytic extension: in Lean 4, the arithmetic/divisor-core bijections (Theorems 1, 2, 4 finite-set parts) are window-independent and the Gaussian square-support estimate sum_{r,l} ||phi_{2^r*M*l^2}||_{Y,b} <= C_b/sqrt(M) (Theorem 3, paramWindowNormSq) is explicitly formalized for every real window base b > 1 (Y > 0, M >= 1). The complete canonical 5-piece same-core bound, |R_square(Y)| <= C_square*(1 + log Y), closure transfer (Theorem 3), and finite Euler-factor energy equivalence (Theorem 5) are formalized in Lean on the canonical tau window [Y, tau*Y] (windowEnergyNormSq); extending those canonical tau-window bounds to an arbitrary fixed base b > 1 is an analytically justified extension outside Lean (no tau-specific arithmetic property is invoked).",
       "actual_zeta_pole_contradiction_summary": "Holomorphic (pole-free) continuation F_hol of zeta(2*z)/zeta(z) to x > 1/2 excludes right-half-strip zeros rho = x + i*y (1/2 < x < 1) via 0 = zeta(rho)*F_hol(rho) = zeta(2*rho) != 0 (2*x > 1), and left-half-strip zeros (0 < x < 1/2) via completedRiemannZeta reflection to 1 - rho; at trivial zeros -2*(n+1) both numerator and denominator vanish simultaneously, and meromorphic continuation alone proves nothing due to compensating poles."
     },
     "premise_and_dependency_table": [
@@ -1108,7 +1122,7 @@
   },
   "section_3_same_core_bound_and_divisor_support": {
     "section_epistemic_classification": "CONCRETE_FORMAL_AND_CERTIFIED_OBSERVATION",
-    "section_epistemic_scope_note": "Deliverable B divisor-core star involution, support bijection (with zero coprimality assumed between c and f), square-support Gaussian sum C_tau / sqrt(M), 5-piece direct-sum Hilbert Minkowski bound (retaining endpoint n = T, e = 1, d + 1, and all cross-terms), uniform O(1 + log Y) bounds on sum_a (||A_a||^2 + ||Bfeature_a||^2) and |R_square(Y)| for all real Y >= 2, and two-way closure transfer S_different <-> S_core are PROVED_IN_LEAN (Lean Theorems 2 & 3) and certified in 256-bit Arb across Y = 2..1024.",
+    "section_epistemic_scope_note": "Deliverable B divisor-core star involution and support bijection (with zero coprimality assumed between c and f, Lean Theorem 2), the Gaussian square-support sum C_b / sqrt(M) for every real window base b > 1 (paramWindowNormSq in Lean Theorem 3), and the complete canonical tau-window (windowEnergyNormSq) 5-piece direct-sum Hilbert Minkowski bound (retaining endpoint n = T, e = 1, d + 1, and all 25 cross-terms), uniform O(1 + log Y) bounds on sum_a (||A_a||_Y^2 + ||Bfeature_a||_Y^2) and |R_square(Y)| for all real Y >= 2 (unconditional with zero external premises; the optional stronger |R_osc(d)| <= C_osc*d component estimate is kept separate), and two-way closure transfer S_different <-> S_core are PROVED_IN_LEAN and certified in 256-bit Arb across Y = 2..1024.",
     "lean_theorems": [
       "divisor_core_star_involution_and_support_bijection_tc064",
       "uniform_same_core_hilbert_bound_and_closure_transfer_tc064"
@@ -1919,17 +1933,17 @@
   },
   "section_4_distinct_core_attempts_seen_diagnostics_and_euler_robustness": {
     "section_epistemic_classification": "MIXED_CONCRETE_FORMAL_CERTIFIED_AND_REFUTATION",
-    "section_epistemic_scope_note": "Deliverable C Attempt 1 & Attempt 2 intermediate identities (pairwise-coprime core sector bijection, Mobius sector diagonalization, logarithmic GCD prime-sector identity, and prime-toggle sign anti-invariance + finite-support boundary split) and Deliverable D finite Euler-factor equivalence are PROVED_IN_LEAN (Lean Theorems 4 & 5); sub-candidates TC064-CAND-C1A-CORE-SECTOR-NONPOS and TC064-CAND-C2A-TOGGLE-PAIR-NONPOS are REFUTED_CANDIDATE by certified 256-bit Arb witnesses; seen scales {512, 576, 960, 1408} are CERTIFIED_FINITE_OBSERVATION strictly labeled SEEN diagnostics; uniform closure of S_core(Y) remains OPEN.",
+    "section_epistemic_scope_note": "Deliverable C Attempt 1 & Attempt 2 intermediate identities (pairwise-coprime core sector bijection, Mobius sector diagonalization, signed logarithmic GCD prime-sector identity, and prime-toggle sign anti-invariance + finite-support boundary split) and Deliverable D finite Euler-factor equivalence (for each fixed finite odd-prime set S, without uniformity as |S| grows or local S_core transfer) are PROVED_IN_LEAN (Lean Theorems 4 & 5; Theorem 4's three integral identities carry explicit Y >= 2 hypotheses while its finite-set/pointwise identities hold under their separately proved domains); sub-candidates TC064-CAND-C1A-CORE-SECTOR-NONPOS and TC064-CAND-C2A-TOGGLE-PAIR-NONPOS are REFUTED_CANDIDATE by certified 256-bit Arb witnesses; the full-profile p^(-3) comparison ||A_{p*a}||_Y << p^(-3)*||A_a||_Y is withdrawn as UNPROVED; seen scales {512, 576, 960, 1408} are CERTIFIED_FINITE_OBSERVATION strictly labeled SEEN diagnostics; uniform closure of S_core(Y) (equivalently D_core(Y) := S_core^scal(Y) - 4*||V_Y^int||_Y^2) remains OPEN.",
     "lean_theorems": [
       "squarefree_core_gcd_prime_sector_and_prime_toggle_identities_tc064",
       "finite_euler_factor_dirichlet_multiplier_and_dilation_equivalence_tc064"
     ],
     "attempt_1_common_factor_coprime_and_scale_blocks": {
       "exact_intermediate_lemmas": [
-        "S_core(Y) = sum_{g in G_core(T)} Pi_Y^core(g) with (g, r, t) pairwise coprime odd squarefree and mu(g*r)*mu(g*t) = mu(r)*mu(t)",
-        "Pi_Y^core(g) + Mcal_Y(g, g) = sum_{h in C(floor(T/g)), gcd(h,g)=1} mu(h)*(||S_Y^core(g*h)||_Y^2 - 4*||F_Y^core(g*h)||_Y^2)",
-        "sum_{g in G_core(T)} (log g)*Pi_Y^core(g) + sum_{a in C(T)} (log a)*Mcal_Y(a, a) = sum_{3 <= p <= T, p prime} (log p)*(||S_Y^core(p)||_Y^2 - 4*||F_Y^core(p)||_Y^2)",
-        "|Pi_Y^core(g)| <= (T/(2*g))*sum_{a in C(T), g | a} (||A_a||_Y^2 + 4*||Bfeature_a||_Y^2) and sum_{g > G} |Pi_Y^core(g)| <= (T/(2*G))*max_{a<=T} d_0(a)*(C_A + 4*C_B)*(1 + log Y) <<_eps T^(1+eps)*(1 + log Y)/G"
+        "S_core(Y) = sum_{g in G_core(T)} Pi_Y^core(g) for real Y >= 2 (finite-set pairwise-coprime factorization (g, r, t) and mu(g*r)*mu(g*t) = mu(r)*mu(t) hold independently of Y)",
+        "For real Y >= 2: Pi_Y^core(g) + Mcal_Y(g, g) = sum_{h in C(floor(T/g)), gcd(h,g)=1} mu(h)*(||S_Y^core(g*h)||_Y^2 - 4*||F_Y^core(g*h)||_Y^2)",
+        "Signed logarithmic-GCD identity (real Y >= 2): sum_{g in G_core(T)} (log g)*Pi_Y^core(g) + sum_{a in C(T)} (log a)*Mcal_Y(a, a) = sum_{3 <= p <= T, p prime} (log p)*(||S_Y^core(p)||_Y^2 - 4*||F_Y^core(p)||_Y^2), where weights log p > 0 are positive while the squared-norm differences are signed (certified strictly negative outward Arb enclosures at Y in {16, 32, 64}; no positive-semidefinite conclusion follows)",
+        "Aggregate large-common-factor tail bound (real Y >= 2, G >= 1, d_0(a) := sum_{d | a} 1): |Pi_Y^core(g)| <= (T/(2*g))*sum_{a in C(T), g | a} (||A_a||_Y^2 + 4*||Bfeature_a||_Y^2) and sum_{g in G_core(T), g > G} |Pi_Y^core(g)| <= (T/(2*G))*max_{1 <= a <= T} d_0(a)*(C_A + 4*C_B)*(1 + log Y) <<_eps T^(1+eps)*(1 + log Y)/G (no pointwise 1/g^2 or d_0(g)^2/g^2 bound is claimed)"
       ],
       "candidate_C1A_core_sector_nonpositivity": {
         "candidate_id": "TC064-CAND-C1A-CORE-SECTOR-NONPOS",
@@ -1956,7 +1970,7 @@
           "arb_ball_str": "[0.003930130205054003930462771468162152924487 +/- 2.23e-43]"
         }
       },
-      "first_uncontrolled_term_and_exact_loss": "Coprime sector Pi_Y^core(1) (and between-shell cross-correlations S_core_between_shells): log(1) = 0 gives zero weight to g = 1 in the logarithmic GCD identity, Mobius inversion f(d) = mu(d) introduces alternating positive signs at even-omega(d) composites d = p_1*p_2, and resonant squarefree core cardinality |C_res(Y)| ~ (16/tau^2)*Y = Theta(Y) causes a Theta(Y) Cauchy-Schwarz loss on [Y, 2*Y] (globally O(Y^(5/4)*log Y)).",
+      "first_uncontrolled_term_and_exact_loss": "Coprime sector Pi_Y^core(1) (and between-shell cross-correlations S_core_between_shells): log(1) = 0 gives zero weight to g = 1 in the signed logarithmic GCD identity (whose RHS differences ||S_Y^core(p)||_Y^2 - 4*||F_Y^core(p)||_Y^2 are themselves signed and certified strictly negative at Y in {16, 32, 64}), Mobius inversion f(d) = mu(d) introduces alternating positive signs at even-omega(d) composites d = p_1*p_2, and resonant squarefree core cardinality |C_res(Y)| ~ (16/tau^2)*Y = Theta(Y) causes a Theta(Y) Cauchy-Schwarz loss on [Y, 2*Y] (globally O(Y^(5/4)*log Y)).",
       "small_scale_sector_and_log_gcd_checks": [
         {
           "Y": 16,
@@ -2525,8 +2539,8 @@
     },
     "attempt_2_squarefree_prime_toggle_involution": {
       "exact_intermediate_lemmas": [
-        "mu(a star p) = -mu(a), a star p != a, and (a star p) star p = a for every odd prime p and odd squarefree a >= 1",
-        "C(T) = C_p^pair(T) sqcup C_p^bdry(T) with C_p^bdry(T) = {a in C(T) : p nmid a and T < 2*p*a}",
+        "mu(a star p) = -mu(a), a star p != a, and (a star p) star p = a for every odd prime p >= 3 and odd squarefree a >= 1",
+        "C(T) = C_p^pair(T) sqcup C_p^bdry(T) with C_p^bdry(T) = {a in C(T) : p nmid a and T < 2*p*a}; under the exact strict inequality 2*p*Y > T(Y) (T(Y) = ceil(Y^(5/4)); asymptotic threshold p ~ Y^(1/4)/2), C_p^bdry(T(Y)) cap C_res(Y) = {a in C_res(Y) : p nmid a}, while p-divisible cores in C_res(Y) remain paired with a/p in C(T(Y)) (counterexample to full-shell absorption: Y = 256, T(256) = 1024, p = 7, a = 301 = 7*43, a star 7 = 43 in C(1024))",
         "U_Y^{int} = (1/2)*sum_{a in C_p^pair(T)} mu(a)*(A_a - A_{a star p}) + sum_{a in C_p^bdry(T)} mu(a)*A_a (and matching feature identity + weighted prime combinations sum_{p in S} w_p = 1)"
       ],
       "candidate_C2A_toggle_pair_nonpositivity": {
@@ -2547,7 +2561,8 @@
           "arb_ball_str": "[0.0002596401625790110754220931064341754328478 +/- 4.87e-44]"
         }
       },
-      "first_uncontrolled_term_and_exact_loss": "At fixed window [Y, tau*Y], for resonant a in [Y, 2*Y] and p nmid a, A_{p*a} peaks near p*a >= 3*Y with ||A_{p*a}||_Y << p^(-3)*||A_a||_Y, so (1/2)*(A_a - sum_{p <= P} w_p*A_{a star p}) merely redistributes mass without norm contraction; across shifted scales Y/p, p <= D_eff + 1 carries nonzero small-divisor jump discrepancies, C_p^bdry(T) swallows C_res(Y) once p > T/(2*Y) ~ (1/2)*Y^(1/4), and full squarefree Mobius recovery U_Y^{int} = A_1 - sum_{d in C(T), d > 1} mu(d)*S_Y^core(d) loses (sum_{d <= Y} |mu(d)|*d^(-1/2))^2 = Theta(Y)."
+      "first_uncontrolled_term_and_exact_loss": "Status separation: (i) the prime-toggle identity (Lean Theorem 4(3)) is PROVED_IN_LEAN; (ii) pairwise toggle nonpositivity TC064-CAND-C2A-TOGGLE-PAIR-NONPOS is refuted by certified witnesses (-2*Mcal_16(5, 15) > 0, -2*Mcal_32(5, 15) > 0) and small primes p <= D_eff(Y) + 1 carry certified nonzero p_4 jump discrepancies (p = 3 at Y = 16, n = 1); (iii) the previously claimed full-profile scale comparison ||A_{p*a}||_Y << p^(-3)*||A_a||_Y and resulting contraction obstruction are withdrawn as UNPROVED (for bare Gaussians phi_n(X) = X^(5/2)*n^(-3)*exp(-X^2/n^2), the exact ratio is phi_{p*n}(X)/phi_n(X) = p^(-3)*exp((1 - p^(-2))*X^2/n^2) > p^(-3) on [Y, tau*Y], and p*a >= 3*Y does NOT place p*a outside [Y, tau*Y] for p = 3); (iv) failure of one norm estimate does not rule out collective cancellation. Under the exact strict inequality 2*p*Y > T(Y) (T(Y) = ceil(Y^(5/4)); p ~ Y^(1/4)/2 asymptotic only), C_p^bdry(T(Y)) cap C_res(Y) = {a in C_res(Y) : p nmid a} (p-divisible resonant cores remain paired with a/p in C(T(Y)), e.g. Y = 256, T = 1024, p = 7, a = 301 = 7*43); and termwise Cauchy-Schwarz on full squarefree Mobius recovery U_Y^{int} = A_1 - sum_{d in C(T), d > 1} mu(d)*S_Y^core(d) loses (sum_{d <= Y} |mu(d)|*d^(-1/2))^2 = Theta(Y).",
+      "full_profile_p_neg3_comparison_status": "UNPROVED"
     },
     "seen_scale_mechanism_diagnostics": [
       {
@@ -7454,5 +7469,6 @@
       "section_5_unseen_validation_and_interval_splits.continuous_interval_case_splits.interval_1296_pm_2_neg12_across_T7776.union_M_KL1_CORE"
     ]
   },
-  "all_mathematical_and_numerical_checks_pass": true
+  "all_mathematical_and_numerical_checks_pass": true,
+  "repair_task_id": "TASK-TC-064R"
 }
