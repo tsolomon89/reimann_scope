@@ -307,7 +307,7 @@ def test_tc064_section5_unseen_validation_and_adversarial_mutations(
         for c in s5_m4b["certification_integrity_conflicts"]
     )
 
-    # --- Mutation 5: Deleted status key in artifact provenance comparison ---
+    # --- Mutation 5: Deleted or None/wrong-typed status key in artifact provenance comparison ---
     mut_del_status = copy.deepcopy(tc064_artifact)
     del mut_del_status["primary_log_saving_probe_outcome"]
     cmp_m5 = compare_tc064_artifacts_by_stable_key(mut_del_status, tc064_artifact)
@@ -319,6 +319,38 @@ def test_tc064_section5_unseen_validation_and_adversarial_mutations(
     rep_m5 = reprocess_task_tc064_metadata_and_lean_audit(bad_art_p, write_output=False)
     assert rep_m5["all_mathematical_and_numerical_checks_pass"] is False
     assert rep_m5["holdout_hypothesis_outcome"] == CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
+
+    # None / wrong-typed status key (without del) must ALSO fail closed:
+    mut_null_status = copy.deepcopy(tc064_artifact)
+    mut_null_status["primary_log_saving_probe_outcome"] = None
+    mut_null_status["section_5_unseen_validation_and_interval_splits"]["coverage_complete"] = "yes"
+    cmp_m5b = compare_tc064_artifacts_by_stable_key(mut_null_status, tc064_artifact)
+    assert cmp_m5b["comparison_status"] == "INCOMPLETE_MISSING_REQUIRED_STATUS_KEYS"
+    assert "top.primary_log_saving_probe_outcome" in cmp_m5b["missing_required_status_keys"]
+    assert "sec5.coverage_complete" in cmp_m5b["missing_required_status_keys"]
+
+    null_art_p = tmp_path / "null_status.json"
+    null_art_p.write_text(json.dumps(mut_null_status), encoding="utf-8")
+    rep_m5b = reprocess_task_tc064_metadata_and_lean_audit(null_art_p, write_output=False)
+    assert rep_m5b["all_mathematical_and_numerical_checks_pass"] is False
+    assert rep_m5b["holdout_hypothesis_outcome"] == CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
+
+    # --- Mutation 6: Fabricated branch M_RSQ_LOC (-999) on continuous interval ---
+    mut_br_rsq = copy.deepcopy(sec5)
+    fake_rsq_loc = serialize_arb_certified(arb(-999))
+    sp_i1 = mut_br_rsq["continuous_interval_case_splits"][
+        "interval_54_55_to_54_80_across_e4_and_B3_mult5"
+    ]
+    for br_i in sp_i1["branches"]:
+        br_i["M_RSQ_LOC"] = fake_rsq_loc
+    sp_i1["union_M_RSQ_LOC"] = fake_rsq_loc
+    s5_m6, top_m6 = aggregate_tc064_section5_and_derive_outcomes(mut_br_rsq, tc064_protocol)
+    assert s5_m6["certification_integrity_ok"] is False
+    assert top_m6["holdout_hypothesis_outcome"] == CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
+    assert any(
+        c["conflict_type"] == "BRANCH_MARGIN_OPERAND_MISMATCH" and c.get("margin_key") == "M_RSQ_LOC"
+        for c in s5_m6["certification_integrity_conflicts"]
+    )
 
 
 def test_tc064_lean_formalization_review_consistency_and_registers(
@@ -343,13 +375,36 @@ def test_tc064_lean_formalization_review_consistency_and_registers(
     # Live review document consistency + adversarial report mutations:
     rev_chk = verify_tc064_review_document_consistency(tc064_artifact, TC_064_REVIEW_DOC_PATH)
     assert rev_chk["verified"] is True, rev_chk
+    assert rev_chk["tagged_and_checked_count"] == rev_chk["raw_tag_comment_count"] >= 130
 
     orig_md = TC_064_REVIEW_DOC_PATH.read_text(encoding="utf-8")
 
-    # Report Mutation A: untagged interval
+    # Report Mutation A1: untagged `[mid +/- rad]` interval
     bad_untagged = tmp_path / "untagged.md"
     bad_untagged.write_text(orig_md + "\nUntagged `[0.1234 +/- 1.0e-5]`.\n", encoding="utf-8")
     assert verify_tc064_review_document_consistency(tc064_artifact, bad_untagged)["verified"] is False
+
+    # Report Mutation A2: untagged zero-centered `[+/- rad]` interval
+    bad_untagged_zc = tmp_path / "untagged_zc.md"
+    bad_untagged_zc.write_text(orig_md + "\nUntagged zero-centered `[+/- 1.23e-5]`.\n", encoding="utf-8")
+    res_uzc = verify_tc064_review_document_consistency(tc064_artifact, bad_untagged_zc)
+    assert res_uzc["verified"] is False
+    assert "[+/- 1.23e-5]" in res_uzc["untagged_intervals"]
+
+    # Report Mutation A3: shrunk zero-centered `[+/- rad]` tagged enclosure
+    bad_shrunk_zc = tmp_path / "shrunk_zc.md"
+    m_zc = next(
+        m_hit
+        for m_hit in (
+            "[+/- 0.0439]",
+            "[+/- 0.0508]",
+        )
+        if m_hit in orig_md
+    )
+    bad_shrunk_zc.write_text(orig_md.replace(m_zc, "[+/- 1.0e-99]", 1), encoding="utf-8")
+    res_szc = verify_tc064_review_document_consistency(tc064_artifact, bad_shrunk_zc)
+    assert res_szc["verified"] is False
+    assert len(res_szc["failed_tags"]) >= 1
 
     # Report Mutation B: stale ball count & forbidden von Mangoldt conflation
     bad_stale = tmp_path / "stale.md"

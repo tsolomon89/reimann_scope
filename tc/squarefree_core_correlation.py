@@ -18,9 +18,11 @@ Sections:
    - Preserves the conditional actual-`riemannZeta` pole contradiction (`0 = zeta(rho)*F_hol(rho)
      = zeta(2*rho) != 0` on `1/2 < x < 1`, reflected partner `1 - rho` via `completedRiemannZeta`
      for `0 < x < 1/2`, trivial-zero double vanishing at `-2*(n+1)`, compensating-pole remark),
-     separates the `6` outside-Lean analytic bridges (`TC063-PREM-04..09`) from the open arithmetic
-     premise, distinguishes square scaling (`n |-> b^2*n`, `z |-> 2*z`) from transcendental-grade
-     `tau^K` scaling, and certifies generic window-base `b > 1` square-support bounds.
+     separates the `5` remaining outside-Lean analytic bridges (`TC063-PREM-04..07` and
+     `TC063-PREM-09`, after `TC063-PREM-08` is formalized in Lean Theorem 5) from the open
+     arithmetic premise, distinguishes square scaling (`n |-> b^2*n`, `z |-> 2*z`) from
+     transcendental-grade `tau^K` scaling, and certifies generic window-base `b > 1` square-support
+     bounds.
    - Maintains the complete declaration-level premise table (`PROVED_IN_LEAN`,
      `PROVED_ANALYTICALLY_OUTSIDE_LEAN`, `CERTIFIED_FINITE_OBSERVATION`, `REFUTED_CANDIDATE`, `OPEN`).
 
@@ -253,6 +255,7 @@ REQUIRED_TC064_INTERVAL_UNION_BRANCH_PAIRS: Tuple[Tuple[str, str], ...] = (
     ("union_S_different_Y", "S_different_Y"),
     ("union_R_square_Y", "R_square_Y"),
     ("union_S_core_Y", "S_core_Y"),
+    ("union_local_rsquare_hilbert_bound", "local_rsquare_hilbert_bound"),
     ("union_M_P0_CORE", "M_P0_CORE"),
     ("union_M_P_NEG_CORE", "M_P_NEG_CORE"),
     ("union_M_RSQ_LOC", "M_RSQ_LOC"),
@@ -3075,6 +3078,7 @@ def evaluate_tc064_continuous_interval_split_arb(
                 "S_different_Y": obs_br["S_different_Y"],
                 "R_square_Y": obs_br["R_square_Y"],
                 "S_core_Y": obs_br["S_core_Y"],
+                "local_rsquare_hilbert_bound": obs_br["local_rsquare_hilbert_bound"],
                 "M_P0_CORE": m_p0_core,
                 "M_P_NEG_CORE": m_neg_core,
                 "M_RSQ_LOC": m_rsq_loc,
@@ -3116,6 +3120,9 @@ def evaluate_tc064_continuous_interval_split_arb(
                 "S_different_Y": serialize_arb_certified(br_obs["S_different_Y"]),
                 "R_square_Y": serialize_arb_certified(br_obs["R_square_Y"]),
                 "S_core_Y": serialize_arb_certified(br_obs["S_core_Y"]),
+                "local_rsquare_hilbert_bound": serialize_arb_certified(
+                    br_obs["local_rsquare_hilbert_bound"]
+                ),
                 "M_P0_CORE": serialize_arb_certified(m_p0_core),
                 "M_P_NEG_CORE": serialize_arb_certified(m_neg_core),
                 "M_RSQ_LOC": serialize_arb_certified(m_rsq_loc),
@@ -3587,11 +3594,12 @@ def aggregate_tc064_section5_and_derive_outcomes(
                     )
 
             # Operand-to-margin & core-split checks on branch:
-            rsq_b, score_b, sdiff_b, lg_b = (
+            rsq_b, score_b, sdiff_b, lg_b, loc_b = (
                 bp["R_square_Y"],
                 bp["S_core_Y"],
                 bp["S_different_Y"],
                 bp["log_Y_times_D_tilde"],
+                bp["local_rsquare_hilbert_bound"],
             )
             if not _interval_overlap_frac(
                 sdiff_b, rsq_b["c_lo"] + score_b["c_lo"], rsq_b["c_hi"] + score_b["c_hi"]
@@ -3599,9 +3607,19 @@ def aggregate_tc064_section5_and_derive_outcomes(
                 conflicts.append(
                     {"conflict_type": "BRANCH_CORE_SPLIT_MISMATCH", "interval_id": iid}
                 )
+            abs_rsq_lo_b = (
+                Fraction(0, 1)
+                if rsq_b["c_lo"] <= 0 <= rsq_b["c_hi"]
+                else min(abs(rsq_b["c_lo"]), abs(rsq_b["c_hi"]))
+            )
+            abs_rsq_hi_b = max(abs(rsq_b["c_lo"]), abs(rsq_b["c_hi"]))
             br_exp_margins = {
                 "M_P0_CORE": (score_b["c_lo"] - lg_b["c_hi"], score_b["c_hi"] - lg_b["c_lo"]),
                 "M_P_NEG_CORE": (score_b["c_lo"], score_b["c_hi"]),
+                "M_RSQ_LOC": (
+                    abs_rsq_lo_b - loc_b["c_hi"],
+                    abs_rsq_hi_b - loc_b["c_lo"],
+                ),
                 "M_KL1_RSQUARE": (
                     rsq_b["c_lo"] - Fraction(1, 4) * lg_b["c_hi"],
                     rsq_b["c_hi"] - Fraction(1, 4) * lg_b["c_lo"],
@@ -3895,8 +3913,38 @@ def compare_tc064_artifacts_by_stable_key(
     previous_art: Dict[str, Any],
 ) -> Dict[str, Any]:
     """Compare two `TC-064` artifact dictionaries across all required status keys, explicitly
-    recording removed keys as `"MISSING"` (`TC-062R3` deleted-status guard).
+    recording removed, `None`, empty-string, or wrong-typed keys as `"MISSING"` (`TC-062R3` /
+    `TC-064` deleted-and-null status guard).
     """
+    bool_keys = {
+        "top.all_mathematical_and_numerical_checks_pass",
+        "top.rh_proved",
+        "top.global_energy_improvement_claimed",
+        "sec5.coverage_complete",
+        "sec5.certification_integrity_ok",
+        "sec5.all_required_applicable_evaluations_resolved",
+        "sec5.all_section_5_checks_pass",
+    }
+    int_keys = {
+        "sec5.registered_unseen_point_count",
+        "sec5.evaluated_unseen_point_count",
+    }
+
+    def _is_valid_status(key_path: str, val: Any) -> bool:
+        if val == "MISSING" or val is None:
+            return False
+        if key_path in bool_keys:
+            return type(val) is bool
+        if key_path in int_keys:
+            return type(val) is int and val >= 0
+        if not isinstance(val, str) or not val.strip():
+            return False
+        if key_path == "top.resource_compliance_status":
+            return val in RESOURCE_COMPLIANCE_STATUSES
+        if key_path == "top.parent_subgate_status":
+            return val == "OPEN"
+        return True
+
     def _extract_status(art: Dict[str, Any], key_path: str) -> Any:
         scope, field = key_path.split(".", 1)
         target = art if scope == "top" else art.get("section_5_unseen_validation_and_interval_splits", {})
@@ -3909,7 +3957,7 @@ def compare_tc064_artifacts_by_stable_key(
     for kp in REQUIRED_CURRENT_TC064_STATUS_KEYS:
         cur_v = _extract_status(current_art, kp)
         prev_v = _extract_status(previous_art, kp)
-        if cur_v == "MISSING":
+        if not _is_valid_status(kp, cur_v) or not _is_valid_status(kp, prev_v):
             missing_keys.append(kp)
         if cur_v != prev_v:
             diffs.append({"key": kp, "previous": prev_v, "current": cur_v})
@@ -3931,14 +3979,15 @@ def verify_tc064_review_document_consistency(
 ) -> Dict[str, Any]:
     """Verify that `docs/reviews/TC_064_SQUAREFREE_CORE_CORRELATION_AND_ARITHMETIC_REGULARITY.md`
     has:
-      1. Every displayed interval bound via `<!-- tc-enclosure: ... -->` enclosing the generated
-         256-bit Arb ball in `artifact`, with zero untagged intervals and zero `>42`-digit fake
+      1. Every displayed interval bound via `<!-- tc-enclosure: ... -->` (including zero-centered
+         `[+/- rad]` enclosures) enclosing the generated 256-bit Arb ball in `artifact`, matching
+         total `tc-enclosure` comment count, with zero untagged intervals and zero `>42`-digit fake
          precision padding;
       2. Zero forbidden circle-half macros or glyphs (`tau` exclusively) and zero non-grade
          `K`-underscore tokens;
-      3. Accurate theorem counts, ball counts, premise IDs, guardrails (`1 * \\lambda`,
-         `\\zeta''(1+\\delta)` via `(\\log n)^2`, Gram-diagonal guard), and `SUBGATE-TC-043A = OPEN` /
-         `rh_proved = false`.
+      3. Accurate theorem counts, ball counts, discrete cutoff tuples, premise IDs, guardrails
+         (`1 * \\lambda`, `\\zeta''(1+\\delta)` via `(\\log n)^2`, Gram-diagonal guard, exact
+         surviving scalar-damped inequality), and `SUBGATE-TC-043A = OPEN` / `rh_proved = false`.
     """
     txt = Path(review_path).read_text(encoding="utf-8")
     p_tok = "p" + "i"
@@ -3949,21 +3998,27 @@ def verify_tc064_review_document_consistency(
     ]
     banned_k = re.findall(r"\bK_[A-Za-z0-9_]+", txt)
 
-    # Check tagged Arb enclosures:
+    # Check ALL tagged Arb enclosures (including zero-centered `[+/- rad]` balls):
+    raw_tag_comment_count = len(re.findall(r"<!--\s*tc-enclosure:", txt))
+    matched_tag_count = 0
     tagged_checked = 0
     failed_tags: List[str] = []
     fake_padding_hits: List[str] = []
     tag_spans: List[Tuple[int, int]] = []
 
     for m in re.finditer(
-        r"`(\[[^`\]]+\+/-[^`\]]+\])`\s*<!--\s*tc-enclosure:\s*observable=\"([^\"]+)\"\s*params=\"([^\"]*)\"\s*json_path=\"([^\"]+)\"\s*-->",
+        r"`(\[[^`\]]*\+/-[^`\]]+\])`\s*<!--\s*tc-enclosure:\s*observable=\"([^\"]+)\"\s*params=\"([^\"]*)\"\s*json_path=\"([^\"]+)\"\s*-->",
         txt,
     ):
+        matched_tag_count += 1
         disp_str, obs_name, params_s, jpath = m.group(1), m.group(2), m.group(3), m.group(4)
         tag_spans.append((m.start(1), m.end(1)))
-        mid_part = disp_str.strip("[]").split("+/-")[0].strip().lstrip("+-")
+        parts_pm = disp_str.strip("[]").split("+/-")
+        mid_part = parts_pm[0].strip().lstrip("+-")
+        rad_part = parts_pm[1].strip().lstrip("+-") if len(parts_pm) > 1 else ""
         sig_digits = len(mid_part.replace(".", "").split("e")[0].lstrip("0"))
-        if sig_digits > 45:
+        rad_digits = len(rad_part.replace(".", "").split("e")[0].lstrip("0"))
+        if sig_digits > 45 or rad_digits > 16:
             fake_padding_hits.append(jpath)
         try:
             target, _parent = _resolve_report_path_with_param_check(
@@ -3977,12 +4032,19 @@ def verify_tc064_review_document_consistency(
         except Exception as exc:  # noqa: BLE001
             failed_tags.append(f"{obs_name}@{jpath}:{exc}")
 
-    # Untagged `[mid +/- rad]` check:
+    if matched_tag_count != raw_tag_comment_count:
+        failed_tags.append(
+            f"unmatched_tc_enclosure_comments:matched_{matched_tag_count}_of_{raw_tag_comment_count}"
+        )
+
+    # Untagged `[mid +/- rad]`, `[+/- rad]`, and LaTeX `[mid \pm rad]` check:
     untagged: List[str] = []
-    for m_raw in re.finditer(r"`(\[[+-]?\d[^`\]]*\+/-[^`\]]+\])`", txt):
+    for m_raw in re.finditer(r"`(\[[^`\]]*\+/-[^`\]]+\])`", txt):
         sp = (m_raw.start(1), m_raw.end(1))
         if sp not in tag_spans:
             untagged.append(m_raw.group(1))
+    for m_ltx in re.finditer(r"(\[[+-]?(?:\d|\s)*\\pm[^\]\n]+\])", txt):
+        untagged.append(m_ltx.group(1))
 
     expected_balls = int(artifact["serialized_arb_self_check"]["total_certified_arb_balls_checked"])
     expected_thms = int(
@@ -4005,8 +4067,19 @@ def verify_tc064_review_document_consistency(
     if expected_thms != len(EXPECTED_TC064_THEOREMS):
         stale_errors.append("Unexpected public theorem count")
 
+    # Guard against discrete-tuple and surviving-lemma formula regressions:
+    for bad_snip in (
+        "(7776, 7, 1578, 7)",
+        "(7777, 7, 1578, 7)",
+        "|C(513)| = 104",
+        "\\Pi_Y^{\\mathrm{core}}(1) - 4\\|V_Y^{\\mathrm{int}}\\|_Y^2 =",
+    ):
+        if bad_snip in txt:
+            stale_errors.append(f"Stale or mathematically invalid snippet {bad_snip!r}")
+
     ok = bool(
         tagged_checked > 0
+        and tagged_checked == raw_tag_comment_count
         and not failed_tags
         and not fake_padding_hits
         and not untagged
@@ -4016,6 +4089,7 @@ def verify_tc064_review_document_consistency(
     )
     return {
         "review_path": str(review_path),
+        "raw_tag_comment_count": raw_tag_comment_count,
         "tagged_and_checked_count": tagged_checked,
         "failed_tags": failed_tags,
         "fake_padding_hits": fake_padding_hits,
@@ -4124,7 +4198,7 @@ EXPECTED_TC064_SECTION_BALL_COUNTS: Dict[str, int] = {
     "section_2_squarefree_core_decomposition_and_cross_checks": 51,
     "section_3_same_core_bound_and_divisor_support": 100,
     "section_4_distinct_core_attempts_seen_diagnostics_and_euler_robustness": 178,
-    "section_5_unseen_validation_and_interval_splits": 309,
+    "section_5_unseen_validation_and_interval_splits": 321,
 }
 
 
@@ -4134,7 +4208,7 @@ def _audit_all_serialized_arb_balls_in_tc064_artifact(
 ) -> Dict[str, Any]:
     """Walk the entire serialized `TC-064` artifact and validate EVERY Arb ball via the
     3-representation exact `Fraction` validator `_parse_serialized_arb_enclosure_tc062`, plus
-    enforce exact per-section ball counts (`36 + 51 + 100 + 178 + 309 = 674`) so silent
+    enforce exact per-section ball counts (`36 + 51 + 100 + 178 + 321 = 686`) so silent
     `{}`/`None`/scalar ball replacement fails closed.
     """
     req_keys = {"mid_float", "rad_float_outward", "lower_dec", "upper_dec", "arb_ball_str"}
@@ -4284,6 +4358,7 @@ def reprocess_task_tc064_metadata_and_lean_audit(
     if cmp_rep["missing_required_status_keys"]:
         updated["execution_and_certification_status"] = "CERTIFICATION_INTEGRITY_CONFLICT_BLOCKED"
         updated["holdout_hypothesis_outcome"] = CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
+        updated["primary_log_saving_probe_outcome"] = CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME
 
     updated["all_mathematical_and_numerical_checks_pass"] = bool(
         s1_ok
