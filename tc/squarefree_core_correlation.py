@@ -3185,6 +3185,21 @@ def _interval_overlap_frac(a: Dict[str, Any], b_lo: Fraction, b_hi: Fraction) ->
     return bool(a["c_lo"] <= b_hi and b_lo <= a["c_hi"])
 
 
+def _clone_tree_preserving_arb(node: Any) -> Any:
+    """Deep-copy nested JSON-like containers while preserving live `flint.arb` objects (`+node`),
+    since Cython `flint.arb` intentionally omits pickle/`__reduce__` for `copy.deepcopy`.
+    """
+    if isinstance(node, arb):
+        return +node
+    if isinstance(node, dict):
+        return {k: _clone_tree_preserving_arb(v) for k, v in node.items()}
+    if isinstance(node, list):
+        return [_clone_tree_preserving_arb(v) for v in node]
+    if isinstance(node, tuple):
+        return tuple(_clone_tree_preserving_arb(v) for v in node)
+    return copy.deepcopy(node)
+
+
 def aggregate_tc064_section5_and_derive_outcomes(
     sec5: Dict[str, Any],
     protocol_obj: Dict[str, Any],
@@ -3203,7 +3218,7 @@ def aggregate_tc064_section5_and_derive_outcomes(
         union-ball containment across all branches;
       - 3-valued `PROCESS_LIFETIME_HIGH_WATER_MARK` resource compliance.
     """
-    s5 = copy.deepcopy(sec5) if isinstance(sec5, dict) else {}
+    s5 = _clone_tree_preserving_arb(sec5) if isinstance(sec5, dict) else {}
     conflicts: List[Dict[str, Any]] = []
 
     sched = protocol_obj.get("unseen_validation_schedule", {})
@@ -4149,7 +4164,7 @@ def reprocess_task_tc064_metadata_and_lean_audit(
         or prov.get("formal_producing_git_commit")
     )
 
-    updated = copy.deepcopy(existing)
+    updated = _clone_tree_preserving_arb(existing)
     updated.update(top_fields)
     new_prov = dict(prov)
     new_prov["validation_git_commit"] = val_commit
