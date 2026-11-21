@@ -33,13 +33,13 @@ Sections:
      and large-prime station disjointness above `floor(sqrt(T))`.
    - Independently cross-checks the unified 1D compensation evaluator against `TC-064` and `TC-061`
      evaluators at `Y in {16, 32, 64}` (`INDEPENDENT_DIRECT_NUMERICAL_VALIDATION`).
-3. Section 3 - Seen-Scale Route 5 & Route 6 Mechanism Discovery & Controls (`SEEN_DISCOVERY`):
+3. Section 3 - Seen-Scale Route 5 & Route 6 Mechanism Discovery & Bare Controls (`SEEN_DISCOVERY`):
    - Evaluates Route 5 (`S1` unweighted `w = 1`, `S2` Mertens contractive `r = 1/2`, `S3` single-channel
      `2`-adic contractive `r = 1/2`, `S4` certified real-interval pointwise oracle residual lower bound)
-     and Route 6 (`E1` full-cutoff vs paired-fringe, `E2` station-disjoint large-prime `p > sqrt(T)`,
-     `E3` bare-Liouville vs shifted-dilation `E_lambda - 4*D_tilde`) on already-seen scales
-     `Y in {16, 32, 64, 128, 256, 512}`, plus the unsigned `a(n) = 1` scaling control and
-     explicitly labeled hybrid finite-prime-flip diagnostic `a_{3}(n)`.
+     and Route 6 (`E1` full-cutoff vs paired-fringe, `E2` prime-power cutoff `p^k > floor(sqrt(T))`
+     vs `p^k <= floor(sqrt(T))`, `E3` bare-Liouville vs shifted-dilation `E_lambda - 4*D_tilde`) on
+     already-seen scales `Y in {64, 128, 256, 512}`, plus the unsigned `a(n) = 1` scaling control and
+     explicitly labeled bare finite-Euler-flip diagnostic `a_{3}(n)` (not a complete `beta_Y` system).
 4. Section 4 - Preregistered Unseen Validation (`8` Unseen Points + `3` Continuous Intervals / `10` Cells):
    - Evaluates all `8` unseen points and `3` cutoff-sensitive continuous intervals with exact binary
      evaluation-domain coverage (`TC-062R4` standard), complete Route 5 & Route 6 residual budgets,
@@ -73,7 +73,7 @@ if str(Path(__file__).resolve().parent.parent) not in sys.path:
 from tc.canonical_theta_correlation_bound import (
     EPIC_TC_042_ID,
     REPO_ROOT,
-    serialize_arb_certified,
+    serialize_arb_certified as _raw_serialize_arb_certified,
     verify_all_serialized_arb_in_tree,
 )
 from tc.coupled_scale_energy_bootstrap import (
@@ -267,6 +267,19 @@ def active_paired_prime_powers(T: int) -> List[Tuple[int, int]]:
     return out
 
 
+def serialize_arb_certified(val: arb, prec_bits: int = 256) -> Dict[str, Any]:
+    """Precision-guarded wrapper around `tc.canonical_theta_correlation_bound.serialize_arb_certified`
+    enforcing `flint_ctx.prec >= prec_bits` (default 256) so outward 40-digit decimal endpoints
+    `lower_dec`/`upper_dec` never inherit ambient 53-bit float64 widening.
+    """
+    saved_p = flint_ctx.prec
+    try:
+        flint_ctx.prec = max(int(saved_p), int(prec_bits))
+        return _raw_serialize_arb_certified(val)
+    finally:
+        flint_ctx.prec = saved_p
+
+
 def _fraction_interval_to_arb(lo: Fraction, hi: Fraction, prec_bits: int = 256) -> arb:
     """Convert an exact rational interval `[lo, hi]` into an outward-rounded `arb` ball."""
     if lo > hi:
@@ -394,6 +407,7 @@ def evaluate_scalar_feature_compensation_1d_arb(
     prec_bits: int = 256,
     quad_tol_bits: int = 160,
     n_panels: int = 16,
+    is_interval: bool = False,
 ) -> Dict[str, arb]:
     """Evaluate all complete-observable Route 5 and Route 6 inner products and norms in ONE shared
     256-bit outward-rounded FLINT/Arb `acb.integral` quadrature pass on `[Y, tau*Y]` (valid for
@@ -405,7 +419,8 @@ def evaluate_scalar_feature_compensation_1d_arb(
         `log_Y_times_D_tilde`, `E_minus_4Dtilde_Y`, `J_T_Y`, `Q_T_plus_A_T_norm_sq`.
       - Route 5 (`S1` unweighted `w = 1`, `S2` Mertens contractive `r`, `S3` single-channel `p=2, k=1`):
         complete residual budgets, contraction slacks, sufficient bounds, and algebraic residuals.
-      - Route 6 (`E1` full-cutoff vs paired-fringe, `E2` large-prime `p > sqrt(T)` vs `p^k <= sqrt(T)`,
+      - Route 6 (`E1` full-cutoff vs paired-fringe, `E2` prime-power cutoff `p^k > floor(sqrt(T))` vs
+        `p^k <= floor(sqrt(T))` matching Lean `splitFeatureHighV` / `splitFeatureLowV`,
         `E3` bare-Liouville vs shifted-dilation): `T_main`, `T_cross`, `T_rem`, fringe norms,
         Lean fringe theorem bound, and algebraic residuals.
     """
@@ -561,8 +576,7 @@ def evaluate_scalar_feature_compensation_1d_arb(
         lgYc = acb(Y_arb.log())
         Yc_52 = Yc ** (acb(5) / acb(2))
         Yc_2 = Yc * Yc
-        is_interval_ball = bool(Y_arb.rad() > arb(0))
-        eff_tol = min(quad_tol_bits, 110) if is_interval_ball else quad_tol_bits
+        eff_tol = min(quad_tol_bits, 110) if is_interval else quad_tol_bits
         tol = arb(2) ** (-eff_tol)
 
         accs = [arb(0) for _ in range(n_int)]
@@ -812,7 +826,7 @@ def evaluate_scalar_feature_compensation_1d_arb(
         fringe_thm_bd = compute_fringe_feature_theorem_bound_arb(Y_arb, prec_bits=prec_bits)
         m_fringe_feat = +(v_fr_sq - fringe_thm_bd)
 
-        # Route 6 E2 (p > sqrt(T) vs p^k <= sqrt(T), <V_gt, V_le> = 0 identically)
+        # Route 6 E2 (prime-power cutoff p^k > floor(sqrt(T)) vs p^k <= floor(sqrt(T)), <V_gt, V_le> = 0 identically)
         e2_4pgt = +(arb(4) * p_gt_sq)
         e2_4vgt = +(arb(4) * v_gt_sq)
         e2_main = +(e2_4pgt - e2_4vgt)
@@ -1263,7 +1277,17 @@ def verify_section_1_protocols_and_premise_chain() -> Dict[str, Any]:
                 "large-prime station disjointness) are window-independent; the fringe feature norm bound "
                 "||G_{Phi_2}||_{Y, w_0}^2 <= (8192*w_0^5*log w_0)/(log Y)^2 + (324*w_0^5*log w_0)/Y^(5/4) "
                 "is formally proved in Lean for every real window base w_0 > 1 (paramWindowNormSq Y w_0) "
-                "and specialized to w_0 = tau. No result in TASK-TC-065 relies on any tau-specific transcendence property."
+                "and specialized to w_0 = tau, while the uniform O(1) scalar fringe bound ||Phi_{fringe,Y}^{scal}||_Y^2 <= C_fr "
+                "is formalized specifically on the canonical w_0 = tau window (windowEnergyNormSq Y). "
+                "No result in TASK-TC-065 relies on any tau-specific transcendence property."
+            ),
+            "e2_cutoff_specification_note": (
+                "Route 6 E2 is implemented on the exact prime-power partition p^k > floor(sqrt(T)) vs p^k <= floor(sqrt(T)) "
+                "matching Lean splitFeatureHighV / splitFeatureLowV (exact channel orthogonality <V_gt, V_le>_Y = 0). "
+                "Pairwise station disjointness (Theorem 4 Part 4b) holds for distinct primes p_1 != p_2 > floor(sqrt(T)), "
+                "whereas same-prime higher powers p^k, p^(k+1) > floor(sqrt(T)) share multiples. The frozen protocol file "
+                "is preserved byte-for-byte unchanged; both p^k > floor(sqrt(T)) and strict prime p > floor(sqrt(T)) "
+                "yield strictly positive growing T_main^{(E2)} > 0 for all tested scales Y >= 64."
             ),
             "scaling_distinction_carried_forward": (
                 "Fixed square dilation n |-> b^2*n gives phi_{b^2*n}(X) = b^(-1)*phi_n(X/b^2) on the bare "
@@ -1633,7 +1657,7 @@ def verify_section_2_reproduction_algebra_and_cross_checks(
 
 
 # ---------------------------------------------------------------------------
-# 4. Section 3: Seen-Scale Route 5 & Route 6 Discovery + Unsigned & Hybrid Controls
+# 4. Section 3: Seen-Scale Route 5 & Route 6 Discovery + Unsigned & Bare Controls
 # ---------------------------------------------------------------------------
 
 
@@ -1809,15 +1833,18 @@ def run_section_3_seen_discovery_and_controls_arb(
                 "E1_U_rem_norm_sq": serialize_arb_certified(ev["E1_U_rem_norm_sq"]),
                 "E1_V_rem_norm_sq": serialize_arb_certified(ev["E1_V_rem_norm_sq"]),
                 "E1_fringe_feat_thm_bound": serialize_arb_certified(ev["E1_fringe_feat_thm_bound"]),
+                "E1_budget_residual": serialize_arb_certified(ev["E1_budget_residual"]),
                 "M_FRINGE_FEAT": serialize_arb_certified(ev["M_FRINGE_FEAT"]),
                 "E2_four_P_gt_sq": serialize_arb_certified(ev["E2_four_P_gt_sq"]),
                 "E2_four_V_gt_sq": serialize_arb_certified(ev["E2_four_V_gt_sq"]),
                 "E2_T_main": serialize_arb_certified(ev["E2_T_main"]),
                 "E2_T_cross": serialize_arb_certified(ev["E2_T_cross"]),
                 "E2_T_rem": serialize_arb_certified(ev["E2_T_rem"]),
+                "E2_budget_residual": serialize_arb_certified(ev["E2_budget_residual"]),
                 "E3_T_main": serialize_arb_certified(ev["E3_T_main"]),
                 "E3_T_cross": serialize_arb_certified(ev["E3_T_cross"]),
                 "E3_T_rem": serialize_arb_certified(ev["E3_T_rem"]),
+                "E3_budget_residual": serialize_arb_certified(ev["E3_budget_residual"]),
             }
         )
 
@@ -2180,6 +2207,7 @@ def evaluate_tc065_continuous_interval_split_arb(
                 prec_bits=prec_bits,
                 quad_tol_bits=110,
                 n_panels=n_pan,
+                is_interval=True,
             )
 
             for u_k, b_k in REQUIRED_TC065_INTERVAL_UNION_BRANCH_PAIRS:
@@ -2332,18 +2360,63 @@ def aggregate_tc065_section4_and_derive_outcomes(
         ("TC065-CAND-E2-LARGE-PRIME-MAIN-NONPOS", "E2_T_main"),
     )
 
+    expected_cutoffs_by_pid = {
+        p["point_id"]: p["expected_cutoffs"] for p in sched["points"]
+    }
+    res_limits = protocol_obj["precision_quadrature_and_resource_policy"]["resource_limits"]
+    max_wall_per_pt = float(res_limits["max_wall_seconds_per_point"])
+    max_rss_mb_lim = float(res_limits["max_rss_megabytes"])
+
     verdict_buckets: Dict[str, List[str]] = {k: [] for k, _ in probe_keys_and_margins}
     verdict_buckets["TC065-CAND-S4-POINTWISE-ZERO-RESIDUAL"] = []
+    recomputed_point_res_checks: List[Dict[str, Any]] = []
 
     for pid in expected_point_ids:
         row = row_by_id.get(pid)
         if row is None:
             continue
         pv = row.get("probe_verdicts", {})
-        # Operand consistency on point: M_P0_DAMPED = damped_core_defect_Y - log_Y_times_D_tilde
+
+        # L4: Cross-check point cutoffs against frozen protocol expected_cutoffs
+        exp_c = expected_cutoffs_by_pid.get(pid, {})
+        if (
+            int(row.get("T_Y", -1)) != int(exp_c.get("T_Y", -2))
+            or int(row.get("D0_raw", -1)) != int(exp_c.get("D0_Y", -2))
+            or int(row.get("D0_eff", -1)) != int(exp_c.get("D_eff_Y", -2))
+            or int(row.get("sqrt_T_Y", -1)) != int(exp_c.get("sqrt_T_Y", -2))
+        ):
+            conflicts.append(
+                {
+                    "conflict_type": "POINT_CUTOFF_PROTOCOL_MISMATCH",
+                    "point_id": pid,
+                    "expected": exp_c,
+                    "got": {
+                        "T_Y": row.get("T_Y"),
+                        "D0_raw": row.get("D0_raw"),
+                        "D0_eff": row.get("D0_eff"),
+                        "sqrt_T_Y": row.get("sqrt_T_Y"),
+                    },
+                }
+            )
+
+        # L2-L3: Full point-level algebraic operand consistency & residual closure
         dc_p = _parse_serialized_arb_enclosure_tc062(row.get("damped_core_defect_Y"))
         ld_p = _parse_serialized_arb_enclosure_tc062(row.get("log_Y_times_D_tilde"))
         m0_p = _parse_serialized_arb_enclosure_tc062(row.get("M_P0_DAMPED"))
+        mneg_p = _parse_serialized_arb_enclosure_tc062(row.get("M_P_NEG_DAMPED"))
+        muv_p = _parse_serialized_arb_enclosure_tc062(row.get("M_P_UV_DOM"))
+        me3_p = _parse_serialized_arb_enclosure_tc062(row.get("M_P_E3_MAIN"))
+        mfr_p = _parse_serialized_arb_enclosure_tc062(row.get("M_FRINGE_FEAT"))
+        uv_p = _parse_serialized_arb_enclosure_tc062(row.get("U_sq_minus_4V_sq_Y"))
+        ja_p = _parse_serialized_arb_enclosure_tc062(row.get("J_A_Y"))
+        u2_p = _parse_serialized_arb_enclosure_tc062(row.get("U_norm_sq_Y"))
+        v4_p = _parse_serialized_arb_enclosure_tc062(row.get("four_V_norm_sq_Y"))
+        ey_p = _parse_serialized_arb_enclosure_tc062(row.get("E_Y"))
+        dt_p = _parse_serialized_arb_enclosure_tc062(row.get("D_tilde_Y"))
+        e3_p = _parse_serialized_arb_enclosure_tc062(row.get("E_minus_4Dtilde_Y"))
+        vrem_p = _parse_serialized_arb_enclosure_tc062(row.get("E1_V_rem_norm_sq"))
+        frbd_p = _parse_serialized_arb_enclosure_tc062(row.get("E1_fringe_feat_thm_bound"))
+
         if (
             dc_p is None
             or ld_p is None
@@ -2353,9 +2426,6 @@ def aggregate_tc065_section4_and_derive_outcomes(
             )
         ):
             conflicts.append({"conflict_type": "POINT_MARGIN_OPERAND_MISMATCH", "point_id": pid, "margin": "M_P0_DAMPED"})
-        # Operand consistency: damped_core_defect_Y = U_sq_minus_4V_sq_Y - J_A_Y
-        uv_p = _parse_serialized_arb_enclosure_tc062(row.get("U_sq_minus_4V_sq_Y"))
-        ja_p = _parse_serialized_arb_enclosure_tc062(row.get("J_A_Y"))
         if (
             dc_p is None
             or uv_p is None
@@ -2365,6 +2435,54 @@ def aggregate_tc065_section4_and_derive_outcomes(
             )
         ):
             conflicts.append({"conflict_type": "POINT_DAMPED_IDENTITY_MISMATCH", "point_id": pid})
+        if (
+            dc_p is None
+            or mneg_p is None
+            or not _interval_overlap_frac_tc065(mneg_p, dc_p["c_lo"], dc_p["c_hi"])
+        ):
+            conflicts.append({"conflict_type": "POINT_MARGIN_OPERAND_MISMATCH", "point_id": pid, "margin": "M_P_NEG_DAMPED"})
+        if (
+            uv_p is None
+            or u2_p is None
+            or v4_p is None
+            or muv_p is None
+            or not _interval_overlap_frac_tc065(
+                uv_p, u2_p["c_lo"] - v4_p["c_hi"], u2_p["c_hi"] - v4_p["c_lo"]
+            )
+            or not _interval_overlap_frac_tc065(muv_p, uv_p["c_lo"], uv_p["c_hi"])
+        ):
+            conflicts.append({"conflict_type": "POINT_MARGIN_OPERAND_MISMATCH", "point_id": pid, "margin": "M_P_UV_DOM"})
+        if (
+            e3_p is None
+            or ey_p is None
+            or dt_p is None
+            or me3_p is None
+            or not _interval_overlap_frac_tc065(
+                e3_p, ey_p["c_lo"] - 4 * dt_p["c_hi"], ey_p["c_hi"] - 4 * dt_p["c_lo"]
+            )
+            or not _interval_overlap_frac_tc065(me3_p, e3_p["c_lo"], e3_p["c_hi"])
+        ):
+            conflicts.append({"conflict_type": "POINT_MARGIN_OPERAND_MISMATCH", "point_id": pid, "margin": "M_P_E3_MAIN"})
+        if (
+            mfr_p is None
+            or vrem_p is None
+            or frbd_p is None
+            or not _interval_overlap_frac_tc065(
+                mfr_p, vrem_p["c_lo"] - frbd_p["c_hi"], vrem_p["c_hi"] - frbd_p["c_lo"]
+            )
+        ):
+            conflicts.append({"conflict_type": "POINT_MARGIN_OPERAND_MISMATCH", "point_id": pid, "margin": "M_FRINGE_FEAT"})
+        for rk in (
+            "S1_budget_residual",
+            "S2_budget_residual",
+            "S3_budget_residual",
+            "E1_budget_residual",
+            "E2_budget_residual",
+            "E3_budget_residual",
+        ):
+            rp = _parse_serialized_arb_enclosure_tc062(row.get(rk))
+            if rp is None or not (rp["c_lo"] <= 0 <= rp["c_hi"]):
+                conflicts.append({"conflict_type": "POINT_BUDGET_RESIDUAL_NONZERO", "point_id": pid, "residual": rk})
 
         for pk, mk in probe_keys_and_margins:
             claimed = pv.get(pk)
@@ -2381,6 +2499,7 @@ def aggregate_tc065_section4_and_derive_outcomes(
                 )
             verdict_buckets[pk].append(derived_v)
 
+        # L5: Cross-check S4 oracle certified_strictly_positive flag and verdict against lower bound
         orc = row.get("S4_oracle_r1", {})
         lb_p = _parse_serialized_arb_enclosure_tc062(orc.get("oracle_residual_lower_bound"))
         if lb_p is None:
@@ -2389,6 +2508,15 @@ def aggregate_tc065_section4_and_derive_outcomes(
         else:
             orc_fail = bool(lb_p["c_lo"] > 0)
             orc_v = "FAIL" if orc_fail else "UNRESOLVED"
+            if bool(orc.get("certified_strictly_positive")) != orc_fail:
+                conflicts.append(
+                    {
+                        "conflict_type": "POINT_ORACLE_FLAG_MISMATCH",
+                        "point_id": pid,
+                        "claimed_flag": orc.get("certified_strictly_positive"),
+                        "derived_flag": orc_fail,
+                    }
+                )
             if pv.get("TC065-CAND-S4-POINTWISE-ZERO-RESIDUAL") != orc_v:
                 conflicts.append(
                     {
@@ -2399,6 +2527,43 @@ def aggregate_tc065_section4_and_derive_outcomes(
                     }
                 )
         verdict_buckets["TC065-CAND-S4-POINTWISE-ZERO-RESIDUAL"].append(orc_v)
+
+        # L8: Recompute per-point resource compliance from escalation_trace & verify elapsed_sec
+        trace = row.get("escalation_trace")
+        if not isinstance(trace, list) or len(trace) == 0:
+            conflicts.append({"conflict_type": "MISSING_ESCALATION_TRACE", "point_id": pid})
+        else:
+            re_rc = evaluate_point_resource_compliance(
+                trace, max_wall_sec=max_wall_per_pt, max_rss_mb=max_rss_mb_lim
+            )
+            recomputed_point_res_checks.append(re_rc)
+            rec_rc = row.get("resource_compliance")
+            if (
+                not isinstance(rec_rc, dict)
+                or rec_rc.get("overall_resource_status") != re_rc["overall_resource_status"]
+                or rec_rc.get("wall_budget_status") != re_rc["wall_budget_status"]
+                or rec_rc.get("memory_budget_status") != re_rc["memory_budget_status"]
+            ):
+                conflicts.append(
+                    {
+                        "conflict_type": "POINT_RESOURCE_COMPLIANCE_MISMATCH",
+                        "point_id": pid,
+                        "recorded": rec_rc,
+                        "recomputed": re_rc,
+                    }
+                )
+            last_el = float(trace[-1].get("elapsed_sec", -1.0))
+            row_el = float(row.get("elapsed_sec", -2.0))
+            if abs(row_el - last_el) > 1e-6 or row_el > max_wall_per_pt:
+                conflicts.append(
+                    {
+                        "conflict_type": "POINT_ELAPSED_SEC_MISMATCH_OR_EXCEEDED",
+                        "point_id": pid,
+                        "row_elapsed_sec": row_el,
+                        "trace_elapsed_sec": last_el,
+                        "max_wall_seconds_per_point": max_wall_per_pt,
+                    }
+                )
 
     # Audit continuous intervals
     interval_probe_map = (
@@ -2466,9 +2631,11 @@ def aggregate_tc065_section4_and_derive_outcomes(
                         "coverage_status": da["coverage_status"],
                     }
                 )
+            br_parsed: Dict[str, Optional[Dict[str, Any]]] = {}
             for u_k, b_k in REQUIRED_TC065_INTERVAL_UNION_BRANCH_PAIRS:
                 u_p = union_parsed.get(u_k)
                 b_p = _parse_serialized_arb_enclosure_tc062(b.get(b_k))
+                br_parsed[b_k] = b_p
                 if (
                     u_p is None
                     or b_p is None
@@ -2482,6 +2649,67 @@ def aggregate_tc065_section4_and_derive_outcomes(
                             "branch_key": b_k,
                         }
                     )
+            # L1: Continuous-interval branch algebraic operand consistency checks
+            b_dc = br_parsed.get("damped_core_defect_Y")
+            b_ld = br_parsed.get("log_Y_times_D_tilde")
+            b_m0 = br_parsed.get("M_P0_DAMPED")
+            b_mneg = br_parsed.get("M_P_NEG_DAMPED")
+            b_uv = br_parsed.get("U_sq_minus_4V_sq_Y")
+            b_muv = br_parsed.get("M_P_UV_DOM")
+            b_u2 = br_parsed.get("U_norm_sq_Y")
+            b_v4 = br_parsed.get("four_V_norm_sq_Y")
+            b_ja = br_parsed.get("J_A_Y")
+            b_ey = br_parsed.get("E_Y")
+            b_dt = br_parsed.get("D_tilde_Y")
+            b_e3 = br_parsed.get("E_minus_4Dtilde_Y")
+            b_me3 = br_parsed.get("M_P_E3_MAIN")
+            if (
+                b_dc is None
+                or b_ld is None
+                or b_m0 is None
+                or not _interval_overlap_frac_tc065(
+                    b_m0, b_dc["c_lo"] - b_ld["c_hi"], b_dc["c_hi"] - b_ld["c_lo"]
+                )
+            ):
+                conflicts.append({"conflict_type": "BRANCH_MARGIN_OPERAND_MISMATCH", "interval_id": iv_id, "cutoff_triple": triple, "margin": "M_P0_DAMPED"})
+            if (
+                b_dc is None
+                or b_uv is None
+                or b_ja is None
+                or not _interval_overlap_frac_tc065(
+                    b_dc, b_uv["c_lo"] - b_ja["c_hi"], b_uv["c_hi"] - b_ja["c_lo"]
+                )
+            ):
+                conflicts.append({"conflict_type": "BRANCH_DAMPED_IDENTITY_MISMATCH", "interval_id": iv_id, "cutoff_triple": triple})
+            if (
+                b_dc is None
+                or b_mneg is None
+                or not _interval_overlap_frac_tc065(b_mneg, b_dc["c_lo"], b_dc["c_hi"])
+            ):
+                conflicts.append({"conflict_type": "BRANCH_MARGIN_OPERAND_MISMATCH", "interval_id": iv_id, "cutoff_triple": triple, "margin": "M_P_NEG_DAMPED"})
+            if (
+                b_uv is None
+                or b_u2 is None
+                or b_v4 is None
+                or b_muv is None
+                or not _interval_overlap_frac_tc065(
+                    b_uv, b_u2["c_lo"] - b_v4["c_hi"], b_u2["c_hi"] - b_v4["c_lo"]
+                )
+                or not _interval_overlap_frac_tc065(b_muv, b_uv["c_lo"], b_uv["c_hi"])
+            ):
+                conflicts.append({"conflict_type": "BRANCH_MARGIN_OPERAND_MISMATCH", "interval_id": iv_id, "cutoff_triple": triple, "margin": "M_P_UV_DOM"})
+            if (
+                b_e3 is None
+                or b_ey is None
+                or b_dt is None
+                or b_me3 is None
+                or not _interval_overlap_frac_tc065(
+                    b_e3, b_ey["c_lo"] - 4 * b_dt["c_hi"], b_ey["c_hi"] - 4 * b_dt["c_lo"]
+                )
+                or not _interval_overlap_frac_tc065(b_me3, b_e3["c_lo"], b_e3["c_hi"])
+            ):
+                conflicts.append({"conflict_type": "BRANCH_MARGIN_OPERAND_MISMATCH", "interval_id": iv_id, "cutoff_triple": triple, "margin": "M_P_E3_MAIN"})
+
             for pk, _, bk, _, br_cls_k, y0_thresh in interval_probe_map:
                 derived_b = _audit_serialized_margin_verdict_tc062(b.get(bk))
                 if derived_b == "CONFLICT" or b.get(br_cls_k) != derived_b:
@@ -2536,14 +2764,8 @@ def aggregate_tc065_section4_and_derive_outcomes(
         return "INCONCLUSIVE"
 
     probe_outcomes = {pk: _derive_probe_outcome(vlist) for pk, vlist in verdict_buckets.items()}
-    res_limits = protocol_obj["precision_quadrature_and_resource_policy"]["resource_limits"]
-    point_res_checks = [
-        r["resource_compliance"]
-        for r in point_rows
-        if isinstance(r.get("resource_compliance"), dict)
-    ]
     res_agg = aggregate_section_resource_compliance(
-        point_res_checks,
+        recomputed_point_res_checks,
         registered_count=len(expected_point_ids),
         distinct_evaluated_count=len(row_by_id),
     )
@@ -2821,24 +3043,41 @@ def verify_tc065_review_document_consistency(
     for m_ltx in re.finditer(r"(\[[^\]\n]*\\pm[^\]\n]+\])", md_text):
         untagged.append(m_ltx.group(1))
 
-    # Verify Lean #L... anchors
+    # L10: Verify Lean #L... anchors are in-range AND start on an actual theorem/def declaration
     lean_anchor_re = re.compile(
-        r"\(\.\./\.\./(formal/RiemannScope/[A-Za-z0-9_]+\.lean)#L(\d+)(?:-L(\d+))?\)"
+        r"\[([^\]]+)\]\(\.\./\.\./(formal/RiemannScope/[A-Za-z0-9_]+\.lean)#L(\d+)(?:-L(\d+))?\)"
     )
     bad_anchors: List[str] = []
     anchor_count = 0
     for am in lean_anchor_re.finditer(md_text):
         anchor_count += 1
-        rel_p = am.group(1)
-        l1 = int(am.group(2))
-        l2 = int(am.group(3)) if am.group(3) else l1
+        link_txt = am.group(1)
+        rel_p = am.group(2)
+        l1 = int(am.group(3))
+        l2 = int(am.group(4)) if am.group(4) else l1
         fp = REPO_ROOT / rel_p
         if not fp.exists():
             bad_anchors.append(f"{rel_p}:MISSING")
             continue
-        nlines = len(fp.read_text(encoding="utf-8").splitlines())
+        file_lines = fp.read_text(encoding="utf-8").splitlines()
+        nlines = len(file_lines)
         if not (1 <= l1 <= l2 <= nlines):
             bad_anchors.append(f"{rel_p}#L{l1}-L{l2}:OUT_OF_RANGE({nlines})")
+            continue
+        decl_m = re.match(
+            r"^(?:private\s+)?(?:noncomputable\s+)?(?:theorem|def)\s+([A-Za-z0-9_]+)",
+            file_lines[l1 - 1],
+        )
+        if decl_m is None:
+            bad_anchors.append(f"{rel_p}#L{l1}-L{l2}:NOT_A_LEAN_DECLARATION")
+        else:
+            decl_name = decl_m.group(1)
+            # If the link text names a specific theorem/def identifier, verify exact match
+            id_m = re.search(r"\b([a-z][A-Za-z0-9_]*_tc0\d+[a-z]?)\b", link_txt)
+            if id_m and id_m.group(1) != decl_name:
+                bad_anchors.append(
+                    f"{rel_p}#L{l1}:NAME_MISMATCH({id_m.group(1)}!={decl_name})"
+                )
 
     # Guardrails: zero circle-half tokens, zero non-grade K_ tokens, zero false closure claims
     p_tok = "p" + "i"
