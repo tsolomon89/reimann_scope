@@ -2709,13 +2709,27 @@ def _audit_all_serialized_arb_balls_in_tc065_artifact(
     `enclosure_arb` objects are still attached (at artifact creation time), also verify via
     `verify_all_serialized_arb_in_tree` that every serialized ball encloses its live 256-bit Arb ball.
     """
-    live_res = verify_all_serialized_arb_in_tree(tree)
-    live_check_ok = bool(live_res["all_enclose_original_256bit_arb_ball"])
+    saved_p = flint_ctx.prec
+    try:
+        flint_ctx.prec = 256
+        live_res = verify_all_serialized_arb_in_tree(tree)
+    finally:
+        flint_ctx.prec = saved_p
     live_check_count = int(live_res["compared_against_live_original_arb_count"])
+    # Live round-trip comparison against the original 256-bit Arb ball applies when live
+    # `enclosure_arb` objects are present (artifact creation time). On JSON-loaded artifacts
+    # (where `enclosure_arb` has been stripped), exact 3-representation Fraction validation via
+    # `_parse_serialized_arb_enclosure_tc062` verifies every ball without conflating outward
+    # decimal truncation `[lower_dec, upper_dec]` with the original ball.
+    if live_check_count > 0:
+        live_check_ok = bool(live_res["all_enclose_original_256bit_arb_ball"])
+        failed_paths: List[str] = [f"LIVE_ROUNDTRIP:{p}" for p in live_res.get("failed_paths", [])]
+    else:
+        live_check_ok = True
+        failed_paths = []
     req_keys = {"mid_float", "rad_float_outward", "lower_dec", "upper_dec", "arb_ball_str"}
     checked_paths: List[str] = []
     counts_by_section: Dict[str, int] = {}
-    failed_paths: List[str] = [f"LIVE_ROUNDTRIP:{p}" for p in live_res.get("failed_paths", [])]
 
     def _walk(node: Any, cur_path: str) -> None:
         if isinstance(node, dict):
@@ -2804,7 +2818,7 @@ def verify_tc065_review_document_consistency(
     for m_raw in re.finditer(r"`(\[[^`\]]*\+/-[^`\]]+\])`", md_text):
         if (m_raw.start(1), m_raw.end(1)) not in tag_spans:
             untagged.append(m_raw.group(1))
-    for m_ltx in re.finditer(r"(\[[+-]?(?:\d|\s)*\\pm[^\]\n]+\])", md_text):
+    for m_ltx in re.finditer(r"(\[[^\]\n]*\\pm[^\]\n]+\])", md_text):
         untagged.append(m_ltx.group(1))
 
     # Verify Lean #L... anchors
@@ -2861,8 +2875,12 @@ def verify_tc065_review_document_consistency(
         and len(bad_anchors) == 0
         and len(guardrail_errors) == 0
     )
+    try:
+        rel_review = str(review_path.relative_to(REPO_ROOT)).replace("\\", "/")
+    except ValueError:
+        rel_review = str(review_path).replace("\\", "/")
     return {
-        "review_path": str(review_path.relative_to(REPO_ROOT)).replace("\\", "/"),
+        "review_path": rel_review,
         "raw_tag_comment_count": raw_tag_comment_count,
         "matched_tag_count": matched_tag_count,
         "tagged_and_checked_count": tagged_checked,

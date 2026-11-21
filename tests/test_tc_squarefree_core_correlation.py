@@ -437,7 +437,7 @@ def test_tc064_lean_formalization_review_consistency_and_registers(
     q_ids = {t["task_id"] for t in q_obj["tasks"]}
     assert TASK_TC_064_ID in q_ids
     assert TASK_TC_064R_ID in q_ids
-    assert q_obj["active_task_id"] in {TASK_TC_064_ID, TASK_TC_064R_ID}
+    assert q_obj["active_task_id"] in {TASK_TC_064_ID, TASK_TC_064R_ID, "TASK-TC-065"}
     s_obj = json.loads((REPO_ROOT / ".agents" / "research" / "state.json").read_text(encoding="utf-8"))
     assert s_obj.get("rh_proved", False) is False
 
