@@ -1,0 +1,449 @@
+{
+  "protocol_id": "TC065-SCALAR-FEATURE-COMPENSATION-PROTOCOL-V1",
+  "schema_version": "1.0.0",
+  "task_id": "TASK-TC-065",
+  "epic_id": "EPIC-TC-042",
+  "parent_subgate": "SUBGATE-TC-043A",
+  "preregistration_stage": "FROZEN_BEFORE_ANY_TC065_UNSEEN_VALIDATION_EVALUATION",
+  "circle_constant_convention": "tau_exclusively",
+  "grade_variable_convention": "K reserved strictly for real-algebraic geometric grades in A_R; Hcal_Y, Kcal_Y, and Mcal_Y for kernels; z = x + i*y complex coordinates; Y real analytic scale >= 2",
+  "baseline_provenance": {
+    "accepted_tc064r_delivered_tip": "9c46ca4c3232afb9eef8b7871cd0fc365cdc3440",
+    "reviewed_tc064_tip": "7e61dfff4cd6a2f78471182a990c495970fda2b5",
+    "reviewed_main_baseline": "bf3babfb7857e41c0ea53235d82a48181cefee84",
+    "preserved_tc061_protocol_id": "TC061-MIXED-ARITHMETIC-COVARIANCE-PROTOCOL-V1",
+    "preserved_tc061_protocol_registration_commit": "bc2f9f709f868ef02981600873dfa0c05da0ba0c",
+    "preserved_tc061_protocol_sha256": "c892c4c5a1ff2a60a11fa499b2d2bc017e01f0426e4aa8feef5880aaff8a70eb",
+    "preserved_tc062_protocol_id": "TC062-JOINT-PRIME-DILATION-SIGNED-REMAINDER-PROTOCOL-V1",
+    "preserved_tc062_protocol_registration_commit": "4961b03130bf1f353570a0e9c62ede4e1a2bf27d",
+    "preserved_tc062_protocol_sha256": "d56fbd30df9d8adf01ff41d0f207d06092a941fa79f593ef6c61382b72fc32df",
+    "preserved_tc063_protocol_id": "TC063-DYADIC-CHAIN-CORRELATION-REGULARITY-PROTOCOL-V1",
+    "preserved_tc063_protocol_registration_commit": "767ff30dcd605e82f7d855fb0b86ee59919eceb8",
+    "preserved_tc063_protocol_sha256": "a5ced83b7aede12e5bcfc4c146a0edb57f7a668ad773098bff44c71e2471edff",
+    "preserved_tc064_protocol_id": "TC064-SQUAREFREE-CORE-CORRELATION-PROTOCOL-V1",
+    "preserved_tc064_protocol_registration_commit": "6bc3f8b604cf989f5feb631c7418cf875a6de601",
+    "preserved_tc064_protocol_sha256": "44fab01b3fa1f0982c0b56740bd459a3a6838cce862ed396321e909adb7fe967",
+    "upstream_source_hashes_sha256": {
+      "tc/squarefree_core_correlation.py": "80b77b0354b32b74a54d0694a0940371d25a429cde88c2ea1c4d347c9193b30b",
+      "formal/RiemannScope/SquarefreeCoreCorrelation.lean": "d96d4ca338502d4c5363eec58665de72165948cb630fe61385149d82e98b8119",
+      "data/tc_squarefree_core_correlation_protocol.json": "1378a2c240343a569bf727b659344ccd2e8ade4bced577bdbfe2b2e10f1741e2",
+      "data/tc_squarefree_core_correlation.json": "df2deab900a4d7be310ec357241ed8dca5673019591832ef0cfbe768680c731e",
+      "data/tc_dyadic_chain_correlation_regularity.json": "637aad7dfcf723d6d9b0b7ac2659467422218a1fca9a892aa5a2fe73f17f83eb",
+      "data/tc_joint_prime_dilation_signed_remainder.json": "88e1e3afb1d8ef91fbc2fab6aa5e9e0e0d05f357c214c210fdbe669c163a2a14",
+      "data/tc_mixed_arithmetic_covariance.json": "1dd8e539645f933c1fc6055f32a5dba4d4bef51a1a67d8ee35a9cdf81bfd49bc"
+    }
+  },
+  "exact_mathematical_object": {
+    "domain": "Y in R, Y >= 2",
+    "window_inner_product": "<f, g>_Y = int_Y^{tau*Y} f(X)*g(X) dX/X on H_scalar,Y = L^2([Y, tau*Y], dX/X)",
+    "feature_hilbert_space": "H_feature,Y = bigoplus_{(p, k) : p^k <= T(Y)} L^2([Y, tau*Y], dX/X)",
+    "canonical_cutoffs": {
+      "T_Y": "ceil(Y^(5/4))",
+      "D0_Y": "floor(log Y)",
+      "D_eff_Y": "min(D0(Y), T(Y) - 1)",
+      "sqrt_T_Y": "floor(sqrt(T(Y)))"
+    },
+    "complete_observables": {
+      "U_Y": "sum_{a in C(T(Y))} mu(a) * A_a = sum_{n in Omega_2(T(Y))} lambda(n) * psi_{Y, n}",
+      "V_Y": "(sum_{a in C(T(Y))} mu(a) * B_{a, (p,k)}^feat)_{p^k <= T(Y)} = (sum_{n in Omega_2(T(Y))} lambda(n) * g_{n, (p,k)})_{p^k <= T(Y)}",
+      "J_A_Y": "sum_{a in C(T(Y))} ||A_a||_Y^2",
+      "J_B_Y": "sum_{a in C(T(Y))} ||B_a^feat||_Y^2",
+      "damped_core_defect_Y": "D_core(Y) := S_core^scal(Y) - 4*||V_Y||_Y^2 = ||U_Y||_Y^2 - 4*||V_Y||_Y^2 - J_A(Y) = S_core(Y) - 4*J_B(Y)",
+      "key_disambiguation": "The artifact key damped_core_defect_Y denotes D_core(Y) = ||U_Y||_Y^2 - 4*||V_Y||_Y^2 - J_A(Y). It is strictly distinct from the inherited TC-064 artifact key D_core_Y, which denotes the core Gram diagonal sum_a (||A_a||_Y^2 - 4*||B_a^feat||_Y^2).",
+      "paired_station_support_Omega2": "{n in [1, T] : Odd(v_2(n)) or 2*n <= T}",
+      "paired_cutoff_fringe_Phi2": "{n in [1, T] : Even(v_2(n)) and T < 2*n}"
+    }
+  },
+  "surviving_closure_target": {
+    "target_id": "TC064-LEM-SURVIVING-SCALAR-CORE-DAMPED",
+    "statement": "MixedCovarianceClosureHypothesis(D_core, D_tilde): forall eta > 0, exists A_eta, B_eta >= 0, 0 < kappa_eta <= 2, Y_eta >= 2: forall real Y >= Y_eta, damped_core_defect_Y(Y) <= A_eta * Y^eta + B_eta * (log Y)^(2 - kappa_eta) * D_tilde(Y)",
+    "epistemic_role": "RH_LEVEL_QUANTITATIVE_CLOSURE_TARGET_OPEN"
+  },
+  "frozen_candidate_probes": [
+    {
+      "probe_id": "TC065-P0-DAMPED",
+      "tier": "PRIMARY",
+      "observable_key": "damped_core_defect_Y",
+      "formula": "damped_core_defect_Y(Y) <= (log Y) * D_tilde(Y) for every real Y >= 20",
+      "margin_formula": "M_{P0-DAMPED}(Y) = damped_core_defect_Y(Y) - (log Y) * D_tilde(Y)",
+      "domain_threshold_Y0": "20",
+      "calibration_dependency": "NONE_FIXED_A_PRIORI"
+    },
+    {
+      "probe_id": "TC065-P-NEG-DAMPED",
+      "tier": "SECONDARY",
+      "observable_key": "damped_core_defect_Y",
+      "formula": "damped_core_defect_Y(Y) <= 0 for every real Y >= 20 (zero-slack damped nonpositivity probe)",
+      "margin_formula": "M_{P-NEG-DAMPED}(Y) = damped_core_defect_Y(Y)",
+      "domain_threshold_Y0": "20",
+      "calibration_dependency": "NONE_FIXED_A_PRIORI"
+    },
+    {
+      "probe_id": "TC065-P-UV-DOM",
+      "tier": "SECONDARY",
+      "observable_key": "U_sq_minus_4V_sq_Y",
+      "formula": "||U_Y||_Y^2 - 4*||V_Y||_Y^2 <= 0 for every real Y >= 20 (pure feature domination without J_A allowance)",
+      "margin_formula": "M_{P-UV-DOM}(Y) = ||U_Y||_Y^2 - 4*||V_Y||_Y^2",
+      "domain_threshold_Y0": "20",
+      "calibration_dependency": "NONE_FIXED_A_PRIORI"
+    },
+    {
+      "probe_id": "TC065-P-E3-MAIN",
+      "tier": "SECONDARY",
+      "observable_key": "E_minus_4Dtilde_Y",
+      "formula": "E_lambda(Y) - 4*D_tilde(Y) <= 0 for every real Y >= 20 (bare-Liouville vs shifted-dilation zero-slack probe)",
+      "margin_formula": "M_{P-E3-MAIN}(Y) = E_lambda(Y) - 4*D_tilde(Y)",
+      "domain_threshold_Y0": "20",
+      "calibration_dependency": "NONE_FIXED_A_PRIORI"
+    },
+    {
+      "probe_id": "TC065-THM-FRINGE-FEAT-BOUND",
+      "tier": "THEOREM_BOUND_CHECK",
+      "observable_key": "V_fringe_norm_sq_Y",
+      "formula": "||G_{Phi_2}||_Y^2 <= C_{Phi,1}(tau)/(log Y)^2 + C_{Phi,2}(tau)/Y^(5/4) for every real Y >= 2",
+      "margin_formula": "M_{FRINGE-FEAT}(Y) = ||G_{Phi_2}||_Y^2 - (C_{Phi,1}(tau)/(log Y)^2 + C_{Phi,2}(tau)/Y^(5/4))",
+      "domain_threshold_Y0": "2",
+      "calibration_dependency": "PROVED_UNIFORMLY_IN_LEAN"
+    }
+  ],
+  "registered_route5_and_route6_candidates": [
+    {
+      "candidate_id": "TC065-CAND-S1-UNWEIGHTED-CONTRACTION",
+      "route": "Route 5 (Primary Attempt \u2014 Exact Unweighted Divisor Synthesis w_{(p,k)} = 1)",
+      "formula": "(L_Y^{(S1)} v)(X) = sum_{p^k <= T} v_{(p,k)}(X), 2*L_Y^{(S1)} V_Y = 2*P_{Omega_2}, R_Y^{(S1)} = -O_{Omega_2}",
+      "statement": "For all real Y >= 20, ||L_Y^{(S1)} V_Y||_Y <= ||V_Y||_Y (equivalently 4*X_{Omega_2}(Y) <= 0)",
+      "domain_threshold_Y0": "20"
+    },
+    {
+      "candidate_id": "TC065-CAND-S2-MERTENS-SUFF-BOUND",
+      "route": "Route 5 (Primary Attempt \u2014 Mertens-Weighted Contractive Synthesis, r = 1/2)",
+      "formula": "w_{(p,k),Y}^{(S2)} = (1/2) * (log p / p^(k/2)) / sqrt(sum_{q^e <= T} (log q)^2 / q^e), exact ||L_Y^{(S2)}||_op = 1/2",
+      "statement": "For all real Y >= 20, ||R_Y^{(S2)}||_Y^2 / (1 - (1/2)^2) - J_A(Y) <= 0",
+      "domain_threshold_Y0": "20"
+    },
+    {
+      "candidate_id": "TC065-CAND-S3-P2-SUFF-BOUND",
+      "route": "Route 5 (Primary Attempt \u2014 Single-Channel 2-Adic Contractive Synthesis, r = 1/2)",
+      "formula": "w_{(p,k),Y}^{(S3)} = (1/2) * 1_{(p,k)=(2,1)}, exact ||L_Y^{(S3)}||_op = 1/2",
+      "statement": "For all real Y >= 20, ||R_Y^{(S3)}||_Y^2 / (1 - (1/2)^2) - J_A(Y) <= 0",
+      "domain_threshold_Y0": "20"
+    },
+    {
+      "candidate_id": "TC065-CAND-S4-POINTWISE-ZERO-RESIDUAL",
+      "route": "Route 5 (Primary Attempt \u2014 Universal Oracle Pointwise Contractive Synthesis, r = 1)",
+      "formula": "Pointwise lower bound ||U_Y - 2*L_Y V_Y||_Y^2 >= int_Y^{tau*Y} max(0, |U_Y(X)| - 2*|V_Y(X)|_{l^2})^2 dX/X",
+      "statement": "For all real Y >= 20, there exist measurable pointwise weights with sum |w_{(p,k),Y}(X)|^2 <= 1 a.e. such that U_Y = 2*L_Y V_Y",
+      "domain_threshold_Y0": "20"
+    },
+    {
+      "candidate_id": "TC065-CAND-E1-MAIN-NONPOS",
+      "route": "Route 6 (Complementary Attempt \u2014 Full-Cutoff vs Paired-Fringe Expansion E1)",
+      "formula": "U_main = Q_T + A_T, U_rem = -S_spill - Phi_fringe, V_main = G_T, V_rem = -G_{Phi_2}, T_main^{(E1)} = J_T(Y)",
+      "statement": "For all real Y >= 20, T_main^{(E1)}(Y) = J_T(Y) <= 0",
+      "domain_threshold_Y0": "20"
+    },
+    {
+      "candidate_id": "TC065-CAND-E2-LARGE-PRIME-MAIN-NONPOS",
+      "route": "Route 6 (Complementary Attempt \u2014 Station-Disjoint Large-Prime p > sqrt(T) Expansion E2)",
+      "formula": "U_main = 2*P_{>}, U_rem = 2*P_{<=} - O_{Omega_2}, V_main = V_{>}, V_rem = V_{<=} (exact <V_{>}, V_{<=}> = 0)",
+      "statement": "For all real Y >= 20, T_main^{(E2)}(Y) = 4*||P_{>}||_Y^2 - 4*||V_{>}||_Y^2 <= 0",
+      "domain_threshold_Y0": "20"
+    }
+  ],
+  "calibration_and_prior_exposure_separation": {
+    "seen_derived_from_tc064_certificates": [
+      512,
+      576,
+      960,
+      1408
+    ],
+    "previously_exposed_historical_scales_all_treated_as_seen": [
+      2,
+      4,
+      8,
+      16,
+      32,
+      64,
+      72,
+      81,
+      96,
+      112,
+      128,
+      144,
+      160,
+      180,
+      192,
+      224,
+      256,
+      288,
+      320,
+      360,
+      384,
+      403,
+      448,
+      512,
+      576,
+      625,
+      720,
+      768,
+      960,
+      1024,
+      1096,
+      1280,
+      1296,
+      1408,
+      1536,
+      2048,
+      4096
+    ],
+    "strict_disjointness_rule": "No TC-065 unseen validation point or continuous interval may coincide with or overlap any point or interval previously evaluated in TC-061, TC-062, TC-063, TC-063R, TC-064, or TC-064R."
+  },
+  "unseen_validation_schedule": {
+    "total_unseen_points": 8,
+    "points": [
+      {
+        "point_id": "TC065-HO-EXP3-LEFT",
+        "label": "e^3*(1 - 2^(-12))",
+        "kind": "exact_symbolic_exp_rational",
+        "rational_factor": "4095/4096",
+        "exp_power": "3/1",
+        "grid_tier": "D0_DISCONTINUITY_SIDED_GRID",
+        "prior_exposure_status": "UNSEEN_FOR_ALL_OBSERVABLES",
+        "expected_cutoffs": {
+          "T_Y": 43,
+          "D0_Y": 2,
+          "D_eff_Y": 2,
+          "sqrt_T_Y": 6
+        }
+      },
+      {
+        "point_id": "TC065-HO-EXP3-RIGHT",
+        "label": "e^3*(1 + 2^(-12))",
+        "kind": "exact_symbolic_exp_rational",
+        "rational_factor": "4097/4096",
+        "exp_power": "3/1",
+        "grid_tier": "D0_DISCONTINUITY_SIDED_GRID",
+        "prior_exposure_status": "UNSEEN_FOR_ALL_OBSERVABLES",
+        "expected_cutoffs": {
+          "T_Y": 43,
+          "D0_Y": 3,
+          "D_eff_Y": 3,
+          "sqrt_T_Y": 6
+        }
+      },
+      {
+        "point_id": "TC065-HO-100",
+        "label": "100",
+        "kind": "exact_rational",
+        "rational_factor": "100/1",
+        "exp_power": "0/1",
+        "grid_tier": "UNSEEN_INTERIOR_GRID",
+        "prior_exposure_status": "UNSEEN_FOR_ALL_OBSERVABLES",
+        "expected_cutoffs": {
+          "T_Y": 317,
+          "D0_Y": 4,
+          "D_eff_Y": 4,
+          "sqrt_T_Y": 17
+        }
+      },
+      {
+        "point_id": "TC065-HO-300",
+        "label": "300",
+        "kind": "exact_rational",
+        "rational_factor": "300/1",
+        "exp_power": "0/1",
+        "grid_tier": "UNSEEN_INTERIOR_GRID",
+        "prior_exposure_status": "UNSEEN_FOR_ALL_OBSERVABLES",
+        "expected_cutoffs": {
+          "T_Y": 1249,
+          "D0_Y": 5,
+          "D_eff_Y": 5,
+          "sqrt_T_Y": 35
+        }
+      },
+      {
+        "point_id": "TC065-HO-600",
+        "label": "600",
+        "kind": "exact_rational",
+        "rational_factor": "600/1",
+        "exp_power": "0/1",
+        "grid_tier": "UNSEEN_INTERIOR_GRID",
+        "prior_exposure_status": "UNSEEN_FOR_ALL_OBSERVABLES",
+        "expected_cutoffs": {
+          "T_Y": 2970,
+          "D0_Y": 6,
+          "D_eff_Y": 6,
+          "sqrt_T_Y": 54
+        }
+      },
+      {
+        "point_id": "TC065-HO-1200",
+        "label": "1200",
+        "kind": "exact_rational",
+        "rational_factor": "1200/1",
+        "exp_power": "0/1",
+        "grid_tier": "UNSEEN_INTERIOR_GRID",
+        "prior_exposure_status": "UNSEEN_FOR_ALL_OBSERVABLES",
+        "expected_cutoffs": {
+          "T_Y": 7063,
+          "D0_Y": 7,
+          "D_eff_Y": 7,
+          "sqrt_T_Y": 84
+        }
+      },
+      {
+        "point_id": "TC065-HO-1600",
+        "label": "1600",
+        "kind": "exact_rational",
+        "rational_factor": "1600/1",
+        "exp_power": "0/1",
+        "grid_tier": "ABOVE_TAU_FOURTH_POWER_GRID",
+        "prior_exposure_status": "UNSEEN_FOR_ALL_OBSERVABLES",
+        "expected_cutoffs": {
+          "T_Y": 10120,
+          "D0_Y": 7,
+          "D_eff_Y": 7,
+          "sqrt_T_Y": 100
+        }
+      },
+      {
+        "point_id": "TC065-HO-1800",
+        "label": "1800",
+        "kind": "exact_rational",
+        "rational_factor": "1800/1",
+        "exp_power": "0/1",
+        "grid_tier": "ABOVE_TAU_FOURTH_POWER_GRID",
+        "prior_exposure_status": "UNSEEN_FOR_ALL_OBSERVABLES",
+        "expected_cutoffs": {
+          "T_Y": 11725,
+          "D0_Y": 7,
+          "D_eff_Y": 7,
+          "sqrt_T_Y": 108
+        }
+      }
+    ],
+    "prescribed_continuous_interval_splits": [
+      {
+        "interval_id": "interval_19_85_to_20_30_across_e3_and_T43_T44",
+        "Y_lo_fraction": "397/20",
+        "Y_hi_fraction": "203/10",
+        "changing_cutoffs_exercised": [
+          "T: 42 -> 43 at Y = 42^(4/5)",
+          "D0: 2 -> 3 at Y = exp(3)",
+          "T: 43 -> 44 at Y = 43^(4/5)"
+        ],
+        "expected_feasible_cells": [
+          [
+            42,
+            2,
+            2
+          ],
+          [
+            43,
+            2,
+            2
+          ],
+          [
+            43,
+            3,
+            3
+          ],
+          [
+            44,
+            3,
+            3
+          ]
+        ]
+      },
+      {
+        "interval_id": "interval_101_60_to_102_45_across_sqrtT18_and_p163",
+        "Y_lo_fraction": "508/5",
+        "Y_hi_fraction": "2049/20",
+        "changing_cutoffs_exercised": [
+          "T: 323 -> 324 -> 325 -> 326",
+          "floor(sqrt(T)): 17 -> 18 at T = 324 = 18^2 (E2 large-prime split boundary)",
+          "active odd-prime channel p = 163 enters P_act(Omega_2(T)) at T = 326 = 2 * 163"
+        ],
+        "expected_feasible_cells": [
+          [
+            323,
+            4,
+            4
+          ],
+          [
+            324,
+            4,
+            4
+          ],
+          [
+            325,
+            4,
+            4
+          ],
+          [
+            326,
+            4,
+            4
+          ]
+        ]
+      },
+      {
+        "interval_id": "interval_1558_50_to_1558_60_across_tau4_and_T9794",
+        "Y_lo_fraction": "3117/2",
+        "Y_hi_fraction": "7793/5",
+        "changing_cutoffs_exercised": [
+          "Physical window-overtake seam Y = tau^4 (~1558.5455) where T(Y) overtakes tau*Y",
+          "T: 9793 -> 9794 at Y = 9793^(4/5)"
+        ],
+        "expected_feasible_cells": [
+          [
+            9793,
+            7,
+            7
+          ],
+          [
+            9794,
+            7,
+            7
+          ]
+        ]
+      }
+    ]
+  },
+  "precision_quadrature_and_resource_policy": {
+    "working_prec_bits": 256,
+    "point_quad_tol_bits": 160,
+    "interval_quad_tol_bits": 110,
+    "n_panels": 16,
+    "three_zone_activation_threshold_T": 512,
+    "zone1_ratio_threshold": 12,
+    "escalation_ladder": [
+      {
+        "tier": 0,
+        "prec_bits": 256,
+        "point_quad_tol_bits": 160,
+        "interval_quad_tol_bits": 110,
+        "n_panels": 16
+      },
+      {
+        "tier": 1,
+        "prec_bits": 384,
+        "point_quad_tol_bits": 200,
+        "interval_quad_tol_bits": 140,
+        "n_panels": 32
+      }
+    ],
+    "resource_limits": {
+      "max_rss_megabytes": 3072.0,
+      "max_wall_seconds_per_point": 1800.0,
+      "max_total_wall_seconds": 7200.0,
+      "peak_rss_covering_semantics": "PROCESS_LIFETIME_HIGH_WATER_MARK"
+    },
+    "stopping_rules": {
+      "certified_inequality_requirement": "Outward-rounded Arb enclosure must have entire interval <= 0 (PASS) or > 0 (FAIL); any enclosure straddling 0 triggers at most one escalation tier and otherwise remains INCONCLUSIVE.",
+      "interval_boundary_handling": "Exact rational/symbolic subdivision across all changing T, D0, D_eff, floor(sqrt(T)), and channel-membership boundaries with certified binary evaluation-domain coverage (never midpoint cutoff selection).",
+      "finite_inference_guard": "Finite tests refute explicitly quantified fixed-constant candidates; they never establish universal asymptotic bounds or RH."
+    }
+  },
+  "protocol_sha256": "2d1e9e5758f7f5a0192ee68d6251a801065dae78c2a2344632780e3a5ead10e7"
+}
