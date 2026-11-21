@@ -149,6 +149,7 @@ REQUIRED_FORMAL_SOURCES = [
     "formal/RiemannScope/JointPrimeDilationSignedRemainder.lean",
     "formal/RiemannScope/DyadicChainCorrelationRegularity.lean",
     "formal/RiemannScope/SquarefreeCoreCorrelation.lean",
+    "formal/RiemannScope/ScalarFeatureCompensation.lean",
 ]
 
 
