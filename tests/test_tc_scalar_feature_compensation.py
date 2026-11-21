@@ -161,7 +161,8 @@ def test_tc065_certified_artifact_integrity_and_epistemic_scope(
     tc065_artifact: dict, tc065_protocol: dict
 ) -> None:
     """Validate the committed certified artifact data/tc_scalar_feature_compensation.json
-    end-to-end: 963 Arb balls, 5/5 valid epistemic scopes, 0 conflicts, open gate status.
+    end-to-end: 975 Arb balls, 256-bit serialization tightness, 160-bit transcendental
+    budget residuals, 5/5 valid epistemic scopes, 0 conflicts, open gate status.
     """
     assert tc065_artifact["task_id"] == TASK_TC_065_ID
     assert tc065_artifact["all_mathematical_and_numerical_checks_pass"] is True
@@ -184,10 +185,50 @@ def test_tc065_certified_artifact_integrity_and_epistemic_scope(
 
     arb_re = _audit_all_serialized_arb_balls_in_tc065_artifact(tc065_artifact)
     assert arb_re["verified"] is True
-    assert arb_re["total_certified_arb_balls_checked"] == 963
+    assert arb_re["total_certified_arb_balls_checked"] == 975
     assert arb_re["failed_paths"] == []
 
+    # Round 2 regression: verify >= 256-bit decimal serialization tightness (no 53-bit truncation)
+    # on Section 2 and Section 3 serialized balls, and 160-bit quadrature accuracy on transcendental points.
+    sec2 = tc065_artifact["section_2_seen_reproduction_algebra_and_cross_checks"]
+    for row in sec2["independent_evaluator_cross_checks"]:
+        w = Fraction(row["damped_core_defect_Y"]["upper_dec"]) - Fraction(row["damped_core_defect_Y"]["lower_dec"])
+        assert w < Fraction(1, 10 ** 35), f"Section 2 decimal width too wide at Y={row['Y']}: {float(w)}"
+
+    sec3 = tc065_artifact["section_3_seen_discovery_and_controls"]
+    for row in sec3["seen_discovery_rows"]:
+        w = Fraction(row["damped_core_defect_Y"]["upper_dec"]) - Fraction(row["damped_core_defect_Y"]["lower_dec"])
+        assert w < Fraction(1, 10 ** 35), f"Section 3 decimal width too wide at Y={row['Y']}: {float(w)}"
+        for rk in (
+            "S1_budget_residual",
+            "S2_budget_residual",
+            "S3_budget_residual",
+            "E1_budget_residual",
+            "E2_budget_residual",
+            "E3_budget_residual",
+        ):
+            r_lo = Fraction(row[rk]["lower_dec"])
+            r_hi = Fraction(row[rk]["upper_dec"])
+            assert r_lo <= 0 <= r_hi
+            assert max(abs(r_lo), abs(r_hi)) < Fraction(1, 10 ** 45)
+
     sec4 = tc065_artifact["section_4_unseen_validation_and_interval_splits"]
+    for pt_row in sec4["holdout_point_evaluations"]:
+        for rk in (
+            "S1_budget_residual",
+            "S2_budget_residual",
+            "S3_budget_residual",
+            "E1_budget_residual",
+            "E2_budget_residual",
+            "E3_budget_residual",
+        ):
+            r_lo = Fraction(pt_row[rk]["lower_dec"])
+            r_hi = Fraction(pt_row[rk]["upper_dec"])
+            assert r_lo <= 0 <= r_hi
+            assert max(abs(r_lo), abs(r_hi)) < Fraction(1, 10 ** 45), (
+                f"{pt_row['point_id']} {rk} exceeded 1e-45: {float(max(abs(r_lo), abs(r_hi)))}"
+            )
+
     re_agg = aggregate_tc065_section4_and_derive_outcomes(
         sec4["holdout_point_evaluations"],
         sec4["continuous_interval_case_splits"],
@@ -304,12 +345,74 @@ def test_tc065_adversarial_section4_fail_closed_mutations(
     assert r9["certification_integrity_ok"] is False
     assert any(c["conflict_type"] == "BRANCH_VERDICT_MISMATCH" for c in r9["certification_integrity_conflicts"])
 
+    # 10. L1 regression: forged branch M_P0_DAMPED and union_M_P0_DAMPED shifted together (verdicts & union containment still match,
+    #     but branch M_P0_DAMPED contradicts branch damped_core_defect_Y - log_Y_times_D_tilde)
+    ivs_l1 = copy.deepcopy(base_ivs)
+    for key_b in (ivs_l1[first_iv]["branches"][0]["M_P0_DAMPED"], ivs_l1[first_iv]["union_M_P0_DAMPED"]):
+        key_b["lower_dec"] = "-50.0"
+        key_b["upper_dec"] = "-49.9"
+        key_b["mid_float"] = -49.95
+        key_b["rad_float_outward"] = 0.05
+        key_b["arb_ball_str"] = "[-49.95 +/- 0.05]"
+    # Make union contain all remaining branches too by widening union lower_dec to cover -50 and existing upper_dec
+    orig_u_hi = base_ivs[first_iv]["union_M_P0_DAMPED"]["upper_dec"]
+    ivs_l1[first_iv]["union_M_P0_DAMPED"]["lower_dec"] = "-50.0"
+    ivs_l1[first_iv]["union_M_P0_DAMPED"]["upper_dec"] = orig_u_hi
+    u_mid = 0.5 * (-50.0 + float(orig_u_hi))
+    u_rad = 0.5 * (float(orig_u_hi) + 50.0) + 1e-6
+    ivs_l1[first_iv]["union_M_P0_DAMPED"]["mid_float"] = u_mid
+    ivs_l1[first_iv]["union_M_P0_DAMPED"]["rad_float_outward"] = u_rad
+    ivs_l1[first_iv]["union_M_P0_DAMPED"]["arb_ball_str"] = f"[{u_mid} +/- {u_rad}]"
+    r10 = aggregate_tc065_section4_and_derive_outcomes(base_pts, ivs_l1, tc065_protocol)
+    assert r10["certification_integrity_ok"] is False
+    assert any(c["conflict_type"] == "BRANCH_MARGIN_OPERAND_MISMATCH" for c in r10["certification_integrity_conflicts"])
+
+    # 11. L2-L3 regression: forged point M_P_NEG_DAMPED + nonzero budget residual
+    pts_l2 = copy.deepcopy(base_pts)
+    pts_l2[0]["M_P_NEG_DAMPED"]["lower_dec"] = "-5.0"
+    pts_l2[0]["M_P_NEG_DAMPED"]["upper_dec"] = "-4.9"
+    pts_l2[0]["M_P_NEG_DAMPED"]["mid_float"] = -4.95
+    pts_l2[0]["M_P_NEG_DAMPED"]["rad_float_outward"] = 0.05
+    pts_l2[0]["M_P_NEG_DAMPED"]["arb_ball_str"] = "[-4.95 +/- 0.05]"
+    pts_l2[1]["E1_budget_residual"]["lower_dec"] = "0.01"
+    pts_l2[1]["E1_budget_residual"]["upper_dec"] = "0.02"
+    pts_l2[1]["E1_budget_residual"]["mid_float"] = 0.015
+    pts_l2[1]["E1_budget_residual"]["rad_float_outward"] = 0.005
+    pts_l2[1]["E1_budget_residual"]["arb_ball_str"] = "[0.015 +/- 0.005]"
+    r11 = aggregate_tc065_section4_and_derive_outcomes(pts_l2, base_ivs, tc065_protocol)
+    assert r11["certification_integrity_ok"] is False
+    assert any(c["conflict_type"] == "POINT_MARGIN_OPERAND_MISMATCH" for c in r11["certification_integrity_conflicts"])
+    assert any(c["conflict_type"] == "POINT_BUDGET_RESIDUAL_NONZERO" for c in r11["certification_integrity_conflicts"])
+
+    # 12. L4 regression: forged point T_Y violating frozen protocol expected_cutoffs
+    pts_l4 = copy.deepcopy(base_pts)
+    pts_l4[0]["T_Y"] = 999999
+    r12 = aggregate_tc065_section4_and_derive_outcomes(pts_l4, base_ivs, tc065_protocol)
+    assert r12["certification_integrity_ok"] is False
+    assert any(c["conflict_type"] == "POINT_CUTOFF_PROTOCOL_MISMATCH" for c in r12["certification_integrity_conflicts"])
+
+    # 13. L5 regression: forged S4_oracle_r1.certified_strictly_positive = True while lower_dec = 0
+    pts_l5 = copy.deepcopy(base_pts)
+    pts_l5[0]["S4_oracle_r1"]["certified_strictly_positive"] = True
+    r13 = aggregate_tc065_section4_and_derive_outcomes(pts_l5, base_ivs, tc065_protocol)
+    assert r13["certification_integrity_ok"] is False
+    assert any(c["conflict_type"] == "POINT_ORACLE_FLAG_MISMATCH" for c in r13["certification_integrity_conflicts"])
+
+    # 14. L8 regression: forged elapsed_sec exceeding budget & mismatched resource_compliance
+    pts_l8 = copy.deepcopy(base_pts)
+    pts_l8[0]["elapsed_sec"] = 2500.0
+    pts_l8[1]["resource_compliance"]["overall_resource_status"] = "EXCEEDED"
+    r14 = aggregate_tc065_section4_and_derive_outcomes(pts_l8, base_ivs, tc065_protocol)
+    assert r14["certification_integrity_ok"] is False
+    assert any(c["conflict_type"] == "POINT_ELAPSED_SEC_MISMATCH_OR_EXCEEDED" for c in r14["certification_integrity_conflicts"])
+    assert any(c["conflict_type"] == "POINT_RESOURCE_COMPLIANCE_MISMATCH" for c in r14["certification_integrity_conflicts"])
+
 
 def test_tc065_live_lean_audit_review_consistency_and_adversarial_review_checks(
     tc065_artifact: dict, tmp_path: Path
 ) -> None:
     """Verify live Lean 4 module audit (17 defs, 5 theorems, 845 compiled theorems),
-    100% review consistency, register consistency, and 8 adversarial review mutations.
+    100% review consistency, register consistency, and 9 adversarial review mutations.
     """
     sec5 = verify_section_5_lean_audit_and_gate_accounting()
     assert sec5["all_section_5_checks_pass"] is True
@@ -328,14 +431,14 @@ def test_tc065_live_lean_audit_review_consistency_and_adversarial_review_checks(
     assert TC_065_REVIEW_DOC_PATH.exists(), "Missing TC_065 review document"
     rev_res = verify_tc065_review_document_consistency(tc065_artifact, TC_065_REVIEW_DOC_PATH)
     assert rev_res["verified"] is True, rev_res
-    assert rev_res["raw_tag_comment_count"] >= 100
+    assert rev_res["raw_tag_comment_count"] >= 199
     assert rev_res["matched_tag_count"] == rev_res["raw_tag_comment_count"]
     assert rev_res["failed_tags"] == []
     assert rev_res["untagged_intervals"] == []
     assert rev_res["bad_lean_anchors"] == []
     assert rev_res["guardrail_errors"] == []
 
-    # Adversarial review mutations (all 8 must fail closed)
+    # Adversarial review mutations (all 9 must fail closed)
     orig_md = TC_065_REVIEW_DOC_PATH.read_text(encoding="utf-8")
 
     # M1: Untagged backtick [mid +/- rad]
@@ -389,6 +492,15 @@ def test_tc065_live_lean_audit_review_consistency_and_adversarial_review_checks(
     p8 = tmp_path / "m8.md"
     p8.write_text(orig_md.replace("rh_proved = false", "rh_proved = true", 1), encoding="utf-8")
     assert verify_tc065_review_document_consistency(tc065_artifact, p8)["verified"] is False
+
+    # M9 (L10 regression): In-range Lean #L... anchor pointing to a non-declaration comment line
+    p9 = tmp_path / "m9.md"
+    p9.write_text(
+        orig_md + "\n[bad decl](../../formal/RiemannScope/ScalarFeatureCompensation.lean#L1-L5)\n",
+        encoding="utf-8",
+    )
+    r_m9 = verify_tc065_review_document_consistency(tc065_artifact, p9)
+    assert r_m9["verified"] is False and len(r_m9["bad_lean_anchors"]) >= 1
 
     # Shared registers check
     q_obj = json.loads((REPO_ROOT / ".agents" / "research" / "queue.json").read_text(encoding="utf-8"))

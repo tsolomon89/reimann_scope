@@ -2419,8 +2419,8 @@
       "objective": "Arithmetic Scalar-Feature Compensation Across Squarefree Cores (TASK-TC-065)",
       "status": "AWAITING_INDEPENDENT_REVIEW",
       "review_status": "AWAITING_INDEPENDENT_REVIEW",
-      "open_implication": "SUBGATE-TC-043A remains OPEN (rh_proved = False, global_energy_improvement_claimed = False): five new Lean 4 theorems (ScalarFeatureCompensation.lean, 845 total compiled theorems, 0 sorry) prove exact paired-station divisor synthesis & telescoping, unconditional general-base (w_0 > 1) fringe feature norm bound O((log Y)^(-2)) and O(1) scalar fringe bound, exact M = floor(sqrt(T)) feature orthogonality, universal Route 5 pointwise synthesis obstructions, and direct conditional Route D closure for bare E_lambda - 4*D_tilde bypassing PREM-07 plus exact z -> 1 nonzero limit of M_S(z) vs zero limit of L_{a_S}(z). All six concrete candidates (S1, S2, S3, S4, E1, E2) are refuted with certified 256-bit Arb witnesses, while TC065-P0-DAMPED, TC065-P-NEG-DAMPED, TC065-P-UV-DOM, TC065-P-E3-MAIN, and TC065-THM-FRINGE-FEAT-BOUND survive 8/8 unseen points and 3/3 continuous intervals (10 cells, 963 certified Arb balls). Surviving closure target TC064-LEM-SURVIVING-SCALAR-CORE-DAMPED / bare E_lambda - 4*D_tilde remains OPEN.",
-      "planned_calculation": "Freeze TC065-SCALAR-FEATURE-COMPENSATION-PROTOCOL-V1 before unseen evaluation; formalize 5 new Lean 4 theorems in formal/RiemannScope/ScalarFeatureCompensation.lean; certify 963 256-bit Arb enclosures across TC-064 seen reproduction, Route 5 & Route 6 budgets, bare controls (a(n)=1 and a_3(n)), 8 genuinely unseen points, and 3 cutoff-sensitive continuous intervals (10 cells); run focused + adversarial tests and parallel independent math-auditor and numerical-verifier reviews.",
+      "open_implication": "SUBGATE-TC-043A remains OPEN (rh_proved = False, global_energy_improvement_claimed = False): five new Lean 4 theorems (ScalarFeatureCompensation.lean, 845 total compiled theorems, 0 sorry) prove exact paired-station divisor synthesis & telescoping, unconditional general-base (w_0 > 1) fringe feature norm bound O((log Y)^(-2)) and canonical-tau (w_0 = tau) O(1) scalar fringe bound, exact M = floor(sqrt(T)) prime-power feature orthogonality, universal Route 5 pointwise synthesis obstructions (ContinuousOn weights in Lean), and direct conditional Route D closure for bare E_lambda - 4*D_tilde bypassing PREM-07 plus exact z -> 1 nonzero limit of M_S(z) vs zero limit of L_{a_S}(z). All six concrete candidates (S1, S2, S3, S4, E1, E2) are refuted with certified 256-bit Arb witnesses, while TC065-P0-DAMPED, TC065-P-NEG-DAMPED, TC065-P-UV-DOM, TC065-P-E3-MAIN, and TC065-THM-FRINGE-FEAT-BOUND survive 8/8 unseen points and 3/3 continuous intervals (10 cells, 975 certified Arb balls). Surviving closure target TC064-LEM-SURVIVING-SCALAR-CORE-DAMPED / bare E_lambda - 4*D_tilde remains OPEN.",
+      "planned_calculation": "Freeze TC065-SCALAR-FEATURE-COMPENSATION-PROTOCOL-V1 before unseen evaluation; formalize 5 new Lean 4 theorems in formal/RiemannScope/ScalarFeatureCompensation.lean; certify 975 256-bit Arb enclosures across TC-064 seen reproduction, Route 5 & Route 6 budgets, bare controls (a(n)=1 and a_3(n)), 8 genuinely unseen points, and 3 cutoff-sensitive continuous intervals (10 cells); run focused + adversarial tests and parallel independent math-auditor and numerical-verifier reviews.",
       "parent_subgate": "SUBGATE-TC-043A",
       "branch": "task/tc-065-arithmetic-scalar-feature-compensation",
       "deliverables": [
@@ -2436,8 +2436,8 @@
         "accepted_tc064r_tip": "9c46ca4c3232afb9eef8b7871cd0fc365cdc3440",
         "protocol_registration_commit": "bcddccf451e33486db42d013d1a645c319cb3bd8",
         "formal_producing_git_commit": "1c767f9e01d77c85c7c10ad6f1f9373409d83af7",
-        "numerical_producing_git_commit": "8cf8f818d50f0182b5060b8530fa56aee505cfc4",
-        "artifact_commit": "684c98b14f9fe61202b8dda8e0e5943d2c000c37"
+        "numerical_producing_git_commit": "fd734f59cb720072cb4abeb33448107373bbaafe",
+        "artifact_commit": "97511f824521b4d86b5554ce6d48f637c8056462"
       }
     }
   ]
