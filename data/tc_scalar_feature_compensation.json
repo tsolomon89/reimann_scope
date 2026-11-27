@@ -22,8 +22,13 @@
     "protocol_sha256": "2d1e9e5758f7f5a0192ee68d6251a801065dae78c2a2344632780e3a5ead10e7",
     "formal_producing_git_commit": "1c767f9e01d77c85c7c10ad6f1f9373409d83af7",
     "numerical_producing_git_commit": "fd734f59cb720072cb4abeb33448107373bbaafe",
-    "validation_git_commit": "fd734f59cb720072cb4abeb33448107373bbaafe",
-    "formal_build_report_hash": "47c22391078d68ca8e83b7a2cf5134a96664a4f27519ea5e14e92ab77cf0c144"
+    "validation_git_commit": "a5afd553e745e09af02f9d25bfbcdc8211c6f5c9",
+    "formal_build_report_hash": "47c22391078d68ca8e83b7a2cf5134a96664a4f27519ea5e14e92ab77cf0c144",
+    "tc065r_repair_task_id": "TASK-TC-065R",
+    "tc065r_repair_branch": "task/tc-065r-proof-scope-and-report-reconciliation",
+    "tc065r_reviewed_tc065_tip": "02924e6103edf7e387c9da05f5eac2e142b98b54",
+    "tc065r_metadata_repair_git_commit": "a5afd553e745e09af02f9d25bfbcdc8211c6f5c9",
+    "tc065r_repair_mode": "METADATA_AND_EXPLANATORY_REPAIR_ONLY_NO_NUMERICAL_OR_FORMAL_REBUILD"
   },
   "section_1_protocols_and_premise_chain": {
     "component_epistemic_map": {
@@ -108,8 +113,9 @@
       "tc064_lean_sha256_preserved": true
     },
     "window_base_and_scaling_scope": {
-      "window_base_generality": "All finite-set arithmetic identities (paired-station partition, odd prime-power vanishing above T/2, square-lift parity, pointwise telescoping of s_Y(n), sum_{e|n} |w_2(e)| = (log n)^2, large-prime station disjointness) are window-independent; the fringe feature norm bound ||G_{Phi_2}||_{Y, w_0}^2 <= (8192*w_0^5*log w_0)/(log Y)^2 + (324*w_0^5*log w_0)/Y^(5/4) is formally proved in Lean for every real window base w_0 > 1 (paramWindowNormSq Y w_0) and specialized to w_0 = tau, while the uniform O(1) scalar fringe bound ||Phi_{fringe,Y}^{scal}||_Y^2 <= C_fr is formalized specifically on the canonical w_0 = tau window (windowEnergyNormSq Y). No result in TASK-TC-065 relies on any tau-specific transcendence property.",
-      "e2_cutoff_specification_note": "Route 6 E2 is implemented on the exact prime-power partition p^k > floor(sqrt(T)) vs p^k <= floor(sqrt(T)) matching Lean splitFeatureHighV / splitFeatureLowV (exact channel orthogonality <V_gt, V_le>_Y = 0). Pairwise station disjointness (Theorem 4 Part 4b) holds for distinct primes p_1 != p_2 > floor(sqrt(T)), whereas same-prime higher powers p^k, p^(k+1) > floor(sqrt(T)) share multiples. The frozen protocol file is preserved byte-for-byte unchanged; both p^k > floor(sqrt(T)) and strict prime p > floor(sqrt(T)) yield strictly positive growing T_main^{(E2)} > 0 for all tested scales Y >= 64.",
+      "window_base_generality": "All finite-set arithmetic identities (paired-station partition, odd prime-power vanishing above T/2, square-lift parity, pointwise telescoping of s_Y(n), sum_{e|n} |w_2(e)| = (log n)^2, large-prime station disjointness) are window-independent; the fringe feature norm bound ||G_{Phi_2}||_{Y, w_0}^2 <= (8192*w_0^5*log w_0)/(log Y)^2 + (324*w_0^5*log w_0)/Y^(5/4) is formally proved in Lean for every fixed real window base w_0 > 1 (paramWindowNormSq Y w_0) and specialized to w_0 = tau, while the uniform O(1) scalar fringe bound ||Phi_{fringe,Y}^{scal}||_Y^2 <= C_fr is formalized strictly on the canonical w_0 = tau window (windowEnergyNormSq Y; no general-base constant formula is asserted for the scalar fringe bound). Both bounds are norm/squared-norm bounds on fringe terms; squared-energy comparisons also retain mixed inner-product terms 2*Re<F, R>. No result in TASK-TC-065/TC-065R relies on any tau-specific transcendence property.",
+      "e2_cutoff_specification_note": "Route 6 E2 is implemented on the exact prime-power partition p^k > floor(sqrt(T)) vs p^k <= floor(sqrt(T)) matching Lean splitFeatureHighV / splitFeatureLowV (exact channel orthogonality <V_gt, V_le>_Y = 0). Pairwise station disjointness (Theorem 4 Part 4b) holds for distinct primes p_1 != p_2 > floor(sqrt(T)), whereas same-prime higher powers p^k, p^(k+1) > floor(sqrt(T)) share multiples. The frozen protocol file is preserved byte-for-byte unchanged. As certified finite observations, prime-power T_main^{(E2)} is strictly positive on seen Y in {64, 128, 256, 512}, unseen Y in {100, 300, 600, 1200, 1600, 1800}, and intervals [101.60, 102.45] and [1558.50, 1558.60] (non-monotone across the combined set: +0.1471 at Y = 256 vs +0.1368 at Y = 300; no asymptotic growth or monotonicity is inferred from samples); strict-prime p > floor(sqrt(T)) was spot-checked strictly positive at sample scales {EXP3-LEFT, 64, 100, 128}.",
+      "s3_and_s2_scope_note_tc065r": "TASK-TC-065R withdraws the unproved aggregate decay claim ||L_{S3} V_Y||_Y^2 = O((log Y)^(-2)): exact implementation gives L_{S3} V_Y(X) = (log 2)/(2*log X) * S_{even,Y}(X) with elementary valid bounds ((log 2)^2 / (4*(log(tau*Y))^2))*||S_{even,Y}||_Y^2 <= ||L_{S3} V_Y||_Y^2 <= ((log 2)^2 / (4*(log Y)^2))*||S_{even,Y}||_Y^2 for real Y >= 2, where uniform control of ||S_{even,Y}||_Y is an unproved arithmetic requirement. Similarly, for S2 (M_pp(T) = sqrt(sum_{(q,j) in P(T)} (log q)^2 / q^j), w_{(p,k)} = (1/2)*(log p)/(p^(k/2)*M_pp(T))), the outside-Lean per-station coefficient bound O((log Y)^(-3/2)*log log Y) does not bound total energy ||L_{S2} V_Y||_Y^2.",
       "scaling_distinction_carried_forward": "Fixed square dilation n |-> b^2*n gives phi_{b^2*n}(X) = b^(-1)*phi_n(X/b^2) on the bare Gaussian while changing supports and adjusted beta_Y terms on complete profiles psi_{Y,n}; running-index squaring n |-> n^2 yields zeta(2*x + 2*i*y) on x > 1/2; Liouville convolution 1 * lambda = 1_square yields zeta(x + i*y)*L_lambda(x + i*y) = zeta(2*x + 2*i*y); tau^K grade transport parameterizes the integration window [Y, tau*Y].",
       "carried_forward_tc064r_corrections": "Carries forward Attempt 1 (common-factor/coprime GCD sectors & signed log-GCD identity) and Attempt 2 (prime-toggle involution & exact resonant boundary {a in C_res(Y) : p nmid a} under strict 2*p*Y > T(Y)), A_a / B_a^feat profile notation, withdrawal of the unproved full-profile p^(-3) comparison, aggregate-only large-g tail bound, and the Section 9 limit clarification (finite Euler multiplier M_S(z) has nonzero limit prod_{q in S} (q+1)/(q-1) != 0 as z -> 1, while the modified Liouville quotient L_{a_S}(z) -> 0 as z -> 1, z != 1)."
     },
@@ -125,7 +131,7 @@
       {
         "premise_id": "TC065-PREM-02-DAMPED-CORE-EXACT-EQUIVALENCE-AND-FRINGE-BOUNDS",
         "stage": "Stage 1A (Damped-Target Identity, Paired-Station Synthesis, Telescoping, & Uniform Fringe Bounds)",
-        "statement": "For all real Y >= 2: D_core(Y) = ||U_Y||^2 - 4*||V_Y||^2 - J_A(Y), S_core(Y) = D_core(Y) + 4*J_B(Y), H(D_core, D_tilde) <-> H(S_core, D_tilde); U_Y = 2*P_{Omega_2} - O_{Omega_2} = Q_T + A_T - S_spill - Phi_fringe; for all w_0 > 1 and Y >= 2, ||G_{Phi_2}||_{Y,w_0}^2 <= (8192*w_0^5*log w_0)/(log Y)^2 + (324*w_0^5*log w_0)/Y^(5/4), giving | ||V_Y||_Y - sqrt(D_tilde(Y)) | <= O(1/log Y); and ||Phi_fringe||_Y^2 <= C_fr = O(1)",
+        "statement": "For all real Y >= 2: D_core(Y) = ||U_Y||^2 - 4*||V_Y||^2 - J_A(Y), S_core(Y) = D_core(Y) + 4*J_B(Y), H(D_core, D_tilde) <-> H(S_core, D_tilde); U_Y = 2*P_{Omega_2} - O_{Omega_2} = Q_T + A_T - S_spill - Phi_fringe (with O_{Omega_2}(X) = (sum_{n in Omega_2(T)} (s_Y(n) - lambda(n)*(log(X/n))^2)*phi_n(X)) / (log X)^2); for all w_0 > 1 and Y >= 2, ||G_{Phi_2}||_{Y,w_0}^2 <= (8192*w_0^5*log w_0)/(log Y)^2 + (324*w_0^5*log w_0)/Y^(5/4), giving norm coincidence | ||V_Y||_Y - sqrt(D_tilde(Y)) | = O(1/log Y) on the canonical tau window; and on the canonical tau window (w_0 = tau, Y >= 2), ||Phi_fringe||_Y^2 <= C_fr = O(1) (these are norm/squared-norm bounds on fringe terms; squared-energy comparisons also retain mixed terms 2*Re<F, R>)",
         "location": "formal/RiemannScope/ScalarFeatureCompensation.lean::damped_core_defect_and_closure_equivalence_tc065, paired_station_partition_divisor_synthesis_and_telescoping_tc065, coupled_mode_expansion_uniform_fringe_bounds_and_orthogonality_tc065",
         "status": "PROVED_IN_LEAN",
         "gap_classification": "NONE"
@@ -133,7 +139,7 @@
       {
         "premise_id": "TC065-PREM-03-SYNTHESIS-OPERATOR-NORM-AND-OBSTRUCTIONS",
         "stage": "Stage 1B (Route 5 Synthesis Budget, Exact Operator Norm, & Pointwise Obstructions)",
-        "statement": "Exact Hilbert budget D_core = 4<L_Y V_Y, R_Y> + ||R_Y||^2 - J_A - 4(||V_Y||^2 - ||L_Y V_Y||^2), strict-contraction bound D_core <= ||R_Y||^2/(1 - r^2) - J_A (0 <= r < 1), exact pointwise operator norm bound & constant-weight tightness, channel-weight dilution (sqrt(|P_act|) - r)^2 <= sum (1 - w)^2, and pointwise oracle residual lower bound",
+        "statement": "Exact Hilbert budget D_core = 4<L_Y V_Y, R_Y> + ||R_Y||^2 - J_A - 4(||V_Y||^2 - ||L_Y V_Y||^2), strict-contraction bound D_core <= ||R_Y||^2/(1 - r^2) - J_A (0 <= r < 1), exact pointwise operator norm bound & constant-weight tightness (ContinuousOn weights on [Y, tau*Y] in Lean; measurable a.e.-bounded extension outside Lean), channel-weight dilution (sqrt(|P_act|) - r)^2 <= sum (1 - w)^2 for 0 <= r <= sqrt(|P_act|), and pointwise oracle residual lower bound (ContinuousOn weights in Lean; unsigned a(n) = 1 scaling E_1/(4*D_tilde_1) = Theta((log Y)^2) is an outside-Lean analytic argument)",
         "location": "formal/RiemannScope/ScalarFeatureCompensation.lean::arithmetic_synthesis_hilbert_budget_operator_norm_and_obstructions_tc065",
         "status": "PROVED_IN_LEAN",
         "gap_classification": "NONE"
@@ -141,7 +147,7 @@
       {
         "premise_id": "TC065-PREM-04-DIRECT-E-MINUS-4DTILDE-CLOSURE-TRANSFER",
         "stage": "Stage 1C (Conditional Direct Route D Transfer for E_lambda - 4*D_tilde Using Only PREM-04..06)",
-        "statement": "Given MixedCovarianceClosureHypothesis(E_lambda - 4*D_tilde, D_tilde) and TC063-PREM-04..06 (without requiring TC063-PREM-07 on ||A_T||^2), forall eps > 0, exists C_eps >= 0, forall Z >= 1, canonicalLiouvilleEnergyE(Z) <= C_eps * Z^eps (and converse holds unconditionally)",
+        "statement": "Given MixedCovarianceClosureHypothesis(E_lambda - 4*D_tilde, D_tilde) and outside-Lean analytic inputs TC063-PREM-04..06 (removing TC063-PREM-07 on ||A_T||^2 from this forward branch), forall eps > 0, exists C_eps >= 0, forall Z >= 1, canonicalLiouvilleEnergyE(Z) <= C_eps * Z^eps (the converse holds unconditionally in Lean; further connection to RH still requires TC063-PREM-08, outside-Lean TC063-PREM-09, and TC063-PREM-10, and Theorems 1 and 5 alone do not prove an unconditional equivalence between D_core and E_lambda - 4*D_tilde)",
         "location": "formal/RiemannScope/ScalarFeatureCompensation.lean::bare_liouville_shifted_dilation_closure_and_euler_limit_tc065",
         "status": "CONDITIONAL_PROVED_IN_LEAN",
         "gap_classification": "NONE_FOR_TRANSFER_IMPLICATION"
@@ -8606,5 +8612,6 @@
       "section_4_unseen_validation_and_interval_splits": "SECTION_EPISTEMIC_SCOPE_VALID",
       "section_5_lean_audit_and_gate_accounting": "SECTION_EPISTEMIC_SCOPE_VALID"
     }
-  }
+  },
+  "repair_task_id": "TASK-TC-065R"
 }
