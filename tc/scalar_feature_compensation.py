@@ -3301,11 +3301,24 @@ def reprocess_task_tc065_metadata_and_audit(
 
     # Sync Section 1 explanatory metadata & protocol verification only (zero numerical changes)
     sec1_fresh = verify_section_1_protocols_and_premise_chain()
+    upstream_checks = sec1_fresh.get("upstream_preservation_checks") if isinstance(sec1_fresh, dict) else None
+    if (
+        not isinstance(sec1_fresh, dict)
+        or sec1_fresh.get("all_section_1_checks_pass") is not True
+        or not isinstance(upstream_checks, dict)
+        or not upstream_checks
+        or not all(v is True for v in upstream_checks.values())
+    ):
+        raise ValueError(
+            "Section 1 protocol and upstream-preservation verification failed or missing "
+            f"(all_section_1_checks_pass={sec1_fresh.get('all_section_1_checks_pass') if isinstance(sec1_fresh, dict) else None!r}, "
+            f"upstream_preservation_checks={upstream_checks!r})"
+        )
     sec1_u = updated["section_1_protocols_and_premise_chain"]
     sec1_u["window_base_and_scaling_scope"] = sec1_fresh["window_base_and_scaling_scope"]
     sec1_u["premise_and_dependency_table"] = sec1_fresh["premise_and_dependency_table"]
     sec1_u["upstream_preservation_checks"] = sec1_fresh["upstream_preservation_checks"]
-    sec1_u["all_section_1_checks_pass"] = sec1_fresh["all_section_1_checks_pass"]
+    sec1_u["all_section_1_checks_pass"] = True
 
     # Re-validate Section 4 fail-closed on untouched point/interval payloads
     sec4_u = updated["section_4_unseen_validation_and_interval_splits"]
@@ -3314,12 +3327,15 @@ def reprocess_task_tc065_metadata_and_audit(
         sec4_u["continuous_interval_case_splits"],
         proto_obj,
     )
-    if not (re_agg["all_section_4_checks_pass"] and re_agg["certification_integrity_ok"]):
+    if not (
+        re_agg.get("all_section_4_checks_pass") is True
+        and re_agg.get("certification_integrity_ok") is True
+    ):
         raise ValueError(f"Section 4 fail-closed re-validation failed: {re_agg['certification_integrity_conflicts']}")
 
     # Live audit of unchanged Lean module & formal/build_report.json
     sec5_fresh = verify_section_5_lean_audit_and_gate_accounting()
-    if not sec5_fresh["all_section_5_checks_pass"]:
+    if not isinstance(sec5_fresh, dict) or sec5_fresh.get("all_section_5_checks_pass") is not True:
         raise ValueError("Section 5 live Lean audit failed")
 
     # Audit all 975 serialized Arb balls & epistemic scope metadata

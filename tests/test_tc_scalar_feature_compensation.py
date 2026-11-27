@@ -675,3 +675,50 @@ def test_tc065r_reconciliation_identities_ratios_and_payload_preservation(
         assert reproc[sec_k] == tc065_artifact[sec_k], f"Reprocess altered {sec_k}"
     assert reproc["provenance"]["numerical_producing_git_commit"] == tc065_artifact["provenance"]["numerical_producing_git_commit"]
     assert reproc["provenance"]["formal_producing_git_commit"] == tc065_artifact["provenance"]["formal_producing_git_commit"]
+
+
+def test_tc065r_reprocessor_rejects_failed_or_missing_section1_without_modifying_artifact(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Regression: metadata-only reprocessor must fail closed if fresh Section 1 validation
+    is False or missing (e.g. an upstream-preservation failure), leaving the artifact
+    byte-for-byte unchanged and never returning an inconsistent passing artifact.
+    """
+    import tc.scalar_feature_compensation as sfc
+
+    tmp_artifact = tmp_path / "tc_scalar_feature_compensation.json"
+    orig_bytes = SCALAR_FEATURE_ARTIFACT_PATH.read_bytes()
+    tmp_artifact.write_bytes(orig_bytes)
+
+    real_sec1 = verify_section_1_protocols_and_premise_chain()
+    assert real_sec1["all_section_1_checks_pass"] is True
+
+    # Case 1: Fresh Section 1 fails an upstream-preservation check (all_section_1_checks_pass = False)
+    failed_sec1 = copy.deepcopy(real_sec1)
+    failed_sec1["upstream_preservation_checks"]["tc064_artifact_sha256_preserved"] = False
+    failed_sec1["all_section_1_checks_pass"] = False
+    monkeypatch.setattr(sfc, "verify_section_1_protocols_and_premise_chain", lambda: failed_sec1)
+    with pytest.raises(ValueError, match="Section 1"):
+        reprocess_task_tc065_metadata_and_audit(
+            tmp_artifact,
+            write_output=True,
+            validation_commit_override="deadbeef00000000000000000000000000000000",
+        )
+    assert tmp_artifact.read_bytes() == orig_bytes
+    with pytest.raises(ValueError, match="Section 1"):
+        reprocess_task_tc065_metadata_and_audit(tmp_artifact, write_output=False)
+
+    # Case 2: Fresh Section 1 omits all_section_1_checks_pass entirely
+    missing_sec1 = copy.deepcopy(real_sec1)
+    missing_sec1.pop("all_section_1_checks_pass", None)
+    monkeypatch.setattr(sfc, "verify_section_1_protocols_and_premise_chain", lambda: missing_sec1)
+    with pytest.raises(ValueError, match="Section 1"):
+        reprocess_task_tc065_metadata_and_audit(
+            tmp_artifact,
+            write_output=True,
+            validation_commit_override="deadbeef00000000000000000000000000000000",
+        )
+    assert tmp_artifact.read_bytes() == orig_bytes
+    with pytest.raises(ValueError, match="Section 1"):
+        reprocess_task_tc065_metadata_and_audit(tmp_artifact, write_output=False)
