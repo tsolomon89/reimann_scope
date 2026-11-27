@@ -46,3 +46,5 @@ import RiemannScope.SignedDilationArithmeticEnergy
 import RiemannScope.MixedArithmeticCovariance
 import RiemannScope.JointPrimeDilationSignedRemainder
 import RiemannScope.DyadicChainCorrelationRegularity
+import RiemannScope.SquarefreeCoreCorrelation
+import RiemannScope.ScalarFeatureCompensation
