@@ -601,24 +601,33 @@ def test_tc065r_reconciliation_identities_ratios_and_payload_preservation(
         c_hi_s3 = (arb(2).log() ** 2) / (arb(4) * (arb(Y).log() ** 2)) * s_even_norm_sq
         assert bool(c_lo_s3 < ev16["S3_LV_norm_sq"] < c_hi_s3)
 
-        # 2. Exact outward Y = 512 squared-norm ratios and exact S2/S3 witness sets from committed artifact
-        def _to_arb(b: dict) -> arb:
-            lo, hi = Fraction(b["lower_dec"]), Fraction(b["upper_dec"])
-            return (arb(lo.numerator) / arb(lo.denominator)).union(arb(hi.numerator) / arb(hi.denominator))
+        # 2. Exact Fraction outward-rounded Y = 512 squared-norm ratios and exact S2/S3 witness sets
+        def _pct_interval(num_b: dict, den_b: dict, den_scale: Fraction = Fraction(1, 1)) -> tuple[Fraction, Fraction]:
+            n_lo, n_hi = Fraction(num_b["lower_dec"]), Fraction(num_b["upper_dec"])
+            d_lo, d_hi = Fraction(den_b["lower_dec"]) * den_scale, Fraction(den_b["upper_dec"]) * den_scale
+            assert n_lo >= 0 and d_lo > 0
+            return (n_lo / d_hi) * 100, (n_hi / d_lo) * 100
 
         r512 = tc065_artifact["section_3_seen_discovery_and_controls"]["seen_discovery_rows"][3]
         assert r512["Y"] == 512
-        u512 = _to_arb(r512["U_norm_sq_Y"])
-        v512 = _to_arb(r512["four_V_norm_sq_Y"]) / arb(4)
-        assert bool(u512 > arb(0)) and bool(v512 > arb(0))
-        s2_u = float((_to_arb(r512["S2_LV_norm_sq"]) / u512).mid()) * 100.0
-        s2_v = float((_to_arb(r512["S2_LV_norm_sq"]) / v512).mid()) * 100.0
-        s2_r = float((_to_arb(r512["S2_R_norm_sq"]) / u512).mid()) * 100.0
-        s3_u = float((_to_arb(r512["S3_LV_norm_sq"]) / u512).mid()) * 100.0
-        s3_v = float((_to_arb(r512["S3_LV_norm_sq"]) / v512).mid()) * 100.0
-        s3_r = float((_to_arb(r512["S3_R_norm_sq"]) / u512).mid()) * 100.0
-        assert abs(s2_u - 0.226) < 0.001 and abs(s2_v - 0.464) < 0.001 and abs(s2_r - 119.340) < 0.002
-        assert abs(s3_u - 0.266) < 0.001 and abs(s3_v - 0.545) < 0.001 and abs(s3_r - 101.468) < 0.002
+        for (num_k, den_k, scale_d, pub_lo, pub_hi) in (
+            ("S2_LV_norm_sq", "U_norm_sq_Y", Fraction(1, 1), Fraction("0.226195"), Fraction("0.226196")),
+            ("S2_LV_norm_sq", "four_V_norm_sq_Y", Fraction(1, 4), Fraction("0.463958"), Fraction("0.463959")),
+            ("S2_R_norm_sq", "U_norm_sq_Y", Fraction(1, 1), Fraction("119.340028"), Fraction("119.340029")),
+            ("S3_LV_norm_sq", "U_norm_sq_Y", Fraction(1, 1), Fraction("0.265780"), Fraction("0.265781")),
+            ("S3_LV_norm_sq", "four_V_norm_sq_Y", Fraction(1, 4), Fraction("0.545152"), Fraction("0.545153")),
+            ("S3_R_norm_sq", "U_norm_sq_Y", Fraction(1, 1), Fraction("101.467599"), Fraction("101.467600")),
+        ):
+            r_lo, r_hi = _pct_interval(r512[num_k], r512[den_k], scale_d)
+            assert pub_lo <= r_lo <= r_hi <= pub_hi, (
+                f"Published 6dp bracket [{pub_lo}, {pub_hi}] does not enclose {num_k}/{den_k} = [{float(r_lo):.9f}, {float(r_hi):.9f}]"
+            )
+
+        # Verify seen TC-064 J_A / |D_core| exact outward containment in [50.4%, 71.3%]
+        for seen_r in tc065_artifact["section_2_seen_reproduction_algebra_and_cross_checks"]["seen_derived_from_tc064_certificates"]["rows"]:
+            ja_lo = Fraction(seen_r["J_A_negativity_share_of_damped_defect"]["lower_dec"]) * 100
+            ja_hi = Fraction(seen_r["J_A_negativity_share_of_damped_defect"]["upper_dec"]) * 100
+            assert Fraction("50.4") <= ja_lo <= ja_hi <= Fraction("71.3")
 
         # Verify S2 & S3 sufficient margins are strictly NEGATIVE (PASS) at unseen Y = 300 and Y = 600,
         # and strictly POSITIVE (FAIL) at Y = 1200, 1600, 1800 (with Y = 1800 ~ +0.03740 / +0.01865)
@@ -626,6 +635,15 @@ def test_tc065r_reconciliation_identities_ratios_and_payload_preservation(
             r["point_id"]: r
             for r in tc065_artifact["section_4_unseen_validation_and_interval_splits"]["holdout_point_evaluations"]
         }
+        # Outward enclosure [0.516%, 0.599%] for S2 ||LV||^2 / ||U||^2 across {600, 1200, 1600, 1800}
+        # and [4.203150%, 4.203151%] at TC065-HO-EXP3-LEFT
+        for pid in ("TC065-HO-600", "TC065-HO-1200", "TC065-HO-1600", "TC065-HO-1800"):
+            p_lo, p_hi = _pct_interval(pts_by_id[pid]["S2_LV_norm_sq"], pts_by_id[pid]["U_norm_sq_Y"])
+            assert Fraction("0.516") <= p_lo <= p_hi <= Fraction("0.599"), f"{pid}: [{float(p_lo):.6f}, {float(p_hi):.6f}]"
+        exp3_lo, exp3_hi = _pct_interval(
+            pts_by_id["TC065-HO-EXP3-LEFT"]["S2_LV_norm_sq"], pts_by_id["TC065-HO-EXP3-LEFT"]["U_norm_sq_Y"]
+        )
+        assert Fraction("4.203150") <= exp3_lo <= exp3_hi <= Fraction("4.203151")
         for pid in ("TC065-HO-300", "TC065-HO-600"):
             assert Fraction(pts_by_id[pid]["S2_suff_bound"]["upper_dec"]) < 0
             assert Fraction(pts_by_id[pid]["S3_suff_bound"]["upper_dec"]) < 0
