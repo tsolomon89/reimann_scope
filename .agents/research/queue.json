@@ -1,6 +1,6 @@
 {
   "queue_version": "1.0.0",
-  "active_task_id": "TASK-TC-065",
+  "active_task_id": "TASK-TC-065R",
   "tasks": [
     {
       "task_id": "TASK-TC-001",
@@ -2445,6 +2445,38 @@
         }
       },
       "resolution": "TASK-TC-065 completed and ACCEPTED after Round 2 PASS verdicts from independent `math-auditor` (`40967302-0b1a-44b1-9c98-c4360c568508`) and `numerical-verifier` (`4b752cb0-d4b6-4ff2-8b6e-96e4d1523daf`) on audited commit `3e6c8fea09c677b52040341d5152b59bdb913a78` (frozen protocol `bcddccf451e33486db42d013d1a645c319cb3bd8`, formal producer `1c767f9e01d77c85c7c10ad6f1f9373409d83af7` with `845` compiled Lean theorems, `0` sorry, `0` custom axioms, clean numerical/validation producer `fd734f59cb720072cb4abeb33448107373bbaafe`, regenerated certified artifact `97511f824521b4d86b5554ce6d48f637c8056462` with `975/975` 256-bit Arb balls and `0` conflicts): proved exact paired-station divisor synthesis & pointwise telescoping of `s_Y(n)`, universal Route 5 pointwise synthesis obstructions (`ContinuousOn` weights in Lean, exact operator norm, dilution under `r <= sqrt(|P_act|)`, oracle residual lower bound, and unsigned `a(n)=1` `Theta((log Y)^2)` barrier), unconditional general-base (`w_0 > 1`) fringe feature norm bound `O((log Y)^(-2))` and canonical-`tau` (`w_0 = tau`) `O(1)` scalar fringe bound plus exact `M = floor(sqrt(T))` prime-power feature orthogonality, and direct conditional Route D closure for bare `E_lambda - 4*D_tilde` bypassing `PREM-07` plus exact `z -> 1` nonzero limit of `M_S(z)` vs zero limit of `L_{a_S}(z)`; refuted all 6 concrete candidates (`S1..S4, E1, E2`) with certified 256-bit Arb witnesses while `TC065-P0-DAMPED`, `TC065-P-NEG-DAMPED`, `TC065-P-UV-DOM`, `TC065-P-E3-MAIN`, and `TC065-THM-FRINGE-FEAT-BOUND` achieved `SURVIVED_TESTED_POINTS` across `8/8` unseen points and `3/3` continuous intervals (`10` cells), `199/199` review enclosures & `13/13` declaration-verified Lean anchors passed, and `SUBGATE-TC-043A` remains `OPEN` (`rh_proved = False`, `global_energy_improvement_claimed = False`)."
+    },
+    {
+      "task_id": "TASK-TC-065R",
+      "epic_id": "EPIC-TC-042",
+      "priority": 92,
+      "objective": "Mathematical Proof-Scope and Delivery-Report Reconciliation (TASK-TC-065R)",
+      "status": "AWAITING_INDEPENDENT_REVIEW",
+      "review_status": "AWAITING_INDEPENDENT_REVIEW",
+      "open_implication": "SUBGATE-TC-043A remains OPEN (rh_proved = False, global_energy_improvement_claimed = False): all TC-065R proof-scope, formula, and numerical-interpretation reconciliations preserve all 5 Lean theorems (845 compiled, 0 sorry, 0 custom axioms), all 5 frozen protocols, and all 975/975 certified 256-bit Arb enclosures identically, leaving the exact unproved arithmetic target: forall eta > 0, exists A_eta, B_eta >= 0, 0 < kappa_eta <= 2, Y_eta >= 2: forall real Y >= Y_eta, E_lambda(Y) - 4*D_tilde(Y) <= A_eta * Y^eta + B_eta * (log Y)^(2 - kappa_eta) * D_tilde(Y).",
+      "planned_calculation": "1) Withdraw unproved S3 aggregate decay claim ||L_S3 V_Y||_Y^2 = O((log Y)^(-2)) as UNPROVED, replacing with exact L_S3 V_Y(X) = (log 2)/(2*log X)*S_even,Y(X), elementary two-sided bounds for Y >= 2, and exact dyadic-scaling identity; inspect S2 dilution for the same coefficient-to-energy separation. 2) Reconcile exact S2 weights (M_pp(T), w_{(p,k)} = (1/2)*(log p)/(p^(k/2)*M_pp(T))), E1 split (U_main = Q_T + A_T, U_rem = -S_spill,T - Phi_fringe,Y), and exact pairedOpenCoreOscO O_{Omega_2,Y}(X) = (sum_{n in Omega_2(T)} (s_Y(n) - lambda(n)*(log(X/n))^2)*phi_n(X)) / (log X)^2. 3) Recompute exact outward Y = 512 squared-norm ratios (||LV||^2/||U||^2, ||LV||^2/||V||^2, ||R||^2/||U||^2) removing orthogonal-partition and >99.7% claims; fix exact S2/S3 positive witness sets (PASS at Y = 300, 600; actual Y = 1800 margins +0.03740 / +0.01865 vs withdrawn +0.171), seen J_A/|D_core| range (50.4%-71.3%), and finite-set qualification + E2 non-monotonicity (256 -> 300). 4) Keep S4 non-refutation caveats and fringe norm vs squared-energy mixed-term caveats explicit; separate outside-Lean unsigned a(n) = 1 Theta((log Y)^2) from Lean Theorem 3, canonical-tau Theorem 4 scalar fringe scope, and directional closure premises of Theorems 1 and 5. 5) Reprocess Section 1 explanatory metadata only on data/tc_scalar_feature_compensation.json preserving all 975 Arb balls and Sections 2-5 identically, persist claim-by-claim erratum in TC_065 review §7, add targeted TC-065R regression test, pass independent math-auditor and numerical-verifier reviews, and pass all repository gates.",
+      "parent_subgate": "SUBGATE-TC-043A",
+      "branch": "task/tc-065r-proof-scope-and-report-reconciliation",
+      "dependencies": [
+        "TASK-TC-065"
+      ],
+      "deliverables": [
+        "tc/scalar_feature_compensation.py",
+        "data/tc_scalar_feature_compensation.json",
+        "docs/reviews/TC_065_ARITHMETIC_SCALAR_FEATURE_COMPENSATION.md",
+        "tests/test_tc_scalar_feature_compensation.py",
+        "formal/RiemannScope/README.md",
+        "RESEARCH_LEDGER.md",
+        ".agents/corpus_map/obligation_register.md"
+      ],
+      "provenance": {
+        "reviewed_tc065_tip": "02924e6103edf7e387c9da05f5eac2e142b98b54",
+        "preserved_protocol_registration_commit": "bcddccf451e33486db42d013d1a645c319cb3bd8",
+        "preserved_formal_producing_git_commit": "1c767f9e01d77c85c7c10ad6f1f9373409d83af7",
+        "preserved_numerical_producing_git_commit": "fd734f59cb720072cb4abeb33448107373bbaafe",
+        "tc065r_metadata_repair_git_commit": "a5afd553e745e09af02f9d25bfbcdc8211c6f5c9",
+        "tc065r_reprocessed_artifact_commit": "2c4e8fe2adf35cb02f13f12d46a2ff59d94691dc"
+      }
     }
   ]
 }

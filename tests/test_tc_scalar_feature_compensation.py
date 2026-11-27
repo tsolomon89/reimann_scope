@@ -11,12 +11,15 @@ import json
 import math
 from pathlib import Path
 
-from flint import arb, ctx as flint_ctx
+from flint import acb, arb, ctx as flint_ctx
 import pytest
 
 from tc.canonical_theta_correlation_bound import REPO_ROOT
+from tc.coupled_scale_energy_bootstrap import _tau_arb, prime_power_pairs_up_to
+from tc.liouville_square_dilation import liouville_lambda_int
 from tc.mixed_arithmetic_covariance import (
     CERTIFICATION_INTEGRITY_CONFLICT_OUTCOME,
+    compute_complete_core_s_Y_and_beta_Y_arb,
     compute_selberg_centered_remainder_table_fast_arb,
 )
 from tc.scalar_feature_compensation import (
@@ -27,6 +30,7 @@ from tc.scalar_feature_compensation import (
     FROZEN_TC065_PROTOCOL_SHA256,
     SCALAR_FEATURE_ARTIFACT_PATH,
     TASK_TC_065_ID,
+    TASK_TC_065R_ID,
     TC_065_REVIEW_DOC_PATH,
     _audit_all_serialized_arb_balls_in_tc065_artifact,
     active_paired_prime_powers,
@@ -37,6 +41,7 @@ from tc.scalar_feature_compensation import (
     evaluate_bare_sequence_energy_and_diag_arb,
     evaluate_scalar_feature_compensation_1d_arb,
     paired_station_partition,
+    reprocess_task_tc065_metadata_and_audit,
     verify_exact_tc065_algebraic_identities,
     verify_frozen_tc065_protocol_immutability,
     verify_section_1_protocols_and_premise_chain,
@@ -506,7 +511,149 @@ def test_tc065_live_lean_audit_review_consistency_and_adversarial_review_checks(
     q_obj = json.loads((REPO_ROOT / ".agents" / "research" / "queue.json").read_text(encoding="utf-8"))
     q_ids = {t["task_id"] for t in q_obj["tasks"]}
     assert TASK_TC_065_ID in q_ids
-    assert q_obj["active_task_id"] == TASK_TC_065_ID
+    assert TASK_TC_065R_ID in q_ids
+    assert q_obj["active_task_id"] in {TASK_TC_065_ID, TASK_TC_065R_ID}
     s_obj = json.loads((REPO_ROOT / ".agents" / "research" / "state.json").read_text(encoding="utf-8"))
     assert s_obj.get("rh_proved", False) is False
     assert "data/tc_scalar_feature_compensation.json" in s_obj["linked_runs"]["campaign_artifacts"]
+
+
+def test_tc065r_reconciliation_identities_ratios_and_payload_preservation(
+    tc065_artifact: dict,
+) -> None:
+    """Targeted TASK-TC-065R regression: verify exact S3 identity & dyadic scaling relation,
+    exact S2 M_pp(T) normalization, exact pairedOpenCoreOscO formula, outward Y=512 squared-norm
+    ratios & exact S2/S3 witness sets (PASS at Y=300, 600), and metadata-only payload preservation.
+    """
+    saved_p = flint_ctx.prec
+    try:
+        flint_ctx.prec = 256
+        # 1. Exact S3 identity L_S3 V_Y(X) = (log 2)/(2 log X) * S_even,Y(X), dyadic scaling,
+        #    exact S2 M_pp(T), and exact pairedOpenCoreOscO at Y = 16
+        Y = 16
+        T = canonical_cutoff_T_of_Y_exact(Y)
+        D0_eff = min(int(math.floor(math.log(Y))), T - 1)
+        tbl = compute_selberg_centered_remainder_table_fast_arb(T, prec_bits=256)
+        vecs = compute_complete_core_s_Y_and_beta_Y_arb(T, D0_eff, tbl["R_osc"], prec_bits=256)
+        om2, phi2 = paired_station_partition(T)
+
+        def _phi(n: int, x: arb) -> arb:
+            return (x ** (arb(5) / arb(2))) * (arb(n) ** (-3)) * (-(x * x) / (arb(n) * arb(n))).exp()
+
+        for mult in (1, 2, 5):
+            X = arb(Y * mult)
+            lgX = X.log()
+            s_even = sum((arb(liouville_lambda_int(n)) * _phi(n, X) for n in om2 if n % 2 == 0), arb(0))
+            q_half = sum(
+                (arb(liouville_lambda_int(m)) * _phi(m, X / arb(2)) for m in range(1, T // 2 + 1)),
+                arb(0),
+            )
+            phi2_even = sum((arb(liouville_lambda_int(n)) * _phi(n, X) for n in phi2 if n % 2 == 0), arb(0))
+            assert bool((s_even - (-(arb(2) ** (arb(-1) / arb(2))) * q_half - phi2_even)).contains(0))
+
+            # Exact pairedOpenCoreOscO matching Lean: (sum_{n in Omega_2} (s_Y(n) - lambda(n)*log(X/n)^2)*phi_n) / (log X)^2
+            o_om_exact = sum(
+                (
+                    (vecs["s_Y"][n] - arb(liouville_lambda_int(n)) * ((X / arb(n)).log() ** 2))
+                    * _phi(n, X)
+                    for n in om2
+                ),
+                arb(0),
+            ) / (lgX * lgX)
+            u_om = sum(
+                ((arb(liouville_lambda_int(n)) - vecs["beta_Y"][n] / (lgX * lgX)) * _phi(n, X) for n in om2),
+                arb(0),
+            )
+            p_om = sum((arb(liouville_lambda_int(n)) * arb(n).log() * _phi(n, X) for n in om2), arb(0)) / lgX
+            assert bool((u_om - (arb(2) * p_om - o_om_exact)).contains(0))
+
+        # Exact S2 M_pp(T) and elementary S3 two-sided bounds against live evaluator
+        ev16 = evaluate_scalar_feature_compensation_1d_arb(
+            arb(Y), T, D0_eff, tbl, prec_bits=256, quad_tol_bits=160, n_panels=8
+        )
+        m_pp_direct = sum(
+            (arb(p).log() ** 2) / arb(p ** k) for p, k in prime_power_pairs_up_to(T)
+        ).sqrt()
+        assert bool((ev16["S2_M_pp_T"] - m_pp_direct).contains(0))
+        # Elementary two-sided S3 bounds via direct Arb quadrature of ||S_even,Y||_Y^2:
+        # (log 2)^2 / (4*(log(tau*Y))^2) * ||S_even,Y||_Y^2 <= ||L_S3 V_Y||_Y^2 <= (log 2)^2 / (4*(log Y)^2) * ||S_even,Y||_Y^2
+        tau_a = _tau_arb()
+        log_tau_a = tau_a.log()
+        om2_even = [n for n in om2 if n % 2 == 0]
+        s_even_norm_sq = arb(0)
+        tol_s = arb(2) ** (-140)
+        for jp in range(4):
+            u_lo = log_tau_a * arb(jp) / arb(4)
+            u_hi = log_tau_a * arb(jp + 1) / arb(4)
+
+            def _s_even_sq(u_var: acb, _an: bool) -> acb:
+                x_c = acb(Y) * u_var.exp()
+                x52 = x_c ** (acb(5) / acb(2))
+                x2 = x_c * x_c
+                val = acb(0)
+                for n_e in om2_even:
+                    val += acb(liouville_lambda_int(n_e)) * x52 * (acb(n_e) ** (-3)) * (-(x2 / acb(n_e * n_e))).exp()
+                return val * val
+
+            s_even_norm_sq += acb.integral(_s_even_sq, acb(u_lo), acb(u_hi), rel_tol=tol_s, abs_tol=tol_s).real
+
+        c_lo_s3 = (arb(2).log() ** 2) / (arb(4) * ((tau_a * arb(Y)).log() ** 2)) * s_even_norm_sq
+        c_hi_s3 = (arb(2).log() ** 2) / (arb(4) * (arb(Y).log() ** 2)) * s_even_norm_sq
+        assert bool(c_lo_s3 < ev16["S3_LV_norm_sq"] < c_hi_s3)
+
+        # 2. Exact outward Y = 512 squared-norm ratios and exact S2/S3 witness sets from committed artifact
+        def _to_arb(b: dict) -> arb:
+            lo, hi = Fraction(b["lower_dec"]), Fraction(b["upper_dec"])
+            return (arb(lo.numerator) / arb(lo.denominator)).union(arb(hi.numerator) / arb(hi.denominator))
+
+        r512 = tc065_artifact["section_3_seen_discovery_and_controls"]["seen_discovery_rows"][3]
+        assert r512["Y"] == 512
+        u512 = _to_arb(r512["U_norm_sq_Y"])
+        v512 = _to_arb(r512["four_V_norm_sq_Y"]) / arb(4)
+        assert bool(u512 > arb(0)) and bool(v512 > arb(0))
+        s2_u = float((_to_arb(r512["S2_LV_norm_sq"]) / u512).mid()) * 100.0
+        s2_v = float((_to_arb(r512["S2_LV_norm_sq"]) / v512).mid()) * 100.0
+        s2_r = float((_to_arb(r512["S2_R_norm_sq"]) / u512).mid()) * 100.0
+        s3_u = float((_to_arb(r512["S3_LV_norm_sq"]) / u512).mid()) * 100.0
+        s3_v = float((_to_arb(r512["S3_LV_norm_sq"]) / v512).mid()) * 100.0
+        s3_r = float((_to_arb(r512["S3_R_norm_sq"]) / u512).mid()) * 100.0
+        assert abs(s2_u - 0.226) < 0.001 and abs(s2_v - 0.464) < 0.001 and abs(s2_r - 119.340) < 0.002
+        assert abs(s3_u - 0.266) < 0.001 and abs(s3_v - 0.545) < 0.001 and abs(s3_r - 101.468) < 0.002
+
+        # Verify S2 & S3 sufficient margins are strictly NEGATIVE (PASS) at unseen Y = 300 and Y = 600,
+        # and strictly POSITIVE (FAIL) at Y = 1200, 1600, 1800 (with Y = 1800 ~ +0.03740 / +0.01865)
+        pts_by_id = {
+            r["point_id"]: r
+            for r in tc065_artifact["section_4_unseen_validation_and_interval_splits"]["holdout_point_evaluations"]
+        }
+        for pid in ("TC065-HO-300", "TC065-HO-600"):
+            assert Fraction(pts_by_id[pid]["S2_suff_bound"]["upper_dec"]) < 0
+            assert Fraction(pts_by_id[pid]["S3_suff_bound"]["upper_dec"]) < 0
+        for pid in ("TC065-HO-1200", "TC065-HO-1600", "TC065-HO-1800"):
+            assert Fraction(pts_by_id[pid]["S2_suff_bound"]["lower_dec"]) > 0
+            assert Fraction(pts_by_id[pid]["S3_suff_bound"]["lower_dec"]) > 0
+        assert abs(pts_by_id["TC065-HO-1800"]["S2_suff_bound"]["mid_float"] - 0.037401) < 1e-4
+        assert abs(pts_by_id["TC065-HO-1800"]["S3_suff_bound"]["mid_float"] - 0.018646) < 1e-4
+        # Verify E2 non-monotonicity between seen Y = 256 and unseen Y = 300
+        r256 = tc065_artifact["section_3_seen_discovery_and_controls"]["seen_discovery_rows"][2]
+        assert Fraction(r256["E2_T_main"]["lower_dec"]) > Fraction(pts_by_id["TC065-HO-300"]["E2_T_main"]["upper_dec"])
+    finally:
+        flint_ctx.prec = saved_p
+
+    # 3. Verify metadata-only reprocess preserves Sections 2-5, generated_at_utc, producers, and all 975 Arb balls identically
+    reproc = reprocess_task_tc065_metadata_and_audit(
+        SCALAR_FEATURE_ARTIFACT_PATH,
+        write_output=False,
+        validation_commit_override=tc065_artifact["provenance"]["validation_git_commit"],
+    )
+    for sec_k in (
+        "generated_at_utc",
+        "section_2_seen_reproduction_algebra_and_cross_checks",
+        "section_3_seen_discovery_and_controls",
+        "section_4_unseen_validation_and_interval_splits",
+        "section_5_lean_audit_and_gate_accounting",
+        "serialized_arb_self_check",
+    ):
+        assert reproc[sec_k] == tc065_artifact[sec_k], f"Reprocess altered {sec_k}"
+    assert reproc["provenance"]["numerical_producing_git_commit"] == tc065_artifact["provenance"]["numerical_producing_git_commit"]
+    assert reproc["provenance"]["formal_producing_git_commit"] == tc065_artifact["provenance"]["formal_producing_git_commit"]
