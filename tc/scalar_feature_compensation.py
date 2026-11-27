@@ -143,7 +143,10 @@ from tc.squarefree_core_correlation import (
 )
 
 TASK_TC_065_ID = "TASK-TC-065"
+TASK_TC_065R_ID = "TASK-TC-065R"
 PROPOSED_TC065_BRANCH = "task/tc-065-arithmetic-scalar-feature-compensation"
+PROPOSED_TC065R_BRANCH = "task/tc-065r-proof-scope-and-report-reconciliation"
+REVIEWED_TC065_TIP = "02924e6103edf7e387c9da05f5eac2e142b98b54"
 ACCEPTED_TC064R_TIP = "9c46ca4c3232afb9eef8b7871cd0fc365cdc3440"
 REVIEWED_TC064_TIP = "7e61dfff4cd6a2f78471182a990c495970fda2b5"
 REVIEWED_MAIN_BASELINE_TC065 = "bf3babfb7857e41c0ea53235d82a48181cefee84"
@@ -1083,9 +1086,12 @@ def _build_tc065_premise_and_dependency_table() -> List[Dict[str, str]]:
             "stage": "Stage 1A (Damped-Target Identity, Paired-Station Synthesis, Telescoping, & Uniform Fringe Bounds)",
             "statement": (
                 "For all real Y >= 2: D_core(Y) = ||U_Y||^2 - 4*||V_Y||^2 - J_A(Y), S_core(Y) = D_core(Y) + 4*J_B(Y), "
-                "H(D_core, D_tilde) <-> H(S_core, D_tilde); U_Y = 2*P_{Omega_2} - O_{Omega_2} = Q_T + A_T - S_spill - Phi_fringe; "
+                "H(D_core, D_tilde) <-> H(S_core, D_tilde); U_Y = 2*P_{Omega_2} - O_{Omega_2} = Q_T + A_T - S_spill - Phi_fringe "
+                "(with O_{Omega_2}(X) = (sum_{n in Omega_2(T)} (s_Y(n) - lambda(n)*(log(X/n))^2)*phi_n(X)) / (log X)^2); "
                 "for all w_0 > 1 and Y >= 2, ||G_{Phi_2}||_{Y,w_0}^2 <= (8192*w_0^5*log w_0)/(log Y)^2 + (324*w_0^5*log w_0)/Y^(5/4), "
-                "giving | ||V_Y||_Y - sqrt(D_tilde(Y)) | <= O(1/log Y); and ||Phi_fringe||_Y^2 <= C_fr = O(1)"
+                "giving norm coincidence | ||V_Y||_Y - sqrt(D_tilde(Y)) | = O(1/log Y) on the canonical tau window; "
+                "and on the canonical tau window (w_0 = tau, Y >= 2), ||Phi_fringe||_Y^2 <= C_fr = O(1) "
+                "(these are norm/squared-norm bounds on fringe terms; squared-energy comparisons also retain mixed terms 2*Re<F, R>)"
             ),
             "location": (
                 "formal/RiemannScope/ScalarFeatureCompensation.lean::"
@@ -1102,8 +1108,10 @@ def _build_tc065_premise_and_dependency_table() -> List[Dict[str, str]]:
             "statement": (
                 "Exact Hilbert budget D_core = 4<L_Y V_Y, R_Y> + ||R_Y||^2 - J_A - 4(||V_Y||^2 - ||L_Y V_Y||^2), "
                 "strict-contraction bound D_core <= ||R_Y||^2/(1 - r^2) - J_A (0 <= r < 1), "
-                "exact pointwise operator norm bound & constant-weight tightness, channel-weight dilution "
-                "(sqrt(|P_act|) - r)^2 <= sum (1 - w)^2, and pointwise oracle residual lower bound"
+                "exact pointwise operator norm bound & constant-weight tightness (ContinuousOn weights on [Y, tau*Y] in Lean; "
+                "measurable a.e.-bounded extension outside Lean), channel-weight dilution "
+                "(sqrt(|P_act|) - r)^2 <= sum (1 - w)^2 for 0 <= r <= sqrt(|P_act|), and pointwise oracle residual lower bound "
+                "(ContinuousOn weights in Lean; unsigned a(n) = 1 scaling E_1/(4*D_tilde_1) = Theta((log Y)^2) is an outside-Lean analytic argument)"
             ),
             "location": (
                 "formal/RiemannScope/ScalarFeatureCompensation.lean::"
@@ -1116,9 +1124,11 @@ def _build_tc065_premise_and_dependency_table() -> List[Dict[str, str]]:
             "premise_id": "TC065-PREM-04-DIRECT-E-MINUS-4DTILDE-CLOSURE-TRANSFER",
             "stage": "Stage 1C (Conditional Direct Route D Transfer for E_lambda - 4*D_tilde Using Only PREM-04..06)",
             "statement": (
-                "Given MixedCovarianceClosureHypothesis(E_lambda - 4*D_tilde, D_tilde) and TC063-PREM-04..06 "
-                "(without requiring TC063-PREM-07 on ||A_T||^2), forall eps > 0, exists C_eps >= 0, "
-                "forall Z >= 1, canonicalLiouvilleEnergyE(Z) <= C_eps * Z^eps (and converse holds unconditionally)"
+                "Given MixedCovarianceClosureHypothesis(E_lambda - 4*D_tilde, D_tilde) and outside-Lean analytic inputs TC063-PREM-04..06 "
+                "(removing TC063-PREM-07 on ||A_T||^2 from this forward branch), forall eps > 0, exists C_eps >= 0, "
+                "forall Z >= 1, canonicalLiouvilleEnergyE(Z) <= C_eps * Z^eps (the converse holds unconditionally in Lean; "
+                "further connection to RH still requires TC063-PREM-08, outside-Lean TC063-PREM-09, and TC063-PREM-10, "
+                "and Theorems 1 and 5 alone do not prove an unconditional equivalence between D_core and E_lambda - 4*D_tilde)"
             ),
             "location": (
                 "formal/RiemannScope/ScalarFeatureCompensation.lean::"
@@ -1212,6 +1222,58 @@ def _build_tc065_premise_and_dependency_table() -> List[Dict[str, str]]:
     ]
 
 
+def _build_tc065_window_base_and_scaling_scope() -> Dict[str, str]:
+    """Canonical Section 1 window-base, E2 cutoff, and TC-064R/TC-065R reconciliation scope notes."""
+    return {
+        "window_base_generality": (
+            "All finite-set arithmetic identities (paired-station partition, odd prime-power vanishing "
+            "above T/2, square-lift parity, pointwise telescoping of s_Y(n), sum_{e|n} |w_2(e)| = (log n)^2, "
+            "large-prime station disjointness) are window-independent; the fringe feature norm bound "
+            "||G_{Phi_2}||_{Y, w_0}^2 <= (8192*w_0^5*log w_0)/(log Y)^2 + (324*w_0^5*log w_0)/Y^(5/4) "
+            "is formally proved in Lean for every fixed real window base w_0 > 1 (paramWindowNormSq Y w_0) "
+            "and specialized to w_0 = tau, while the uniform O(1) scalar fringe bound ||Phi_{fringe,Y}^{scal}||_Y^2 <= C_fr "
+            "is formalized strictly on the canonical w_0 = tau window (windowEnergyNormSq Y; no general-base constant formula "
+            "is asserted for the scalar fringe bound). Both bounds are norm/squared-norm bounds on fringe terms; squared-energy "
+            "comparisons also retain mixed inner-product terms 2*Re<F, R>. No result in TASK-TC-065/TC-065R relies on any "
+            "tau-specific transcendence property."
+        ),
+        "e2_cutoff_specification_note": (
+            "Route 6 E2 is implemented on the exact prime-power partition p^k > floor(sqrt(T)) vs p^k <= floor(sqrt(T)) "
+            "matching Lean splitFeatureHighV / splitFeatureLowV (exact channel orthogonality <V_gt, V_le>_Y = 0). "
+            "Pairwise station disjointness (Theorem 4 Part 4b) holds for distinct primes p_1 != p_2 > floor(sqrt(T)), "
+            "whereas same-prime higher powers p^k, p^(k+1) > floor(sqrt(T)) share multiples. The frozen protocol file "
+            "is preserved byte-for-byte unchanged. As certified finite observations, prime-power T_main^{(E2)} is strictly "
+            "positive on seen Y in {64, 128, 256, 512}, unseen Y in {100, 300, 600, 1200, 1600, 1800}, and intervals "
+            "[101.60, 102.45] and [1558.50, 1558.60] (non-monotone across the combined set: +0.1471 at Y = 256 vs +0.1368 at "
+            "Y = 300; no asymptotic growth or monotonicity is inferred from samples); strict-prime p > floor(sqrt(T)) was "
+            "spot-checked strictly positive at sample scales {EXP3-LEFT, 64, 100, 128}."
+        ),
+        "s3_and_s2_scope_note_tc065r": (
+            "TASK-TC-065R withdraws the unproved aggregate decay claim ||L_{S3} V_Y||_Y^2 = O((log Y)^(-2)): "
+            "exact implementation gives L_{S3} V_Y(X) = (log 2)/(2*log X) * S_{even,Y}(X) with elementary valid bounds "
+            "((log 2)^2 / (4*(log(tau*Y))^2))*||S_{even,Y}||_Y^2 <= ||L_{S3} V_Y||_Y^2 <= ((log 2)^2 / (4*(log Y)^2))*||S_{even,Y}||_Y^2 "
+            "for real Y >= 2, where uniform control of ||S_{even,Y}||_Y is an unproved arithmetic requirement. "
+            "Similarly, for S2 (M_pp(T) = sqrt(sum_{(q,j) in P(T)} (log q)^2 / q^j), w_{(p,k)} = (1/2)*(log p)/(p^(k/2)*M_pp(T))), "
+            "the outside-Lean per-station coefficient bound O((log Y)^(-3/2)*log log Y) does not bound total energy ||L_{S2} V_Y||_Y^2."
+        ),
+        "scaling_distinction_carried_forward": (
+            "Fixed square dilation n |-> b^2*n gives phi_{b^2*n}(X) = b^(-1)*phi_n(X/b^2) on the bare "
+            "Gaussian while changing supports and adjusted beta_Y terms on complete profiles psi_{Y,n}; "
+            "running-index squaring n |-> n^2 yields zeta(2*x + 2*i*y) on x > 1/2; Liouville convolution "
+            "1 * lambda = 1_square yields zeta(x + i*y)*L_lambda(x + i*y) = zeta(2*x + 2*i*y); "
+            "tau^K grade transport parameterizes the integration window [Y, tau*Y]."
+        ),
+        "carried_forward_tc064r_corrections": (
+            "Carries forward Attempt 1 (common-factor/coprime GCD sectors & signed log-GCD identity) "
+            "and Attempt 2 (prime-toggle involution & exact resonant boundary {a in C_res(Y) : p nmid a} "
+            "under strict 2*p*Y > T(Y)), A_a / B_a^feat profile notation, withdrawal of the unproved "
+            "full-profile p^(-3) comparison, aggregate-only large-g tail bound, and the Section 9 limit "
+            "clarification (finite Euler multiplier M_S(z) has nonzero limit prod_{q in S} (q+1)/(q-1) != 0 "
+            "as z -> 1, while the modified Liouville quotient L_{a_S}(z) -> 0 as z -> 1, z != 1)."
+        ),
+    }
+
+
 def verify_section_1_protocols_and_premise_chain() -> Dict[str, Any]:
     """Verify all five frozen protocols, upstream artifact preservation, and premise chain."""
     p61 = verify_frozen_protocol_immutability()
@@ -1270,41 +1332,7 @@ def verify_section_1_protocols_and_premise_chain() -> Dict[str, Any]:
             "TC065": {k: v for k, v in p65.items() if k != "protocol_object"},
         },
         "upstream_preservation_checks": upstream_checks,
-        "window_base_and_scaling_scope": {
-            "window_base_generality": (
-                "All finite-set arithmetic identities (paired-station partition, odd prime-power vanishing "
-                "above T/2, square-lift parity, pointwise telescoping of s_Y(n), sum_{e|n} |w_2(e)| = (log n)^2, "
-                "large-prime station disjointness) are window-independent; the fringe feature norm bound "
-                "||G_{Phi_2}||_{Y, w_0}^2 <= (8192*w_0^5*log w_0)/(log Y)^2 + (324*w_0^5*log w_0)/Y^(5/4) "
-                "is formally proved in Lean for every real window base w_0 > 1 (paramWindowNormSq Y w_0) "
-                "and specialized to w_0 = tau, while the uniform O(1) scalar fringe bound ||Phi_{fringe,Y}^{scal}||_Y^2 <= C_fr "
-                "is formalized specifically on the canonical w_0 = tau window (windowEnergyNormSq Y). "
-                "No result in TASK-TC-065 relies on any tau-specific transcendence property."
-            ),
-            "e2_cutoff_specification_note": (
-                "Route 6 E2 is implemented on the exact prime-power partition p^k > floor(sqrt(T)) vs p^k <= floor(sqrt(T)) "
-                "matching Lean splitFeatureHighV / splitFeatureLowV (exact channel orthogonality <V_gt, V_le>_Y = 0). "
-                "Pairwise station disjointness (Theorem 4 Part 4b) holds for distinct primes p_1 != p_2 > floor(sqrt(T)), "
-                "whereas same-prime higher powers p^k, p^(k+1) > floor(sqrt(T)) share multiples. The frozen protocol file "
-                "is preserved byte-for-byte unchanged; both p^k > floor(sqrt(T)) and strict prime p > floor(sqrt(T)) "
-                "yield strictly positive growing T_main^{(E2)} > 0 for all tested scales Y >= 64."
-            ),
-            "scaling_distinction_carried_forward": (
-                "Fixed square dilation n |-> b^2*n gives phi_{b^2*n}(X) = b^(-1)*phi_n(X/b^2) on the bare "
-                "Gaussian while changing supports and adjusted beta_Y terms on complete profiles psi_{Y,n}; "
-                "running-index squaring n |-> n^2 yields zeta(2*x + 2*i*y) on x > 1/2; Liouville convolution "
-                "1 * lambda = 1_square yields zeta(x + i*y)*L_lambda(x + i*y) = zeta(2*x + 2*i*y); "
-                "tau^K grade transport parameterizes the integration window [Y, tau*Y]."
-            ),
-            "carried_forward_tc064r_corrections": (
-                "Carries forward Attempt 1 (common-factor/coprime GCD sectors & signed log-GCD identity) "
-                "and Attempt 2 (prime-toggle involution & exact resonant boundary {a in C_res(Y) : p nmid a} "
-                "under strict 2*p*Y > T(Y)), A_a / B_a^feat profile notation, withdrawal of the unproved "
-                "full-profile p^(-3) comparison, aggregate-only large-g tail bound, and the Section 9 limit "
-                "clarification (finite Euler multiplier M_S(z) has nonzero limit prod_{q in S} (q+1)/(q-1) != 0 "
-                "as z -> 1, while the modified Liouville quotient L_{a_S}(z) -> 0 as z -> 1, z != 1)."
-            ),
-        },
+        "window_base_and_scaling_scope": _build_tc065_window_base_and_scaling_scope(),
         "premise_and_dependency_table": _build_tc065_premise_and_dependency_table(),
         "all_section_1_checks_pass": all_ok,
     }
@@ -3248,12 +3276,102 @@ def generate_task_tc065_artifact(
     return clean_artifact
 
 
+def reprocess_task_tc065_metadata_and_audit(
+    artifact_path: Path = SCALAR_FEATURE_ARTIFACT_PATH,
+    *,
+    write_output: bool = True,
+    validation_commit_override: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Re-run full serialized 975-ball Arb validation, Section 4 fail-closed aggregation,
+    Section 5 live Lean declaration audit, and `TASK-TC-065R` Section 1 descriptive metadata
+    synchronization on an existing `TC-065` artifact WITHOUT altering any numerical Arb ball,
+    cutoff, evaluated binary domain, witness classification, `generated_at_utc`,
+    `numerical_producing_git_commit`, or `formal_producing_git_commit`.
+    """
+    existing = json.loads(Path(artifact_path).read_text(encoding="utf-8"))
+    updated = copy.deepcopy(existing)
+    prov = dict(existing.get("provenance", {}))
+    if not prov.get("numerical_producing_git_commit") or not existing.get("generated_at_utc"):
+        raise ValueError("Existing TC-065 artifact is missing numerical_producing_git_commit or generated_at_utc")
+
+    proto_chk = verify_frozen_tc065_protocol_immutability()
+    if not proto_chk["verified"]:
+        raise ValueError("Frozen TC-065 protocol immutability check failed")
+    proto_obj = proto_chk["protocol_object"]
+
+    # Sync Section 1 explanatory metadata & protocol verification only (zero numerical changes)
+    sec1_fresh = verify_section_1_protocols_and_premise_chain()
+    sec1_u = updated["section_1_protocols_and_premise_chain"]
+    sec1_u["window_base_and_scaling_scope"] = sec1_fresh["window_base_and_scaling_scope"]
+    sec1_u["premise_and_dependency_table"] = sec1_fresh["premise_and_dependency_table"]
+    sec1_u["upstream_preservation_checks"] = sec1_fresh["upstream_preservation_checks"]
+    sec1_u["all_section_1_checks_pass"] = sec1_fresh["all_section_1_checks_pass"]
+
+    # Re-validate Section 4 fail-closed on untouched point/interval payloads
+    sec4_u = updated["section_4_unseen_validation_and_interval_splits"]
+    re_agg = aggregate_tc065_section4_and_derive_outcomes(
+        sec4_u["holdout_point_evaluations"],
+        sec4_u["continuous_interval_case_splits"],
+        proto_obj,
+    )
+    if not (re_agg["all_section_4_checks_pass"] and re_agg["certification_integrity_ok"]):
+        raise ValueError(f"Section 4 fail-closed re-validation failed: {re_agg['certification_integrity_conflicts']}")
+
+    # Live audit of unchanged Lean module & formal/build_report.json
+    sec5_fresh = verify_section_5_lean_audit_and_gate_accounting()
+    if not sec5_fresh["all_section_5_checks_pass"]:
+        raise ValueError("Section 5 live Lean audit failed")
+
+    # Audit all 975 serialized Arb balls & epistemic scope metadata
+    arb_audit = _audit_all_serialized_arb_balls_in_tc065_artifact(updated)
+    if not arb_audit["verified"] or arb_audit["total_certified_arb_balls_checked"] != int(
+        existing["serialized_arb_self_check"]["total_certified_arb_balls_checked"]
+    ):
+        raise ValueError(f"Serialized Arb ball audit failed or ball count drifted: {arb_audit}")
+
+    scope_results = {
+        k: verify_section_epistemic_scope_metadata(updated[k])
+        for k in (
+            "section_1_protocols_and_premise_chain",
+            "section_2_seen_reproduction_algebra_and_cross_checks",
+            "section_3_seen_discovery_and_controls",
+            "section_4_unseen_validation_and_interval_splits",
+            "section_5_lean_audit_and_gate_accounting",
+        )
+    }
+    if not all(ok for ok, _ in scope_results.values()):
+        raise ValueError(f"Epistemic scope verification failed: {scope_results}")
+
+    val_commit = validation_commit_override or _get_git_head_commit()
+    prov["validation_git_commit"] = val_commit
+    prov["tc065r_repair_task_id"] = TASK_TC_065R_ID
+    prov["tc065r_repair_branch"] = PROPOSED_TC065R_BRANCH
+    prov["tc065r_reviewed_tc065_tip"] = REVIEWED_TC065_TIP
+    prov["tc065r_metadata_repair_git_commit"] = val_commit
+    prov["tc065r_repair_mode"] = "METADATA_AND_EXPLANATORY_REPAIR_ONLY_NO_NUMERICAL_OR_FORMAL_REBUILD"
+    updated["repair_task_id"] = TASK_TC_065R_ID
+    updated["provenance"] = prov
+
+    if write_output:
+        Path(artifact_path).write_text(
+            json.dumps(updated, indent=2, ensure_ascii=True) + "\n", encoding="utf-8"
+        )
+    return updated
+
+
 if __name__ == "__main__":
-    art = generate_task_tc065_artifact()
+    if "--reprocess-metadata-only" in sys.argv[1:]:
+        art = reprocess_task_tc065_metadata_and_audit(write_output=True)
+        mode_lbl = "Reprocessed metadata-only (numerical payloads preserved byte-for-byte)"
+    else:
+        art = generate_task_tc065_artifact()
+        mode_lbl = "Generated full artifact"
     print(
         json.dumps(
             {
+                "mode": mode_lbl,
                 "task_id": art["task_id"],
+                "repair_task_id": art.get("repair_task_id"),
                 "all_pass": art["all_mathematical_and_numerical_checks_pass"],
                 "total_arb_balls": art["serialized_arb_self_check"][
                     "total_certified_arb_balls_checked"
